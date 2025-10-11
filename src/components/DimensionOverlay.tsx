@@ -69,6 +69,10 @@ export default function DimensionOverlay({
     // screen = original * scale + translate
     const screenX = imageX * zoomScale + zoomTranslateX;
     const screenY = imageY * zoomScale + zoomTranslateY;
+    
+    // Debug logging
+    console.log(`imageToScreen: image=(${imageX.toFixed(0)}, ${imageY.toFixed(0)}) scale=${zoomScale.toFixed(2)} translate=(${zoomTranslateX.toFixed(0)}, ${zoomTranslateY.toFixed(0)}) -> screen=(${screenX.toFixed(0)}, ${screenY.toFixed(0)})`);
+    
     return { x: screenX, y: screenY };
   };
 
