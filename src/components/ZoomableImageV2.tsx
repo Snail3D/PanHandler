@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withSpring,
   runOnJS,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -45,6 +46,19 @@ export default function ZoomableImage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Continuously notify parent of transform changes during gestures
+  useAnimatedReaction(
+    () => ({ scale: scale.value, x: translateX.value, y: translateY.value }),
+    (current, previous) => {
+      if (onTransformChange && previous) {
+        // Only update if values actually changed
+        if (current.scale !== previous.scale || current.x !== previous.x || current.y !== previous.y) {
+          runOnJS(onTransformChange)(current.scale, current.x, current.y);
+        }
+      }
+    }
+  );
+
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
@@ -53,9 +67,6 @@ export default function ZoomableImage({
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
-      if (onTransformChange) {
-        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
-      }
     });
 
   const panGesture = Gesture.Pan()
@@ -66,9 +77,6 @@ export default function ZoomableImage({
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
-      if (onTransformChange) {
-        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
-      }
     });
 
   const doubleTapGesture = Gesture.Tap()
