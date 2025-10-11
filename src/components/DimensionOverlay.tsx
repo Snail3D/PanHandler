@@ -55,18 +55,20 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    // Transform applies right-to-left: screen = original * scale - translate (translate moves view, not image)
-    // So inverse is: original = (screen + translate) / scale
-    const imageX = (screenX + zoomTranslateX) / zoomScale;
-    const imageY = (screenY + zoomTranslateY) / zoomScale;
+    // Pan gesture translates the IMAGE, so positive translate = image moved right
+    // To find image coords: remove the translation, then unscale
+    // screen = original * scale + translate, so: original = (screen - translate) / scale
+    const imageX = (screenX - zoomTranslateX) / zoomScale;
+    const imageY = (screenY - zoomTranslateY) / zoomScale;
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    // Transform applies right-to-left: screen = original * scale - translate (translate moves view, not image)
-    const screenX = imageX * zoomScale - zoomTranslateX;
-    const screenY = imageY * zoomScale - zoomTranslateY;
+    // Pan gesture translates the IMAGE, so positive translate = image moved right
+    // screen = original * scale + translate
+    const screenX = imageX * zoomScale + zoomTranslateX;
+    const screenY = imageY * zoomScale + zoomTranslateY;
     return { x: screenX, y: screenY };
   };
 
@@ -136,9 +138,10 @@ export default function DimensionOverlay({
   // Long press state management
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [longPressStart, setLongPressStart] = useState<{x: number, y: number} | null>(null);
+  const [justPlacedPoint, setJustPlacedPoint] = useState(false);
+  const [isHoldingAfterPlace, setIsHoldingAfterPlace] = useState(false);
 
-  const handlePressIn = (event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
+  const startLongPress = (locationX: number, locationY: number) => {
     setLongPressStart({ x: locationX, y: locationY });
     pressX.value = locationX;
     pressY.value = locationY;
@@ -149,10 +152,30 @@ export default function DimensionOverlay({
       placePoint(locationX, locationY);
       setShowPressIndicator(false);
       pressProgress.value = 0;
-      setLongPressStart(null);
+      setJustPlacedPoint(true);
+      setIsHoldingAfterPlace(true);
     }, 1500);
     
     setLongPressTimer(timer);
+  };
+
+  const handlePressIn = (event: any) => {
+    const { locationX, locationY } = event.nativeEvent;
+    startLongPress(locationX, locationY);
+  };
+
+  const handlePressMove = (event: any) => {
+    const { locationX, locationY } = event.nativeEvent;
+    
+    // If we just placed a point and user is still holding, start next placement
+    if (justPlacedPoint && isHoldingAfterPlace) {
+      setJustPlacedPoint(false);
+      startLongPress(locationX, locationY);
+    } else if (showPressIndicator && longPressStart) {
+      // Update indicator position during initial hold
+      pressX.value = locationX;
+      pressY.value = locationY;
+    }
   };
 
   const handlePressOut = () => {
@@ -163,6 +186,8 @@ export default function DimensionOverlay({
     setShowPressIndicator(false);
     pressProgress.value = 0;
     setLongPressStart(null);
+    setJustPlacedPoint(false);
+    setIsHoldingAfterPlace(false);
   };
 
   // Animated style for press indicator
@@ -302,6 +327,10 @@ export default function DimensionOverlay({
           onResponderGrant={(evt) => {
             const touch = evt.nativeEvent.touches[0];
             handlePressIn({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
+          }}
+          onResponderMove={(evt) => {
+            const touch = evt.nativeEvent.touches[0];
+            handlePressMove({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
           }}
           onResponderRelease={handlePressOut}
           onResponderTerminate={handlePressOut}
