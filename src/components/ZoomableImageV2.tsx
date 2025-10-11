@@ -16,6 +16,7 @@ interface ZoomableImageProps {
   initialScale?: number;
   initialTranslateX?: number;
   initialTranslateY?: number;
+  zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
 }
 
 export default function ZoomableImage({ 
@@ -24,6 +25,7 @@ export default function ZoomableImage({
   initialScale = 1,
   initialTranslateX = 0,
   initialTranslateY = 0,
+  zoomToCenter = false,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -49,13 +51,19 @@ export default function ZoomableImage({
     })
     .onUpdate((event) => {
       const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      
-      // To keep the focal point stationary:
-      // The point in the image under the focal point should remain under the focal point
-      // Formula: newTranslate = focalPoint - (focalPoint - oldTranslate) * (newScale / oldScale)
       const scaleRatio = newScale / savedScale.value;
-      translateX.value = focalX.value - (focalX.value - savedTranslateX.value) * scaleRatio;
-      translateY.value = focalY.value - (focalY.value - savedTranslateY.value) * scaleRatio;
+      
+      if (zoomToCenter) {
+        // For calibration: zoom toward screen center
+        const centerX = SCREEN_WIDTH / 2;
+        const centerY = SCREEN_HEIGHT / 2;
+        translateX.value = centerX - (centerX - savedTranslateX.value) * scaleRatio;
+        translateY.value = centerY - (centerY - savedTranslateY.value) * scaleRatio;
+      } else {
+        // For measurement: zoom toward focal point (where fingers are)
+        translateX.value = focalX.value - (focalX.value - savedTranslateX.value) * scaleRatio;
+        translateY.value = focalY.value - (focalY.value - savedTranslateY.value) * scaleRatio;
+      }
       
       scale.value = newScale;
       
