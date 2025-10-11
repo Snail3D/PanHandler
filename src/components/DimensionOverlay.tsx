@@ -42,12 +42,6 @@ export default function DimensionOverlay({
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const viewRef = useRef<View>(null);
   
-  // Long press indicator animation
-  const pressProgress = useSharedValue(0);
-  const pressX = useSharedValue(0);
-  const pressY = useSharedValue(0);
-  const [showPressIndicator, setShowPressIndicator] = useState(false);
-  
   // Lock-in animation
   const lockInOpacity = useSharedValue(0);
   const lockInScale = useSharedValue(1);
@@ -134,7 +128,6 @@ export default function DimensionOverlay({
     }
   };
 
-  const [placementMode, setPlacementMode] = useState(false);
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
 
   // Show locked-in animation when coin circle first appears
@@ -159,87 +152,78 @@ export default function DimensionOverlay({
       setTimeout(blink, 350);
       setTimeout(blink, 700);
       
-      // Auto-enable placement mode and hide animation after blinking
+      // Hide animation after blinking
       setTimeout(() => {
-        setPlacementMode(true);
         setShowLockedInAnimation(false);
       }, 1200);
     }
   }, [coinCircle]);
 
-  // Touch cursor state management
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  // Force touch cursor state management
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [touchStartTime, setTouchStartTime] = useState(0);
+  const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120; // Distance above finger
+  const FORCE_THRESHOLD = 0.5; // Force threshold for activation (0-1 scale)
+  const MOVEMENT_THRESHOLD = 15; // Max movement in pixels before canceling
 
-  const startLongPress = (locationX: number, locationY: number) => {
-    pressX.value = locationX;
-    pressY.value = locationY;
-    setShowPressIndicator(true);
-    pressProgress.value = withTiming(1, { duration: 1500 });
+  const handleTouchStart = (event: any) => {
+    const touch = event.nativeEvent.touches[0];
+    const { pageX, pageY, force = 0 } = touch;
     
-    const timer = setTimeout(() => {
-      // After 1.5s, show the cursor above the finger
+    setTouchStartTime(Date.now());
+    setTouchStartPos({ x: pageX, y: pageY });
+    
+    // Check for force touch (firm press)
+    if (force > FORCE_THRESHOLD) {
+      // Firm press detected! Show cursor immediately
       setShowCursor(true);
-      setCursorPosition({ x: locationX, y: locationY - cursorOffsetY });
-      setShowPressIndicator(false);
-      pressProgress.value = 0;
-    }, 1500);
-    
-    setLongPressTimer(timer);
-  };
-
-  const handlePressIn = (event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
-    startLongPress(locationX, locationY);
-  };
-
-  const handlePressMove = (event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
-    
-    if (showCursor) {
-      // Update cursor position as finger moves
-      setCursorPosition({ x: locationX, y: locationY - cursorOffsetY });
-    } else if (showPressIndicator) {
-      // Update press indicator during hold
-      pressX.value = locationX;
-      pressY.value = locationY;
+      setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+      
+      // Haptic feedback
+      if (typeof navigator !== 'undefined' && (navigator as any).vibrate) {
+        (navigator as any).vibrate(10); // Short haptic "pop"
+      }
     }
   };
 
-  const handlePressOut = () => {
+  const handleTouchMove = (event: any) => {
+    const touch = event.nativeEvent.touches[0];
+    const { pageX, pageY, force = 0 } = touch;
+    
+    if (showCursor) {
+      // Update cursor position as finger moves
+      setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+    } else {
+      // Check if we should activate cursor via force during movement
+      if (force > FORCE_THRESHOLD) {
+        const distance = Math.sqrt(
+          Math.pow(pageX - touchStartPos.x, 2) + 
+          Math.pow(pageY - touchStartPos.y, 2)
+        );
+        
+        // Only activate if not moving too much (prevents activation during pan)
+        if (distance < MOVEMENT_THRESHOLD) {
+          setShowCursor(true);
+          setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+          
+          // Haptic feedback
+          if (typeof navigator !== 'undefined' && (navigator as any).vibrate) {
+            (navigator as any).vibrate(10);
+          }
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
     // Place point at cursor position when finger is released
     if (showCursor) {
       placePoint(cursorPosition.x, cursorPosition.y);
       setShowCursor(false);
     }
-    
-    // Clean up
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-    setShowPressIndicator(false);
-    pressProgress.value = 0;
   };
-
-  // Animated style for press indicator
-  const pressIndicatorStyle = useAnimatedStyle(() => {
-    return {
-      position: 'absolute',
-      left: pressX.value - 50,
-      top: pressY.value - 50,
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      borderWidth: 3,
-      borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-      backgroundColor: `${mode === 'distance' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'}`,
-      transform: [{ scale: pressProgress.value }],
-      opacity: 1 - pressProgress.value * 0.3,
-    };
-  });
 
   const handleClear = () => {
     setCurrentPoints([]);
@@ -353,132 +337,115 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Touch overlay - only active in placement mode */}
-      {placementMode ? (
-        <View 
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          onStartShouldSetResponder={() => true}
-          onResponderGrant={(evt) => {
-            const touch = evt.nativeEvent.touches[0];
-            handlePressIn({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
-          }}
-          onResponderMove={(evt) => {
-            const touch = evt.nativeEvent.touches[0];
-            handlePressMove({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
-          }}
-          onResponderRelease={handlePressOut}
-          onResponderTerminate={handlePressOut}
-        >
-          {/* Press and hold indicator */}
-          {showPressIndicator && (
-            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
-          )}
-          
-          {/* Floating cursor above finger */}
-          {showCursor && (
-            <View
+      {/* Touch overlay - always active, responds to force touch */}
+      <View 
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        onStartShouldSetResponder={() => true}
+        onResponderGrant={(evt) => {
+          handleTouchStart(evt);
+        }}
+        onResponderMove={(evt) => {
+          handleTouchMove(evt);
+        }}
+        onResponderRelease={handleTouchEnd}
+        onResponderTerminate={handleTouchEnd}
+        pointerEvents="box-none"
+      >
+        {/* Floating cursor above finger */}
+        {showCursor && (
+          <View
+            style={{
+              position: 'absolute',
+              left: cursorPosition.x - 50,
+              top: cursorPosition.y - 50,
+              width: 100,
+              height: 100,
+            }}
+            pointerEvents="none"
+          >
+            <Svg width={100} height={100}>
+              {/* Outer circle */}
+              <Circle
+                cx={50}
+                cy={50}
+                r={30}
+                fill="none"
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="3"
+                opacity={0.8}
+              />
+              {/* Inner circle */}
+              <Circle
+                cx={50}
+                cy={50}
+                r={15}
+                fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'}
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="2"
+              />
+              {/* Crosshair - horizontal */}
+              <Line
+                x1={10}
+                y1={50}
+                x2={35}
+                y2={50}
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="2"
+              />
+              <Line
+                x1={65}
+                y1={50}
+                x2={90}
+                y2={50}
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="2"
+              />
+              {/* Crosshair - vertical */}
+              <Line
+                x1={50}
+                y1={10}
+                x2={50}
+                y2={35}
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="2"
+              />
+              <Line
+                x1={50}
+                y1={65}
+                x2={50}
+                y2={90}
+                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
+                strokeWidth="2"
+              />
+              {/* Center dot */}
+              <Circle
+                cx={50}
+                cy={50}
+                r={3}
+                fill={mode === 'distance' ? '#3B82F6' : '#10B981'}
+              />
+            </Svg>
+            
+            {/* Release instruction */}
+            <View 
               style={{
                 position: 'absolute',
-                left: cursorPosition.x - 50,
-                top: cursorPosition.y - 50,
-                width: 100,
-                height: 100,
+                top: -35,
+                left: 0,
+                right: 0,
+                backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+                paddingHorizontal: 12,
+                paddingVertical: 4,
+                borderRadius: 12,
               }}
-              pointerEvents="none"
             >
-              <Svg width={100} height={100}>
-                {/* Outer circle */}
-                <Circle
-                  cx={50}
-                  cy={50}
-                  r={30}
-                  fill="none"
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="3"
-                  opacity={0.8}
-                />
-                {/* Inner circle */}
-                <Circle
-                  cx={50}
-                  cy={50}
-                  r={15}
-                  fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'}
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="2"
-                />
-                {/* Crosshair - horizontal */}
-                <Line
-                  x1={10}
-                  y1={50}
-                  x2={35}
-                  y2={50}
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="2"
-                />
-                <Line
-                  x1={65}
-                  y1={50}
-                  x2={90}
-                  y2={50}
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="2"
-                />
-                {/* Crosshair - vertical */}
-                <Line
-                  x1={50}
-                  y1={10}
-                  x2={50}
-                  y2={35}
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="2"
-                />
-                <Line
-                  x1={50}
-                  y1={65}
-                  x2={50}
-                  y2={90}
-                  stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                  strokeWidth="2"
-                />
-                {/* Center dot */}
-                <Circle
-                  cx={50}
-                  cy={50}
-                  r={3}
-                  fill={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                />
-              </Svg>
-              
-              {/* Release instruction */}
-              <View 
-                style={{
-                  position: 'absolute',
-                  top: -35,
-                  left: 0,
-                  right: 0,
-                  backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-                  paddingHorizontal: 12,
-                  paddingVertical: 4,
-                  borderRadius: 12,
-                }}
-              >
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
-                  Release to place
-                </Text>
-              </View>
+              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                Release to place
+              </Text>
             </View>
-          )}
-        </View>
-      ) : (
-        <View 
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          pointerEvents="none"
-        >
-          {showPressIndicator && (
-            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
-          )}
-        </View>
-      )}
+          </View>
+        )}
+      </View>
 
       {/* Visual overlay - no touch interaction */}
       <View
@@ -749,31 +716,6 @@ export default function DimensionOverlay({
           })()}
       </View>
 
-      {/* Floating placement mode toggle button */}
-      <View
-        style={{
-          position: 'absolute',
-          top: insets.top + 80,
-          right: 20,
-        }}
-      >
-        <Pressable
-          onPress={() => setPlacementMode(!placementMode)}
-          className={`rounded-full w-16 h-16 items-center justify-center shadow-xl ${placementMode ? 'bg-blue-600' : 'bg-gray-800/90'}`}
-        >
-          <Ionicons 
-            name={placementMode ? "hand-left" : "move"} 
-            size={28} 
-            color="white" 
-          />
-        </Pressable>
-        {!placementMode && (
-          <View className="absolute -bottom-8 left-0 right-0 bg-red-500 rounded-full px-2 py-1">
-            <Text className="text-white text-xs font-bold text-center">Tap me!</Text>
-          </View>
-        )}
-      </View>
-
       {/* Bottom toolbar */}
       <View
         className="absolute left-0 right-0 z-20"
@@ -813,9 +755,7 @@ export default function DimensionOverlay({
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                {placementMode 
-                  ? "📍 Hold 1.5s → Cursor appears → Move finger → Release to place" 
-                  : "💡 Tap hand icon to place points • Pinch to zoom • Double-tap to reset"}
+                💡 Press firmly to place points • Light touch to pan • Pinch to zoom
               </Text>
             </View>
           )}
@@ -838,7 +778,7 @@ export default function DimensionOverlay({
             <View className="flex-row items-center mb-3">
               <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
               <Text className="ml-3 text-gray-700 font-medium flex-1">
-                {mode === 'distance' ? 'Hold & release to place points (need 2)' : 'Hold & release to place points (need 3)'}
+                {mode === 'distance' ? 'Press firmly to place 2 points' : 'Press firmly to place 3 points'}
               </Text>
             </View>
           )}
@@ -847,9 +787,9 @@ export default function DimensionOverlay({
             <View className="flex-row items-center mb-3">
               <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : 'bg-green-500'}`} />
               <Text className="ml-3 text-gray-700 font-medium">
-                {mode === 'distance' && currentPoints.length === 1 && 'Hold & release for point 2'}
-                {mode === 'angle' && currentPoints.length === 1 && 'Hold & release on vertex (center)'}
-                {mode === 'angle' && currentPoints.length === 2 && 'Hold & release for point 3'}
+                {mode === 'distance' && currentPoints.length === 1 && 'Press firmly for point 2'}
+                {mode === 'angle' && currentPoints.length === 1 && 'Press firmly on vertex (center)'}
+                {mode === 'angle' && currentPoints.length === 2 && 'Press firmly for point 3'}
               </Text>
             </View>
           )}
