@@ -8,7 +8,7 @@ import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
 import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
-import ZoomableImage from '../components/ZoomableImage';
+import ZoomableImage from '../components/ZoomableImageV2';
 import { CoinReference } from '../utils/coinReferences';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');

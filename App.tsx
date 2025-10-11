@@ -26,6 +26,7 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
+  // v2.0.1 - Fixed gesture composition race condition
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>

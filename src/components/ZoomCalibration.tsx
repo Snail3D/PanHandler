@@ -4,7 +4,7 @@ import { Svg, Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CoinReference } from '../utils/coinReferences';
-import ZoomableImage from './ZoomableImage';
+import ZoomableImage from './ZoomableImageV2';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
