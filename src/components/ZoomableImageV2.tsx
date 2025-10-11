@@ -51,21 +51,18 @@ export default function ZoomableImage({
     })
     .onUpdate((event) => {
       const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      const scaleRatio = newScale / savedScale.value;
       
       if (zoomToCenter) {
-        // For calibration: zoom toward screen center
-        const centerX = SCREEN_WIDTH / 2;
-        const centerY = SCREEN_HEIGHT / 2;
-        translateX.value = centerX - (centerX - savedTranslateX.value) * scaleRatio;
-        translateY.value = centerY - (centerY - savedTranslateY.value) * scaleRatio;
+        // For calibration: only change scale, don't adjust translate
+        // This keeps the image centered while zooming
+        scale.value = newScale;
       } else {
         // For measurement: zoom toward focal point (where fingers are)
+        const scaleRatio = newScale / savedScale.value;
         translateX.value = focalX.value - (focalX.value - savedTranslateX.value) * scaleRatio;
         translateY.value = focalY.value - (focalY.value - savedTranslateY.value) * scaleRatio;
+        scale.value = newScale;
       }
-      
-      scale.value = newScale;
       
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
