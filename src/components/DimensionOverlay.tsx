@@ -1,14 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
-import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 
@@ -60,6 +57,7 @@ export default function DimensionOverlay({
   const screenToImage = (screenX: number, screenY: number) => {
     const imageX = (screenX - zoomTranslateX) / zoomScale;
     const imageY = (screenY - zoomTranslateY) / zoomScale;
+    console.log('screenToImage:', { screenX, screenY, zoomScale, zoomTranslateX, zoomTranslateY, imageX, imageY });
     return { x: imageX, y: imageY };
   };
 
@@ -67,6 +65,7 @@ export default function DimensionOverlay({
   const imageToScreen = (imageX: number, imageY: number) => {
     const screenX = imageX * zoomScale + zoomTranslateX;
     const screenY = imageY * zoomScale + zoomTranslateY;
+    console.log('imageToScreen:', { imageX, imageY, zoomScale, zoomTranslateX, zoomTranslateY, screenX, screenY });
     return { x: screenX, y: screenY };
   };
 
@@ -131,24 +130,37 @@ export default function DimensionOverlay({
     }
   };
 
-  // Long press gesture to place points (1.5 seconds)
-  const longPressGesture = Gesture.LongPress()
-    .minDuration(1500)
-    .onStart((event) => {
-      pressX.value = event.x;
-      pressY.value = event.y;
-      runOnJS(setShowPressIndicator)(true);
-      pressProgress.value = withTiming(1, { duration: 1500 });
-    })
-    .onEnd((event) => {
-      runOnJS(setShowPressIndicator)(false);
+  // Long press state management
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPressStart, setLongPressStart] = useState<{x: number, y: number} | null>(null);
+
+  const handlePressIn = (event: any) => {
+    const { locationX, locationY } = event.nativeEvent;
+    setLongPressStart({ x: locationX, y: locationY });
+    pressX.value = locationX;
+    pressY.value = locationY;
+    setShowPressIndicator(true);
+    pressProgress.value = withTiming(1, { duration: 1500 });
+    
+    const timer = setTimeout(() => {
+      placePoint(locationX, locationY);
+      setShowPressIndicator(false);
       pressProgress.value = 0;
-      runOnJS(placePoint)(event.x, event.y);
-    })
-    .onFinalize(() => {
-      runOnJS(setShowPressIndicator)(false);
-      pressProgress.value = 0;
-    });
+      setLongPressStart(null);
+    }, 1500);
+    
+    setLongPressTimer(timer);
+  };
+
+  const handlePressOut = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+    setShowPressIndicator(false);
+    pressProgress.value = 0;
+    setLongPressStart(null);
+  };
 
   // Animated style for press indicator
   const pressIndicatorStyle = useAnimatedStyle(() => {
@@ -279,18 +291,22 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Gesture overlay for long-press to place points */}
-      <GestureDetector gesture={longPressGesture}>
-        <Animated.View 
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} 
-          pointerEvents="box-none"
+      {/* Pressable overlay for long-press to place points - doesn't block other gestures */}
+      <View 
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        pointerEvents="box-none"
+      >
+        <Pressable
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         >
           {/* Long press indicator */}
           {showPressIndicator && (
             <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
           )}
-        </Animated.View>
-      </GestureDetector>
+        </Pressable>
+      </View>
 
       {/* Visual overlay - no touch interaction */}
       <View
