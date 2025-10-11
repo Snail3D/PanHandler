@@ -17,7 +17,7 @@ interface MeasurementStore {
   } | null;
   unitSystem: UnitSystem;
   
-  setImageUri: (uri: string) => void;
+  setImageUri: (uri: string | null) => void;
   addTempPoint: (point: Point) => void;
   clearTempPoints: () => void;
   completeMeasurement: () => void;
