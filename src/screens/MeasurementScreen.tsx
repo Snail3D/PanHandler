@@ -22,7 +22,6 @@ export default function MeasurementScreen() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
-  const [calibrationZoom, setCalibrationZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   
   const cameraRef = useRef<CameraView>(null);
   const insets = useSafeAreaInsets();
@@ -102,14 +101,7 @@ export default function MeasurementScreen() {
 
     setCoinCircle(calibrationData.coinCircle);
     
-    // Store the calibration zoom separately (this is locked)
-    setCalibrationZoom({
-      scale: calibrationData.initialZoom.scale,
-      translateX: calibrationData.initialZoom.translateX,
-      translateY: calibrationData.initialZoom.translateY,
-    });
-    
-    // Also set it as the initial measurement zoom (this will change as user zooms)
+    // Set the initial measurement zoom from calibration
     setMeasurementZoom({
       scale: calibrationData.initialZoom.scale,
       translateX: calibrationData.initialZoom.translateX,
@@ -126,6 +118,9 @@ export default function MeasurementScreen() {
 
   const handleRetakePhoto = () => {
     setImageUri(null);
+    setCoinCircle(null);
+    setCalibration(null);
+    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
     setMode('camera');
   };
 
@@ -233,7 +228,6 @@ export default function MeasurementScreen() {
                 zoomScale={measurementZoom.scale}
                 zoomTranslateX={measurementZoom.translateX}
                 zoomTranslateY={measurementZoom.translateY}
-                calibrationZoom={calibrationZoom}
               />
             </>
           )}
@@ -263,11 +257,17 @@ export default function MeasurementScreen() {
               
               {mode === 'measurement' && (
                 <Pressable
-                  onPress={() => setMode('selectCoin')}
+                  onPress={() => {
+                    // Clear coin circle when going back to settings
+                    setCoinCircle(null);
+                    setCalibration(null);
+                    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+                    setMode('selectCoin');
+                  }}
                   className="flex-row items-center bg-white/20 rounded-full px-3 py-2"
                 >
                   <Ionicons name="settings-outline" size={20} color="white" />
-                  <Text className="text-white text-sm font-medium ml-2">Settings</Text>
+                  <Text className="text-white text-sm font-medium ml-2">Recalibrate</Text>
                 </Pressable>
               )}
             </View>
