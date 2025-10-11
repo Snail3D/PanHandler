@@ -21,6 +21,7 @@ export default function MeasurementScreen() {
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
+  const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   
   const cameraRef = useRef<CameraView>(null);
   const insets = useSafeAreaInsets();
@@ -203,8 +204,17 @@ export default function MeasurementScreen() {
           {/* Measurement Mode */}
           {mode === 'measurement' && (
             <>
-              <ZoomableImage imageUri={currentImageUri} />
-              <DimensionOverlay />
+              <ZoomableImage 
+                imageUri={currentImageUri} 
+                onTransformChange={(scale, translateX, translateY) => {
+                  setMeasurementZoom({ scale, translateX, translateY });
+                }}
+              />
+              <DimensionOverlay 
+                zoomScale={measurementZoom.scale}
+                zoomTranslateX={measurementZoom.translateX}
+                zoomTranslateY={measurementZoom.translateY}
+              />
             </>
           )}
 
