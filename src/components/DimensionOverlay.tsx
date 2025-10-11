@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSequence, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
@@ -29,6 +31,12 @@ export default function DimensionOverlay({
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const viewRef = useRef<View>(null);
   
+  // Long press indicator animation
+  const pressProgress = useSharedValue(0);
+  const pressX = useSharedValue(0);
+  const pressY = useSharedValue(0);
+  const [showPressIndicator, setShowPressIndicator] = useState(false);
+  
   const calibration = useStore((s) => s.calibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -48,11 +56,9 @@ export default function DimensionOverlay({
     return { x: screenX, y: screenY };
   };
 
-  const handlePress = (event: any) => {
-    const { locationX, locationY } = event.nativeEvent;
-    
+  const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
-    const imageCoords = screenToImage(locationX, locationY);
+    const imageCoords = screenToImage(x, y);
     
     const requiredPoints = mode === 'distance' ? 2 : 3;
     
@@ -64,6 +70,43 @@ export default function DimensionOverlay({
       setPoints([...points, { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() }]);
     }
   };
+
+  // Long press gesture to place points (2 seconds)
+  const longPressGesture = Gesture.LongPress()
+    .minDuration(2000)
+    .onStart((event) => {
+      pressX.value = event.x;
+      pressY.value = event.y;
+      runOnJS(setShowPressIndicator)(true);
+      pressProgress.value = withTiming(1, { duration: 2000 });
+    })
+    .onEnd((event) => {
+      runOnJS(setShowPressIndicator)(false);
+      pressProgress.value = 0;
+      runOnJS(placePoint)(event.x, event.y);
+    })
+    .onFinalize(() => {
+      runOnJS(setShowPressIndicator)(false);
+      pressProgress.value = 0;
+    });
+
+  // Animated style for press indicator
+  const pressIndicatorStyle = useAnimatedStyle(() => {
+    const scale = pressProgress.value * 50; // Grows to 50px radius
+    return {
+      position: 'absolute',
+      left: pressX.value - 50,
+      top: pressY.value - 50,
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      borderWidth: 3,
+      borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+      backgroundColor: `${mode === 'distance' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'}`,
+      transform: [{ scale: pressProgress.value }],
+      opacity: 1 - pressProgress.value * 0.3,
+    };
+  });
 
   const handleClear = () => {
     setPoints([]);
@@ -177,13 +220,12 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Touchable overlay that doesn't block multi-touch gestures */}
-      <View ref={viewRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
-        <TouchableWithoutFeedback
-          onPress={(event) => {
-            const { locationX, locationY } = event.nativeEvent;
-            handlePress({ nativeEvent: { locationX, locationY } });
-          }}
+      {/* Gesture overlay for long-press to place points */}
+      <GestureDetector gesture={longPressGesture}>
+        <Animated.View 
+          ref={viewRef} 
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} 
+          pointerEvents="box-none"
         >
           <View
             style={{
@@ -193,10 +235,15 @@ export default function DimensionOverlay({
               right: 0,
               bottom: 0,
             }}
-            pointerEvents="box-only"
+            pointerEvents="box-none"
           >
+          {/* Long press indicator */}
+          {showPressIndicator && (
+            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
+          )}
+          
           {/* SVG overlay for drawing */}
-          <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
+          <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT} pointerEvents="none">
             {/* Persistent coin circle reference - transform to screen coords */}
             {coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
@@ -352,8 +399,8 @@ export default function DimensionOverlay({
             );
           })()}
           </View>
-        </TouchableWithoutFeedback>
-      </View>
+        </Animated.View>
+      </GestureDetector>
 
       {/* Bottom toolbar */}
       <View
@@ -402,9 +449,9 @@ export default function DimensionOverlay({
           {/* Status/Result Display */}
           {points.length === 0 && (
             <View className="flex-row items-center">
-              <Ionicons name="hand-left-outline" size={20} color="#6B7280" />
+              <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
               <Text className="ml-3 text-gray-700 font-medium">
-                {mode === 'distance' ? 'Tap two points to measure distance' : 'Tap three points to measure angle'}
+                {mode === 'distance' ? 'Hold for 2s to place points (need 2)' : 'Hold for 2s to place points (need 3)'}
               </Text>
             </View>
           )}
@@ -413,7 +460,7 @@ export default function DimensionOverlay({
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-blue-500" />
               <Text className="ml-3 text-gray-700 font-medium">
-                Tap second point to complete
+                Hold for 2s to place second point
               </Text>
             </View>
           )}
@@ -422,7 +469,7 @@ export default function DimensionOverlay({
             <View className="flex-row items-center">
               <View className="w-3 h-3 rounded-full bg-green-500" />
               <Text className="ml-3 text-gray-700 font-medium">
-                {points.length === 1 ? 'Tap vertex (center) point' : 'Tap third point to complete'}
+                {points.length === 1 ? 'Hold for 2s on vertex (center) point' : 'Hold for 2s to place third point'}
               </Text>
             </View>
           )}
