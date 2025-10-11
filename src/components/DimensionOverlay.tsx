@@ -282,27 +282,24 @@ export default function DimensionOverlay({
       {/* Gesture overlay for long-press to place points */}
       <GestureDetector gesture={longPressGesture}>
         <Animated.View 
-          ref={viewRef} 
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} 
           pointerEvents="box-none"
         >
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-            pointerEvents="box-none"
-          >
           {/* Long press indicator */}
           {showPressIndicator && (
             <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
           )}
-          
-          {/* SVG overlay for drawing */}
-          <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT} pointerEvents="none">
+        </Animated.View>
+      </GestureDetector>
+
+      {/* Visual overlay - no touch interaction */}
+      <View
+        ref={viewRef}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        pointerEvents="none"
+      >
+        {/* SVG overlay for drawing */}
+        <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Persistent coin circle reference - transform to screen coords */}
             {coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
@@ -505,9 +502,7 @@ export default function DimensionOverlay({
               </View>
             );
           })()}
-          </View>
-        </Animated.View>
-      </GestureDetector>
+      </View>
 
       {/* Bottom toolbar */}
       <View
