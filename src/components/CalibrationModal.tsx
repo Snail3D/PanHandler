@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useStore from '../state/measurementStore';
 import UnitSelector from './UnitSelector';
-import { COIN_REFERENCES, CoinReference } from '../utils/coinReferences';
+import { COIN_REFERENCES, CoinReference, getCoinByName } from '../utils/coinReferences';
 
 interface CalibrationModalProps {
   visible: boolean;
@@ -12,9 +12,21 @@ interface CalibrationModalProps {
 
 export default function CalibrationModal({ visible, onComplete }: CalibrationModalProps) {
   const setCalibration = useStore((s) => s.setCalibration);
+  const lastSelectedCoin = useStore((s) => s.lastSelectedCoin);
+  const setLastSelectedCoin = useStore((s) => s.setLastSelectedCoin);
   
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  // Load last selected coin on mount
+  useEffect(() => {
+    if (visible && lastSelectedCoin) {
+      const coin = getCoinByName(lastSelectedCoin);
+      if (coin) {
+        setSelectedCoin(coin);
+      }
+    }
+  }, [visible, lastSelectedCoin]);
 
   const handleSkipCalibration = () => {
     // Set a default calibration (1 pixel = 1mm)
@@ -33,6 +45,7 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
       return;
     }
 
+    setLastSelectedCoin(selectedCoin.name);
     onComplete(selectedCoin);
   };
 

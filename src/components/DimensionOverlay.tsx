@@ -4,8 +4,7 @@ import { Svg, Line, Circle, Path } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
-import * as Sharing from 'expo-sharing';
-import * as MailComposer from 'expo-mail-composer';
+import * as MediaLibrary from 'expo-media-library';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 
@@ -101,31 +100,10 @@ export default function DimensionOverlay() {
     if (!viewRef.current || !currentImageUri) return;
 
     try {
-      const uri = await captureRef(viewRef.current, {
-        format: 'jpg',
-        quality: 1,
-      });
-
-      const isAvailable = await Sharing.isAvailableAsync();
-      if (isAvailable) {
-        await Sharing.shareAsync(uri, {
-          mimeType: 'image/jpeg',
-          dialogTitle: 'Export Measurement Photo',
-        });
-      }
-    } catch (error) {
-      Alert.alert('Export Error', 'Failed to export image. Please try again.');
-      console.error('Export error:', error);
-    }
-  };
-
-  const handleEmail = async () => {
-    if (!viewRef.current || !currentImageUri) return;
-
-    try {
-      const isAvailable = await MailComposer.isAvailableAsync();
-      if (!isAvailable) {
-        Alert.alert('Email Not Available', 'Email is not configured on this device.');
+      // Request permissions
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please grant photo library access to save images.');
         return;
       }
 
@@ -134,15 +112,35 @@ export default function DimensionOverlay() {
         quality: 1,
       });
 
-      await MailComposer.composeAsync({
-        subject: 'Measurement Photo',
-        body: 'Please see attached measurement photo with dimensions.',
-        attachments: [uri],
-      });
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert('Success', 'Measurement saved to Photos!');
     } catch (error) {
-      Alert.alert('Email Error', 'Failed to send email. Please try again.');
-      console.error('Email error:', error);
+      Alert.alert('Save Error', 'Failed to save image. Please try again.');
+      console.error('Export error:', error);
     }
+  };
+
+  const handleReset = () => {
+    Alert.alert(
+      'Reset Measurements',
+      'This will clear all measurements and return to the camera. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Reset', 
+          style: 'destructive',
+          onPress: () => {
+            const setImageUri = useStore.getState().setImageUri;
+            const setCoinCircle = useStore.getState().setCoinCircle;
+            const setCalibration = useStore.getState().setCalibration;
+            
+            setImageUri(null);
+            setCoinCircle(null);
+            setCalibration(null);
+          }
+        },
+      ]
+    );
   };
 
   const hasCompleteMeasurement = 
@@ -384,16 +382,16 @@ export default function DimensionOverlay() {
                   onPress={handleExport}
                   className="flex-1 bg-blue-500 rounded-xl py-3 flex-row items-center justify-center"
                 >
-                  <Ionicons name="share-outline" size={18} color="white" />
-                  <Text className="text-white font-semibold ml-2">Export</Text>
+                  <Ionicons name="save-outline" size={18} color="white" />
+                  <Text className="text-white font-semibold ml-2">Save to Photos</Text>
                 </Pressable>
                 
                 <Pressable
-                  onPress={handleEmail}
-                  className="flex-1 bg-gray-700 rounded-xl py-3 flex-row items-center justify-center"
+                  onPress={handleReset}
+                  className="bg-red-500 rounded-xl px-6 py-3 flex-row items-center justify-center"
                 >
-                  <Ionicons name="mail-outline" size={18} color="white" />
-                  <Text className="text-white font-semibold ml-2">Email</Text>
+                  <Ionicons name="refresh-outline" size={18} color="white" />
+                  <Text className="text-white font-semibold ml-2">Reset</Text>
                 </Pressable>
               </View>
             </>
