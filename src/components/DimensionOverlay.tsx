@@ -1,18 +1,27 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Pressable, Dimensions, Alert } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSequence, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type MeasurementMode = 'distance' | 'angle';
+
+interface Measurement {
+  id: string;
+  points: Array<{ x: number; y: number }>;
+  value: string;
+  mode: MeasurementMode;
+}
 
 interface DimensionOverlayProps {
   zoomScale?: number;
@@ -26,8 +35,13 @@ export default function DimensionOverlay({
   zoomTranslateY = 0 
 }: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
-  // Points are stored in ORIGINAL image coordinates (unzoomed)
-  const [points, setPoints] = useState<Array<{ x: number; y: number; id: string }>>([]);
+  
+  // Current points being placed (in ORIGINAL image coordinates)
+  const [currentPoints, setCurrentPoints] = useState<Array<{ x: number; y: number; id: string }>>([]);
+  
+  // Completed measurements
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const viewRef = useRef<View>(null);
   
@@ -56,62 +70,6 @@ export default function DimensionOverlay({
     return { x: screenX, y: screenY };
   };
 
-  const placePoint = (x: number, y: number) => {
-    // Convert screen tap to original image coordinates
-    const imageCoords = screenToImage(x, y);
-    
-    const requiredPoints = mode === 'distance' ? 2 : 3;
-    
-    if (points.length >= requiredPoints) {
-      // Reset and start new measurement - store in IMAGE coordinates
-      setPoints([{ x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() }]);
-    } else {
-      // Add point - store in IMAGE coordinates
-      setPoints([...points, { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() }]);
-    }
-  };
-
-  // Long press gesture to place points (2 seconds)
-  const longPressGesture = Gesture.LongPress()
-    .minDuration(2000)
-    .onStart((event) => {
-      pressX.value = event.x;
-      pressY.value = event.y;
-      runOnJS(setShowPressIndicator)(true);
-      pressProgress.value = withTiming(1, { duration: 2000 });
-    })
-    .onEnd((event) => {
-      runOnJS(setShowPressIndicator)(false);
-      pressProgress.value = 0;
-      runOnJS(placePoint)(event.x, event.y);
-    })
-    .onFinalize(() => {
-      runOnJS(setShowPressIndicator)(false);
-      pressProgress.value = 0;
-    });
-
-  // Animated style for press indicator
-  const pressIndicatorStyle = useAnimatedStyle(() => {
-    const scale = pressProgress.value * 50; // Grows to 50px radius
-    return {
-      position: 'absolute',
-      left: pressX.value - 50,
-      top: pressY.value - 50,
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      borderWidth: 3,
-      borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-      backgroundColor: `${mode === 'distance' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'}`,
-      transform: [{ scale: pressProgress.value }],
-      opacity: 1 - pressProgress.value * 0.3,
-    };
-  });
-
-  const handleClear = () => {
-    setPoints([]);
-  };
-
   // Calculate distance in pixels and convert to real units
   const calculateDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
     const pixelDistance = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
@@ -138,12 +96,80 @@ export default function DimensionOverlay({
     return `${angle.toFixed(1)}°`;
   };
 
-  // Calculate midpoint for label positioning
-  const getMidpoint = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
+  const placePoint = (x: number, y: number) => {
+    // Convert screen tap to original image coordinates
+    const imageCoords = screenToImage(x, y);
+    
+    const requiredPoints = mode === 'distance' ? 2 : 3;
+    const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
+    
+    if (currentPoints.length + 1 < requiredPoints) {
+      // Still need more points
+      setCurrentPoints([...currentPoints, newPoint]);
+    } else {
+      // This completes a measurement
+      const completedPoints = [...currentPoints, newPoint];
+      
+      // Calculate measurement value
+      let value: string;
+      if (mode === 'distance') {
+        value = calculateDistance(completedPoints[0], completedPoints[1]);
+      } else {
+        value = calculateAngle(completedPoints[0], completedPoints[1], completedPoints[2]);
+      }
+      
+      // Save as completed measurement
+      const newMeasurement: Measurement = {
+        id: Date.now().toString(),
+        points: completedPoints.map(p => ({ x: p.x, y: p.y })),
+        value,
+        mode,
+      };
+      
+      setMeasurements([...measurements, newMeasurement]);
+      setCurrentPoints([]); // Reset for next measurement
+    }
+  };
+
+  // Long press gesture to place points (1.5 seconds)
+  const longPressGesture = Gesture.LongPress()
+    .minDuration(1500)
+    .onStart((event) => {
+      pressX.value = event.x;
+      pressY.value = event.y;
+      runOnJS(setShowPressIndicator)(true);
+      pressProgress.value = withTiming(1, { duration: 1500 });
+    })
+    .onEnd((event) => {
+      runOnJS(setShowPressIndicator)(false);
+      pressProgress.value = 0;
+      runOnJS(placePoint)(event.x, event.y);
+    })
+    .onFinalize(() => {
+      runOnJS(setShowPressIndicator)(false);
+      pressProgress.value = 0;
+    });
+
+  // Animated style for press indicator
+  const pressIndicatorStyle = useAnimatedStyle(() => {
     return {
-      x: (p1.x + p2.x) / 2,
-      y: (p1.y + p2.y) / 2,
+      position: 'absolute',
+      left: pressX.value - 50,
+      top: pressY.value - 50,
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      borderWidth: 3,
+      borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+      backgroundColor: `${mode === 'distance' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)'}`,
+      transform: [{ scale: pressProgress.value }],
+      opacity: 1 - pressProgress.value * 0.3,
     };
+  });
+
+  const handleClear = () => {
+    setCurrentPoints([]);
+    setMeasurements([]);
   };
 
   // Generate arc path for angle visualization
@@ -191,6 +217,40 @@ export default function DimensionOverlay({
     }
   };
 
+  const handleEmail = async () => {
+    if (!viewRef.current || !currentImageUri) return;
+
+    try {
+      // Capture the image with measurements
+      const uri = await captureRef(viewRef.current, {
+        format: 'jpg',
+        quality: 1,
+      });
+
+      // Build measurement text
+      let measurementText = 'Measurements:\\n\\n';
+      measurements.forEach((m, idx) => {
+        measurementText += `${idx + 1}. ${m.value}\\n`;
+      });
+
+      const subject = 'Measurement Results';
+      const body = measurementText;
+
+      // Create mailto link
+      const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      
+      const canOpen = await Linking.canOpenURL(mailto);
+      if (canOpen) {
+        await Linking.openURL(mailto);
+      } else {
+        Alert.alert('Error', 'Cannot open email app');
+      }
+    } catch (error) {
+      Alert.alert('Email Error', 'Failed to prepare email. Please try again.');
+      console.error('Email error:', error);
+    }
+  };
+
   const handleReset = () => {
     Alert.alert(
       'Reset Measurements',
@@ -214,9 +274,8 @@ export default function DimensionOverlay({
     );
   };
 
-  const hasCompleteMeasurement = 
-    (mode === 'distance' && points.length === 2) ||
-    (mode === 'angle' && points.length === 3);
+  const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
+  const requiredPoints = mode === 'distance' ? 2 : 3;
 
   return (
     <>
@@ -262,87 +321,95 @@ export default function DimensionOverlay({
               );
             })()}
 
-            {/* Distance mode: Draw line between two points */}
-            {mode === 'distance' && points.length === 2 && (() => {
-              const p0 = imageToScreen(points[0].x, points[0].y);
-              const p1 = imageToScreen(points[1].x, points[1].y);
+            {/* Draw completed measurements */}
+            {measurements.map((measurement, idx) => {
+              if (measurement.mode === 'distance') {
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                const midX = (p0.x + p1.x) / 2;
+                const midY = (p0.y + p1.y) / 2;
+                
+                return (
+                  <React.Fragment key={measurement.id}>
+                    <Line
+                      x1={p0.x}
+                      y1={p0.y}
+                      x2={p1.x}
+                      y2={p1.y}
+                      stroke="#3B82F6"
+                      strokeWidth="3"
+                    />
+                    <Line
+                      x1={p0.x}
+                      y1={p0.y - 10}
+                      x2={p0.x}
+                      y2={p0.y + 10}
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                    />
+                    <Line
+                      x1={p1.x}
+                      y1={p1.y - 10}
+                      x2={p1.x}
+                      y2={p1.y + 10}
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                    />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
+                  </React.Fragment>
+                );
+              } else {
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+                
+                return (
+                  <React.Fragment key={measurement.id}>
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="3" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="3" />
+                    <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill="#059669" stroke="white" strokeWidth="3" />
+                    <Circle cx={p2.x} cy={p2.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
+                  </React.Fragment>
+                );
+              }
+            })}
+
+            {/* Draw current points being placed */}
+            {mode === 'distance' && currentPoints.length === 2 && (() => {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
               return (
                 <>
-                  <Line
-                    x1={p0.x}
-                    y1={p0.y}
-                    x2={p1.x}
-                    y2={p1.y}
-                    stroke="#3B82F6"
-                    strokeWidth="3"
-                  />
-                  
-                  {/* Extension lines at endpoints */}
-                  <Line
-                    x1={p0.x}
-                    y1={p0.y - 10}
-                    x2={p0.x}
-                    y2={p0.y + 10}
-                    stroke="#3B82F6"
-                    strokeWidth="2"
-                  />
-                  <Line
-                    x1={p1.x}
-                    y1={p1.y - 10}
-                    x2={p1.x}
-                    y2={p1.y + 10}
-                    stroke="#3B82F6"
-                    strokeWidth="2"
-                  />
+                  <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="3" />
+                  <Line x1={p0.x} y1={p0.y - 10} x2={p0.x} y2={p0.y + 10} stroke="#3B82F6" strokeWidth="2" />
+                  <Line x1={p1.x} y1={p1.y - 10} x2={p1.x} y2={p1.y + 10} stroke="#3B82F6" strokeWidth="2" />
                 </>
               );
             })()}
 
-            {/* Angle mode: Draw lines and arc for three points */}
-            {mode === 'angle' && points.length >= 2 && (() => {
-              const p0 = imageToScreen(points[0].x, points[0].y);
-              const p1 = imageToScreen(points[1].x, points[1].y);
-              const p2 = points.length === 3 ? imageToScreen(points[2].x, points[2].y) : null;
+            {mode === 'angle' && currentPoints.length >= 2 && (() => {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              const p2 = currentPoints.length === 3 ? imageToScreen(currentPoints[2].x, currentPoints[2].y) : null;
               
               return (
                 <>
-                  {/* First line */}
-                  <Line
-                    x1={p1.x}
-                    y1={p1.y}
-                    x2={p0.x}
-                    y2={p0.y}
-                    stroke="#10B981"
-                    strokeWidth="3"
-                  />
-                  
-                  {/* Second line (if third point exists) */}
+                  <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="3" />
                   {p2 && (
                     <>
-                      <Line
-                        x1={p1.x}
-                        y1={p1.y}
-                        x2={p2.x}
-                        y2={p2.y}
-                        stroke="#10B981"
-                        strokeWidth="3"
-                      />
-                      
-                      {/* Arc to show angle */}
-                      <Path
-                        d={generateArcPath(p0, p1, p2)}
-                        stroke="#10B981"
-                        strokeWidth="2"
-                        fill="none"
-                      />
+                      <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="3" />
+                      <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" />
                     </>
                   )}
                 </>
               );
             })()}
 
-            {/* Draw points */}
-            {points.map((point, index) => {
+            {/* Draw current point markers */}
+            {currentPoints.map((point, index) => {
               const screenPos = imageToScreen(point.x, point.y);
               return (
                 <Circle
@@ -358,18 +425,60 @@ export default function DimensionOverlay({
             })}
           </Svg>
 
-          {/* Measurement label */}
-          {hasCompleteMeasurement && (() => {
+          {/* Measurement labels for completed measurements */}
+          {measurements.map((measurement, idx) => {
             let screenX, screenY;
-            if (mode === 'distance') {
-              const mid = getMidpoint(points[0], points[1]);
-              const screenMid = imageToScreen(mid.x, mid.y);
-              screenX = screenMid.x - 50;
-              screenY = screenMid.y - 40;
+            if (measurement.mode === 'distance') {
+              const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+              const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+              screenX = (p0.x + p1.x) / 2 - 50;
+              screenY = (p0.y + p1.y) / 2 - 40;
             } else {
-              const screenP1 = imageToScreen(points[1].x, points[1].y);
-              screenX = screenP1.x - 50;
-              screenY = screenP1.y - 60;
+              const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+              screenX = p1.x - 50;
+              screenY = p1.y - 60;
+            }
+            
+            return (
+              <View
+                key={measurement.id}
+                style={{
+                  position: 'absolute',
+                  left: screenX,
+                  top: screenY,
+                  backgroundColor: measurement.mode === 'distance' ? '#3B82F6' : '#10B981',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 8,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 4,
+                  elevation: 5,
+                }}
+                pointerEvents="none"
+              >
+                <Text className="text-white font-bold text-sm">
+                  {idx + 1}. {measurement.value}
+                </Text>
+              </View>
+            );
+          })}
+
+          {/* Label for current measurement in progress */}
+          {currentPoints.length === requiredPoints && (() => {
+            let screenX, screenY, value;
+            if (mode === 'distance') {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              screenX = (p0.x + p1.x) / 2 - 50;
+              screenY = (p0.y + p1.y) / 2 - 40;
+              value = calculateDistance(currentPoints[0], currentPoints[1]);
+            } else {
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              screenX = p1.x - 50;
+              screenY = p1.y - 60;
+              value = calculateAngle(currentPoints[0], currentPoints[1], currentPoints[2]);
             }
             
             return (
@@ -391,9 +500,7 @@ export default function DimensionOverlay({
                 pointerEvents="none"
               >
                 <Text className="text-white font-bold text-base">
-                  {mode === 'distance' 
-                    ? calculateDistance(points[0], points[1])
-                    : calculateAngle(points[0], points[1], points[2])}
+                  {value}
                 </Text>
               </View>
             );
@@ -416,7 +523,7 @@ export default function DimensionOverlay({
             <Pressable
               onPress={() => {
                 setMode('distance');
-                setPoints([]);
+                setCurrentPoints([]);
               }}
               className={`flex-1 py-2 rounded-md ${mode === 'distance' ? 'bg-white' : ''}`}
             >
@@ -427,7 +534,7 @@ export default function DimensionOverlay({
             <Pressable
               onPress={() => {
                 setMode('angle');
-                setPoints([]);
+                setCurrentPoints([]);
               }}
               className={`flex-1 py-2 rounded-md ${mode === 'angle' ? 'bg-white' : ''}`}
             >
@@ -438,80 +545,85 @@ export default function DimensionOverlay({
           </View>
 
           {/* Zoom tip */}
-          {points.length === 0 && (
+          {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                💡 Pinch to zoom • Double-tap to reset zoom
+                💡 Pinch to zoom • Double-tap to reset zoom • Hold 1.5s to place point
               </Text>
+            </View>
+          )}
+
+          {/* Measurements list */}
+          {measurements.length > 0 && (
+            <View className="mb-3 max-h-24">
+              <ScrollView className="bg-gray-50 rounded-lg p-2">
+                {measurements.map((m, idx) => (
+                  <Text key={m.id} className="text-gray-700 text-sm mb-1">
+                    {idx + 1}. {m.value}
+                  </Text>
+                ))}
+              </ScrollView>
             </View>
           )}
 
           {/* Status/Result Display */}
-          {points.length === 0 && (
-            <View className="flex-row items-center">
+          {currentPoints.length === 0 && measurements.length === 0 && (
+            <View className="flex-row items-center mb-3">
               <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
-              <Text className="ml-3 text-gray-700 font-medium">
-                {mode === 'distance' ? 'Hold for 2s to place points (need 2)' : 'Hold for 2s to place points (need 3)'}
+              <Text className="ml-3 text-gray-700 font-medium flex-1">
+                {mode === 'distance' ? 'Hold 1.5s to place points (need 2)' : 'Hold 1.5s to place points (need 3)'}
               </Text>
             </View>
           )}
           
-          {mode === 'distance' && points.length === 1 && (
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full bg-blue-500" />
+          {currentPoints.length > 0 && currentPoints.length < requiredPoints && (
+            <View className="flex-row items-center mb-3">
+              <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : 'bg-green-500'}`} />
               <Text className="ml-3 text-gray-700 font-medium">
-                Hold for 2s to place second point
-              </Text>
-            </View>
-          )}
-
-          {mode === 'angle' && points.length > 0 && points.length < 3 && (
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full bg-green-500" />
-              <Text className="ml-3 text-gray-700 font-medium">
-                {points.length === 1 ? 'Hold for 2s on vertex (center) point' : 'Hold for 2s to place third point'}
+                {mode === 'distance' && currentPoints.length === 1 && 'Hold 1.5s for point 2'}
+                {mode === 'angle' && currentPoints.length === 1 && 'Hold 1.5s on vertex (center)'}
+                {mode === 'angle' && currentPoints.length === 2 && 'Hold 1.5s for point 3'}
               </Text>
             </View>
           )}
           
-          {hasCompleteMeasurement && (
+          {/* Action Buttons */}
+          {hasAnyMeasurements && (
             <>
-              <View className="flex-row items-center justify-between mb-3">
-                <View className="flex-1">
-                  <Text className="text-gray-600 text-sm capitalize">{mode}</Text>
-                  <Text className="text-gray-900 font-bold text-lg">
-                    {mode === 'distance' 
-                      ? calculateDistance(points[0], points[1])
-                      : calculateAngle(points[0], points[1], points[2])}
-                  </Text>
-                </View>
-                
-                <Pressable
-                  onPress={handleClear}
-                  className="bg-gray-100 rounded-xl px-4 py-3"
-                >
-                  <Text className="text-gray-700 font-semibold">New</Text>
-                </Pressable>
-              </View>
+              <Pressable
+                onPress={handleClear}
+                className="bg-gray-100 rounded-xl py-3 mb-3"
+              >
+                <Text className="text-gray-700 font-semibold text-center">Clear All</Text>
+              </Pressable>
 
-              {/* Export Buttons */}
-              <View className="flex-row space-x-2 pt-3 border-t border-gray-200">
-                <Pressable
-                  onPress={handleExport}
-                  className="flex-1 bg-blue-500 rounded-xl py-3 flex-row items-center justify-center"
-                >
-                  <Ionicons name="save-outline" size={18} color="white" />
-                  <Text className="text-white font-semibold ml-2">Save to Photos</Text>
-                </Pressable>
-                
-                <Pressable
-                  onPress={handleReset}
-                  className="bg-red-500 rounded-xl px-6 py-3 flex-row items-center justify-center"
-                >
-                  <Ionicons name="refresh-outline" size={18} color="white" />
-                  <Text className="text-white font-semibold ml-2">Reset</Text>
-                </Pressable>
-              </View>
+              {measurements.length > 0 && (
+                <View className="flex-row space-x-2 mb-3">
+                  <Pressable
+                    onPress={handleExport}
+                    className="flex-1 bg-blue-500 rounded-xl py-3 flex-row items-center justify-center"
+                  >
+                    <Ionicons name="save-outline" size={18} color="white" />
+                    <Text className="text-white font-semibold ml-2">Save</Text>
+                  </Pressable>
+                  
+                  <Pressable
+                    onPress={handleEmail}
+                    className="flex-1 bg-green-500 rounded-xl py-3 flex-row items-center justify-center"
+                  >
+                    <Ionicons name="mail-outline" size={18} color="white" />
+                    <Text className="text-white font-semibold ml-2">Email</Text>
+                  </Pressable>
+                </View>
+              )}
+
+              <Pressable
+                onPress={handleReset}
+                className="bg-red-500 rounded-xl py-3 flex-row items-center justify-center"
+              >
+                <Ionicons name="refresh-outline" size={18} color="white" />
+                <Text className="text-white font-semibold ml-2">Reset</Text>
+              </Pressable>
             </>
           )}
         </View>
