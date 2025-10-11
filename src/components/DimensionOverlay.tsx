@@ -167,12 +167,16 @@ export default function DimensionOverlay({
     }
   }, [coinCircle]);
 
-  // Force touch cursor state management
+  // Simple tap-to-place mode
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const cursorOffsetY = 120; // Distance above finger
-  const HAPTIC_DISTANCE = 20; // Distance to move before next haptic
+  const cursorOffsetY = 120;
+  const PRESS_DURATION = 350; // 350ms - good sweet spot
+  const MOVEMENT_THRESHOLD = 15; // Allow 15px movement before canceling
+  const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
     setCurrentPoints([]);
@@ -286,59 +290,82 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Firm press detection layer - uses Pressable's delayLongPress */}
-      <Pressable
+      {/* Invisible touch overlay - NEVER blocks gestures unless cursor is active */}
+      <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-        delayLongPress={250}
-        onLongPress={(event) => {
+        onStartShouldSetResponder={() => false} // Never block initial touch
+        onMoveShouldSetResponder={() => showCursor} // Only capture if cursor is active
+        onResponderGrant={(event) => {
           const { pageX, pageY } = event.nativeEvent;
-          console.log('🔥 LONG PRESS detected at:', pageX, pageY);
+          console.log('👆 Touch started at:', pageX, pageY);
+          setPressStartPos({ x: pageX, y: pageY });
           
-          // Activate cursor
-          setShowCursor(true);
-          setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-          setLastHapticPosition({ x: pageX, y: pageY });
+          // Start timer
+          const timer = setTimeout(() => {
+            console.log('🔥 Timer fired! Activating cursor');
+            setShowCursor(true);
+            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            setLastHapticPosition({ x: pageX, y: pageY });
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          }, PRESS_DURATION);
           
-          // Heavy haptic "pop"
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          setPressTimer(timer);
         }}
-        onPressOut={() => {
+        onResponderMove={(event) => {
+          const touch = event.nativeEvent.touches[0];
+          if (!touch) return;
+          
+          const { pageX, pageY } = touch;
+          
+          if (showCursor) {
+            // Update cursor
+            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            
+            // Haptic feedback
+            const distance = Math.sqrt(
+              Math.pow(pageX - lastHapticPosition.x, 2) + 
+              Math.pow(pageY - lastHapticPosition.y, 2)
+            );
+            if (distance >= HAPTIC_DISTANCE) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setLastHapticPosition({ x: pageX, y: pageY });
+            }
+          } else if (pressTimer) {
+            // Check movement threshold
+            const distance = Math.sqrt(
+              Math.pow(pageX - pressStartPos.x, 2) + 
+              Math.pow(pageY - pressStartPos.y, 2)
+            );
+            if (distance > MOVEMENT_THRESHOLD) {
+              console.log('📱 Movement detected, canceling timer');
+              clearTimeout(pressTimer);
+              setPressTimer(null);
+            }
+          }
+        }}
+        onResponderRelease={() => {
+          if (pressTimer) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+          }
+          
           if (showCursor) {
             console.log('✅ Placing point');
             placePoint(cursorPosition.x, cursorPosition.y);
             setShowCursor(false);
-            
-            // Success haptic
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }
         }}
+        onResponderTerminate={() => {
+          if (pressTimer) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+          }
+          setShowCursor(false);
+        }}
+        pointerEvents={showCursor ? "auto" : "box-none"}
       >
-        {/* Cursor tracking overlay - only active when cursor is shown */}
-        {showCursor && (
-          <View
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-            onStartShouldSetResponder={() => true}
-            onResponderMove={(event) => {
-              const touch = event.nativeEvent.touches[0];
-              if (touch) {
-                const { pageX, pageY } = touch;
-                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-                
-                // Haptic feedback on movement
-                const distance = Math.sqrt(
-                  Math.pow(pageX - lastHapticPosition.x, 2) + 
-                  Math.pow(pageY - lastHapticPosition.y, 2)
-                );
-                
-                if (distance >= HAPTIC_DISTANCE) {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setLastHapticPosition({ x: pageX, y: pageY });
-                }
-              }
-            }}
-          />
-        )}
-        {/* Floating cursor above finger */}
+        {/* Floating cursor */}
         {showCursor && (
           <View
             style={{
@@ -351,90 +378,22 @@ export default function DimensionOverlay({
             pointerEvents="none"
           >
             <Svg width={100} height={100}>
-              {/* Outer circle */}
-              <Circle
-                cx={50}
-                cy={50}
-                r={30}
-                fill="none"
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="3"
-                opacity={0.8}
-              />
-              {/* Inner circle */}
-              <Circle
-                cx={50}
-                cy={50}
-                r={15}
-                fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'}
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="2"
-              />
-              {/* Crosshair - horizontal */}
-              <Line
-                x1={10}
-                y1={50}
-                x2={35}
-                y2={50}
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="2"
-              />
-              <Line
-                x1={65}
-                y1={50}
-                x2={90}
-                y2={50}
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="2"
-              />
-              {/* Crosshair - vertical */}
-              <Line
-                x1={50}
-                y1={10}
-                x2={50}
-                y2={35}
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="2"
-              />
-              <Line
-                x1={50}
-                y1={65}
-                x2={50}
-                y2={90}
-                stroke={mode === 'distance' ? '#3B82F6' : '#10B981'}
-                strokeWidth="2"
-              />
-              {/* Center dot */}
-              <Circle
-                cx={50}
-                cy={50}
-                r={3}
-                fill={mode === 'distance' ? '#3B82F6' : '#10B981'}
-              />
+              <Circle cx={50} cy={50} r={30} fill="none" stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="3" opacity={0.8} />
+              <Circle cx={50} cy={50} r={15} fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
+              <Line x1={10} y1={50} x2={35} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
+              <Line x1={65} y1={50} x2={90} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
+              <Line x1={50} y1={10} x2={50} y2={35} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
+              <Line x1={50} y1={65} x2={50} y2={90} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
+              <Circle cx={50} cy={50} r={3} fill={mode === 'distance' ? '#3B82F6' : '#10B981'} />
             </Svg>
-            
-            {/* Release instruction */}
-            <View 
-              style={{
-                position: 'absolute',
-                top: -35,
-                left: 0,
-                right: 0,
-                backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                borderRadius: 12,
-              }}
-            >
-              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
-                Release to place
-              </Text>
+            <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>Release to place</Text>
             </View>
           </View>
         )}
-      </Pressable>
+      </View>
 
-      {/* Visual overlay - no touch interaction */}
+      {/* Visual overlay for measurements */}
       <View
         ref={viewRef}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
@@ -742,7 +701,7 @@ export default function DimensionOverlay({
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                💡 Press firmly to place points • Light touch to pan • Pinch to zoom
+                💡 Hold still 350ms to place • Drag immediately to pan/zoom
               </Text>
             </View>
           )}
