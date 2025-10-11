@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  runOnJS,
 } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -34,25 +35,25 @@ export default function ZoomableImage({
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      if (onTransformChange) {
-        onTransformChange(scale.value, translateX.value, translateY.value);
-      }
     })
     .onEnd(() => {
       savedScale.value = scale.value;
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
+      }
     });
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
-      if (onTransformChange) {
-        onTransformChange(scale.value, translateX.value, translateY.value);
-      }
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
+      }
     });
 
   const doubleTapGesture = Gesture.Tap()
@@ -70,7 +71,7 @@ export default function ZoomableImage({
         savedScale.value = 2;
       }
       if (onTransformChange) {
-        onTransformChange(scale.value, translateX.value, translateY.value);
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
     });
 
