@@ -55,18 +55,18 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    // Transform applies as: screen = (original + translate) * scale
-    // So inverse is: original = screen / scale - translate
-    const imageX = screenX / zoomScale - zoomTranslateX;
-    const imageY = screenY / zoomScale - zoomTranslateY;
+    // Transform applies right-to-left: screen = original * scale + translate
+    // So inverse is: original = (screen - translate) / scale
+    const imageX = (screenX - zoomTranslateX) / zoomScale;
+    const imageY = (screenY - zoomTranslateY) / zoomScale;
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    // Transform applies as: screen = (original + translate) * scale
-    const screenX = (imageX + zoomTranslateX) * zoomScale;
-    const screenY = (imageY + zoomTranslateY) * zoomScale;
+    // Transform applies right-to-left: screen = original * scale + translate
+    const screenX = imageX * zoomScale + zoomTranslateX;
+    const screenY = imageY * zoomScale + zoomTranslateY;
     return { x: screenX, y: screenY };
   };
 
@@ -327,12 +327,27 @@ export default function DimensionOverlay({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
+        {/* Debug overlay at top */}
+        {coinCircle && (
+          <View style={{ position: 'absolute', top: 100, left: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, borderRadius: 8, zIndex: 9999 }}>
+            <Text style={{ color: '#00FF41', fontSize: 11, fontFamily: 'monospace' }}>
+              Zoom: {zoomScale.toFixed(2)}x | Translate: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)}){'\n'}
+              Coin Orig: ({coinCircle.centerX.toFixed(0)}, {coinCircle.centerY.toFixed(0)}) r={coinCircle.radius.toFixed(0)}{'\n'}
+              Coin Screen: ({((coinCircle.centerX * zoomScale + zoomTranslateX)).toFixed(0)}, {((coinCircle.centerY * zoomScale + zoomTranslateY)).toFixed(0)}){'\n'}
+              Screen: {SCREEN_WIDTH}x{SCREEN_HEIGHT}
+            </Text>
+          </View>
+        )}
+        
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Persistent coin circle reference - transform to screen coords */}
             {coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
               const screenRadius = coinCircle.radius * zoomScale;
+              
+              // Log for debugging
+              console.log(`Circle: orig=(${coinCircle.centerX.toFixed(0)},${coinCircle.centerY.toFixed(0)}) screen=(${screenPos.x.toFixed(0)},${screenPos.y.toFixed(0)}) zoom=${zoomScale.toFixed(2)} translate=(${zoomTranslateX.toFixed(0)},${zoomTranslateY.toFixed(0)})`);
               
               return (
                 <>
