@@ -12,8 +12,19 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type MeasurementMode = 'distance' | 'angle';
 
-export default function DimensionOverlay() {
+interface DimensionOverlayProps {
+  zoomScale?: number;
+  zoomTranslateX?: number;
+  zoomTranslateY?: number;
+}
+
+export default function DimensionOverlay({ 
+  zoomScale = 1, 
+  zoomTranslateX = 0, 
+  zoomTranslateY = 0 
+}: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
+  // Points are stored in ORIGINAL image coordinates (unzoomed)
   const [points, setPoints] = useState<Array<{ x: number; y: number; id: string }>>([]);
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const viewRef = useRef<View>(null);
@@ -23,17 +34,34 @@ export default function DimensionOverlay() {
   const currentImageUri = useStore((s) => s.currentImageUri);
   const coinCircle = useStore((s) => s.coinCircle);
 
+  // Helper to convert screen coordinates to original image coordinates
+  const screenToImage = (screenX: number, screenY: number) => {
+    const imageX = (screenX - zoomTranslateX) / zoomScale;
+    const imageY = (screenY - zoomTranslateY) / zoomScale;
+    return { x: imageX, y: imageY };
+  };
+
+  // Helper to convert original image coordinates to screen coordinates
+  const imageToScreen = (imageX: number, imageY: number) => {
+    const screenX = imageX * zoomScale + zoomTranslateX;
+    const screenY = imageY * zoomScale + zoomTranslateY;
+    return { x: screenX, y: screenY };
+  };
+
   const handlePress = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
+    
+    // Convert screen tap to original image coordinates
+    const imageCoords = screenToImage(locationX, locationY);
     
     const requiredPoints = mode === 'distance' ? 2 : 3;
     
     if (points.length >= requiredPoints) {
-      // Reset and start new measurement
-      setPoints([{ x: locationX, y: locationY, id: Date.now().toString() }]);
+      // Reset and start new measurement - store in IMAGE coordinates
+      setPoints([{ x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() }]);
     } else {
-      // Add point
-      setPoints([...points, { x: locationX, y: locationY, id: Date.now().toString() }]);
+      // Add point - store in IMAGE coordinates
+      setPoints([...points, { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() }]);
     }
   };
 
@@ -168,132 +196,160 @@ export default function DimensionOverlay() {
           >
           {/* SVG overlay for drawing */}
           <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-            {/* Persistent coin circle reference */}
-            {coinCircle && (
-              <Circle
-                cx={coinCircle.centerX}
-                cy={coinCircle.centerY}
-                r={coinCircle.radius}
-                stroke="#F59E0B"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="8,4"
-                opacity={0.6}
-              />
-            )}
+            {/* Persistent coin circle reference - transform to screen coords */}
+            {coinCircle && (() => {
+              const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
+              const screenRadius = coinCircle.radius * zoomScale;
+              return (
+                <Circle
+                  cx={screenPos.x}
+                  cy={screenPos.y}
+                  r={screenRadius}
+                  stroke="#F59E0B"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray="8,4"
+                  opacity={0.6}
+                />
+              );
+            })()}
 
             {/* Distance mode: Draw line between two points */}
-            {mode === 'distance' && points.length === 2 && (
-              <>
-                <Line
-                  x1={points[0].x}
-                  y1={points[0].y}
-                  x2={points[1].x}
-                  y2={points[1].y}
-                  stroke="#3B82F6"
-                  strokeWidth="3"
-                />
-                
-                {/* Extension lines at endpoints */}
-                <Line
-                  x1={points[0].x}
-                  y1={points[0].y - 10}
-                  x2={points[0].x}
-                  y2={points[0].y + 10}
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-                <Line
-                  x1={points[1].x}
-                  y1={points[1].y - 10}
-                  x2={points[1].x}
-                  y2={points[1].y + 10}
-                  stroke="#3B82F6"
-                  strokeWidth="2"
-                />
-              </>
-            )}
+            {mode === 'distance' && points.length === 2 && (() => {
+              const p0 = imageToScreen(points[0].x, points[0].y);
+              const p1 = imageToScreen(points[1].x, points[1].y);
+              return (
+                <>
+                  <Line
+                    x1={p0.x}
+                    y1={p0.y}
+                    x2={p1.x}
+                    y2={p1.y}
+                    stroke="#3B82F6"
+                    strokeWidth="3"
+                  />
+                  
+                  {/* Extension lines at endpoints */}
+                  <Line
+                    x1={p0.x}
+                    y1={p0.y - 10}
+                    x2={p0.x}
+                    y2={p0.y + 10}
+                    stroke="#3B82F6"
+                    strokeWidth="2"
+                  />
+                  <Line
+                    x1={p1.x}
+                    y1={p1.y - 10}
+                    x2={p1.x}
+                    y2={p1.y + 10}
+                    stroke="#3B82F6"
+                    strokeWidth="2"
+                  />
+                </>
+              );
+            })()}
 
             {/* Angle mode: Draw lines and arc for three points */}
-            {mode === 'angle' && points.length >= 2 && (
-              <>
-                {/* First line */}
-                <Line
-                  x1={points[1].x}
-                  y1={points[1].y}
-                  x2={points[0].x}
-                  y2={points[0].y}
-                  stroke="#10B981"
-                  strokeWidth="3"
-                />
-                
-                {/* Second line (if third point exists) */}
-                {points.length === 3 && (
-                  <>
-                    <Line
-                      x1={points[1].x}
-                      y1={points[1].y}
-                      x2={points[2].x}
-                      y2={points[2].y}
-                      stroke="#10B981"
-                      strokeWidth="3"
-                    />
-                    
-                    {/* Arc to show angle */}
-                    <Path
-                      d={generateArcPath(points[0], points[1], points[2])}
-                      stroke="#10B981"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                  </>
-                )}
-              </>
-            )}
+            {mode === 'angle' && points.length >= 2 && (() => {
+              const p0 = imageToScreen(points[0].x, points[0].y);
+              const p1 = imageToScreen(points[1].x, points[1].y);
+              const p2 = points.length === 3 ? imageToScreen(points[2].x, points[2].y) : null;
+              
+              return (
+                <>
+                  {/* First line */}
+                  <Line
+                    x1={p1.x}
+                    y1={p1.y}
+                    x2={p0.x}
+                    y2={p0.y}
+                    stroke="#10B981"
+                    strokeWidth="3"
+                  />
+                  
+                  {/* Second line (if third point exists) */}
+                  {p2 && (
+                    <>
+                      <Line
+                        x1={p1.x}
+                        y1={p1.y}
+                        x2={p2.x}
+                        y2={p2.y}
+                        stroke="#10B981"
+                        strokeWidth="3"
+                      />
+                      
+                      {/* Arc to show angle */}
+                      <Path
+                        d={generateArcPath(p0, p1, p2)}
+                        stroke="#10B981"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                    </>
+                  )}
+                </>
+              );
+            })()}
 
             {/* Draw points */}
-            {points.map((point, index) => (
-              <Circle
-                key={point.id}
-                cx={point.x}
-                cy={point.y}
-                r="8"
-                fill={mode === 'distance' ? '#3B82F6' : index === 1 ? '#059669' : '#10B981'}
-                stroke="white"
-                strokeWidth="3"
-              />
-            ))}
+            {points.map((point, index) => {
+              const screenPos = imageToScreen(point.x, point.y);
+              return (
+                <Circle
+                  key={point.id}
+                  cx={screenPos.x}
+                  cy={screenPos.y}
+                  r="8"
+                  fill={mode === 'distance' ? '#3B82F6' : index === 1 ? '#059669' : '#10B981'}
+                  stroke="white"
+                  strokeWidth="3"
+                />
+              );
+            })}
           </Svg>
 
           {/* Measurement label */}
-          {hasCompleteMeasurement && (
-            <View
-              style={{
-                position: 'absolute',
-                left: mode === 'distance' 
-                  ? getMidpoint(points[0], points[1]).x - 50
-                  : points[1].x - 50,
-                top: mode === 'distance'
-                  ? getMidpoint(points[0], points[1]).y - 40
-                  : points[1].y - 60,
-                backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 8,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 4,
-                elevation: 5,
-              }}
-            >
-              <Text className="text-white font-bold text-base">
-                {mode === 'distance' 
-                  ? calculateDistance(points[0], points[1])
-                  : calculateAngle(points[0], points[1], points[2])}
-              </Text>
+          {hasCompleteMeasurement && (() => {
+            let screenX, screenY;
+            if (mode === 'distance') {
+              const mid = getMidpoint(points[0], points[1]);
+              const screenMid = imageToScreen(mid.x, mid.y);
+              screenX = screenMid.x - 50;
+              screenY = screenMid.y - 40;
+            } else {
+              const screenP1 = imageToScreen(points[1].x, points[1].y);
+              screenX = screenP1.x - 50;
+              screenY = screenP1.y - 60;
+            }
+            
+            return (
+              <View
+                style={{
+                  position: 'absolute',
+                  left: screenX,
+                  top: screenY,
+                  backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 8,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 4,
+                  elevation: 5,
+                }}
+                pointerEvents="none"
+              >
+                <Text className="text-white font-bold text-base">
+                  {mode === 'distance' 
+                    ? calculateDistance(points[0], points[1])
+                    : calculateAngle(points[0], points[1], points[2])}
+                </Text>
               </View>
-            )}
+            );
+          })()}
           </View>
         </TouchableWithoutFeedback>
       </View>
