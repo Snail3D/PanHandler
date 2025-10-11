@@ -174,8 +174,8 @@ export default function DimensionOverlay({
   const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120;
-  const PRESS_DURATION = 350; // 350ms - good sweet spot
-  const MOVEMENT_THRESHOLD = 15; // Allow 15px movement before canceling
+  const PRESS_DURATION = 200; // 200ms - very quick, feels like pressure detection
+  const MOVEMENT_THRESHOLD = 5; // 5px - very sensitive, must hold still
   const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
@@ -290,23 +290,30 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Invisible touch overlay - NEVER blocks gestures unless cursor is active */}
+      {/* Touch overlay - starts timer on every touch, locks when timer completes */}
       <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-        onStartShouldSetResponder={() => false} // Never block initial touch
-        onMoveShouldSetResponder={() => showCursor} // Only capture if cursor is active
+        onStartShouldSetResponder={() => true} // Always intercept to start timer
+        onMoveShouldSetResponder={() => showCursor} // Keep control if cursor is active
+        onResponderTerminationRequest={() => !showCursor} // Release control if no cursor (allow pan/zoom)
         onResponderGrant={(event) => {
           const { pageX, pageY } = event.nativeEvent;
           console.log('👆 Touch started at:', pageX, pageY);
           setPressStartPos({ x: pageX, y: pageY });
           
-          // Start timer
+          // Start timer for firm press
           const timer = setTimeout(() => {
-            console.log('🔥 Timer fired! Activating cursor');
+            console.log('🔥 FIRM PRESS! Locking screen and activating cursor');
             setShowCursor(true);
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            
+            // Double haptic for "lock" feel
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).then(() => {
+              setTimeout(() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }, 50);
+            });
           }, PRESS_DURATION);
           
           setPressTimer(timer);
@@ -318,7 +325,8 @@ export default function DimensionOverlay({
           const { pageX, pageY } = touch;
           
           if (showCursor) {
-            // Update cursor
+            // Screen is LOCKED - update cursor
+            console.log('Moving cursor');
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
             // Haptic feedback
@@ -331,39 +339,46 @@ export default function DimensionOverlay({
               setLastHapticPosition({ x: pageX, y: pageY });
             }
           } else if (pressTimer) {
-            // Check movement threshold
+            // Timer is running - check if movement exceeds threshold
             const distance = Math.sqrt(
               Math.pow(pageX - pressStartPos.x, 2) + 
               Math.pow(pageY - pressStartPos.y, 2)
             );
             if (distance > MOVEMENT_THRESHOLD) {
-              console.log('📱 Movement detected, canceling timer');
+              console.log('📱 Movement detected, canceling timer - allowing pan/zoom');
               clearTimeout(pressTimer);
               setPressTimer(null);
+              // This will cause onResponderTerminationRequest to return true
+              // allowing ZoomableImage to take over
             }
           }
         }}
         onResponderRelease={() => {
+          console.log('Release');
+          
+          // Cancel timer if still waiting
           if (pressTimer) {
             clearTimeout(pressTimer);
             setPressTimer(null);
           }
           
+          // If cursor was active, place point and UNLOCK
           if (showCursor) {
-            console.log('✅ Placing point');
+            console.log('✅ Placing point and UNLOCKING screen');
             placePoint(cursorPosition.x, cursorPosition.y);
             setShowCursor(false);
+            
+            // Success haptic
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }
         }}
         onResponderTerminate={() => {
+          console.log('Gesture terminated');
           if (pressTimer) {
             clearTimeout(pressTimer);
             setPressTimer(null);
           }
-          setShowCursor(false);
         }}
-        pointerEvents={showCursor ? "auto" : "box-none"}
       >
         {/* Floating cursor */}
         {showCursor && (
@@ -701,7 +716,7 @@ export default function DimensionOverlay({
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                💡 Hold still 350ms to place • Drag immediately to pan/zoom
+                💡 Press firmly & hold still 200ms to lock • Drag to pan/zoom
               </Text>
             </View>
           )}
@@ -724,7 +739,7 @@ export default function DimensionOverlay({
             <View className="flex-row items-center mb-3">
               <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
               <Text className="ml-3 text-gray-700 font-medium flex-1">
-                {mode === 'distance' ? 'Press firmly to place 2 points' : 'Press firmly to place 3 points'}
+                {mode === 'distance' ? 'Press firmly to lock & place 2 points' : 'Press firmly to lock & place 3 points'}
               </Text>
             </View>
           )}
