@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
+import * as Haptics from 'expo-haptics';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 
@@ -135,6 +136,13 @@ export default function DimensionOverlay({
     if (coinCircle && !showLockedInAnimation) {
       setShowLockedInAnimation(true);
       
+      // Double haptic feedback for "Locked In!"
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
+        setTimeout(() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }, 100);
+      });
+      
       // Green blink animation (3 blinks)
       lockInOpacity.value = 0;
       lockInScale.value = 1;
@@ -164,64 +172,89 @@ export default function DimensionOverlay({
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [touchStartTime, setTouchStartTime] = useState(0);
   const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120; // Distance above finger
-  const FORCE_THRESHOLD = 0.5; // Force threshold for activation (0-1 scale)
-  const MOVEMENT_THRESHOLD = 15; // Max movement in pixels before canceling
+  const PRESS_DURATION = 300; // 300ms firm press to activate (shorter than pan threshold)
+  const MOVEMENT_THRESHOLD = 10; // Max movement in pixels before canceling
+  const HAPTIC_DISTANCE = 20; // Distance to move before next haptic
 
   const handleTouchStart = (event: any) => {
     const touch = event.nativeEvent.touches[0];
-    const { pageX, pageY, force = 0 } = touch;
+    const { pageX, pageY } = touch;
     
     setTouchStartTime(Date.now());
     setTouchStartPos({ x: pageX, y: pageY });
     
-    // Check for force touch (firm press)
-    if (force > FORCE_THRESHOLD) {
-      // Firm press detected! Show cursor immediately
-      setShowCursor(true);
-      setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+    // Start timer for firm press detection (300ms)
+    const timer = setTimeout(() => {
+      // Check if finger hasn't moved too much
+      const distance = Math.sqrt(
+        Math.pow(pageX - touchStartPos.x, 2) + 
+        Math.pow(pageY - touchStartPos.y, 2)
+      );
       
-      // Haptic feedback
-      if (typeof navigator !== 'undefined' && (navigator as any).vibrate) {
-        (navigator as any).vibrate(10); // Short haptic "pop"
+      if (distance < MOVEMENT_THRESHOLD) {
+        // Firm press detected! Show cursor
+        setShowCursor(true);
+        setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+        setLastHapticPosition({ x: pageX, y: pageY });
+        
+        // Strong haptic feedback for activation
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
-    }
+    }, PRESS_DURATION);
+    
+    setPressTimer(timer);
   };
 
   const handleTouchMove = (event: any) => {
     const touch = event.nativeEvent.touches[0];
-    const { pageX, pageY, force = 0 } = touch;
+    const { pageX, pageY } = touch;
     
     if (showCursor) {
       // Update cursor position as finger moves
       setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+      
+      // Light haptic feedback as cursor moves
+      const distance = Math.sqrt(
+        Math.pow(pageX - lastHapticPosition.x, 2) + 
+        Math.pow(pageY - lastHapticPosition.y, 2)
+      );
+      
+      if (distance >= HAPTIC_DISTANCE) {
+        // Gentle haptic jitter
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setLastHapticPosition({ x: pageX, y: pageY });
+      }
     } else {
-      // Check if we should activate cursor via force during movement
-      if (force > FORCE_THRESHOLD) {
-        const distance = Math.sqrt(
-          Math.pow(pageX - touchStartPos.x, 2) + 
-          Math.pow(pageY - touchStartPos.y, 2)
-        );
-        
-        // Only activate if not moving too much (prevents activation during pan)
-        if (distance < MOVEMENT_THRESHOLD) {
-          setShowCursor(true);
-          setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-          
-          // Haptic feedback
-          if (typeof navigator !== 'undefined' && (navigator as any).vibrate) {
-            (navigator as any).vibrate(10);
-          }
-        }
+      // Check if finger moved too much - cancel press timer
+      const distance = Math.sqrt(
+        Math.pow(pageX - touchStartPos.x, 2) + 
+        Math.pow(pageY - touchStartPos.y, 2)
+      );
+      
+      if (distance >= MOVEMENT_THRESHOLD && pressTimer) {
+        clearTimeout(pressTimer);
+        setPressTimer(null);
       }
     }
   };
 
   const handleTouchEnd = () => {
+    // Clear press timer if still waiting
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    
     // Place point at cursor position when finger is released
     if (showCursor) {
       placePoint(cursorPosition.x, cursorPosition.y);
       setShowCursor(false);
+      
+      // Success haptic
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   };
 
