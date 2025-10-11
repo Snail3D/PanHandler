@@ -150,7 +150,7 @@ export default function DimensionOverlay() {
   return (
     <>
       {/* Touchable overlay */}
-      <View ref={viewRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+      <View ref={viewRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
         <Pressable
           onPress={handlePress}
           style={{
@@ -159,7 +159,6 @@ export default function DimensionOverlay() {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 10,
           }}
         >
           {/* SVG overlay for drawing */}
