@@ -291,21 +291,31 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Pressable overlay for long-press to place points - doesn't block other gestures */}
+      {/* Touch overlay for long-press - only captures single finger */}
       <View 
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        pointerEvents="box-none"
+        onStartShouldSetResponder={(evt) => {
+          // Only capture if it's a single touch (not pinch)
+          return evt.nativeEvent.touches.length === 1;
+        }}
+        onResponderGrant={(evt) => {
+          // Single finger touch started
+          const touch = evt.nativeEvent.touches[0];
+          handlePressIn({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
+        }}
+        onResponderRelease={() => {
+          // Touch ended
+          handlePressOut();
+        }}
+        onResponderTerminate={() => {
+          // Touch was interrupted (e.g., by another gesture)
+          handlePressOut();
+        }}
       >
-        <Pressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        >
-          {/* Long press indicator */}
-          {showPressIndicator && (
-            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
-          )}
-        </Pressable>
+        {/* Long press indicator */}
+        {showPressIndicator && (
+          <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
+        )}
       </View>
 
       {/* Visual overlay - no touch interaction */}
