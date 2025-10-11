@@ -26,7 +26,7 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
-  // v2.2.0 - Multiple measurements, 1.5s hold, email export, mm for metric
+  // v2.2.2 - Fixed touch responder to allow pinch/pan with single-finger hold
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
