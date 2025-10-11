@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -29,6 +29,13 @@ export default function MeasurementScreen() {
   const setImageUri = useStore((s) => s.setImageUri);
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
+
+  // Watch for image changes and reset mode to camera when image is cleared
+  useEffect(() => {
+    if (!currentImageUri && mode !== 'camera') {
+      setMode('camera');
+    }
+  }, [currentImageUri, mode]);
 
   if (!permission) {
     return (

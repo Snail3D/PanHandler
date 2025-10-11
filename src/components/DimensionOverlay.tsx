@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Pressable, Dimensions, Alert } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, TouchableWithoutFeedback } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -149,18 +149,23 @@ export default function DimensionOverlay() {
 
   return (
     <>
-      {/* Touchable overlay */}
+      {/* Touchable overlay that doesn't block multi-touch gestures */}
       <View ref={viewRef} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
-        <Pressable
-          onPress={handlePress}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+        <TouchableWithoutFeedback
+          onPress={(event) => {
+            const { locationX, locationY } = event.nativeEvent;
+            handlePress({ nativeEvent: { locationX, locationY } });
           }}
         >
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          >
           {/* SVG overlay for drawing */}
           <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Persistent coin circle reference */}
@@ -287,9 +292,10 @@ export default function DimensionOverlay() {
                   ? calculateDistance(points[0], points[1])
                   : calculateAngle(points[0], points[1], points[2])}
               </Text>
-            </View>
-          )}
-        </Pressable>
+              </View>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
       </View>
 
       {/* Bottom toolbar */}
