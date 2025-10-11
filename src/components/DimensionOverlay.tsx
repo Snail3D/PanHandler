@@ -334,16 +334,37 @@ export default function DimensionOverlay({
               const screenRadius = coinCircle.radius * zoomScale;
               
               return (
-                <Circle
-                  cx={screenPos.x}
-                  cy={screenPos.y}
-                  r={screenRadius}
-                  stroke="#F59E0B"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeDasharray="8,4"
-                  opacity={0.6}
-                />
+                <>
+                  {/* Outer glow effect - Slimer green! */}
+                  <Circle
+                    cx={screenPos.x}
+                    cy={screenPos.y}
+                    r={screenRadius + 4}
+                    stroke="#00FF41"
+                    strokeWidth="6"
+                    fill="none"
+                    opacity={0.3}
+                  />
+                  {/* Main bright green circle */}
+                  <Circle
+                    cx={screenPos.x}
+                    cy={screenPos.y}
+                    r={screenRadius}
+                    stroke="#00FF41"
+                    strokeWidth="3"
+                    fill="none"
+                    strokeDasharray="8,4"
+                    opacity={0.9}
+                  />
+                  {/* Center dot for precision */}
+                  <Circle
+                    cx={screenPos.x}
+                    cy={screenPos.y}
+                    r="4"
+                    fill="#00FF41"
+                    opacity={0.8}
+                  />
+                </>
               );
             })()}
 

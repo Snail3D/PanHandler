@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, Dimensions, StyleSheet } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -31,6 +31,13 @@ export default function ZoomableImage({
   const translateY = useSharedValue(initialTranslateY);
   const savedTranslateX = useSharedValue(initialTranslateX);
   const savedTranslateY = useSharedValue(initialTranslateY);
+
+  // Notify parent of initial transform values on mount
+  useEffect(() => {
+    if (onTransformChange) {
+      onTransformChange(initialScale, initialTranslateX, initialTranslateY);
+    }
+  }, []);
 
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
