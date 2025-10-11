@@ -50,14 +50,7 @@ export default function ZoomableImage({
       focalY.value = event.focalY;
     })
     .onUpdate((event) => {
-      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      
-      // Simple approach: just update scale, don't touch translate
-      scale.value = newScale;
-      
-      if (onTransformChange) {
-        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
-      }
+      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
     .onEnd(() => {
       savedScale.value = scale.value;
@@ -70,9 +63,6 @@ export default function ZoomableImage({
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
-      if (onTransformChange) {
-        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
-      }
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
