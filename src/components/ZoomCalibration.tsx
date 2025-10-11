@@ -63,11 +63,9 @@ export default function ZoomCalibration({
     const pixelsPerMM = originalImageCoinDiameterPixels / selectedCoin.diameter;
 
     // Calculate the coin circle position in the ORIGINAL image coordinates
-    // User sees circle at screen center, but image might be translated/zoomed
-    // React Native applies: screen = (original + translate) * scale
-    // So inverse is: original = screen / scale - translate
-    const originalImageCenterX = referenceCenterX / zoomScale - zoomTranslate.x;
-    const originalImageCenterY = referenceCenterY / zoomScale - zoomTranslate.y;
+    // screen = original * scale + translate, so: original = (screen - translate) / scale
+    const originalImageCenterX = (referenceCenterX - zoomTranslate.x) / zoomScale;
+    const originalImageCenterY = (referenceCenterY - zoomTranslate.y) / zoomScale;
     const originalImageRadius = referenceRadiusPixels / zoomScale;
 
     onComplete({

@@ -55,18 +55,17 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    // React Native applies: screen = (original + translate) * scale
-    // So inverse is: original = screen / scale - translate
-    const imageX = screenX / zoomScale - zoomTranslateX;
-    const imageY = screenY / zoomScale - zoomTranslateY;
+    // screen = original * scale + translate, so: original = (screen - translate) / scale
+    const imageX = (screenX - zoomTranslateX) / zoomScale;
+    const imageY = (screenY - zoomTranslateY) / zoomScale;
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    // React Native applies: screen = (original + translate) * scale
-    const screenX = (imageX + zoomTranslateX) * zoomScale;
-    const screenY = (imageY + zoomTranslateY) * zoomScale;
+    // screen = original * scale + translate
+    const screenX = imageX * zoomScale + zoomTranslateX;
+    const screenY = imageY * zoomScale + zoomTranslateY;
     return { x: screenX, y: screenY };
   };
 
