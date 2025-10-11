@@ -52,13 +52,15 @@ export default function ZoomableImage({
     })
     .onUpdate((event) => {
       const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      const scaleDelta = newScale - savedScale.value;
       
-      // Adjust translate to keep focal point stationary
-      // If focal point is at (fx, fy) and we change scale, translate must adjust
-      // to keep the same image point under the focal point
-      translateX.value = savedTranslateX.value - (focalX.value - savedTranslateX.value) * (scaleDelta / savedScale.value);
-      translateY.value = savedTranslateY.value - (focalY.value - savedTranslateY.value) * (scaleDelta / savedScale.value);
+      // Always zoom toward screen center, not focal point
+      const centerX = SCREEN_WIDTH / 2;
+      const centerY = SCREEN_HEIGHT / 2;
+      const scaleRatio = newScale / savedScale.value;
+      
+      // Adjust translate to keep screen center on the same image point
+      translateX.value = centerX - (centerX - savedTranslateX.value) * scaleRatio;
+      translateY.value = centerY - (centerY - savedTranslateY.value) * scaleRatio;
       
       scale.value = newScale;
     })
