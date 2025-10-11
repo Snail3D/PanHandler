@@ -43,6 +43,9 @@ export default function ZoomableImage({
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
+      }
     })
     .onEnd(() => {
       savedScale.value = scale.value;
@@ -55,6 +58,9 @@ export default function ZoomableImage({
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
+      }
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
