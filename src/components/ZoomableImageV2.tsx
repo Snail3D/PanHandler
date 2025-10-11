@@ -53,6 +53,7 @@ export default function ZoomableImage({
       if (onTransformChange && previous) {
         // Only update if values actually changed
         if (current.scale !== previous.scale || current.x !== previous.x || current.y !== previous.y) {
+          console.log('📊 Transform changed:', current.scale.toFixed(2), current.x.toFixed(0), current.y.toFixed(0));
           runOnJS(onTransformChange)(current.scale, current.x, current.y);
         }
       }

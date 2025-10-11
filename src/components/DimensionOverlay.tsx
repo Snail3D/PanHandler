@@ -167,15 +167,12 @@ export default function DimensionOverlay({
     }
   }, [coinCircle]);
 
-  // Simple tap-to-place mode
+  // Cursor placement via long press
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120;
   const PRESS_DURATION = 500; // 500ms - half second, natural deliberate hold
-  const MOVEMENT_THRESHOLD = 25; // 25px - forgiving for tremors/natural movement
   const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
@@ -290,20 +287,21 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Touch overlay - starts timer on every touch, locks when timer completes */}
-      <View
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-        onStartShouldSetResponder={() => true} // Always intercept to start timer
-        onMoveShouldSetResponder={() => showCursor} // Keep control if cursor is active
-        onResponderTerminationRequest={() => !showCursor} // Release control if no cursor (allow pan/zoom)
-        onResponderGrant={(event) => {
-          const { pageX, pageY } = event.nativeEvent;
-          console.log('👆 Touch started at:', pageX, pageY);
-          setPressStartPos({ x: pageX, y: pageY });
-          
-          // Start timer for firm press
-          const timer = setTimeout(() => {
-            console.log('🔥 FIRM PRESS! Locking screen and activating cursor');
+      {/* Debug: Show current zoom values */}
+      <View style={{ position: 'absolute', top: insets.top + 80, left: 10, backgroundColor: 'rgba(0,0,0,0.7)', padding: 8, borderRadius: 8, zIndex: 999 }} pointerEvents="none">
+        <Text style={{ color: '#00FF41', fontSize: 10, fontFamily: 'monospace' }}>
+          Zoom: {zoomScale.toFixed(2)}x{'\n'}
+          Pan: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)})
+        </Text>
+      </View>
+
+      {/* Long press detector - allows pan/zoom when not pressing long */}
+      {!showCursor && (
+        <Pressable
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+          onLongPress={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            console.log('🔥 LONG PRESS! Locking screen and activating cursor');
             setShowCursor(true);
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
@@ -314,19 +312,30 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               }, 50);
             });
-          }, PRESS_DURATION);
-          
-          setPressTimer(timer);
-        }}
-        onResponderMove={(event) => {
-          const touch = event.nativeEvent.touches[0];
-          if (!touch) return;
-          
-          const { pageX, pageY } = touch;
-          
-          if (showCursor) {
-            // Screen is LOCKED - update cursor
-            console.log('Moving cursor');
+          }}
+          delayLongPress={PRESS_DURATION}
+        />
+      )}
+
+      {/* Cursor movement overlay - only when locked */}
+      {showCursor && (
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+          onStartShouldSetResponder={() => true}
+          onMoveShouldSetResponder={() => true}
+          onResponderGrant={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            console.log('👆 Cursor mode - touch started');
+            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            setLastHapticPosition({ x: pageX, y: pageY });
+          }}
+          onResponderMove={(event) => {
+            const touch = event.nativeEvent.touches[0];
+            if (!touch) return;
+            
+            const { pageX, pageY } = touch;
+            
+            // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
             // Haptic feedback
@@ -338,48 +347,20 @@ export default function DimensionOverlay({
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setLastHapticPosition({ x: pageX, y: pageY });
             }
-          } else if (pressTimer) {
-            // Timer is running - check if movement exceeds threshold
-            const distance = Math.sqrt(
-              Math.pow(pageX - pressStartPos.x, 2) + 
-              Math.pow(pageY - pressStartPos.y, 2)
-            );
-            if (distance > MOVEMENT_THRESHOLD) {
-              console.log('📱 Movement detected, canceling timer - allowing pan/zoom');
-              clearTimeout(pressTimer);
-              setPressTimer(null);
-              // This will cause onResponderTerminationRequest to return true
-              // allowing ZoomableImage to take over
-            }
-          }
-        }}
-        onResponderRelease={() => {
-          console.log('Release');
-          
-          // Cancel timer if still waiting
-          if (pressTimer) {
-            clearTimeout(pressTimer);
-            setPressTimer(null);
-          }
-          
-          // If cursor was active, place point and UNLOCK
-          if (showCursor) {
+          }}
+          onResponderRelease={() => {
             console.log('✅ Placing point and UNLOCKING screen');
             placePoint(cursorPosition.x, cursorPosition.y);
             setShowCursor(false);
             
             // Success haptic
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }
-        }}
-        onResponderTerminate={() => {
-          console.log('Gesture terminated');
-          if (pressTimer) {
-            clearTimeout(pressTimer);
-            setPressTimer(null);
-          }
-        }}
-      >
+          }}
+        />
+      )}
+
+      {/* Floating cursor container */}
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }} pointerEvents="none">
         {/* Floating cursor */}
         {showCursor && (
           <View
