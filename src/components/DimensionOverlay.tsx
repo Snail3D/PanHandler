@@ -170,84 +170,9 @@ export default function DimensionOverlay({
   // Force touch cursor state management
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
-  const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [isWaitingForPress, setIsWaitingForPress] = useState(false);
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120; // Distance above finger
-  const PRESS_DURATION = 250; // 250ms to activate - quick but deliberate
-  const MOVEMENT_CANCEL_THRESHOLD = 8; // If you move more than 8px, it's a pan
   const HAPTIC_DISTANCE = 20; // Distance to move before next haptic
-
-  const startPressDetection = (x: number, y: number) => {
-    console.log('👆 Touch detected at:', x, y);
-    setPressStartPos({ x, y });
-    setIsWaitingForPress(true);
-    
-    const timer = setTimeout(() => {
-      console.log('🔥 FIRM PRESS! Activating cursor');
-      setIsWaitingForPress(false);
-      setShowCursor(true);
-      setCursorPosition({ x, y: y - cursorOffsetY });
-      setLastHapticPosition({ x, y });
-      
-      // Strong haptic feedback - double tap for "pop" effect
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }, PRESS_DURATION);
-    
-    setPressTimer(timer);
-  };
-
-  const cancelPressDetection = () => {
-    if (pressTimer) {
-      console.log('❌ Canceling press detection');
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    setIsWaitingForPress(false);
-  };
-
-  const handleMove = (x: number, y: number) => {
-    if (showCursor) {
-      // Update cursor position
-      setCursorPosition({ x, y: y - cursorOffsetY });
-      
-      // Light haptic feedback
-      const distance = Math.sqrt(
-        Math.pow(x - lastHapticPosition.x, 2) + 
-        Math.pow(y - lastHapticPosition.y, 2)
-      );
-      
-      if (distance >= HAPTIC_DISTANCE) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setLastHapticPosition({ x, y });
-      }
-    } else if (isWaitingForPress) {
-      // Check if movement exceeds threshold - if so, cancel and allow pan
-      const distance = Math.sqrt(
-        Math.pow(x - pressStartPos.x, 2) + 
-        Math.pow(y - pressStartPos.y, 2)
-      );
-      
-      if (distance > MOVEMENT_CANCEL_THRESHOLD) {
-        console.log('📱 Movement detected, canceling - allowing pan/zoom');
-        cancelPressDetection();
-      }
-    }
-  };
-
-  const handleRelease = () => {
-    cancelPressDetection();
-    
-    if (showCursor) {
-      console.log('✅ Placing point at cursor position');
-      placePoint(cursorPosition.x, cursorPosition.y);
-      setShowCursor(false);
-      
-      // Success haptic
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-  };
 
   const handleClear = () => {
     setCurrentPoints([]);
@@ -361,59 +286,58 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Visual debug indicator */}
-      {isWaitingForPress && (
-        <View 
-          style={{ 
-            position: 'absolute', 
-            top: pressStartPos.y - 40, 
-            left: pressStartPos.x - 40, 
-            width: 80, 
-            height: 80, 
-            borderRadius: 40, 
-            backgroundColor: 'rgba(59, 130, 246, 0.2)', 
-            borderWidth: 3, 
-            borderColor: '#3B82F6',
-            zIndex: 999 
-          }} 
-          pointerEvents="none" 
-        />
-      )}
-      
-      {/* Touch overlay - intercepts touches only when needed */}
-      <View
+      {/* Firm press detection layer - uses Pressable's delayLongPress */}
+      <Pressable
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-        onStartShouldSetResponder={() => {
-          // Always try to intercept initially
-          return true;
+        delayLongPress={250}
+        onLongPress={(event) => {
+          const { pageX, pageY } = event.nativeEvent;
+          console.log('🔥 LONG PRESS detected at:', pageX, pageY);
+          
+          // Activate cursor
+          setShowCursor(true);
+          setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+          setLastHapticPosition({ x: pageX, y: pageY });
+          
+          // Heavy haptic "pop"
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         }}
-        onMoveShouldSetResponder={() => {
-          // Only keep capturing if cursor is active
-          return showCursor;
-        }}
-        onResponderGrant={(event) => {
-          const touch = event.nativeEvent.touches[0];
-          if (touch) {
-            startPressDetection(touch.pageX, touch.pageY);
+        onPressOut={() => {
+          if (showCursor) {
+            console.log('✅ Placing point');
+            placePoint(cursorPosition.x, cursorPosition.y);
+            setShowCursor(false);
+            
+            // Success haptic
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }
-        }}
-        onResponderMove={(event) => {
-          const touch = event.nativeEvent.touches[0];
-          if (touch) {
-            handleMove(touch.pageX, touch.pageY);
-          }
-        }}
-        onResponderRelease={handleRelease}
-        onResponderTerminate={() => {
-          console.log('Gesture terminated');
-          cancelPressDetection();
-          setShowCursor(false);
-        }}
-        onResponderReject={() => {
-          console.log('Gesture rejected');
-          cancelPressDetection();
         }}
       >
+        {/* Cursor tracking overlay - only active when cursor is shown */}
+        {showCursor && (
+          <View
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            onStartShouldSetResponder={() => true}
+            onResponderMove={(event) => {
+              const touch = event.nativeEvent.touches[0];
+              if (touch) {
+                const { pageX, pageY } = touch;
+                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+                
+                // Haptic feedback on movement
+                const distance = Math.sqrt(
+                  Math.pow(pageX - lastHapticPosition.x, 2) + 
+                  Math.pow(pageY - lastHapticPosition.y, 2)
+                );
+                
+                if (distance >= HAPTIC_DISTANCE) {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setLastHapticPosition({ x: pageX, y: pageY });
+                }
+              }
+            }}
+          />
+        )}
         {/* Floating cursor above finger */}
         {showCursor && (
           <View
@@ -508,7 +432,7 @@ export default function DimensionOverlay({
             </View>
           </View>
         )}
-      </View>
+      </Pressable>
 
       {/* Visual overlay - no touch interaction */}
       <View
