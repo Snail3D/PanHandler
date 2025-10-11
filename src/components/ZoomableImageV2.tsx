@@ -63,8 +63,6 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
-    .minPointers(1)
-    .maxPointers(1)
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
@@ -96,10 +94,9 @@ export default function ZoomableImage({
       }
     });
 
-  const composedGesture = Gesture.Exclusive(
-    pinchGesture,
-    panGesture,
-    doubleTapGesture
+  const composedGesture = Gesture.Race(
+    doubleTapGesture,
+    Gesture.Simultaneous(pinchGesture, panGesture)
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
