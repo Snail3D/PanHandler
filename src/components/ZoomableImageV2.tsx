@@ -64,8 +64,11 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      translateX.value = savedTranslateX.value + event.translationX;
-      translateY.value = savedTranslateY.value + event.translationY;
+      // When panning during a pinch, scale might be changing
+      // Adjust translation based on current scale vs saved scale
+      const currentScaleRatio = scale.value / savedScale.value;
+      translateX.value = savedTranslateX.value * currentScaleRatio + event.translationX;
+      translateY.value = savedTranslateY.value * currentScaleRatio + event.translationY;
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
