@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -47,6 +47,10 @@ export default function DimensionOverlay({
   const pressX = useSharedValue(0);
   const pressY = useSharedValue(0);
   const [showPressIndicator, setShowPressIndicator] = useState(false);
+  
+  // Lock-in animation
+  const lockInOpacity = useSharedValue(0);
+  const lockInScale = useSharedValue(1);
   
   const calibration = useStore((s) => s.calibration);
   const unitSystem = useStore((s) => s.unitSystem);
@@ -131,6 +135,37 @@ export default function DimensionOverlay({
   };
 
   const [placementMode, setPlacementMode] = useState(false);
+  const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
+
+  // Show locked-in animation when coin circle first appears
+  useEffect(() => {
+    if (coinCircle && !showLockedInAnimation) {
+      setShowLockedInAnimation(true);
+      
+      // Green blink animation (3 blinks)
+      lockInOpacity.value = 0;
+      lockInScale.value = 1;
+      
+      const blink = () => {
+        lockInOpacity.value = withTiming(1, { duration: 150 }, () => {
+          lockInOpacity.value = withTiming(0, { duration: 150 });
+        });
+        lockInScale.value = withTiming(1.2, { duration: 150 }, () => {
+          lockInScale.value = withTiming(1, { duration: 150 });
+        });
+      };
+      
+      blink();
+      setTimeout(blink, 350);
+      setTimeout(blink, 700);
+      
+      // Auto-enable placement mode and hide animation after blinking
+      setTimeout(() => {
+        setPlacementMode(true);
+        setShowLockedInAnimation(false);
+      }, 1200);
+    }
+  }, [coinCircle]);
 
   // Touch cursor state management
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
@@ -451,28 +486,16 @@ export default function DimensionOverlay({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        {/* Debug display */}
-        {coinCircle && (
-          <View style={{ position: 'absolute', top: 100, left: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.9)', padding: 8, borderRadius: 8, zIndex: 9999 }}>
-            <Text style={{ color: '#00FF41', fontSize: 11, fontFamily: 'monospace' }}>
-              Zoom: {zoomScale.toFixed(2)} | Trans: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)}){'\n'}
-              Coin Img: ({coinCircle.centerX.toFixed(1)}, {coinCircle.centerY.toFixed(1)}) R: {coinCircle.radius.toFixed(1)}{'\n'}
-              Screen: ({(coinCircle.centerX * zoomScale + zoomTranslateX).toFixed(1)}, {(coinCircle.centerY * zoomScale + zoomTranslateY).toFixed(1)}) R: {(coinCircle.radius * zoomScale).toFixed(1)}
-            </Text>
-          </View>
-        )}
-        
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-            {/* Persistent coin circle reference - transform using CURRENT zoom so it scales with image */}
-            {coinCircle && (() => {
-              // Use current zoom so circle scales with the image
+            {/* Lock-in animation - green blinking circle (only shows during animation) */}
+            {showLockedInAnimation && coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
               const screenRadius = coinCircle.radius * zoomScale;
               
               return (
                 <>
-                  {/* Filled green circle with semi-transparency */}
+                  {/* Animated green circle that blinks */}
                   <Circle
                     cx={screenPos.x}
                     cy={screenPos.y}
@@ -481,13 +504,11 @@ export default function DimensionOverlay({
                     stroke="#00FF41"
                     strokeWidth="3"
                   />
-                  {/* Center dot for precision */}
                   <Circle
                     cx={screenPos.x}
                     cy={screenPos.y}
                     r="4"
                     fill="#00FF41"
-                    opacity={0.8}
                   />
                 </>
               );
@@ -597,25 +618,31 @@ export default function DimensionOverlay({
             })}
           </Svg>
 
-          {/* Coin circle label showing diameter */}
-          {coinCircle && (() => {
-            const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
-            return (
-              <View
-                style={{
-                  position: 'absolute',
-                  left: screenPos.x - 60,
-                  top: screenPos.y - 15,
-                  width: 120,
-                }}
-                pointerEvents="none"
-              >
-                <Text style={{ color: '#00FF41', fontSize: 14, fontWeight: 'bold', textAlign: 'center', textShadowColor: 'rgba(0,0,0,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }}>
-                  {coinCircle.coinDiameter}mm
-                </Text>
-              </View>
-            );
-          })()}
+          {/* "Locked In!" message during animation */}
+          {showLockedInAnimation && (
+            <View
+              style={{
+                position: 'absolute',
+                top: SCREEN_HEIGHT / 2 - 100,
+                left: SCREEN_WIDTH / 2 - 80,
+                width: 160,
+                backgroundColor: '#00FF41',
+                paddingVertical: 12,
+                paddingHorizontal: 20,
+                borderRadius: 16,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
+              pointerEvents="none"
+            >
+              <Text style={{ color: '#000', fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>
+                ✓ Locked In!
+              </Text>
+            </View>
+          )}
 
           {/* Measurement labels for completed measurements */}
           {measurements.map((measurement, idx) => {
@@ -623,12 +650,12 @@ export default function DimensionOverlay({
             if (measurement.mode === 'distance') {
               const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
               const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-              screenX = (p0.x + p1.x) / 2 - 50;
-              screenY = (p0.y + p1.y) / 2 - 40;
+              screenX = (p0.x + p1.x) / 2;
+              screenY = (p0.y + p1.y) / 2 - 50;
             } else {
               const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-              screenX = p1.x - 50;
-              screenY = p1.y - 60;
+              screenX = p1.x;
+              screenY = p1.y - 70;
             }
             
             return (
@@ -636,23 +663,46 @@ export default function DimensionOverlay({
                 key={measurement.id}
                 style={{
                   position: 'absolute',
-                  left: screenX,
+                  left: screenX - 60,
                   top: screenY,
-                  backgroundColor: measurement.mode === 'distance' ? '#3B82F6' : '#10B981',
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 8,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 4,
-                  elevation: 5,
+                  alignItems: 'center',
                 }}
                 pointerEvents="none"
               >
-                <Text className="text-white font-bold text-sm">
-                  {idx + 1}. {measurement.value}
-                </Text>
+                {/* Small number badge */}
+                <View
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 4,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                    {idx + 1}
+                  </Text>
+                </View>
+                {/* Measurement value */}
+                <View
+                  style={{
+                    backgroundColor: measurement.mode === 'distance' ? '#3B82F6' : '#10B981',
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
+                    {measurement.value}
+                  </Text>
+                </View>
               </View>
             );
           })}
