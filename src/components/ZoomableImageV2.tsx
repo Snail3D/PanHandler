@@ -31,6 +31,8 @@ export default function ZoomableImage({
   const translateY = useSharedValue(initialTranslateY);
   const savedTranslateX = useSharedValue(initialTranslateX);
   const savedTranslateY = useSharedValue(initialTranslateY);
+  const focalX = useSharedValue(0);
+  const focalY = useSharedValue(0);
 
   // Notify parent of initial transform values on mount
   useEffect(() => {
@@ -41,14 +43,28 @@ export default function ZoomableImage({
   }, []);
 
   const pinchGesture = Gesture.Pinch()
+    .onStart((event) => {
+      focalX.value = event.focalX;
+      focalY.value = event.focalY;
+    })
     .onUpdate((event) => {
-      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      
+      // Adjust translation to keep the focal point stationary
+      const scaleDiff = newScale - scale.value;
+      translateX.value = savedTranslateX.value - (focalX.value - savedTranslateX.value) * (scaleDiff / savedScale.value);
+      translateY.value = savedTranslateY.value - (focalY.value - savedTranslateY.value) * (scaleDiff / savedScale.value);
+      
+      scale.value = newScale;
+      
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
     })
     .onEnd(() => {
       savedScale.value = scale.value;
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
