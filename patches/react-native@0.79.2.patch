@@ -1,0 +1,570 @@
+diff --git a/Libraries/Core/ExceptionsManager.js b/Libraries/Core/ExceptionsManager.js
+index 05160ce36285bc27cb7776bff15faf0a20e86354..413f56b2d34e9cabff083bb3121a2ce0834d075e 100644
+--- a/Libraries/Core/ExceptionsManager.js
++++ b/Libraries/Core/ExceptionsManager.js
+@@ -12,6 +12,7 @@
+ 
+ import type {ExtendedError} from './ExtendedError';
+ import type {ExceptionData} from './NativeExceptionsManager';
++import LogBoxLog from '../LogBox/Data/LogBoxLog';
+ 
+ export class SyntheticError extends Error {
+   name: string = '';
+@@ -53,6 +54,80 @@ function preprocessException(data: ExceptionData): ExceptionData {
+   return data;
+ }
+ 
++function formatStack(stack: [any]) {
++  return stack.map((item) => {
++    const isComponentStack = !!item.fileName;
++    if (isComponentStack) {
++      return `
++      <${item.content}/>
++      ${item.fileName}:${item.location.row}:${item.location.column}`
++    } else {
++      return `
++      ${item.methodName}
++      ${item.file}:${item.lineNumber}:${item.column}`
++    }
++  }).join('\n');
++}
++function reportExceptionToNative(data: ExceptionData, e: ExtendedError) {
++  const temp = {
++    ...data,
++    isComponentError: !!e.isComponentError,
++  };
++
++  const ParseLogBoxLog = require('../LogBox/Data/parseLogBoxLog');
++  const parsed = ParseLogBoxLog.parseLogBoxException(temp);
++  const logParsed = new LogBoxLog(parsed);
++
++  logParsed.handleSymbolicateAsync().then(() => {
++    const stack = logParsed.getAvailableStack();
++    const componentStack = logParsed.getAvailableComponentStack();
++
++    // Function to strip ANSI color codes
++    const stripAnsiColors = (str) => {
++      return str ? str.replace(/\u001b\[[0-9;]*m/g, '') : '';
++    };
++    const codeFrame = stripAnsiColors(logParsed.codeFrame?.content);
++    const codeFrameLocation = `${logParsed.codeFrame?.fileName} (${logParsed.codeFrame?.location.row}:${logParsed.codeFrame?.location.column})`;
++    const componentCodeFrame = stripAnsiColors(logParsed.componentCodeFrame?.content);
++    const componentCodeFrameLocation = `${logParsed.componentCodeFrame?.fileName} (${logParsed.componentCodeFrame?.location.row}:${logParsed.componentCodeFrame?.location.column})`;
++    const formattedStack = formatStack(stack);
++    const formattedComponentStack = formatStack(componentStack);
++
++    const errorDetails = `
++    ${codeFrame && `codeFrame: 
++${codeFrame}
++    ${codeFrameLocation}`}
++    
++    ${componentCodeFrame && `componentCodeFrame: 
++${componentCodeFrame}
++    ${componentCodeFrameLocation}`}
++
++    ${formattedStack && `stack: ${formattedStack}`}
++
++    ${formattedComponentStack && `componentStack: ${formattedComponentStack}`}
++    `
++
++    const errorMsg = logParsed.category;
++
++    const combinedErrorMsg = `${errorMsg}\n\n%errorDetails%${errorDetails}`;
++    const NativeExceptionsManager =
++      require('./NativeExceptionsManager').default;
++
++    if (NativeExceptionsManager) {
++      const errorData = {
++        message: combinedErrorMsg,
++        name: errorMsg,
++        componentStack: componentStack,
++        stack: stack,
++        id: logParsed.id,
++        isFatal: false,
++      }
++
++      NativeExceptionsManager.reportException(errorData);
++    }
++  });
++}
++
+ /**
+  * Handles the developer-visible aspect of errors and exceptions
+  */
+@@ -104,6 +179,11 @@ function reportException(
+     extraData,
+   });
+ 
++  // TODO: maybe hide this behind if(__VIBECODE__)
++  reportExceptionToNative(data, e);
++  console.log(e);
++  return;
++
+   if (reportToConsole) {
+     // we feed back into console.error, to make sure any methods that are
+     // monkey patched on top of console.error are called when coming from
+diff --git a/Libraries/LogBox/Data/LogBoxData.js b/Libraries/LogBox/Data/LogBoxData.js
+index 1c11fd4e0b46f5485fcc22cd1274fbbdec01ac19..2fb02a7f642d0789203accaec85e88930619a3ce 100644
+--- a/Libraries/LogBox/Data/LogBoxData.js
++++ b/Libraries/LogBox/Data/LogBoxData.js
+@@ -188,9 +188,10 @@ function appendNewLog(newLog: LogBoxLog) {
+         handleUpdate();
+       }
+     });
+-  } else if (newLog.level === 'syntax') {
+-    logs.add(newLog);
+-    setSelectedLog(logs.size - 1);
++  // Make syntax errors dismissible  
++  // } else if (newLog.level === 'syntax') {
++  //   logs.add(newLog);
++  //   setSelectedLog(logs.size - 1);
+   } else {
+     logs.add(newLog);
+     handleUpdate();
+diff --git a/Libraries/LogBox/Data/LogBoxLog.js b/Libraries/LogBox/Data/LogBoxLog.js
+index be475215db88c9ffaa871a1e4ed3bfc64286b0e1..ba3a79d454cfa3d599d9b268b486f6fcb4732027 100644
+--- a/Libraries/LogBox/Data/LogBoxLog.js
++++ b/Libraries/LogBox/Data/LogBoxLog.js
+@@ -163,6 +163,50 @@ class LogBoxLog {
+     }
+   }
+ 
++  handleSymbolicateAsync(): Promise<void> {
++    const callback = () => {};
++    const promises = [];
++    if (
++      this.symbolicated.status !== 'PENDING' &&
++      this.symbolicated.status !== 'COMPLETE'
++    ) {
++      this.updateStatus(null, null, null, callback);
++      promises.push(LogBoxSymbolication.symbolicate(this.stack, this.extraData).then(
++        data => {
++          this.updateStatus(null, data?.stack, data?.codeFrame, callback);
++        },
++        error => {
++          this.updateStatus(error, null, null, callback);
++        },
++      ));
++    }
++    if (
++      this.componentStack != null &&
++      this.componentStackType === 'stack' &&
++      this.symbolicatedComponentStack.status !== 'PENDING' &&
++      this.symbolicatedComponentStack.status !== 'COMPLETE'
++    ) {
++      this.updateComponentStackStatus(null, null, null, callback);
++      const componentStackFrames = convertComponentStateToStack(
++        this.componentStack,
++      );
++      promises.push(LogBoxSymbolication.symbolicate(componentStackFrames, []).then(
++        data => {
++          this.updateComponentStackStatus(
++            null,
++            convertStackToComponentStack(data.stack),
++            data?.codeFrame,
++            callback,
++          );
++        },
++        error => {
++          this.updateComponentStackStatus(error, null, null, callback);
++        },
++      ));
++    }
++    return Promise.all(promises);
++  }
++
+   handleSymbolicate(callback?: (status: SymbolicationStatus) => void): void {
+     if (
+       this.symbolicated.status !== 'PENDING' &&
+diff --git a/Libraries/LogBox/LogBox.js b/Libraries/LogBox/LogBox.js
+index bc0eb4b3042c5f570be880dd11f94151ab41b199..2d7d57076259ac99fca2eebc7df4bcb70f534466 100644
+--- a/Libraries/LogBox/LogBox.js
++++ b/Libraries/LogBox/LogBox.js
+@@ -34,7 +34,7 @@ interface ILogBox {
+ /**
+  * LogBox displays logs in the app.
+  */
+-if (__DEV__) {
++if (false) { // __DEV__
+   const LogBoxData = require('./Data/LogBoxData');
+   const {parseLogBoxLog, parseInterpolation} = require('./Data/parseLogBoxLog');
+ 
+diff --git a/Libraries/LogBox/UI/LogBoxInspector.js b/Libraries/LogBox/UI/LogBoxInspector.js
+index be889b06fd58e8a93f7e512e2874b2234c728c4f..3b93f5dcaeac90f6d5813b3258332e3cf66ef639 100644
+--- a/Libraries/LogBox/UI/LogBoxInspector.js
++++ b/Libraries/LogBox/UI/LogBoxInspector.js
+@@ -76,6 +76,8 @@ export default function LogBoxInspector(props: Props): React.Node {
+         onDismiss={props.onDismiss}
+         onMinimize={props.onMinimize}
+         level={log.level}
++        log={log}
++        logs={logs}
+       />
+     </View>
+   );
+diff --git a/Libraries/LogBox/UI/LogBoxInspectorFooter.js b/Libraries/LogBox/UI/LogBoxInspectorFooter.js
+index c3a7b692106d9233d508d7dabfc082f091b2d257..37d192543e1b2035cb714b03e1b808ac21f0adcd 100644
+--- a/Libraries/LogBox/UI/LogBoxInspectorFooter.js
++++ b/Libraries/LogBox/UI/LogBoxInspectorFooter.js
+@@ -8,7 +8,7 @@
+  * @format
+  */
+ 
+-import type {LogLevel} from '../Data/LogBoxLog';
++import LogBoxLog, { type LogLevel } from '../Data/LogBoxLog';
+ 
+ import View from '../../Components/View/View';
+ import StyleSheet from '../../StyleSheet/StyleSheet';
+@@ -16,28 +16,54 @@ import Text from '../../Text/Text';
+ import LogBoxInspectorFooterButton from './LogBoxInspectorFooterButton';
+ import * as LogBoxStyle from './LogBoxStyle';
+ import * as React from 'react';
++import Clipboard from '@react-native-clipboard/clipboard';
+ 
+ type Props = $ReadOnly<{
+   onDismiss: () => void,
+   onMinimize: () => void,
+   level?: ?LogLevel,
++  log?: LogBoxLog,
++  logs?: $ReadOnlyArray<LogBoxLog>,
+ }>;
+ 
+ export default function LogBoxInspectorFooter(props: Props): React.Node {
+-  if (props.level === 'syntax') {
+-    return (
+-      <View style={styles.root}>
+-        <View style={styles.button}>
+-          <Text id="logbox_dismissable_text" style={styles.syntaxErrorText}>
+-            This error cannot be dismissed.
+-          </Text>
+-        </View>
+-      </View>
+-    );
++  // if (props.level === 'syntax') {
++  //   return (
++  //     <View style={styles.root}>
++  //       <View style={styles.button}>
++  //         <Text id="logbox_dismissable_text" style={styles.syntaxErrorText}>
++  //           This error cannot be dismissed.
++  //         </Text>
++  //       </View>
++  //     </View>
++  //   );
++  // }
++
++  const getCopyText = (log: LogBoxLog) => {
++    const message = log.message.content;
++    const filePath = log.codeFrame?.fileName;
++    const codeContent = log.codeFrame?.content;
++    const copyText = `${message}\n\n${filePath}\n\n${codeContent}`.replaceAll(/\u001b\[[0-9;]*m/g, '');
++    return copyText;
++  }
++
++  const copyToClipboard = () => {
++    if (props.log) {
++      Clipboard.setString(getCopyText(props.log));
++    }
++  }
++
++  const copyAllToClipboard = () => {
++    if (props.logs) {
++      const copyText = props.logs.map(log => getCopyText(log)).join('\n');
++      Clipboard.setString(copyText);
++    }
+   }
+ 
+   return (
+     <View style={styles.root}>
++      <LogBoxInspectorFooterButton text="Copy" onPress={copyToClipboard} />
++      <LogBoxInspectorFooterButton text="Copy All" onPress={copyAllToClipboard} />
+       <LogBoxInspectorFooterButton
+         id="logbox_footer_button_dismiss"
+         text="Dismiss"
+diff --git a/Libraries/Network/RCTHTTPRequestHandler.h b/Libraries/Network/RCTHTTPRequestHandler.h
+index 768982a9de592ab6296f4cf827f91df49cefea98..f1dbd0b370f65abe4ed59d5d50e0c3b3219c0064 100644
+--- a/Libraries/Network/RCTHTTPRequestHandler.h
++++ b/Libraries/Network/RCTHTTPRequestHandler.h
+@@ -14,6 +14,22 @@ typedef NSURLSessionConfiguration * (^NSURLSessionConfigurationProvider)(void);
+  * app.
+  */
+ RCT_EXTERN void RCTSetCustomNSURLSessionConfigurationProvider(NSURLSessionConfigurationProvider);
++
++/**
++ * Set proxy credentials for HTTP requests.
++ */
++RCT_EXTERN void RCTSetProxyCredentials(NSString *username, NSString *password);
++
++/**
++ * Set proxy host for HTTP requests.
++ */
++RCT_EXTERN void RCTSetProxyHost(NSString *host);
++
++/**
++ * Set proxied domains for HTTP requests.
++ */
++RCT_EXTERN void RCTSetProxiedDomains(NSArray<NSString *> *domains);
++
+ /**
+  * This is the default RCTURLRequestHandler implementation for HTTP requests.
+  */
+diff --git a/Libraries/Network/RCTHTTPRequestHandler.mm b/Libraries/Network/RCTHTTPRequestHandler.mm
+index 4a0353396d7eda980da9d4aef0ee36b557b4a911..ce7d32a885dedad3ad383c24e7b01631634239a2 100644
+--- a/Libraries/Network/RCTHTTPRequestHandler.mm
++++ b/Libraries/Network/RCTHTTPRequestHandler.mm
+@@ -20,11 +20,32 @@ @interface RCTHTTPRequestHandler () <NSURLSessionDataDelegate, RCTTurboModule>
+ 
+ static NSURLSessionConfigurationProvider urlSessionConfigurationProvider;
+ 
++static NSString *proxyUsername = nil;
++static NSString *proxyPassword = nil;
++static NSString *proxyHost = nil;
++static NSSet<NSString *> *proxiedDomains = nil;
++
+ void RCTSetCustomNSURLSessionConfigurationProvider(NSURLSessionConfigurationProvider provider)
+ {
+   urlSessionConfigurationProvider = provider;
+ }
+ 
++void RCTSetProxyCredentials(NSString *username, NSString *password)
++{
++  proxyUsername = username;
++  proxyPassword = password;
++}
++
++void RCTSetProxyHost(NSString *host)
++{
++  proxyHost = host;
++}
++
++void RCTSetProxiedDomains(NSArray<NSString *> *domains)
++{
++  proxiedDomains = [NSSet setWithArray:domains];
++}
++
+ @implementation RCTHTTPRequestHandler {
+   NSMapTable *_delegates;
+   NSURLSession *_session;
+@@ -66,6 +87,39 @@ - (BOOL)canHandleRequest:(NSURLRequest *)request
+ - (NSURLSessionDataTask *)sendRequest:(NSURLRequest *)request withDelegate:(id<RCTURLRequestDelegate>)delegate
+ {
+   std::lock_guard<std::mutex> lock(_mutex);
++
++  // Proxy code
++  NSMutableURLRequest *mutableRequest = [request mutableCopy];
++  NSURL *originalURL = request.URL;
++  if (originalURL.host && proxyHost && proxiedDomains != nil) {
++    BOOL shouldProxy = NO;
++    for (NSString *domain in proxiedDomains) {
++      if ([originalURL.host isEqualToString:domain] || 
++          [originalURL.host hasSuffix:[NSString stringWithFormat:@".%@", domain]]) {
++        shouldProxy = YES;
++        break;
++      }
++    }
++    
++    if (shouldProxy) {
++      NSString *modifiedHost = [NSString stringWithFormat:@"%@.%@", originalURL.host, proxyHost];
++
++      NSURLComponents *components = [NSURLComponents componentsWithURL:originalURL resolvingAgainstBaseURL:NO];
++      components.host = modifiedHost;
++
++      if (proxyUsername && proxyPassword) {
++        components.user = proxyUsername;
++        components.password = proxyPassword;
++      }
++
++      NSURL *modifiedURL = [components URL];
++      if (modifiedURL) {
++        mutableRequest.URL = modifiedURL;
++        NSLog(@"Modified URL: %@", mutableRequest.URL.absoluteString);
++      }
++    }
++  }
++
+   // Lazy setup
+   if (!_session && [self isValid]) {
+     // You can override default NSURLSession instance property allowsCellularAccess (default value YES)
+@@ -100,7 +154,7 @@ - (NSURLSessionDataTask *)sendRequest:(NSURLRequest *)request withDelegate:(id<R
+                                            valueOptions:NSPointerFunctionsStrongMemory
+                                                capacity:0];
+   }
+-  NSURLSessionDataTask *task = [_session dataTaskWithRequest:request];
++  NSURLSessionDataTask *task = [_session dataTaskWithRequest:mutableRequest];
+   [_delegates setObject:delegate forKey:task];
+   [task resume];
+   return task;
+diff --git a/React/Base/RCTAssert.m b/React/Base/RCTAssert.m
+index ca8542eb6acf2feebb70a9da47ece608d7bde773..63f844b7c9977b90b39a6fc136502d467a69bec7 100644
+--- a/React/Base/RCTAssert.m
++++ b/React/Base/RCTAssert.m
+@@ -127,9 +127,9 @@ void RCTFatal(NSError *error)
+   if (fatalHandler) {
+     fatalHandler(error);
+   } else {
+-#if DEBUG
++// #if DEBUG
+     @try {
+-#endif
++// #endif
+       NSString *name = [NSString stringWithFormat:@"%@: %@", RCTFatalExceptionName, error.localizedDescription];
+ 
+       // Truncate the localized description to 175 characters to avoid wild screen overflows
+@@ -145,10 +145,10 @@ void RCTFatal(NSError *error)
+       // reason: <underlying error description plus JS stack trace, truncated to 175 characters>
+       // userInfo: <underlying error userinfo, plus untruncated description plus JS stack trace>
+       @throw [[NSException alloc] initWithName:name reason:message userInfo:userInfo];
+-#if DEBUG
++// #if DEBUG
+     } @catch (NSException *e) {
+     }
+-#endif
++// #endif
+   }
+ }
+ 
+diff --git a/React/Base/RCTDefines.h b/React/Base/RCTDefines.h
+index 228d92c2960a78ff209b8856884b179baed320c8..f87902b18c7eaa8169977f840d0c9c570b88755d 100644
+--- a/React/Base/RCTDefines.h
++++ b/React/Base/RCTDefines.h
+@@ -92,7 +92,7 @@
+  * By default though, it will inherit from RCT_DEV.
+  */
+ #ifndef RCT_DEV_MENU
+-#define RCT_DEV_MENU RCT_DEV
++#define RCT_DEV_MENU 1 //RCT_DEV
+ #endif
+ 
+ #ifndef RCT_DEV_SETTINGS_ENABLE_PACKAGER_CONNECTION
+diff --git a/React/Base/RCTRedBoxSetEnabled.m b/React/Base/RCTRedBoxSetEnabled.m
+index 51142be37507b2df40c103cc155bb75ef7e73410..7a077df9fb75227202d34ea468614f582324359f 100644
+--- a/React/Base/RCTRedBoxSetEnabled.m
++++ b/React/Base/RCTRedBoxSetEnabled.m
+@@ -10,7 +10,7 @@
+ #if RCT_DEV
+ static BOOL redBoxEnabled = YES;
+ #else
+-static BOOL redBoxEnabled = NO;
++static BOOL redBoxEnabled = YES; // NO;
+ #endif
+ 
+ void RCTRedBoxSetEnabled(BOOL enabled)
+diff --git a/React/CoreModules/RCTDevMenu.mm b/React/CoreModules/RCTDevMenu.mm
+index 3918ea0b1425fee133701ac3a50a299cf981078c..d606ef17879b9e95779607b69ee83a92c2914914 100644
+--- a/React/CoreModules/RCTDevMenu.mm
++++ b/React/CoreModules/RCTDevMenu.mm
+@@ -105,13 +105,13 @@ @implementation RCTDevMenu {
+ 
+ RCT_EXPORT_MODULE()
+ 
+-+ (void)initialize
+-{
+-  // We're swizzling here because it's poor form to override methods in a category,
+-  // however UIWindow doesn't actually implement motionEnded:withEvent:, so there's
+-  // no need to call the original implementation.
+-  RCTSwapInstanceMethods([UIWindow class], @selector(motionEnded:withEvent:), @selector(RCT_motionEnded:withEvent:));
+-}
++//+ (void)initialize
++//{
++//  // We're swizzling here because it's poor form to override methods in a category,
++//  // however UIWindow doesn't actually implement motionEnded:withEvent:, so there's
++//  // no need to call the original implementation.
++//  RCTSwapInstanceMethods([UIWindow class], @selector(motionEnded:withEvent:), @selector(RCT_motionEnded:withEvent:));
++//}
+ 
+ + (BOOL)requiresMainQueueSetup
+ {
+diff --git a/React/CoreModules/RCTRedBox.h b/React/CoreModules/RCTRedBox.h
+index a8031aa3aede9e60d22cf94015607ace05441ff8..2f5615b2a50011882a5ef8b5131742b7bbaafe6a 100644
+--- a/React/CoreModules/RCTRedBox.h
++++ b/React/CoreModules/RCTRedBox.h
+@@ -14,6 +14,8 @@
+ 
+ typedef void (^RCTRedBoxButtonPressHandler)(void);
+ 
++static NSString * const VibecodeRedBoxErrorShown = @"VibecodeRedBoxErrorShown";
++
+ @interface RCTRedBox : NSObject <RCTBridgeModule>
+ 
+ - (void)registerErrorCustomizer:(id<RCTErrorCustomizer>)errorCustomizer;
+diff --git a/React/CoreModules/RCTRedBox.mm b/React/CoreModules/RCTRedBox.mm
+index fb057b969214ee3d4d691a8530a49c4a8f727c34..0a20ae4ed3dd08fa6ecd5e5efaf98ff42c508902 100644
+--- a/React/CoreModules/RCTRedBox.mm
++++ b/React/CoreModules/RCTRedBox.mm
+@@ -612,23 +612,55 @@ - (void)showErrorMessage:(NSString *)message
+       self->_extraDataViewController.actionDelegate = self;
+     }
+ 
++    // Emit event when showErrorMessage is called
++// #pragma clang diagnostic push
++// #pragma clang diagnostic ignored "-Wdeprecated-declarations"
++//     [[self->_moduleRegistry moduleForName:"EventDispatcher"] sendDeviceEventWithName:@"redBoxErrorShown"
++//                                                                                 body:@{
++//                                                                                   @"message": message ?: @"",
++//                                                                                   @"isUpdate": @(isUpdate),
++//                                                                                   @"errorCookie": @(errorCookie)
++//                                                                                 }];
++// #pragma clang diagnostic pop
++
++    // Also post a notification for native listeners
++    NSMutableArray *stackDictionaries = [NSMutableArray array];
++    for (RCTJSStackFrame *frame in stack) {
++      NSMutableDictionary *frameDict = [NSMutableDictionary dictionary];
++      if (frame.methodName) frameDict[@"methodName"] = frame.methodName;
++      if (frame.file) frameDict[@"file"] = frame.file;
++      frameDict[@"lineNumber"] = @(frame.lineNumber);
++      frameDict[@"column"] = @(frame.column);
++      frameDict[@"collapse"] = @(frame.collapse);
++      [stackDictionaries addObject:frameDict];
++    }
++    
++    [[NSNotificationCenter defaultCenter] postNotificationName:VibecodeRedBoxErrorShown
++                                                        object:self
++                                                      userInfo:@{
++                                                        @"message": message ?: @"",
++                                                        @"isUpdate": @(isUpdate),
++                                                        @"errorCookie": @(errorCookie),
++                                                        @"stack": stackDictionaries
++                                                      }];
++
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+     [[self->_moduleRegistry moduleForName:"EventDispatcher"] sendDeviceEventWithName:@"collectRedBoxExtraData"
+                                                                                 body:nil];
+ #pragma clang diagnostic pop
+-    if (!self->_controller) {
+-      self->_controller = [[RCTRedBoxController alloc] initWithCustomButtonTitles:self->_customButtonTitles
+-                                                             customButtonHandlers:self->_customButtonHandlers];
+-      self->_controller.actionDelegate = self;
+-    }
+-
+-    RCTErrorInfo *errorInfo = [[RCTErrorInfo alloc] initWithErrorMessage:message stack:stack];
+-    errorInfo = [self _customizeError:errorInfo];
+-    [self->_controller showErrorMessage:errorInfo.errorMessage
+-                              withStack:errorInfo.stack
+-                               isUpdate:isUpdate
+-                            errorCookie:errorCookie];
++//    if (!self->_controller) {
++//      self->_controller = [[RCTRedBoxController alloc] initWithCustomButtonTitles:self->_customButtonTitles
++//                                                             customButtonHandlers:self->_customButtonHandlers];
++//      self->_controller.actionDelegate = self;
++//    }
++//
++//    RCTErrorInfo *errorInfo = [[RCTErrorInfo alloc] initWithErrorMessage:message stack:stack];
++//    errorInfo = [self _customizeError:errorInfo];
++//    [self->_controller showErrorMessage:errorInfo.errorMessage
++//                              withStack:errorInfo.stack
++//                               isUpdate:isUpdate
++//                            errorCookie:errorCookie];
+   });
+ }
+ 
+@@ -656,7 +688,8 @@ - (void)loadExtraDataViewController
+ 
+ - (void)invalidate
+ {
+-  [self dismiss];
++  // workaround for https://github.com/facebook/react-native/pull/50867
++  // [self dismiss];
+ }
+ 
+ - (void)redBoxController:(__unused RCTRedBoxController *)redBoxController
