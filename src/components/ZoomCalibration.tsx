@@ -64,8 +64,10 @@ export default function ZoomCalibration({
 
     // Calculate the coin circle position in the ORIGINAL image coordinates
     // User sees circle at screen center, but image might be translated/zoomed
-    const originalImageCenterX = (referenceCenterX - zoomTranslate.x) / zoomScale;
-    const originalImageCenterY = (referenceCenterY - zoomTranslate.y) / zoomScale;
+    // Transform applies as: screen = (original + translate) * scale
+    // So inverse is: original = screen / scale - translate
+    const originalImageCenterX = referenceCenterX / zoomScale - zoomTranslate.x;
+    const originalImageCenterY = referenceCenterY / zoomScale - zoomTranslate.y;
     const originalImageRadius = referenceRadiusPixels / zoomScale;
 
     onComplete({
