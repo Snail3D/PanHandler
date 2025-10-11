@@ -50,16 +50,34 @@ export default function ZoomableImage({
       focalY.value = event.focalY;
     })
     .onUpdate((event) => {
-      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      const scaleRatio = newScale / savedScale.value;
+      
+      // Adjust translate to keep the focal point stationary
+      // As scale changes, adjust translate so the point under the focal point stays there
+      if (zoomToCenter) {
+        const centerX = SCREEN_WIDTH / 2;
+        const centerY = SCREEN_HEIGHT / 2;
+        translateX.value = savedTranslateX.value - (centerX - savedTranslateX.value) * (scaleRatio - 1);
+        translateY.value = savedTranslateY.value - (centerY - savedTranslateY.value) * (scaleRatio - 1);
+      } else {
+        translateX.value = savedTranslateX.value - (focalX.value - savedTranslateX.value) * (scaleRatio - 1);
+        translateY.value = savedTranslateY.value - (focalY.value - savedTranslateY.value) * (scaleRatio - 1);
+      }
+      
+      scale.value = newScale;
     })
     .onEnd(() => {
       savedScale.value = scale.value;
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
     });
 
   const panGesture = Gesture.Pan()
+    .maxPointers(1)  // Only respond to single-finger pans
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
