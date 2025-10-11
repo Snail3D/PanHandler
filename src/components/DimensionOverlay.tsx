@@ -370,7 +370,7 @@ export default function DimensionOverlay({
                     cx={screenPos.x}
                     cy={screenPos.y}
                     r={screenRadius}
-                    fill="rgba(0, 255, 65, 0.25)"
+                    fill="rgba(0, 255, 65, 0.5)"
                     stroke="#00FF41"
                     strokeWidth="3"
                   />

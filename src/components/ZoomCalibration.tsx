@@ -110,7 +110,7 @@ export default function ZoomCalibration({
             cx={referenceCenterX}
             cy={referenceCenterY}
             r={referenceRadiusPixels}
-            fill="rgba(59, 130, 246, 0.3)"
+            fill="rgba(59, 130, 246, 0.5)"
             stroke="#3B82F6"
             strokeWidth="3"
           />
