@@ -174,8 +174,8 @@ export default function DimensionOverlay({
   const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120;
-  const PRESS_DURATION = 200; // 200ms - very quick, feels like pressure detection
-  const MOVEMENT_THRESHOLD = 5; // 5px - very sensitive, must hold still
+  const PRESS_DURATION = 500; // 500ms - half second, natural deliberate hold
+  const MOVEMENT_THRESHOLD = 25; // 25px - forgiving for tremors/natural movement
   const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
@@ -716,7 +716,7 @@ export default function DimensionOverlay({
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                💡 Press firmly & hold still 200ms to lock • Drag to pan/zoom
+                💡 Hold still ½ second to place • Swipe to pan/zoom
               </Text>
             </View>
           )}
