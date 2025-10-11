@@ -57,9 +57,9 @@ export default function ZoomableImage({
         // For calibration: zoom toward screen center to keep blue circle centered
         const centerX = SCREEN_WIDTH / 2;
         const centerY = SCREEN_HEIGHT / 2;
-        // Adjust translate proportionally to keep screen center on same image point
-        translateX.value = savedTranslateX.value * scaleRatio;
-        translateY.value = savedTranslateY.value * scaleRatio;
+        // Keep the image point at screen center stationary
+        translateX.value = centerX - (centerX - savedTranslateX.value) * scaleRatio;
+        translateY.value = centerY - (centerY - savedTranslateY.value) * scaleRatio;
         scale.value = newScale;
       } else {
         // For measurement: zoom toward focal point (where fingers are)
