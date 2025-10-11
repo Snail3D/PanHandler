@@ -247,6 +247,7 @@ export default function MeasurementScreen() {
           <CalibrationModal
             visible={mode === 'selectCoin'}
             onComplete={handleCoinSelected}
+            onDismiss={handleRetakePhoto}
           />
         </>
       )}
