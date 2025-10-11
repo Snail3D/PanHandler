@@ -8,6 +8,7 @@ import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
 import CoinTracer from '../components/CoinTracer';
 import DimensionOverlay from '../components/DimensionOverlay';
+import ZoomableImage from '../components/ZoomableImage';
 import { CoinReference } from '../utils/coinReferences';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -197,11 +198,19 @@ export default function MeasurementScreen() {
     <View className="flex-1 bg-black">
       {currentImageUri && (
         <>
-          <Image
-            source={{ uri: currentImageUri }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
-            resizeMode="contain"
-          />
+          {/* Zoomable Image Layer */}
+          {(mode === 'measurement' || mode === 'traceCoin') && (
+            <ZoomableImage imageUri={currentImageUri} />
+          )}
+
+          {/* Static Image for Coin Selection */}
+          {mode === 'selectCoin' && (
+            <Image
+              source={{ uri: currentImageUri }}
+              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+              resizeMode="contain"
+            />
+          )}
           
           {mode === 'measurement' && <DimensionOverlay />}
           

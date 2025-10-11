@@ -328,6 +328,15 @@ export default function DimensionOverlay() {
             </Pressable>
           </View>
 
+          {/* Zoom tip */}
+          {points.length === 0 && (
+            <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
+              <Text className="text-blue-800 text-xs text-center">
+                💡 Pinch to zoom • Double-tap to reset zoom
+              </Text>
+            </View>
+          )}
+
           {/* Status/Result Display */}
           {points.length === 0 && (
             <View className="flex-row items-center">
