@@ -130,6 +130,8 @@ export default function DimensionOverlay({
     }
   };
 
+  const [placementMode, setPlacementMode] = useState(false);
+
   // Long press state management
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [longPressStart, setLongPressStart] = useState<{x: number, y: number} | null>(null);
@@ -291,32 +293,32 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Touch overlay for long-press - only captures single finger */}
-      <View 
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        onStartShouldSetResponder={(evt) => {
-          // Only capture if it's a single touch (not pinch)
-          return evt.nativeEvent.touches.length === 1;
-        }}
-        onResponderGrant={(evt) => {
-          // Single finger touch started
-          const touch = evt.nativeEvent.touches[0];
-          handlePressIn({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
-        }}
-        onResponderRelease={() => {
-          // Touch ended
-          handlePressOut();
-        }}
-        onResponderTerminate={() => {
-          // Touch was interrupted (e.g., by another gesture)
-          handlePressOut();
-        }}
-      >
-        {/* Long press indicator */}
-        {showPressIndicator && (
-          <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
-        )}
-      </View>
+      {/* Touch overlay - only active in placement mode */}
+      {placementMode ? (
+        <View 
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          onStartShouldSetResponder={() => true}
+          onResponderGrant={(evt) => {
+            const touch = evt.nativeEvent.touches[0];
+            handlePressIn({ nativeEvent: { locationX: touch.pageX, locationY: touch.pageY } });
+          }}
+          onResponderRelease={handlePressOut}
+          onResponderTerminate={handlePressOut}
+        >
+          {showPressIndicator && (
+            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
+          )}
+        </View>
+      ) : (
+        <View 
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          pointerEvents="none"
+        >
+          {showPressIndicator && (
+            <Animated.View style={pressIndicatorStyle} pointerEvents="none" />
+          )}
+        </View>
+      )}
 
       {/* Visual overlay - no touch interaction */}
       <View
@@ -530,6 +532,26 @@ export default function DimensionOverlay({
           })()}
       </View>
 
+      {/* Floating placement mode toggle button */}
+      <View
+        style={{
+          position: 'absolute',
+          top: insets.top + 80,
+          right: 20,
+        }}
+      >
+        <Pressable
+          onPress={() => setPlacementMode(!placementMode)}
+          className={`rounded-full w-14 h-14 items-center justify-center shadow-lg ${placementMode ? 'bg-blue-500' : 'bg-gray-700/80'}`}
+        >
+          <Ionicons 
+            name={placementMode ? "hand-left" : "move"} 
+            size={24} 
+            color="white" 
+          />
+        </Pressable>
+      </View>
+
       {/* Bottom toolbar */}
       <View
         className="absolute left-0 right-0 z-20"
@@ -569,7 +591,9 @@ export default function DimensionOverlay({
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
               <Text className="text-blue-800 text-xs text-center">
-                💡 Pinch to zoom • Double-tap to reset zoom • Hold 1.5s to place point
+                {placementMode 
+                  ? "📍 Placement Mode: Hold 1.5s to place point • Tap hand icon to zoom" 
+                  : "💡 Tap hand icon to place points • Pinch to zoom • Double-tap to reset"}
               </Text>
             </View>
           )}
