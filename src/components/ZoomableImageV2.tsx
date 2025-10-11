@@ -46,23 +46,8 @@ export default function ZoomableImage({
   }, []);
 
   const pinchGesture = Gesture.Pinch()
-    .onStart((event) => {
-      focalX.value = event.focalX;
-      focalY.value = event.focalY;
-    })
     .onUpdate((event) => {
-      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      
-      // Always zoom toward screen center, not focal point
-      const centerX = SCREEN_WIDTH / 2;
-      const centerY = SCREEN_HEIGHT / 2;
-      const scaleRatio = newScale / savedScale.value;
-      
-      // Adjust translate to keep screen center on the same image point
-      translateX.value = centerX - (centerX - savedTranslateX.value) * scaleRatio;
-      translateY.value = centerY - (centerY - savedTranslateY.value) * scaleRatio;
-      
-      scale.value = newScale;
+      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
     .onEnd(() => {
       savedScale.value = scale.value;
