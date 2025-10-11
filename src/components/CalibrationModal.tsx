@@ -17,7 +17,6 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
   const unitSystem = useStore((s) => s.unitSystem);
   
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [useCustomSize, setUseCustomSize] = useState(false);
   const [customSize, setCustomSize] = useState('');
   const [customUnit, setCustomUnit] = useState<'mm' | 'cm' | 'in'>(unitSystem === 'metric' ? 'mm' : 'in');
@@ -91,10 +90,6 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
       setLastSelectedCoin(selectedCoin.name);
       onComplete(selectedCoin);
     }
-  };
-
-  const toggleCategory = (label: string) => {
-    setExpandedCategory(expandedCategory === label ? null : label);
   };
 
   return (
@@ -232,6 +227,7 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                         placeholder="Search coins by name, country, or currency..."
                         className="flex-1 ml-3 text-gray-900"
                         placeholderTextColor="#9CA3AF"
+                        autoFocus={!selectedCoin}
                       />
                       {searchQuery.length > 0 && (
                         <Pressable onPress={() => setSearchQuery('')}>
@@ -286,69 +282,21 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                       <Text className="text-gray-400 text-sm">Try a different search term</Text>
                     </View>
                   ) : (
-                    <>
-                      <Text className="text-sm font-semibold text-gray-700 mb-3">
-                        SELECT REFERENCE COIN
+                    <View className="py-8 items-center bg-gray-50 rounded-xl">
+                      <Ionicons name="search" size={48} color="#9CA3AF" />
+                      <Text className="text-gray-600 mt-3 font-medium">Start typing to search</Text>
+                      <Text className="text-gray-400 text-sm text-center px-8 mt-2">
+                        Search for coins by name, country, or currency
                       </Text>
-                      
-                      {COIN_REFERENCES.map((category) => (
-                  <View key={category.label} className="mb-3">
-                    <Pressable
-                      onPress={() => toggleCategory(category.label)}
-                      className="bg-gray-100 rounded-lg px-4 py-3 flex-row items-center justify-between"
-                    >
-                      <View className="flex-row items-center flex-1">
-                        <Ionicons 
-                          name="cash-outline" 
-                          size={20} 
-                          color="#4B5563" 
-                        />
-                        <Text className="ml-3 text-gray-900 font-semibold">
-                          {category.label}
+                      <View className="mt-4 bg-white rounded-lg px-4 py-2 border border-gray-200">
+                        <Text className="text-gray-500 text-xs">
+                          💡 Try: "penny", "euro", "yen", "quarter"
                         </Text>
                       </View>
-                      <Ionicons 
-                        name={expandedCategory === category.label ? "chevron-up" : "chevron-down"} 
-                        size={20} 
-                        color="#6B7280" 
-                      />
-                    </Pressable>
-
-                    {expandedCategory === category.label && (
-                      <View className="mt-2 ml-4">
-                        {category.coins.map((coin) => (
-                          <Pressable
-                            key={coin.name}
-                            onPress={() => {
-                              setSelectedCoin(coin);
-                              setExpandedCategory(null);
-                            }}
-                            className={`py-3 px-4 mb-2 rounded-lg border-2 ${
-                              selectedCoin?.name === coin.name
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 bg-white'
-                            }`}
-                          >
-                            <Text className={`font-semibold mb-1 ${
-                              selectedCoin?.name === coin.name ? 'text-blue-900' : 'text-gray-900'
-                            }`}>
-                              {coin.name}
-                            </Text>
-                            <Text className={`text-sm ${
-                              selectedCoin?.name === coin.name ? 'text-blue-600' : 'text-gray-600'
-                            }`}>
-                              {coin.diameter}mm diameter
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                ))}
-              </>
-            )}
-          </View>
-        )}
+                    </View>
+                  )}
+                </View>
+              )}
 
               {/* Info box */}
               {!useCustomSize && (
