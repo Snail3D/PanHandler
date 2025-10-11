@@ -228,9 +228,13 @@ export default function MeasurementScreen() {
               </Pressable>
               
               {mode === 'measurement' && (
-                <Text className="text-white text-base font-semibold">
-                  Tap to Measure
-                </Text>
+                <Pressable
+                  onPress={() => setMode('selectCoin')}
+                  className="flex-row items-center bg-white/20 rounded-full px-3 py-2"
+                >
+                  <Ionicons name="settings-outline" size={20} color="white" />
+                  <Text className="text-white text-sm font-medium ml-2">Settings</Text>
+                </Pressable>
               )}
             </View>
           </View>

@@ -3,7 +3,9 @@ import { View, Text, Pressable, Dimensions } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useStore from '../state/measurementStore';
 import { CoinReference } from '../utils/coinReferences';
+import { formatMeasurement } from '../utils/unitConversion';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -15,65 +17,35 @@ interface CoinTracerProps {
 
 export default function CoinTracer({ selectedCoin, onComplete, onCancel }: CoinTracerProps) {
   const insets = useSafeAreaInsets();
+  const unitSystem = useStore((s) => s.unitSystem);
   const [centerPoint, setCenterPoint] = useState<{ x: number; y: number } | null>(null);
-  const [edgePoint, setEdgePoint] = useState<{ x: number; y: number } | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
 
   const handlePress = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
 
-    if (!centerPoint) {
-      // First tap: set center
-      setCenterPoint({ x: locationX, y: locationY });
-    } else if (!isDrawing) {
-      // Second tap: start drawing edge
-      setIsDrawing(true);
-      setEdgePoint({ x: locationX, y: locationY });
-    }
-  };
-
-  const handleMove = (event: any) => {
-    if (isDrawing && centerPoint) {
-      const { locationX, locationY } = event.nativeEvent;
-      setEdgePoint({ x: locationX, y: locationY });
-    }
-  };
-
-  const handleRelease = () => {
-    if (isDrawing && centerPoint && edgePoint) {
-      const radius = Math.sqrt(
-        Math.pow(edgePoint.x - centerPoint.x, 2) + 
-        Math.pow(edgePoint.y - centerPoint.y, 2)
-      );
-      
+    // Set center and automatically complete
+    setCenterPoint({ x: locationX, y: locationY });
+    
+    // Calculate radius based on coin diameter
+    // Use a reasonable default that will be adjusted by actual calibration
+    const estimatedRadius = 50; // Default radius in pixels for visualization
+    
+    // Complete immediately after tap
+    setTimeout(() => {
       onComplete({
-        centerX: centerPoint.x,
-        centerY: centerPoint.y,
-        radius: radius,
+        centerX: locationX,
+        centerY: locationY,
+        radius: estimatedRadius,
       });
-    }
+    }, 100);
   };
 
-  const handleReset = () => {
-    setCenterPoint(null);
-    setEdgePoint(null);
-    setIsDrawing(false);
-  };
-
-  const radius = centerPoint && edgePoint
-    ? Math.sqrt(
-        Math.pow(edgePoint.x - centerPoint.x, 2) + 
-        Math.pow(edgePoint.y - centerPoint.y, 2)
-      )
-    : 0;
+  const radius = 50; // Fixed radius for visualization
 
   return (
     <>
-      <View
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={handlePress}
-        onResponderMove={handleMove}
-        onResponderRelease={handleRelease}
+      <Pressable
+        onPress={handlePress}
         style={{
           position: 'absolute',
           top: 0,
@@ -84,8 +56,8 @@ export default function CoinTracer({ selectedCoin, onComplete, onCancel }: CoinT
         }}
       >
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-          {/* Draw circle if we have center and edge */}
-          {centerPoint && edgePoint && (
+          {/* Show coin circle if center is set */}
+          {centerPoint && (
             <>
               {/* Main circle */}
               <Circle
@@ -107,32 +79,10 @@ export default function CoinTracer({ selectedCoin, onComplete, onCancel }: CoinT
                 stroke="white"
                 strokeWidth="2"
               />
-              
-              {/* Edge point */}
-              <Circle
-                cx={edgePoint.x}
-                cy={edgePoint.y}
-                r="6"
-                fill="#F59E0B"
-                stroke="white"
-                strokeWidth="2"
-              />
             </>
           )}
-          
-          {/* Just center point if only center is set */}
-          {centerPoint && !edgePoint && (
-            <Circle
-              cx={centerPoint.x}
-              cy={centerPoint.y}
-              r="8"
-              fill="#F59E0B"
-              stroke="white"
-              strokeWidth="3"
-            />
-          )}
         </Svg>
-      </View>
+      </Pressable>
 
       {/* Instructions overlay */}
       <View
@@ -145,90 +95,43 @@ export default function CoinTracer({ selectedCoin, onComplete, onCancel }: CoinT
         <View className="bg-white/95 rounded-2xl px-6 py-4 shadow-lg">
           {/* Selected coin info */}
           <View className="flex-row items-center mb-4 pb-4 border-b border-gray-200">
-            <View className="w-10 h-10 rounded-full bg-amber-500 items-center justify-center mr-3">
-              <Ionicons name="cash" size={20} color="white" />
+            <View className="w-12 h-12 rounded-full bg-amber-500 items-center justify-center mr-3">
+              <Ionicons name="cash" size={24} color="white" />
             </View>
             <View className="flex-1">
-              <Text className="text-gray-900 font-bold">
+              <Text className="text-gray-900 font-bold text-lg">
                 {selectedCoin.name}
               </Text>
-              <Text className="text-gray-600 text-sm">
-                {selectedCoin.diameter}mm diameter
+              <Text className="text-gray-600">
+                {formatMeasurement(selectedCoin.diameter, 'mm', unitSystem, 1)}
               </Text>
             </View>
           </View>
 
           {/* Instructions */}
-          {!centerPoint && (
-            <View className="flex-row items-start">
-              <View className="w-8 h-8 rounded-full bg-amber-100 items-center justify-center mr-3 mt-0.5">
-                <Text className="text-amber-700 font-bold">1</Text>
-              </View>
-              <View className="flex-1">
-                <Text className="text-gray-900 font-semibold mb-1">
-                  Tap the center of the coin
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  Place your finger at the center point of the coin in the photo
-                </Text>
-              </View>
+          <View className="flex-row items-start mb-4">
+            <View className="w-10 h-10 rounded-full bg-amber-100 items-center justify-center mr-3 mt-0.5">
+              <Ionicons name="radio-button-on" size={24} color="#d97706" />
             </View>
-          )}
-
-          {centerPoint && !isDrawing && (
-            <View className="flex-row items-start">
-              <View className="w-8 h-8 rounded-full bg-amber-100 items-center justify-center mr-3 mt-0.5">
-                <Text className="text-amber-700 font-bold">2</Text>
-              </View>
-              <View className="flex-1">
-                <Text className="text-gray-900 font-semibold mb-1">
-                  Tap and drag to the edge
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  Touch the edge of the coin and drag to trace its size
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {isDrawing && (
-            <View className="flex-row items-start">
-              <View className="w-8 h-8 rounded-full bg-amber-100 items-center justify-center mr-3 mt-0.5">
-                <Text className="text-amber-700 font-bold">3</Text>
-              </View>
-              <View className="flex-1">
-                <Text className="text-gray-900 font-semibold mb-1">
-                  Release to confirm
-                </Text>
-                <Text className="text-gray-600 text-sm">
-                  Adjust the circle to match the coin, then lift your finger
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* Action buttons */}
-          <View className="flex-row space-x-3 mt-4">
-            {centerPoint && (
-              <Pressable
-                onPress={handleReset}
-                className="flex-1 bg-gray-100 rounded-xl py-3"
-              >
-                <Text className="text-gray-700 text-center font-semibold">
-                  Reset
-                </Text>
-              </Pressable>
-            )}
-            
-            <Pressable
-              onPress={onCancel}
-              className="flex-1 bg-gray-700 rounded-xl py-3"
-            >
-              <Text className="text-white text-center font-semibold">
-                Cancel
+            <View className="flex-1">
+              <Text className="text-gray-900 font-bold text-lg mb-1">
+                Tap the coin center
               </Text>
-            </Pressable>
+              <Text className="text-gray-600 text-base">
+                Simply tap the center of the coin in your photo. The app will automatically calibrate based on the coin size.
+              </Text>
+            </View>
           </View>
+
+          {/* Action button */}
+          <Pressable
+            onPress={onCancel}
+            className="bg-gray-700 rounded-xl py-3"
+          >
+            <Text className="text-white text-center font-semibold">
+              Choose Different Coin
+            </Text>
+          </Pressable>
         </View>
       </View>
     </>

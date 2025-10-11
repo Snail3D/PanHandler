@@ -25,6 +25,7 @@ interface MeasurementStore {
   } | null;
   coinCircle: CoinCircle | null;
   unitSystem: UnitSystem;
+  lastSelectedCoin: string | null; // Store coin name
   
   setImageUri: (uri: string | null) => void;
   addTempPoint: (point: Point) => void;
@@ -35,6 +36,7 @@ interface MeasurementStore {
   clearAll: () => void;
   setCalibration: (calibration: MeasurementStore['calibration']) => void;
   setCoinCircle: (circle: CoinCircle | null) => void;
+  setLastSelectedCoin: (coinName: string) => void;
   updatePointPosition: (pointId: string, x: number, y: number) => void;
   setUnitSystem: (system: UnitSystem) => void;
 }
@@ -49,6 +51,7 @@ const useStore = create<MeasurementStore>()(
       calibration: null,
       coinCircle: null,
       unitSystem: 'metric',
+      lastSelectedCoin: null,
 
       setImageUri: (uri) => set({ currentImageUri: uri, measurements: [], tempPoints: [], coinCircle: null }),
 
@@ -86,6 +89,8 @@ const useStore = create<MeasurementStore>()(
 
       setCoinCircle: (circle) => set({ coinCircle: circle }),
 
+      setLastSelectedCoin: (coinName) => set({ lastSelectedCoin: coinName }),
+
       updatePointPosition: (pointId, x, y) => set((state) => {
         const measurements = state.measurements.map((measurement) => ({
           ...measurement,
@@ -106,7 +111,10 @@ const useStore = create<MeasurementStore>()(
     {
       name: 'measurement-settings',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ unitSystem: state.unitSystem }),
+      partialize: (state) => ({ 
+        unitSystem: state.unitSystem,
+        lastSelectedCoin: state.lastSelectedCoin,
+      }),
     }
   )
 );
