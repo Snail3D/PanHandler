@@ -51,22 +51,9 @@ export default function ZoomableImage({
     })
     .onUpdate((event) => {
       const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      const scaleRatio = newScale / savedScale.value;
       
-      if (zoomToCenter) {
-        // For calibration: zoom toward screen center to keep blue circle centered
-        const centerX = SCREEN_WIDTH / 2;
-        const centerY = SCREEN_HEIGHT / 2;
-        // Try inverted formula
-        translateX.value = savedTranslateX.value + (centerX - savedTranslateX.value) * (1 - scaleRatio);
-        translateY.value = savedTranslateY.value + (centerY - savedTranslateY.value) * (1 - scaleRatio);
-        scale.value = newScale;
-      } else {
-        // For measurement: zoom toward focal point (where fingers are)
-        translateX.value = savedTranslateX.value + (focalX.value - savedTranslateX.value) * (1 - scaleRatio);
-        translateY.value = savedTranslateY.value + (focalY.value - savedTranslateY.value) * (1 - scaleRatio);
-        scale.value = newScale;
-      }
+      // Simple approach: just update scale, don't touch translate
+      scale.value = newScale;
       
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
@@ -74,8 +61,6 @@ export default function ZoomableImage({
     })
     .onEnd(() => {
       savedScale.value = scale.value;
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
