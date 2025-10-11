@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Pressable, Modal, ScrollView, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useStore from '../state/measurementStore';
 import UnitSelector from './UnitSelector';
@@ -14,19 +14,28 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
   const setCalibration = useStore((s) => s.setCalibration);
   const lastSelectedCoin = useStore((s) => s.lastSelectedCoin);
   const setLastSelectedCoin = useStore((s) => s.setLastSelectedCoin);
+  const unitSystem = useStore((s) => s.unitSystem);
   
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [useCustomSize, setUseCustomSize] = useState(false);
+  const [customSize, setCustomSize] = useState('');
+  const [customUnit, setCustomUnit] = useState<'mm' | 'cm' | 'in'>(unitSystem === 'metric' ? 'mm' : 'in');
 
   // Load last selected coin on mount
   useEffect(() => {
-    if (visible && lastSelectedCoin) {
+    if (visible && lastSelectedCoin && !useCustomSize) {
       const coin = getCoinByName(lastSelectedCoin);
       if (coin) {
         setSelectedCoin(coin);
       }
     }
-  }, [visible, lastSelectedCoin]);
+  }, [visible, lastSelectedCoin, useCustomSize]);
+
+  useEffect(() => {
+    // Update custom unit when unit system changes
+    setCustomUnit(unitSystem === 'metric' ? 'mm' : 'in');
+  }, [unitSystem]);
 
   const handleSkipCalibration = () => {
     // Set a default calibration (1 pixel = 1mm)
@@ -41,12 +50,35 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
   };
 
   const handleSetCalibration = () => {
-    if (!selectedCoin) {
-      return;
-    }
+    if (useCustomSize) {
+      const size = parseFloat(customSize);
+      if (isNaN(size) || size <= 0) {
+        return;
+      }
+      
+      // Convert to mm for consistency
+      let sizeInMm = size;
+      if (customUnit === 'cm') sizeInMm = size * 10;
+      if (customUnit === 'in') sizeInMm = size * 25.4;
+      
+      // Create a custom coin reference
+      const customCoin: CoinReference = {
+        name: `Custom ${size}${customUnit}`,
+        diameter: sizeInMm,
+        currency: 'CUSTOM',
+        country: 'Custom',
+      };
+      
+      setLastSelectedCoin(customCoin.name);
+      onComplete(customCoin);
+    } else {
+      if (!selectedCoin) {
+        return;
+      }
 
-    setLastSelectedCoin(selectedCoin.name);
-    onComplete(selectedCoin);
+      setLastSelectedCoin(selectedCoin.name);
+      onComplete(selectedCoin);
+    }
   };
 
   const toggleCategory = (label: string) => {
@@ -86,8 +118,75 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                 <UnitSelector />
               </View>
 
+              {/* Custom Size Toggle */}
+              <View className="mb-6">
+                <Pressable
+                  onPress={() => {
+                    setUseCustomSize(!useCustomSize);
+                    if (!useCustomSize) {
+                      setSelectedCoin(null);
+                    }
+                  }}
+                  className="flex-row items-center justify-between bg-gray-50 rounded-xl p-4"
+                >
+                  <View className="flex-row items-center flex-1">
+                    <Ionicons 
+                      name={useCustomSize ? "create" : "cash-outline"} 
+                      size={24} 
+                      color={useCustomSize ? "#3B82F6" : "#6B7280"} 
+                    />
+                    <Text className={`ml-3 font-semibold ${useCustomSize ? 'text-blue-600' : 'text-gray-700'}`}>
+                      {useCustomSize ? 'Custom Size' : 'Use Coin Reference'}
+                    </Text>
+                  </View>
+                  <Ionicons 
+                    name={useCustomSize ? "checkmark-circle" : "ellipse-outline"} 
+                    size={24} 
+                    color={useCustomSize ? "#3B82F6" : "#D1D5DB"} 
+                  />
+                </Pressable>
+              </View>
+
+              {/* Custom Size Input */}
+              {useCustomSize && (
+                <View className="mb-6 bg-amber-50 rounded-xl p-4">
+                  <Text className="text-sm font-semibold text-amber-900 mb-3">
+                    CUSTOM REFERENCE SIZE
+                  </Text>
+                  <View className="flex-row items-center">
+                    <TextInput
+                      value={customSize}
+                      onChangeText={setCustomSize}
+                      placeholder="Enter size"
+                      keyboardType="decimal-pad"
+                      className="flex-1 bg-white rounded-lg px-4 py-3 text-lg font-medium text-gray-900 border-2 border-amber-200"
+                    />
+                    
+                    {/* Unit selector buttons */}
+                    <View className="ml-3 bg-white rounded-lg flex-row border-2 border-amber-200">
+                      {(unitSystem === 'metric' ? ['mm', 'cm'] : ['in']).map((unit) => (
+                        <Pressable
+                          key={unit}
+                          onPress={() => setCustomUnit(unit as 'mm' | 'cm' | 'in')}
+                          className={`px-4 py-3 ${customUnit === unit ? 'bg-amber-500' : 'bg-transparent'} ${
+                            unit === 'mm' ? 'rounded-l-lg' : ''
+                          } ${unit === (unitSystem === 'metric' ? 'cm' : 'in') ? 'rounded-r-lg' : ''}`}
+                        >
+                          <Text className={`font-semibold ${customUnit === unit ? 'text-white' : 'text-gray-600'}`}>
+                            {unit}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </View>
+                  <Text className="text-amber-700 text-sm mt-3">
+                    Enter the diameter or width of any reference object in your photo
+                  </Text>
+                </View>
+              )}
+
               {/* Selected Coin Display */}
-              {selectedCoin && (
+              {selectedCoin && !useCustomSize && (
                 <View className="mb-6 bg-blue-50 rounded-xl p-4">
                   <View className="flex-row items-center">
                     <View className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center mr-3">
@@ -109,12 +208,13 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
               )}
 
               {/* Coin Categories */}
-              <View className="mb-6">
-                <Text className="text-sm font-semibold text-gray-700 mb-3">
-                  SELECT REFERENCE COIN
-                </Text>
-                
-                {COIN_REFERENCES.map((category) => (
+              {!useCustomSize && (
+                <View className="mb-6">
+                  <Text className="text-sm font-semibold text-gray-700 mb-3">
+                    SELECT REFERENCE COIN
+                  </Text>
+                  
+                  {COIN_REFERENCES.map((category) => (
                   <View key={category.label} className="mb-3">
                     <Pressable
                       onPress={() => toggleCategory(category.label)}
@@ -167,30 +267,36 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                       </View>
                     )}
                   </View>
-                ))}
-              </View>
+                  ))}
+                </View>
+              )}
 
               {/* Info box */}
-              <View className="bg-amber-50 rounded-xl p-4 mb-6">
-                <View className="flex-row">
-                  <Ionicons name="bulb" size={20} color="#d97706" />
-                  <Text className="flex-1 ml-2 text-sm text-amber-900 leading-5">
-                    Place a coin on or near the object you want to measure. Make sure the coin is clearly visible and on the same plane as the object for accurate measurements.
-                  </Text>
+              {!useCustomSize && (
+                <View className="bg-amber-50 rounded-xl p-4 mb-6">
+                  <View className="flex-row">
+                    <Ionicons name="bulb" size={20} color="#d97706" />
+                    <Text className="flex-1 ml-2 text-sm text-amber-900 leading-5">
+                      Place a coin on or near the object you want to measure. Make sure the coin is clearly visible and on the same plane as the object for accurate measurements.
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              )}
 
               {/* Action buttons */}
               <View className="space-y-3">
                 <Pressable
                   onPress={handleSetCalibration}
-                  disabled={!selectedCoin}
+                  disabled={useCustomSize ? (!customSize || parseFloat(customSize) <= 0) : !selectedCoin}
                   className={`rounded-xl py-4 ${
-                    !selectedCoin ? 'bg-gray-300' : 'bg-blue-500'
+                    (useCustomSize ? (!customSize || parseFloat(customSize) <= 0) : !selectedCoin) ? 'bg-gray-300' : 'bg-blue-500'
                   }`}
                 >
                   <Text className="text-white text-center text-base font-semibold">
-                    {selectedCoin ? `Use ${selectedCoin.name} as Reference` : 'Select a Coin First'}
+                    {useCustomSize 
+                      ? (customSize ? `Use Custom ${customSize}${customUnit} Reference` : 'Enter Size First')
+                      : (selectedCoin ? `Use ${selectedCoin.name} as Reference` : 'Select a Coin First')
+                    }
                   </Text>
                 </Pressable>
 
