@@ -26,7 +26,7 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
-  // v2.0.2 - Fixed zoom persistence and gesture update callbacks
+  // v2.0.3 - Verified gesture pass-through for zoom in measurement mode
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
