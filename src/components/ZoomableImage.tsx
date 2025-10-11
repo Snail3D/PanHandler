@@ -68,9 +68,7 @@ export default function ZoomableImage({ imageUri, onTransformChange }: ZoomableI
       }
     });
 
-  const composedGesture = Gesture.Simultaneous(
-    Gesture.Race(doubleTapGesture, Gesture.Simultaneous(pinchGesture, panGesture))
-  );
+  const composedGesture = Gesture.Simultaneous(pinchGesture, panGesture, doubleTapGesture);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
