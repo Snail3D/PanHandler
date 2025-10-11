@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, ScrollView, KeyboardAvoidingView, Platfor
 import { Ionicons } from '@expo/vector-icons';
 import useStore from '../state/measurementStore';
 import UnitSelector from './UnitSelector';
-import { COIN_REFERENCES, CoinReference, getCoinByName } from '../utils/coinReferences';
+import { COIN_REFERENCES, CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
 
 interface CalibrationModalProps {
   visible: boolean;
@@ -21,6 +21,8 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
   const [useCustomSize, setUseCustomSize] = useState(false);
   const [customSize, setCustomSize] = useState('');
   const [customUnit, setCustomUnit] = useState<'mm' | 'cm' | 'in'>(unitSystem === 'metric' ? 'mm' : 'in');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
 
   // Load last selected coin on mount
   useEffect(() => {
@@ -36,6 +38,15 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
     // Update custom unit when unit system changes
     setCustomUnit(unitSystem === 'metric' ? 'mm' : 'in');
   }, [unitSystem]);
+
+  useEffect(() => {
+    // Update search results when query changes
+    if (searchQuery.trim()) {
+      setSearchResults(searchCoins(searchQuery));
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
 
   const handleSkipCalibration = () => {
     // Set a default calibration (1 pixel = 1mm)
@@ -67,6 +78,7 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
         diameter: sizeInMm,
         currency: 'CUSTOM',
         country: 'Custom',
+        value: `${size}${customUnit}`,
       };
       
       setLastSelectedCoin(customCoin.name);
@@ -210,11 +222,76 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
               {/* Coin Categories */}
               {!useCustomSize && (
                 <View className="mb-6">
-                  <Text className="text-sm font-semibold text-gray-700 mb-3">
-                    SELECT REFERENCE COIN
-                  </Text>
-                  
-                  {COIN_REFERENCES.map((category) => (
+                  {/* Search Bar */}
+                  <View className="mb-4">
+                    <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3">
+                      <Ionicons name="search" size={20} color="#6B7280" />
+                      <TextInput
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search coins by name, country, or currency..."
+                        className="flex-1 ml-3 text-gray-900"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                      {searchQuery.length > 0 && (
+                        <Pressable onPress={() => setSearchQuery('')}>
+                          <Ionicons name="close-circle" size={20} color="#6B7280" />
+                        </Pressable>
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Search Results */}
+                  {searchResults.length > 0 ? (
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-700 mb-3">
+                        SEARCH RESULTS ({searchResults.length})
+                      </Text>
+                      <View className="space-y-2">
+                        {searchResults.map((coin) => (
+                          <Pressable
+                            key={`${coin.country}-${coin.name}`}
+                            onPress={() => {
+                              setSelectedCoin(coin);
+                              setSearchQuery('');
+                            }}
+                            className={`py-3 px-4 rounded-lg border-2 ${
+                              selectedCoin?.name === coin.name
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 bg-white'
+                            }`}
+                          >
+                            <View className="flex-row items-center justify-between">
+                              <View className="flex-1">
+                                <Text className={`font-semibold ${
+                                  selectedCoin?.name === coin.name ? 'text-blue-900' : 'text-gray-900'
+                                }`}>
+                                  {coin.name} {coin.nativeName && `(${coin.nativeName})`}
+                                </Text>
+                                <Text className={`text-sm ${
+                                  selectedCoin?.name === coin.name ? 'text-blue-600' : 'text-gray-600'
+                                }`}>
+                                  {coin.country} • {coin.value} • {coin.diameter}mm
+                                </Text>
+                              </View>
+                            </View>
+                          </Pressable>
+                        ))}
+                      </View>
+                    </View>
+                  ) : searchQuery.length > 0 ? (
+                    <View className="py-8 items-center">
+                      <Ionicons name="search-outline" size={48} color="#D1D5DB" />
+                      <Text className="text-gray-500 mt-3">No coins found</Text>
+                      <Text className="text-gray-400 text-sm">Try a different search term</Text>
+                    </View>
+                  ) : (
+                    <>
+                      <Text className="text-sm font-semibold text-gray-700 mb-3">
+                        SELECT REFERENCE COIN
+                      </Text>
+                      
+                      {COIN_REFERENCES.map((category) => (
                   <View key={category.label} className="mb-3">
                     <Pressable
                       onPress={() => toggleCategory(category.label)}
@@ -267,9 +344,11 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                       </View>
                     )}
                   </View>
-                  ))}
-                </View>
-              )}
+                ))}
+              </>
+            )}
+          </View>
+        )}
 
               {/* Info box */}
               {!useCustomSize && (
