@@ -6,14 +6,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
-import CoinTracer from '../components/CoinTracer';
+import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImage';
 import { CoinReference } from '../utils/coinReferences';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-type ScreenMode = 'camera' | 'selectCoin' | 'traceCoin' | 'measurement';
+type ScreenMode = 'camera' | 'selectCoin' | 'zoomCalibrate' | 'measurement';
 
 export default function MeasurementScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -88,36 +88,21 @@ export default function MeasurementScreen() {
 
   const handleCoinSelected = (coin: CoinReference) => {
     setSelectedCoin(coin);
-    setMode('traceCoin');
+    setMode('zoomCalibrate');
   };
 
-  const handleCoinTraceComplete = (circleData: { centerX: number; centerY: number; radius: number }) => {
-    if (!selectedCoin) return;
-
-    // Calculate pixels per unit from the traced circle
-    // Circle diameter in pixels = radius * 2
-    // Coin diameter in mm = selectedCoin.diameter
-    const pixelDiameter = circleData.radius * 2;
-    const pixelsPerMM = pixelDiameter / selectedCoin.diameter;
-
+  const handleCalibrationComplete = (calibrationData: any) => {
     setCalibration({
-      pixelsPerUnit: pixelsPerMM,
-      unit: 'mm',
-      referenceDistance: selectedCoin.diameter,
+      pixelsPerUnit: calibrationData.pixelsPerUnit,
+      unit: calibrationData.unit,
+      referenceDistance: calibrationData.referenceDistance,
     });
 
-    setCoinCircle({
-      centerX: circleData.centerX,
-      centerY: circleData.centerY,
-      radius: circleData.radius,
-      coinName: selectedCoin.name,
-      coinDiameter: selectedCoin.diameter,
-    });
-
+    setCoinCircle(calibrationData.coinCircle);
     setMode('measurement');
   };
 
-  const handleCancelCoinTrace = () => {
+  const handleCancelCalibration = () => {
     setMode('selectCoin');
     setSelectedCoin(null);
   };
@@ -205,9 +190,22 @@ export default function MeasurementScreen() {
     <View className="flex-1 bg-black">
       {currentImageUri && (
         <>
-          {/* Zoomable Image Layer */}
-          {(mode === 'measurement' || mode === 'traceCoin') && (
-            <ZoomableImage imageUri={currentImageUri} />
+          {/* Zoom Calibration Mode */}
+          {mode === 'zoomCalibrate' && selectedCoin && (
+            <ZoomCalibration
+              imageUri={currentImageUri}
+              selectedCoin={selectedCoin}
+              onComplete={handleCalibrationComplete}
+              onCancel={handleCancelCalibration}
+            />
+          )}
+
+          {/* Measurement Mode */}
+          {mode === 'measurement' && (
+            <>
+              <ZoomableImage imageUri={currentImageUri} />
+              <DimensionOverlay />
+            </>
           )}
 
           {/* Static Image for Coin Selection */}
@@ -216,16 +214,6 @@ export default function MeasurementScreen() {
               source={{ uri: currentImageUri }}
               style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
               resizeMode="contain"
-            />
-          )}
-          
-          {mode === 'measurement' && <DimensionOverlay />}
-          
-          {mode === 'traceCoin' && selectedCoin && (
-            <CoinTracer
-              selectedCoin={selectedCoin}
-              onComplete={handleCoinTraceComplete}
-              onCancel={handleCancelCoinTrace}
             />
           )}
           
