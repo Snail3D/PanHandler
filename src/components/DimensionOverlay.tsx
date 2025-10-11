@@ -55,24 +55,18 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    // Pan gesture translates the IMAGE, so positive translate = image moved right
-    // To find image coords: remove the translation, then unscale
-    // screen = original * scale + translate, so: original = (screen - translate) / scale
-    const imageX = (screenX - zoomTranslateX) / zoomScale;
-    const imageY = (screenY - zoomTranslateY) / zoomScale;
+    // React Native applies: screen = (original + translate) * scale
+    // So inverse is: original = screen / scale - translate
+    const imageX = screenX / zoomScale - zoomTranslateX;
+    const imageY = screenY / zoomScale - zoomTranslateY;
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    // Pan gesture translates the IMAGE, so positive translate = image moved right
-    // screen = original * scale + translate
-    const screenX = imageX * zoomScale + zoomTranslateX;
-    const screenY = imageY * zoomScale + zoomTranslateY;
-    
-    // Debug logging
-    console.log(`imageToScreen: image=(${imageX.toFixed(0)}, ${imageY.toFixed(0)}) scale=${zoomScale.toFixed(2)} translate=(${zoomTranslateX.toFixed(0)}, ${zoomTranslateY.toFixed(0)}) -> screen=(${screenX.toFixed(0)}, ${screenY.toFixed(0)})`);
-    
+    // React Native applies: screen = (original + translate) * scale
+    const screenX = (imageX + zoomTranslateX) * zoomScale;
+    const screenY = (imageY + zoomTranslateY) * zoomScale;
     return { x: screenX, y: screenY };
   };
 
@@ -360,18 +354,6 @@ export default function DimensionOverlay({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        {/* Debug display */}
-        {coinCircle && (
-          <View style={{ position: 'absolute', top: 100, left: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.8)', padding: 8, borderRadius: 8 }}>
-            <Text style={{ color: '#00FF41', fontSize: 10, fontFamily: 'monospace' }}>
-              Scale: {zoomScale.toFixed(3)}{'\n'}
-              Translate: ({zoomTranslateX.toFixed(1)}, {zoomTranslateY.toFixed(1)}){'\n'}
-              Coin Img: ({coinCircle.centerX.toFixed(1)}, {coinCircle.centerY.toFixed(1)}){'\n'}
-              Coin Scrn: ({(coinCircle.centerX * zoomScale + zoomTranslateX).toFixed(1)}, {(coinCircle.centerY * zoomScale + zoomTranslateY).toFixed(1)})
-            </Text>
-          </View>
-        )}
-        
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Persistent coin circle reference - transform to screen coords */}
