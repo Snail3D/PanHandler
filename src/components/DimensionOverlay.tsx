@@ -55,18 +55,18 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    // Transform applies right-to-left: screen = original * scale + translate
-    // So inverse is: original = (screen - translate) / scale
-    const imageX = (screenX - zoomTranslateX) / zoomScale;
-    const imageY = (screenY - zoomTranslateY) / zoomScale;
+    // Transform applies right-to-left: screen = original * scale - translate (translate moves view, not image)
+    // So inverse is: original = (screen + translate) / scale
+    const imageX = (screenX + zoomTranslateX) / zoomScale;
+    const imageY = (screenY + zoomTranslateY) / zoomScale;
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    // Transform applies right-to-left: screen = original * scale + translate
-    const screenX = imageX * zoomScale + zoomTranslateX;
-    const screenY = imageY * zoomScale + zoomTranslateY;
+    // Transform applies right-to-left: screen = original * scale - translate (translate moves view, not image)
+    const screenX = imageX * zoomScale - zoomTranslateX;
+    const screenY = imageY * zoomScale - zoomTranslateY;
     return { x: screenX, y: screenY };
   };
 
