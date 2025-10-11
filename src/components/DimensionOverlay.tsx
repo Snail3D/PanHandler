@@ -55,16 +55,18 @@ export default function DimensionOverlay({
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
-    const imageX = (screenX - zoomTranslateX) / zoomScale;
-    const imageY = (screenY - zoomTranslateY) / zoomScale;
+    // Transform order: translate then scale, so inverse is: unscale then untranslate
+    const imageX = (screenX / zoomScale) - zoomTranslateX;
+    const imageY = (screenY / zoomScale) - zoomTranslateY;
     console.log('screenToImage:', { screenX, screenY, zoomScale, zoomTranslateX, zoomTranslateY, imageX, imageY });
     return { x: imageX, y: imageY };
   };
 
   // Helper to convert original image coordinates to screen coordinates
   const imageToScreen = (imageX: number, imageY: number) => {
-    const screenX = imageX * zoomScale + zoomTranslateX;
-    const screenY = imageY * zoomScale + zoomTranslateY;
+    // Transform order: translate then scale
+    const screenX = (imageX + zoomTranslateX) * zoomScale;
+    const screenY = (imageY + zoomTranslateY) * zoomScale;
     console.log('imageToScreen:', { imageX, imageY, zoomScale, zoomTranslateX, zoomTranslateY, screenX, screenY });
     return { x: screenX, y: screenY };
   };
