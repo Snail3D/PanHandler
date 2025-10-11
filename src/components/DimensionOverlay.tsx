@@ -170,77 +170,44 @@ export default function DimensionOverlay({
   // Force touch cursor state management
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [isPressing, setIsPressing] = useState(false);
-  const [pressStartPos, setPressStartPos] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120; // Distance above finger
-  const PRESS_DURATION = 400; // 400ms firm press to activate
-  const MOVEMENT_THRESHOLD = 20; // Max movement in pixels before canceling
+  const TOUCH_RADIUS_THRESHOLD = 15; // Touch radius in pixels for firm press
   const HAPTIC_DISTANCE = 20; // Distance to move before next haptic
 
-  const handleLongPressStart = (x: number, y: number) => {
-    console.log('Press start at:', x, y);
-    setIsPressing(true);
-    setPressStartPos({ x, y });
+  const handleFirmPress = (x: number, y: number) => {
+    console.log('🔥 Firm press detected at:', x, y);
     
-    // Start timer for firm press detection
-    const timer = setTimeout(() => {
-      console.log('Timer fired! Activating cursor');
-      // Firm press detected! Show cursor
-      setShowCursor(true);
-      setCursorPosition({ x, y: y - cursorOffsetY });
+    // Show cursor
+    setShowCursor(true);
+    setCursorPosition({ x, y: y - cursorOffsetY });
+    setLastHapticPosition({ x, y });
+    
+    // Strong haptic feedback - double tap for "pop" effect
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+  };
+
+  const handleCursorMove = (x: number, y: number) => {
+    if (!showCursor) return;
+    
+    // Update cursor position as finger moves
+    setCursorPosition({ x, y: y - cursorOffsetY });
+    
+    // Light haptic feedback as cursor moves
+    const distance = Math.sqrt(
+      Math.pow(x - lastHapticPosition.x, 2) + 
+      Math.pow(y - lastHapticPosition.y, 2)
+    );
+    
+    if (distance >= HAPTIC_DISTANCE) {
+      // Gentle haptic jitter
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setLastHapticPosition({ x, y });
-      setIsPressing(false);
-      
-      // Strong haptic feedback for activation
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }, PRESS_DURATION);
-    
-    setPressTimer(timer);
-  };
-
-  const handleLongPressMove = (x: number, y: number) => {
-    if (showCursor) {
-      // Update cursor position as finger moves
-      setCursorPosition({ x, y: y - cursorOffsetY });
-      
-      // Light haptic feedback as cursor moves
-      const distance = Math.sqrt(
-        Math.pow(x - lastHapticPosition.x, 2) + 
-        Math.pow(y - lastHapticPosition.y, 2)
-      );
-      
-      if (distance >= HAPTIC_DISTANCE) {
-        // Gentle haptic jitter
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setLastHapticPosition({ x, y });
-      }
-    } else if (isPressing) {
-      // Check if finger moved too much - cancel press timer
-      const distance = Math.sqrt(
-        Math.pow(x - pressStartPos.x, 2) + 
-        Math.pow(y - pressStartPos.y, 2)
-      );
-      
-      if (distance >= MOVEMENT_THRESHOLD && pressTimer) {
-        console.log('Movement exceeded threshold, canceling');
-        clearTimeout(pressTimer);
-        setPressTimer(null);
-        setIsPressing(false);
-      }
     }
   };
 
-  const handleLongPressEnd = () => {
-    console.log('Press end, showCursor:', showCursor);
-    
-    // Clear press timer if still waiting
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    setIsPressing(false);
+  const handleCursorRelease = () => {
+    console.log('Release, showCursor:', showCursor);
     
     // Place point at cursor position when finger is released
     if (showCursor) {
@@ -364,29 +331,40 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Debug indicator to show press is detected */}
-      {isPressing && (
-        <View style={{ position: 'absolute', top: pressStartPos.y - 30, left: pressStartPos.x - 30, width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(255, 0, 0, 0.3)', borderWidth: 2, borderColor: 'red', zIndex: 999 }} pointerEvents="none" />
-      )}
-      
-      {/* Touch overlay for firm press detection */}
+      {/* Touch overlay - detects firm press via touch radius */}
       <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-        onStartShouldSetResponder={() => true}
-        onMoveShouldSetResponder={() => showCursor}
-        onResponderTerminationRequest={() => !showCursor}
-        onResponderGrant={(event) => {
-          const { pageX, pageY } = event.nativeEvent;
-          handleLongPressStart(pageX, pageY);
+        onStartShouldSetResponder={(event) => {
+          // Check touch radius for firm press
+          const touch = event.nativeEvent.touches[0];
+          if (!touch) return false;
+          
+          const radius = Math.max(
+            (touch as any).radiusX || 0,
+            (touch as any).radiusY || 0
+          );
+          
+          console.log('Touch radius:', radius);
+          
+          // If radius is large (firm press), intercept
+          if (radius > TOUCH_RADIUS_THRESHOLD) {
+            const { pageX, pageY } = touch;
+            handleFirmPress(pageX, pageY);
+            return true; // Capture this gesture
+          }
+          
+          return false; // Let ZoomableImage handle it
         }}
+        onMoveShouldSetResponder={() => showCursor}
         onResponderMove={(event) => {
           const touch = event.nativeEvent.touches[0];
-          if (touch) {
-            handleLongPressMove(touch.pageX, touch.pageY);
+          if (touch && showCursor) {
+            handleCursorMove(touch.pageX, touch.pageY);
           }
         }}
-        onResponderRelease={handleLongPressEnd}
-        onResponderTerminate={handleLongPressEnd}
+        onResponderRelease={handleCursorRelease}
+        onResponderTerminate={handleCursorRelease}
+        pointerEvents={showCursor ? "auto" : "box-none"}
       >
         {/* Floating cursor above finger */}
         {showCursor && (
