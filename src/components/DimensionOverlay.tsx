@@ -24,14 +24,12 @@ interface DimensionOverlayProps {
   zoomScale?: number;
   zoomTranslateX?: number;
   zoomTranslateY?: number;
-  calibrationZoom?: { scale: number; translateX: number; translateY: number };
 }
 
 export default function DimensionOverlay({ 
   zoomScale = 1, 
   zoomTranslateX = 0, 
-  zoomTranslateY = 0,
-  calibrationZoom = { scale: 1, translateX: 0, translateY: 0 }
+  zoomTranslateY = 0
 }: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
   
@@ -68,14 +66,6 @@ export default function DimensionOverlay({
     // screen = original * scale + translate
     const screenX = imageX * zoomScale + zoomTranslateX;
     const screenY = imageY * zoomScale + zoomTranslateY;
-    return { x: screenX, y: screenY };
-  };
-
-  // Helper to convert coin circle coordinates using LOCKED calibration zoom values
-  const coinImageToScreen = (imageX: number, imageY: number) => {
-    // Use the calibration zoom that was active when the coin was locked
-    const screenX = imageX * calibrationZoom.scale + calibrationZoom.translateX;
-    const screenY = imageY * calibrationZoom.scale + calibrationZoom.translateY;
     return { x: screenX, y: screenY };
   };
 
@@ -461,14 +451,24 @@ export default function DimensionOverlay({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        {/* Debug display - REMOVED for production */}
+        {/* Debug display */}
+        {coinCircle && (
+          <View style={{ position: 'absolute', top: 100, left: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.9)', padding: 8, borderRadius: 8, zIndex: 9999 }}>
+            <Text style={{ color: '#00FF41', fontSize: 11, fontFamily: 'monospace' }}>
+              Zoom: {zoomScale.toFixed(2)} | Trans: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)}){'\n'}
+              Coin Img: ({coinCircle.centerX.toFixed(1)}, {coinCircle.centerY.toFixed(1)}) R: {coinCircle.radius.toFixed(1)}{'\n'}
+              Screen: ({(coinCircle.centerX * zoomScale + zoomTranslateX).toFixed(1)}, {(coinCircle.centerY * zoomScale + zoomTranslateY).toFixed(1)}) R: {(coinCircle.radius * zoomScale).toFixed(1)}
+            </Text>
+          </View>
+        )}
         
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-            {/* Persistent coin circle reference - use LOCKED calibration zoom */}
+            {/* Persistent coin circle reference - transform using CURRENT zoom so it scales with image */}
             {coinCircle && (() => {
-              const screenPos = coinImageToScreen(coinCircle.centerX, coinCircle.centerY);
-              const screenRadius = coinCircle.radius * calibrationZoom.scale;
+              // Use current zoom so circle scales with the image
+              const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
+              const screenRadius = coinCircle.radius * zoomScale;
               
               return (
                 <>
@@ -599,7 +599,7 @@ export default function DimensionOverlay({
 
           {/* Coin circle label showing diameter */}
           {coinCircle && (() => {
-            const screenPos = coinImageToScreen(coinCircle.centerX, coinCircle.centerY);
+            const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
             return (
               <View
                 style={{
