@@ -5,6 +5,14 @@ import { Point, Measurement } from '../types/measurement';
 
 export type UnitSystem = 'metric' | 'imperial';
 
+export interface CoinCircle {
+  centerX: number;
+  centerY: number;
+  radius: number;
+  coinName: string;
+  coinDiameter: number; // in mm
+}
+
 interface MeasurementStore {
   currentImageUri: string | null;
   measurements: Measurement[];
@@ -15,6 +23,7 @@ interface MeasurementStore {
     unit: 'mm' | 'cm' | 'in';
     referenceDistance: number;
   } | null;
+  coinCircle: CoinCircle | null;
   unitSystem: UnitSystem;
   
   setImageUri: (uri: string | null) => void;
@@ -25,6 +34,7 @@ interface MeasurementStore {
   deleteMeasurement: (id: string) => void;
   clearAll: () => void;
   setCalibration: (calibration: MeasurementStore['calibration']) => void;
+  setCoinCircle: (circle: CoinCircle | null) => void;
   updatePointPosition: (pointId: string, x: number, y: number) => void;
   setUnitSystem: (system: UnitSystem) => void;
 }
@@ -37,9 +47,10 @@ const useStore = create<MeasurementStore>()(
       tempPoints: [],
       measurementMode: 'distance',
       calibration: null,
+      coinCircle: null,
       unitSystem: 'metric',
 
-      setImageUri: (uri) => set({ currentImageUri: uri, measurements: [], tempPoints: [] }),
+      setImageUri: (uri) => set({ currentImageUri: uri, measurements: [], tempPoints: [], coinCircle: null }),
 
       addTempPoint: (point) => set((state) => {
         const newTempPoints = [...state.tempPoints, point];
@@ -69,9 +80,11 @@ const useStore = create<MeasurementStore>()(
         measurements: state.measurements.filter((m) => m.id !== id),
       })),
 
-      clearAll: () => set({ measurements: [], tempPoints: [], currentImageUri: null }),
+      clearAll: () => set({ measurements: [], tempPoints: [], currentImageUri: null, coinCircle: null }),
 
       setCalibration: (calibration) => set({ calibration }),
+
+      setCoinCircle: (circle) => set({ coinCircle: circle }),
 
       updatePointPosition: (pointId, x, y) => set((state) => {
         const measurements = state.measurements.map((measurement) => ({

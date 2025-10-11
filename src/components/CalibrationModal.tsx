@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Pressable, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useStore from '../state/measurementStore';
-import { getDefaultCalibrationUnit } from '../utils/unitConversion';
 import UnitSelector from './UnitSelector';
+import { COIN_REFERENCES, CoinReference } from '../utils/coinReferences';
 
 interface CalibrationModalProps {
   visible: boolean;
-  onComplete: () => void;
+  onComplete: (coin: CoinReference) => void;
 }
 
 export default function CalibrationModal({ visible, onComplete }: CalibrationModalProps) {
-  const unitSystem = useStore((s) => s.unitSystem);
   const setCalibration = useStore((s) => s.setCalibration);
-  const defaultUnit = getDefaultCalibrationUnit(unitSystem);
   
-  const [referenceDistance, setReferenceDistance] = useState('');
-  const [selectedUnit, setSelectedUnit] = useState<'mm' | 'cm' | 'in'>(defaultUnit);
+  const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   const handleSkipCalibration = () => {
     // Set a default calibration (1 pixel = 1mm)
@@ -25,29 +23,22 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
       unit: 'mm',
       referenceDistance: 1,
     });
-    onComplete();
+    // Use US Quarter as default
+    const defaultCoin = COIN_REFERENCES[0].coins[3]; // US Quarter
+    onComplete(defaultCoin);
   };
 
   const handleSetCalibration = () => {
-    const distance = parseFloat(referenceDistance);
-    if (isNaN(distance) || distance <= 0) {
+    if (!selectedCoin) {
       return;
     }
 
-    // For now, we'll set a default pixel ratio
-    // In a full implementation, the user would draw a reference line first
-    setCalibration({
-      pixelsPerUnit: 100 / distance, // Assuming 100px reference
-      unit: selectedUnit,
-      referenceDistance: distance,
-    });
-    
-    onComplete();
+    onComplete(selectedCoin);
   };
 
-  const metricUnits: Array<'mm' | 'cm'> = ['mm', 'cm'];
-  const imperialUnits: Array<'in'> = ['in'];
-  const availableUnits = unitSystem === 'metric' ? metricUnits : imperialUnits;
+  const toggleCategory = (label: string) => {
+    setExpandedCategory(expandedCategory === label ? null : label);
+  };
 
   return (
     <Modal
@@ -59,14 +50,14 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <View className="bg-white rounded-t-3xl overflow-hidden">
+          <View className="bg-white rounded-t-3xl overflow-hidden" style={{ maxHeight: '85%' }}>
             {/* Header */}
             <View className="px-6 pt-6 pb-4 border-b border-gray-200">
               <Text className="text-2xl font-bold text-gray-900 mb-2">
                 Set Reference Scale
               </Text>
               <Text className="text-gray-600 text-base">
-                Enter a known dimension to calibrate measurements
+                Select a coin in your photo for calibration
               </Text>
             </View>
 
@@ -82,45 +73,96 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                 <UnitSelector />
               </View>
 
-              {/* Reference Distance Input */}
-              <View className="mb-6">
-                <Text className="text-sm font-semibold text-gray-700 mb-3">
-                  KNOWN DIMENSION
-                </Text>
-                <View className="flex-row items-center">
-                  <TextInput
-                    value={referenceDistance}
-                    onChangeText={setReferenceDistance}
-                    placeholder="Enter distance"
-                    keyboardType="decimal-pad"
-                    className="flex-1 bg-gray-100 rounded-lg px-4 py-4 text-lg font-medium text-gray-900"
-                  />
-                  
-                  {/* Unit selector buttons */}
-                  <View className="ml-3 bg-gray-100 rounded-lg flex-row">
-                    {availableUnits.map((unit) => (
-                      <Pressable
-                        key={unit}
-                        onPress={() => setSelectedUnit(unit)}
-                        className={`px-4 py-4 ${selectedUnit === unit ? 'bg-blue-500' : 'bg-transparent'} ${
-                          unit === availableUnits[0] ? 'rounded-l-lg' : ''
-                        } ${unit === availableUnits[availableUnits.length - 1] ? 'rounded-r-lg' : ''}`}
-                      >
-                        <Text className={`font-semibold ${selectedUnit === unit ? 'text-white' : 'text-gray-600'}`}>
-                          {unit}
-                        </Text>
-                      </Pressable>
-                    ))}
+              {/* Selected Coin Display */}
+              {selectedCoin && (
+                <View className="mb-6 bg-blue-50 rounded-xl p-4">
+                  <View className="flex-row items-center">
+                    <View className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center mr-3">
+                      <Ionicons name="cash" size={24} color="white" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-blue-900 font-bold text-base">
+                        {selectedCoin.name}
+                      </Text>
+                      <Text className="text-blue-700 text-sm">
+                        {selectedCoin.diameter}mm diameter
+                      </Text>
+                    </View>
+                    <Pressable onPress={() => setSelectedCoin(null)}>
+                      <Ionicons name="close-circle" size={24} color="#2563eb" />
+                    </Pressable>
                   </View>
                 </View>
+              )}
+
+              {/* Coin Categories */}
+              <View className="mb-6">
+                <Text className="text-sm font-semibold text-gray-700 mb-3">
+                  SELECT REFERENCE COIN
+                </Text>
+                
+                {COIN_REFERENCES.map((category) => (
+                  <View key={category.label} className="mb-3">
+                    <Pressable
+                      onPress={() => toggleCategory(category.label)}
+                      className="bg-gray-100 rounded-lg px-4 py-3 flex-row items-center justify-between"
+                    >
+                      <View className="flex-row items-center flex-1">
+                        <Ionicons 
+                          name="cash-outline" 
+                          size={20} 
+                          color="#4B5563" 
+                        />
+                        <Text className="ml-3 text-gray-900 font-semibold">
+                          {category.label}
+                        </Text>
+                      </View>
+                      <Ionicons 
+                        name={expandedCategory === category.label ? "chevron-up" : "chevron-down"} 
+                        size={20} 
+                        color="#6B7280" 
+                      />
+                    </Pressable>
+
+                    {expandedCategory === category.label && (
+                      <View className="mt-2 ml-4">
+                        {category.coins.map((coin) => (
+                          <Pressable
+                            key={coin.name}
+                            onPress={() => {
+                              setSelectedCoin(coin);
+                              setExpandedCategory(null);
+                            }}
+                            className={`py-3 px-4 mb-2 rounded-lg border-2 ${
+                              selectedCoin?.name === coin.name
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 bg-white'
+                            }`}
+                          >
+                            <Text className={`font-semibold mb-1 ${
+                              selectedCoin?.name === coin.name ? 'text-blue-900' : 'text-gray-900'
+                            }`}>
+                              {coin.name}
+                            </Text>
+                            <Text className={`text-sm ${
+                              selectedCoin?.name === coin.name ? 'text-blue-600' : 'text-gray-600'
+                            }`}>
+                              {coin.diameter}mm diameter
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                ))}
               </View>
 
               {/* Info box */}
-              <View className="bg-blue-50 rounded-xl p-4 mb-6">
+              <View className="bg-amber-50 rounded-xl p-4 mb-6">
                 <View className="flex-row">
-                  <Ionicons name="information-circle" size={20} color="#2563eb" />
-                  <Text className="flex-1 ml-2 text-sm text-blue-900 leading-5">
-                    Find an object in your photo with a known size (like a credit card, ruler, or standard object) to calibrate accurate measurements.
+                  <Ionicons name="bulb" size={20} color="#d97706" />
+                  <Text className="flex-1 ml-2 text-sm text-amber-900 leading-5">
+                    Place a coin on or near the object you want to measure. Make sure the coin is clearly visible and on the same plane as the object for accurate measurements.
                   </Text>
                 </View>
               </View>
@@ -129,15 +171,13 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
               <View className="space-y-3">
                 <Pressable
                   onPress={handleSetCalibration}
-                  disabled={!referenceDistance || parseFloat(referenceDistance) <= 0}
+                  disabled={!selectedCoin}
                   className={`rounded-xl py-4 ${
-                    !referenceDistance || parseFloat(referenceDistance) <= 0
-                      ? 'bg-gray-300'
-                      : 'bg-blue-500'
+                    !selectedCoin ? 'bg-gray-300' : 'bg-blue-500'
                   }`}
                 >
                   <Text className="text-white text-center text-base font-semibold">
-                    Set Calibration & Start Measuring
+                    {selectedCoin ? `Use ${selectedCoin.name} as Reference` : 'Select a Coin First'}
                   </Text>
                 </Pressable>
 
@@ -146,7 +186,7 @@ export default function CalibrationModal({ visible, onComplete }: CalibrationMod
                   className="rounded-xl py-4 bg-gray-100"
                 >
                   <Text className="text-gray-700 text-center text-base font-medium">
-                    Skip Calibration
+                    Skip (Pixel Measurements Only)
                   </Text>
                 </Pressable>
               </View>

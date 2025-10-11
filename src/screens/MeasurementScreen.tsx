@@ -1,27 +1,33 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
+import CoinTracer from '../components/CoinTracer';
 import DimensionOverlay from '../components/DimensionOverlay';
+import { CoinReference } from '../utils/coinReferences';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-type ScreenMode = 'camera' | 'calibration' | 'measurement';
+type ScreenMode = 'camera' | 'selectCoin' | 'traceCoin' | 'measurement';
 
 export default function MeasurementScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
+  const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   
   const cameraRef = useRef<CameraView>(null);
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
   const setImageUri = useStore((s) => s.setImageUri);
+  const setCalibration = useStore((s) => s.setCalibration);
+  const setCoinCircle = useStore((s) => s.setCoinCircle);
 
   if (!permission) {
     return (
@@ -59,7 +65,7 @@ export default function MeasurementScreen() {
       
       if (photo?.uri) {
         setImageUri(photo.uri);
-        setMode('calibration');
+        setMode('selectCoin');
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -72,13 +78,58 @@ export default function MeasurementScreen() {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   };
 
-  const handleCalibrationComplete = () => {
+  const handleCoinSelected = (coin: CoinReference) => {
+    setSelectedCoin(coin);
+    setMode('traceCoin');
+  };
+
+  const handleCoinTraceComplete = (circleData: { centerX: number; centerY: number; radius: number }) => {
+    if (!selectedCoin) return;
+
+    // Calculate pixels per unit from the traced circle
+    // Circle diameter in pixels = radius * 2
+    // Coin diameter in mm = selectedCoin.diameter
+    const pixelDiameter = circleData.radius * 2;
+    const pixelsPerMM = pixelDiameter / selectedCoin.diameter;
+
+    setCalibration({
+      pixelsPerUnit: pixelsPerMM,
+      unit: 'mm',
+      referenceDistance: selectedCoin.diameter,
+    });
+
+    setCoinCircle({
+      centerX: circleData.centerX,
+      centerY: circleData.centerY,
+      radius: circleData.radius,
+      coinName: selectedCoin.name,
+      coinDiameter: selectedCoin.diameter,
+    });
+
     setMode('measurement');
+  };
+
+  const handleCancelCoinTrace = () => {
+    setMode('selectCoin');
+    setSelectedCoin(null);
   };
 
   const handleRetakePhoto = () => {
     setImageUri(null);
     setMode('camera');
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setImageUri(result.assets[0].uri);
+      setMode('selectCoin');
+    }
   };
 
   // Camera Mode
@@ -113,6 +164,16 @@ export default function MeasurementScreen() {
             style={{ paddingBottom: insets.bottom + 32 }}
           >
             <View className="items-center">
+              {/* Photo Library Button */}
+              <Pressable
+                onPress={pickImage}
+                className="absolute left-8 bottom-0 w-14 h-14 rounded-full bg-gray-800/80 items-center justify-center"
+                style={{ marginBottom: 3 }}
+              >
+                <Ionicons name="images-outline" size={28} color="white" />
+              </Pressable>
+
+              {/* Camera Shutter */}
               <Pressable
                 onPress={takePicture}
                 disabled={isCapturing}
@@ -120,6 +181,7 @@ export default function MeasurementScreen() {
               >
                 <View className="w-16 h-16 rounded-full bg-white" />
               </Pressable>
+              
               <Text className="text-white text-sm mt-4">
                 Tap to capture photo
               </Text>
@@ -143,6 +205,14 @@ export default function MeasurementScreen() {
           
           {mode === 'measurement' && <DimensionOverlay />}
           
+          {mode === 'traceCoin' && selectedCoin && (
+            <CoinTracer
+              selectedCoin={selectedCoin}
+              onComplete={handleCoinTraceComplete}
+              onCancel={handleCancelCoinTrace}
+            />
+          )}
+          
           {/* Top bar with retake button */}
           <View 
             className="absolute top-0 left-0 right-0 z-20 bg-black/50"
@@ -165,10 +235,10 @@ export default function MeasurementScreen() {
             </View>
           </View>
 
-          {/* Calibration Modal */}
+          {/* Coin Selection Modal */}
           <CalibrationModal
-            visible={mode === 'calibration'}
-            onComplete={handleCalibrationComplete}
+            visible={mode === 'selectCoin'}
+            onComplete={handleCoinSelected}
           />
         </>
       )}
