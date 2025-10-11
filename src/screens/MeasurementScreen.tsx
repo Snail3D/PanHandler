@@ -100,6 +100,14 @@ export default function MeasurementScreen() {
     });
 
     setCoinCircle(calibrationData.coinCircle);
+    
+    // Preserve the zoom state from calibration
+    setMeasurementZoom({
+      scale: calibrationData.initialZoom.scale,
+      translateX: calibrationData.initialZoom.translateX,
+      translateY: calibrationData.initialZoom.translateY,
+    });
+    
     setMode('measurement');
   };
 
@@ -205,7 +213,10 @@ export default function MeasurementScreen() {
           {mode === 'measurement' && (
             <>
               <ZoomableImage 
-                imageUri={currentImageUri} 
+                imageUri={currentImageUri}
+                initialScale={measurementZoom.scale}
+                initialTranslateX={measurementZoom.translateX}
+                initialTranslateY={measurementZoom.translateY}
                 onTransformChange={(scale, translateX, translateY) => {
                   setMeasurementZoom({ scale, translateX, translateY });
                 }}

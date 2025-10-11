@@ -22,6 +22,11 @@ interface ZoomCalibrationProps {
       coinName: string;
       coinDiameter: number;
     };
+    initialZoom: {
+      scale: number;
+      translateX: number;
+      translateY: number;
+    };
   }) => void;
   onCancel: () => void;
 }
@@ -73,6 +78,11 @@ export default function ZoomCalibration({
         radius: originalImageRadius,
         coinName: selectedCoin.name,
         coinDiameter: selectedCoin.diameter,
+      },
+      initialZoom: {
+        scale: zoomScale,
+        translateX: zoomTranslate.x,
+        translateY: zoomTranslate.y,
       },
     });
   };

@@ -12,38 +12,47 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 interface ZoomableImageProps {
   imageUri: string;
   onTransformChange?: (scale: number, translateX: number, translateY: number) => void;
+  initialScale?: number;
+  initialTranslateX?: number;
+  initialTranslateY?: number;
 }
 
-export default function ZoomableImage({ imageUri, onTransformChange }: ZoomableImageProps) {
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
+export default function ZoomableImage({ 
+  imageUri, 
+  onTransformChange,
+  initialScale = 1,
+  initialTranslateX = 0,
+  initialTranslateY = 0,
+}: ZoomableImageProps) {
+  const scale = useSharedValue(initialScale);
+  const savedScale = useSharedValue(initialScale);
+  const translateX = useSharedValue(initialTranslateX);
+  const translateY = useSharedValue(initialTranslateY);
+  const savedTranslateX = useSharedValue(initialTranslateX);
+  const savedTranslateY = useSharedValue(initialTranslateY);
 
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-    })
-    .onEnd(() => {
-      savedScale.value = scale.value;
       if (onTransformChange) {
         onTransformChange(scale.value, translateX.value, translateY.value);
       }
+    })
+    .onEnd(() => {
+      savedScale.value = scale.value;
     });
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
+      if (onTransformChange) {
+        onTransformChange(scale.value, translateX.value, translateY.value);
+      }
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
-      if (onTransformChange) {
-        onTransformChange(scale.value, translateX.value, translateY.value);
-      }
     });
 
   const doubleTapGesture = Gesture.Tap()
@@ -56,15 +65,12 @@ export default function ZoomableImage({ imageUri, onTransformChange }: ZoomableI
         translateY.value = withSpring(0);
         savedTranslateX.value = 0;
         savedTranslateY.value = 0;
-        if (onTransformChange) {
-          onTransformChange(1, 0, 0);
-        }
       } else {
         scale.value = withSpring(2);
         savedScale.value = 2;
-        if (onTransformChange) {
-          onTransformChange(2, translateX.value, translateY.value);
-        }
+      }
+      if (onTransformChange) {
+        onTransformChange(scale.value, translateX.value, translateY.value);
       }
     });
 
