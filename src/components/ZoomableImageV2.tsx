@@ -47,7 +47,6 @@ export default function ZoomableImage({
 
   const pinchGesture = Gesture.Pinch()
     .onStart((event) => {
-      isPinching.value = true;
       focalX.value = event.focalX;
       focalY.value = event.focalY;
     })
@@ -55,7 +54,6 @@ export default function ZoomableImage({
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
     .onEnd(() => {
-      isPinching.value = false;
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
@@ -66,19 +64,14 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      // Only pan if not currently pinching
-      if (!isPinching.value) {
-        translateX.value = savedTranslateX.value + event.translationX;
-        translateY.value = savedTranslateY.value + event.translationY;
-      }
+      translateX.value = savedTranslateX.value + event.translationX;
+      translateY.value = savedTranslateY.value + event.translationY;
     })
     .onEnd(() => {
-      if (!isPinching.value) {
-        savedTranslateX.value = translateX.value;
-        savedTranslateY.value = translateY.value;
-        if (onTransformChange) {
-          runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
-        }
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
       }
     });
 
