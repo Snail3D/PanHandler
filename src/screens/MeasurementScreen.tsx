@@ -22,6 +22,7 @@ export default function MeasurementScreen() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
+  const [calibrationZoom, setCalibrationZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   
   const cameraRef = useRef<CameraView>(null);
   const insets = useSafeAreaInsets();
@@ -101,7 +102,14 @@ export default function MeasurementScreen() {
 
     setCoinCircle(calibrationData.coinCircle);
     
-    // Preserve the zoom state from calibration
+    // Store the calibration zoom separately (this is locked)
+    setCalibrationZoom({
+      scale: calibrationData.initialZoom.scale,
+      translateX: calibrationData.initialZoom.translateX,
+      translateY: calibrationData.initialZoom.translateY,
+    });
+    
+    // Also set it as the initial measurement zoom (this will change as user zooms)
     setMeasurementZoom({
       scale: calibrationData.initialZoom.scale,
       translateX: calibrationData.initialZoom.translateX,
@@ -225,6 +233,7 @@ export default function MeasurementScreen() {
                 zoomScale={measurementZoom.scale}
                 zoomTranslateX={measurementZoom.translateX}
                 zoomTranslateY={measurementZoom.translateY}
+                calibrationZoom={calibrationZoom}
               />
             </>
           )}
