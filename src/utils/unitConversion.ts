@@ -37,12 +37,8 @@ export function getDisplayUnit(
   }
 
   if (unitSystem === 'metric') {
-    // Use mm for values less than 10mm, cm otherwise
-    if (valueInMm < 10) {
-      return { value: valueInMm, unit: 'mm' };
-    } else {
-      return { value: valueInMm / 10, unit: 'cm' };
-    }
+    // Always use mm for metric
+    return { value: valueInMm, unit: 'mm' };
   } else {
     // Imperial: use inches for values less than 12 inches, feet otherwise
     const valueInInches = valueInMm / 25.4;
@@ -76,5 +72,5 @@ export function getCalibrationUnits(unitSystem: UnitSystem): MeasurementUnit[] {
 
 // Get default calibration unit for unit system
 export function getDefaultCalibrationUnit(unitSystem: UnitSystem): 'mm' | 'cm' | 'in' {
-  return unitSystem === 'metric' ? 'cm' : 'in';
+  return unitSystem === 'metric' ? 'mm' : 'in';
 }
