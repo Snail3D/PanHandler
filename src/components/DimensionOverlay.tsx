@@ -332,6 +332,14 @@ export default function DimensionOverlay({
             {coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
               const screenRadius = coinCircle.radius * zoomScale;
+              
+              // Debug logging
+              console.log('Yellow Circle Debug:', {
+                coinImageCoords: { x: coinCircle.centerX, y: coinCircle.centerY, r: coinCircle.radius },
+                zoomState: { scale: zoomScale, tx: zoomTranslateX, ty: zoomTranslateY },
+                screenCoords: { x: screenPos.x, y: screenPos.y, r: screenRadius }
+              });
+              
               return (
                 <Circle
                   cx={screenPos.x}
@@ -551,6 +559,30 @@ export default function DimensionOverlay({
           />
         </Pressable>
       </View>
+
+      {/* Debug zoom info */}
+      {coinCircle && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 150,
+            right: 20,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: 8,
+            borderRadius: 8,
+          }}
+        >
+          <Text className="text-white text-xs">
+            Scale: {zoomScale.toFixed(2)}x
+          </Text>
+          <Text className="text-white text-xs">
+            TX: {zoomTranslateX.toFixed(0)}
+          </Text>
+          <Text className="text-white text-xs">
+            TY: {zoomTranslateY.toFixed(0)}
+          </Text>
+        </View>
+      )}
 
       {/* Bottom toolbar */}
       <View
