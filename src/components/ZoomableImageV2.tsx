@@ -51,7 +51,16 @@ export default function ZoomableImage({
       focalY.value = event.focalY;
     })
     .onUpdate((event) => {
-      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      const scaleDelta = newScale - savedScale.value;
+      
+      // Adjust translate to keep focal point stationary
+      // If focal point is at (fx, fy) and we change scale, translate must adjust
+      // to keep the same image point under the focal point
+      translateX.value = savedTranslateX.value - (focalX.value - savedTranslateX.value) * (scaleDelta / savedScale.value);
+      translateY.value = savedTranslateY.value - (focalY.value - savedTranslateY.value) * (scaleDelta / savedScale.value);
+      
+      scale.value = newScale;
     })
     .onEnd(() => {
       savedScale.value = scale.value;
@@ -64,11 +73,8 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      // When panning during a pinch, scale might be changing
-      // Adjust translation based on current scale vs saved scale
-      const currentScaleRatio = scale.value / savedScale.value;
-      translateX.value = savedTranslateX.value * currentScaleRatio + event.translationX;
-      translateY.value = savedTranslateY.value * currentScaleRatio + event.translationY;
+      translateX.value = savedTranslateX.value + event.translationX;
+      translateY.value = savedTranslateY.value + event.translationY;
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
