@@ -105,15 +105,14 @@ export default function ZoomCalibration({
         pointerEvents="none"
       >
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-          {/* Main reference circle */}
+          {/* Filled blue circle with semi-transparency */}
           <Circle
             cx={referenceCenterX}
             cy={referenceCenterY}
             r={referenceRadiusPixels}
+            fill="rgba(59, 130, 246, 0.3)"
             stroke="#3B82F6"
             strokeWidth="3"
-            fill="none"
-            strokeDasharray="10,5"
           />
           
           {/* Crosshair for precision */}
@@ -124,6 +123,20 @@ export default function ZoomCalibration({
             fill="#3B82F6"
           />
         </Svg>
+        
+        {/* Text instruction inside the circle */}
+        <View
+          style={{
+            position: 'absolute',
+            left: referenceCenterX - 80,
+            top: referenceCenterY - 30,
+            width: 160,
+          }}
+        >
+          <Text style={{ color: '#3B82F6', fontSize: 16, fontWeight: 'bold', textAlign: 'center', textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}>
+            Cover the{'\n'}{selectedCoin.name}
+          </Text>
+        </View>
       </View>
 
       {/* Instructions */}

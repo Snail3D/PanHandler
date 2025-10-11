@@ -356,18 +356,6 @@ export default function DimensionOverlay({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        {/* Debug overlay at top */}
-        {coinCircle && (
-          <View style={{ position: 'absolute', top: 100, left: 10, right: 10, backgroundColor: 'rgba(0,0,0,0.8)', padding: 10, borderRadius: 8, zIndex: 9999 }}>
-            <Text style={{ color: '#00FF41', fontSize: 11, fontFamily: 'monospace' }}>
-              Zoom: {zoomScale.toFixed(2)}x | Translate: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)}){'\n'}
-              Coin Orig: ({coinCircle.centerX.toFixed(0)}, {coinCircle.centerY.toFixed(0)}) r={coinCircle.radius.toFixed(0)}{'\n'}
-              Coin Screen: ({((coinCircle.centerX * zoomScale + zoomTranslateX)).toFixed(0)}, {((coinCircle.centerY * zoomScale + zoomTranslateY)).toFixed(0)}){'\n'}
-              Screen: {SCREEN_WIDTH}x{SCREEN_HEIGHT}
-            </Text>
-          </View>
-        )}
-        
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Persistent coin circle reference - transform to screen coords */}
@@ -375,31 +363,16 @@ export default function DimensionOverlay({
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
               const screenRadius = coinCircle.radius * zoomScale;
               
-              // Log for debugging
-              console.log(`Circle: orig=(${coinCircle.centerX.toFixed(0)},${coinCircle.centerY.toFixed(0)}) screen=(${screenPos.x.toFixed(0)},${screenPos.y.toFixed(0)}) zoom=${zoomScale.toFixed(2)} translate=(${zoomTranslateX.toFixed(0)},${zoomTranslateY.toFixed(0)})`);
-              
               return (
                 <>
-                  {/* Outer glow effect - Slimer green! */}
-                  <Circle
-                    cx={screenPos.x}
-                    cy={screenPos.y}
-                    r={screenRadius + 4}
-                    stroke="#00FF41"
-                    strokeWidth="6"
-                    fill="none"
-                    opacity={0.3}
-                  />
-                  {/* Main bright green circle */}
+                  {/* Filled green circle with semi-transparency */}
                   <Circle
                     cx={screenPos.x}
                     cy={screenPos.y}
                     r={screenRadius}
+                    fill="rgba(0, 255, 65, 0.25)"
                     stroke="#00FF41"
                     strokeWidth="3"
-                    fill="none"
-                    strokeDasharray="8,4"
-                    opacity={0.9}
                   />
                   {/* Center dot for precision */}
                   <Circle
@@ -516,6 +489,26 @@ export default function DimensionOverlay({
               );
             })}
           </Svg>
+
+          {/* Coin circle label showing diameter */}
+          {coinCircle && (() => {
+            const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
+            return (
+              <View
+                style={{
+                  position: 'absolute',
+                  left: screenPos.x - 60,
+                  top: screenPos.y - 15,
+                  width: 120,
+                }}
+                pointerEvents="none"
+              >
+                <Text style={{ color: '#00FF41', fontSize: 14, fontWeight: 'bold', textAlign: 'center', textShadowColor: 'rgba(0,0,0,0.9)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }}>
+                  {coinCircle.coinDiameter}mm
+                </Text>
+              </View>
+            );
+          })()}
 
           {/* Measurement labels for completed measurements */}
           {measurements.map((measurement, idx) => {
