@@ -26,7 +26,7 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
-  // v2.0.3 - Verified gesture pass-through for zoom in measurement mode
+  // v2.1.0 - Long-press (2s) to place points, freeing up pinch/pan gestures
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
