@@ -63,6 +63,8 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
+      // Use current scale to properly scale the translation
+      const scaleAdjustment = scale.value / savedScale.value;
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
     })
@@ -95,7 +97,8 @@ export default function ZoomableImage({
 
   const composedGesture = Gesture.Race(
     doubleTapGesture,
-    Gesture.Simultaneous(pinchGesture, panGesture)
+    pinchGesture,
+    panGesture
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
