@@ -52,21 +52,7 @@ export default function ZoomableImage({
       focalY.value = event.focalY;
     })
     .onUpdate((event) => {
-      const newScale = Math.max(1, Math.min(savedScale.value * event.scale, 20));
-      
-      // Track how the focal point moves during pinch
-      const focalDeltaX = event.focalX - focalX.value;
-      const focalDeltaY = event.focalY - focalY.value;
-      
-      // Compensate translate for focal point movement
-      translateX.value = translateX.value + focalDeltaX;
-      translateY.value = translateY.value + focalDeltaY;
-      
-      // Update focal point for next frame
-      focalX.value = event.focalX;
-      focalY.value = event.focalY;
-      
-      scale.value = newScale;
+      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
     .onEnd(() => {
       isPinching.value = false;
