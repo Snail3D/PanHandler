@@ -37,6 +37,7 @@ export default function ZoomableImage({
     if (onTransformChange) {
       onTransformChange(initialScale, initialTranslateX, initialTranslateY);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const pinchGesture = Gesture.Pinch()
