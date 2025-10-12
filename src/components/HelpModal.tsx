@@ -3,7 +3,7 @@ import { View, Text, Modal, ScrollView, Pressable, Linking } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Svg, Line, Circle, Path } from 'react-native-svg';
+import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -297,12 +297,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               >
                 <View style={{ marginLeft: 4 }}>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 16, marginRight: 8 }}>🎯</Text>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Use 1x zoom</Text> - No digital zoom for accuracy
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>📐</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                       <Text style={{ fontWeight: '600' }}>Hold perpendicular</Text> - Camera straight down (90°)
@@ -317,7 +311,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>🪙</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Place coin near object</Text> - Same flat surface
+                      <Text style={{ fontWeight: '600' }}>Coin in center of object</Text>
                     </Text>
                   </View>
                 </View>
@@ -340,25 +334,28 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 8 }}>
-                    Enable Auto Level in camera for hands-free capture! The app monitors your device angle and stability in real-time.
+                    Enable Auto Level in camera for hands-free capture in portrait OR landscape orientation! The app monitors your device angle and stability in real-time.
                   </Text>
                   <View style={{ marginLeft: 8 }}>
                     <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
-                      • Hold camera perpendicular (90°) to the surface
+                      • <Text style={{ fontWeight: '600' }}>Hold (press and hold) the shutter button</Text> - Don't just tap, keep it pressed down
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
-                      • Keep steady - watch the alignment indicator turn green
+                      • <Text style={{ fontWeight: '600' }}>Watch the color indicator</Text> - Red (too tilted) → Yellow (close) → Green (perfect alignment)
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
-                      • When perfectly level and stable, a 3-second countdown begins
+                      • <Text style={{ fontWeight: '600' }}>Works horizontally OR vertically</Text> - Orient your phone perpendicular (90°) to surface in either direction
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                      • <Text style={{ fontWeight: '600' }}>Hold steady when green</Text> - A 3-second countdown begins automatically
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20 }}>
-                      • Photo captures automatically - no need to tap!
+                      • <Text style={{ fontWeight: '600' }}>Photo captures automatically</Text> - No need to tap, just keep holding steady!
                     </Text>
                   </View>
                   <View style={{ marginTop: 8, backgroundColor: 'rgba(46, 125, 50, 0.15)', borderRadius: 6, padding: 8 }}>
                     <Text style={{ fontSize: 13, color: '#1B5E20', fontStyle: 'italic' }}>
-                      💡 Tip: If you move during countdown, it will cancel and restart when steady again
+                      💡 Tip: If you move during countdown, it will cancel and restart when you're steady again
                     </Text>
                   </View>
                 </View>
@@ -374,13 +371,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • Select your coin type from the list
+                    • <Text style={{ fontWeight: '600' }}>Search for your coin type</Text> - Over 100 coin types from around the world!
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
                     • Zoom in and position the calibration circle
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • Align circle edges perfectly with coin edge
+                    • <Text style={{ fontWeight: '600' }}>Align circle edges perfectly to cover the coin</Text> - Match the outer edge precisely
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22 }}>
                     • Tap "Lock In Calibration" when ready
@@ -490,7 +487,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
               {/* Controls & Navigation */}
               <FeatureCard
-                icon="options"
+                icon="navigate-circle"
                 title="Navigation & Controls"
                 color="#FF3B30"
                 delay={300}
@@ -498,7 +495,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <View style={{ marginLeft: 4 }}>
                   <View style={{ marginBottom: 12 }}>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      🔄 Pan/Zoom Mode
+                      🗺️ Pan/Zoom Mode
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
                       Pinch to zoom, drag to pan around the image. Perfect for exploring your photo before measuring.
@@ -507,19 +504,74 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
                   <View style={{ marginBottom: 12 }}>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      ✏️ Measure Mode
+                      📏 Measure Mode
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      Tap to place measurement points. Pan/zoom locks after first point for precision. Switch back to Pan mode to reposition.
+                      Tap to place measurement points with the floating precision cursor. Pan/zoom automatically locks after placing your first point for maximum precision. Switch back to Pan mode to zoom/reposition before placing your next measurement.
                     </Text>
                   </View>
 
-                  <View>
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
+                      📍 Precision Cursor Helper
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
+                      A floating crosshair cursor appears above your finger when placing measurements. It's color-coded to match your next measurement and shows exactly where the point will be placed. The label above tells you which point you're placing (Point 1, Point 2, etc.). The yellow center dot indicates the exact placement location.
+                    </Text>
+                  </View>
+
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
+                      ✨ Center Alignment Guides
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
+                      Subtle white crosshairs appear in Pan mode after calibration to help center your object for CAD software import. These guides help you position objects at the origin (0,0) for perfect alignment in Fusion 360 and other CAD tools.
+                    </Text>
+                  </View>
+
+                  <View style={{ marginBottom: 12 }}>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
                       🎨 Color-Coded Measurements
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
                       Each measurement gets a unique vibrant color. Check the legend in the corner to identify them!
+                    </Text>
+                  </View>
+
+                  {/* Visual Sample */}
+                  <View style={{ marginTop: 12, alignItems: 'center', backgroundColor: '#F8F9FA', borderRadius: 12, padding: 16 }}>
+                    <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 12, fontWeight: '600' }}>
+                      Example measurement:
+                    </Text>
+                    <View style={{ position: 'relative', width: 220, height: 80 }}>
+                      <Svg width={220} height={80} viewBox="0 0 220 80">
+                        {/* Measurement line */}
+                        <Line x1={30} y1={40} x2={190} y2={40} stroke="#3B82F6" strokeWidth="3" />
+                        
+                        {/* Start point */}
+                        <Circle cx={30} cy={40} r={8} fill="#3B82F6" stroke="white" strokeWidth="2" />
+                        
+                        {/* End point */}
+                        <Circle cx={190} cy={40} r={8} fill="#3B82F6" stroke="white" strokeWidth="2" />
+                        
+                        {/* Label background */}
+                        <Rect x={85} y={10} width={50} height={20} rx={4} fill="#3B82F6" />
+                      </Svg>
+                      <Text style={{ 
+                        position: 'absolute', 
+                        top: 13, 
+                        left: 0, 
+                        right: 0, 
+                        textAlign: 'center',
+                        fontSize: 12, 
+                        color: 'white', 
+                        fontWeight: '600' 
+                      }}>
+                        145.2 mm
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 12, color: '#8E8E93', marginTop: 8, fontStyle: 'italic', textAlign: 'center' }}>
+                      Measurements show as colored lines with labeled values
                     </Text>
                   </View>
                 </View>
