@@ -124,7 +124,7 @@ export default function DimensionOverlay({
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
-  const [hasShownAnimation, setHasShownAnimation] = useState(false);
+  const [hasShownAnimation, setHasShownAnimation] = useState(coinCircle ? true : false); // Start true if coinCircle already exists
   const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
   
   // Measurement mode states
@@ -2020,11 +2020,39 @@ export default function DimensionOverlay({
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
                 
-                {/* Header with collapse button */}
+                {/* Header with undo and collapse button */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(0, 0, 0, 0.5)', marginLeft: 4 }}>
-                    CONTROLS
-                  </Text>
+                  {/* Undo button - only show if there are measurements or current points */}
+                  {(measurements.length > 0 || currentPoints.length > 0) ? (
+                    <Pressable
+                      onPress={handleClear}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                        borderRadius: 8,
+                        paddingVertical: 4,
+                        paddingHorizontal: 8,
+                        borderWidth: 0.5,
+                        borderColor: 'rgba(0, 0, 0, 0.08)',
+                      }}
+                    >
+                      <Ionicons name="arrow-undo-outline" size={12} color="rgba(0, 0, 0, 0.6)" />
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        fontWeight: '600',
+                        fontSize: 10,
+                        marginLeft: 4,
+                      }}>
+                        {measurements.length > 0 
+                          ? `Undo (${measurements.length})` 
+                          : 'Clear'}
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <View />
+                  )}
+                  
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 9, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
                       Hide menu
@@ -2338,49 +2366,9 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {currentPoints.length > 0 && currentPoints.length < requiredPoints && (
-            <View className="flex-row items-center mb-3">
-              <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : mode === 'circle' ? 'bg-red-500' : 'bg-green-500'}`} />
-              <Text className="ml-3 text-gray-700 font-medium">
-                {mode === 'distance' && currentPoints.length === 1 && 'Tap for Point 2'}
-                {mode === 'angle' && currentPoints.length === 1 && 'Tap for Point 2 (vertex)'}
-                {mode === 'angle' && currentPoints.length === 2 && 'Tap for Point 3'}
-                {mode === 'circle' && currentPoints.length === 1 && 'Tap outside edge of circle'}
-                {mode === 'rectangle' && currentPoints.length === 1 && 'Tap for second corner'}
-              </Text>
-            </View>
-          )}
-          
           {/* Action Buttons */}
           {hasAnyMeasurements && (
             <>
-              <Pressable
-                onPress={handleClear}
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                  borderRadius: 10,
-                  paddingVertical: 8,
-                  marginBottom: 6,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 0.5,
-                  borderColor: 'rgba(0, 0, 0, 0.08)',
-                }}
-              >
-                <Ionicons name="arrow-undo-outline" size={14} color="rgba(0, 0, 0, 0.6)" />
-                <Text style={{
-                  color: 'rgba(0, 0, 0, 0.6)',
-                  fontWeight: '600',
-                  fontSize: 11,
-                  marginLeft: 6,
-                }}>
-                  {measurements.length > 0 
-                    ? `Remove Last (${measurements.length})` 
-                    : 'Clear Points'}
-                </Text>
-              </Pressable>
-
               {measurements.length > 0 && (
                 <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
                   <Pressable
