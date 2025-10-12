@@ -2849,43 +2849,41 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {/* Action Buttons - All in one row */}
+          {/* Action Buttons - Always show Save and Email */}
           <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
-            {hasAnyMeasurements && measurements.length > 0 && (
-              <>
-                <Pressable
-                  onPress={handleExport}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0, 122, 255, 0.85)',
-                    borderRadius: 10,
-                    paddingVertical: 8,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Ionicons name="images-outline" size={12} color="white" />
-                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
-                </Pressable>
-                
-                <Pressable
-                  onPress={handleEmail}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(52, 199, 89, 0.85)',
-                    borderRadius: 10,
-                    paddingVertical: 8,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Ionicons name="mail-outline" size={12} color="white" />
-                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
-                </Pressable>
-              </>
-            )}
+            <>
+              <Pressable
+                onPress={handleExport}
+                style={{
+                  flex: 1,
+                  backgroundColor: 'rgba(0, 122, 255, 0.85)',
+                  borderRadius: 10,
+                  paddingVertical: 8,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons name="images-outline" size={12} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+              </Pressable>
+              
+              <Pressable
+                onPress={handleEmail}
+                style={{
+                  flex: 1,
+                  backgroundColor: 'rgba(52, 199, 89, 0.85)',
+                  borderRadius: 10,
+                  paddingVertical: 8,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons name="mail-outline" size={12} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+              </Pressable>
+            </>
 
             {/* New Photo button - always visible in the same row */}
             <Pressable
