@@ -319,14 +319,6 @@ export default function DimensionOverlay({
   };
 
   const placePoint = (x: number, y: number) => {
-    // Check if user is trying to add more than 2 measurements without pro
-    if (!isProUser && measurements.length >= 2 && currentPoints.length === 0) {
-      // Show paywall modal
-      setShowProModal(true);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      return;
-    }
-    
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
     console.log('🎯 Placing point:');
@@ -642,12 +634,6 @@ export default function DimensionOverlay({
       return;
     }
     
-    // Check if user has more than 2 measurements without pro
-    if (!isProUser && measurements.length > 2) {
-      setShowProModal(true);
-      return;
-    }
-
     try {
       // Check if email is available
       const isAvailable = await MailComposer.isAvailableAsync();
@@ -2640,12 +2626,10 @@ export default function DimensionOverlay({
                   {[
                     { feature: 'Saves per month', free: '10', pro: '∞' },
                     { feature: 'Emails per month', free: '10', pro: '∞' },
-                    { feature: 'Measurements per photo', free: '1', pro: '∞' },
-                    { feature: 'Mix measurement types', free: false, pro: true },
-                    { feature: 'Color-coded lines', free: false, pro: true },
+                    { feature: 'Measurements per photo', free: '∞', pro: '∞' },
                     { feature: 'Remove watermarks', free: false, pro: true },
                   ].map((row, idx) => (
-                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 5 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
+                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 3 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
                       <View style={{ flex: 2, justifyContent: 'center' }}>
                         <Text style={{ fontSize: 14, color: '#333' }}>{row.feature}</Text>
                       </View>
