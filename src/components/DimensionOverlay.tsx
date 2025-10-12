@@ -735,14 +735,15 @@ export default function DimensionOverlay({
       // Add calibration/scale information
       if (calibration) {
         measurementText += `\n---\nCalibration Info:\n`;
-        measurementText += `Scale: ${calibration.pixelsPerUnit.toFixed(2)} pixels per ${calibration.unit}\n`;
+        measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}\n`;
         measurementText += `Reference Distance: ${calibration.referenceDistance.toFixed(2)} ${calibration.unit}`;
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        measurementText += `\n\nFor Fusion 360:\n`;
-        measurementText += `Canvas Scale X/Y: ${calibration.pixelsPerUnit.toFixed(6)}\n`;
-        measurementText += `(Insert > Canvas > Select Face > Set Scale X and Y to this value)`;
+        measurementText += `\n\nFor Fusion 360 Canvas Import:\n`;
+        measurementText += `Canvas Scale X/Y: ${calibration.pixelsPerUnit.toFixed(4)} px/${calibration.unit}\n`;
+        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
+        measurementText += `📐 Math: Scale = Coin Diameter (px) ÷ Coin Diameter (${calibration.unit})`;
       }
       
       // Add footer (only for non-Pro users)
