@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput, Modal, Image } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
+import LabelModal from './LabelModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -105,6 +106,12 @@ export default function DimensionOverlay({
   const [showProModal, setShowProModal] = useState(false);
   const [proTapCount, setProTapCount] = useState(0);
   const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Label modal for save/email
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
+  const labelViewRef = useRef<View>(null); // For capturing photo with label
+  const [currentLabel, setCurrentLabel] = useState<string | null>(null);
   
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
@@ -442,6 +449,12 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
+    // Show label modal first
+    setPendingAction('save');
+    setShowLabelModal(true);
+  };
+
+  const performSave = async (label: string | null) => {
     if (!viewRef || !viewRef.current || !currentImageUri) {
       console.error('❌ Export failed: viewRef or currentImageUri is missing');
       Alert.alert('Export Error', 'Unable to capture measurement. Please try again.');
@@ -449,7 +462,7 @@ export default function DimensionOverlay({
     }
 
     try {
-      console.log('📸 Starting capture...');
+      console.log('📸 Starting capture with label:', label);
       
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -462,8 +475,9 @@ export default function DimensionOverlay({
       
       // Hide menu for capture
       setIsCapturing(true);
+      setCurrentLabel(label);
       
-      // Wait a frame for the UI to update
+      // Wait a frame for the UI to update with label
       await new Promise(resolve => setTimeout(resolve, 100));
       
       const uri = await captureRef(viewRef.current, {
@@ -476,8 +490,9 @@ export default function DimensionOverlay({
       console.log('💾 Saving to library...');
       await MediaLibrary.saveToLibraryAsync(uri);
       
-      // Show menu again
+      // Show menu again and clear label
       setIsCapturing(false);
+      setCurrentLabel(null);
       
       console.log('✅ Save successful!');
       Alert.alert('Success', 'Measurement saved to Photos!');
@@ -486,12 +501,19 @@ export default function DimensionOverlay({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       setIsCapturing(false);
+      setCurrentLabel(null);
       console.error('❌ Export error:', error);
       Alert.alert('Save Error', `Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleEmail = async () => {
+    // Show label modal first
+    setPendingAction('email');
+    setShowLabelModal(true);
+  };
+
+  const performEmail = async (label: string | null) => {
     if (!viewRef || !viewRef.current || !currentImageUri) {
       console.error('❌ Email failed: viewRef or currentImageUri is missing');
       Alert.alert('Email Error', 'Unable to capture measurement. Please try again.');
@@ -545,10 +567,11 @@ export default function DimensionOverlay({
 
       console.log('📸 Hiding menu and capturing view for email...');
       
-      // Hide menu for capture
+      // Hide menu for capture and set label
       setIsCapturing(true);
+      setCurrentLabel(label);
       
-      // Wait a frame for the UI to update
+      // Wait a frame for the UI to update with label
       await new Promise(resolve => setTimeout(resolve, 100));
       
       // Capture the image with measurements
@@ -558,14 +581,20 @@ export default function DimensionOverlay({
         result: 'tmpfile',
       });
       
-      // Show menu again
+      // Show menu again and clear label
       setIsCapturing(false);
+      setCurrentLabel(null);
 
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
       let measurementText = 'PanHandler Measurements\n';
       measurementText += '======================\n\n';
+      
+      // Add label if provided
+      if (label) {
+        measurementText += `Item: ${label}\n\n`;
+      }
       
       // Add coin reference information at the top
       if (coinCircle) {
@@ -612,11 +641,16 @@ export default function DimensionOverlay({
         attachments.push(currentImageUri);
       }
       
+      // Build subject with label
+      const subject = label 
+        ? `PanHandler Measurements - ${label}` 
+        : 'PanHandler Measurements';
+      
       // Compose email with attachments
       await MailComposer.composeAsync({
         recipients,
         ccRecipients,
-        subject: 'PanHandler Measurements',
+        subject,
         body: measurementText,
         attachments,
       });
@@ -669,6 +703,24 @@ export default function DimensionOverlay({
   
   // Help modal
   const [showHelpModal, setShowHelpModal] = useState(false);
+  
+  // Handle label modal completion
+  const handleLabelComplete = (label: string | null) => {
+    setShowLabelModal(false);
+    
+    if (pendingAction === 'save') {
+      performSave(label);
+    } else if (pendingAction === 'email') {
+      performEmail(label);
+    }
+    
+    setPendingAction(null);
+  };
+  
+  const handleLabelDismiss = () => {
+    setShowLabelModal(false);
+    setPendingAction(null);
+  };
   
   // Menu slide-to-hide with side tab
   const [menuHidden, setMenuHidden] = useState(false);
@@ -1623,6 +1675,52 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
+          
+          {/* Label and scale info - top-center */}
+          {(currentLabel || (calibration && !isCapturing)) && (
+            <View
+              style={{
+                position: 'absolute',
+                top: insets.top + 16,
+                left: 12,
+                right: 12,
+                alignItems: 'center',
+              }}
+              pointerEvents="none"
+            >
+              {currentLabel && (
+                <View
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    borderRadius: 12,
+                    marginBottom: 6,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', textAlign: 'center' }}>
+                    {currentLabel}
+                  </Text>
+                </View>
+              )}
+              
+              {calibration && currentLabel && (
+                <View
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text style={{ color: '#A0A0A0', fontSize: 11, fontWeight: '600', textAlign: 'center' }}>
+                    Scale: {calibration.pixelsPerUnit.toFixed(2)} px/{calibration.unit}
+                    {coinCircle && ` • ${coinCircle.coinName}`}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Measurement legend in upper-left corner - only show if there are measurements */}
           {measurements.length > 0 && (
@@ -2268,6 +2366,13 @@ export default function DimensionOverlay({
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      
+      {/* Label Modal */}
+      <LabelModal 
+        visible={showLabelModal} 
+        onComplete={handleLabelComplete}
+        onDismiss={handleLabelDismiss}
+      />
     </>
   );
 }

@@ -4,9 +4,11 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as Haptics from 'expo-haptics';
+import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { captureRef } from 'react-native-view-shot';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -28,6 +30,7 @@ export default function MeasurementScreen() {
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [tempPhotoForBadge, setTempPhotoForBadge] = useState<{ uri: string; isAuto: boolean } | null>(null);
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -39,6 +42,7 @@ export default function MeasurementScreen() {
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
+  const photoWithBadgeRef = useRef<View>(null);
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -184,6 +188,8 @@ export default function MeasurementScreen() {
   const takePicture = async () => {
     if (!cameraRef.current || isCapturing) return;
     
+    const wasAutoCapture = alignmentStatus === 'good' && isStable;
+    
     try {
       setIsCapturing(true);
       setIsHoldingShutter(false); // Release hold state
@@ -193,37 +199,87 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Request media library permission if not granted
-        let canSave = mediaLibraryPermission?.granted || false;
-        if (!canSave) {
-          const { granted } = await requestMediaLibraryPermission();
-          canSave = granted;
-          if (!granted) {
-            console.log('Media library permission not granted');
-          }
+        // If auto-capture, prepare to add badge before saving
+        if (wasAutoCapture) {
+          setTempPhotoForBadge({ uri: photo.uri, isAuto: true });
+          // The useEffect will handle the rest
+        } else {
+          // Regular capture - save immediately
+          await saveToCameraRoll(photo.uri);
+          setImageUri(photo.uri, false);
+          await detectOrientation(photo.uri);
+          setMode('selectCoin');
         }
-
-        // Save to camera roll
-        if (canSave) {
-          try {
-            await MediaLibrary.saveToLibraryAsync(photo.uri);
-            console.log('✅ Photo saved to camera roll');
-          } catch (saveError) {
-            console.error('Failed to save to camera roll:', saveError);
-          }
-        }
-
-        // Set image URI (auto-captured if it was via hold)
-        setImageUri(photo.uri, wasAutoCapture);
-        await detectOrientation(photo.uri);
-        setMode('selectCoin');
       }
     } catch (error) {
       console.error('Error taking picture:', error);
-    } finally {
       setIsCapturing(false);
     }
   };
+
+  const saveToCameraRoll = async (uri: string) => {
+    // Request media library permission if not granted
+    let canSave = mediaLibraryPermission?.granted || false;
+    if (!canSave) {
+      const { granted } = await requestMediaLibraryPermission();
+      canSave = granted;
+      if (!granted) {
+        console.log('Media library permission not granted');
+        return;
+      }
+    }
+
+    // Save to camera roll
+    if (canSave) {
+      try {
+        await MediaLibrary.saveToLibraryAsync(uri);
+        console.log('✅ Photo saved to camera roll');
+      } catch (saveError) {
+        console.error('Failed to save to camera roll:', saveError);
+      }
+    }
+  };
+
+  // Handle auto-capture badge rendering and saving
+  useEffect(() => {
+    if (!tempPhotoForBadge) return;
+
+    const processBadgedPhoto = async () => {
+      try {
+        // Wait a tiny bit for the view to render
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Capture the view with the AUTO badge
+        const capturedUri = await captureRef(photoWithBadgeRef, {
+          format: 'jpg',
+          quality: 1,
+        });
+
+        // Save the badged photo to camera roll
+        await saveToCameraRoll(capturedUri);
+
+        // Use the original photo for the app (not the badged one)
+        setImageUri(tempPhotoForBadge.uri, tempPhotoForBadge.isAuto);
+        await detectOrientation(tempPhotoForBadge.uri);
+        
+        // Clean up and proceed
+        setTempPhotoForBadge(null);
+        setIsCapturing(false);
+        setMode('selectCoin');
+      } catch (error) {
+        console.error('Error processing badged photo:', error);
+        // Fallback: just save the original
+        await saveToCameraRoll(tempPhotoForBadge.uri);
+        setImageUri(tempPhotoForBadge.uri, tempPhotoForBadge.isAuto);
+        await detectOrientation(tempPhotoForBadge.uri);
+        setTempPhotoForBadge(null);
+        setIsCapturing(false);
+        setMode('selectCoin');
+      }
+    };
+
+    processBadgedPhoto();
+  }, [tempPhotoForBadge]);
 
   const wasAutoCapture = alignmentStatus === 'good' && isStable;
 
@@ -431,6 +487,50 @@ export default function MeasurementScreen() {
             onDismiss={handleRetakePhoto}
           />
         </>
+      )}
+
+      {/* Hidden view for capturing photo with AUTO badge */}
+      {tempPhotoForBadge && (
+        <View 
+          ref={photoWithBadgeRef}
+          style={{ 
+            position: 'absolute', 
+            left: -10000, // Render off-screen
+            width: SCREEN_WIDTH, 
+            height: SCREEN_HEIGHT 
+          }}
+          collapsable={false}
+        >
+          <Image
+            source={{ uri: tempPhotoForBadge.uri }}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+            resizeMode="contain"
+          />
+          {tempPhotoForBadge.isAuto && (
+            <View 
+              style={{ 
+                position: 'absolute', 
+                top: insets.top + 20, 
+                right: 20,
+                backgroundColor: '#10B981',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+              }}
+            >
+              <Ionicons name="checkmark-circle" size={18} color="white" />
+              <Text style={{ color: 'white', fontWeight: '700', fontSize: 14, marginLeft: 4 }}>
+                AUTO
+              </Text>
+            </View>
+          )}
+        </View>
       )}
 
       {/* Help Modal */}

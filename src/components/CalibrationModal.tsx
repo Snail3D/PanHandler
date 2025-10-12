@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, Modal, TextInput } from 'react-native';
+import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useStore from '../state/measurementStore';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
@@ -119,6 +119,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                   <Pressable
                     key={`${coin.country}-${coin.name}`}
                     onPress={() => {
+                      Keyboard.dismiss();
                       setSelectedCoin(coin);
                       setSearchQuery('');
                     }}
