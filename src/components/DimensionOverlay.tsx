@@ -108,13 +108,44 @@ export default function DimensionOverlay({
   // Selected measurement for delete/drag
   const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
+  const [resizingCorner, setResizingCorner] = useState<{ measurementId: string, cornerIndex: 0 | 1 } | null>(null);
   const dragStartPos = useSharedValue({ x: 0, y: 0 });
   const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
+  const [didDrag, setDidDrag] = useState(false); // Track if user actually dragged
   
   // Get color for measurement based on index
   const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
     const colors = MEASUREMENT_COLORS[measurementMode];
     return colors[index % colors.length];
+  };
+
+  // Helper to check if tap is near a rectangle corner
+  const getTappedRectangleCorner = (tapX: number, tapY: number): { measurementId: string, cornerIndex: 0 | 1 } | null => {
+    const CORNER_THRESHOLD = 40; // pixels
+    
+    for (const measurement of measurements) {
+      if (measurement.mode === 'rectangle') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        
+        // Check distance to corner 0
+        const distToCorner0 = Math.sqrt(
+          Math.pow(tapX - p0.x, 2) + Math.pow(tapY - p0.y, 2)
+        );
+        if (distToCorner0 < CORNER_THRESHOLD) {
+          return { measurementId: measurement.id, cornerIndex: 0 };
+        }
+        
+        // Check distance to corner 1
+        const distToCorner1 = Math.sqrt(
+          Math.pow(tapX - p1.x, 2) + Math.pow(tapY - p1.y, 2)
+        );
+        if (distToCorner1 < CORNER_THRESHOLD) {
+          return { measurementId: measurement.id, cornerIndex: 1 };
+        }
+      }
+    }
+    return null;
   };
 
   // Helper to convert screen coordinates to original image coordinates
@@ -284,17 +315,17 @@ export default function DimensionOverlay({
           Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
         );
         const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
-        value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem)}`;
+        value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
       } else {
         // Rectangle: calculate width and height
         const p0 = completedPoints[0];
         const p1 = completedPoints[1];
         const widthPx = Math.abs(p1.x - p0.x);
         const heightPx = Math.abs(p1.y - p0.y);
-        width = widthPx * (calibration?.pixelsPerUnit || 1);
-        height = heightPx * (calibration?.pixelsPerUnit || 1);
-        const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem);
-        const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem);
+        width = widthPx / (calibration?.pixelsPerUnit || 1);
+        height = heightPx / (calibration?.pixelsPerUnit || 1);
+        const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+        const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
         value = `${widthStr} × ${heightStr}`;
       }
       
@@ -886,64 +917,103 @@ export default function DimensionOverlay({
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}
           onMoveShouldSetResponder={(event) => {
-            // Only respond to move if we're dragging a circle or rectangle
-            return draggedMeasurementId !== null;
+            // Only respond to move if we're dragging or resizing
+            return draggedMeasurementId !== null || resizingCorner !== null;
           }}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
+            
+            // Check if tapping a rectangle corner first
+            const corner = getTappedRectangleCorner(pageX, pageY);
+            if (corner) {
+              setResizingCorner(corner);
+              setDidDrag(false);
+              dragStartPos.value = { x: pageX, y: pageY };
+              dragCurrentPos.value = { x: pageX, y: pageY };
+              return;
+            }
+            
+            // Check if tapping a measurement
             const tappedId = getTappedMeasurement(pageX, pageY);
             
+            // Reset drag flag and states
+            setDidDrag(false);
+            setDraggedMeasurementId(null);
+            setResizingCorner(null);
+            
             if (tappedId) {
-              const measurement = measurements.find(m => m.id === tappedId);
-              
-              // Check if this is a draggable measurement (circle or rectangle)
-              if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
-                // Store start position for potential drag
-                dragStartPos.value = { x: pageX, y: pageY };
-                dragCurrentPos.value = { x: pageX, y: pageY };
-                
-                // Dismiss previous selection if tapping a different measurement
-                if (selectedMeasurementId && selectedMeasurementId !== tappedId) {
-                  setSelectedMeasurementId(null);
-                }
-              } else {
-                // For distance/angle measurements, just select for delete
-                if (selectedMeasurementId === tappedId) {
-                  setSelectedMeasurementId(null);
-                } else {
-                  setSelectedMeasurementId(tappedId);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                }
-              }
+              // Store start position for potential drag
+              dragStartPos.value = { x: pageX, y: pageY };
+              dragCurrentPos.value = { x: pageX, y: pageY };
             } else {
-              // Tapped empty space - dismiss selection
+              // Tapped empty space - dismiss any selection
               if (selectedMeasurementId) {
                 setSelectedMeasurementId(null);
               }
             }
           }}
           onResponderMove={(event) => {
-            if (!draggedMeasurementId) {
-              const { pageX, pageY } = event.nativeEvent;
+            const { pageX, pageY } = event.nativeEvent;
+            
+            // Handle corner resizing
+            if (resizingCorner) {
+              setDidDrag(true);
+              const imageCoords = screenToImage(pageX, pageY);
+              
+              const updatedMeasurements = measurements.map(m => {
+                if (m.id === resizingCorner.measurementId) {
+                  const newPoints = [...m.points];
+                  newPoints[resizingCorner.cornerIndex] = imageCoords;
+                  
+                  // Recalculate width and height
+                  const widthPx = Math.abs(newPoints[1].x - newPoints[0].x);
+                  const heightPx = Math.abs(newPoints[1].y - newPoints[0].y);
+                  const width = widthPx / (calibration?.pixelsPerUnit || 1);
+                  const height = heightPx / (calibration?.pixelsPerUnit || 1);
+                  const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+                  const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+                  
+                  return {
+                    ...m,
+                    points: newPoints,
+                    value: `${widthStr} × ${heightStr}`,
+                    width,
+                    height,
+                  };
+                }
+                return m;
+              });
+              
+              setMeasurements(updatedMeasurements);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              return;
+            }
+            
+            // Check if user moved enough to start dragging
+            const dragDistance = Math.sqrt(
+              Math.pow(pageX - dragStartPos.value.x, 2) +
+              Math.pow(pageY - dragStartPos.value.y, 2)
+            );
+            
+            // Start dragging if moved > 10px and not already dragging
+            if (dragDistance > 10 && !draggedMeasurementId) {
               const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
-              
-              // Check if user moved enough to start dragging
-              const dragDistance = Math.sqrt(
-                Math.pow(pageX - dragStartPos.value.x, 2) +
-                Math.pow(pageY - dragStartPos.value.y, 2)
-              );
-              
-              if (dragDistance > 10 && tappedId) {
+              if (tappedId) {
                 const measurement = measurements.find(m => m.id === tappedId);
                 if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
                   setDraggedMeasurementId(tappedId);
+                  setDidDrag(true);
+                  // Dismiss any delete button when starting to drag
+                  if (selectedMeasurementId) {
+                    setSelectedMeasurementId(null);
+                  }
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }
               }
             }
             
+            // Continue dragging if active
             if (draggedMeasurementId) {
-              const { pageX, pageY } = event.nativeEvent;
               dragCurrentPos.value = { x: pageX, y: pageY };
               
               // Calculate offset from start
@@ -978,26 +1048,30 @@ export default function DimensionOverlay({
             }
           }}
           onResponderRelease={() => {
-            if (draggedMeasurementId) {
-              // Finished dragging
-              setDraggedMeasurementId(null);
+            if (resizingCorner) {
+              // Finished resizing - don't show delete button
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } else {
-              // Was just a tap - handle selection
+            } else if (draggedMeasurementId) {
+              // Finished dragging - don't show delete button
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else if (!didDrag) {
+              // Was just a quick tap without dragging - show delete button
               const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
               if (tappedId) {
-                const measurement = measurements.find(m => m.id === tappedId);
-                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
-                  // Toggle selection for circle/rectangle
-                  if (selectedMeasurementId === tappedId) {
-                    setSelectedMeasurementId(null);
-                  } else {
-                    setSelectedMeasurementId(tappedId);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }
+                // Toggle selection (show delete button)
+                if (selectedMeasurementId === tappedId) {
+                  setSelectedMeasurementId(null);
+                } else {
+                  setSelectedMeasurementId(tappedId);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }
               }
             }
+            
+            // Always reset drag state
+            setDraggedMeasurementId(null);
+            setResizingCorner(null);
+            setDidDrag(false);
           }}
         />
       )}
@@ -1407,6 +1481,88 @@ export default function DimensionOverlay({
               </View>
             ));
           })()}
+
+          {/* Side labels for rectangles - Width on left, Height on top */}
+          {measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
+            const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
+            const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+            const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+            
+            const minX = Math.min(p0.x, p1.x);
+            const maxX = Math.max(p0.x, p1.x);
+            const minY = Math.min(p0.y, p1.y);
+            const maxY = Math.max(p0.y, p1.y);
+            const centerY = (minY + maxY) / 2;
+            const centerX = (minX + maxX) / 2;
+            
+            // Calculate width and height with 2 decimals
+            const widthPx = Math.abs(p1.x - p0.x) / zoomScale;
+            const heightPx = Math.abs(p1.y - p0.y) / zoomScale;
+            const widthValue = widthPx / (calibration?.pixelsPerUnit || 1);
+            const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
+            const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
+            const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
+            
+            return (
+              <React.Fragment key={`${measurement.id}-sides`}>
+                {/* Width label on left side */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: minX - 70,
+                    top: centerY - 15,
+                  }}
+                  pointerEvents="none"
+                >
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
+                      W: {widthLabel}
+                    </Text>
+                  </View>
+                </View>
+                
+                {/* Height label on top side */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: centerX - 40,
+                    top: minY - 35,
+                  }}
+                  pointerEvents="none"
+                >
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
+                      H: {heightLabel}
+                    </Text>
+                  </View>
+                </View>
+              </React.Fragment>
+            );
+          })}
 
           {/* Label for current measurement in progress */}
           {currentPoints.length === requiredPoints && (() => {
