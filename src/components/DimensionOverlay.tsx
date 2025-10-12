@@ -189,6 +189,8 @@ export default function DimensionOverlay({
   const [tetrisBlocks, setTetrisBlocks] = useState<Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}>>([]);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
+  const gameOverOpacity = useSharedValue(0);
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
@@ -307,7 +309,7 @@ export default function DimensionOverlay({
     return CALCULATOR_WORDS[hash % CALCULATOR_WORDS.length];
   };
   
-  // Tetris animation trigger
+  // Tetris animation trigger - EPIC GAME OVER sequence!
   const triggerTetrisAnimation = () => {
     setShowTetris(true);
     
@@ -317,59 +319,74 @@ export default function DimensionOverlay({
     // Fade in
     tetrisOpacity.value = withTiming(1, { duration: 600 });
     
-    // Generate falling Tetris blocks
-    const blockShapes = [
-      // I block
-      [[1,1,1,1]],
-      // O block  
-      [[1,1],[1,1]],
-      // T block
-      [[0,1,0],[1,1,1]],
-      // L block
-      [[1,0],[1,0],[1,1]],
-      // J block
-      [[0,1],[0,1],[1,1]],
-      // S block
-      [[0,1,1],[1,1,0]],
-      // Z block
-      [[1,1,0],[0,1,1]],
-    ];
-    
-    // Create 15 blocks that will fall over 15 seconds
+    // Create 30 blocks that will pile up FAST like runaway Tetris
     const blocks: Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}> = [];
-    for (let i = 0; i < 15; i++) {
+    const blockSize = 40;
+    const blocksPerRow = Math.floor(SCREEN_WIDTH / blockSize) - 1;
+    
+    // Generate blocks that will stack from bottom to top
+    for (let i = 0; i < 30; i++) {
+      const row = Math.floor(i / blocksPerRow);
+      const col = i % blocksPerRow;
+      
       blocks.push({
         id: `tetris-${i}`,
-        x: Math.random() * (SCREEN_WIDTH - 80), // Random x position
-        y: -100 - (i * 120), // Stagger vertically (start above screen)
-        rotation: Math.floor(Math.random() * 4) * 90, // Random rotation
-        shape: Math.floor(Math.random() * blockShapes.length),
+        x: 20 + (col * blockSize), // Grid position
+        y: -100 - (i * 60), // Start way above screen, staggered
+        rotation: Math.floor(Math.random() * 4) * 90,
+        shape: Math.floor(Math.random() * 7),
         settled: false,
       });
     }
     
     setTetrisBlocks(blocks);
     
-    // Animate blocks falling one by one
+    // Animate blocks falling FAST one by one (faster and faster = runaway!)
     blocks.forEach((block, idx) => {
+      const row = Math.floor(idx / blocksPerRow);
+      // Get faster as it goes: start at 400ms, end at 100ms
+      const dropDelay = Math.max(100, 400 - (idx * 10));
+      
       setTimeout(() => {
         setTetrisBlocks(prev => 
           prev.map(b => 
             b.id === block.id 
-              ? { ...b, y: SCREEN_HEIGHT - 100 - (idx * 8), settled: true } 
+              ? { ...b, y: SCREEN_HEIGHT - 140 - (row * blockSize), settled: true } 
               : b
           )
         );
-      }, idx * 1000); // Drop one every second
+      }, idx * dropDelay);
     });
     
-    // Fade out after 15 seconds
+    // Show GAME OVER when blocks reach top (after ~6 seconds)
+    setTimeout(() => {
+      // Huge success haptic
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      
+      // Show GAME OVER overlay
+      runOnJS(setShowGameOver)(true);
+      gameOverOpacity.value = withTiming(1, { duration: 400 });
+    }, 6000);
+    
+    // Fade out and CLEAR EVERYTHING after 8 seconds
     setTimeout(() => {
       tetrisOpacity.value = withTiming(0, { duration: 800 }, () => {
         runOnJS(setShowTetris)(false);
         runOnJS(setTetrisBlocks)([]);
+        runOnJS(setShowGameOver)(false);
+        
+        // CLEAR ALL MEASUREMENTS! 🧹
+        runOnJS(setMeasurements)([]);
+        runOnJS(setCurrentPoints)([]);
+        runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
+        
+        // Reset game over
+        gameOverOpacity.value = 0;
+        
+        // Success haptic for the reset
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       });
-    }, 15000);
+    }, 8000);
   };
   
   // Get color for measurement based on index
@@ -705,8 +722,17 @@ export default function DimensionOverlay({
     // After 500ms delay, start repeating undo every 333ms (1/3 second)
     undoTimeoutRef.current = setTimeout(() => {
       undoIntervalRef.current = setInterval(() => {
-        handleClear();
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        // Get current measurements from store
+        const currentMeasurements = useStore.getState().completedMeasurements;
+        const currentPointsState = useStore.getState().currentPoints;
+        
+        if (currentMeasurements.length > 0) {
+          setMeasurements(currentMeasurements.slice(0, -1));
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } else if (currentPointsState.length > 0) {
+          setCurrentPoints([]);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
       }, 333); // Delete one every 1/3 second
     }, 500); // 500ms initial delay before repeating
   };
@@ -3422,6 +3448,77 @@ export default function DimensionOverlay({
               YOU'RE A MEASUREMENT MASTER! 🏆
             </Text>
           </Animated.View>
+          
+          {/* GAME OVER overlay - appears when blocks reach top */}
+          {showGameOver && (
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 0, 0, 0.3)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: gameOverOpacity.value,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: '#FF0000',
+                  paddingHorizontal: 40,
+                  paddingVertical: 20,
+                  borderRadius: 12,
+                  borderWidth: 4,
+                  borderColor: '#FFFFFF',
+                }}
+              >
+                <Text
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fontFamily: 'Courier',
+                    textAlign: 'center',
+                    textShadowColor: '#000000',
+                    textShadowOffset: { width: 2, height: 2 },
+                    textShadowRadius: 4,
+                    letterSpacing: 4,
+                  }}
+                >
+                  GAME
+                </Text>
+                <Text
+                  style={{
+                    color: '#FFFFFF',
+                    fontSize: 48,
+                    fontWeight: 'bold',
+                    fontFamily: 'Courier',
+                    textAlign: 'center',
+                    textShadowColor: '#000000',
+                    textShadowOffset: { width: 2, height: 2 },
+                    textShadowRadius: 4,
+                    letterSpacing: 4,
+                  }}
+                >
+                  OVER
+                </Text>
+                <Text
+                  style={{
+                    color: '#FFFF00',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    fontFamily: 'Courier',
+                    textAlign: 'center',
+                    marginTop: 12,
+                  }}
+                >
+                  CLEARING SCREEN...
+                </Text>
+              </View>
+            </Animated.View>
+          )}
         </Animated.View>
       </Modal>
     </>
