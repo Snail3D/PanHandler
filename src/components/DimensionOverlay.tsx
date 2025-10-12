@@ -257,7 +257,14 @@ export default function DimensionOverlay({
         return;
       }
 
-      console.log('📸 Capturing view...');
+      console.log('📸 Hiding menu and capturing view...');
+      
+      // Hide menu for capture
+      setIsCapturing(true);
+      
+      // Wait a frame for the UI to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const uri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 0.9,
@@ -268,12 +275,16 @@ export default function DimensionOverlay({
       console.log('💾 Saving to library...');
       await MediaLibrary.saveToLibraryAsync(uri);
       
+      // Show menu again
+      setIsCapturing(false);
+      
       console.log('✅ Save successful!');
       Alert.alert('Success', 'Measurement saved to Photos!');
       
       // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
+      setIsCapturing(false);
       console.error('❌ Export error:', error);
       Alert.alert('Save Error', `Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -300,7 +311,7 @@ export default function DimensionOverlay({
         await new Promise<void>((resolve) => {
           Alert.prompt(
             'Email Address',
-            'Enter your email address to auto-populate for future use:',
+            'Enter your email address to auto-populate for future use:\n\n(This is secure and not shared with us or anyone. It is simply to make sending emails faster for you in the future)',
             [
               {
                 text: 'Cancel',
@@ -325,13 +336,23 @@ export default function DimensionOverlay({
         });
       }
 
-      console.log('📸 Capturing view for email...');
+      console.log('📸 Hiding menu and capturing view for email...');
+      
+      // Hide menu for capture
+      setIsCapturing(true);
+      
+      // Wait a frame for the UI to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Capture the image with measurements
       const uri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
       });
+      
+      // Show menu again
+      setIsCapturing(false);
 
       console.log('📸 Captured URI for email:', uri);
 
@@ -382,6 +403,7 @@ export default function DimensionOverlay({
       
       console.log('✅ Email composer opened');
     } catch (error) {
+      setIsCapturing(false);
       console.error('❌ Email error:', error);
       Alert.alert('Email Error', `Failed to prepare email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -418,6 +440,9 @@ export default function DimensionOverlay({
   
   // Menu minimization
   const [menuMinimized, setMenuMinimized] = useState(false);
+  
+  // Hide menu during capture
+  const [isCapturing, setIsCapturing] = useState(false);
 
   return (
     <>
@@ -450,39 +475,41 @@ export default function DimensionOverlay({
       )}
 
       {/* Sexy iOS-styled minimize button */}
-      <Pressable
-        onPress={() => {
-          setMenuMinimized(!menuMinimized);
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }}
-        className="absolute z-30"
-        style={{ 
-          bottom: menuMinimized ? insets.bottom + 20 : insets.bottom + 20,
-          left: '50%',
-          marginLeft: -35,
-        }}
-      >
-        <View className="bg-white rounded-full shadow-2xl" style={{ 
-          width: 70, 
-          height: 70,
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderWidth: 1,
-          borderColor: 'rgba(0,0,0,0.06)',
-        }}>
-          {menuMinimized ? (
-            <View className="items-center">
-              <Ionicons name="menu" size={28} color="#007AFF" />
-              <Text style={{ fontSize: 8, color: '#007AFF', fontWeight: '600', marginTop: 2 }}>MENU</Text>
-            </View>
-          ) : (
-            <View className="items-center">
-              <Ionicons name="chevron-down" size={20} color="#8E8E93" />
-              <View className="w-8 h-1 bg-gray-300 rounded-full mt-1" />
-            </View>
-          )}
-        </View>
-      </Pressable>
+      {!isCapturing && (
+        <Pressable
+          onPress={() => {
+            setMenuMinimized(!menuMinimized);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          className="absolute z-30"
+          style={{ 
+            bottom: menuMinimized ? insets.bottom + 20 : insets.bottom + 20,
+            left: '50%',
+            marginLeft: -35,
+          }}
+        >
+          <View className="bg-white rounded-full shadow-2xl" style={{ 
+            width: 70, 
+            height: 70,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 1,
+            borderColor: 'rgba(0,0,0,0.06)',
+          }}>
+            {menuMinimized ? (
+              <View className="items-center">
+                <Ionicons name="menu" size={28} color="#007AFF" />
+                <Text style={{ fontSize: 8, color: '#007AFF', fontWeight: '600', marginTop: 2 }}>MENU</Text>
+              </View>
+            ) : (
+              <View className="items-center">
+                <Ionicons name="chevron-down" size={20} color="#8E8E93" />
+                <View className="w-8 h-1 bg-gray-300 rounded-full mt-1" />
+              </View>
+            )}
+          </View>
+        </Pressable>
+      )}
 
       {/* Touch overlay - only active in measurement mode */}
       {measurementMode && (
@@ -832,7 +859,7 @@ export default function DimensionOverlay({
       </View>
 
       {/* Bottom toolbar - iOS 18 ultra-transparent style */}
-      {!menuMinimized && (
+      {!menuMinimized && !isCapturing && (
         <View
           className="absolute left-0 right-0 z-20"
           style={{ 
