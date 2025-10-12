@@ -1366,31 +1366,25 @@ export default function DimensionOverlay({
       </View>
 
       {/* Finger touch indicators - subtle shadows under fingers */}
-      {fingerTouches.map((touch) => {
+      {(() => {
         const nextMeasurementIndex = currentPoints.length === requiredPoints 
           ? measurements.length + 1 
           : measurements.length;
         const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
         const fingerColor = nextColor.main;
         
-        const animatedStyle = useAnimatedStyle(() => ({
-          opacity: fingerOpacity.value,
-        }));
-        
-        return (
+        return fingerTouches.map((touch) => (
           <Animated.View
             key={touch.id}
-            style={[
-              {
-                position: 'absolute',
-                left: touch.x - 20,
-                top: touch.y - 20,
-                width: 40,
-                height: 40,
-                pointerEvents: 'none',
-              },
-              animatedStyle
-            ]}
+            style={{
+              position: 'absolute',
+              left: touch.x - 20,
+              top: touch.y - 20,
+              width: 40,
+              height: 40,
+              pointerEvents: 'none',
+              opacity: fingerOpacity.value,
+            }}
           >
             <Svg width={40} height={40}>
               {/* Subtle shadow/glow */}
@@ -1417,8 +1411,8 @@ export default function DimensionOverlay({
               />
             </Svg>
           </Animated.View>
-        );
-      })}
+        ));
+      })()}
 
       {/* Subtle guide lines - only show in Pan mode after calibration */}
       {!measurementMode && calibration && (
