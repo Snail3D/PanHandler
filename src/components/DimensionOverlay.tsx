@@ -3187,16 +3187,16 @@ export default function DimensionOverlay({
           </Animated.View>
         )}
         
-        {/* Label and scale info overlay for Fusion 360 export */}
-        {currentLabel && (
-          <View
-            style={{
-              position: 'absolute',
-              top: insets.top + 16,
-              left: 12,
-            }}
-            pointerEvents="none"
-          >
+        {/* Label and scale info overlay for CAD canvas export - ALWAYS SHOW */}
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            left: 12,
+          }}
+          pointerEvents="none"
+        >
+          {currentLabel && (
             <View
               style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -3210,29 +3210,28 @@ export default function DimensionOverlay({
                 {currentLabel}
               </Text>
             </View>
-            
-            {calibration && (
-              <View
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  borderRadius: 5,
-                  marginBottom: 4,
-                }}
-              >
+          )}
+          
+          {calibration && (
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                CAD Scale: {((1 / calibration.pixelsPerUnit) * (savedZoomState?.scale || 1)).toFixed(6)} mm/px
+              </Text>
+              {coinCircle && (
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  CAD Scale: {((1 / calibration.pixelsPerUnit) * (savedZoomState?.scale || 1)).toFixed(6)} mm/px
+                  Ref: {coinCircle.coinName}
                 </Text>
-                {coinCircle && (
-                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    Ref: {coinCircle.coinName}
-                  </Text>
-                )}
-              </View>
-            )}
-          </View>
-        )}
+              )}
+            </View>
+          )}
+        </View>
       </View>
       
       {/* Inspirational Quote Overlay */}
