@@ -1,4 +1,4 @@
-// DimensionOverlay v2.1 - Cache bust: Oct 12, 2025, 8:00 AM
+// DimensionOverlay v2.2 - Try-catch protected touch handling - Oct 12, 8:06 AM
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
@@ -1430,73 +1430,78 @@ export default function DimensionOverlay({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }}
           onResponderMove={(event) => {
-            // CACHE BUST: Fixed touch array handling
-            const touch = event.nativeEvent.touches[0];
-            if (!touch) return;
-            
-            const { pageX, pageY } = touch;
-            
-            // Update finger touch positions for all touches with pressure and random seeds
-            const nativeTouches = event?.nativeEvent?.touches;
-            const touches = nativeTouches && Array.isArray(nativeTouches) 
-              ? Array.from(nativeTouches).map((t: any, idx: number) => ({
-                  x: t.pageX || 0,
-                  y: t.pageY || 0,
-                  id: `touch-${idx}`,
-                  pressure: t.force || 0.5,
-                  seed: Math.random()
-                }))
-              : [];
-            setFingerTouches(touches);
-            
-            // Gradient horizontal offset: crosshair leans in direction of movement
-            // At center: 0 offset
-            // Moving left: crosshair shifts left (negative)
-            // Moving right: crosshair shifts right (positive)
-            const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
-            const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
-            const maxOffset = 30;
-            const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
-            
-            // Update cursor with gradient offset
-            setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
-            
-            // Adaptive haptic feedback based on movement speed
-            const distance = Math.sqrt(
-              Math.pow(pageX - lastHapticPosition.x, 2) + 
-              Math.pow(pageY - lastHapticPosition.y, 2)
-            );
-            
-            const currentTime = Date.now();
-            const timeDelta = currentTime - lastHapticTime;
-            
-            // Calculate speed (pixels per millisecond)
-            const speed = distance / Math.max(timeDelta, 1);
-            
-            // Dynamic haptic distance based on speed:
-            // - Fast movements: larger distance between haptics (slow tick...tick...tick)
-            // - Slow movements: smaller distance between haptics (fast tickticktick)
-            let dynamicHapticDistance;
-            if (speed < 0.3) {
-              // Very slow/precise - frequent ticks
-              dynamicHapticDistance = 2;  // tick tick tick tick tick
-            } else if (speed < 0.8) {
-              // Medium slow - moderate ticks
-              dynamicHapticDistance = 5;  // tick tick tick
-            } else if (speed < 2) {
-              // Medium fast - slower ticks
-              dynamicHapticDistance = 15; // tick...tick...tick
-            } else {
-              // Very fast - very slow ticks
-              dynamicHapticDistance = 30; // tick.....tick.....tick
-            }
-            
-            if (distance >= dynamicHapticDistance) {
-              // Use light haptic for all movement feedback
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            try {
+              // CACHE BUST v2: Extra safe touch handling
+              const touch = event?.nativeEvent?.touches?.[0];
+              if (!touch) return;
               
-              setLastHapticPosition({ x: pageX, y: pageY });
-              setLastHapticTime(currentTime);
+              const { pageX, pageY } = touch;
+              
+              // Update finger touch positions for all touches with pressure and random seeds
+              const nativeTouches = event?.nativeEvent?.touches;
+              const touches = nativeTouches && Array.isArray(nativeTouches) 
+                ? Array.from(nativeTouches).map((t: any, idx: number) => ({
+                    x: t.pageX || 0,
+                    y: t.pageY || 0,
+                    id: `touch-${idx}`,
+                    pressure: t.force || 0.5,
+                    seed: Math.random()
+                  }))
+                : [];
+              setFingerTouches(touches);
+              
+              // Gradient horizontal offset: crosshair leans in direction of movement
+              // At center: 0 offset
+              // Moving left: crosshair shifts left (negative)
+              // Moving right: crosshair shifts right (positive)
+              const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
+              const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
+              const maxOffset = 30;
+              const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
+              
+              // Update cursor with gradient offset
+              setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
+              
+              // Adaptive haptic feedback based on movement speed
+              const distance = Math.sqrt(
+                Math.pow(pageX - lastHapticPosition.x, 2) + 
+                Math.pow(pageY - lastHapticPosition.y, 2)
+              );
+              
+              const currentTime = Date.now();
+              const timeDelta = currentTime - lastHapticTime;
+              
+              // Calculate speed (pixels per millisecond)
+              const speed = distance / Math.max(timeDelta, 1);
+              
+              // Dynamic haptic distance based on speed:
+              // - Fast movements: larger distance between haptics (slow tick...tick...tick)
+              // - Slow movements: smaller distance between haptics (fast tickticktick)
+              let dynamicHapticDistance;
+              if (speed < 0.3) {
+                // Very slow/precise - frequent ticks
+                dynamicHapticDistance = 2;  // tick tick tick tick tick
+              } else if (speed < 0.8) {
+                // Medium slow - moderate ticks
+                dynamicHapticDistance = 5;  // tick tick tick
+              } else if (speed < 2) {
+                // Medium fast - slower ticks
+                dynamicHapticDistance = 15; // tick...tick...tick
+              } else {
+                // Very fast - very slow ticks
+                dynamicHapticDistance = 30; // tick.....tick.....tick
+              }
+              
+              if (distance >= dynamicHapticDistance) {
+                // Use light haptic for all movement feedback
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                
+                setLastHapticPosition({ x: pageX, y: pageY });
+                setLastHapticTime(currentTime);
+              }
+            } catch (error) {
+              // Silently handle any touch errors to prevent crashes
+              console.warn('Touch handling error:', error);
             }
           }}
           onResponderRelease={() => {
