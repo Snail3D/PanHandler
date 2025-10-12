@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -112,6 +112,7 @@ export default function DimensionOverlay({
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
+  const fusionViewRef = useRef<View>(null); // For capturing zoomed/rotated image for Fusion 360
   const [currentLabel, setCurrentLabel] = useState<string | null>(null);
   
   // Selected measurement for delete/drag
@@ -209,6 +210,12 @@ export default function DimensionOverlay({
 
   // Calculate angle between three points
   const calculateAngle = (p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }) => {
+    // Safety check
+    if (!p1 || !p2 || !p3 || p1.y === undefined || p2.y === undefined || p3.y === undefined) {
+      console.warn('⚠️ calculateAngle called with undefined points');
+      return '0°';
+    }
+    
     const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
     const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
     let angle = Math.abs((angle2 - angle1) * (180 / Math.PI));
@@ -534,6 +541,29 @@ export default function DimensionOverlay({
         console.log('✅ Saved both photos!');
       }
       
+      // Capture Fusion 360 image (70% opacity, zoomed/rotated, no overlays)
+      if (fusionViewRef.current) {
+        console.log('📸 Capturing Fusion 360 image...');
+        
+        try {
+          const fusionUri = await captureRef(fusionViewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          console.log('📸 Captured Fusion 360 URI:', fusionUri);
+          
+          // Save Fusion photo with custom filename
+          const fusionFilename = label ? `${label}_Fusion360` : 'PanHandler_Fusion360';
+          const fusionAsset = await MediaLibrary.createAssetAsync(fusionUri);
+          
+          console.log('✅ Saved Fusion 360 photo!');
+        } catch (error) {
+          console.error('Failed to capture Fusion 360 image:', error);
+        }
+      }
+      
       // Show menu again and clear label
       setIsCapturing(false);
       setCurrentLabel(null);
@@ -728,6 +758,30 @@ export default function DimensionOverlay({
             const fallbackDest = `${FileSystem.cacheDirectory}${fallbackFilename}`;
             await FileSystem.copyAsync({ from: currentImageUri, to: fallbackDest });
             attachments.push(fallbackDest);
+          }
+        }
+        
+        // Capture Fusion 360 image (70% opacity, zoomed/rotated, no overlays)
+        if (fusionViewRef.current) {
+          try {
+            console.log('📸 Capturing Fusion 360 image for email...');
+            
+            const fusionUri = await captureRef(fusionViewRef.current, {
+              format: 'jpg',
+              quality: 0.9,
+              result: 'tmpfile',
+            });
+            
+            // Insert as second attachment (after measurements, before reference)
+            const fusionFilename = label ? `${label}_Fusion360.jpg` : 'PanHandler_Fusion360.jpg';
+            const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
+            await FileSystem.copyAsync({ from: fusionUri, to: fusionDest });
+            // Insert at position 1 (after measurements photo)
+            attachments.splice(1, 0, fusionDest);
+            
+            console.log('✅ Added Fusion 360 photo to email');
+          } catch (error) {
+            console.error('Failed to capture Fusion 360 image:', error);
           }
         }
       } else if (currentImageUri) {
@@ -1703,11 +1757,35 @@ export default function DimensionOverlay({
               screenX = (p0.x + p1.x) / 2 - 50;
               screenY = (p0.y + p1.y) / 2 - 40;
               value = calculateDistance(currentPoints[0], currentPoints[1]);
-            } else {
+            } else if (mode === 'angle' && currentPoints.length >= 3 && currentPoints[2]) {
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
               screenX = p1.x - 50;
               screenY = p1.y - 60;
               value = calculateAngle(currentPoints[0], currentPoints[1], currentPoints[2]);
+            } else if (mode === 'circle' && currentPoints.length >= 2) {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              screenX = p0.x + 10;
+              screenY = p0.y - 40;
+              const radius = Math.sqrt(
+                Math.pow(currentPoints[1].x - currentPoints[0].x, 2) + 
+                Math.pow(currentPoints[1].y - currentPoints[0].y, 2)
+              );
+              const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+              value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+            } else if (mode === 'rectangle' && currentPoints.length >= 2) {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              screenX = (p0.x + p1.x) / 2 - 50;
+              screenY = Math.min(p0.y, p1.y) - 50;
+              const widthPx = Math.abs(currentPoints[1].x - currentPoints[0].x);
+              const heightPx = Math.abs(currentPoints[1].y - currentPoints[0].y);
+              const width = widthPx / (calibration?.pixelsPerUnit || 1);
+              const height = heightPx / (calibration?.pixelsPerUnit || 1);
+              const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+              const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+              value = `${widthStr} × ${heightStr}`;
+            } else {
+              return null; // Safety fallback
             }
             
             return (
@@ -2490,6 +2568,43 @@ export default function DimensionOverlay({
         onComplete={handleLabelComplete}
         onDismiss={handleLabelDismiss}
       />
+      
+      {/* Hidden view for capturing Fusion 360 image (70% opacity, zoomed/rotated, no overlays) */}
+      <View
+        ref={fusionViewRef}
+        collapsable={false}
+        style={{
+          position: 'absolute',
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT,
+          top: 0,
+          left: -10000, // Position off-screen
+          backgroundColor: 'black',
+        }}
+      >
+        {currentImageUri && (
+          <Animated.View
+            style={{
+              position: 'absolute',
+              width: SCREEN_WIDTH,
+              height: SCREEN_HEIGHT,
+              opacity: 0.7,
+              transform: [
+                { translateX: zoomTranslateX },
+                { translateY: zoomTranslateY },
+                { scale: zoomScale },
+                { rotate: `${useStore.getState().savedZoomState?.rotation || 0}rad` },
+              ],
+            }}
+          >
+            <Image
+              source={{ uri: currentImageUri }}
+              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        )}
+      </View>
     </>
   );
 }
