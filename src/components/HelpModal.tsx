@@ -811,7 +811,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       Scale calculation: 1000 pixels ÷ 24.26mm = 41.23 px/mm{'\n'}
                     </Text>
                     {'\n'}
-                    Attached: 3 photos for reference and CAD import
+                    Attached: 2 photos (labeled + CAD canvas)
                   </Text>
                 </View>
 
