@@ -106,7 +106,6 @@ export default function DimensionOverlay({
   const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Selected measurement for delete/drag
-  const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
   const [resizingCorner, setResizingCorner] = useState<{ measurementId: string, cornerIndex: 0 | 1 } | null>(null);
   const dragStartPos = useSharedValue({ x: 0, y: 0 });
@@ -839,10 +838,7 @@ export default function DimensionOverlay({
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
             
-            // Dismiss any selected measurement
-            if (selectedMeasurementId) {
-              setSelectedMeasurementId(null);
-            }
+
             
             setShowCursor(true);
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
@@ -959,10 +955,7 @@ export default function DimensionOverlay({
               dragStartPos.value = { x: pageX, y: pageY };
               dragCurrentPos.value = { x: pageX, y: pageY };
             } else {
-              // Tapped empty space - dismiss any selection
-              if (selectedMeasurementId) {
-                setSelectedMeasurementId(null);
-              }
+              // Tapped empty space - no action needed
             }
           }}
           onResponderMove={(event) => {
@@ -1016,10 +1009,6 @@ export default function DimensionOverlay({
                 if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
                   setDraggedMeasurementId(tappedId);
                   setDidDrag(true);
-                  // Dismiss any delete button when starting to drag
-                  if (selectedMeasurementId) {
-                    setSelectedMeasurementId(null);
-                  }
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }
               }
@@ -1062,23 +1051,11 @@ export default function DimensionOverlay({
           }}
           onResponderRelease={() => {
             if (resizingCorner) {
-              // Finished resizing - don't show delete button
+              // Finished resizing
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             } else if (draggedMeasurementId) {
-              // Finished dragging - don't show delete button
+              // Finished dragging
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } else if (!didDrag) {
-              // Was just a quick tap without dragging - show delete button
-              const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
-              if (tappedId) {
-                // Toggle selection (show delete button)
-                if (selectedMeasurementId === tappedId) {
-                  setSelectedMeasurementId(null);
-                } else {
-                  setSelectedMeasurementId(tappedId);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                }
-              }
             }
             
             // Always reset drag state
@@ -1673,71 +1650,6 @@ export default function DimensionOverlay({
           )}
       </View>
 
-      {/* Delete button for selected measurement */}
-      {selectedMeasurementId && (() => {
-        const selectedMeasurement = measurements.find(m => m.id === selectedMeasurementId);
-        if (!selectedMeasurement) return null;
-
-        let buttonX, buttonY;
-        if (selectedMeasurement.mode === 'distance') {
-          const p0 = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
-          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
-          buttonX = (p0.x + p1.x) / 2;
-          buttonY = (p0.y + p1.y) / 2 + 40;
-        } else if (selectedMeasurement.mode === 'angle') {
-          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
-          buttonX = p1.x;
-          buttonY = p1.y + 60;
-        } else if (selectedMeasurement.mode === 'circle') {
-          const center = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
-          buttonX = center.x;
-          buttonY = center.y + 50;
-        } else if (selectedMeasurement.mode === 'rectangle') {
-          const p0 = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
-          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
-          buttonX = (p0.x + p1.x) / 2;
-          buttonY = Math.max(p0.y, p1.y) + 40;
-        }
-
-        return (
-          <View
-            style={{
-              position: 'absolute',
-              left: buttonX! - 28,
-              top: buttonY!,
-              zIndex: 50,
-            }}
-            pointerEvents="box-only"
-          >
-            <Pressable
-              onPress={() => {
-                const newMeasurements = measurements.filter(m => m.id !== selectedMeasurementId);
-                setMeasurements(newMeasurements);
-                setSelectedMeasurementId(null);
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              }}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 28,
-                backgroundColor: 'rgba(255, 59, 48, 0.95)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 10,
-                borderWidth: 3,
-                borderColor: 'rgba(255, 255, 255, 0.5)',
-              }}
-            >
-              <Ionicons name="trash-outline" size={28} color="white" />
-            </Pressable>
-          </View>
-        );
-      })()}
-
       {/* Bottom toolbar - Water droplet style with slide gesture */}
       {!menuMinimized && !isCapturing && (
         <GestureDetector gesture={menuPanGesture}>
@@ -2152,23 +2064,25 @@ export default function DimensionOverlay({
                   </Pressable>
                 </View>
               )}
-
-              <Pressable
-                onPress={handleReset}
-                style={{
-                  backgroundColor: 'rgba(255, 59, 48, 0.85)',
-                  borderRadius: 10,
-                  paddingVertical: 8,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Ionicons name="camera-outline" size={14} color="white" />
-                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
-              </Pressable>
             </>
           )}
+
+          {/* New Photo button - always visible */}
+          <Pressable
+            onPress={handleReset}
+            style={{
+              backgroundColor: 'rgba(255, 59, 48, 0.85)',
+              borderRadius: 10,
+              paddingVertical: 8,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 8,
+            }}
+          >
+            <Ionicons name="camera-outline" size={14} color="white" />
+            <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
+          </Pressable>
           
           {/* Pro status footer */}
           <Pressable
