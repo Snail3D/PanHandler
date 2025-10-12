@@ -703,40 +703,52 @@ export default function DimensionOverlay({
       {/* Floating cursor container */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }} pointerEvents="none">
         {/* Floating cursor */}
-        {showCursor && (
-          <View
-            style={{
-              position: 'absolute',
-              left: cursorPosition.x - 50,
-              top: cursorPosition.y - 50,
-              width: 100,
-              height: 100,
-            }}
-            pointerEvents="none"
-          >
-            <Svg width={100} height={100}>
-              <Circle cx={50} cy={50} r={30} fill="none" stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="3" opacity={0.8} />
-              <Circle cx={50} cy={50} r={15} fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              <Line x1={10} y1={50} x2={35} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              <Line x1={65} y1={50} x2={90} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              <Line x1={50} y1={10} x2={50} y2={35} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              <Line x1={50} y1={65} x2={50} y2={90} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              {/* Ultra-bright yellow center dot with bold black outline for maximum visibility */}
-              {/* Outer black stroke layers for bold outline */}
-              <Circle cx={50} cy={50} r={3} fill="#000000" opacity={1} />
-              <Circle cx={50} cy={50} r={2.5} fill="#000000" opacity={1} />
-              {/* Yellow glow layers */}
-              <Circle cx={50} cy={50} r={6} fill="#FFFF00" opacity={0.2} />
-              <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.4} />
-              {/* Core yellow dot - tiny for precision */}
-              <Circle cx={50} cy={50} r={1.5} fill="#FFFFFF" opacity={1} />
-              <Circle cx={50} cy={50} r={1.5} fill="#FFFF00" opacity={1} />
-            </Svg>
-            <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
-              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>Release to place</Text>
+        {showCursor && (() => {
+          // Determine which measurement this will be (if completing current or starting new)
+          const nextMeasurementIndex = currentPoints.length === requiredPoints 
+            ? measurements.length + 1  // Current measurement will be saved, this is the next one
+            : measurements.length;      // This is for the current measurement being placed
+          
+          // Get the color for the next measurement
+          const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
+          const cursorColor = nextColor.main;
+          
+          return (
+            <View
+              style={{
+                position: 'absolute',
+                left: cursorPosition.x - 50,
+                top: cursorPosition.y - 50,
+                width: 100,
+                height: 100,
+              }}
+              pointerEvents="none"
+            >
+              <Svg width={100} height={100}>
+                {/* Outer ring with next measurement color */}
+                <Circle cx={50} cy={50} r={30} fill="none" stroke={cursorColor} strokeWidth="3" opacity={0.8} />
+                {/* Inner circle with next measurement color */}
+                <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
+                {/* Crosshair lines with next measurement color */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
+                
+                {/* Neon yellow center dot - smaller and less glowy */}
+                {/* Black outline for contrast */}
+                <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
+                {/* Minimal glow - just one layer */}
+                <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
+                {/* Core neon yellow dot - smaller for precision */}
+                <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
+              </Svg>
+              <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>Release to place</Text>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        })()}
       </View>
 
       {/* Visual overlay for measurements */}
