@@ -48,6 +48,7 @@ export default function DimensionOverlay({
   // Use store for persistent state
   const calibration = useStore((s) => s.calibration);
   const unitSystem = useStore((s) => s.unitSystem);
+  const setUnitSystem = useStore((s) => s.setUnitSystem);
   const currentImageUri = useStore((s) => s.currentImageUri);
   const coinCircle = useStore((s) => s.coinCircle);
   const currentPoints = useStore((s) => s.currentPoints);
@@ -334,7 +335,19 @@ export default function DimensionOverlay({
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
-      let measurementText = 'Measurements:\n\n';
+      let measurementText = 'PanHandler Measurements\n';
+      measurementText += '======================\n\n';
+      
+      // Add coin reference information at the top
+      if (coinCircle) {
+        measurementText += `Reference Coin: ${coinCircle.coinName}\n`;
+        measurementText += `Coin Diameter: ${coinCircle.coinDiameter.toFixed(2)} mm\n\n`;
+      }
+      
+      measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
+      measurementText += 'Measurements:\n';
+      measurementText += '-------------\n';
+      
       measurements.forEach((m, idx) => {
         measurementText += `${idx + 1}. ${m.value}\n`;
       });
@@ -343,11 +356,11 @@ export default function DimensionOverlay({
       if (calibration) {
         measurementText += `\n---\nCalibration Info:\n`;
         measurementText += `Scale: ${calibration.pixelsPerUnit.toFixed(2)} pixels per ${calibration.unit}\n`;
-        measurementText += `Reference: ${calibration.referenceDistance} ${calibration.unit}`;
+        measurementText += `Reference Distance: ${calibration.referenceDistance.toFixed(2)} ${calibration.unit}`;
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        measurementText += `\n\nTo use in other software:\n`;
+        measurementText += `\n\nFor CAD/Design Software:\n`;
         measurementText += `Set scale to ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}`;
       }
 
@@ -840,6 +853,54 @@ export default function DimensionOverlay({
             borderWidth: 1.5,
             borderColor: 'rgba(255, 255, 255, 0.3)',
           }}>
+          {/* Unit System Toggle: Metric vs Imperial */}
+          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 13, padding: 2.5 }}>
+            <Pressable
+              onPress={() => {
+                setUnitSystem('metric');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={{
+                flex: 1,
+                paddingVertical: 9,
+                borderRadius: 11,
+                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Text style={{
+                  fontWeight: '600',
+                  fontSize: 13,
+                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Metric
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setUnitSystem('imperial');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={{
+                flex: 1,
+                paddingVertical: 9,
+                borderRadius: 11,
+                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Text style={{
+                  fontWeight: '600',
+                  fontSize: 13,
+                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Imperial
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
           {/* Mode Toggle: Pan/Zoom vs Measure */}
           <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 13, padding: 2.5 }}>
             <Pressable
