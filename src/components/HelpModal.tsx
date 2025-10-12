@@ -1003,9 +1003,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </Text>
                 </Animated.View>
               </View>
-            </ScrollView>
 
-              {/* Easter Egg Hints Section */}
+              {/* Easter Egg Hints Section - At the very bottom of scrollable content */}
               <View style={{ marginBottom: 20, marginTop: 8 }}>
                 <Animated.View 
                   entering={FadeIn.delay(800)}
@@ -1048,6 +1047,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </Animated.View>
               </View>
+            </ScrollView>
 
             {/* Footer */}
             <View
