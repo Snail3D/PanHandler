@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, ScrollView, Pressable, Linking } from 'react-native';
+import { View, Text, Modal, ScrollView, Pressable, Linking, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -691,16 +691,59 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ height: 1, backgroundColor: '#E5E5EA', marginBottom: 10 }} />
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     Measurement Report from PanHandler{'\n\n'}
-                    <Text style={{ fontWeight: '600' }}>Calibration Scale:</Text> 24.26mm (US Quarter){'\n'}
+                    <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (US Quarter){'\n'}
                     <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Canvas Scale (Fusion 360):</Text> 0.0412{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>Pixels Per Unit:</Text> 41.23 px/mm{'\n'}
+                    <Text style={{ fontWeight: '600' }}>Canvas Scale (Fusion 360):</Text> 41.23 px/mm{'\n'}
+                    <Text style={{ fontWeight: '600' }}>Image Resolution:</Text> 3024 × 4032 pixels{'\n\n'}
                     <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
-                    Blue Distance: 145.2mm{'\n'}
-                    Green Angle: 87.5°{'\n'}
-                    Red Circle: Ø 52.3mm{'\n\n'}
+                    🔵 Blue Distance: 145.2mm{'\n'}
+                    🟢 Green Angle: 87.5°{'\n'}
+                    🔴 Red Circle: Ø 52.3mm{'\n\n'}
+                    <Text style={{ fontSize: 12, color: '#8E8E93', fontStyle: 'italic' }}>
+                      Scale calculation: 1000 pixels ÷ 24.26mm = 41.23 px/mm{'\n'}
+                    </Text>
+                    {'\n'}
                     Attached: 3 photos for reference and CAD import
                   </Text>
                 </View>
+
+                {/* "The Nerdy Stuff" Link */}
+                <Pressable
+                  onPress={() => {
+                    Alert.alert(
+                      '🤓 The Nerdy Stuff: Scale Calculations',
+                      'HOW PANHANDLER CALCULATES PRECISE MEASUREMENTS:\n\n' +
+                      '1️⃣ CALIBRATION PHASE:\n' +
+                      'When you align the calibration circle to your coin, PanHandler measures the circle diameter in pixels (e.g., 1000 px).\n\n' +
+                      '2️⃣ PIXELS PER UNIT:\n' +
+                      'pixelsPerUnit = coin_diameter_pixels ÷ coin_diameter_mm\n' +
+                      'Example: 1000 px ÷ 24.26mm = 41.23 px/mm\n\n' +
+                      '3️⃣ DISTANCE MEASUREMENTS:\n' +
+                      'distance_mm = √((x₂-x₁)² + (y₂-y₁)²) ÷ pixelsPerUnit\n' +
+                      'This converts pixel distance to real-world units.\n\n' +
+                      '4️⃣ FUSION 360 CANVAS SCALE:\n' +
+                      'Canvas Scale = pixelsPerUnit (directly!)\n' +
+                      'Fusion expects: pixels per mm or pixels per inch\n' +
+                      'Example: 41.23 px/mm\n\n' +
+                      '5️⃣ ANGLE MEASUREMENTS:\n' +
+                      'angle = atan2(y₃-y₂, x₃-x₂) - atan2(y₁-y₂, x₁-x₂)\n' +
+                      'Converted to degrees: angle × (180/π)\n\n' +
+                      '6️⃣ CIRCLE MEASUREMENTS:\n' +
+                      'radius_px = √((x_edge-x_center)² + (y_edge-y_center)²)\n' +
+                      'radius_mm = radius_px ÷ pixelsPerUnit\n' +
+                      'diameter = radius × 2\n\n' +
+                      'WHY THIS WORKS:\n' +
+                      'By using a known reference (coin), we establish a pixel-to-millimeter ratio that remains constant across the entire photo. All measurements use this ratio for accurate real-world dimensions!\n\n' +
+                      '🎯 TIP: Higher resolution photos = more accurate measurements!'
+                    );
+                  }}
+                  style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#F0F4FF', borderRadius: 8, alignSelf: 'flex-start' }}
+                >
+                  <Text style={{ fontSize: 13, color: '#007AFF', fontWeight: '600' }}>
+                    🤓 Read "the nerdy stuff" - How the math works
+                  </Text>
+                </Pressable>
               </ExpandableSection>
 
               {/* Fusion 360 Tutorial - Expandable */}
