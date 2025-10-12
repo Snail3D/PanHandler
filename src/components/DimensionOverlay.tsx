@@ -904,8 +904,13 @@ export default function DimensionOverlay({
   
   // Drag gesture for repositioning tab vertically
   const tabDragGesture = Gesture.Pan()
+    .onStart(() => {
+      // Store the starting position
+      tabPositionY.value = tabPositionY.value;
+    })
     .onUpdate((event) => {
-      const newY = tabPositionY.value + event.translationY;
+      // Use absoluteY for smoother direct positioning
+      const newY = event.absoluteY;
       // Keep tab within safe bounds
       tabPositionY.value = Math.max(insets.top + 80, Math.min(newY, SCREEN_HEIGHT - insets.bottom - 80));
     })
