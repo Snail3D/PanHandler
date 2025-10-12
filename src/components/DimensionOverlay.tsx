@@ -511,35 +511,8 @@ export default function DimensionOverlay({
       const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Save blank photo with label if we have label or calibration
-      if (label || calibration) {
-        console.log('📸 Capturing blank photo with label...');
-        
-        // Hide measurements temporarily
-        const savedMeasurements = measurements;
-        setMeasurements([]);
-        
-        // Wait for render
-        await new Promise(resolve => setTimeout(resolve, 150));
-        
-        // Capture blank with label
-        const blankUri = await captureRef(viewRef.current, {
-          format: 'jpg',
-          quality: 0.9,
-          result: 'tmpfile',
-        });
-        
-        // Restore measurements
-        setMeasurements(savedMeasurements);
-        
-        console.log('📸 Captured blank URI:', blankUri);
-        
-        // Save blank photo with custom filename
-        const blankFilename = label ? `${label}_Reference` : 'PanHandler_Reference';
-        const blankAsset = await MediaLibrary.createAssetAsync(blankUri);
-        
-        console.log('✅ Saved reference photo!');
-      }
+      // Save measurements temporarily and hide them for remaining captures
+      const savedMeasurements = measurements;
       
       // Capture Fusion 360 image (50% opacity, zoomed/rotated, no overlays)
       if (fusionViewRef.current) {
@@ -564,21 +537,35 @@ export default function DimensionOverlay({
         }
       }
       
-      // Save original photo as third image (zoomed out with scale info)
-      if (currentImageUri) {
-        console.log('📸 Saving original photo...');
+      // Save original photo with label overlay (no measurements)
+      if (currentImageUri && (label || calibration)) {
+        console.log('📸 Capturing original photo with label...');
         
         try {
-          const originalFilename = label ? `${label}_Original` : 'PanHandler_Original';
-          const originalAsset = await MediaLibrary.createAssetAsync(currentImageUri);
+          // Clear measurements, keep label
+          setMeasurements([]);
           
-          console.log('✅ Saved original photo!');
+          // Wait for render
+          await new Promise(resolve => setTimeout(resolve, 150));
+          
+          // Capture original with label/scale overlay
+          const originalWithLabelUri = await captureRef(viewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          const originalFilename = label ? `${label}_Original` : 'PanHandler_Original';
+          const originalAsset = await MediaLibrary.createAssetAsync(originalWithLabelUri);
+          
+          console.log('✅ Saved original photo with label!');
         } catch (error) {
           console.error('Failed to save original image:', error);
         }
       }
       
-      // Show menu again and clear label
+      // Restore measurements and clear state
+      setMeasurements(savedMeasurements);
       setIsCapturing(false);
       setCurrentLabel(null);
       
@@ -1834,8 +1821,8 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {/* Label and scale info - upper-left corner */}
-          {(currentLabel || (calibration && currentLabel)) && !isCapturing && (
+          {/* Label and scale info - upper-left corner (always visible when capturing) */}
+          {currentLabel && (
             <View
               style={{
                 position: 'absolute',
@@ -1844,23 +1831,21 @@ export default function DimensionOverlay({
               }}
               pointerEvents="none"
             >
-              {currentLabel && (
-                <View
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    borderRadius: 6,
-                    marginBottom: 4,
-                  }}
-                >
-                  <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
-                    {currentLabel}
-                  </Text>
-                </View>
-              )}
+              <View
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: 6,
+                  marginBottom: 4,
+                }}
+              >
+                <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
+                  {currentLabel}
+                </Text>
+              </View>
               
-              {calibration && currentLabel && (
+              {calibration && (
                 <View
                   style={{
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
