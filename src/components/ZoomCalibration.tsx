@@ -93,7 +93,6 @@ export default function ZoomCalibration({
       <ZoomableImage
         imageUri={imageUri}
         zoomToCenter={true}
-        showLevelLine={true}
         onTransformChange={(scale, translateX, translateY) => {
           setZoomScale(scale);
           setZoomTranslate({ x: translateX, y: translateY });
@@ -138,6 +137,66 @@ export default function ZoomCalibration({
             Cover the{'\n'}{selectedCoin.name}
           </Text>
         </View>
+      </View>
+
+      {/* Level line and center crosshairs - very faint guides */}
+      <View
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+        pointerEvents="none"
+      >
+        {/* Horizontal level line - 1/4 down from top */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT * 0.25,
+            left: 0,
+            right: 0,
+            height: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          }}
+        />
+        
+        {/* "LEVEL" text */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT * 0.25 - 20,
+            left: 12,
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            paddingHorizontal: 8,
+            paddingVertical: 3,
+            borderRadius: 4,
+          }}
+        >
+          <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 10, fontWeight: '500' }}>
+            LEVEL
+          </Text>
+        </View>
+        
+        {/* Center crosshairs - very faint */}
+        {/* Vertical center line */}
+        <View
+          style={{
+            position: 'absolute',
+            left: SCREEN_WIDTH / 2,
+            top: 0,
+            bottom: 0,
+            width: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          }}
+        />
+        
+        {/* Horizontal center line */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT / 2,
+            left: 0,
+            right: 0,
+            height: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          }}
+        />
       </View>
 
       {/* Instructions */}
