@@ -973,6 +973,65 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </View>
               </ExpandableSection>
 
+              {/* Accuracy Fun Fact Section */}
+              <View style={{ marginBottom: 16, marginTop: 12 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(650)}
+                  style={{
+                    backgroundColor: '#FFF7ED',
+                    borderRadius: 16,
+                    padding: 18,
+                    shadowColor: '#F59E0B',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 8,
+                    elevation: 4,
+                    borderWidth: 2,
+                    borderColor: '#FED7AA',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    <Ionicons name="star" size={24} color="#F59E0B" />
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#92400E', marginLeft: 8 }}>
+                      🎯 Amazing Accuracy!
+                    </Text>
+                  </View>
+                  
+                  <Text style={{ fontSize: 15, color: '#78350F', lineHeight: 22, marginBottom: 12 }}>
+                    PanHandler achieves{' '}
+                    <Text style={{ fontWeight: '700', color: '#92400E' }}>
+                      ~0.2 mm accuracy
+                    </Text>
+                    {' '}(or better) with small objects!
+                  </Text>
+                  
+                  <View style={{ 
+                    backgroundColor: '#FFFBEB', 
+                    borderRadius: 12, 
+                    padding: 12, 
+                    borderWidth: 1, 
+                    borderColor: '#FDE68A' 
+                  }}>
+                    <Text style={{ fontSize: 14, color: '#92400E', lineHeight: 20, marginBottom: 6 }}>
+                      📐 <Text style={{ fontWeight: '600' }}>That's approximately:</Text>
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                      • 0.0079 inches (less than 1/100th of an inch!)
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                      • Thickness of 2-3 sheets of paper
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                      • Width of a human hair
+                    </Text>
+                  </View>
+
+                  <Text style={{ fontSize: 13, color: '#92400E', fontStyle: 'italic', marginTop: 12, lineHeight: 18 }}>
+                    💡 Pro tip: Use higher resolution photos and proper lighting for maximum accuracy!
+                  </Text>
+                </Animated.View>
+              </View>
+
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <Animated.View 
