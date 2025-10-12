@@ -1006,21 +1006,10 @@ export default function DimensionOverlay({
         // The measurements are in original image space, so scale should match
         const fusionScale = 1 / calibration.pixelsPerUnit;
         
-        console.log('📐 Canvas Scale Calculation:');
-        console.log('  Current Image URI:', currentImageUri);
-        console.log('  pixelsPerUnit:', calibration.pixelsPerUnit);
-        console.log('  Canvas Scale (1/pixelsPerUnit):', fusionScale);
-        
-        // Get actual image dimensions to verify scale calculation
-        if (currentImageUri) {
-          Image.getSize(currentImageUri, (width, height) => {
-            console.log('  Actual image dimensions:', width, 'x', height);
-            console.log('  Screen dimensions:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
-            console.log('  Aspect ratios - Image:', (width/height).toFixed(2), 'Screen:', (SCREEN_WIDTH/SCREEN_HEIGHT).toFixed(2));
-          }, (error) => {
-            console.log('  Could not get image size:', error);
-          });
-        }
+        // Add debug info to email
+        measurementText += `\n\n=== DEBUG INFO ===\n`;
+        measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
+        measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
