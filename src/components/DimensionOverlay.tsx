@@ -850,32 +850,7 @@ export default function DimensionOverlay({
         }
       }
       
-      // Save original photo with label overlay (no measurements)
-      if (currentImageUri && (label || calibration)) {
-        console.log('📸 Capturing original photo with label...');
-        
-        try {
-          // Clear measurements, keep label
-          setMeasurements([]);
-          
-          // Wait for render
-          await new Promise(resolve => setTimeout(resolve, 150));
-          
-          // Capture original with label/scale overlay
-          const originalWithLabelUri = await captureRef(viewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
-            result: 'tmpfile',
-          });
-          
-          const originalFilename = label ? `${label}_Original` : 'PanHandler_Original';
-          const originalAsset = await MediaLibrary.createAssetAsync(originalWithLabelUri);
-          
-          console.log('✅ Saved original photo with label!');
-        } catch (error) {
-          console.error('Failed to save original image:', error);
-        }
-      }
+      // Original photo removed - only save labeled measurements and CAD canvas photo
       
       // Restore measurements and clear state
       setMeasurements(savedMeasurements);
@@ -1079,49 +1054,7 @@ export default function DimensionOverlay({
         }
       }
       
-      // 3. Original zoomed-out image with label and scale info overlay
-      if (currentImageUri && (label || calibration)) {
-        try {
-          // Hide measurements temporarily, keep label and scale info
-          const savedMeasurements = measurements;
-          setMeasurements([]);
-          setCurrentLabel(label);
-          
-          // Wait for render
-          await new Promise(resolve => setTimeout(resolve, 150));
-          
-          // Capture original with label/scale overlay
-          const originalWithLabelUri = await captureRef(viewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
-            result: 'tmpfile',
-          });
-          
-          // Restore measurements and clear label
-          setMeasurements(savedMeasurements);
-          setCurrentLabel(null);
-          
-          const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
-          const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
-          await FileSystem.copyAsync({ from: originalWithLabelUri, to: originalDest });
-          attachments.push(originalDest);
-          
-          console.log('✅ Added original photo with label to email');
-        } catch (error) {
-          console.error('Failed to capture original with label:', error);
-          // Fallback to plain original
-          const fallbackFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
-          const fallbackDest = `${FileSystem.cacheDirectory}${fallbackFilename}`;
-          await FileSystem.copyAsync({ from: currentImageUri, to: fallbackDest });
-          attachments.push(fallbackDest);
-        }
-      } else if (currentImageUri) {
-        // No label or calibration, just attach plain original
-        const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
-        const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
-        await FileSystem.copyAsync({ from: currentImageUri, to: originalDest });
-        attachments.push(originalDest);
-      }
+      // Original photo removed - only email labeled measurements and CAD canvas photo
       
       // Build subject with label
       const subject = label 
