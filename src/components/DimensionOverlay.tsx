@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,6 +54,8 @@ export default function DimensionOverlay({
   const setCurrentPoints = useStore((s) => s.setCurrentPoints);
   const measurements = useStore((s) => s.completedMeasurements);
   const setMeasurements = useStore((s) => s.setCompletedMeasurements);
+  const userEmail = useStore((s) => s.userEmail);
+  const setUserEmail = useStore((s) => s.setUserEmail);
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
@@ -290,6 +292,37 @@ export default function DimensionOverlay({
         return;
       }
 
+      // Prompt for email if not set
+      let emailToUse = userEmail;
+      if (!emailToUse) {
+        await new Promise<void>((resolve) => {
+          Alert.prompt(
+            'Email Address',
+            'Enter your email address to auto-populate for future use:',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => resolve(),
+              },
+              {
+                text: 'Save',
+                onPress: (email) => {
+                  if (email && email.trim()) {
+                    emailToUse = email.trim();
+                    setUserEmail(emailToUse);
+                  }
+                  resolve();
+                },
+              },
+            ],
+            'plain-text',
+            '',
+            'email-address'
+          );
+        });
+      }
+
       console.log('📸 Capturing view for email...');
       // Capture the image with measurements
       const uri = await captureRef(viewRef.current, {
@@ -319,9 +352,16 @@ export default function DimensionOverlay({
       }
 
       console.log('📧 Opening email composer...');
+      
+      // Build recipients array - use saved email for both to/cc if available
+      const recipients = emailToUse ? [emailToUse] : [];
+      const ccRecipients = emailToUse ? [emailToUse] : [];
+      
       // Compose email with attachment
       await MailComposer.composeAsync({
-        subject: 'Measurement Results',
+        recipients,
+        ccRecipients,
+        subject: 'PanHandler Measurements',
         body: measurementText,
         attachments: [uri],
       });

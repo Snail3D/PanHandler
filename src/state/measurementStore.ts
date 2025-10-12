@@ -38,6 +38,7 @@ interface MeasurementStore {
   coinCircle: CoinCircle | null;
   unitSystem: UnitSystem;
   lastSelectedCoin: string | null; // Store coin name
+  userEmail: string | null; // User's email for auto-population
   
   setImageUri: (uri: string | null) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
@@ -54,6 +55,7 @@ interface MeasurementStore {
   setLastSelectedCoin: (coinName: string) => void;
   updatePointPosition: (pointId: string, x: number, y: number) => void;
   setUnitSystem: (system: UnitSystem) => void;
+  setUserEmail: (email: string | null) => void;
 }
 
 const useStore = create<MeasurementStore>()(
@@ -70,6 +72,7 @@ const useStore = create<MeasurementStore>()(
       coinCircle: null,
       unitSystem: 'metric',
       lastSelectedCoin: null,
+      userEmail: null,
 
       setImageUri: (uri) => set({ 
         currentImageUri: uri,
@@ -135,6 +138,8 @@ const useStore = create<MeasurementStore>()(
       }),
 
       setUnitSystem: (system) => set({ unitSystem: system }),
+
+      setUserEmail: (email) => set({ userEmail: email }),
     }),
     {
       name: 'measurement-settings',
@@ -142,6 +147,7 @@ const useStore = create<MeasurementStore>()(
       partialize: (state) => ({ 
         unitSystem: state.unitSystem,
         lastSelectedCoin: state.lastSelectedCoin,
+        userEmail: state.userEmail, // Persist user email
         // Persist current work session
         currentImageUri: state.currentImageUri,
         imageOrientation: state.imageOrientation,
