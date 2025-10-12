@@ -1016,55 +1016,56 @@ export default function DimensionOverlay({
             className="absolute left-0 right-0 z-20"
             style={[
               { 
-                bottom: insets.bottom + 20,
-                paddingHorizontal: 20,
+                bottom: insets.bottom + 16,
+                paddingHorizontal: 24,
               },
               menuAnimatedStyle
             ]}
           >
             <BlurView
-              intensity={40}
+              intensity={35}
               tint="light"
               style={{
-                borderRadius: 22,
+                borderRadius: 20,
                 overflow: 'hidden',
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.25,
-                shadowRadius: 24,
-                elevation: 18,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.2,
+                shadowRadius: 20,
+                elevation: 16,
               }}
             >
               <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.55)',
-                borderRadius: 22,
-                paddingHorizontal: 12,
-                paddingTop: 12,
-                paddingBottom: 14,
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                borderRadius: 20,
+                paddingHorizontal: 10,
+                paddingTop: 10,
+                paddingBottom: 10,
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
+                borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
                 
-                {/* Collapse arrow button in top-right corner */}
-                <Pressable
-                  onPress={collapseMenu}
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 100,
-                  }}
-                >
-                  <Ionicons name="chevron-forward" size={18} color="rgba(0, 0, 0, 0.6)" />
-                </Pressable>
+                {/* Header with collapse button */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(0, 0, 0, 0.5)', marginLeft: 4 }}>
+                    CONTROLS
+                  </Text>
+                  <Pressable
+                    onPress={collapseMenu}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
+                  </Pressable>
+                </View>
           {/* Unit System Toggle: Metric vs Imperial */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
                 setUnitSystem('metric');
@@ -1072,16 +1073,16 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 7,
-                borderRadius: 9,
-                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Text style={{
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
+                  fontSize: 10,
+                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Metric
                 </Text>
@@ -1094,16 +1095,16 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 7,
-                borderRadius: 9,
-                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Text style={{
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
+                  fontSize: 10,
+                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Imperial
                 </Text>
@@ -1112,7 +1113,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
                 if (isPanZoomLocked) return;
@@ -1123,25 +1124,25 @@ export default function DimensionOverlay({
               disabled={isPanZoomLocked}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
-                backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 opacity: isPanZoomLocked ? 0.5 : 1,
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name={isPanZoomLocked ? "lock-closed" : "move-outline"}
-                  size={15} 
-                  color={isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.5)')} 
+                  size={12} 
+                  color={isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')} 
                 />
                 <Text style={{
-                  marginLeft: 5,
+                  marginLeft: 4,
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.5)')
+                  fontSize: 10,
+                  color: isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')
                 }}>
-                  {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
+                  {isPanZoomLocked ? 'Locked' : 'Pan'}
                 </Text>
               </View>
             </Pressable>
@@ -1152,22 +1153,22 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
-                backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name="create-outline" 
-                  size={15} 
-                  color={measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.5)'} 
+                  size={12} 
+                  color={measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
                 />
                 <Text style={{
-                  marginLeft: 5,
+                  marginLeft: 4,
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.5)'
+                  fontSize: 10,
+                  color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Measure
                 </Text>
@@ -1176,7 +1177,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
@@ -1186,23 +1187,23 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
-                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name="resize-outline" 
-                  size={15} 
-                  color={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'} 
+                  size={12} 
+                  color={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
                 />
                 <Text style={{
-                  marginLeft: 5,
+                  marginLeft: 4,
                   textAlign: 'center',
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
+                  fontSize: 10,
+                  color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Distance
                 </Text>
@@ -1217,23 +1218,23 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
-                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name="git-compare-outline" 
-                  size={15} 
-                  color={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.5)'} 
+                  size={12} 
+                  color={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
                 />
                 <Text style={{
-                  marginLeft: 5,
+                  marginLeft: 4,
                   textAlign: 'center',
                   fontWeight: '600',
-                  fontSize: 11,
-                  color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.5)'
+                  fontSize: 10,
+                  color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Angle
                 </Text>
@@ -1302,23 +1303,23 @@ export default function DimensionOverlay({
               <Pressable
                 onPress={handleClear}
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                  borderRadius: 14,
-                  paddingVertical: 11,
-                  marginBottom: 10,
+                  backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                  borderRadius: 10,
+                  paddingVertical: 8,
+                  marginBottom: 6,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(0, 0, 0, 0.1)',
+                  borderWidth: 0.5,
+                  borderColor: 'rgba(0, 0, 0, 0.08)',
                 }}
               >
-                <Ionicons name="arrow-undo-outline" size={18} color="#333" />
+                <Ionicons name="arrow-undo-outline" size={14} color="rgba(0, 0, 0, 0.6)" />
                 <Text style={{
-                  color: '#333',
+                  color: 'rgba(0, 0, 0, 0.6)',
                   fontWeight: '600',
-                  fontSize: 13,
-                  marginLeft: 8,
+                  fontSize: 11,
+                  marginLeft: 6,
                 }}>
                   {measurements.length > 0 
                     ? `Remove Last (${measurements.length})` 
@@ -1327,37 +1328,37 @@ export default function DimensionOverlay({
               </Pressable>
 
               {measurements.length > 0 && (
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
                   <Pressable
                     onPress={handleExport}
                     style={{
                       flex: 1,
-                      backgroundColor: '#007AFF',
-                      borderRadius: 12,
-                      paddingVertical: 10,
+                      backgroundColor: 'rgba(0, 122, 255, 0.85)',
+                      borderRadius: 10,
+                      paddingVertical: 8,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="images-outline" size={14} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 12, marginLeft: 6 }}>Save</Text>
+                    <Ionicons name="images-outline" size={12} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
                   </Pressable>
                   
                   <Pressable
                     onPress={handleEmail}
                     style={{
                       flex: 1,
-                      backgroundColor: '#34C759',
-                      borderRadius: 12,
-                      paddingVertical: 10,
+                      backgroundColor: 'rgba(52, 199, 89, 0.85)',
+                      borderRadius: 10,
+                      paddingVertical: 8,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="mail-outline" size={14} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 12, marginLeft: 6 }}>Email</Text>
+                    <Ionicons name="mail-outline" size={12} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
                   </Pressable>
                 </View>
               )}
@@ -1365,16 +1366,16 @@ export default function DimensionOverlay({
               <Pressable
                 onPress={handleReset}
                 style={{
-                  backgroundColor: '#FF3B30',
-                  borderRadius: 14,
-                  paddingVertical: 11,
+                  backgroundColor: 'rgba(255, 59, 48, 0.85)',
+                  borderRadius: 10,
+                  paddingVertical: 8,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="camera-outline" size={16} color="white" />
-                <Text style={{ color: 'white', fontWeight: '600', fontSize: 13, marginLeft: 8 }}>New Photo</Text>
+                <Ionicons name="camera-outline" size={14} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
               </Pressable>
             </>
           )}
