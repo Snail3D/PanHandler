@@ -435,13 +435,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    {/* Custom angle icon matching menu */}
+                    {/* Custom angle icon matching menu - 45 degree acute angle */}
                     <Svg width={18} height={18} viewBox="0 0 16 16">
-                      <Line x1="3" y1="13" x2="3" y2="3" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
+                      <Line x1="3" y1="13" x2="13" y2="3" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
                       <Line x1="3" y1="13" x2="13" y2="13" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
-                      <Path d="M 7 13 A 4 4 0 0 1 3 9" stroke="#FB8C00" strokeWidth="1.3" fill="none" />
-                      <Line x1="5.3" y1="12.3" x2="5.7" y2="13.3" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
-                      <Line x1="3.7" y1="10.7" x2="2.7" y2="10.3" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
+                      <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke="#FB8C00" strokeWidth="1.3" fill="none" />
+                      <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
+                      <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
                     </Svg>
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Angle Mode
