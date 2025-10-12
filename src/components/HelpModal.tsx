@@ -783,48 +783,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 color="#34C759"
                 delay={450}
               >
-                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
-                  How Email Reports Work
-                </Text>
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  When you tap the <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> button, PanHandler generates a comprehensive report containing:
+                  Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 3 photos and a detailed measurement table.
                 </Text>
                 
-                <View style={{ backgroundColor: '#F8F9FA', borderRadius: 10, padding: 12, marginBottom: 12 }}>
-                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 4 }}>
-                    📎 <Text style={{ fontWeight: '600' }}>3 Attached Photos:</Text>
-                  </Text>
-                  <View style={{ marginLeft: 20 }}>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • Labeled photo with all measurements
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • CAD canvas photo (50% opacity)
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • Original reference photo with scale
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={{ backgroundColor: '#F8F9FA', borderRadius: 10, padding: 12, marginBottom: 12 }}>
-                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 4 }}>
-                    📊 <Text style={{ fontWeight: '600' }}>Detailed Measurement Table:</Text>
-                  </Text>
-                  <View style={{ marginLeft: 20 }}>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • All measurements with color coding
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • Measurement types (distance, angle, etc.)
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • Precise values in your selected units
-                    </Text>
-                  </View>
-                </View>
-
-                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 8, marginTop: 8, fontWeight: '600' }}>
+                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 8, fontWeight: '600' }}>
                   Example Email Format
                 </Text>
                 
@@ -838,7 +801,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (US Quarter){'\n'}
                     <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n'}
                     <Text style={{ fontWeight: '600' }}>Pixels Per Unit:</Text> 41.23 px/mm{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Canvas Scale (Fusion 360):</Text> 41.23 px/mm{'\n'}
+                    <Text style={{ fontWeight: '600' }}>Canvas Scale:</Text> 41.23 px/mm{'\n'}
                     <Text style={{ fontWeight: '600' }}>Image Resolution:</Text> 3024 × 4032 pixels{'\n\n'}
                     <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
                     🔵 Blue Distance: 145.2mm{'\n'}
@@ -866,9 +829,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       '3️⃣ DISTANCE MEASUREMENTS:\n' +
                       'distance_mm = √((x₂-x₁)² + (y₂-y₁)²) ÷ pixelsPerUnit\n' +
                       'This converts pixel distance to real-world units.\n\n' +
-                      '4️⃣ FUSION 360 CANVAS SCALE:\n' +
+                      '4️⃣ CAD CANVAS SCALE:\n' +
                       'Canvas Scale = pixelsPerUnit (directly!)\n' +
-                      'Fusion expects: pixels per mm or pixels per inch\n' +
+                      'Most CAD software expects: pixels per mm or pixels per inch\n' +
                       'Example: 41.23 px/mm\n\n' +
                       '5️⃣ ANGLE MEASUREMENTS:\n' +
                       'angle = atan2(y₃-y₂, x₃-x₂) - atan2(y₁-y₂, x₁-x₂)\n' +
