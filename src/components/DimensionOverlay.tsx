@@ -34,6 +34,11 @@ export default function DimensionOverlay({
 }: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
   
+  // Debug: Log when zoom props change
+  useEffect(() => {
+    console.log('🔍 DimensionOverlay zoom props updated:', zoomScale.toFixed(2), zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
+  }, [zoomScale, zoomTranslateX, zoomTranslateY]);
+  
   // Current points being placed (in ORIGINAL image coordinates)
   const [currentPoints, setCurrentPoints] = useState<Array<{ x: number; y: number; id: string }>>([]);
   
@@ -97,9 +102,18 @@ export default function DimensionOverlay({
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
+    console.log('🎯 Placing point:');
+    console.log('  Screen coords:', x, y);
+    console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
+    console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
     
     const requiredPoints = mode === 'distance' ? 2 : 3;
     const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
+    
+    // Auto-enable measurement mode and lock pan/zoom after first point
+    if (currentPoints.length === 0 && measurements.length === 0) {
+      setMeasurementMode(true);
+    }
     
     if (currentPoints.length + 1 < requiredPoints) {
       // Still need more points
@@ -176,8 +190,13 @@ export default function DimensionOverlay({
   const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
-    setCurrentPoints([]);
-    setMeasurements([]);
+    // Remove one measurement at a time (last first)
+    if (measurements.length > 0) {
+      setMeasurements(measurements.slice(0, -1));
+    } else if (currentPoints.length > 0) {
+      // If no completed measurements, clear current points
+      setCurrentPoints([]);
+    }
   };
 
   // Generate arc path for angle visualization
@@ -284,6 +303,9 @@ export default function DimensionOverlay({
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
   const requiredPoints = mode === 'distance' ? 2 : 3;
+  
+  // Lock pan/zoom once any points are placed
+  const isPanZoomLocked = hasAnyMeasurements;
 
   return (
     <>
@@ -653,20 +675,22 @@ export default function DimensionOverlay({
           <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
             <Pressable
               onPress={() => {
+                if (isPanZoomLocked) return; // Can't switch to pan/zoom once measurements started
                 setMeasurementMode(false);
                 setShowCursor(false);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              className={`flex-1 py-2 rounded-md ${!measurementMode ? 'bg-white' : ''}`}
+              disabled={isPanZoomLocked}
+              className={`flex-1 py-2 rounded-md ${!measurementMode ? 'bg-white' : ''} ${isPanZoomLocked ? 'opacity-50' : ''}`}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
-                  name="move-outline" 
+                  name={isPanZoomLocked ? "lock-closed" : "move-outline"}
                   size={16} 
-                  color={!measurementMode ? '#3B82F6' : '#6B7280'} 
+                  color={isPanZoomLocked ? '#9CA3AF' : (!measurementMode ? '#3B82F6' : '#6B7280')} 
                 />
-                <Text className={`ml-1 text-center font-semibold ${!measurementMode ? 'text-blue-600' : 'text-gray-600'}`}>
-                  Pan/Zoom
+                <Text className={`ml-1 text-center font-semibold ${isPanZoomLocked ? 'text-gray-400' : (!measurementMode ? 'text-blue-600' : 'text-gray-600')}`}>
+                  {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
                 </Text>
               </View>
             </Pressable>
@@ -725,9 +749,18 @@ export default function DimensionOverlay({
             <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
               <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
                 {measurementMode 
-                  ? '💡 Tap to place points • Switch to Pan/Zoom to navigate'
-                  : '💡 Pinch to zoom • Drag to pan • Switch to Measure to place points'
+                  ? '💡 Tap to place points • Pan/zoom will lock after first point'
+                  : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
                 }
+              </Text>
+            </View>
+          )}
+          
+          {/* Locked notice */}
+          {isPanZoomLocked && (
+            <View className="bg-amber-50 rounded-lg px-3 py-2 mb-3">
+              <Text className="text-amber-800 text-xs text-center">
+                🔒 Pan/zoom locked • Remove all measurements to unlock
               </Text>
             </View>
           )}
@@ -771,9 +804,14 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleClear}
-                className="bg-gray-100 rounded-xl py-3 mb-3"
+                className="bg-gray-100 rounded-xl py-3 mb-3 flex-row items-center justify-center"
               >
-                <Text className="text-gray-700 font-semibold text-center">Clear All</Text>
+                <Ionicons name="arrow-undo-outline" size={18} color="#374151" />
+                <Text className="text-gray-700 font-semibold ml-2">
+                  {measurements.length > 0 
+                    ? `Remove Last (${measurements.length} total)` 
+                    : 'Clear Points'}
+                </Text>
               </Pressable>
 
               {measurements.length > 0 && (
