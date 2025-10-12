@@ -1026,10 +1026,12 @@ export default function DimensionOverlay({
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        measurementText += `\n\nFor Fusion 360 Canvas Import:\n`;
-        measurementText += `Canvas Scale X/Y: ${calibration.pixelsPerUnit.toFixed(4)} px/${calibration.unit}\n`;
+        // Fusion 360 expects mm/px (the INVERSE of pixelsPerUnit)
+        const fusionScale = 1 / calibration.pixelsPerUnit;
+        measurementText += `\n\nFor CAD Canvas Import:\n`;
+        measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = Coin Diameter (px) ÷ Coin Diameter (${calibration.unit})`;
+        measurementText += `📐 Math: Scale = Coin Diameter (${calibration.unit}) ÷ Coin Diameter (px) = ${calibration.referenceDistance.toFixed(2)} ÷ ${(calibration.referenceDistance * calibration.pixelsPerUnit).toFixed(2)} = ${fusionScale.toFixed(6)}`;
       }
       
       // Add footer (only for non-Pro users)
@@ -2394,7 +2396,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    Fusion Scale: {calibration.pixelsPerUnit.toFixed(6)}
+                    CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
@@ -3284,7 +3286,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  Fusion Scale: {calibration.pixelsPerUnit.toFixed(6)}
+                  CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
                 </Text>
                 {coinCircle && (
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
