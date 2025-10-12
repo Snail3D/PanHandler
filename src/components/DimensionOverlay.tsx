@@ -629,8 +629,9 @@ export default function DimensionOverlay({
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        measurementText += `\n\nFor CAD/Design Software:\n`;
-        measurementText += `Set scale to ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}`;
+        measurementText += `\n\nFor Fusion 360:\n`;
+        measurementText += `Canvas Scale X/Y: ${calibration.pixelsPerUnit.toFixed(4)}\n`;
+        measurementText += `(Insert > Canvas > Select Face > Set Scale X and Y to this value)`;
       }
       
       // Add footer
@@ -1742,11 +1743,11 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    Scale: {calibration.pixelsPerUnit.toFixed(2)} px/{calibration.unit}
+                    Fusion Scale: {calibration.pixelsPerUnit.toFixed(4)}
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                      {coinCircle.coinName}
+                      Ref: {coinCircle.coinName}
                     </Text>
                   )}
                 </View>
