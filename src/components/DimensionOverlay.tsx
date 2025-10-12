@@ -2039,53 +2039,6 @@ export default function DimensionOverlay({
                     <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
                   </Pressable>
                 </View>
-          {/* Unit System Toggle: Metric vs Imperial */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
-            <Pressable
-              onPress={() => {
-                setUnitSystem('metric');
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={{
-                flex: 1,
-                paddingVertical: 5,
-                borderRadius: 7.5,
-                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-              }}
-            >
-              <View className="flex-row items-center justify-center">
-                <Text style={{
-                  fontWeight: '600',
-                  fontSize: 10,
-                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                }}>
-                  Metric
-                </Text>
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setUnitSystem('imperial');
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={{
-                flex: 1,
-                paddingVertical: 5,
-                borderRadius: 7.5,
-                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-              }}
-            >
-              <View className="flex-row items-center justify-center">
-                <Text style={{
-                  fontWeight: '600',
-                  fontSize: 10,
-                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                }}>
-                  Imperial
-                </Text>
-              </View>
-            </Pressable>
-          </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
@@ -2291,6 +2244,54 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
             </View>
+          </View>
+
+          {/* Unit System Toggle: Metric vs Imperial - Moved below measurement types */}
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <Pressable
+              onPress={() => {
+                setUnitSystem('metric');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={{
+                flex: 1,
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Text style={{
+                  fontWeight: '600',
+                  fontSize: 10,
+                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                }}>
+                  Metric
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setUnitSystem('imperial');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={{
+                flex: 1,
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Text style={{
+                  fontWeight: '600',
+                  fontSize: 10,
+                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                }}>
+                  Imperial
+                </Text>
+              </View>
+            </Pressable>
           </View>
 
           {/* Tip */}
