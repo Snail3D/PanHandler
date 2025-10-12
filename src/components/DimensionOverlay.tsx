@@ -1002,12 +1002,12 @@ export default function DimensionOverlay({
           measurementText += ` (${coinCircle.coinName})`;
         }
         // CAD Canvas exports the ZOOMED view, so we need to adjust the scale
-        // The exported image is zoomed by zoomScale, so each pixel represents less distance
-        const fusionScale = (1 / calibration.pixelsPerUnit) / zoomScale;
+        // The exported image is zoomed by zoomScale, so each pixel represents MORE distance
+        const fusionScale = (1 / calibration.pixelsPerUnit) * zoomScale;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) ÷ zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) ÷ ${zoomScale.toFixed(2)} = ${fusionScale.toFixed(6)}`;
+        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${zoomScale.toFixed(2)} = ${fusionScale.toFixed(6)}`;
       }
       
       // Add footer (only for non-Pro users)
@@ -2330,7 +2330,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    CAD Scale: {((1 / calibration.pixelsPerUnit) / zoomScale).toFixed(6)} mm/px
+                    CAD Scale: {((1 / calibration.pixelsPerUnit) * zoomScale).toFixed(6)} mm/px
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
@@ -3220,7 +3220,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  CAD Scale: {((1 / calibration.pixelsPerUnit) / zoomScale).toFixed(6)} mm/px
+                  CAD Scale: {((1 / calibration.pixelsPerUnit) * zoomScale).toFixed(6)} mm/px
                 </Text>
                 {coinCircle && (
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
