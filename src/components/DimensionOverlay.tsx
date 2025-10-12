@@ -717,12 +717,14 @@ export default function DimensionOverlay({
               <Line x1={65} y1={50} x2={90} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={50} y1={10} x2={50} y2={35} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={50} y1={65} x2={50} y2={90} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
-              {/* Brighter, smaller center dot for fine precision - ULTRA BRIGHT */}
-              {/* Multiple glow layers for intense brightness */}
-              <Circle cx={50} cy={50} r={8} fill="#FFFF00" opacity={0.3} />
-              <Circle cx={50} cy={50} r={6} fill="#FFFF00" opacity={0.4} />
-              <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.6} />
-              <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.8} />
+              {/* Ultra-bright yellow center dot with bold black outline for maximum visibility */}
+              {/* Outer black stroke layers for bold outline */}
+              <Circle cx={50} cy={50} r={3} fill="#000000" opacity={1} />
+              <Circle cx={50} cy={50} r={2.5} fill="#000000" opacity={1} />
+              {/* Yellow glow layers */}
+              <Circle cx={50} cy={50} r={6} fill="#FFFF00" opacity={0.2} />
+              <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.4} />
+              {/* Core yellow dot - tiny for precision */}
               <Circle cx={50} cy={50} r={1.5} fill="#FFFFFF" opacity={1} />
               <Circle cx={50} cy={50} r={1.5} fill="#FFFF00" opacity={1} />
             </Svg>
