@@ -142,11 +142,29 @@ export default function DimensionOverlay({
   };
 
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
+  const [hasShownAnimation, setHasShownAnimation] = useState(false);
+  const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
+
+  // Detect pan/zoom changes and dismiss animation immediately
+  useEffect(() => {
+    const zoomChanged = 
+      Math.abs(zoomScale - prevZoomRef.current.scale) > 0.01 ||
+      Math.abs(zoomTranslateX - prevZoomRef.current.x) > 1 ||
+      Math.abs(zoomTranslateY - prevZoomRef.current.y) > 1;
+    
+    if (zoomChanged && showLockedInAnimation) {
+      console.log('🚫 Pan/zoom detected - dismissing lock-in animation');
+      setShowLockedInAnimation(false);
+    }
+    
+    prevZoomRef.current = { scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY };
+  }, [zoomScale, zoomTranslateX, zoomTranslateY, showLockedInAnimation]);
 
   // Show locked-in animation when coin circle first appears
   useEffect(() => {
-    if (coinCircle && !showLockedInAnimation) {
+    if (coinCircle && !hasShownAnimation) {
       setShowLockedInAnimation(true);
+      setHasShownAnimation(true);
       
       // Double haptic feedback for "Locked In!"
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
@@ -172,12 +190,12 @@ export default function DimensionOverlay({
       setTimeout(blink, 350);
       setTimeout(blink, 700);
       
-      // Hide animation after blinking
+      // Auto-hide animation after blinking (if not dismissed by pan)
       setTimeout(() => {
         setShowLockedInAnimation(false);
       }, 1200);
     }
-  }, [coinCircle]);
+  }, [coinCircle, hasShownAnimation]);
 
   // Measurement mode toggle
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
@@ -311,6 +329,34 @@ export default function DimensionOverlay({
 
   return (
     <>
+      {/* Persistent "Calibration Locked" indicator */}
+      {coinCircle && !showLockedInAnimation && (
+        <View 
+          className="absolute z-20"
+          style={{
+            top: insets.top + 16,
+            right: 16,
+            backgroundColor: 'rgba(52, 199, 89, 0.9)',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 5,
+          }}
+          pointerEvents="none"
+        >
+          <Ionicons name="checkmark-circle" size={16} color="white" />
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
+            Calibrated
+          </Text>
+        </View>
+      )}
+
       {/* Sexy iOS-styled minimize button */}
       <Pressable
         onPress={() => {
@@ -430,32 +476,6 @@ export default function DimensionOverlay({
       >
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-            {/* Define glow filters */}
-            <defs>
-              <filter id="blueGlow" height="300%" width="300%" x="-75%" y="-75%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="0 0 0 0 0.23
-                                                                0 0 0 0 0.51
-                                                                0 0 0 0 0.96
-                                                                0 0 0 0.6 0" result="glow"/>
-                <feMerge>
-                  <feMergeNode in="glow"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-              <filter id="greenGlow" height="300%" width="300%" x="-75%" y="-75%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="0 0 0 0 0.06
-                                                                0 0 0 0 0.73
-                                                                0 0 0 0 0.51
-                                                                0 0 0 0.6 0" result="glow"/>
-                <feMerge>
-                  <feMergeNode in="glow"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-            
             {/* Lock-in animation - green blinking circle (only shows during animation) */}
             {showLockedInAnimation && coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
@@ -492,50 +512,20 @@ export default function DimensionOverlay({
                 
                 return (
                   <React.Fragment key={measurement.id}>
-                    {/* Glow layer */}
-                    <Line
-                      x1={p0.x}
-                      y1={p0.y}
-                      x2={p1.x}
-                      y2={p1.y}
-                      stroke="#3B82F6"
-                      strokeWidth="8"
-                      opacity="0.3"
-                      filter="url(#blueGlow)"
-                    />
+                    {/* Outer glow layers - multiple for smooth gradient */}
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main line */}
-                    <Line
-                      x1={p0.x}
-                      y1={p0.y}
-                      x2={p1.x}
-                      y2={p1.y}
-                      stroke="#3B82F6"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                    />
-                    {/* End caps */}
-                    <Line
-                      x1={p0.x}
-                      y1={p0.y - 12}
-                      x2={p0.x}
-                      y2={p0.y + 12}
-                      stroke="#3B82F6"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                    <Line
-                      x1={p1.x}
-                      y1={p1.y - 12}
-                      x2={p1.x}
-                      y2={p1.y + 12}
-                      stroke="#3B82F6"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                    {/* Point markers with glow */}
-                    <Circle cx={p0.x} cy={p0.y} r="10" fill="#3B82F6" opacity="0.3" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="4" strokeLinecap="round" />
+                    {/* End caps with glow */}
+                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                    {/* Point markers with layered glow */}
+                    <Circle cx={p0.x} cy={p0.y} r="16" fill="#3B82F6" opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="12" fill="#3B82F6" opacity="0.2" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
-                    <Circle cx={p1.x} cy={p1.y} r="10" fill="#3B82F6" opacity="0.3" />
+                    <Circle cx={p1.x} cy={p1.y} r="16" fill="#3B82F6" opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="12" fill="#3B82F6" opacity="0.2" />
                     <Circle cx={p1.x} cy={p1.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
@@ -547,18 +537,23 @@ export default function DimensionOverlay({
                 return (
                   <React.Fragment key={measurement.id}>
                     {/* Glow layers */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="8" opacity="0.3" filter="url(#greenGlow)" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="8" opacity="0.3" filter="url(#greenGlow)" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main lines */}
                     <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
                     <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" strokeLinecap="round" />
-                    {/* Point markers with glow */}
-                    <Circle cx={p0.x} cy={p0.y} r="10" fill="#10B981" opacity="0.3" />
+                    {/* Point markers with layered glow */}
+                    <Circle cx={p0.x} cy={p0.y} r="16" fill="#10B981" opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="12" fill="#10B981" opacity="0.2" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
-                    <Circle cx={p1.x} cy={p1.y} r="12" fill="#059669" opacity="0.3" />
+                    <Circle cx={p1.x} cy={p1.y} r="18" fill="#059669" opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="14" fill="#059669" opacity="0.2" />
                     <Circle cx={p1.x} cy={p1.y} r="10" fill="#059669" stroke="white" strokeWidth="3" />
-                    <Circle cx={p2.x} cy={p2.y} r="10" fill="#10B981" opacity="0.3" />
+                    <Circle cx={p2.x} cy={p2.y} r="16" fill="#10B981" opacity="0.1" />
+                    <Circle cx={p2.x} cy={p2.y} r="12" fill="#10B981" opacity="0.2" />
                     <Circle cx={p2.x} cy={p2.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
