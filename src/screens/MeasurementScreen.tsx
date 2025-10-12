@@ -3,6 +3,8 @@ import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
+import * as Haptics from 'expo-haptics';
+import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
@@ -27,8 +29,16 @@ export default function MeasurementScreen() {
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   const [showHelpModal, setShowHelpModal] = useState(false);
   
+  // Auto-capture states
+  const [isHoldingShutter, setIsHoldingShutter] = useState(false);
+  const [tiltAngle, setTiltAngle] = useState(0);
+  const [isStable, setIsStable] = useState(false);
+  const [alignmentStatus, setAlignmentStatus] = useState<'good' | 'warning' | 'bad'>('bad');
+  const recentAngles = useRef<number[]>([]);
+  const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
+  
   const cameraRef = useRef<CameraView>(null);
-  const measurementViewRef = useRef<View | null>(null); // For capturing measurements with image
+  const measurementViewRef = useRef<View | null>(null);
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -62,6 +72,67 @@ export default function MeasurementScreen() {
       console.error('Error detecting orientation:', error);
     }
   };
+
+  // Monitor device tilt for auto-capture when holding shutter
+  useEffect(() => {
+    if (mode !== 'camera') return;
+
+    DeviceMotion.setUpdateInterval(100);
+
+    const subscription = DeviceMotion.addListener((data) => {
+      if (data.rotation) {
+        const beta = data.rotation.beta * (180 / Math.PI);
+        const absBeta = Math.abs(beta);
+        
+        // Auto-detect horizontal (0°) or vertical (90°)
+        const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
+        const absTilt = targetOrientation === 'horizontal' ? absBeta : Math.abs(absBeta - 90);
+        
+        setTiltAngle(absTilt);
+        
+        // Track stability
+        recentAngles.current.push(absTilt);
+        if (recentAngles.current.length > 10) recentAngles.current.shift();
+        
+        if (recentAngles.current.length >= 5) {
+          const maxAngle = Math.max(...recentAngles.current);
+          const minAngle = Math.min(...recentAngles.current);
+          const stable = (maxAngle - minAngle) <= 2;
+          setIsStable(stable);
+        }
+
+        // Alignment status (strict 2° tolerance when holding)
+        let status: 'good' | 'warning' | 'bad';
+        if (absTilt <= 2) status = 'good';
+        else if (absTilt <= 10) status = 'warning';
+        else status = 'bad';
+
+        setAlignmentStatus(status);
+
+        // Haptic feedback on status change (only when holding)
+        if (isHoldingShutter && status !== lastHapticRef.current) {
+          if (status === 'good') {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          } else if (status === 'warning') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+          lastHapticRef.current = status;
+        }
+      }
+    });
+
+    return () => subscription.remove();
+  }, [mode, isHoldingShutter]);
+
+  // Auto-capture when holding and conditions are met
+  useEffect(() => {
+    if (!isHoldingShutter || isCapturing) return;
+
+    if (alignmentStatus === 'good' && isStable) {
+      // Perfect conditions - auto snap!
+      takePicture();
+    }
+  }, [isHoldingShutter, alignmentStatus, isStable, isCapturing]);
 
   // Restore session on mount if there's a persisted image
   useEffect(() => {
@@ -115,6 +186,8 @@ export default function MeasurementScreen() {
     
     try {
       setIsCapturing(true);
+      setIsHoldingShutter(false); // Release hold state
+      
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
       });
@@ -140,8 +213,8 @@ export default function MeasurementScreen() {
           }
         }
 
-        // Set image URI (not auto-captured in this flow)
-        setImageUri(photo.uri, false);
+        // Set image URI (auto-captured if it was via hold)
+        setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         setMode('selectCoin');
       }
@@ -151,6 +224,8 @@ export default function MeasurementScreen() {
       setIsCapturing(false);
     }
   };
+
+  const wasAutoCapture = alignmentStatus === 'good' && isStable;
 
   const toggleCameraFacing = () => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
@@ -254,17 +329,41 @@ export default function MeasurementScreen() {
                 <Ionicons name="images-outline" size={28} color="white" />
               </Pressable>
 
-              {/* Camera Shutter */}
+              {/* Camera Shutter - press and hold for auto-capture */}
               <Pressable
                 onPress={takePicture}
+                onPressIn={() => {
+                  setIsHoldingShutter(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+                onPressOut={() => setIsHoldingShutter(false)}
                 disabled={isCapturing}
-                className="w-20 h-20 rounded-full bg-white border-4 border-gray-300 items-center justify-center active:scale-95"
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: 'white',
+                  borderWidth: 4,
+                  borderColor: isHoldingShutter 
+                    ? (alignmentStatus === 'good' ? '#00C800' : alignmentStatus === 'warning' ? '#FFC800' : '#FF3232')
+                    : '#D1D5DB',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
               >
-                <View className="w-16 h-16 rounded-full bg-white" />
+                <View style={{ 
+                  width: 64, 
+                  height: 64, 
+                  borderRadius: 32, 
+                  backgroundColor: isHoldingShutter && alignmentStatus === 'good' ? '#00FF00' : 'white',
+                }} />
               </Pressable>
               
               <Text className="text-white text-sm mt-4">
-                Tap to capture photo
+                {isHoldingShutter 
+                  ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
+                  : 'Tap or hold for auto-capture'
+                }
               </Text>
             </View>
           </View>
