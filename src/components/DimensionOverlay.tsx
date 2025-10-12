@@ -1,4 +1,4 @@
-// DimensionOverlay v2.2 - Try-catch protected touch handling - Oct 12, 8:06 AM
+// DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
@@ -1402,13 +1402,15 @@ export default function DimensionOverlay({
             
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
-            setFingerTouches([{ 
-              x: pageX, 
-              y: pageY, 
-              id: 'touch-0',
-              pressure: pressure,
-              seed: Math.random()
-            }]);
+            // TEMPORARY: Disable fingerprint indicators to avoid cache issue
+            // setFingerTouches([{ 
+            //   x: pageX, 
+            //   y: pageY, 
+            //   id: 'touch-0',
+            //   pressure: pressure,
+            //   seed: Math.random()
+            // }]);
+            setFingerTouches([]); // Empty until cache clears
             fingerOpacity.value = withTiming(1, { duration: 150 });
             fingerScale.value = 1;
             fingerRotation.value = 0;
@@ -1448,7 +1450,9 @@ export default function DimensionOverlay({
                     seed: Math.random()
                   }))
                 : [];
-              setFingerTouches(touches);
+              // TEMPORARY: Disable fingerprint indicators to avoid cache issue
+              // setFingerTouches(touches);
+              setFingerTouches([]); // Empty array until cache clears
               
               // Gradient horizontal offset: crosshair leans in direction of movement
               // At center: 0 offset
