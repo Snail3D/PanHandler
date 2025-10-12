@@ -144,6 +144,19 @@ export default function ZoomCalibration({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
+        {/* TEST: Red box in corner to verify this View renders */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 100,
+            right: 20,
+            width: 50,
+            height: 50,
+            backgroundColor: 'red',
+            zIndex: 9999,
+          }}
+        />
+        
         {/* Horizontal level line - 1/4 down from top */}
         <View
           style={{
@@ -151,8 +164,9 @@ export default function ZoomCalibration({
             top: SCREEN_HEIGHT * 0.25,
             left: 0,
             right: 0,
-            height: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            height: 3,
+            backgroundColor: 'rgba(255, 0, 0, 0.8)',
+            zIndex: 9999,
           }}
         />
         
@@ -160,15 +174,16 @@ export default function ZoomCalibration({
         <View
           style={{
             position: 'absolute',
-            top: SCREEN_HEIGHT * 0.25 - 20,
+            top: SCREEN_HEIGHT * 0.25 - 25,
             left: 12,
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-            paddingHorizontal: 8,
-            paddingVertical: 3,
+            backgroundColor: 'rgba(255, 0, 0, 0.9)',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
             borderRadius: 4,
+            zIndex: 9999,
           }}
         >
-          <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 10, fontWeight: '500' }}>
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
             LEVEL
           </Text>
         </View>
@@ -178,11 +193,12 @@ export default function ZoomCalibration({
         <View
           style={{
             position: 'absolute',
-            left: SCREEN_WIDTH / 2,
+            left: SCREEN_WIDTH / 2 - 1.5,
             top: 0,
             bottom: 0,
-            width: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            width: 3,
+            backgroundColor: 'rgba(0, 255, 0, 0.8)',
+            zIndex: 9999,
           }}
         />
         
@@ -190,11 +206,12 @@ export default function ZoomCalibration({
         <View
           style={{
             position: 'absolute',
-            top: SCREEN_HEIGHT / 2,
+            top: SCREEN_HEIGHT / 2 - 1.5,
             left: 0,
             right: 0,
-            height: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            height: 3,
+            backgroundColor: 'rgba(0, 255, 0, 0.8)',
+            zIndex: 9999,
           }}
         />
       </View>
