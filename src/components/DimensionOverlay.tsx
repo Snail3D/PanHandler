@@ -706,7 +706,7 @@ export default function DimensionOverlay({
           measurementText += ` (${coinCircle.coinName})`;
         }
         measurementText += `\n\nFor Fusion 360:\n`;
-        measurementText += `Canvas Scale X/Y: ${(1 / calibration.pixelsPerUnit).toFixed(6)}\n`;
+        measurementText += `Canvas Scale X/Y: ${calibration.pixelsPerUnit.toFixed(6)}\n`;
         measurementText += `(Insert > Canvas > Select Face > Set Scale X and Y to this value)`;
       }
       
@@ -1894,7 +1894,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    Fusion Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)}
+                    Fusion Scale: {calibration.pixelsPerUnit.toFixed(6)}
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
@@ -2666,7 +2666,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  Fusion Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)}
+                  Fusion Scale: {calibration.pixelsPerUnit.toFixed(6)}
                 </Text>
                 {coinCircle && (
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
