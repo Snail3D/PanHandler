@@ -26,17 +26,20 @@ interface DimensionOverlayProps {
   zoomScale?: number;
   zoomTranslateX?: number;
   zoomTranslateY?: number;
+  viewRef?: React.RefObject<View>;
 }
 
 export default function DimensionOverlay({ 
   zoomScale = 1, 
   zoomTranslateX = 0, 
-  zoomTranslateY = 0
+  zoomTranslateY = 0,
+  viewRef: externalViewRef
 }: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
-  const viewRef = useRef<View>(null);
+  const internalViewRef = useRef<View>(null);
+  const viewRef = externalViewRef || internalViewRef; // Use external ref if provided
   
   // Lock-in animation
   const lockInOpacity = useSharedValue(0);
@@ -308,20 +311,39 @@ export default function DimensionOverlay({
 
   return (
     <>
-      {/* Minimizable menu toggle button */}
+      {/* Sexy iOS-styled minimize button */}
       <Pressable
-        onPress={() => setMenuMinimized(!menuMinimized)}
-        className="absolute z-20 bg-white/95 rounded-full p-3 shadow-lg"
+        onPress={() => {
+          setMenuMinimized(!menuMinimized);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}
+        className="absolute z-30"
         style={{ 
-          bottom: insets.bottom + 20,
-          right: 20,
+          bottom: menuMinimized ? insets.bottom + 20 : insets.bottom + 20,
+          left: '50%',
+          marginLeft: -35,
         }}
       >
-        <Ionicons 
-          name={menuMinimized ? "chevron-up" : "chevron-down"} 
-          size={24} 
-          color="#374151" 
-        />
+        <View className="bg-white rounded-full shadow-2xl" style={{ 
+          width: 70, 
+          height: 70,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderWidth: 1,
+          borderColor: 'rgba(0,0,0,0.06)',
+        }}>
+          {menuMinimized ? (
+            <View className="items-center">
+              <Ionicons name="menu" size={28} color="#007AFF" />
+              <Text style={{ fontSize: 8, color: '#007AFF', fontWeight: '600', marginTop: 2 }}>MENU</Text>
+            </View>
+          ) : (
+            <View className="items-center">
+              <Ionicons name="chevron-down" size={20} color="#8E8E93" />
+              <View className="w-8 h-1 bg-gray-300 rounded-full mt-1" />
+            </View>
+          )}
+        </View>
       </Pressable>
 
       {/* Touch overlay - only active in measurement mode */}
@@ -674,30 +696,54 @@ export default function DimensionOverlay({
         <View
           className="absolute left-0 right-0 z-20"
           style={{ 
-            bottom: insets.bottom + 20,
-            paddingHorizontal: 20,
+            bottom: insets.bottom + 110,
+            paddingHorizontal: 16,
           }}
         >
-          <View className="bg-white/95 rounded-2xl px-6 py-4 shadow-lg">
+          <View style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            borderRadius: 28,
+            paddingHorizontal: 20,
+            paddingTop: 20,
+            paddingBottom: 24,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.15,
+            shadowRadius: 24,
+            elevation: 12,
+            borderWidth: 1,
+            borderColor: 'rgba(0,0,0,0.04)',
+          }}>
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
+          <View className="flex-row mb-4" style={{ backgroundColor: '#F2F2F7', borderRadius: 14, padding: 4 }}>
             <Pressable
               onPress={() => {
-                if (isPanZoomLocked) return; // Can't switch to pan/zoom once measurements started
+                if (isPanZoomLocked) return;
                 setMeasurementMode(false);
                 setShowCursor(false);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               disabled={isPanZoomLocked}
-              className={`flex-1 py-2 rounded-md ${!measurementMode ? 'bg-white' : ''} ${isPanZoomLocked ? 'opacity-50' : ''}`}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 11,
+                backgroundColor: !measurementMode ? '#FFFFFF' : 'transparent',
+                opacity: isPanZoomLocked ? 0.5 : 1,
+              }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name={isPanZoomLocked ? "lock-closed" : "move-outline"}
-                  size={16} 
-                  color={isPanZoomLocked ? '#9CA3AF' : (!measurementMode ? '#3B82F6' : '#6B7280')} 
+                  size={18} 
+                  color={isPanZoomLocked ? '#8E8E93' : (!measurementMode ? '#007AFF' : '#8E8E93')} 
                 />
-                <Text className={`ml-1 text-center font-semibold ${isPanZoomLocked ? 'text-gray-400' : (!measurementMode ? 'text-blue-600' : 'text-gray-600')}`}>
+                <Text style={{
+                  marginLeft: 6,
+                  fontWeight: '600',
+                  fontSize: 15,
+                  color: isPanZoomLocked ? '#8E8E93' : (!measurementMode ? '#007AFF' : '#8E8E93')
+                }}>
                   {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
                 </Text>
               </View>
@@ -707,15 +753,25 @@ export default function DimensionOverlay({
                 setMeasurementMode(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              className={`flex-1 py-2 rounded-md ${measurementMode ? 'bg-white' : ''}`}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 11,
+                backgroundColor: measurementMode ? '#FFFFFF' : 'transparent',
+              }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name="create-outline" 
-                  size={16} 
-                  color={measurementMode ? '#10B981' : '#6B7280'} 
+                  size={18} 
+                  color={measurementMode ? '#34C759' : '#8E8E93'} 
                 />
-                <Text className={`ml-1 text-center font-semibold ${measurementMode ? 'text-green-600' : 'text-gray-600'}`}>
+                <Text style={{
+                  marginLeft: 6,
+                  fontWeight: '600',
+                  fontSize: 15,
+                  color: measurementMode ? '#34C759' : '#8E8E93'
+                }}>
                   Measure
                 </Text>
               </View>
@@ -723,7 +779,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
+          <View className="flex-row mb-4" style={{ backgroundColor: '#F2F2F7', borderRadius: 14, padding: 4 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
