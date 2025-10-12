@@ -1,3 +1,4 @@
+// DimensionOverlay v2.1 - Cache bust: Oct 12, 2025, 8:00 AM
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
@@ -3480,28 +3481,48 @@ export default function DimensionOverlay({
             );
           })}
           
-          {/* Bottom congratulations text */}
+          {/* Bottom congratulations text - now centered */}
           <Animated.View
             style={{
               position: 'absolute',
-              bottom: insets.bottom + 60,
-              alignSelf: 'center',
+              top: '50%',
+              left: 0,
+              right: 0,
+              alignItems: 'center',
+              transform: [{ translateY: -40 }],
               opacity: tetrisOpacity.value,
+              paddingHorizontal: 20,
             }}
           >
             <Text
               style={{
                 color: '#FFFF00',
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 'bold',
                 fontFamily: 'Courier',
                 textAlign: 'center',
                 textShadowColor: '#FFFF00',
                 textShadowOffset: { width: 0, height: 0 },
                 textShadowRadius: 10,
+                lineHeight: 28,
               }}
             >
-              YOU'RE A MEASUREMENT MASTER! 🏆
+              WE CAN PLAY GAMES TOO {';)'}
+            </Text>
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 16,
+                fontWeight: 'bold',
+                fontFamily: 'Courier',
+                textAlign: 'center',
+                marginTop: 8,
+                textShadowColor: '#000000',
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 4,
+              }}
+            >
+              You're starting fresh
             </Text>
           </Animated.View>
           
