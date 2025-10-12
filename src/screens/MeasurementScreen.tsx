@@ -9,6 +9,7 @@ import CalibrationModal from '../components/CalibrationModal';
 import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
+import HelpModal from '../components/HelpModal';
 import { CoinReference } from '../utils/coinReferences';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -22,6 +23,7 @@ export default function MeasurementScreen() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
+  const [showHelpModal, setShowHelpModal] = useState(false);
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null); // For capturing measurements with image
@@ -198,7 +200,12 @@ export default function MeasurementScreen() {
             style={{ paddingTop: insets.top + 16 }}
           >
             <View className="flex-row justify-between items-center px-6">
-              <View className="w-10" />
+              <Pressable
+                onPress={() => setShowHelpModal(true)}
+                className="w-10 h-10 items-center justify-center"
+              >
+                <Ionicons name="help-circle-outline" size={28} color="white" />
+              </Pressable>
               <Text className="text-white text-lg font-semibold">Take Photo</Text>
               <Pressable
                 onPress={toggleCameraFacing}
@@ -303,6 +310,9 @@ export default function MeasurementScreen() {
           />
         </>
       )}
+
+      {/* Help Modal */}
+      <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
     </View>
   );
 }
