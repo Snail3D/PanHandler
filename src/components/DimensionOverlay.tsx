@@ -297,66 +297,48 @@ export default function DimensionOverlay({
 
       {/* Touch overlay - only active in measurement mode */}
       {measurementMode && (
-        <>
-          {/* Tap to activate cursor */}
-          {!showCursor && (
-            <Pressable
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-              onPress={(event) => {
-                const { pageX, pageY } = event.nativeEvent;
-                console.log('🎯 TAP! Activating cursor at:', pageX, pageY);
-                setShowCursor(true);
-                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-                setLastHapticPosition({ x: pageX, y: pageY });
-                
-                // Haptic for activation
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              }}
-            />
-          )}
-
-          {/* Cursor movement overlay - when cursor is active */}
-          {showCursor && (
-            <View
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-              onStartShouldSetResponder={() => true}
-              onMoveShouldSetResponder={() => true}
-              onResponderGrant={(event) => {
-                const { pageX, pageY } = event.nativeEvent;
-                console.log('👆 Cursor mode - touch started');
-                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-                setLastHapticPosition({ x: pageX, y: pageY });
-              }}
-              onResponderMove={(event) => {
-                const touch = event.nativeEvent.touches[0];
-                if (!touch) return;
-                
-                const { pageX, pageY } = touch;
-                
-                // Update cursor
-                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-                
-                // Haptic feedback
-                const distance = Math.sqrt(
-                  Math.pow(pageX - lastHapticPosition.x, 2) + 
-                  Math.pow(pageY - lastHapticPosition.y, 2)
-                );
-                if (distance >= HAPTIC_DISTANCE) {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setLastHapticPosition({ x: pageX, y: pageY });
-                }
-              }}
-              onResponderRelease={() => {
-                console.log('✅ Placing point');
-                placePoint(cursorPosition.x, cursorPosition.y);
-                setShowCursor(false);
-                
-                // Success haptic
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              }}
-            />
-          )}
-        </>
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+          onStartShouldSetResponder={() => true}
+          onMoveShouldSetResponder={() => true}
+          onResponderGrant={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            console.log('👆 Touch started - activating cursor');
+            setShowCursor(true);
+            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            setLastHapticPosition({ x: pageX, y: pageY });
+            
+            // Haptic for activation
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          }}
+          onResponderMove={(event) => {
+            const touch = event.nativeEvent.touches[0];
+            if (!touch) return;
+            
+            const { pageX, pageY } = touch;
+            
+            // Update cursor
+            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            
+            // Haptic feedback every 20px
+            const distance = Math.sqrt(
+              Math.pow(pageX - lastHapticPosition.x, 2) + 
+              Math.pow(pageY - lastHapticPosition.y, 2)
+            );
+            if (distance >= HAPTIC_DISTANCE) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setLastHapticPosition({ x: pageX, y: pageY });
+            }
+          }}
+          onResponderRelease={() => {
+            console.log('✅ Touch released - placing point and hiding cursor');
+            placePoint(cursorPosition.x, cursorPosition.y);
+            setShowCursor(false);
+            
+            // Success haptic
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          }}
+        />
       )}
 
       {/* Floating cursor container */}
