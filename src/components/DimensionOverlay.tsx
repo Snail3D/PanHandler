@@ -2200,13 +2200,16 @@ export default function DimensionOverlay({
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Custom angle icon: 90 degree angle with arc */}
+                  {/* Custom angle icon: 90 degree angle with arc and measurement marks */}
                   <Svg width={16} height={16} viewBox="0 0 16 16">
                     {/* Right angle lines */}
-                    <Line x1="3" y1="13" x2="3" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
-                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
-                    {/* Angle arc */}
-                    <Path d="M 7 13 A 4 4 0 0 1 3 9" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" fill="none" />
+                    <Line x1="3" y1="13" x2="3" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    {/* Angle arc with measurement indicator */}
+                    <Path d="M 7 13 A 4 4 0 0 1 3 9" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
+                    {/* Small tick marks on arc to show measurement */}
+                    <Line x1="5.3" y1="12.3" x2="5.7" y2="13.3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                    <Line x1="3.7" y1="10.7" x2="2.7" y2="10.3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
                   </Svg>
                   <Text style={{
                     marginLeft: 4,
