@@ -167,6 +167,7 @@ const useStore = create<MeasurementStore>()(
         isProUser: state.isProUser, // Persist pro status
         // Persist current work session
         currentImageUri: state.currentImageUri,
+        isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
         imageOrientation: state.imageOrientation,
         calibration: state.calibration,
         coinCircle: state.coinCircle,
