@@ -121,17 +121,23 @@ export default function MeasurementScreen() {
       
       if (photo?.uri) {
         // Request media library permission if not granted
-        if (!mediaLibraryPermission?.granted) {
+        let canSave = mediaLibraryPermission?.granted || false;
+        if (!canSave) {
           const { granted } = await requestMediaLibraryPermission();
+          canSave = granted;
           if (!granted) {
             console.log('Media library permission not granted');
           }
         }
 
         // Save to camera roll
-        if (mediaLibraryPermission?.granted) {
-          await MediaLibrary.saveToLibraryAsync(photo.uri);
-          console.log('✅ Photo saved to camera roll');
+        if (canSave) {
+          try {
+            await MediaLibrary.saveToLibraryAsync(photo.uri);
+            console.log('✅ Photo saved to camera roll');
+          } catch (saveError) {
+            console.error('Failed to save to camera roll:', saveError);
+          }
         }
 
         // Set image URI (not auto-captured in this flow)
