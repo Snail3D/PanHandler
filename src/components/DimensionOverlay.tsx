@@ -26,7 +26,7 @@ interface DimensionOverlayProps {
   zoomScale?: number;
   zoomTranslateX?: number;
   zoomTranslateY?: number;
-  viewRef?: React.RefObject<View>;
+  viewRef?: React.RefObject<View | null>;
 }
 
 export default function DimensionOverlay({ 
@@ -936,42 +936,78 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleClear}
-                className="bg-gray-100 rounded-xl py-3 mb-3 flex-row items-center justify-center"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: 16,
+                  paddingVertical: 14,
+                  marginBottom: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                <Ionicons name="arrow-undo-outline" size={18} color="#374151" />
-                <Text className="text-gray-700 font-semibold ml-2">
+                <Ionicons name="arrow-undo-outline" size={18} color="rgba(255, 255, 255, 0.9)" />
+                <Text style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontWeight: '600',
+                  fontSize: 15,
+                  marginLeft: 8,
+                }}>
                   {measurements.length > 0 
-                    ? `Remove Last (${measurements.length} total)` 
+                    ? `Remove Last (${measurements.length})` 
                     : 'Clear Points'}
                 </Text>
               </Pressable>
 
               {measurements.length > 0 && (
-                <View className="flex-row space-x-2 mb-3">
+                <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
                   <Pressable
                     onPress={handleExport}
-                    className="flex-1 bg-blue-500 rounded-xl py-3 flex-row items-center justify-center"
+                    style={{
+                      flex: 1,
+                      backgroundColor: '#007AFF',
+                      borderRadius: 16,
+                      paddingVertical: 14,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
-                    <Ionicons name="save-outline" size={18} color="white" />
-                    <Text className="text-white font-semibold ml-2">Save</Text>
+                    <Ionicons name="square-outline" size={18} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>Save</Text>
                   </Pressable>
                   
                   <Pressable
                     onPress={handleEmail}
-                    className="flex-1 bg-green-500 rounded-xl py-3 flex-row items-center justify-center"
+                    style={{
+                      flex: 1,
+                      backgroundColor: '#34C759',
+                      borderRadius: 16,
+                      paddingVertical: 14,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
                     <Ionicons name="mail-outline" size={18} color="white" />
-                    <Text className="text-white font-semibold ml-2">Email</Text>
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>Email</Text>
                   </Pressable>
                 </View>
               )}
 
               <Pressable
                 onPress={handleReset}
-                className="bg-red-500 rounded-xl py-3 flex-row items-center justify-center"
+                style={{
+                  backgroundColor: '#FF3B30',
+                  borderRadius: 16,
+                  paddingVertical: 14,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                <Ionicons name="refresh-outline" size={18} color="white" />
-                <Text className="text-white font-semibold ml-2">Reset</Text>
+                <Ionicons name="camera-outline" size={18} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>New Photo</Text>
               </Pressable>
             </>
           )}

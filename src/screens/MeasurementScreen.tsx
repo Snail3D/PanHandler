@@ -24,7 +24,7 @@ export default function MeasurementScreen() {
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   
   const cameraRef = useRef<CameraView>(null);
-  const measurementViewRef = useRef<View>(null); // For capturing measurements with image
+  const measurementViewRef = useRef<View | null>(null); // For capturing measurements with image
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -279,38 +279,6 @@ export default function MeasurementScreen() {
               resizeMode="contain"
             />
           )}
-          
-          {/* Top bar with retake button */}
-          <View 
-            className="absolute top-0 left-0 right-0 z-20 bg-black/50"
-            style={{ paddingTop: insets.top + 12, paddingBottom: 12 }}
-          >
-            <View className="flex-row justify-between items-center px-6">
-              <Pressable
-                onPress={handleRetakePhoto}
-                className="flex-row items-center"
-              >
-                <Ionicons name="arrow-back" size={24} color="white" />
-                <Text className="text-white text-base font-medium ml-2">Retake</Text>
-              </Pressable>
-              
-              {mode === 'measurement' && (
-                <Pressable
-                  onPress={() => {
-                    // Clear coin circle when going back to settings
-                    setCoinCircle(null);
-                    setCalibration(null);
-                    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
-                    setMode('selectCoin');
-                  }}
-                  className="flex-row items-center bg-white/20 rounded-full px-3 py-2"
-                >
-                  <Ionicons name="settings-outline" size={20} color="white" />
-                  <Text className="text-white text-sm font-medium ml-2">Recalibrate</Text>
-                </Pressable>
-              )}
-            </View>
-          </View>
 
           {/* Coin Selection Modal */}
           <CalibrationModal
