@@ -24,6 +24,7 @@ export default function MeasurementScreen() {
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
   
   const cameraRef = useRef<CameraView>(null);
+  const measurementViewRef = useRef<View>(null); // For capturing measurements with image
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -251,7 +252,7 @@ export default function MeasurementScreen() {
 
           {/* Measurement Mode */}
           {mode === 'measurement' && (
-            <>
+            <View ref={measurementViewRef} style={{ flex: 1 }}>
               <ZoomableImage 
                 imageUri={currentImageUri}
                 initialScale={measurementZoom.scale}
@@ -265,8 +266,9 @@ export default function MeasurementScreen() {
                 zoomScale={measurementZoom.scale}
                 zoomTranslateX={measurementZoom.translateX}
                 zoomTranslateY={measurementZoom.translateY}
+                viewRef={measurementViewRef}
               />
-            </>
+            </View>
           )}
 
           {/* Static Image for Coin Selection */}
