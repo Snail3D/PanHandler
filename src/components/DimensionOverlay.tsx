@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
+import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
@@ -34,17 +35,6 @@ export default function DimensionOverlay({
 }: DimensionOverlayProps = {}) {
   const insets = useSafeAreaInsets();
   
-  // Debug: Log when zoom props change
-  useEffect(() => {
-    console.log('🔍 DimensionOverlay zoom props updated:', zoomScale.toFixed(2), zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
-  }, [zoomScale, zoomTranslateX, zoomTranslateY]);
-  
-  // Current points being placed (in ORIGINAL image coordinates)
-  const [currentPoints, setCurrentPoints] = useState<Array<{ x: number; y: number; id: string }>>([]);
-  
-  // Completed measurements
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
-  
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const viewRef = useRef<View>(null);
   
@@ -52,10 +42,15 @@ export default function DimensionOverlay({
   const lockInOpacity = useSharedValue(0);
   const lockInScale = useSharedValue(1);
   
+  // Use store for persistent state
   const calibration = useStore((s) => s.calibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const currentImageUri = useStore((s) => s.currentImageUri);
   const coinCircle = useStore((s) => s.coinCircle);
+  const currentPoints = useStore((s) => s.currentPoints);
+  const setCurrentPoints = useStore((s) => s.setCurrentPoints);
+  const measurements = useStore((s) => s.completedMeasurements);
+  const setMeasurements = useStore((s) => s.setCompletedMeasurements);
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
@@ -248,30 +243,31 @@ export default function DimensionOverlay({
     if (!viewRef.current || !currentImageUri) return;
 
     try {
+      // Check if email is available
+      const isAvailable = await MailComposer.isAvailableAsync();
+      if (!isAvailable) {
+        Alert.alert('Email Not Available', 'No email app is configured on this device.');
+        return;
+      }
+
       // Capture the image with measurements
       const uri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 1,
       });
 
-      // Build measurement text
-      let measurementText = 'Measurements:\\n\\n';
+      // Build measurement text - one per line
+      let measurementText = 'Measurements:\n\n';
       measurements.forEach((m, idx) => {
-        measurementText += `${idx + 1}. ${m.value}\\n`;
+        measurementText += `${idx + 1}. ${m.value}\n`;
       });
 
-      const subject = 'Measurement Results';
-      const body = measurementText;
-
-      // Create mailto link
-      const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      
-      const canOpen = await Linking.canOpenURL(mailto);
-      if (canOpen) {
-        await Linking.openURL(mailto);
-      } else {
-        Alert.alert('Error', 'Cannot open email app');
-      }
+      // Compose email with attachment
+      await MailComposer.composeAsync({
+        subject: 'Measurement Results',
+        body: measurementText,
+        attachments: [uri],
+      });
     } catch (error) {
       Alert.alert('Email Error', 'Failed to prepare email. Please try again.');
       console.error('Email error:', error);
@@ -306,16 +302,27 @@ export default function DimensionOverlay({
   
   // Lock pan/zoom once any points are placed
   const isPanZoomLocked = hasAnyMeasurements;
+  
+  // Menu minimization
+  const [menuMinimized, setMenuMinimized] = useState(false);
 
   return (
     <>
-      {/* Debug: Show current zoom values */}
-      <View style={{ position: 'absolute', top: insets.top + 80, left: 10, backgroundColor: 'rgba(0,0,0,0.7)', padding: 8, borderRadius: 8, zIndex: 999 }} pointerEvents="none">
-        <Text style={{ color: '#00FF41', fontSize: 10, fontFamily: 'monospace' }}>
-          Zoom: {zoomScale.toFixed(2)}x{'\n'}
-          Pan: ({zoomTranslateX.toFixed(0)}, {zoomTranslateY.toFixed(0)})
-        </Text>
-      </View>
+      {/* Minimizable menu toggle button */}
+      <Pressable
+        onPress={() => setMenuMinimized(!menuMinimized)}
+        className="absolute z-20 bg-white/95 rounded-full p-3 shadow-lg"
+        style={{ 
+          bottom: insets.bottom + 20,
+          right: 20,
+        }}
+      >
+        <Ionicons 
+          name={menuMinimized ? "chevron-up" : "chevron-down"} 
+          size={24} 
+          color="#374151" 
+        />
+      </Pressable>
 
       {/* Touch overlay - only active in measurement mode */}
       {measurementMode && (
@@ -663,14 +670,15 @@ export default function DimensionOverlay({
       </View>
 
       {/* Bottom toolbar */}
-      <View
-        className="absolute left-0 right-0 z-20"
-        style={{ 
-          bottom: insets.bottom + 20,
-          paddingHorizontal: 20,
-        }}
-      >
-        <View className="bg-white/95 rounded-2xl px-6 py-4 shadow-lg">
+      {!menuMinimized && (
+        <View
+          className="absolute left-0 right-0 z-20"
+          style={{ 
+            bottom: insets.bottom + 20,
+            paddingHorizontal: 20,
+          }}
+        >
+          <View className="bg-white/95 rounded-2xl px-6 py-4 shadow-lg">
           {/* Mode Toggle: Pan/Zoom vs Measure */}
           <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
             <Pressable
@@ -845,6 +853,7 @@ export default function DimensionOverlay({
           )}
         </View>
       </View>
+      )}
     </>
   );
 }
