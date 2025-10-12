@@ -1001,12 +1001,13 @@ export default function DimensionOverlay({
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        // Fusion 360 expects mm/px (the INVERSE of pixelsPerUnit)
-        const fusionScale = 1 / calibration.pixelsPerUnit;
+        // CAD Canvas exports the ZOOMED view, so we need to adjust the scale
+        // The exported image is zoomed by zoomScale, so each pixel represents less distance
+        const fusionScale = (1 / calibration.pixelsPerUnit) / zoomScale;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = Coin Diameter (${calibration.unit}) ÷ Coin Diameter (px) = ${calibration.referenceDistance.toFixed(2)} ÷ ${(calibration.referenceDistance * calibration.pixelsPerUnit).toFixed(2)} = ${fusionScale.toFixed(6)}`;
+        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) ÷ zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) ÷ ${zoomScale.toFixed(2)} = ${fusionScale.toFixed(6)}`;
       }
       
       // Add footer (only for non-Pro users)
@@ -2329,7 +2330,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
+                    CAD Scale: {((1 / calibration.pixelsPerUnit) / zoomScale).toFixed(6)} mm/px
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
@@ -3148,7 +3149,7 @@ export default function DimensionOverlay({
         onDismiss={handleLabelDismiss}
       />
       
-      {/* Hidden view for capturing Fusion 360 image (50% opacity, zoomed/rotated, no overlays) */}
+      {/* Hidden view for capturing CAD canvas image (light/washed out, zoomed view matching measurements) */}
       <View
         ref={fusionViewRef}
         collapsable={false}
@@ -3158,7 +3159,7 @@ export default function DimensionOverlay({
           height: SCREEN_HEIGHT,
           top: 0,
           left: -10000, // Position off-screen
-          backgroundColor: 'black',
+          backgroundColor: 'white', // White background makes image appear lighter
         }}
       >
         {currentImageUri && (
@@ -3167,9 +3168,13 @@ export default function DimensionOverlay({
               position: 'absolute',
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
-              opacity: 0.25,
-              // NO TRANSFORM - export original unzoomed image for CAD calibration
-              // Lower opacity (25%) = lighter/more transparent for easier CAD tracing
+              opacity: 0.35, // 35% opacity on white = light/washed out appearance
+              transform: [
+                { translateX: zoomTranslateX },
+                { translateY: zoomTranslateY },
+                { scale: zoomScale },
+                { rotate: `${useStore.getState().savedZoomState?.rotation || 0}rad` },
+              ],
             }}
           >
             <Image
@@ -3215,7 +3220,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
+                  CAD Scale: {((1 / calibration.pixelsPerUnit) / zoomScale).toFixed(6)} mm/px
                 </Text>
                 {coinCircle && (
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
