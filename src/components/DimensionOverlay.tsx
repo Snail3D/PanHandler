@@ -1421,7 +1421,8 @@ export default function DimensionOverlay({
             const { pageX, pageY } = touch;
             
             // Update finger touch positions for all touches with pressure and random seeds
-            const touches = Array.from(event.nativeEvent.touches).map((t, idx) => ({
+            const touchArray = event.nativeEvent.touches || [];
+            const touches = Array.from(touchArray).map((t: any, idx: number) => ({
               x: t.pageX,
               y: t.pageY,
               id: `touch-${idx}`,
