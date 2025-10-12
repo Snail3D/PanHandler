@@ -136,6 +136,15 @@ export default function DimensionOverlay({
   const HAPTIC_DISTANCE = 20;
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
   
+  // Initialize measurement mode based on whether there are existing measurements
+  // If there are measurements on reload, pan/zoom should be locked
+  useEffect(() => {
+    if (measurements.length > 0) {
+      // Pan/zoom is locked when measurements exist
+      setMeasurementMode(false); // Keep in pan mode but locked
+    }
+  }, []); // Only run on mount
+  
   // Menu states
   const [menuMinimized, setMenuMinimized] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);

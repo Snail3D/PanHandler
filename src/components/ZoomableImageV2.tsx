@@ -20,6 +20,7 @@ interface ZoomableImageProps {
   initialRotation?: number;
   zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
   showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
+  locked?: boolean; // If true, disable pan/zoom gestures
 }
 
 export default function ZoomableImage({ 
@@ -31,6 +32,7 @@ export default function ZoomableImage({
   initialRotation = 0,
   zoomToCenter = false,
   showLevelLine = false,
+  locked = false,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -67,6 +69,7 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
+    .enabled(!locked)
     .onUpdate((event) => {
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
@@ -77,6 +80,7 @@ export default function ZoomableImage({
     });
   
   const rotationGesture = Gesture.Rotation()
+    .enabled(!locked)
     .onUpdate((event) => {
       rotation.value = savedRotation.value + event.rotation;
     })
@@ -85,6 +89,7 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
+    .enabled(!locked)
     .onUpdate((event) => {
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
@@ -97,6 +102,7 @@ export default function ZoomableImage({
 
   const doubleTapGesture = Gesture.Tap()
     .numberOfTaps(2)
+    .enabled(!locked)
     .onEnd(() => {
       if (scale.value > 1) {
         scale.value = withSpring(1);
