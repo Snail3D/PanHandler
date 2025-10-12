@@ -1424,7 +1424,7 @@ export default function DimensionOverlay({
           {/* Pro status footer */}
           <Pressable
             onPress={() => {
-              // Secret backdoor: 5 taps to unlock pro
+              // Secret backdoor: 5 fast taps to unlock pro
               const newCount = proTapCount + 1;
               setProTapCount(newCount);
               
@@ -1433,18 +1433,29 @@ export default function DimensionOverlay({
               }
               
               if (newCount >= 5) {
+                // Unlock pro!
                 setIsProUser(true);
                 setProTapCount(0);
                 Alert.alert('🎉 Pro Unlocked!', 'All pro features are now available!');
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               } else {
+                // Reset counter after 2 seconds
                 proTapTimeoutRef.current = setTimeout(() => {
                   setProTapCount(0);
                 }, 2000);
                 
-                if (!isProUser) {
-                  setShowProModal(true);
+                // Only show modal on 1st tap (not during rapid tapping)
+                if (newCount === 1 && !isProUser) {
+                  setTimeout(() => {
+                    // Check if user didn't continue tapping (still at 1 tap after 500ms)
+                    if (proTapCount === 1) {
+                      setShowProModal(true);
+                    }
+                  }, 500);
                 }
+                
+                // Haptic feedback for tap counting
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
             }}
             style={{
