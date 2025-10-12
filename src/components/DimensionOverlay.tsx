@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput, Modal } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -14,6 +14,24 @@ import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Vibrant color palette for measurements (professional but fun)
+const MEASUREMENT_COLORS = {
+  distance: [
+    { main: '#3B82F6', glow: '#3B82F6', name: 'Blue' },      // Classic blue
+    { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    // Vibrant purple
+    { main: '#EC4899', glow: '#EC4899', name: 'Pink' },      // Hot pink
+    { main: '#F59E0B', glow: '#F59E0B', name: 'Amber' },     // Warm amber
+    { main: '#06B6D4', glow: '#06B6D4', name: 'Cyan' },      // Bright cyan
+  ],
+  angle: [
+    { main: '#10B981', glow: '#10B981', name: 'Green' },     // Classic green
+    { main: '#6366F1', glow: '#6366F1', name: 'Indigo' },    // Deep indigo
+    { main: '#F43F5E', glow: '#F43F5E', name: 'Rose' },      // Vibrant rose
+    { main: '#14B8A6', glow: '#14B8A6', name: 'Teal' },      // Fresh teal
+    { main: '#A855F7', glow: '#A855F7', name: 'Violet' },    // Rich violet
+  ],
+};
 
 type MeasurementMode = 'distance' | 'angle';
 
@@ -59,6 +77,19 @@ export default function DimensionOverlay({
   const setMeasurements = useStore((s) => s.setCompletedMeasurements);
   const userEmail = useStore((s) => s.userEmail);
   const setUserEmail = useStore((s) => s.setUserEmail);
+  const isProUser = useStore((s) => s.isProUser);
+  const setIsProUser = useStore((s) => s.setIsProUser);
+  
+  // Pro upgrade modal
+  const [showProModal, setShowProModal] = useState(false);
+  const [proTapCount, setProTapCount] = useState(0);
+  const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Get color for measurement based on index
+  const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
+    const colors = MEASUREMENT_COLORS[measurementMode];
+    return colors[index % colors.length];
+  };
 
   // Helper to convert screen coordinates to original image coordinates
   const screenToImage = (screenX: number, screenY: number) => {
@@ -103,6 +134,14 @@ export default function DimensionOverlay({
   };
 
   const placePoint = (x: number, y: number) => {
+    // Check if user is trying to add more than 1 measurement without pro
+    if (!isProUser && measurements.length >= 1 && currentPoints.length === 0) {
+      // Show paywall modal
+      setShowProModal(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+    
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
     console.log('🎯 Placing point:');
@@ -295,6 +334,12 @@ export default function DimensionOverlay({
     if (!viewRef || !viewRef.current || !currentImageUri) {
       console.error('❌ Email failed: viewRef or currentImageUri is missing');
       Alert.alert('Email Error', 'Unable to capture measurement. Please try again.');
+      return;
+    }
+    
+    // Check if user has multiple measurements without pro
+    if (!isProUser && measurements.length > 1) {
+      setShowProModal(true);
       return;
     }
 
@@ -749,6 +794,8 @@ export default function DimensionOverlay({
 
             {/* Draw completed measurements */}
             {measurements.map((measurement, idx) => {
+              const color = getMeasurementColor(idx, measurement.mode);
+              
               if (measurement.mode === 'distance') {
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
@@ -758,20 +805,20 @@ export default function DimensionOverlay({
                 return (
                   <React.Fragment key={measurement.id}>
                     {/* Outer glow layers - multiple for smooth gradient */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main line */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="4" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
                     {/* End caps with glow */}
-                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke="#3B82F6" strokeWidth="3" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
                     {/* Point markers with layered glow */}
-                    <Circle cx={p0.x} cy={p0.y} r="16" fill="#3B82F6" opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill="#3B82F6" opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
-                    <Circle cx={p1.x} cy={p1.y} r="16" fill="#3B82F6" opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="12" fill="#3B82F6" opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
+                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
               } else {
@@ -782,24 +829,24 @@ export default function DimensionOverlay({
                 return (
                   <React.Fragment key={measurement.id}>
                     {/* Glow layers */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main lines */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
-                    <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
+                    <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
                     {/* Point markers with layered glow */}
-                    <Circle cx={p0.x} cy={p0.y} r="16" fill="#10B981" opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill="#10B981" opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
-                    <Circle cx={p1.x} cy={p1.y} r="18" fill="#059669" opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="14" fill="#059669" opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="10" fill="#059669" stroke="white" strokeWidth="3" />
-                    <Circle cx={p2.x} cy={p2.y} r="16" fill="#10B981" opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="12" fill="#10B981" opacity="0.2" />
-                    <Circle cx={p2.x} cy={p2.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
+                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="18" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="14" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="10" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p2.x} cy={p2.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p2.x} cy={p2.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
               }
@@ -881,6 +928,7 @@ export default function DimensionOverlay({
 
           {/* Measurement labels for completed measurements */}
           {measurements.map((measurement, idx) => {
+            const color = getMeasurementColor(idx, measurement.mode);
             let screenX, screenY;
             if (measurement.mode === 'distance') {
               const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
@@ -923,7 +971,7 @@ export default function DimensionOverlay({
                 {/* Measurement value */}
                 <View
                   style={{
-                    backgroundColor: measurement.mode === 'distance' ? '#3B82F6' : '#10B981',
+                    backgroundColor: color.main,
                     paddingHorizontal: 12,
                     paddingVertical: 6,
                     borderRadius: 8,
@@ -1334,11 +1382,121 @@ export default function DimensionOverlay({
               </Pressable>
             </>
           )}
+          
+          {/* Pro status footer */}
+          <Pressable
+            onPress={() => {
+              // Secret backdoor: 5 taps to unlock pro
+              const newCount = proTapCount + 1;
+              setProTapCount(newCount);
+              
+              if (proTapTimeoutRef.current) {
+                clearTimeout(proTapTimeoutRef.current);
+              }
+              
+              if (newCount >= 5) {
+                setIsProUser(true);
+                setProTapCount(0);
+                Alert.alert('🎉 Pro Unlocked!', 'All pro features are now available!');
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              } else {
+                proTapTimeoutRef.current = setTimeout(() => {
+                  setProTapCount(0);
+                }, 2000);
+                
+                if (!isProUser) {
+                  setShowProModal(true);
+                }
+              }
+            }}
+            style={{
+              marginTop: 8,
+              paddingVertical: 6,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 9, color: 'rgba(0, 0, 0, 0.4)', fontWeight: '500' }}>
+              {isProUser ? '✨ Pro User' : 'Tap for Pro Features'}
+            </Text>
+          </Pressable>
         </View>
         </BlurView>
           </Animated.View>
         </GestureDetector>
       )}
+      
+      {/* Pro Upgrade Modal */}
+      <Modal
+        visible={showProModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowProModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <BlurView
+            intensity={100}
+            tint="light"
+            style={{ borderRadius: 24, overflow: 'hidden', width: '100%', maxWidth: 400 }}
+          >
+            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 24 }}>
+              {/* Header */}
+              <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                <View style={{ backgroundColor: '#007AFF', width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
+                  <Ionicons name="star" size={32} color="white" />
+                </View>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#000', marginBottom: 4 }}>
+                  Upgrade to Pro
+                </Text>
+                <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
+                  Unlock unlimited measurements
+                </Text>
+              </View>
+              
+              {/* Features list */}
+              <View style={{ marginBottom: 24 }}>
+                {[
+                  'Unlimited measurements per photo',
+                  'Email multiple measurements',
+                  'Vibrant color-coded lines',
+                  'Priority support',
+                ].map((feature, idx) => (
+                  <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    <View style={{ backgroundColor: '#34C759', width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Ionicons name="checkmark" size={16} color="white" />
+                    </View>
+                    <Text style={{ fontSize: 15, color: '#333', flex: 1 }}>{feature}</Text>
+                  </View>
+                ))}
+              </View>
+              
+              {/* Price */}
+              <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20, alignItems: 'center' }}>
+                <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#007AFF' }}>$5.99</Text>
+                <Text style={{ fontSize: 13, color: '#666' }}>One-time purchase • Lifetime access</Text>
+              </View>
+              
+              {/* Buttons */}
+              <Pressable
+                onPress={() => {
+                  setShowProModal(false);
+                  // Here you would integrate actual payment (Stripe, RevenueCat, etc.)
+                  Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
+                }}
+                style={{ backgroundColor: '#007AFF', borderRadius: 14, paddingVertical: 16, marginBottom: 12 }}
+              >
+                <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Upgrade Now</Text>
+              </Pressable>
+              
+              <Pressable
+                onPress={() => setShowProModal(false)}
+                style={{ paddingVertical: 12 }}
+              >
+                <Text style={{ color: '#666', fontSize: 15, textAlign: 'center' }}>Maybe Later</Text>
+              </Pressable>
+            </View>
+          </BlurView>
+        </View>
+      </Modal>
     </>
   );
 }
