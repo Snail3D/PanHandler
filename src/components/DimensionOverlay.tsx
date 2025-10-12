@@ -1060,11 +1060,6 @@ export default function DimensionOverlay({
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
             
-            // For circle mode, immediately place the center point
-            if (mode === 'circle' && currentPoints.length === 0) {
-              placePoint(pageX, pageY - cursorOffsetY);
-            }
-            
             // Haptic for activation
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }}
@@ -1077,7 +1072,7 @@ export default function DimensionOverlay({
             // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
-            // For circle mode, continuously update the edge point (second point)
+            // For circle mode with center already placed, continuously update the edge point
             if (mode === 'circle' && currentPoints.length === 1) {
               // Update the second point position as user drags
               const imageCoords = screenToImage(pageX, pageY - cursorOffsetY);
@@ -1100,35 +1095,38 @@ export default function DimensionOverlay({
           onResponderRelease={() => {
             console.log('✅ Touch released');
             
-            // For circle mode with center already placed, finalize the circle
-            if (mode === 'circle' && currentPoints.length === 2) {
-              // Circle is complete, save it
-              const center = currentPoints[0];
-              const edge = currentPoints[1];
-              const radius = Math.sqrt(
-                Math.pow(edge.x - center.x, 2) + 
-                Math.pow(edge.y - center.y, 2)
-              );
-              const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
-              const formattedValue = formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem);
-              
-              setMeasurements([...measurements, {
-                id: Date.now().toString(),
-                points: currentPoints.map(p => ({ x: p.x, y: p.y })),
-                value: formattedValue,
-                mode: 'circle',
-                radius,
-              }]);
-              setCurrentPoints([]);
-              setShowCursor(false);
-              
-              // Success haptic
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } else if (mode === 'circle' && currentPoints.length === 1) {
-              // User just tapped without dragging in circle mode - ignore this release
-              // They need to drag to set the radius
-              setShowCursor(false);
-              console.log('⚠️ Circle mode: Need to drag to set radius');
+            // For circle mode
+            if (mode === 'circle') {
+              if (currentPoints.length === 0) {
+                // First tap: place center point
+                placePoint(cursorPosition.x, cursorPosition.y);
+                setShowCursor(false);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              } else if (currentPoints.length === 2) {
+                // Second tap/drag release: finalize circle
+                const center = currentPoints[0];
+                const edge = currentPoints[1];
+                const radius = Math.sqrt(
+                  Math.pow(edge.x - center.x, 2) + 
+                  Math.pow(edge.y - center.y, 2)
+                );
+                const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+                const formattedValue = formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem);
+                
+                setMeasurements([...measurements, {
+                  id: Date.now().toString(),
+                  points: currentPoints.map(p => ({ x: p.x, y: p.y })),
+                  value: formattedValue,
+                  mode: 'circle',
+                  radius,
+                }]);
+                setCurrentPoints([]);
+                setShowCursor(false);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              } else {
+                // Waiting for edge point - just hide cursor
+                setShowCursor(false);
+              }
             } else {
               // For other modes, place point normally
               placePoint(cursorPosition.x, cursorPosition.y);
