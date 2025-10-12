@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import * as ScreenOrientation from 'expo-screen-orientation';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
@@ -36,28 +35,16 @@ export default function MeasurementScreen() {
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
 
-  // Helper to detect and lock orientation based on image
-  const detectAndLockOrientation = async (uri: string) => {
+  // Helper to detect orientation based on image (for future use)
+  const detectOrientation = async (uri: string) => {
     try {
-      // Get image dimensions
       await new Promise<void>((resolve) => {
-        Image.getSize(uri, async (width, height) => {
+        Image.getSize(uri, (width, height) => {
           console.log('📐 Image dimensions:', width, 'x', height);
-          
-          // Determine orientation
           const isLandscape = width > height;
           const orientation = isLandscape ? 'LANDSCAPE' : 'PORTRAIT';
-          
-          console.log('🔒 Locking to:', orientation);
+          console.log('📱 Image orientation:', orientation);
           setImageOrientation(orientation);
-          
-          // Lock screen orientation
-          if (isLandscape) {
-            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-          } else {
-            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-          }
-          
           resolve();
         }, (error) => {
           console.error('Error getting image size:', error);
@@ -65,35 +52,17 @@ export default function MeasurementScreen() {
         });
       });
     } catch (error) {
-      console.error('Error locking orientation:', error);
+      console.error('Error detecting orientation:', error);
     }
   };
 
   // Restore session on mount if there's a persisted image
   useEffect(() => {
-    const restoreSession = async () => {
-      if (currentImageUri && calibration && coinCircle) {
-        console.log('📦 Restoring previous session');
-        
-        // Restore orientation lock
-        if (imageOrientation) {
-          try {
-            if (imageOrientation === 'LANDSCAPE') {
-              await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-            } else {
-              await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-            }
-          } catch (error) {
-            console.error('Error restoring orientation:', error);
-          }
-        }
-        
-        setMode('measurement');
-        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
-      }
-    };
-    
-    restoreSession();
+    if (currentImageUri && calibration && coinCircle) {
+      console.log('📦 Restoring previous session');
+      setMode('measurement');
+      setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+    }
   }, []); // Only run on mount
 
   // Watch for image changes and reset mode to camera when image is cleared
@@ -139,7 +108,7 @@ export default function MeasurementScreen() {
       
       if (photo?.uri) {
         setImageUri(photo.uri);
-        await detectAndLockOrientation(photo.uri);
+        await detectOrientation(photo.uri);
         setMode('selectCoin');
       }
     } catch (error) {
@@ -182,20 +151,13 @@ export default function MeasurementScreen() {
     setSelectedCoin(null);
   };
 
-  const handleRetakePhoto = async () => {
+  const handleRetakePhoto = () => {
     setImageUri(null);
     setCoinCircle(null);
     setCalibration(null);
     setImageOrientation(null);
     setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
     setMode('camera');
-    
-    // Unlock orientation when returning to camera
-    try {
-      await ScreenOrientation.unlockAsync();
-    } catch (error) {
-      console.error('Error unlocking orientation:', error);
-    }
   };
 
   const pickImage = async () => {
@@ -207,7 +169,7 @@ export default function MeasurementScreen() {
 
     if (!result.canceled && result.assets[0]) {
       setImageUri(result.assets[0].uri);
-      await detectAndLockOrientation(result.assets[0].uri);
+      await detectOrientation(result.assets[0].uri);
       setMode('selectCoin');
     }
   };
