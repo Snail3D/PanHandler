@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -2525,69 +2525,152 @@ export default function DimensionOverlay({
         animationType="fade"
         onRequestClose={() => setShowProModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-          <BlurView
-            intensity={100}
-            tint="light"
-            style={{ borderRadius: 24, overflow: 'hidden', width: '100%', maxWidth: 400 }}
+        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <ScrollView 
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+            showsVerticalScrollIndicator={false}
           >
-            <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 24 }}>
-              {/* Header */}
-              <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                <View style={{ backgroundColor: '#007AFF', width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
-                  <Ionicons name="star" size={32} color="white" />
-                </View>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#000', marginBottom: 4 }}>
-                  Upgrade to Pro
-                </Text>
-                <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
-                  Unlock unlimited measurements
-                </Text>
-              </View>
-              
-              {/* Features list */}
-              <View style={{ marginBottom: 24 }}>
-                {[
-                  'Unlimited saves per month',
-                  'Unlimited emails per month',
-                  'Unlimited measurements per photo',
-                  'Priority support',
-                ].map((feature, idx) => (
-                  <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <View style={{ backgroundColor: '#34C759', width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-                      <Ionicons name="checkmark" size={16} color="white" />
-                    </View>
-                    <Text style={{ fontSize: 15, color: '#333', flex: 1 }}>{feature}</Text>
+            <BlurView
+              intensity={100}
+              tint="light"
+              style={{ borderRadius: 24, overflow: 'hidden', width: '100%', maxWidth: 420, marginVertical: 20 }}
+            >
+              <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 24 }}>
+                {/* Header */}
+                <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                  <View style={{ backgroundColor: '#007AFF', width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
+                    <Ionicons name="star" size={32} color="white" />
                   </View>
-                ))}
+                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#000', marginBottom: 4 }}>
+                    Upgrade to Pro
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
+                    Unlock unlimited precision
+                  </Text>
+                </View>
+                
+                {/* Usage Tracker - Only show for free users */}
+                {!isProUser && (
+                  <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#666', marginBottom: 12, textAlign: 'center' }}>
+                      YOUR MONTHLY USAGE
+                    </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                      <View style={{ alignItems: 'center', flex: 1 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 4 }}>
+                          <Text style={{ fontSize: 28, fontWeight: 'bold', color: monthlySaveCount >= 10 ? '#FF3B30' : '#007AFF' }}>
+                            {10 - monthlySaveCount}
+                          </Text>
+                          <Text style={{ fontSize: 16, color: '#666', marginLeft: 2 }}>/10</Text>
+                        </View>
+                        <Text style={{ fontSize: 12, color: '#666' }}>Saves Left</Text>
+                      </View>
+                      <View style={{ width: 1, backgroundColor: '#D1D5DB', marginHorizontal: 12 }} />
+                      <View style={{ alignItems: 'center', flex: 1 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 4 }}>
+                          <Text style={{ fontSize: 28, fontWeight: 'bold', color: monthlyEmailCount >= 10 ? '#FF3B30' : '#007AFF' }}>
+                            {10 - monthlyEmailCount}
+                          </Text>
+                          <Text style={{ fontSize: 16, color: '#666', marginLeft: 2 }}>/10</Text>
+                        </View>
+                        <Text style={{ fontSize: 12, color: '#666' }}>Emails Left</Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+                
+                {/* Comparison Chart */}
+                <View style={{ marginBottom: 20 }}>
+                  {/* Table Header */}
+                  <View style={{ flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: '#E5E7EB', paddingBottom: 12, marginBottom: 12 }}>
+                    <View style={{ flex: 2 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#666' }}>FEATURE</Text>
+                    </View>
+                    <View style={{ flex: 1, alignItems: 'center' }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#666' }}>FREE</Text>
+                    </View>
+                    <View style={{ flex: 1, alignItems: 'center' }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#007AFF' }}>PRO</Text>
+                    </View>
+                  </View>
+                  
+                  {/* Table Rows */}
+                  {[
+                    { feature: 'Saves per month', free: '10', pro: '∞' },
+                    { feature: 'Emails per month', free: '10', pro: '∞' },
+                    { feature: 'Measurements per photo', free: '1', pro: '∞' },
+                    { feature: 'Mix measurement types', free: false, pro: true },
+                    { feature: 'Color-coded lines', free: false, pro: true },
+                    { feature: 'Remove watermarks', free: false, pro: true },
+                  ].map((row, idx) => (
+                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 5 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
+                      <View style={{ flex: 2, justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 14, color: '#333' }}>{row.feature}</Text>
+                      </View>
+                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        {typeof row.free === 'boolean' ? (
+                          row.free ? (
+                            <Ionicons name="checkmark-circle" size={20} color="#34C759" />
+                          ) : (
+                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
+                          )
+                        ) : (
+                          <Text style={{ fontSize: 14, fontWeight: '600', color: '#666' }}>{row.free}</Text>
+                        )}
+                      </View>
+                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        {typeof row.pro === 'boolean' ? (
+                          row.pro ? (
+                            <Ionicons name="checkmark-circle" size={20} color="#007AFF" />
+                          ) : (
+                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
+                          )
+                        ) : (
+                          <Text style={{ fontSize: 16, fontWeight: '700', color: '#007AFF' }}>{row.pro}</Text>
+                        )}
+                      </View>
+                    </View>
+                  ))}
+                </View>
+                
+                {/* Price */}
+                <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 36, fontWeight: 'bold', color: '#007AFF' }}>$9.97</Text>
+                  <Text style={{ fontSize: 13, color: '#666' }}>One-time purchase • Lifetime access</Text>
+                </View>
+                
+                {/* Purchase Button */}
+                <Pressable
+                  onPress={() => {
+                    setShowProModal(false);
+                    // Here you would integrate actual payment (Stripe, RevenueCat, etc.)
+                    Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
+                  }}
+                  style={{ backgroundColor: '#007AFF', borderRadius: 14, paddingVertical: 16, marginBottom: 12 }}
+                >
+                  <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Purchase Pro</Text>
+                </Pressable>
+                
+                {/* Restore Purchase Button */}
+                <Pressable
+                  onPress={() => {
+                    Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
+                  }}
+                  style={{ paddingVertical: 12, marginBottom: 8 }}
+                >
+                  <Text style={{ color: '#007AFF', fontSize: 15, textAlign: 'center', fontWeight: '500' }}>Restore Purchase</Text>
+                </Pressable>
+                
+                {/* Maybe Later Button */}
+                <Pressable
+                  onPress={() => setShowProModal(false)}
+                  style={{ paddingVertical: 12 }}
+                >
+                  <Text style={{ color: '#666', fontSize: 15, textAlign: 'center' }}>Maybe Later</Text>
+                </Pressable>
               </View>
-              
-              {/* Price */}
-              <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20, alignItems: 'center' }}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#007AFF' }}>$9.99</Text>
-                <Text style={{ fontSize: 13, color: '#666' }}>One-time purchase • Lifetime access</Text>
-              </View>
-              
-              {/* Buttons */}
-              <Pressable
-                onPress={() => {
-                  setShowProModal(false);
-                  // Here you would integrate actual payment (Stripe, RevenueCat, etc.)
-                  Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
-                }}
-                style={{ backgroundColor: '#007AFF', borderRadius: 14, paddingVertical: 16, marginBottom: 12 }}
-              >
-                <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Upgrade Now</Text>
-              </Pressable>
-              
-              <Pressable
-                onPress={() => setShowProModal(false)}
-                style={{ paddingVertical: 12 }}
-              >
-                <Text style={{ color: '#666', fontSize: 15, textAlign: 'center' }}>Maybe Later</Text>
-              </Pressable>
-            </View>
-          </BlurView>
+            </BlurView>
+          </ScrollView>
         </View>
       </Modal>
 
