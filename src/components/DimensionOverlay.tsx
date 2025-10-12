@@ -300,11 +300,23 @@ export default function DimensionOverlay({
 
       console.log('📸 Captured URI for email:', uri);
 
-      // Build measurement text - one per line
+      // Build measurement text with scale information
       let measurementText = 'Measurements:\n\n';
       measurements.forEach((m, idx) => {
         measurementText += `${idx + 1}. ${m.value}\n`;
       });
+      
+      // Add calibration/scale information
+      if (calibration) {
+        measurementText += `\n---\nCalibration Info:\n`;
+        measurementText += `Scale: ${calibration.pixelsPerUnit.toFixed(2)} pixels per ${calibration.unit}\n`;
+        measurementText += `Reference: ${calibration.referenceDistance} ${calibration.unit}`;
+        if (coinCircle) {
+          measurementText += ` (${coinCircle.coinName})`;
+        }
+        measurementText += `\n\nTo use in other software:\n`;
+        measurementText += `Set scale to ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}`;
+      }
 
       console.log('📧 Opening email composer...');
       // Compose email with attachment
