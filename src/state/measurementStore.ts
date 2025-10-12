@@ -17,7 +17,10 @@ export interface CompletedMeasurement {
   id: string;
   points: Array<{ x: number; y: number }>;
   value: string;
-  mode: 'distance' | 'angle';
+  mode: 'distance' | 'angle' | 'circle' | 'rectangle';
+  radius?: number; // For circles
+  width?: number;  // For rectangles  
+  height?: number; // For rectangles
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
@@ -29,7 +32,7 @@ interface MeasurementStore {
   completedMeasurements: CompletedMeasurement[]; // For DimensionOverlay
   currentPoints: Array<{ x: number; y: number; id: string }>; // For DimensionOverlay
   tempPoints: Point[];
-  measurementMode: 'distance' | 'angle';
+  measurementMode: 'distance' | 'angle' | 'circle' | 'rectangle';
   calibration: {
     pixelsPerUnit: number;
     unit: 'mm' | 'cm' | 'in';
@@ -49,7 +52,7 @@ interface MeasurementStore {
   addTempPoint: (point: Point) => void;
   clearTempPoints: () => void;
   completeMeasurement: () => void;
-  setMeasurementMode: (mode: 'distance' | 'angle') => void;
+  setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle') => void;
   deleteMeasurement: (id: string) => void;
   clearAll: () => void;
   setCalibration: (calibration: MeasurementStore['calibration']) => void;

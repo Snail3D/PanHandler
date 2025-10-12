@@ -6,10 +6,13 @@ export interface Point {
 
 export interface Measurement {
   id: string;
-  type: 'distance' | 'angle';
+  type: 'distance' | 'angle' | 'circle' | 'rectangle';
   points: Point[];
   value?: number;
   label?: string;
+  radius?: number; // For circles
+  width?: number;  // For rectangles
+  height?: number; // For rectangles
 }
 
 export interface MeasurementData {
