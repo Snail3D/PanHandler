@@ -1816,7 +1816,7 @@ export default function DimensionOverlay({
             >
               <Ionicons name="flash" size={12} color="white" />
               <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
-                AUTO
+                AUTO LEVEL
               </Text>
             </View>
           )}
@@ -2492,7 +2492,7 @@ export default function DimensionOverlay({
               
               {/* Price */}
               <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20, alignItems: 'center' }}>
-                <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#007AFF' }}>$5.99</Text>
+                <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#007AFF' }}>$9.99</Text>
                 <Text style={{ fontSize: 13, color: '#666' }}>One-time purchase • Lifetime access</Text>
               </View>
               
