@@ -1190,21 +1190,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <Text style={{ fontSize: 24 }}>🥚</Text>
                   </View>
                   
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, textAlign: 'center', marginBottom: 12, fontStyle: 'italic' }}>
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, textAlign: 'center', fontStyle: 'italic' }}>
                     Some badges hide secrets... if you are persistent enough 🤔
                   </Text>
-
-                  <View style={{ backgroundColor: 'rgba(255,215,0,0.08)', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 0.5, borderColor: 'rgba(255,215,0,0.2)' }}>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, textAlign: 'center' }}>
-                      💚 <Text style={{ fontWeight: '600' }}>The green badge</Text> guards a playful message from the past...
-                    </Text>
-                  </View>
-
-                  <View style={{ backgroundColor: 'rgba(255,215,0,0.08)', borderRadius: 12, padding: 12, borderWidth: 0.5, borderColor: 'rgba(255,215,0,0.2)' }}>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, textAlign: 'center' }}>
-                      ⚡ <Text style={{ fontWeight: '600' }}>The flash badge</Text> holds a legendary tune...
-                    </Text>
-                  </View>
                 </Animated.View>
               </View>
             </ScrollView>
