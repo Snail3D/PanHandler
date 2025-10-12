@@ -1072,16 +1072,6 @@ export default function DimensionOverlay({
             // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
-            // For circle mode with center already placed, continuously update the edge point
-            if (mode === 'circle' && currentPoints.length === 1) {
-              // Update the second point position as user drags
-              const imageCoords = screenToImage(pageX, pageY - cursorOffsetY);
-              setCurrentPoints([
-                currentPoints[0], 
-                { x: imageCoords.x, y: imageCoords.y, id: `temp-edge-${Date.now()}` }
-              ]);
-            }
-            
             // Haptic feedback every 20px
             const distance = Math.sqrt(
               Math.pow(pageX - lastHapticPosition.x, 2) + 
@@ -1102,30 +1092,11 @@ export default function DimensionOverlay({
                 placePoint(cursorPosition.x, cursorPosition.y);
                 setShowCursor(false);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              } else if (currentPoints.length === 2) {
-                // Second tap/drag release: finalize circle
-                const center = currentPoints[0];
-                const edge = currentPoints[1];
-                const radius = Math.sqrt(
-                  Math.pow(edge.x - center.x, 2) + 
-                  Math.pow(edge.y - center.y, 2)
-                );
-                const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
-                const formattedValue = formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem);
-                
-                setMeasurements([...measurements, {
-                  id: Date.now().toString(),
-                  points: currentPoints.map(p => ({ x: p.x, y: p.y })),
-                  value: formattedValue,
-                  mode: 'circle',
-                  radius,
-                }]);
-                setCurrentPoints([]);
+              } else if (currentPoints.length === 1) {
+                // Second tap: place edge point, which will auto-complete the circle via placePoint
+                placePoint(cursorPosition.x, cursorPosition.y);
                 setShowCursor(false);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              } else {
-                // Waiting for edge point - just hide cursor
-                setShowCursor(false);
               }
             } else {
               // For other modes, place point normally
