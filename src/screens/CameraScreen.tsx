@@ -7,6 +7,7 @@ import { DeviceMotion } from 'expo-sensors';
 import * as Haptics from 'expo-haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
+import HelpModal from '../components/HelpModal';
 
 interface CameraScreenProps {
   onPhotoTaken: (uri: string, isAutoCaptured: boolean) => void;
@@ -28,6 +29,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [autoMode, setAutoMode] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   
   // Stability tracking
   const recentAngles = React.useRef<number[]>([]);
@@ -289,22 +291,30 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           style={{ paddingTop: insets.top + 16 }}
         >
           <View className="flex-row justify-between items-center px-6">
-            <Pressable
-              onPress={toggleOrientationMode}
-              className="w-10 h-10 items-center justify-center"
-            >
-              <Ionicons 
-                name={
-                  orientationMode === 'auto' 
-                    ? 'infinite' 
-                    : orientationMode === 'horizontal' 
-                    ? 'swap-horizontal' 
-                    : 'swap-vertical'
-                } 
-                size={24} 
-                color="white" 
-              />
-            </Pressable>
+            <View className="flex-row items-center">
+              <Pressable
+                onPress={toggleOrientationMode}
+                className="w-10 h-10 items-center justify-center"
+              >
+                <Ionicons 
+                  name={
+                    orientationMode === 'auto' 
+                      ? 'infinite' 
+                      : orientationMode === 'horizontal' 
+                      ? 'swap-horizontal' 
+                      : 'swap-vertical'
+                  } 
+                  size={24} 
+                  color="white" 
+                />
+              </Pressable>
+              <Pressable
+                onPress={() => setShowHelpModal(true)}
+                className="w-10 h-10 items-center justify-center ml-2"
+              >
+                <Ionicons name="help-circle-outline" size={26} color="white" />
+              </Pressable>
+            </View>
             <Text className="text-white text-lg font-semibold">Take Reference Photo</Text>
             <Pressable
               onPress={toggleCameraFacing}
@@ -488,6 +498,9 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           </View>
         </View>
       </CameraView>
+      
+      {/* Help Modal */}
+      <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
     </View>
   );
 }
