@@ -178,6 +178,10 @@ export default function DimensionOverlay({
   const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Undo long-press state
+  const undoIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const undoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
@@ -578,6 +582,14 @@ export default function DimensionOverlay({
       }, 1200);
     }
   }, [coinCircle, hasShownAnimation]);
+  
+  // Cleanup undo long-press timers on unmount
+  useEffect(() => {
+    return () => {
+      if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+      if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
+    };
+  }, []);
 
   const handleClear = () => {
     // Remove one measurement at a time (last first)
@@ -586,6 +598,37 @@ export default function DimensionOverlay({
     } else if (currentPoints.length > 0) {
       // If no completed measurements, clear current points
       setCurrentPoints([]);
+    }
+  };
+  
+  // Long-press handlers for undo button (like holding backspace)
+  const startUndoLongPress = () => {
+    // Clear any existing timers
+    if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+    if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
+    
+    // First undo happens immediately on press
+    handleClear();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    // After 500ms delay, start repeating undo every 333ms (1/3 second)
+    undoTimeoutRef.current = setTimeout(() => {
+      undoIntervalRef.current = setInterval(() => {
+        handleClear();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }, 333); // Delete one every 1/3 second
+    }, 500); // 500ms initial delay before repeating
+  };
+  
+  const stopUndoLongPress = () => {
+    // Clear both timers when user releases
+    if (undoTimeoutRef.current) {
+      clearTimeout(undoTimeoutRef.current);
+      undoTimeoutRef.current = null;
+    }
+    if (undoIntervalRef.current) {
+      clearInterval(undoIntervalRef.current);
+      undoIntervalRef.current = null;
     }
   };
 
@@ -2300,7 +2343,8 @@ export default function DimensionOverlay({
                   {/* Center: Undo button - only show if there are measurements or current points */}
                   {(measurements.length > 0 || currentPoints.length > 0) && (
                     <Pressable
-                      onPress={handleClear}
+                      onPressIn={startUndoLongPress}
+                      onPressOut={stopUndoLongPress}
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
