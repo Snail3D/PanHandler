@@ -504,31 +504,28 @@ export default function DimensionOverlay({
   
   // Animated style for tab position
   const tabAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: tabPositionY.value }],
+    top: tabPositionY.value - 40, // Center the 80px tall tab
   }));
   
   // Pan gesture for sliding menu in/out
   const menuPanGesture = Gesture.Pan()
     .onUpdate((event) => {
-      if (event.translationX < -50 && !menuHidden) {
-        // Swipe left to hide (from right side)
-        menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
-      } else if (event.translationX > 50 && menuHidden && tabSide === 'right') {
-        // Swipe right to show (from right side)
-        menuTranslateX.value = Math.min(SCREEN_WIDTH + event.translationX, 0);
-      } else if (event.translationX < -50 && menuHidden && tabSide === 'left') {
-        // Swipe left to show (from left side)
-        menuTranslateX.value = Math.max(-SCREEN_WIDTH + event.translationX, 0);
-      } else if (event.translationX > 50 && !menuHidden && tabSide === 'left') {
-        // Swipe right to hide (from left side)
-        menuTranslateX.value = Math.min(event.translationX, SCREEN_WIDTH);
+      // Only respond to horizontal swipes
+      if (Math.abs(event.translationX) > Math.abs(event.translationY)) {
+        if (event.translationX < -50 && !menuHidden) {
+          // Swipe left to hide (to right side)
+          menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
+        } else if (event.translationX > 50 && menuHidden && tabSide === 'right') {
+          // Swipe right to show (from right side)
+          menuTranslateX.value = Math.min(SCREEN_WIDTH + event.translationX, 0);
+        }
       }
     })
     .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.3;
-      if (Math.abs(menuTranslateX.value) > threshold) {
-        // Hide menu
-        menuTranslateX.value = withSpring(tabSide === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH, {}, () => {
+      const threshold = SCREEN_WIDTH * 0.2;
+      if (Math.abs(event.translationX) > threshold) {
+        // Hide menu to the right
+        menuTranslateX.value = withSpring(SCREEN_WIDTH, {}, () => {
           runOnJS(setMenuHidden)(true);
         });
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
@@ -540,11 +537,12 @@ export default function DimensionOverlay({
       }
     });
   
-  // Drag gesture for repositioning tab
+  // Drag gesture for repositioning tab vertically
   const tabDragGesture = Gesture.Pan()
     .onUpdate((event) => {
       const newY = tabPositionY.value + event.translationY;
-      tabPositionY.value = Math.max(insets.top + 50, Math.min(newY, SCREEN_HEIGHT - insets.bottom - 100));
+      // Keep tab within safe bounds
+      tabPositionY.value = Math.max(insets.top + 80, Math.min(newY, SCREEN_HEIGHT - insets.bottom - 80));
     })
     .onEnd(() => {
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
@@ -555,9 +553,15 @@ export default function DimensionOverlay({
       menuTranslateX.value = withSpring(0);
       setMenuHidden(false);
     } else {
-      menuTranslateX.value = withSpring(tabSide === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH);
+      menuTranslateX.value = withSpring(SCREEN_WIDTH);
       setMenuHidden(true);
     }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
+  
+  const collapseMenu = () => {
+    menuTranslateX.value = withSpring(SCREEN_WIDTH);
+    setMenuHidden(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
@@ -644,43 +648,6 @@ export default function DimensionOverlay({
             </Pressable>
           </Animated.View>
         </GestureDetector>
-      )}
-
-      {/* Sexy iOS-styled minimize button */}
-      {!isCapturing && (
-        <Pressable
-          onPress={() => {
-            setMenuMinimized(!menuMinimized);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-          className="absolute z-30"
-          style={{ 
-            bottom: menuMinimized ? insets.bottom + 20 : insets.bottom + 20,
-            left: '50%',
-            marginLeft: -35,
-          }}
-        >
-          <View className="bg-white rounded-full shadow-2xl" style={{ 
-            width: 70, 
-            height: 70,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderWidth: 1,
-            borderColor: 'rgba(0,0,0,0.06)',
-          }}>
-            {menuMinimized ? (
-              <View className="items-center">
-                <Ionicons name="menu" size={28} color="#007AFF" />
-                <Text style={{ fontSize: 8, color: '#007AFF', fontWeight: '600', marginTop: 2 }}>MENU</Text>
-              </View>
-            ) : (
-              <View className="items-center">
-                <Ionicons name="chevron-down" size={20} color="#8E8E93" />
-                <View className="w-8 h-1 bg-gray-300 rounded-full mt-1" />
-              </View>
-            )}
-          </View>
-        </Pressable>
       )}
 
       {/* Touch overlay - only active in measurement mode */}
@@ -1047,7 +1014,7 @@ export default function DimensionOverlay({
             className="absolute left-0 right-0 z-20"
             style={[
               { 
-                bottom: insets.bottom + 90,
+                bottom: insets.bottom + 20,
                 paddingHorizontal: 20,
               },
               menuAnimatedStyle
@@ -1075,6 +1042,25 @@ export default function DimensionOverlay({
                 borderWidth: 1,
                 borderColor: 'rgba(255, 255, 255, 0.4)',
               }}>
+                
+                {/* Collapse arrow button in top-right corner */}
+                <Pressable
+                  onPress={collapseMenu}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 100,
+                  }}
+                >
+                  <Ionicons name="chevron-forward" size={18} color="rgba(0, 0, 0, 0.6)" />
+                </Pressable>
           {/* Unit System Toggle: Metric vs Imperial */}
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
             <Pressable
