@@ -2633,6 +2633,53 @@ export default function DimensionOverlay({
             />
           </Animated.View>
         )}
+        
+        {/* Label and scale info overlay for Fusion 360 export */}
+        {currentLabel && (
+          <View
+            style={{
+              position: 'absolute',
+              top: insets.top + 52,
+              left: 12,
+            }}
+            pointerEvents="none"
+          >
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 6,
+                marginBottom: 4,
+              }}
+            >
+              <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
+                {currentLabel}
+              </Text>
+            </View>
+            
+            {calibration && (
+              <View
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  borderRadius: 5,
+                  marginBottom: 4,
+                }}
+              >
+                <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                  Fusion Scale: {calibration.pixelsPerUnit.toFixed(4)}
+                </Text>
+                {coinCircle && (
+                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                    Ref: {coinCircle.coinName}
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
+        )}
       </View>
     </>
   );
