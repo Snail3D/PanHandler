@@ -1534,13 +1534,13 @@ export default function DimensionOverlay({
         </View>
       </Modal>
 
-      {/* Help Button - Floating at top right */}
+      {/* Help Button - Floating at top left */}
       {!menuHidden && !isCapturing && (
         <View
           style={{
             position: 'absolute',
             top: insets.top + 16,
-            right: 20,
+            left: 20,
             zIndex: 50,
           }}
           pointerEvents="box-none"
@@ -1549,9 +1549,9 @@ export default function DimensionOverlay({
             onPress={() => setShowHelpModal(true)}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
-              width: 44,
-              height: 44,
-              borderRadius: 22,
+              width: 32,
+              height: 32,
+              borderRadius: 16,
               justifyContent: 'center',
               alignItems: 'center',
               shadowColor: '#000',
@@ -1561,7 +1561,7 @@ export default function DimensionOverlay({
               elevation: 5,
             }}
           >
-            <Ionicons name="help-circle-outline" size={28} color="white" />
+            <Ionicons name="help-circle-outline" size={20} color="white" />
           </Pressable>
         </View>
       )}
