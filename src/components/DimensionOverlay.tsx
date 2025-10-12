@@ -1277,11 +1277,12 @@ export default function DimensionOverlay({
             {mode === 'distance' && currentPoints.length === 2 && (() => {
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              const nextColor = getMeasurementColor(measurements.length, 'distance');
               return (
                 <>
-                  <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke="#3B82F6" strokeWidth="3" />
-                  <Line x1={p0.x} y1={p0.y - 10} x2={p0.x} y2={p0.y + 10} stroke="#3B82F6" strokeWidth="2" />
-                  <Line x1={p1.x} y1={p1.y - 10} x2={p1.x} y2={p1.y + 10} stroke="#3B82F6" strokeWidth="2" />
+                  <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={nextColor.main} strokeWidth="3" />
+                  <Line x1={p0.x} y1={p0.y - 10} x2={p0.x} y2={p0.y + 10} stroke={nextColor.main} strokeWidth="2" />
+                  <Line x1={p1.x} y1={p1.y - 10} x2={p1.x} y2={p1.y + 10} stroke={nextColor.main} strokeWidth="2" />
                 </>
               );
             })()}
@@ -1290,14 +1291,15 @@ export default function DimensionOverlay({
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
               const p2 = currentPoints.length === 3 ? imageToScreen(currentPoints[2].x, currentPoints[2].y) : null;
+              const nextColor = getMeasurementColor(measurements.length, 'angle');
               
               return (
                 <>
-                  <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="3" />
+                  <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={nextColor.main} strokeWidth="3" />
                   {p2 && (
                     <>
-                      <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="3" />
-                      <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" />
+                      <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={nextColor.main} strokeWidth="3" />
+                      <Path d={generateArcPath(p0, p1, p2)} stroke={nextColor.main} strokeWidth="2" fill="none" />
                     </>
                   )}
                 </>
@@ -1344,13 +1346,14 @@ export default function DimensionOverlay({
             {/* Draw current point markers */}
             {currentPoints.map((point, index) => {
               const screenPos = imageToScreen(point.x, point.y);
+              const nextColor = getMeasurementColor(measurements.length, mode);
               return (
                 <Circle
                   key={point.id}
                   cx={screenPos.x}
                   cy={screenPos.y}
                   r="8"
-                  fill={mode === 'distance' ? '#3B82F6' : index === 1 ? '#059669' : '#10B981'}
+                  fill={nextColor.main}
                   stroke="white"
                   strokeWidth="3"
                 />
@@ -1580,6 +1583,8 @@ export default function DimensionOverlay({
           {/* Label for current measurement in progress */}
           {currentPoints.length === requiredPoints && (() => {
             let screenX, screenY, value;
+            const nextColor = getMeasurementColor(measurements.length, mode);
+            
             if (mode === 'distance') {
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
@@ -1599,7 +1604,7 @@ export default function DimensionOverlay({
                   position: 'absolute',
                   left: screenX,
                   top: screenY,
-                  backgroundColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+                  backgroundColor: nextColor.main,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 8,
