@@ -2114,8 +2114,6 @@ export default function DimensionOverlay({
                       style={{
                         width: 28,
                         height: 28,
-                        borderRadius: 14,
-                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}
