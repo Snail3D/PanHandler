@@ -342,7 +342,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       fontWeight: '500',
                       marginTop: -2,
                     }}>
-                      Master PanHandler
+                      By CAD pros, for CAD pros
                     </Text>
                   </View>
                 </Animated.View>
