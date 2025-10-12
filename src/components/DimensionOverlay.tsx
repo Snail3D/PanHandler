@@ -1003,14 +1003,23 @@ export default function DimensionOverlay({
           measurementText += ` (${coinCircle.coinName})`;
         }
         // CAD Canvas exports a screen capture with zoom transform applied
-        // This means objects appear larger in the captured image (more pixels per mm)
-        // Canvas Scale = 1 / (pixelsPerUnit × zoom) = (1/pixelsPerUnit) / zoom
+        // The captured view shows objects magnified, so Canvas Scale must be larger
         const calibrationZoom = savedZoomState?.scale || 1;
-        const fusionScale = (1 / calibration.pixelsPerUnit) / calibrationZoom;
+        
+        // Debug logging
+        console.log('📐 Canvas Scale Calculation:');
+        console.log('  pixelsPerUnit:', calibration.pixelsPerUnit);
+        console.log('  savedZoomState.scale:', calibrationZoom);
+        console.log('  Base scale (1/pixelsPerUnit):', 1 / calibration.pixelsPerUnit);
+        
+        const fusionScale = (1 / calibration.pixelsPerUnit) * calibrationZoom;
+        
+        console.log('  Final Canvas Scale (multiply):', fusionScale);
+        console.log('  Final Canvas Scale (divide):', (1 / calibration.pixelsPerUnit) / calibrationZoom);
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) ÷ zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) ÷ ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)}`;
+        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)}`;
       }
       
       // Add footer (only for non-Pro users)
@@ -2333,7 +2342,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    CAD Scale: {((1 / calibration.pixelsPerUnit) / (savedZoomState?.scale || 1)).toFixed(6)} mm/px
+                    CAD Scale: {((1 / calibration.pixelsPerUnit) * (savedZoomState?.scale || 1)).toFixed(6)} mm/px
                   </Text>
                   {coinCircle && (
                     <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
@@ -3223,7 +3232,7 @@ export default function DimensionOverlay({
               }}
             >
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  CAD Scale: {((1 / calibration.pixelsPerUnit) / (savedZoomState?.scale || 1)).toFixed(6)} mm/px
+                  CAD Scale: {((1 / calibration.pixelsPerUnit) * (savedZoomState?.scale || 1)).toFixed(6)} mm/px
                 </Text>
               {coinCircle && (
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
