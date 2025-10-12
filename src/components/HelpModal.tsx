@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, ScrollView, Pressable, Linking, Alert } from 'react-native';
+import { View, Text, Modal, ScrollView, Pressable, Linking, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -958,9 +958,22 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
-                    Created by <Text style={{ fontWeight: '700', color: '#007AFF' }}>Snail</Text>, a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
+                      Created by{' '}
+                    </Text>
+                    <Image 
+                      source={require('../../assets/snail-logo.png')} 
+                      style={{ width: 20, height: 20, marginRight: 4 }}
+                      resizeMode="contain"
+                    />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', lineHeight: 22 }}>
+                      Snail
+                    </Text>
+                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
+                      , a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
+                    </Text>
+                  </View>
 
                   <Pressable
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
