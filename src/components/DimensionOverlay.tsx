@@ -167,12 +167,12 @@ export default function DimensionOverlay({
     }
   }, [coinCircle]);
 
-  // Cursor placement via long press
+  // Measurement mode toggle
+  const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120;
-  const PRESS_DURATION = 500; // 500ms - half second, natural deliberate hold
   const HAPTIC_DISTANCE = 20;
 
   const handleClear = () => {
@@ -295,68 +295,68 @@ export default function DimensionOverlay({
         </Text>
       </View>
 
-      {/* Long press detector - allows pan/zoom when not pressing long */}
-      {!showCursor && (
-        <Pressable
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-          onLongPress={(event) => {
-            const { pageX, pageY } = event.nativeEvent;
-            console.log('🔥 LONG PRESS! Locking screen and activating cursor');
-            setShowCursor(true);
-            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-            setLastHapticPosition({ x: pageX, y: pageY });
-            
-            // Double haptic for "lock" feel
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).then(() => {
-              setTimeout(() => {
+      {/* Touch overlay - only active in measurement mode */}
+      {measurementMode && (
+        <>
+          {/* Tap to activate cursor */}
+          {!showCursor && (
+            <Pressable
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+              onPress={(event) => {
+                const { pageX, pageY } = event.nativeEvent;
+                console.log('🎯 TAP! Activating cursor at:', pageX, pageY);
+                setShowCursor(true);
+                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+                setLastHapticPosition({ x: pageX, y: pageY });
+                
+                // Haptic for activation
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              }, 50);
-            });
-          }}
-          delayLongPress={PRESS_DURATION}
-        />
-      )}
+              }}
+            />
+          )}
 
-      {/* Cursor movement overlay - only when locked */}
-      {showCursor && (
-        <View
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
-          onStartShouldSetResponder={() => true}
-          onMoveShouldSetResponder={() => true}
-          onResponderGrant={(event) => {
-            const { pageX, pageY } = event.nativeEvent;
-            console.log('👆 Cursor mode - touch started');
-            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-            setLastHapticPosition({ x: pageX, y: pageY });
-          }}
-          onResponderMove={(event) => {
-            const touch = event.nativeEvent.touches[0];
-            if (!touch) return;
-            
-            const { pageX, pageY } = touch;
-            
-            // Update cursor
-            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
-            
-            // Haptic feedback
-            const distance = Math.sqrt(
-              Math.pow(pageX - lastHapticPosition.x, 2) + 
-              Math.pow(pageY - lastHapticPosition.y, 2)
-            );
-            if (distance >= HAPTIC_DISTANCE) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setLastHapticPosition({ x: pageX, y: pageY });
-            }
-          }}
-          onResponderRelease={() => {
-            console.log('✅ Placing point and UNLOCKING screen');
-            placePoint(cursorPosition.x, cursorPosition.y);
-            setShowCursor(false);
-            
-            // Success haptic
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }}
-        />
+          {/* Cursor movement overlay - when cursor is active */}
+          {showCursor && (
+            <View
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+              onStartShouldSetResponder={() => true}
+              onMoveShouldSetResponder={() => true}
+              onResponderGrant={(event) => {
+                const { pageX, pageY } = event.nativeEvent;
+                console.log('👆 Cursor mode - touch started');
+                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+                setLastHapticPosition({ x: pageX, y: pageY });
+              }}
+              onResponderMove={(event) => {
+                const touch = event.nativeEvent.touches[0];
+                if (!touch) return;
+                
+                const { pageX, pageY } = touch;
+                
+                // Update cursor
+                setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+                
+                // Haptic feedback
+                const distance = Math.sqrt(
+                  Math.pow(pageX - lastHapticPosition.x, 2) + 
+                  Math.pow(pageY - lastHapticPosition.y, 2)
+                );
+                if (distance >= HAPTIC_DISTANCE) {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setLastHapticPosition({ x: pageX, y: pageY });
+                }
+              }}
+              onResponderRelease={() => {
+                console.log('✅ Placing point');
+                placePoint(cursorPosition.x, cursorPosition.y);
+                setShowCursor(false);
+                
+                // Success haptic
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }}
+            />
+          )}
+        </>
       )}
 
       {/* Floating cursor container */}
@@ -667,12 +667,55 @@ export default function DimensionOverlay({
         }}
       >
         <View className="bg-white/95 rounded-2xl px-6 py-4 shadow-lg">
-          {/* Mode Toggle */}
+          {/* Mode Toggle: Pan/Zoom vs Measure */}
+          <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
+            <Pressable
+              onPress={() => {
+                setMeasurementMode(false);
+                setShowCursor(false);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              className={`flex-1 py-2 rounded-md ${!measurementMode ? 'bg-white' : ''}`}
+            >
+              <View className="flex-row items-center justify-center">
+                <Ionicons 
+                  name="move-outline" 
+                  size={16} 
+                  color={!measurementMode ? '#3B82F6' : '#6B7280'} 
+                />
+                <Text className={`ml-1 text-center font-semibold ${!measurementMode ? 'text-blue-600' : 'text-gray-600'}`}>
+                  Pan/Zoom
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setMeasurementMode(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              className={`flex-1 py-2 rounded-md ${measurementMode ? 'bg-white' : ''}`}
+            >
+              <View className="flex-row items-center justify-center">
+                <Ionicons 
+                  name="create-outline" 
+                  size={16} 
+                  color={measurementMode ? '#10B981' : '#6B7280'} 
+                />
+                <Text className={`ml-1 text-center font-semibold ${measurementMode ? 'text-green-600' : 'text-gray-600'}`}>
+                  Measure
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* Measurement Type Toggle */}
           <View className="flex-row mb-3 bg-gray-100 rounded-lg p-1">
             <Pressable
               onPress={() => {
                 setMode('distance');
                 setCurrentPoints([]);
+                setMeasurementMode(true); // Auto-enable measurement mode
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               className={`flex-1 py-2 rounded-md ${mode === 'distance' ? 'bg-white' : ''}`}
             >
@@ -684,6 +727,8 @@ export default function DimensionOverlay({
               onPress={() => {
                 setMode('angle');
                 setCurrentPoints([]);
+                setMeasurementMode(true); // Auto-enable measurement mode
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               className={`flex-1 py-2 rounded-md ${mode === 'angle' ? 'bg-white' : ''}`}
             >
@@ -693,11 +738,14 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
 
-          {/* Zoom tip */}
+          {/* Tip */}
           {measurements.length === 0 && currentPoints.length === 0 && (
-            <View className="bg-blue-50 rounded-lg px-3 py-2 mb-3">
-              <Text className="text-blue-800 text-xs text-center">
-                💡 Hold still ½ second to place • Swipe to pan/zoom
+            <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
+              <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
+                {measurementMode 
+                  ? '💡 Tap to place points • Switch to Pan/Zoom to navigate'
+                  : '💡 Pinch to zoom • Drag to pan • Switch to Measure to place points'
+                }
               </Text>
             </View>
           )}
@@ -716,11 +764,11 @@ export default function DimensionOverlay({
           )}
 
           {/* Status/Result Display */}
-          {currentPoints.length === 0 && measurements.length === 0 && (
+          {currentPoints.length === 0 && measurements.length === 0 && measurementMode && (
             <View className="flex-row items-center mb-3">
               <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
               <Text className="ml-3 text-gray-700 font-medium flex-1">
-                {mode === 'distance' ? 'Press firmly to lock & place 2 points' : 'Press firmly to lock & place 3 points'}
+                {mode === 'distance' ? 'Tap to place 2 points' : 'Tap to place 3 points (vertex in center)'}
               </Text>
             </View>
           )}
@@ -729,9 +777,9 @@ export default function DimensionOverlay({
             <View className="flex-row items-center mb-3">
               <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : 'bg-green-500'}`} />
               <Text className="ml-3 text-gray-700 font-medium">
-                {mode === 'distance' && currentPoints.length === 1 && 'Press firmly for point 2'}
-                {mode === 'angle' && currentPoints.length === 1 && 'Press firmly on vertex (center)'}
-                {mode === 'angle' && currentPoints.length === 2 && 'Press firmly for point 3'}
+                {mode === 'distance' && currentPoints.length === 1 && 'Tap for point 2'}
+                {mode === 'angle' && currentPoints.length === 1 && 'Tap on vertex (center point)'}
+                {mode === 'angle' && currentPoints.length === 2 && 'Tap for point 3'}
               </Text>
             </View>
           )}
