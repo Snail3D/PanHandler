@@ -2,11 +2,11 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useEffect, useState } from "react";
-import * as StoreReview from 'expo-store-review';
+// import { useEffect, useState } from "react";
+// import * as StoreReview from 'expo-store-review';
 import MeasurementScreen from "./src/screens/MeasurementScreen";
-import RatingPromptModal from "./src/components/RatingPromptModal";
-import useStore from "./src/state/measurementStore";
+// import RatingPromptModal from "./src/components/RatingPromptModal";
+// import useStore from "./src/state/measurementStore";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -30,62 +30,63 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
-  const [showRatingPrompt, setShowRatingPrompt] = useState(false);
-  const sessionCount = useStore((s) => s.sessionCount);
-  const hasRatedApp = useStore((s) => s.hasRatedApp);
-  const lastRatingPromptDate = useStore((s) => s.lastRatingPromptDate);
-  const incrementSessionCount = useStore((s) => s.incrementSessionCount);
-  const setHasRatedApp = useStore((s) => s.setHasRatedApp);
-  const setLastRatingPromptDate = useStore((s) => s.setLastRatingPromptDate);
+  // RATING PROMPT TEMPORARILY DISABLED - Will work in production build
+  // const [showRatingPrompt, setShowRatingPrompt] = useState(false);
+  // const sessionCount = useStore((s) => s.sessionCount);
+  // const hasRatedApp = useStore((s) => s.hasRatedApp);
+  // const lastRatingPromptDate = useStore((s) => s.lastRatingPromptDate);
+  // const incrementSessionCount = useStore((s) => s.incrementSessionCount);
+  // const setHasRatedApp = useStore((s) => s.setHasRatedApp);
+  // const setLastRatingPromptDate = useStore((s) => s.setLastRatingPromptDate);
 
-  useEffect(() => {
-    // Increment session count on app start
-    incrementSessionCount();
+  // useEffect(() => {
+  //   // Increment session count on app start
+  //   incrementSessionCount();
 
-    // Check if we should show rating prompt
-    const shouldShowPrompt = async () => {
-      // Don't show if user has already rated
-      if (hasRatedApp) return;
+  //   // Check if we should show rating prompt
+  //   const shouldShowPrompt = async () => {
+  //     // Don't show if user has already rated
+  //     if (hasRatedApp) return;
 
-      // Show after 3-4 sessions
-      if (sessionCount >= 3 && sessionCount <= 4) {
-        // Check if we've shown prompt recently (wait 7 days between prompts)
-        if (lastRatingPromptDate) {
-          const lastPromptTime = new Date(lastRatingPromptDate).getTime();
-          const daysSinceLastPrompt = (Date.now() - lastPromptTime) / (1000 * 60 * 60 * 24);
-          if (daysSinceLastPrompt < 7) return;
-        }
+  //     // Show after 3-4 sessions
+  //     if (sessionCount >= 3 && sessionCount <= 4) {
+  //       // Check if we've shown prompt recently (wait 7 days between prompts)
+  //       if (lastRatingPromptDate) {
+  //         const lastPromptTime = new Date(lastRatingPromptDate).getTime();
+  //         const daysSinceLastPrompt = (Date.now() - lastPromptTime) / (1000 * 60 * 60 * 24);
+  //         if (daysSinceLastPrompt < 7) return;
+  //       }
 
-        // Check if store review is available
-        const isAvailable = await StoreReview.isAvailableAsync();
-        if (isAvailable) {
-          // Small delay before showing prompt
-          setTimeout(() => {
-            setShowRatingPrompt(true);
-          }, 2000);
-        }
-      }
-    };
+  //       // Check if store review is available
+  //       const isAvailable = await StoreReview.isAvailableAsync();
+  //       if (isAvailable) {
+  //         // Small delay before showing prompt
+  //         setTimeout(() => {
+  //           setShowRatingPrompt(true);
+  //         }, 2000);
+  //       }
+  //     }
+  //   };
 
-    shouldShowPrompt();
-  }, []);
+  //   shouldShowPrompt();
+  // }, []);
 
-  const handleRate = async () => {
-    setShowRatingPrompt(false);
-    setHasRatedApp(true);
-    setLastRatingPromptDate(new Date().toISOString());
-    
-    // Request in-app review (iOS 10.3+, Android 5.0+)
-    const isAvailable = await StoreReview.isAvailableAsync();
-    if (isAvailable) {
-      await StoreReview.requestReview();
-    }
-  };
+  // const handleRate = async () => {
+  //   setShowRatingPrompt(false);
+  //   setHasRatedApp(true);
+  //   setLastRatingPromptDate(new Date().toISOString());
+  //   
+  //   // Request in-app review (iOS 10.3+, Android 5.0+)
+  //   const isAvailable = await StoreReview.isAvailableAsync();
+  //   if (isAvailable) {
+  //     await StoreReview.requestReview();
+  //   }
+  // };
 
-  const handleDismiss = () => {
-    setShowRatingPrompt(false);
-    setLastRatingPromptDate(new Date().toISOString());
-  };
+  // const handleDismiss = () => {
+  //   setShowRatingPrompt(false);
+  //   setLastRatingPromptDate(new Date().toISOString());
+  // };
 
   // v2.2.2 - Fixed touch responder to allow pinch/pan with single-finger hold
   return (
@@ -95,11 +96,12 @@ export default function App() {
           <MeasurementScreen />
           <StatusBar style="auto" />
         </NavigationContainer>
-        <RatingPromptModal 
+        {/* Rating prompt will be enabled in production build */}
+        {/* <RatingPromptModal 
           visible={showRatingPrompt}
           onClose={handleDismiss}
           onRate={handleRate}
-        />
+        /> */}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
