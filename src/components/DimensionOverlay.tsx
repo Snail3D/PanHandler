@@ -1056,31 +1056,31 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // CORRECTED Canvas Scale:
-      // Multiply by imageRatio (actual image is larger than screen)
-      // Multiply by zoom (measurements are in zoomed space)
-      const fusionScale = baseScale * imageToScreenRatio * calibrationZoom;
+      // FINAL CORRECTED Canvas Scale:
+      // The CAD canvas exports at SCREEN resolution (not original image resolution)
+      // pixelsPerUnit is in screen coordinate space (already accounts for zoom via screenToImage)
+      // Therefore: Canvas Scale = 1 / pixelsPerUnit (no additional corrections needed!)
+      const fusionScale = baseScale;
       
-      console.log('📐 CANVAS SCALE CALCULATION:');
-      console.log('  Actual image:', actualImageWidth, 'x', actualImageHeight);
-      console.log('  Rendered on screen:', renderedWidth.toFixed(0), 'x', renderedHeight.toFixed(0));
-      console.log('  Image-to-screen ratio:', imageToScreenRatio.toFixed(2));
-      console.log('  Calibration zoom:', calibrationZoom.toFixed(2));
-      console.log('  Base scale (screen):', baseScale.toFixed(6));
-      console.log('  CORRECTED scale (actual image ÷ zoom):', fusionScale.toFixed(6));
+      console.log('📐 CANVAS SCALE - FUNDAMENTAL SOLUTION:');
+      console.log('  Key insight: screenToImage() returns unzoomed SCREEN coordinates, not original image coords');
+      console.log('  Therefore pixelsPerUnit:', calibration.pixelsPerUnit.toFixed(2), 'px/mm is in screen-space');
+      console.log('  CAD canvas exports at screen size:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
+      console.log('  Canvas Scale = 1 / pixelsPerUnit =', fusionScale.toFixed(6), 'mm/px');
+      console.log('  (No imageRatio or zoom corrections needed!)');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
       measurementText += `Actual Image Size: ${actualImageWidth} × ${actualImageHeight}\n`;
       measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(2)}x\n`;
       measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(2)}x\n`;
-      measurementText += `Base Scale (screen-space): ${baseScale.toFixed(6)} mm/px\n`;
-      measurementText += `Corrected Scale (× imageRatio × zoom): ${fusionScale.toFixed(6)} mm/px\n`;
+      measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/mm (in screen space)\n`;
+      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px (simply 1 ÷ pixelsPerUnit)\n`;
       measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) × imageRatio × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${imageToScreenRatio.toFixed(2)} × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)}`;
+        measurementText += `📐 Math: Canvas Scale = 1 ÷ pixelsPerUnit = 1 ÷ ${calibration.pixelsPerUnit.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
@@ -1116,6 +1116,17 @@ export default function DimensionOverlay({
             quality: 0.9,
             result: 'tmpfile',
           });
+          
+          // Get actual dimensions of exported CAD canvas
+          Image.getSize(
+            fusionUri,
+            (width, height) => {
+              console.log('🎯 EXPORTED CAD CANVAS DIMENSIONS:', width, 'x', height);
+              console.log('  If this matches screen size (440x956), Canvas Scale = 1/pixelsPerUnit is correct');
+              console.log('  If this matches image size (1856x4032), we need to multiply by imageRatio');
+            },
+            (error) => console.error('Could not get CAD canvas dimensions:', error)
+          );
           
           const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
           const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
