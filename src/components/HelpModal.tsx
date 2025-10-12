@@ -799,7 +799,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       • Labeled photo with all measurements
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      • Fusion 360 export (50% opacity)
+                      • CAD canvas photo (50% opacity)
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
                       • Original reference photo with scale
@@ -890,18 +890,18 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Pressable>
               </ExpandableSection>
 
-              {/* Fusion 360 Tutorial - Expandable */}
+              {/* CAD Import Tutorial - Expandable */}
               <ExpandableSection
-                title="🔧 Fusion 360 Import Tutorial"
+                title="🔧 CAD Import Guide"
                 icon="construct"
                 color="#FF9500"
                 delay={500}
               >
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
-                  Step-by-Step: Import to Fusion 360
+                  Import to Any CAD Software
                 </Text>
-                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 16 }}>
-                  Use the Fusion 360 Export image to trace your measurements perfectly in CAD software.
+                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 16 }}>
+                  Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images.
                 </Text>
                 
                 <View style={{ marginBottom: 14 }}>
@@ -911,10 +911,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Open Fusion 360
+                        Open Your CAD Software
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
-                        Create a new design or open an existing project where you want to import the reference image.
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Create a new project or open an existing design
                       </Text>
                     </View>
                   </View>
@@ -929,8 +929,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Insert Canvas Image
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
-                        Go to <Text style={{ fontWeight: '600' }}>Insert {`>`} Canvas</Text> from the toolbar. Select your Fusion 360 export image from PanHandler.
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Import the CAD Canvas Photo from PanHandler as a canvas or reference image
                       </Text>
                     </View>
                   </View>
@@ -945,12 +945,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Set Canvas Scale
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginBottom: 8 }}>
-                        Right-click the canvas image and select <Text style={{ fontWeight: '600' }}>Calibrate</Text>. Look at the scale note on your exported photo.
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                        Use the scale value shown on the photo to calibrate your canvas
                       </Text>
                       <View style={{ backgroundColor: 'rgba(255,149,0,0.1)', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
                         <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
-                          <Text style={{ fontWeight: '700' }}>Example:</Text> If the scale note says "Canvas Scale: 0.0412", enter 0.0412 for both X and Y scale values.
+                          <Text style={{ fontWeight: '700' }}>Example:</Text> If the photo shows "Canvas Scale: 0.0412", enter this value in your CAD software's canvas calibration settings
                         </Text>
                       </View>
                     </View>
@@ -958,32 +958,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </View>
 
                 <View style={{ marginBottom: 14 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                       <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>4</Text>
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Position & Align
-                      </Text>
-                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
-                        Use the center crosshairs visible in the image to align your canvas to the origin point (0,0) in Fusion 360 for perfect positioning.
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{ marginBottom: 14 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>5</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Trace & Model
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
-                        Now you can trace over the 50% opacity image using sketches, lines, circles, and other CAD tools. All measurements will be perfectly scaled!
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Trace over the 50% opacity image using your CAD tools. All measurements are perfectly scaled!
                       </Text>
                     </View>
                   </View>
@@ -997,7 +981,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
-                    The 50% opacity makes it easy to see your CAD lines while still having the reference visible. You can adjust canvas opacity in Fusion 360 if needed!
+                    The 50% opacity makes it easy to see your CAD lines while still having the reference visible
                   </Text>
                 </View>
               </ExpandableSection>
@@ -1062,7 +1046,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <ComparisonRow feature="Measurements" free="∞" pro="∞" />
                     <ComparisonRow feature="All Measurement Types" free="✓" pro="✓" />
                     <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
-                    <ComparisonRow feature="Fusion 360 Export" free="✓" pro="✓" last />
+                    <ComparisonRow feature="CAD Canvas Photo" free="✓" pro="✓" last />
                   </View>
 
                   {/* Price */}
@@ -1210,41 +1194,42 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                     <Ionicons name="star" size={22} color="#FFCC00" />
                     <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
-                      🎯 Amazing Accuracy!
+                      🎯 Amazing Accuracy
                     </Text>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 14, textAlign: 'center' }}>
                     PanHandler achieves{' '}
                     <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>
                       ~0.2 mm accuracy
                     </Text>
-                    {' '}(or better) with small objects!
+                    {'\n'}with small objects
                   </Text>
                   
                   <View style={{ 
                     backgroundColor: 'rgba(255,204,0,0.08)', 
                     borderRadius: 12, 
-                    padding: 12, 
+                    padding: 14, 
                     borderWidth: 0.5, 
-                    borderColor: 'rgba(255,204,0,0.2)' 
+                    borderColor: 'rgba(255,204,0,0.2)',
+                    gap: 6,
                   }}>
-                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 6, fontWeight: '600' }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', marginBottom: 4, fontWeight: '600', textAlign: 'center' }}>
                       📐 That's approximately:
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
-                      • 0.0079 inches (less than 1/100th of an inch!)
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
+                      • 1/100th of an inch
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
-                      • Thickness of 2-3 sheets of paper
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
+                      • 2-3 sheets of paper
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
                       • Width of a human hair
                     </Text>
                   </View>
 
-                  <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', marginTop: 12, lineHeight: 18 }}>
-                    💡 Pro tip: Use higher resolution photos and proper lighting for maximum accuracy!
+                  <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', marginTop: 12, lineHeight: 18, textAlign: 'center' }}>
+                    💡 Tip: Higher resolution photos = better accuracy
                   </Text>
                 </Animated.View>
               </View>
