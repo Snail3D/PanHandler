@@ -1,4 +1,5 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
+// CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
@@ -80,6 +81,9 @@ export default function DimensionOverlay({
   zoomTranslateY = 0,
   viewRef: externalViewRef
 }: DimensionOverlayProps = {}) {
+  // CACHE BUST v4.0 - Verify new bundle is loaded
+  console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
+  
   const insets = useSafeAreaInsets();
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
@@ -328,8 +332,9 @@ export default function DimensionOverlay({
   };
   
   // Tetris animation trigger - EPIC GAME OVER sequence!
-  // Static Tetris animation - simple fade in/out
+  // Static Tetris animation - simple fade in/out (v4.0)
   const triggerTetrisAnimation = () => {
+    console.log('🎮 STATIC TETRIS v4.0 - Simple fade animation');
     setShowTetris(true);
     
     // Success haptic
