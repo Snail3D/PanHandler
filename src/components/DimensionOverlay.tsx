@@ -1096,25 +1096,33 @@ export default function DimensionOverlay({
               Math.pow(pageY - lastHapticPosition.y, 2)
             );
             
-            if (distance >= HAPTIC_DISTANCE) {
-              const currentTime = Date.now();
-              const timeDelta = currentTime - lastHapticTime;
-              
-              // Calculate speed (pixels per millisecond)
-              const speed = distance / Math.max(timeDelta, 1);
-              
-              // Adaptive haptic intensity:
-              // - Slow movements (speed < 0.5 px/ms): Medium intensity for precision
-              // - Medium movements (0.5-2 px/ms): Light intensity
-              // - Fast movements (> 2 px/ms): Very light/no haptic to avoid overwhelming
-              if (speed < 0.5) {
-                // Micro adjustments - more intense feedback
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              } else if (speed < 2) {
-                // Normal movements - light feedback
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }
-              // Fast swipes - no haptic (skip feedback)
+            const currentTime = Date.now();
+            const timeDelta = currentTime - lastHapticTime;
+            
+            // Calculate speed (pixels per millisecond)
+            const speed = distance / Math.max(timeDelta, 1);
+            
+            // Dynamic haptic distance based on speed:
+            // - Fast movements: larger distance between haptics (slow tick...tick...tick)
+            // - Slow movements: smaller distance between haptics (fast tickticktick)
+            let dynamicHapticDistance;
+            if (speed < 0.3) {
+              // Very slow/precise - frequent ticks
+              dynamicHapticDistance = 2;  // tick tick tick tick tick
+            } else if (speed < 0.8) {
+              // Medium slow - moderate ticks
+              dynamicHapticDistance = 5;  // tick tick tick
+            } else if (speed < 2) {
+              // Medium fast - slower ticks
+              dynamicHapticDistance = 15; // tick...tick...tick
+            } else {
+              // Very fast - very slow ticks
+              dynamicHapticDistance = 30; // tick.....tick.....tick
+            }
+            
+            if (distance >= dynamicHapticDistance) {
+              // Use light haptic for all movement feedback
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               
               setLastHapticPosition({ x: pageX, y: pageY });
               setLastHapticTime(currentTime);
