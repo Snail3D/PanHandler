@@ -173,6 +173,15 @@ export default function DimensionOverlay({
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   
+  // Animated styles for quote overlay
+  const quoteBackgroundStyle = useAnimatedStyle(() => ({
+    backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
+  }));
+  
+  const quoteContentStyle = useAnimatedStyle(() => ({
+    opacity: quoteOpacity.value,
+  }));
+  
   // Easter egg states
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
@@ -200,8 +209,12 @@ export default function DimensionOverlay({
     setQuoteTapCount(0);
     setShowQuote(true);
     
-    // Fade in overlay
-    quoteOpacity.value = withTiming(1, { duration: 300 });
+    // Smooth fade in with spring physics for buttery smoothness
+    quoteOpacity.value = withSpring(1, {
+      damping: 20,
+      stiffness: 90,
+      mass: 0.5,
+    });
     
     // Type out the quote text
     const fullText = `"${quote.text}"`;
@@ -228,7 +241,10 @@ export default function DimensionOverlay({
   };
   
   const dismissQuote = () => {
-    quoteOpacity.value = withTiming(0, { duration: 400 }, () => {
+    quoteOpacity.value = withTiming(0, { 
+      duration: 500,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1) // Smooth deceleration
+    }, () => {
       runOnJS(setShowQuote)(false);
       runOnJS(setCurrentQuote)(null);
       runOnJS(setDisplayedText)('');
@@ -3282,40 +3298,50 @@ export default function DimensionOverlay({
         animationType="none"
         onRequestClose={dismissQuote}
       >
-        <Pressable
-          onPress={handleQuoteTap}
-          style={{
-            flex: 1,
-            backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 40,
-          }}
+        <Animated.View
+          style={[
+            {
+              flex: 1,
+            },
+            quoteBackgroundStyle
+          ]}
         >
-          <Animated.View
+          <Pressable
+            onPress={handleQuoteTap}
             style={{
-              opacity: quoteOpacity.value,
-              maxWidth: 600,
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 40,
             }}
           >
-            <Text
-              style={{
-                color: '#FFFFFF',
-                fontSize: 20,
-                fontWeight: '400',
-                textAlign: 'center',
-                lineHeight: 32,
-                textShadowColor: 'rgba(255, 255, 255, 0.3)',
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 10,
-                fontFamily: 'System',
-                letterSpacing: 0.5,
-              }}
+            <Animated.View
+              style={[
+                {
+                  maxWidth: 600,
+                },
+                quoteContentStyle
+              ]}
             >
-              {displayedText}
-            </Text>
-          </Animated.View>
-        </Pressable>
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  fontSize: 20,
+                  fontWeight: '400',
+                  textAlign: 'center',
+                  lineHeight: 32,
+                  textShadowColor: 'rgba(255, 255, 255, 0.3)',
+                  textShadowOffset: { width: 0, height: 0 },
+                  textShadowRadius: 10,
+                  fontFamily: 'System',
+                  letterSpacing: 0.5,
+                }}
+              >
+                {displayedText}
+              </Text>
+            </Animated.View>
+          </Pressable>
+        </Animated.View>
       </Modal>
       
       {/* Tetris Easter Egg Overlay */}
