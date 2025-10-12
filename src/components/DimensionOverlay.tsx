@@ -704,6 +704,12 @@ export default function DimensionOverlay({
   // Help modal
   const [showHelpModal, setShowHelpModal] = useState(false);
   
+  // Menu slide-to-hide with side tab
+  const [menuHidden, setMenuHidden] = useState(false);
+  const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
+  const menuTranslateX = useSharedValue(0);
+  const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  
   // Handle label modal completion
   const handleLabelComplete = (label: string | null) => {
     setShowLabelModal(false);
@@ -721,12 +727,6 @@ export default function DimensionOverlay({
     setShowLabelModal(false);
     setPendingAction(null);
   };
-  
-  // Menu slide-to-hide with side tab
-  const [menuHidden, setMenuHidden] = useState(false);
-  const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
-  const menuTranslateX = useSharedValue(0);
-  const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   
   // Animated style for menu sliding
   const menuAnimatedStyle = useAnimatedStyle(() => ({
