@@ -821,28 +821,30 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     Alert.alert(
                       '🤓 The Nerdy Stuff: Scale Calculations',
                       'HOW PANHANDLER CALCULATES PRECISE MEASUREMENTS:\n\n' +
-                      '1️⃣ CALIBRATION PHASE:\n' +
-                      'When you align the calibration circle to your coin, PanHandler measures the circle diameter in pixels (e.g., 1000 px).\n\n' +
-                      '2️⃣ PIXELS PER UNIT:\n' +
-                      'pixelsPerUnit = coin_diameter_pixels ÷ coin_diameter_mm\n' +
-                      'Example: 1000 px ÷ 24.26mm = 41.23 px/mm\n\n' +
+                      '1️⃣ CALIBRATION SETUP:\n' +
+                      'You zoom the photo until the coin matches the reference circle on screen (200px diameter).\n\n' +
+                      '2️⃣ CALCULATING PIXELS PER UNIT:\n' +
+                      'originalCoinSize = (200px ÷ zoomScale)\n' +
+                      'pixelsPerUnit = originalCoinSize ÷ actualCoinSize\n' +
+                      'Example: (200px ÷ 2x zoom) ÷ 24.26mm = 100px ÷ 24.26mm = 4.12 px/mm\n\n' +
                       '3️⃣ DISTANCE MEASUREMENTS:\n' +
-                      'distance_mm = √((x₂-x₁)² + (y₂-y₁)²) ÷ pixelsPerUnit\n' +
-                      'This converts pixel distance to real-world units.\n\n' +
+                      'pixelDistance = √((x₂-x₁)² + (y₂-y₁)²)\n' +
+                      'realDistance = pixelDistance ÷ pixelsPerUnit\n' +
+                      'Example: 412px ÷ 4.12 px/mm = 100mm\n\n' +
                       '4️⃣ CAD CANVAS SCALE:\n' +
-                      'Canvas Scale = pixelsPerUnit (directly!)\n' +
-                      'Most CAD software expects: pixels per mm or pixels per inch\n' +
-                      'Example: 41.23 px/mm\n\n' +
+                      'Canvas Scale = pixelsPerUnit\n' +
+                      'This tells CAD software: "Every X pixels = 1mm"\n' +
+                      'Import photo → Set canvas scale to this value → Perfect 1:1 scale!\n\n' +
                       '5️⃣ ANGLE MEASUREMENTS:\n' +
-                      'angle = atan2(y₃-y₂, x₃-x₂) - atan2(y₁-y₂, x₁-x₂)\n' +
-                      'Converted to degrees: angle × (180/π)\n\n' +
-                      '6️⃣ CIRCLE MEASUREMENTS:\n' +
-                      'radius_px = √((x_edge-x_center)² + (y_edge-y_center)²)\n' +
-                      'radius_mm = radius_px ÷ pixelsPerUnit\n' +
-                      'diameter = radius × 2\n\n' +
+                      'angle₁ = atan2(y₁-y₂, x₁-x₂)\n' +
+                      'angle₂ = atan2(y₃-y₂, x₃-x₂)\n' +
+                      'finalAngle = |angle₂ - angle₁| × (180/π)\n\n' +
+                      '6️⃣ CIRCLE & RECTANGLE:\n' +
+                      'Circle: radius = √((x-cx)² + (y-cy)²) ÷ pixelsPerUnit\n' +
+                      'Rectangle: width/height = pixelSize ÷ pixelsPerUnit\n\n' +
                       'WHY THIS WORKS:\n' +
-                      'By using a known reference (coin), we establish a pixel-to-millimeter ratio that remains constant across the entire photo. All measurements use this ratio for accurate real-world dimensions!\n\n' +
-                      '🎯 TIP: Higher resolution photos = more accurate measurements!'
+                      'The coin creates a pixel-to-mm ratio that stays constant across the entire photo (assuming flat, parallel surface). All measurements use this ratio for accurate real-world dimensions!\n\n' +
+                      '🎯 TIP: Higher resolution photos = more pixels per mm = better precision!'
                     );
                   }}
                   style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#F0F4FF', borderRadius: 8, alignSelf: 'flex-start' }}
