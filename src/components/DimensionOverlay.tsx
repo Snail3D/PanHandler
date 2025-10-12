@@ -2469,7 +2469,7 @@ export default function DimensionOverlay({
             }}
             style={{
               marginTop: 8,
-              paddingVertical: 6,
+              paddingVertical: 3,
               alignItems: 'center',
             }}
           >
