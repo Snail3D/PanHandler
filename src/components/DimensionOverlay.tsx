@@ -668,11 +668,13 @@ export default function DimensionOverlay({
         measurementText += `(Insert > Canvas > Select Face > Set Scale X and Y to this value)`;
       }
       
-      // Add footer
-      measurementText += '\n\n\n';
-      measurementText += '═══════════════════════════\n';
-      measurementText += '   Made with the PanHandler App on iOS\n';
-      measurementText += '═══════════════════════════';
+      // Add footer (only for non-Pro users)
+      if (!isProUser) {
+        measurementText += '\n\n\n';
+        measurementText += '═══════════════════════════\n';
+        measurementText += '   Made with the PanHandler App on iOS\n';
+        measurementText += '═══════════════════════════';
+      }
 
       console.log('📧 Opening email composer...');
       
@@ -1851,6 +1853,38 @@ export default function DimensionOverlay({
                   </View>
                 );
               })}
+            </View>
+          )}
+          
+          {/* "Made with PanHandler" banner - bottom center (only when capturing/saving) */}
+          {!isCapturing && !isProUser && (
+            <View
+              style={{
+                position: 'absolute',
+                bottom: insets.bottom + 20,
+                left: 0,
+                right: 0,
+                alignItems: 'center',
+              }}
+              pointerEvents="none"
+            >
+              <View
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 6,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '500' }}>
+                  Made with PanHandler
+                </Text>
+                <Text style={{ color: '#A0A0A0', fontSize: 9, fontWeight: '400', marginLeft: 6 }}>
+                  • Remove with Pro
+                </Text>
+              </View>
             </View>
           )}
       </View>
