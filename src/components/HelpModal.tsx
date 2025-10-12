@@ -372,35 +372,55 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     borderColor: 'rgba(76,175,80,0.2)',
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="flash" size={18} color="#34C759" />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                    <Ionicons name="flash" size={20} color="#34C759" />
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
                       AUTO LEVEL Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
-                    Enable Auto Level in camera for hands-free capture in portrait OR landscape orientation! The app monitors your device angle and stability in real-time.
-                  </Text>
-                  <View style={{ marginLeft: 8 }}>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
-                      • <Text style={{ fontWeight: '600' }}>Hold (press and hold) the shutter button</Text> - Don't just tap, keep it pressed down
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
-                      • <Text style={{ fontWeight: '600' }}>Watch the color indicator</Text> - Red (too tilted) → Yellow (close) → Green (perfect alignment)
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
-                      • <Text style={{ fontWeight: '600' }}>Works horizontally OR vertically</Text> - Orient your phone perpendicular (90°) to surface in either direction
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
-                      • <Text style={{ fontWeight: '600' }}>Hold steady when green</Text> - A 3-second countdown begins automatically
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                      • <Text style={{ fontWeight: '600' }}>Photo captures automatically</Text> - No need to tap, just keep holding steady!
-                    </Text>
+                  
+                  {/* Visual: Finger holding button */}
+                  <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <Text style={{ fontSize: 32 }}>👆</Text>
+                      <View style={{
+                        backgroundColor: 'rgba(52,199,89,0.15)',
+                        paddingHorizontal: 16,
+                        paddingVertical: 10,
+                        borderRadius: 24,
+                        borderWidth: 2,
+                        borderColor: '#34C759',
+                      }}>
+                        <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32' }}>HOLD SHUTTER</Text>
+                      </View>
+                    </View>
                   </View>
+                  
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 10, textAlign: 'center' }}>
+                    Press and hold the shutter button for hands-free capture
+                  </Text>
+                  
+                  {/* Color indicator flow */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                    <View style={{ alignItems: 'center' }}>
+                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#FF3B30' }} />
+                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Too tilted</Text>
+                    </View>
+                    <Text style={{ fontSize: 18, marginHorizontal: 8, color: '#8E8E93' }}>→</Text>
+                    <View style={{ alignItems: 'center' }}>
+                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#FFCC00' }} />
+                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Close</Text>
+                    </View>
+                    <Text style={{ fontSize: 18, marginHorizontal: 8, color: '#8E8E93' }}>→</Text>
+                    <View style={{ alignItems: 'center' }}>
+                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#34C759' }} />
+                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Perfect!</Text>
+                    </View>
+                  </View>
+                  
                   <View style={{ marginTop: 8, backgroundColor: 'rgba(76,175,80,0.12)', borderRadius: 8, padding: 10 }}>
-                    <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic' }}>
-                      💡 Tip: If you move during countdown, it will cancel and restart when you're steady again
+                    <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic', textAlign: 'center' }}>
+                      💡 Green = Auto countdown starts → Photo captures automatically
                     </Text>
                   </View>
                 </View>
@@ -550,50 +570,57 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 color="#FF3B30"
                 delay={300}
               >
-                <View style={{ marginLeft: 4 }}>
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      🗺️ Pan/Zoom Mode
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      Pinch to zoom, drag to pan around the image. Perfect for exploring your photo before measuring.
-                    </Text>
+                <View style={{ gap: 12 }}>
+                  {/* Pan/Zoom */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>🗺️</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Pan/Zoom Mode
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Pinch to zoom, drag to pan
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      📏 Measure Mode
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      Tap to place measurement points with the floating precision cursor. Pan/zoom automatically locks after placing your first point for maximum precision. Switch back to Pan mode to zoom/reposition before placing your next measurement.
-                    </Text>
+                  {/* Measure */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>📏</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Measure Mode
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Tap to place points with precision cursor
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      📍 Precision Cursor Helper
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      A floating crosshair cursor appears above your finger when placing measurements. It's color-coded to match your next measurement and shows exactly where the point will be placed. The label above tells you which point you're placing (Point 1, Point 2, etc.). The yellow center dot indicates the exact placement location.
-                    </Text>
+                  {/* Cursor */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>🎯</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Precision Cursor
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Floating crosshair shows exactly where points will be placed
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      ✨ Center Alignment Guides
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      Subtle white crosshairs appear in Pan mode after calibration to help center your object for CAD software import. These guides help you position objects at the origin (0,0) for perfect alignment in Fusion 360 and other CAD tools.
-                    </Text>
-                  </View>
-
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      🎨 Color-Coded Measurements
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginLeft: 8 }}>
-                      Each measurement gets a unique vibrant color. Check the legend in the corner to identify them!
-                    </Text>
+                  {/* Colors */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>🎨</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Color-Coded
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Each measurement gets a unique color
+                      </Text>
+                    </View>
                   </View>
 
                   {/* Visual Sample */}
