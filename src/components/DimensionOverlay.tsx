@@ -2213,7 +2213,7 @@ export default function DimensionOverlay({
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   {/* Custom distance icon: two points with line */}
-                  <Svg width={16} height={16} viewBox="0 0 16 16">
+                  <Svg width={18} height={18} viewBox="0 0 16 16">
                     <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
                     <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
                     <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
@@ -2222,7 +2222,7 @@ export default function DimensionOverlay({
                     marginLeft: 4,
                     textAlign: 'center',
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: 12,
                     color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Distance
@@ -2245,7 +2245,7 @@ export default function DimensionOverlay({
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   {/* Custom angle icon: 45 degree acute angle with arc and measurement marks */}
-                  <Svg width={16} height={16} viewBox="0 0 16 16">
+                  <Svg width={18} height={18} viewBox="0 0 16 16">
                     {/* Acute angle lines - 45 degrees */}
                     <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
                     <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
@@ -2259,7 +2259,7 @@ export default function DimensionOverlay({
                     marginLeft: 4,
                     textAlign: 'center',
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: 12,
                     color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Angle
@@ -2287,14 +2287,14 @@ export default function DimensionOverlay({
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons 
                     name="ellipse-outline" 
-                    size={16} 
+                    size={18} 
                     color={mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'} 
                   />
                   <Text style={{
                     marginLeft: 4,
                     textAlign: 'center',
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: 12,
                     color: mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Circle
@@ -2318,14 +2318,14 @@ export default function DimensionOverlay({
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons 
                     name="square-outline" 
-                    size={16} 
+                    size={18} 
                     color={mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'} 
                   />
                   <Text style={{
                     marginLeft: 4,
                     textAlign: 'center',
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: 12,
                     color: mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Box
