@@ -1688,7 +1688,7 @@ export default function DimensionOverlay({
             
             return (
               <React.Fragment key={`${measurement.id}-sides`}>
-                {/* Width label on left side */}
+                {/* Width label on left side (vertical dimension) */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1711,12 +1711,12 @@ export default function DimensionOverlay({
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
-                      W: {widthLabel}
+                      W: {heightLabel}
                     </Text>
                   </View>
                 </View>
                 
-                {/* Height label on top side */}
+                {/* Length label on top side (horizontal dimension) */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1739,7 +1739,7 @@ export default function DimensionOverlay({
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
-                      H: {heightLabel}
+                      L: {widthLabel}
                     </Text>
                   </View>
                 </View>
