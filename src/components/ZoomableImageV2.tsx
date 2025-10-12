@@ -72,8 +72,9 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      translateX.value = savedTranslateX.value + event.translationX;
-      translateY.value = savedTranslateY.value + event.translationY;
+      // Reduce sensitivity by 30% (multiply by 0.7)
+      translateX.value = savedTranslateX.value + event.translationX * 0.7;
+      translateY.value = savedTranslateY.value + event.translationY * 0.7;
     })
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
