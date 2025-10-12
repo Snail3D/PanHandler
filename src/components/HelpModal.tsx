@@ -832,9 +832,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       'realDistance = pixelDistance ÷ pixelsPerUnit\n' +
                       'Example: 412px ÷ 4.12 px/mm = 100mm\n\n' +
                       '4️⃣ CAD CANVAS SCALE:\n' +
-                      'Canvas Scale = pixelsPerUnit\n' +
-                      'This tells CAD software: "Every X pixels = 1mm"\n' +
-                      'Import photo → Set canvas scale to this value → Perfect 1:1 scale!\n\n' +
+                      'Canvas Scale = 1 ÷ pixelsPerUnit\n' +
+                      'This gives you mm/px (millimeters per pixel)\n' +
+                      'Example: 1 ÷ 4.12 px/mm = 0.2427 mm/px\n' +
+                      'Import photo → Set Scale X/Y to this value → Perfect 1:1!\n\n' +
                       '5️⃣ ANGLE MEASUREMENTS:\n' +
                       'angle₁ = atan2(y₁-y₂, x₁-x₂)\n' +
                       'angle₂ = atan2(y₃-y₂, x₃-x₂)\n' +
