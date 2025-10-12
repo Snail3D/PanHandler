@@ -1002,18 +1002,76 @@ export default function DimensionOverlay({
         if (coinCircle) {
           measurementText += ` (${coinCircle.coinName})`;
         }
-        // CAD Canvas should use the ORIGINAL image, not zoomed screen view
-        // The measurements are in original image space, so scale should match
-        const fusionScale = 1 / calibration.pixelsPerUnit;
-        
-        // Add debug info to email
-        measurementText += `\n\n=== DEBUG INFO ===\n`;
-        measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
-        measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
+      // CRITICAL FIX: Get actual image dimensions for correct Canvas Scale
+      // The pixelsPerUnit is calculated for screen-space rendering, but CAD imports the full-res image
+      let actualImageWidth = SCREEN_WIDTH;
+      let actualImageHeight = SCREEN_HEIGHT;
+      
+      if (currentImageUri) {
+        try {
+          // Get actual image dimensions synchronously-ish using a promise
+          await new Promise<void>((resolve) => {
+            Image.getSize(
+              currentImageUri,
+              (width, height) => {
+                actualImageWidth = width;
+                actualImageHeight = height;
+                console.log('✅ Got actual image dimensions:', width, 'x', height);
+                resolve();
+              },
+              (error) => {
+                console.error('❌ Failed to get image size:', error);
+                resolve(); // Continue anyway with screen dimensions
+              }
+            );
+          });
+        } catch (error) {
+          console.error('Error getting image dimensions:', error);
+        }
+      }
+      
+      // Calculate how the image is rendered on screen with resizeMode="contain"
+      const imageAspect = actualImageWidth / actualImageHeight;
+      const screenAspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+      
+      let renderedWidth, renderedHeight;
+      if (imageAspect > screenAspect) {
+        // Image is wider - constrained by width
+        renderedWidth = SCREEN_WIDTH;
+        renderedHeight = SCREEN_WIDTH / imageAspect;
+      } else {
+        // Image is taller - constrained by height
+        renderedHeight = SCREEN_HEIGHT;
+        renderedWidth = SCREEN_HEIGHT * imageAspect;
+      }
+      
+      // The scale factor between actual image and rendered size
+      const imageToScreenRatio = actualImageWidth / renderedWidth;
+      
+      // Base Canvas Scale (for screen-space)
+      const baseScale = 1 / calibration.pixelsPerUnit;
+      
+      // CORRECTED Canvas Scale (for actual image file)
+      const fusionScale = baseScale * imageToScreenRatio;
+      
+      console.log('📐 CANVAS SCALE CALCULATION:');
+      console.log('  Actual image:', actualImageWidth, 'x', actualImageHeight);
+      console.log('  Rendered on screen:', renderedWidth.toFixed(0), 'x', renderedHeight.toFixed(0));
+      console.log('  Image-to-screen ratio:', imageToScreenRatio.toFixed(2));
+      console.log('  Base scale (screen):', baseScale.toFixed(6));
+      console.log('  CORRECTED scale (actual image):', fusionScale.toFixed(6));
+      
+      measurementText += `\n\n=== DEBUG INFO ===\n`;
+      measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
+      measurementText += `Actual Image Size: ${actualImageWidth} × ${actualImageHeight}\n`;
+      measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(2)}x\n`;
+      measurementText += `Base Scale (screen-space): ${baseScale.toFixed(6)} mm/px\n`;
+      measurementText += `Corrected Scale (actual image): ${fusionScale.toFixed(6)} mm/px\n`;
+      measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Scale = 1 ÷ pixelsPerUnit = 1 ÷ ${calibration.pixelsPerUnit.toFixed(2)} = ${fusionScale.toFixed(6)}`;
+        measurementText += `📐 Math: Scale = (1 ÷ pixelsPerUnit) × imageToScreenRatio = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${imageToScreenRatio.toFixed(2)} = ${fusionScale.toFixed(6)}`;
       }
       
       // Add footer (only for non-Pro users)
