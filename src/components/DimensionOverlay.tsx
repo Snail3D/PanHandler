@@ -1300,7 +1300,11 @@ export default function DimensionOverlay({
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
               <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>Release to place</Text>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                  {mode === 'circle' && currentPoints.length === 0 && 'Center of circle'}
+                  {mode === 'circle' && currentPoints.length === 1 && 'Outside of circle'}
+                  {mode !== 'circle' && 'Release to place'}
+                </Text>
               </View>
             </View>
           );
@@ -2301,18 +2305,23 @@ export default function DimensionOverlay({
             <View className="flex-row items-center mb-3">
               <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
               <Text className="ml-3 text-gray-700 font-medium flex-1">
-                {mode === 'distance' ? 'Tap to place 2 points' : 'Tap to place 3 points (vertex in center)'}
+                {mode === 'distance' && 'Tap to place 2 points'}
+                {mode === 'angle' && 'Tap to place 3 points (vertex in center)'}
+                {mode === 'circle' && 'Tap center, then tap edge of circle'}
+                {mode === 'rectangle' && 'Tap to place 2 corners'}
               </Text>
             </View>
           )}
           
           {currentPoints.length > 0 && currentPoints.length < requiredPoints && (
             <View className="flex-row items-center mb-3">
-              <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : 'bg-green-500'}`} />
+              <View className={`w-3 h-3 rounded-full ${mode === 'distance' ? 'bg-blue-500' : mode === 'circle' ? 'bg-red-500' : 'bg-green-500'}`} />
               <Text className="ml-3 text-gray-700 font-medium">
                 {mode === 'distance' && currentPoints.length === 1 && 'Tap for point 2'}
                 {mode === 'angle' && currentPoints.length === 1 && 'Tap on vertex (center point)'}
                 {mode === 'angle' && currentPoints.length === 2 && 'Tap for point 3'}
+                {mode === 'circle' && currentPoints.length === 1 && 'Tap outside edge of circle'}
+                {mode === 'rectangle' && currentPoints.length === 1 && 'Tap opposite corner'}
               </Text>
             </View>
           )}
