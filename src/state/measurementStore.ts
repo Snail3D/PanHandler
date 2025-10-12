@@ -39,6 +39,7 @@ interface MeasurementStore {
   unitSystem: UnitSystem;
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
+  isProUser: boolean; // Pro user status for paywall
   
   setImageUri: (uri: string | null) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
@@ -56,6 +57,7 @@ interface MeasurementStore {
   updatePointPosition: (pointId: string, x: number, y: number) => void;
   setUnitSystem: (system: UnitSystem) => void;
   setUserEmail: (email: string | null) => void;
+  setIsProUser: (isPro: boolean) => void;
 }
 
 const useStore = create<MeasurementStore>()(
@@ -73,6 +75,7 @@ const useStore = create<MeasurementStore>()(
       unitSystem: 'metric',
       lastSelectedCoin: null,
       userEmail: null,
+      isProUser: false,
 
       setImageUri: (uri) => set({ 
         currentImageUri: uri,
@@ -140,6 +143,8 @@ const useStore = create<MeasurementStore>()(
       setUnitSystem: (system) => set({ unitSystem: system }),
 
       setUserEmail: (email) => set({ userEmail: email }),
+
+      setIsProUser: (isPro) => set({ isProUser: isPro }),
     }),
     {
       name: 'measurement-settings',
@@ -148,6 +153,7 @@ const useStore = create<MeasurementStore>()(
         unitSystem: state.unitSystem,
         lastSelectedCoin: state.lastSelectedCoin,
         userEmail: state.userEmail, // Persist user email
+        isProUser: state.isProUser, // Persist pro status
         // Persist current work session
         currentImageUri: state.currentImageUri,
         imageOrientation: state.imageOrientation,
