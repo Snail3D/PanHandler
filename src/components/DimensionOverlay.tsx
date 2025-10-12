@@ -2024,53 +2024,58 @@ export default function DimensionOverlay({
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
                 
-                {/* Header with undo and collapse button */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  {/* Undo button - only show if there are measurements or current points */}
-                  {(measurements.length > 0 || currentPoints.length > 0) ? (
+                {/* Header with centered undo button */}
+                <View style={{ marginBottom: 8 }}>
+                  {/* Top row: Hide menu text and button */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
+                      Hide menu
+                    </Text>
                     <Pressable
-                      onPress={handleClear}
+                      onPress={collapseMenu}
                       style={{
-                        flexDirection: 'row',
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                        justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                        borderRadius: 8,
-                        paddingVertical: 5,
-                        paddingHorizontal: 10,
-                        borderWidth: 0.5,
-                        borderColor: 'rgba(0, 0, 0, 0.08)',
                       }}
                     >
-                      <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
-                      <Text style={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        fontWeight: '600',
-                        fontSize: 14,
-                        marginLeft: 5,
-                      }}>
-                        {measurements.length > 0 
-                          ? `Undo (${measurements.length})` 
-                          : 'Clear'}
-                      </Text>
+                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
                     </Pressable>
-                  ) : (
-                    <View />
-                  )}
+                  </View>
                   
-                  {/* Collapse button - chevron only */}
-                  <Pressable
-                    onPress={collapseMenu}
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 14,
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
-                  </Pressable>
+                  {/* Center row: Undo button - only show if there are measurements or current points */}
+                  {(measurements.length > 0 || currentPoints.length > 0) && (
+                    <View style={{ alignItems: 'center' }}>
+                      <Pressable
+                        onPress={handleClear}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                          borderRadius: 8,
+                          paddingVertical: 5,
+                          paddingHorizontal: 10,
+                          borderWidth: 0.5,
+                          borderColor: 'rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
+                        <Text style={{
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          fontWeight: '600',
+                          fontSize: 14,
+                          marginLeft: 5,
+                        }}>
+                          {measurements.length > 0 
+                            ? `Undo (${measurements.length})` 
+                            : 'Clear'}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
