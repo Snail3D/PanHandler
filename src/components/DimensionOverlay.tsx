@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput, Modal } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput, Modal, Image } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -248,6 +248,7 @@ export default function DimensionOverlay({
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 120;
   const HAPTIC_DISTANCE = 20;
+  const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
 
   const handleClear = () => {
     // Remove one measurement at a time (last first)
@@ -742,9 +743,39 @@ export default function DimensionOverlay({
             }}
             pointerEvents="none"
           >
-            <Svg width={100} height={100}>
+            {/* Magnified preview bubble */}
+            <View
+              style={{
+                position: 'absolute',
+                left: 5,
+                top: 5,
+                width: 90,
+                height: 90,
+                borderRadius: 45,
+                overflow: 'hidden',
+                borderWidth: 3,
+                borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
+                backgroundColor: '#000',
+              }}
+            >
+              {currentImageUri && (
+                <Image
+                  source={{ uri: currentImageUri }}
+                  style={{
+                    position: 'absolute',
+                    width: SCREEN_WIDTH * MAGNIFICATION_SCALE * zoomScale,
+                    height: SCREEN_HEIGHT * MAGNIFICATION_SCALE * zoomScale,
+                    left: -(cursorPosition.x * MAGNIFICATION_SCALE * zoomScale - 45),
+                    top: -(cursorPosition.y * MAGNIFICATION_SCALE * zoomScale - 45),
+                  }}
+                  resizeMode="contain"
+                />
+              )}
+            </View>
+            
+            {/* Crosshair overlay */}
+            <Svg width={100} height={100} style={{ position: 'absolute' }}>
               <Circle cx={50} cy={50} r={30} fill="none" stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="3" opacity={0.8} />
-              <Circle cx={50} cy={50} r={15} fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={10} y1={50} x2={35} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={65} y1={50} x2={90} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={50} y1={10} x2={50} y2={35} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
