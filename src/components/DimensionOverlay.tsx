@@ -120,6 +120,29 @@ export default function DimensionOverlay({
   const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
   const [didDrag, setDidDrag] = useState(false); // Track if user actually dragged
   
+  // Lock-in animation states
+  const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
+  const [hasShownAnimation, setHasShownAnimation] = useState(false);
+  const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
+  
+  // Measurement mode states
+  const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
+  const [showCursor, setShowCursor] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const cursorOffsetY = 120;
+  const HAPTIC_DISTANCE = 20;
+  const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
+  
+  // Menu states
+  const [menuMinimized, setMenuMinimized] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [menuHidden, setMenuHidden] = useState(false);
+  const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
+  const menuTranslateX = useSharedValue(0);
+  const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  
   // Get color for measurement based on index
   const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
     const colors = MEASUREMENT_COLORS[measurementMode];
@@ -352,10 +375,6 @@ export default function DimensionOverlay({
     }
   };
 
-  const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
-  const [hasShownAnimation, setHasShownAnimation] = useState(false);
-  const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
-
   // Detect pan/zoom changes and dismiss animation immediately
   useEffect(() => {
     const zoomChanged = 
@@ -407,15 +426,6 @@ export default function DimensionOverlay({
       }, 1200);
     }
   }, [coinCircle, hasShownAnimation]);
-
-  // Measurement mode toggle
-  const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
-  const [showCursor, setShowCursor] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const cursorOffsetY = 120;
-  const HAPTIC_DISTANCE = 20;
-  const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
 
   const handleClear = () => {
     // Remove one measurement at a time (last first)
@@ -635,9 +645,43 @@ export default function DimensionOverlay({
       const recipients = emailToUse ? [emailToUse] : [];
       const ccRecipients = emailToUse ? [emailToUse] : [];
       
-      // Prepare attachments: captured image + original blank photo
+      // Prepare attachments: captured image with measurements + blank photo with label
       const attachments = [uri];
-      if (currentImageUri) {
+      
+      // Capture blank photo with label/scale if we have them
+      if (currentImageUri && (label || calibration)) {
+        try {
+          // Hide measurements temporarily to capture just the blank with label
+          const savedMeasurements = measurements;
+          setMeasurements([]);
+          setCurrentLabel(label);
+          
+          // Wait for render
+          await new Promise(resolve => setTimeout(resolve, 150));
+          
+          // Capture blank photo with label overlay
+          const blankWithLabelUri = await captureRef(viewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          // Restore measurements and clear label
+          setMeasurements(savedMeasurements);
+          setCurrentLabel(null);
+          
+          attachments.push(blankWithLabelUri);
+          
+          console.log('✅ Created labeled blank photo');
+        } catch (error) {
+          console.error('Failed to create labeled blank photo:', error);
+          // Fallback to original blank photo
+          if (currentImageUri) {
+            attachments.push(currentImageUri);
+          }
+        }
+      } else if (currentImageUri) {
+        // No label or calibration, just attach original
         attachments.push(currentImageUri);
       }
       
@@ -694,21 +738,6 @@ export default function DimensionOverlay({
   
   // Lock pan/zoom once any points are placed
   const isPanZoomLocked = hasAnyMeasurements;
-  
-  // Menu minimization
-  const [menuMinimized, setMenuMinimized] = useState(false);
-  
-  // Hide menu during capture
-  const [isCapturing, setIsCapturing] = useState(false);
-  
-  // Help modal
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  
-  // Menu slide-to-hide with side tab
-  const [menuHidden, setMenuHidden] = useState(false);
-  const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
-  const menuTranslateX = useSharedValue(0);
-  const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   
   // Handle label modal completion
   const handleLabelComplete = (label: string | null) => {
@@ -1676,29 +1705,27 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {/* Label and scale info - top-center */}
-          {(currentLabel || (calibration && !isCapturing)) && (
+          {/* Label and scale info - upper-left corner */}
+          {(currentLabel || (calibration && currentLabel)) && !isCapturing && (
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + 16,
+                top: insets.top + 52,
                 left: 12,
-                right: 12,
-                alignItems: 'center',
               }}
               pointerEvents="none"
             >
               {currentLabel && (
                 <View
                   style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 12,
-                    marginBottom: 6,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    borderRadius: 6,
+                    marginBottom: 4,
                   }}
                 >
-                  <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', textAlign: 'center' }}>
+                  <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
                     {currentLabel}
                   </Text>
                 </View>
@@ -1707,16 +1734,21 @@ export default function DimensionOverlay({
               {calibration && currentLabel && (
                 <View
                   style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 8,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 5,
+                    marginBottom: 4,
                   }}
                 >
-                  <Text style={{ color: '#A0A0A0', fontSize: 11, fontWeight: '600', textAlign: 'center' }}>
+                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
                     Scale: {calibration.pixelsPerUnit.toFixed(2)} px/{calibration.unit}
-                    {coinCircle && ` • ${coinCircle.coinName}`}
                   </Text>
+                  {coinCircle && (
+                    <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                      {coinCircle.coinName}
+                    </Text>
+                  )}
                 </View>
               )}
             </View>
@@ -1727,7 +1759,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + 52,
+                top: currentLabel ? insets.top + 52 + 70 : insets.top + 52,
                 left: 12,
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: 6,
