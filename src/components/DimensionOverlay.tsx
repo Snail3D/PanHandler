@@ -2031,18 +2031,18 @@ export default function DimensionOverlay({
                         alignItems: 'center',
                         backgroundColor: 'rgba(255, 255, 255, 0.35)',
                         borderRadius: 8,
-                        paddingVertical: 4,
-                        paddingHorizontal: 8,
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
                         borderWidth: 0.5,
                         borderColor: 'rgba(0, 0, 0, 0.08)',
                       }}
                     >
-                      <Ionicons name="arrow-undo-outline" size={12} color="rgba(0, 0, 0, 0.6)" />
+                      <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
                       <Text style={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         fontWeight: '600',
-                        fontSize: 10,
-                        marginLeft: 4,
+                        fontSize: 14,
+                        marginLeft: 5,
                       }}>
                         {measurements.length > 0 
                           ? `Undo (${measurements.length})` 
@@ -2054,7 +2054,7 @@ export default function DimensionOverlay({
                   )}
                   
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 9, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
+                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
                       Hide menu
                     </Text>
                     <Pressable
