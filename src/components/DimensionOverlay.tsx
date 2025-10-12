@@ -903,22 +903,58 @@ export default function DimensionOverlay({
             </View>
           )}
 
-          {/* Measurement labels for completed measurements */}
-          {measurements.map((measurement, idx) => {
-            const color = getMeasurementColor(idx, measurement.mode);
-            let screenX, screenY;
-            if (measurement.mode === 'distance') {
-              const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-              const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-              screenX = (p0.x + p1.x) / 2;
-              screenY = (p0.y + p1.y) / 2 - 50;
-            } else {
-              const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-              screenX = p1.x;
-              screenY = p1.y - 70;
+          {/* Measurement labels for completed measurements with smart positioning */}
+          {(() => {
+            // Calculate initial positions for all labels
+            const labelData = measurements.map((measurement, idx) => {
+              const color = getMeasurementColor(idx, measurement.mode);
+              let screenX, screenY;
+              if (measurement.mode === 'distance') {
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                screenX = (p0.x + p1.x) / 2;
+                screenY = (p0.y + p1.y) / 2 - 50;
+              } else {
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                screenX = p1.x;
+                screenY = p1.y - 70;
+              }
+              return { measurement, idx, color, screenX, screenY };
+            });
+
+            // Smart label positioning algorithm to prevent overlaps
+            const LABEL_WIDTH = 120;
+            const LABEL_HEIGHT = 60; // badge + value height
+            const MIN_SEPARATION = 10;
+
+            // Detect and resolve overlaps
+            for (let i = 0; i < labelData.length; i++) {
+              for (let j = i + 1; j < labelData.length; j++) {
+                const label1 = labelData[i];
+                const label2 = labelData[j];
+
+                // Check if labels overlap horizontally
+                const xOverlap = Math.abs(label1.screenX - label2.screenX) < LABEL_WIDTH;
+                
+                if (xOverlap) {
+                  // Check if they overlap vertically
+                  const yDistance = Math.abs(label1.screenY - label2.screenY);
+                  
+                  if (yDistance < LABEL_HEIGHT + MIN_SEPARATION) {
+                    // Overlap detected! Adjust positions
+                    // Move the lower label down further
+                    if (label1.screenY < label2.screenY) {
+                      label2.screenY = label1.screenY + LABEL_HEIGHT + MIN_SEPARATION;
+                    } else {
+                      label1.screenY = label2.screenY + LABEL_HEIGHT + MIN_SEPARATION;
+                    }
+                  }
+                }
+              }
             }
-            
-            return (
+
+            // Render labels with adjusted positions
+            return labelData.map(({ measurement, idx, color, screenX, screenY }) => (
               <View
                 key={measurement.id}
                 style={{
@@ -964,8 +1000,8 @@ export default function DimensionOverlay({
                   </Text>
                 </View>
               </View>
-            );
-          })}
+            ));
+          })()}
 
           {/* Label for current measurement in progress */}
           {currentPoints.length === requiredPoints && (() => {
@@ -1263,19 +1299,7 @@ export default function DimensionOverlay({
             </View>
           )}
 
-          {/* Measurements list */}
-          {measurements.length > 0 && (
-            <View className="mb-3 max-h-24">
-              <ScrollView className="bg-gray-50 rounded-lg p-2">
-                {measurements.map((m, idx) => (
-                  <Text key={m.id} className="text-gray-700 text-sm mb-1">
-                    {idx + 1}. {m.value}
-                  </Text>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
+          
           {/* Status/Result Display */}
           {currentPoints.length === 0 && measurements.length === 0 && measurementMode && (
             <View className="flex-row items-center mb-3">

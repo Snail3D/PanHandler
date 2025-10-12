@@ -40,6 +40,7 @@ interface MeasurementStore {
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
   isProUser: boolean; // Pro user status for paywall
+  savedZoomState: { scale: number; translateX: number; translateY: number } | null; // Restore zoom/pan
   
   setImageUri: (uri: string | null) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
@@ -58,6 +59,7 @@ interface MeasurementStore {
   setUnitSystem: (system: UnitSystem) => void;
   setUserEmail: (email: string | null) => void;
   setIsProUser: (isPro: boolean) => void;
+  setSavedZoomState: (state: { scale: number; translateX: number; translateY: number } | null) => void;
 }
 
 const useStore = create<MeasurementStore>()(
@@ -76,11 +78,12 @@ const useStore = create<MeasurementStore>()(
       lastSelectedCoin: null,
       userEmail: null,
       isProUser: false,
+      savedZoomState: null,
 
       setImageUri: (uri) => set({ 
         currentImageUri: uri,
         // Only clear measurements if setting to null
-        ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null } : {})
+        ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null, savedZoomState: null } : {})
       }),
 
       setImageOrientation: (orientation) => set({ imageOrientation: orientation }),
@@ -145,6 +148,8 @@ const useStore = create<MeasurementStore>()(
       setUserEmail: (email) => set({ userEmail: email }),
 
       setIsProUser: (isPro) => set({ isProUser: isPro }),
+
+      setSavedZoomState: (state) => set({ savedZoomState: state }),
     }),
     {
       name: 'measurement-settings',
@@ -163,6 +168,7 @@ const useStore = create<MeasurementStore>()(
         completedMeasurements: state.completedMeasurements,
         currentPoints: state.currentPoints,
         measurementMode: state.measurementMode,
+        savedZoomState: state.savedZoomState, // Persist zoom/pan state
       }),
     }
   )
