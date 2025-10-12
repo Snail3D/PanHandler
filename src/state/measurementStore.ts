@@ -48,11 +48,19 @@ interface MeasurementStore {
   sessionCount: number; // Track app sessions for rating prompt
   hasRatedApp: boolean; // Track if user has been prompted/rated
   lastRatingPromptDate: string | null; // Track when user was last prompted
+  monthlySaveCount: number; // Track saves this month for free users
+  monthlyEmailCount: number; // Track emails this month for free users
+  lastResetDate: string | null; // Track when counters were last reset
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
   setHasRatedApp: (hasRated: boolean) => void;
   setLastRatingPromptDate: (date: string) => void;
+  incrementSaveCount: () => void;
+  incrementEmailCount: () => void;
+  canSave: () => boolean;
+  canEmail: () => boolean;
+  resetMonthlyLimits: () => void;
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -74,7 +82,7 @@ interface MeasurementStore {
 
 const useStore = create<MeasurementStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentImageUri: null,
       isAutoCaptured: false,
       imageOrientation: null,
@@ -93,6 +101,9 @@ const useStore = create<MeasurementStore>()(
       sessionCount: 0,
       hasRatedApp: false,
       lastRatingPromptDate: null,
+      monthlySaveCount: 0,
+      monthlyEmailCount: 0,
+      lastResetDate: null,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -107,13 +118,53 @@ const useStore = create<MeasurementStore>()(
 
       setLastRatingPromptDate: (date) => set({ lastRatingPromptDate: date }),
 
-      setImageOrientation: (orientation) => set({ imageOrientation: orientation }),
+      incrementSaveCount: () => set((state) => ({ monthlySaveCount: state.monthlySaveCount + 1 })),
 
-      setCompletedMeasurements: (completedMeasurements) => set({ completedMeasurements }),
+      incrementEmailCount: () => set((state) => ({ monthlyEmailCount: state.monthlyEmailCount + 1 })),
+
+      canSave: () => {
+        const state = get();
+        if (state.isProUser) return true;
+        
+        // Check if we need to reset monthly counters
+        const now = new Date();
+        const lastReset = state.lastResetDate ? new Date(state.lastResetDate) : null;
+        if (!lastReset || now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
+          get().resetMonthlyLimits();
+          return true;
+        }
+        
+        return state.monthlySaveCount < 10;
+      },
+
+      canEmail: () => {
+        const state = get();
+        if (state.isProUser) return true;
+        
+        // Check if we need to reset monthly counters
+        const now = new Date();
+        const lastReset = state.lastResetDate ? new Date(state.lastResetDate) : null;
+        if (!lastReset || now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
+          get().resetMonthlyLimits();
+          return true;
+        }
+        
+        return state.monthlyEmailCount < 10;
+      },
+
+      resetMonthlyLimits: () => set({ 
+        monthlySaveCount: 0, 
+        monthlyEmailCount: 0, 
+        lastResetDate: new Date().toISOString() 
+      }),
+
+      setImageOrientation: (orientation: AppOrientation) => set({ imageOrientation: orientation }),
+
+      setCompletedMeasurements: (completedMeasurements: CompletedMeasurement[]) => set({ completedMeasurements }),
       
-      setCurrentPoints: (currentPoints) => set({ currentPoints }),
+      setCurrentPoints: (currentPoints: Array<{ x: number; y: number; id: string }>) => set({ currentPoints }),
 
-      addTempPoint: (point) => set((state) => {
+      addTempPoint: (point: Point) => set((state) => {
         const newTempPoints = [...state.tempPoints, point];
         return { tempPoints: newTempPoints };
       }),
@@ -135,21 +186,21 @@ const useStore = create<MeasurementStore>()(
         };
       }),
 
-      setMeasurementMode: (mode) => set({ measurementMode: mode, tempPoints: [] }),
+      setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle') => set({ measurementMode: mode, tempPoints: [] }),
 
-      deleteMeasurement: (id) => set((state) => ({
+      deleteMeasurement: (id: string) => set((state) => ({
         measurements: state.measurements.filter((m) => m.id !== id),
       })),
 
       clearAll: () => set({ measurements: [], tempPoints: [], currentImageUri: null, coinCircle: null }),
 
-      setCalibration: (calibration) => set({ calibration }),
+      setCalibration: (calibration: MeasurementStore['calibration']) => set({ calibration }),
 
-      setCoinCircle: (circle) => set({ coinCircle: circle }),
+      setCoinCircle: (circle: CoinCircle | null) => set({ coinCircle: circle }),
 
-      setLastSelectedCoin: (coinName) => set({ lastSelectedCoin: coinName }),
+      setLastSelectedCoin: (coinName: string) => set({ lastSelectedCoin: coinName }),
 
-      updatePointPosition: (pointId, x, y) => set((state) => {
+      updatePointPosition: (pointId: string, x: number, y: number) => set((state) => {
         const measurements = state.measurements.map((measurement) => ({
           ...measurement,
           points: measurement.points.map((point) =>
@@ -164,13 +215,13 @@ const useStore = create<MeasurementStore>()(
         return { measurements, tempPoints };
       }),
 
-      setUnitSystem: (system) => set({ unitSystem: system }),
+      setUnitSystem: (system: UnitSystem) => set({ unitSystem: system }),
 
-      setUserEmail: (email) => set({ userEmail: email }),
+      setUserEmail: (email: string | null) => set({ userEmail: email }),
 
-      setIsProUser: (isPro) => set({ isProUser: isPro }),
+      setIsProUser: (isPro: boolean) => set({ isProUser: isPro }),
 
-      setSavedZoomState: (state) => set({ savedZoomState: state }),
+      setSavedZoomState: (zoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => set({ savedZoomState: zoomState }),
     }),
     {
       name: 'measurement-settings',
@@ -183,6 +234,9 @@ const useStore = create<MeasurementStore>()(
         sessionCount: state.sessionCount, // Persist session count
         hasRatedApp: state.hasRatedApp, // Persist rating status
         lastRatingPromptDate: state.lastRatingPromptDate, // Persist last prompt date
+        monthlySaveCount: state.monthlySaveCount, // Persist monthly save count
+        monthlyEmailCount: state.monthlyEmailCount, // Persist monthly email count
+        lastResetDate: state.lastResetDate, // Persist last reset date
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag

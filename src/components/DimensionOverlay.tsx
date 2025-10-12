@@ -102,6 +102,12 @@ export default function DimensionOverlay({
   const setUserEmail = useStore((s) => s.setUserEmail);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
+  const canSave = useStore((s) => s.canSave);
+  const canEmail = useStore((s) => s.canEmail);
+  const incrementSaveCount = useStore((s) => s.incrementSaveCount);
+  const incrementEmailCount = useStore((s) => s.incrementEmailCount);
+  const monthlySaveCount = useStore((s) => s.monthlySaveCount);
+  const monthlyEmailCount = useStore((s) => s.monthlyEmailCount);
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
@@ -478,6 +484,19 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
+    // Check if user can save (monthly limit for free users)
+    if (!canSave()) {
+      Alert.alert(
+        'Monthly Limit Reached',
+        `You have used all 10 saves this month. Upgrade to Pro for unlimited saves!\n\nUsed this month: ${monthlySaveCount}/10`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
+        ]
+      );
+      return;
+    }
+    
     // Show label modal first
     setPendingAction('save');
     setShowLabelModal(true);
@@ -583,6 +602,9 @@ export default function DimensionOverlay({
       console.log('✅ Save successful!');
       Alert.alert('Success', label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
       
+      // Increment save counter for free users
+      incrementSaveCount();
+      
       // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
@@ -594,6 +616,19 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
+    // Check if user can email (monthly limit for free users)
+    if (!canEmail()) {
+      Alert.alert(
+        'Monthly Limit Reached',
+        `You have used all 10 emails this month. Upgrade to Pro for unlimited emails!\n\nUsed this month: ${monthlyEmailCount}/10`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
+        ]
+      );
+      return;
+    }
+    
     // Show label modal first
     setPendingAction('email');
     setShowLabelModal(true);
@@ -814,6 +849,9 @@ export default function DimensionOverlay({
       });
       
       console.log('✅ Email composer opened');
+      
+      // Increment email counter for free users (counts when composer opens)
+      incrementEmailCount();
     } catch (error) {
       setIsCapturing(false);
       console.error('❌ Email error:', error);
@@ -2510,9 +2548,9 @@ export default function DimensionOverlay({
               {/* Features list */}
               <View style={{ marginBottom: 24 }}>
                 {[
+                  'Unlimited saves per month',
+                  'Unlimited emails per month',
                   'Unlimited measurements per photo',
-                  'Email multiple measurements',
-                  'Vibrant color-coded lines',
                   'Priority support',
                 ].map((feature, idx) => (
                   <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
