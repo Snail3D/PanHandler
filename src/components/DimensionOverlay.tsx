@@ -2025,19 +2025,24 @@ export default function DimensionOverlay({
                   <Text style={{ fontSize: 10, fontWeight: '600', color: 'rgba(0, 0, 0, 0.5)', marginLeft: 4 }}>
                     CONTROLS
                   </Text>
-                  <Pressable
-                    onPress={collapseMenu}
-                    style={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 14,
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
-                  </Pressable>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 9, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
+                      Hide menu
+                    </Text>
+                    <Pressable
+                      onPress={collapseMenu}
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
+                    </Pressable>
+                  </View>
                 </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
