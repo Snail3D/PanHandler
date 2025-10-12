@@ -1008,7 +1008,7 @@ export default function DimensionOverlay({
               style={{
                 width: 44,
                 height: 80,
-                backgroundColor: 'rgba(255, 255, 255, 0.65)',
+                backgroundColor: 'rgba(128, 128, 128, 0.5)',
                 borderTopLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderBottomLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderTopRightRadius: tabSide === 'left' ? 16 : 0,
@@ -1017,27 +1017,30 @@ export default function DimensionOverlay({
                 alignItems: 'center',
                 shadowColor: '#000',
                 shadowOffset: { width: tabSide === 'right' ? -2 : 2, height: 0 },
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-                elevation: 8,
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 4,
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
+                borderColor: 'rgba(128, 128, 128, 0.3)',
                 [tabSide === 'right' ? 'borderRightWidth' : 'borderLeftWidth']: 0,
               }}
             >
-              <View style={{ alignItems: 'center' }}>
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name={tabSide === 'right' ? 'chevron-back' : 'chevron-forward'} 
-                  size={20} 
-                  color="#007AFF" 
+                  size={16} 
+                  color="rgba(255, 255, 255, 0.8)" 
                 />
-                <View style={{ 
-                  width: 24, 
-                  height: 3, 
-                  backgroundColor: 'rgba(0, 122, 255, 0.5)', 
-                  borderRadius: 2,
-                  marginTop: 4
-                }} />
+                <Text style={{ 
+                  fontSize: 8, 
+                  color: 'rgba(255, 255, 255, 0.8)', 
+                  fontWeight: '600',
+                  marginTop: 2,
+                  textAlign: 'center',
+                  lineHeight: 10
+                }}>
+                  Hide{'\n'}menu
+                </Text>
               </View>
             </Pressable>
           </Animated.View>
@@ -1566,8 +1569,10 @@ export default function DimensionOverlay({
 
           {/* Measurement labels for completed measurements with smart positioning */}
           {(() => {
-            // Calculate initial positions for all labels
-            const labelData = measurements.map((measurement, idx) => {
+            // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
+            const labelData = measurements
+              .filter(m => m.mode !== 'rectangle')
+              .map((measurement, idx) => {
               const color = getMeasurementColor(idx, measurement.mode);
               let screenX = 0, screenY = 0;
               if (measurement.mode === 'distance') {
@@ -1721,7 +1726,7 @@ export default function DimensionOverlay({
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
-                      W: {heightLabel}
+                      H: {heightLabel}
                     </Text>
                   </View>
                 </View>
