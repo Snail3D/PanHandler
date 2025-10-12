@@ -2099,7 +2099,7 @@ export default function DimensionOverlay({
               disabled={isPanZoomLocked}
               style={{
                 flex: 1,
-                paddingVertical: 5,
+                paddingVertical: 6,
                 borderRadius: 7.5,
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 opacity: isPanZoomLocked ? 0.5 : 1,
@@ -2108,13 +2108,13 @@ export default function DimensionOverlay({
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name={isPanZoomLocked ? "lock-closed" : "move-outline"}
-                  size={12} 
+                  size={14} 
                   color={isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')} 
                 />
                 <Text style={{
                   marginLeft: 4,
                   fontWeight: '600',
-                  fontSize: 10,
+                  fontSize: 12,
                   color: isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')
                 }}>
                   {isPanZoomLocked ? 'Locked' : 'Pan'}
@@ -2128,7 +2128,7 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 5,
+                paddingVertical: 6,
                 borderRadius: 7.5,
                 backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
@@ -2136,13 +2136,13 @@ export default function DimensionOverlay({
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name="create-outline" 
-                  size={12} 
+                  size={14} 
                   color={measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
                 />
                 <Text style={{
                   marginLeft: 4,
                   fontWeight: '600',
-                  fontSize: 10,
+                  fontSize: 12,
                   color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Measure
