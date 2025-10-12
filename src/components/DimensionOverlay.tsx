@@ -990,7 +990,7 @@ export default function DimensionOverlay({
         <View 
           className="absolute z-20"
           style={{
-            top: insets.top + 16,
+            top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
             right: 16,
             backgroundColor: 'rgba(52, 199, 89, 0.9)',
             paddingHorizontal: 12,
