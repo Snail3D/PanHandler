@@ -1880,7 +1880,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + 52,
+                top: insets.top + 16,
                 right: 12,
                 backgroundColor: 'rgba(0, 200, 0, 0.9)',
                 paddingHorizontal: 8,
@@ -1903,7 +1903,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + 52,
+                top: insets.top + 16,
                 left: 12,
               }}
               pointerEvents="none"
@@ -1950,7 +1950,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: currentLabel ? insets.top + 52 + 70 : insets.top + 52,
+                top: currentLabel ? insets.top + 16 + 70 : insets.top + 16,
                 left: 12,
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: 6,
@@ -2762,7 +2762,7 @@ export default function DimensionOverlay({
           <View
             style={{
               position: 'absolute',
-              top: insets.top + 52,
+              top: insets.top + 16,
               left: 12,
             }}
             pointerEvents="none"
