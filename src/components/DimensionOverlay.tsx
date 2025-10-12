@@ -265,8 +265,8 @@ export default function DimensionOverlay({
   };
 
   const placePoint = (x: number, y: number) => {
-    // Check if user is trying to add more than 1 measurement without pro
-    if (!isProUser && measurements.length >= 1 && currentPoints.length === 0) {
+    // Check if user is trying to add more than 2 measurements without pro
+    if (!isProUser && measurements.length >= 2 && currentPoints.length === 0) {
       // Show paywall modal
       setShowProModal(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -498,8 +498,8 @@ export default function DimensionOverlay({
       return;
     }
     
-    // Check if user has multiple measurements without pro
-    if (!isProUser && measurements.length > 1) {
+    // Check if user has more than 2 measurements without pro
+    if (!isProUser && measurements.length > 2) {
       setShowProModal(true);
       return;
     }
