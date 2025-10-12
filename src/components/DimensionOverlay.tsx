@@ -15,6 +15,7 @@ import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import LabelModal from './LabelModal';
+import { getRandomQuote } from '../utils/makerQuotes';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -162,6 +163,64 @@ export default function DimensionOverlay({
   const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
   const menuTranslateX = useSharedValue(0);
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  
+  // Inspirational quote overlay state
+  const [showQuote, setShowQuote] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
+  const [displayedText, setDisplayedText] = useState('');
+  const quoteOpacity = useSharedValue(0);
+  const [quoteTapCount, setQuoteTapCount] = useState(0);
+  
+  // Show inspirational quote overlay
+  const showQuoteOverlay = () => {
+    const quote = getRandomQuote();
+    setCurrentQuote(quote);
+    setDisplayedText('');
+    setQuoteTapCount(0);
+    setShowQuote(true);
+    
+    // Fade in overlay
+    quoteOpacity.value = withTiming(1, { duration: 300 });
+    
+    // Type out the quote text
+    const fullText = `"${quote.text}"`;
+    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    const completeText = `${fullText}\n\n${authorText}`;
+    
+    let currentIndex = 0;
+    const typingSpeed = 30; // milliseconds per character (normal reading speed)
+    
+    const typeInterval = setInterval(() => {
+      if (currentIndex < completeText.length) {
+        setDisplayedText(completeText.substring(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typeInterval);
+        // Auto-dismiss after 5 seconds of being fully displayed
+        setTimeout(() => {
+          dismissQuote();
+        }, 5000);
+      }
+    }, typingSpeed);
+    
+    return () => clearInterval(typeInterval);
+  };
+  
+  const dismissQuote = () => {
+    quoteOpacity.value = withTiming(0, { duration: 400 }, () => {
+      runOnJS(setShowQuote)(false);
+      runOnJS(setCurrentQuote)(null);
+      runOnJS(setDisplayedText)('');
+    });
+  };
+  
+  const handleQuoteTap = () => {
+    setQuoteTapCount(prev => prev + 1);
+    if (quoteTapCount >= 2) {
+      // User tapped 3+ times, dismiss immediately
+      dismissQuote();
+    }
+  };
   
   // Get color for measurement based on index
   const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
@@ -602,6 +661,9 @@ export default function DimensionOverlay({
       
       // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      
+      // Show inspirational quote overlay
+      setTimeout(() => showQuoteOverlay(), 500);
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
@@ -842,6 +904,9 @@ export default function DimensionOverlay({
       
       // Increment email counter for free users (counts when composer opens)
       incrementEmailCount();
+      
+      // Show inspirational quote overlay
+      setTimeout(() => showQuoteOverlay(), 500);
     } catch (error) {
       setIsCapturing(false);
       console.error('❌ Email error:', error);
@@ -2897,6 +2962,49 @@ export default function DimensionOverlay({
           </View>
         )}
       </View>
+      
+      {/* Inspirational Quote Overlay */}
+      <Modal
+        visible={showQuote}
+        transparent
+        animationType="none"
+        onRequestClose={dismissQuote}
+      >
+        <Pressable
+          onPress={handleQuoteTap}
+          style={{
+            flex: 1,
+            backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 40,
+          }}
+        >
+          <Animated.View
+            style={{
+              opacity: quoteOpacity.value,
+              maxWidth: 600,
+            }}
+          >
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 20,
+                fontWeight: '400',
+                textAlign: 'center',
+                lineHeight: 32,
+                textShadowColor: 'rgba(255, 255, 255, 0.3)',
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 10,
+                fontFamily: 'System',
+                letterSpacing: 0.5,
+              }}
+            >
+              {displayedText}
+            </Text>
+          </Animated.View>
+        </Pressable>
+      </Modal>
     </>
   );
 }
