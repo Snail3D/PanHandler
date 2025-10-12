@@ -2080,7 +2080,11 @@ export default function DimensionOverlay({
                         borderColor: 'rgba(0, 0, 0, 0.08)',
                       }}
                     >
-                      <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
+                      <Image 
+                        source={require('../../assets/snail-logo.png')} 
+                        style={{ width: 16, height: 16, opacity: 0.6 }}
+                        resizeMode="contain"
+                      />
                       <Text style={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         fontWeight: '600',
