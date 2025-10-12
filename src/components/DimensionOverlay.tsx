@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput } from 'react-native';
 import { Svg, Line, Circle, Path } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
@@ -443,6 +444,76 @@ export default function DimensionOverlay({
   
   // Hide menu during capture
   const [isCapturing, setIsCapturing] = useState(false);
+  
+  // Menu slide-to-hide with side tab
+  const [menuHidden, setMenuHidden] = useState(false);
+  const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
+  const menuTranslateX = useSharedValue(0);
+  const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  
+  // Animated style for menu sliding
+  const menuAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: menuTranslateX.value }],
+  }));
+  
+  // Animated style for tab position
+  const tabAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: tabPositionY.value }],
+  }));
+  
+  // Pan gesture for sliding menu in/out
+  const menuPanGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      if (event.translationX < -50 && !menuHidden) {
+        // Swipe left to hide (from right side)
+        menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
+      } else if (event.translationX > 50 && menuHidden && tabSide === 'right') {
+        // Swipe right to show (from right side)
+        menuTranslateX.value = Math.min(SCREEN_WIDTH + event.translationX, 0);
+      } else if (event.translationX < -50 && menuHidden && tabSide === 'left') {
+        // Swipe left to show (from left side)
+        menuTranslateX.value = Math.max(-SCREEN_WIDTH + event.translationX, 0);
+      } else if (event.translationX > 50 && !menuHidden && tabSide === 'left') {
+        // Swipe right to hide (from left side)
+        menuTranslateX.value = Math.min(event.translationX, SCREEN_WIDTH);
+      }
+    })
+    .onEnd((event) => {
+      const threshold = SCREEN_WIDTH * 0.3;
+      if (Math.abs(menuTranslateX.value) > threshold) {
+        // Hide menu
+        menuTranslateX.value = withSpring(tabSide === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH, {}, () => {
+          runOnJS(setMenuHidden)(true);
+        });
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        // Show menu
+        menuTranslateX.value = withSpring(0);
+        runOnJS(setMenuHidden)(false);
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+      }
+    });
+  
+  // Drag gesture for repositioning tab
+  const tabDragGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      const newY = tabPositionY.value + event.translationY;
+      tabPositionY.value = Math.max(insets.top + 50, Math.min(newY, SCREEN_HEIGHT - insets.bottom - 100));
+    })
+    .onEnd(() => {
+      runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+    });
+  
+  const toggleMenuFromTab = () => {
+    if (menuHidden) {
+      menuTranslateX.value = withSpring(0);
+      setMenuHidden(false);
+    } else {
+      menuTranslateX.value = withSpring(tabSide === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH);
+      setMenuHidden(true);
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
 
   return (
     <>
@@ -472,6 +543,61 @@ export default function DimensionOverlay({
             Calibrated
           </Text>
         </View>
+      )}
+
+      {/* Draggable side tab - appears when menu is hidden */}
+      {menuHidden && !isCapturing && (
+        <GestureDetector gesture={tabDragGesture}>
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                [tabSide]: 0,
+                top: 0,
+                zIndex: 25,
+              },
+              tabAnimatedStyle
+            ]}
+          >
+            <Pressable
+              onPress={toggleMenuFromTab}
+              style={{
+                width: 44,
+                height: 80,
+                backgroundColor: 'rgba(255, 255, 255, 0.65)',
+                borderTopLeftRadius: tabSide === 'right' ? 16 : 0,
+                borderBottomLeftRadius: tabSide === 'right' ? 16 : 0,
+                borderTopRightRadius: tabSide === 'left' ? 16 : 0,
+                borderBottomRightRadius: tabSide === 'left' ? 16 : 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: tabSide === 'right' ? -2 : 2, height: 0 },
+                shadowOpacity: 0.15,
+                shadowRadius: 8,
+                elevation: 8,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.4)',
+                [tabSide === 'right' ? 'borderRightWidth' : 'borderLeftWidth']: 0,
+              }}
+            >
+              <View style={{ alignItems: 'center' }}>
+                <Ionicons 
+                  name={tabSide === 'right' ? 'chevron-back' : 'chevron-forward'} 
+                  size={20} 
+                  color="#007AFF" 
+                />
+                <View style={{ 
+                  width: 24, 
+                  height: 3, 
+                  backgroundColor: 'rgba(0, 122, 255, 0.5)', 
+                  borderRadius: 2,
+                  marginTop: 4
+                }} />
+              </View>
+            </Pressable>
+          </Animated.View>
+        </GestureDetector>
       )}
 
       {/* Sexy iOS-styled minimize button */}
@@ -858,39 +984,43 @@ export default function DimensionOverlay({
           })()}
       </View>
 
-      {/* Bottom toolbar - iOS 18 ultra-transparent style */}
+      {/* Bottom toolbar - Water droplet style with slide gesture */}
       {!menuMinimized && !isCapturing && (
-        <View
-          className="absolute left-0 right-0 z-20"
-          style={{ 
-            bottom: insets.bottom + 110,
-            paddingHorizontal: 16,
-          }}
-        >
-          <BlurView
-            intensity={80}
-            tint="light"
-            style={{
-              borderRadius: 26,
-              overflow: 'hidden',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.3,
-              shadowRadius: 32,
-              elevation: 20,
-            }}
+        <GestureDetector gesture={menuPanGesture}>
+          <Animated.View
+            className="absolute left-0 right-0 z-20"
+            style={[
+              { 
+                bottom: insets.bottom + 90,
+                paddingHorizontal: 20,
+              },
+              menuAnimatedStyle
+            ]}
           >
-            <View style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.75)',
-              borderRadius: 26,
-              paddingHorizontal: 16,
-              paddingTop: 16,
-              paddingBottom: 18,
-              borderWidth: 1.5,
-              borderColor: 'rgba(255, 255, 255, 0.6)',
-            }}>
+            <BlurView
+              intensity={40}
+              tint="light"
+              style={{
+                borderRadius: 22,
+                overflow: 'hidden',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.25,
+                shadowRadius: 24,
+                elevation: 18,
+              }}
+            >
+              <View style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.55)',
+                borderRadius: 22,
+                paddingHorizontal: 12,
+                paddingTop: 12,
+                paddingBottom: 14,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.4)',
+              }}>
           {/* Unit System Toggle: Metric vs Imperial */}
-          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 13, padding: 2.5 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
             <Pressable
               onPress={() => {
                 setUnitSystem('metric');
@@ -898,15 +1028,15 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
+                paddingVertical: 7,
+                borderRadius: 9,
                 backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Text style={{
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
                 }}>
                   Metric
@@ -920,15 +1050,15 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 9,
-                borderRadius: 11,
+                paddingVertical: 7,
+                borderRadius: 9,
                 backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Text style={{
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
                 }}>
                   Imperial
@@ -938,7 +1068,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 13, padding: 2.5 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
             <Pressable
               onPress={() => {
                 if (isPanZoomLocked) return;
@@ -964,7 +1094,7 @@ export default function DimensionOverlay({
                 <Text style={{
                   marginLeft: 5,
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.5)')
                 }}>
                   {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
@@ -992,7 +1122,7 @@ export default function DimensionOverlay({
                 <Text style={{
                   marginLeft: 5,
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.5)'
                 }}>
                   Measure
@@ -1002,7 +1132,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 13, padding: 2.5 }}>
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.24)', borderRadius: 11, padding: 2 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
@@ -1027,7 +1157,7 @@ export default function DimensionOverlay({
                   marginLeft: 5,
                   textAlign: 'center',
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.5)'
                 }}>
                   Distance
@@ -1058,7 +1188,7 @@ export default function DimensionOverlay({
                   marginLeft: 5,
                   textAlign: 'center',
                   fontWeight: '600',
-                  fontSize: 13,
+                  fontSize: 11,
                   color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.5)'
                 }}>
                   Angle
@@ -1129,9 +1259,9 @@ export default function DimensionOverlay({
                 onPress={handleClear}
                 style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                  borderRadius: 16,
-                  paddingVertical: 14,
-                  marginBottom: 12,
+                  borderRadius: 14,
+                  paddingVertical: 11,
+                  marginBottom: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1143,7 +1273,7 @@ export default function DimensionOverlay({
                 <Text style={{
                   color: '#333',
                   fontWeight: '600',
-                  fontSize: 15,
+                  fontSize: 13,
                   marginLeft: 8,
                 }}>
                   {measurements.length > 0 
@@ -1153,21 +1283,21 @@ export default function DimensionOverlay({
               </Pressable>
 
               {measurements.length > 0 && (
-                <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
                   <Pressable
                     onPress={handleExport}
                     style={{
                       flex: 1,
                       backgroundColor: '#007AFF',
-                      borderRadius: 14,
-                      paddingVertical: 12,
+                      borderRadius: 12,
+                      paddingVertical: 10,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="images-outline" size={16} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginLeft: 6 }}>Save</Text>
+                    <Ionicons name="images-outline" size={14} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 12, marginLeft: 6 }}>Save</Text>
                   </Pressable>
                   
                   <Pressable
@@ -1175,15 +1305,15 @@ export default function DimensionOverlay({
                     style={{
                       flex: 1,
                       backgroundColor: '#34C759',
-                      borderRadius: 14,
-                      paddingVertical: 12,
+                      borderRadius: 12,
+                      paddingVertical: 10,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="mail-outline" size={16} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginLeft: 6 }}>Email</Text>
+                    <Ionicons name="mail-outline" size={14} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 12, marginLeft: 6 }}>Email</Text>
                   </Pressable>
                 </View>
               )}
@@ -1192,21 +1322,22 @@ export default function DimensionOverlay({
                 onPress={handleReset}
                 style={{
                   backgroundColor: '#FF3B30',
-                  borderRadius: 16,
-                  paddingVertical: 14,
+                  borderRadius: 14,
+                  paddingVertical: 11,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="camera-outline" size={18} color="white" />
-                <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>New Photo</Text>
+                <Ionicons name="camera-outline" size={16} color="white" />
+                <Text style={{ color: 'white', fontWeight: '600', fontSize: 13, marginLeft: 8 }}>New Photo</Text>
               </Pressable>
             </>
           )}
         </View>
         </BlurView>
-      </View>
+          </Animated.View>
+        </GestureDetector>
       )}
     </>
   );
