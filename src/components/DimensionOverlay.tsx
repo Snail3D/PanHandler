@@ -743,50 +743,9 @@ export default function DimensionOverlay({
             }}
             pointerEvents="none"
           >
-            {/* Magnified preview bubble */}
-            <View
-              style={{
-                position: 'absolute',
-                left: 5,
-                top: 5,
-                width: 90,
-                height: 90,
-                borderRadius: 45,
-                overflow: 'hidden',
-                borderWidth: 3,
-                borderColor: mode === 'distance' ? '#3B82F6' : '#10B981',
-                backgroundColor: '#000',
-              }}
-            >
-              {currentImageUri && (() => {
-                // Convert cursor screen position to image coordinates
-                const imageCoords = screenToImage(cursorPosition.x, cursorPosition.y);
-                
-                // Calculate the portion of the image to show in the magnified view
-                // We want to show the area around imageCoords, magnified by MAGNIFICATION_SCALE
-                const bubbleRadius = 45; // Half of 90px bubble
-                const imageAreaRadius = bubbleRadius / (zoomScale * MAGNIFICATION_SCALE);
-                
-                return (
-                  <Image
-                    source={{ uri: currentImageUri }}
-                    style={{
-                      position: 'absolute',
-                      width: SCREEN_WIDTH * MAGNIFICATION_SCALE,
-                      height: SCREEN_HEIGHT * MAGNIFICATION_SCALE,
-                      // Position image so cursor point is at center of bubble
-                      left: bubbleRadius - (imageCoords.x * zoomScale * MAGNIFICATION_SCALE),
-                      top: bubbleRadius - (imageCoords.y * zoomScale * MAGNIFICATION_SCALE),
-                    }}
-                    resizeMode="contain"
-                  />
-                );
-              })()}
-            </View>
-            
-            {/* Crosshair overlay */}
-            <Svg width={100} height={100} style={{ position: 'absolute' }}>
+            <Svg width={100} height={100}>
               <Circle cx={50} cy={50} r={30} fill="none" stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="3" opacity={0.8} />
+              <Circle cx={50} cy={50} r={15} fill={mode === 'distance' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.3)'} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={10} y1={50} x2={35} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={65} y1={50} x2={90} y2={50} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
               <Line x1={50} y1={10} x2={50} y2={35} stroke={mode === 'distance' ? '#3B82F6' : '#10B981'} strokeWidth="2" />
