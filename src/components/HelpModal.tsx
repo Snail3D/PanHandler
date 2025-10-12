@@ -230,10 +230,28 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       AUTO LEVEL Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20 }}>
-                    Enable Auto Level in camera for hands-free capture! The app monitors your device angle and stability, then auto-captures when perfectly aligned. 
-                    Watch for the green indicator and countdown.
+                  <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 8 }}>
+                    Enable Auto Level in camera for hands-free capture! The app monitors your device angle and stability in real-time.
                   </Text>
+                  <View style={{ marginLeft: 8 }}>
+                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                      • Hold camera perpendicular (90°) to the surface
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                      • Keep steady - watch the alignment indicator turn green
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                      • When perfectly level and stable, a 3-second countdown begins
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20 }}>
+                      • Photo captures automatically - no need to tap!
+                    </Text>
+                  </View>
+                  <View style={{ marginTop: 8, backgroundColor: 'rgba(46, 125, 50, 0.15)', borderRadius: 6, padding: 8 }}>
+                    <Text style={{ fontSize: 13, color: '#1B5E20', fontStyle: 'italic' }}>
+                      💡 Tip: If you move during countdown, it will cancel and restart when steady again
+                    </Text>
+                  </View>
                 </View>
               </FeatureCard>
 
