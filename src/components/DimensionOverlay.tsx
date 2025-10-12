@@ -132,7 +132,7 @@ export default function DimensionOverlay({
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
-  const cursorOffsetY = 120;
+  const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 20;
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
   
