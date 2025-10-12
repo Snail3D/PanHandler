@@ -138,6 +138,7 @@ export default function DimensionOverlay({
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [lastHapticTime, setLastHapticTime] = useState<number>(Date.now());
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
@@ -1089,14 +1090,34 @@ export default function DimensionOverlay({
             // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
-            // Haptic feedback every 20px
+            // Adaptive haptic feedback based on movement speed
             const distance = Math.sqrt(
               Math.pow(pageX - lastHapticPosition.x, 2) + 
               Math.pow(pageY - lastHapticPosition.y, 2)
             );
+            
             if (distance >= HAPTIC_DISTANCE) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const currentTime = Date.now();
+              const timeDelta = currentTime - lastHapticTime;
+              
+              // Calculate speed (pixels per millisecond)
+              const speed = distance / Math.max(timeDelta, 1);
+              
+              // Adaptive haptic intensity:
+              // - Slow movements (speed < 0.5 px/ms): Medium intensity for precision
+              // - Medium movements (0.5-2 px/ms): Light intensity
+              // - Fast movements (> 2 px/ms): Very light/no haptic to avoid overwhelming
+              if (speed < 0.5) {
+                // Micro adjustments - more intense feedback
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              } else if (speed < 2) {
+                // Normal movements - light feedback
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+              // Fast swipes - no haptic (skip feedback)
+              
               setLastHapticPosition({ x: pageX, y: pageY });
+              setLastHapticTime(currentTime);
             }
           }}
           onResponderRelease={() => {
