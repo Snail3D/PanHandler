@@ -2053,24 +2053,20 @@ export default function DimensionOverlay({
                     <View />
                   )}
                   
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
-                      Hide menu
-                    </Text>
-                    <Pressable
-                      onPress={collapseMenu}
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 14,
-                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
-                    </Pressable>
-                  </View>
+                  {/* Collapse button - chevron only */}
+                  <Pressable
+                    onPress={collapseMenu}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
+                  </Pressable>
                 </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
