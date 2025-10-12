@@ -12,6 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
+import HelpModal from './HelpModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -490,6 +491,9 @@ export default function DimensionOverlay({
   
   // Hide menu during capture
   const [isCapturing, setIsCapturing] = useState(false);
+  
+  // Help modal
+  const [showHelpModal, setShowHelpModal] = useState(false);
   
   // Menu slide-to-hide with side tab
   const [menuHidden, setMenuHidden] = useState(false);
@@ -1529,6 +1533,41 @@ export default function DimensionOverlay({
           </BlurView>
         </View>
       </Modal>
+
+      {/* Help Button - Floating at top right */}
+      {!menuHidden && !isCapturing && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            right: 20,
+            zIndex: 50,
+          }}
+          pointerEvents="box-none"
+        >
+          <Pressable
+            onPress={() => setShowHelpModal(true)}
+            style={{
+              backgroundColor: 'rgba(0, 122, 255, 0.9)',
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 4,
+              elevation: 5,
+            }}
+          >
+            <Ionicons name="help-circle-outline" size={28} color="white" />
+          </Pressable>
+        </View>
+      )}
+
+      {/* Help Modal */}
+      <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
     </>
   );
 }
