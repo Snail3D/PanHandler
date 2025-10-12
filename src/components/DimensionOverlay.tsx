@@ -9,6 +9,7 @@ import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
+import * as FileSystem from 'expo-file-system';
 import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
@@ -490,22 +491,55 @@ export default function DimensionOverlay({
       // Wait a frame for the UI to update with label
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const uri = await captureRef(viewRef.current, {
+      // Capture measurements photo
+      const measurementsUri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
       });
 
-      console.log('📸 Captured URI:', uri);
-      console.log('💾 Saving to library...');
-      await MediaLibrary.saveToLibraryAsync(uri);
+      console.log('📸 Captured measurements URI:', measurementsUri);
+      
+      // Save measurements photo with custom filename
+      const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
+      const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
+      
+      // Save blank photo with label if we have label or calibration
+      if (label || calibration) {
+        console.log('📸 Capturing blank photo with label...');
+        
+        // Hide measurements temporarily
+        const savedMeasurements = measurements;
+        setMeasurements([]);
+        
+        // Wait for render
+        await new Promise(resolve => setTimeout(resolve, 150));
+        
+        // Capture blank with label
+        const blankUri = await captureRef(viewRef.current, {
+          format: 'jpg',
+          quality: 0.9,
+          result: 'tmpfile',
+        });
+        
+        // Restore measurements
+        setMeasurements(savedMeasurements);
+        
+        console.log('📸 Captured blank URI:', blankUri);
+        
+        // Save blank photo with custom filename
+        const blankFilename = label ? `${label}_Reference` : 'PanHandler_Reference';
+        const blankAsset = await MediaLibrary.createAssetAsync(blankUri);
+        
+        console.log('✅ Saved both photos!');
+      }
       
       // Show menu again and clear label
       setIsCapturing(false);
       setCurrentLabel(null);
       
       console.log('✅ Save successful!');
-      Alert.alert('Success', 'Measurement saved to Photos!');
+      Alert.alert('Success', label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
       
       // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -646,8 +680,14 @@ export default function DimensionOverlay({
       const recipients = emailToUse ? [emailToUse] : [];
       const ccRecipients = emailToUse ? [emailToUse] : [];
       
-      // Prepare attachments: captured image with measurements + blank photo with label
-      const attachments = [uri];
+      // Prepare attachments with proper filenames
+      const attachments: string[] = [];
+      
+      // Copy measurements photo with custom filename
+      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
+      const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
+      await FileSystem.copyAsync({ from: uri, to: measurementsDest });
+      attachments.push(measurementsDest);
       
       // Capture blank photo with label/scale if we have them
       if (currentImageUri && (label || calibration)) {
@@ -671,19 +711,29 @@ export default function DimensionOverlay({
           setMeasurements(savedMeasurements);
           setCurrentLabel(null);
           
-          attachments.push(blankWithLabelUri);
+          // Copy blank photo with custom filename
+          const blankFilename = label ? `${label}_Reference.jpg` : 'PanHandler_Reference.jpg';
+          const blankDest = `${FileSystem.cacheDirectory}${blankFilename}`;
+          await FileSystem.copyAsync({ from: blankWithLabelUri, to: blankDest });
+          attachments.push(blankDest);
           
-          console.log('✅ Created labeled blank photo');
+          console.log('✅ Created labeled blank photo with filename:', blankFilename);
         } catch (error) {
           console.error('Failed to create labeled blank photo:', error);
           // Fallback to original blank photo
           if (currentImageUri) {
-            attachments.push(currentImageUri);
+            const fallbackFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
+            const fallbackDest = `${FileSystem.cacheDirectory}${fallbackFilename}`;
+            await FileSystem.copyAsync({ from: currentImageUri, to: fallbackDest });
+            attachments.push(fallbackDest);
           }
         }
       } else if (currentImageUri) {
-        // No label or calibration, just attach original
-        attachments.push(currentImageUri);
+        // No label or calibration, just attach original with filename
+        const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
+        const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
+        await FileSystem.copyAsync({ from: currentImageUri, to: originalDest });
+        attachments.push(originalDest);
       }
       
       // Build subject with label
