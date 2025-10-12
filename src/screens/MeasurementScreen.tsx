@@ -46,11 +46,16 @@ export default function MeasurementScreen() {
   const coinCircle = useStore((s) => s.coinCircle);
   const imageOrientation = useStore((s) => s.imageOrientation);
   const savedZoomState = useStore((s) => s.savedZoomState);
+  const measurements = useStore((s) => s.completedMeasurements);
+  const currentPoints = useStore((s) => s.currentPoints);
   const setImageUri = useStore((s) => s.setImageUri);
   const setImageOrientation = useStore((s) => s.setImageOrientation);
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
+  
+  // Determine if pan/zoom should be locked
+  const isPanZoomLocked = measurements.length > 0 || currentPoints.length > 0;
 
   // Helper to detect orientation based on image (for future use)
   const detectOrientation = async (uri: string) => {
@@ -467,6 +472,7 @@ export default function MeasurementScreen() {
                   initialTranslateY={measurementZoom.translateY}
                   initialRotation={measurementZoom.rotation}
                   showLevelLine={false}
+                  locked={isPanZoomLocked}
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
