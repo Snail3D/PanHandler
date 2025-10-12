@@ -1403,13 +1403,14 @@ export default function DimensionOverlay({
             fingerScale.value = 1;
             fingerRotation.value = 0;
             
-            // Gradient horizontal offset: smooth transition from center
+            // Gradient horizontal offset: crosshair leans in direction of movement
             // At center: 0 offset
-            // At edges: ±30px offset away from edge
+            // Moving left: crosshair shifts left (negative)
+            // Moving right: crosshair shifts right (positive)
             const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
             const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
             const maxOffset = 30;
-            const horizontalOffset = -normalizedPosition * maxOffset;
+            const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
             
             setShowCursor(true);
             setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
@@ -1435,16 +1436,14 @@ export default function DimensionOverlay({
             }));
             setFingerTouches(touches);
             
-            // Gradient horizontal offset: smooth transition from center
+            // Gradient horizontal offset: crosshair leans in direction of movement
             // At center: 0 offset
-            // At edges: ±30px offset away from edge
-            // Formula: offset moves crosshair AWAY from the edge you're near
+            // Moving left: crosshair shifts left (negative)
+            // Moving right: crosshair shifts right (positive)
             const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
-            const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left edge) to +1 (right edge)
-            const maxOffset = 30; // Maximum offset at edges
-            
-            // Negative offset when on right (shifts left), positive when on left (shifts right)
-            const horizontalOffset = -normalizedPosition * maxOffset;
+            const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
+            const maxOffset = 30;
+            const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
             
             // Update cursor with gradient offset
             setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
