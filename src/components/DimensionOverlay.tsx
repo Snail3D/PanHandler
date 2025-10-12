@@ -1617,6 +1617,59 @@ export default function DimensionOverlay({
               </View>
             );
           })()}
+          
+          {/* Measurement legend in upper-left corner - only show if there are measurements */}
+          {measurements.length > 0 && (
+            <View
+              style={{
+                position: 'absolute',
+                top: insets.top + 52,
+                left: 12,
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                paddingHorizontal: 6,
+                paddingVertical: 4,
+                borderRadius: 4,
+              }}
+              pointerEvents="none"
+            >
+              {measurements.map((measurement, idx) => {
+                const color = getMeasurementColor(idx, measurement.mode);
+                return (
+                  <View
+                    key={`legend-${measurement.id}`}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginVertical: 1,
+                    }}
+                  >
+                    {/* Line number */}
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600', marginRight: 3 }}>
+                      {idx + 1}.
+                    </Text>
+                    {/* Color indicator */}
+                    <View
+                      style={{
+                        width: 12,
+                        height: 8,
+                        backgroundColor: color.main,
+                        borderRadius: 2,
+                        marginRight: 3,
+                      }}
+                    />
+                    {/* Color name */}
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '500', marginRight: 4 }}>
+                      {color.name}
+                    </Text>
+                    {/* Measurement value */}
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
+                      {measurement.value}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
       </View>
 
       {/* Delete button for selected measurement */}
