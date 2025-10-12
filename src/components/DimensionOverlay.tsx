@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Linking, ScrollView, TextInput, Modal, Image } from 'react-native';
-import { Svg, Line, Circle, Path } from 'react-native-svg';
+import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,15 +32,34 @@ const MEASUREMENT_COLORS = {
     { main: '#14B8A6', glow: '#14B8A6', name: 'Teal' },      // Fresh teal
     { main: '#A855F7', glow: '#A855F7', name: 'Violet' },    // Rich violet
   ],
+  circle: [
+    { main: '#EF4444', glow: '#EF4444', name: 'Red' },       // Vibrant red
+    { main: '#F97316', glow: '#F97316', name: 'Orange' },    // Bright orange
+    { main: '#FBBF24', glow: '#FBBF24', name: 'Yellow' },    // Golden yellow
+    { main: '#84CC16', glow: '#84CC16', name: 'Lime' },      // Lime green
+    { main: '#22D3EE', glow: '#22D3EE', name: 'Sky' },       // Sky blue
+  ],
+  rectangle: [
+    { main: '#DC2626', glow: '#DC2626', name: 'Crimson' },   // Deep crimson
+    { main: '#DB2777', glow: '#DB2777', name: 'Magenta' },   // Magenta
+    { main: '#9333EA', glow: '#9333EA', name: 'Purple' },    // Royal purple
+    { main: '#4F46E5', glow: '#4F46E5', name: 'Indigo' },    // Royal indigo
+    { main: '#0EA5E9', glow: '#0EA5E9', name: 'Blue' },      // Sky blue
+  ],
 };
 
-type MeasurementMode = 'distance' | 'angle';
+type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle';
 
 interface Measurement {
   id: string;
   points: Array<{ x: number; y: number }>;
   value: string;
   mode: MeasurementMode;
+  // For circles: points[0] = center, points[1] = edge point (defines radius)
+  // For rectangles: points[0] = first corner, points[1] = opposite corner
+  radius?: number; // For circles
+  width?: number;  // For rectangles
+  height?: number; // For rectangles
 }
 
 interface DimensionOverlayProps {
@@ -150,7 +169,10 @@ export default function DimensionOverlay({
     console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
     console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
     
-    const requiredPoints = mode === 'distance' ? 2 : 3;
+    const requiredPoints = mode === 'distance' ? 2 
+      : mode === 'angle' ? 3 
+      : mode === 'circle' ? 2 
+      : 2; // rectangle
     const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
     
     // Auto-enable measurement mode and lock pan/zoom after first point
@@ -167,10 +189,33 @@ export default function DimensionOverlay({
       
       // Calculate measurement value
       let value: string;
+      let radius: number | undefined;
+      let width: number | undefined;
+      let height: number | undefined;
+      
       if (mode === 'distance') {
         value = calculateDistance(completedPoints[0], completedPoints[1]);
-      } else {
+      } else if (mode === 'angle') {
         value = calculateAngle(completedPoints[0], completedPoints[1], completedPoints[2]);
+      } else if (mode === 'circle') {
+        // Calculate radius and diameter
+        radius = Math.sqrt(
+          Math.pow(completedPoints[1].x - completedPoints[0].x, 2) + 
+          Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
+        );
+        const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+        value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem)}`;
+      } else {
+        // Rectangle: calculate width and height
+        const p0 = completedPoints[0];
+        const p1 = completedPoints[1];
+        const widthPx = Math.abs(p1.x - p0.x);
+        const heightPx = Math.abs(p1.y - p0.y);
+        width = widthPx * (calibration?.pixelsPerUnit || 1);
+        height = heightPx * (calibration?.pixelsPerUnit || 1);
+        const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem);
+        const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem);
+        value = `${widthStr} × ${heightStr}`;
       }
       
       // Save as completed measurement
@@ -179,6 +224,9 @@ export default function DimensionOverlay({
         points: completedPoints.map(p => ({ x: p.x, y: p.y })),
         value,
         mode,
+        ...(radius !== undefined && { radius }),
+        ...(width !== undefined && { width }),
+        ...(height !== undefined && { height }),
       };
       
       setMeasurements([...measurements, newMeasurement]);
@@ -481,7 +529,10 @@ export default function DimensionOverlay({
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
-  const requiredPoints = mode === 'distance' ? 2 : 3;
+  const requiredPoints = mode === 'distance' ? 2 
+    : mode === 'angle' ? 3 
+    : mode === 'circle' ? 2  // center + edge point
+    : 2;  // rectangle: 2 corners
   
   // Lock pan/zoom once any points are placed
   const isPanZoomLocked = hasAnyMeasurements;
@@ -667,6 +718,11 @@ export default function DimensionOverlay({
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
             
+            // For circle mode, immediately place the center point
+            if (mode === 'circle' && currentPoints.length === 0) {
+              placePoint(pageX, pageY - cursorOffsetY);
+            }
+            
             // Haptic for activation
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }}
@@ -679,6 +735,16 @@ export default function DimensionOverlay({
             // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             
+            // For circle mode, continuously update the edge point (second point)
+            if (mode === 'circle' && currentPoints.length === 1) {
+              // Update the second point position as user drags
+              const imageCoords = screenToImage(pageX, pageY - cursorOffsetY);
+              setCurrentPoints([
+                currentPoints[0], 
+                { x: imageCoords.x, y: imageCoords.y, id: `temp-edge-${Date.now()}` }
+              ]);
+            }
+            
             // Haptic feedback every 20px
             const distance = Math.sqrt(
               Math.pow(pageX - lastHapticPosition.x, 2) + 
@@ -690,12 +756,40 @@ export default function DimensionOverlay({
             }
           }}
           onResponderRelease={() => {
-            console.log('✅ Touch released - placing point and hiding cursor');
-            placePoint(cursorPosition.x, cursorPosition.y);
-            setShowCursor(false);
+            console.log('✅ Touch released');
             
-            // Success haptic
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            // For circle mode with center already placed, finalize the circle
+            if (mode === 'circle' && currentPoints.length === 2) {
+              // Circle is complete, save it
+              const center = currentPoints[0];
+              const edge = currentPoints[1];
+              const radius = Math.sqrt(
+                Math.pow(edge.x - center.x, 2) + 
+                Math.pow(edge.y - center.y, 2)
+              );
+              const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+              const formattedValue = formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem);
+              
+              setMeasurements([...measurements, {
+                id: Date.now().toString(),
+                points: currentPoints.map(p => ({ x: p.x, y: p.y })),
+                value: formattedValue,
+                mode: 'circle',
+                radius,
+              }]);
+              setCurrentPoints([]);
+              setShowCursor(false);
+              
+              // Success haptic
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else {
+              // For other modes, place point normally
+              placePoint(cursorPosition.x, cursorPosition.y);
+              setShowCursor(false);
+              
+              // Success haptic
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
           }}
         />
       )}
@@ -792,20 +886,18 @@ export default function DimensionOverlay({
               if (measurement.mode === 'distance') {
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                const midX = (p0.x + p1.x) / 2;
-                const midY = (p0.y + p1.y) / 2;
                 
                 return (
                   <React.Fragment key={measurement.id}>
-                    {/* Outer glow layers - multiple for smooth gradient */}
+                    {/* Outer glow layers */}
                     <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
                     <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main line */}
                     <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
-                    {/* End caps with glow */}
+                    {/* End caps */}
                     <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
-                    {/* Point markers with layered glow */}
+                    {/* Point markers */}
                     <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
@@ -814,7 +906,7 @@ export default function DimensionOverlay({
                     <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
-              } else {
+              } else if (measurement.mode === 'angle') {
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
@@ -830,7 +922,7 @@ export default function DimensionOverlay({
                     <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
                     <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
-                    {/* Point markers with layered glow */}
+                    {/* Point markers */}
                     <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
@@ -842,7 +934,48 @@ export default function DimensionOverlay({
                     <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
+              } else if (measurement.mode === 'circle') {
+                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                const screenRadius = Math.sqrt(
+                  Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+                );
+                
+                return (
+                  <React.Fragment key={measurement.id}>
+                    {/* Glow layers */}
+                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+                    {/* Main circle */}
+                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="4" />
+                    {/* Center marker */}
+                    <Circle cx={center.x} cy={center.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={center.x} cy={center.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                  </React.Fragment>
+                );
+              } else if (measurement.mode === 'rectangle') {
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                
+                return (
+                  <React.Fragment key={measurement.id}>
+                    {/* Glow layers */}
+                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+                    {/* Main rectangle */}
+                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.main} strokeWidth="4" />
+                    {/* Corner markers */}
+                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                  </React.Fragment>
+                );
               }
+              return null;
             })}
 
             {/* Draw current points being placed */}
@@ -873,6 +1006,43 @@ export default function DimensionOverlay({
                     </>
                   )}
                 </>
+              );
+            })()}
+
+            {/* Draw live circle preview while dragging */}
+            {mode === 'circle' && currentPoints.length === 2 && (() => {
+              const center = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const edge = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              const radius = Math.sqrt(
+                Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+              );
+              const nextColor = getMeasurementColor(measurements.length, 'circle');
+              
+              return (
+                <>
+                  <Circle cx={center.x} cy={center.y} r={radius} fill="none" stroke={nextColor.main} strokeWidth="3" opacity="0.8" />
+                  <Line x1={center.x} y1={center.y} x2={edge.x} y2={edge.y} stroke={nextColor.main} strokeWidth="2" strokeDasharray="5,5" />
+                </>
+              );
+            })()}
+
+            {/* Draw live rectangle preview */}
+            {mode === 'rectangle' && currentPoints.length === 2 && (() => {
+              const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+              const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
+              const nextColor = getMeasurementColor(measurements.length, 'rectangle');
+              
+              return (
+                <Rect 
+                  x={Math.min(p0.x, p1.x)} 
+                  y={Math.min(p0.y, p1.y)} 
+                  width={Math.abs(p1.x - p0.x)} 
+                  height={Math.abs(p1.y - p0.y)} 
+                  fill="none" 
+                  stroke={nextColor.main} 
+                  strokeWidth="3" 
+                  opacity="0.8"
+                />
               );
             })()}
 
@@ -924,16 +1094,27 @@ export default function DimensionOverlay({
             // Calculate initial positions for all labels
             const labelData = measurements.map((measurement, idx) => {
               const color = getMeasurementColor(idx, measurement.mode);
-              let screenX, screenY;
+              let screenX = 0, screenY = 0;
               if (measurement.mode === 'distance') {
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = (p0.x + p1.x) / 2;
                 screenY = (p0.y + p1.y) / 2 - 50;
-              } else {
+              } else if (measurement.mode === 'angle') {
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = p1.x;
                 screenY = p1.y - 70;
+              } else if (measurement.mode === 'circle') {
+                // Label in center of circle
+                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                screenX = center.x;
+                screenY = center.y;
+              } else if (measurement.mode === 'rectangle') {
+                // Label at top center of rectangle
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                screenX = (p0.x + p1.x) / 2;
+                screenY = Math.min(p0.y, p1.y) - 40;
               }
               return { measurement, idx, color, screenX, screenY };
             });
@@ -1228,70 +1409,139 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
 
-          {/* Measurement Type Toggle */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
-            <Pressable
-              onPress={() => {
-                setMode('distance');
-                setCurrentPoints([]);
-                setMeasurementMode(true);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={{
-                flex: 1,
-                paddingVertical: 5,
-                borderRadius: 7.5,
-                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons 
-                  name="resize-outline" 
-                  size={12} 
-                  color={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
-                />
-                <Text style={{
-                  marginLeft: 4,
-                  textAlign: 'center',
-                  fontWeight: '600',
-                  fontSize: 10,
-                  color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                }}>
-                  Distance
-                </Text>
-              </View>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setMode('angle');
-                setCurrentPoints([]);
-                setMeasurementMode(true);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={{
-                flex: 1,
-                paddingVertical: 5,
-                borderRadius: 7.5,
-                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons 
-                  name="git-compare-outline" 
-                  size={12} 
-                  color={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
-                />
-                <Text style={{
-                  marginLeft: 4,
-                  textAlign: 'center',
-                  fontWeight: '600',
-                  fontSize: 10,
-                  color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
-                }}>
-                  Angle
-                </Text>
-              </View>
-            </Pressable>
+          {/* Measurement Type Toggle - 2x2 Grid */}
+          <View style={{ marginBottom: 8 }}>
+            {/* Row 1: Distance and Angle */}
+            <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+              <Pressable
+                onPress={() => {
+                  setMode('distance');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 5,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="resize-outline" 
+                    size={12} 
+                    color={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginLeft: 4,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Distance
+                  </Text>
+                </View>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setMode('angle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 5,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="git-compare-outline" 
+                    size={12} 
+                    color={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginLeft: 4,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Angle
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+
+            {/* Row 2: Circle and Rectangle */}
+            <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+              <Pressable
+                onPress={() => {
+                  setMode('circle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 5,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="ellipse-outline" 
+                    size={12} 
+                    color={mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginLeft: 4,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Circle
+                  </Text>
+                </View>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  setMode('rectangle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 5,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="square-outline" 
+                    size={12} 
+                    color={mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginLeft: 4,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Box
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
           </View>
 
           {/* Tip */}
@@ -1299,7 +1549,11 @@ export default function DimensionOverlay({
             <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
               <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
                 {measurementMode 
-                  ? '💡 Tap to place points • Pan/zoom will lock after first point'
+                  ? mode === 'circle' 
+                    ? '⭕ Press center, drag to size, release to finish'
+                    : mode === 'rectangle'
+                    ? '⬜ Tap first corner, then tap opposite corner'
+                    : '💡 Tap to place points • Pan/zoom will lock after first point'
                   : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
                 }
               </Text>
