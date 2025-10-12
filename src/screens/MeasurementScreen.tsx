@@ -316,6 +316,71 @@ export default function MeasurementScreen() {
             </View>
           </View>
 
+          {/* Crosshairs overlay - center of screen */}
+          <View 
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: 100,
+              height: 100,
+              marginLeft: -50,
+              marginTop: -50,
+            }}
+            pointerEvents="none"
+          >
+            {/* Horizontal line */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 49,
+                left: 0,
+                right: 0,
+                height: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+              }}
+            />
+            {/* Vertical line */}
+            <View
+              style={{
+                position: 'absolute',
+                left: 49,
+                top: 0,
+                bottom: 0,
+                width: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+              }}
+            />
+            {/* Center dot */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 47,
+                left: 47,
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              }}
+            />
+            
+            {/* "Center object here" text below crosshairs */}
+            <Text
+              style={{
+                position: 'absolute',
+                top: 110,
+                left: -50,
+                width: 200,
+                textAlign: 'center',
+                color: 'rgba(255, 255, 255, 0.6)',
+                fontSize: 13,
+                fontWeight: '500',
+              }}
+            >
+              Center object here
+            </Text>
+          </View>
+
           {/* Bottom controls */}
           <View 
             className="absolute bottom-0 left-0 right-0 z-10"
