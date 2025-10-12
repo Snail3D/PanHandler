@@ -44,9 +44,15 @@ interface MeasurementStore {
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
   isProUser: boolean; // Pro user status for paywall
-  savedZoomState: { scale: number; translateX: number; translateY: number; rotation: number } | null; // Restore zoom/pan/rotation
+  savedZoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null; // Restore zoom/pan/rotation
+  sessionCount: number; // Track app sessions for rating prompt
+  hasRatedApp: boolean; // Track if user has been prompted/rated
+  lastRatingPromptDate: string | null; // Track when user was last prompted
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
+  incrementSessionCount: () => void;
+  setHasRatedApp: (hasRated: boolean) => void;
+  setLastRatingPromptDate: (date: string) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -63,7 +69,7 @@ interface MeasurementStore {
   setUnitSystem: (system: UnitSystem) => void;
   setUserEmail: (email: string | null) => void;
   setIsProUser: (isPro: boolean) => void;
-  setSavedZoomState: (state: { scale: number; translateX: number; translateY: number } | null) => void;
+  setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
 }
 
 const useStore = create<MeasurementStore>()(
@@ -84,6 +90,9 @@ const useStore = create<MeasurementStore>()(
       userEmail: null,
       isProUser: false,
       savedZoomState: null,
+      sessionCount: 0,
+      hasRatedApp: false,
+      lastRatingPromptDate: null,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -91,6 +100,12 @@ const useStore = create<MeasurementStore>()(
         // Only clear measurements if setting to null
         ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null, savedZoomState: null, isAutoCaptured: false } : {})
       }),
+
+      incrementSessionCount: () => set((state) => ({ sessionCount: state.sessionCount + 1 })),
+
+      setHasRatedApp: (hasRated) => set({ hasRatedApp: hasRated }),
+
+      setLastRatingPromptDate: (date) => set({ lastRatingPromptDate: date }),
 
       setImageOrientation: (orientation) => set({ imageOrientation: orientation }),
 
@@ -165,6 +180,9 @@ const useStore = create<MeasurementStore>()(
         lastSelectedCoin: state.lastSelectedCoin,
         userEmail: state.userEmail, // Persist user email
         isProUser: state.isProUser, // Persist pro status
+        sessionCount: state.sessionCount, // Persist session count
+        hasRatedApp: state.hasRatedApp, // Persist rating status
+        lastRatingPromptDate: state.lastRatingPromptDate, // Persist last prompt date
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag

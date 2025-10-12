@@ -82,6 +82,7 @@
     "expo-splash-screen": "~0.30.8",
     "expo-sqlite": "~15.2.9",
     "expo-status-bar": "~2.2.3",
+    "expo-store-review": "^9.0.8",
     "expo-symbols": "~0.4.4",
     "expo-system-ui": "~5.0.7",
     "expo-video": "~2.1.8",
