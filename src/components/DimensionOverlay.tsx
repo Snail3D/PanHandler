@@ -2685,13 +2685,13 @@ export default function DimensionOverlay({
         </View>
       </Modal>
 
-      {/* Help Button - Floating at top left */}
+      {/* Help Button - Floating centered horizontally */}
       {!menuHidden && !isCapturing && (
         <View
           style={{
             position: 'absolute',
             top: insets.top + 52,
-            left: 20,
+            left: SCREEN_WIDTH / 2 - 13,
             zIndex: 50,
           }}
           pointerEvents="box-none"
