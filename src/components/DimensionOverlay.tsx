@@ -578,7 +578,8 @@ export default function DimensionOverlay({
       measurementText += '-------------\n';
       
       measurements.forEach((m, idx) => {
-        measurementText += `${idx + 1}. ${m.value}\n`;
+        const color = getMeasurementColor(idx, m.mode);
+        measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
       });
       
       // Add calibration/scale information
@@ -592,6 +593,12 @@ export default function DimensionOverlay({
         measurementText += `\n\nFor CAD/Design Software:\n`;
         measurementText += `Set scale to ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}`;
       }
+      
+      // Add footer
+      measurementText += '\n\n\n';
+      measurementText += '═══════════════════════════\n';
+      measurementText += '   Made with the PanHandler App on iOS\n';
+      measurementText += '═══════════════════════════';
 
       console.log('📧 Opening email composer...');
       
@@ -599,13 +606,19 @@ export default function DimensionOverlay({
       const recipients = emailToUse ? [emailToUse] : [];
       const ccRecipients = emailToUse ? [emailToUse] : [];
       
-      // Compose email with attachment
+      // Prepare attachments: captured image + original blank photo
+      const attachments = [uri];
+      if (currentImageUri) {
+        attachments.push(currentImageUri);
+      }
+      
+      // Compose email with attachments
       await MailComposer.composeAsync({
         recipients,
         ccRecipients,
         subject: 'PanHandler Measurements',
         body: measurementText,
-        attachments: [uri],
+        attachments,
       });
       
       console.log('✅ Email composer opened');
