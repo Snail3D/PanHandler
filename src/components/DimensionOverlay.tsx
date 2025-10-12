@@ -1289,6 +1289,38 @@ export default function DimensionOverlay({
         })()}
       </View>
 
+      {/* Subtle guide lines - only show in Pan mode after calibration */}
+      {!measurementMode && calibration && (
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          pointerEvents="none"
+        >
+          {/* Vertical center line - very subtle */}
+          <View
+            style={{
+              position: 'absolute',
+              left: SCREEN_WIDTH / 2 - 0.5,
+              top: 0,
+              bottom: 0,
+              width: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            }}
+          />
+          
+          {/* Horizontal center line - very subtle */}
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT / 2 - 0.5,
+              left: 0,
+              right: 0,
+              height: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            }}
+          />
+        </View>
+      )}
+
       {/* Visual overlay for measurements */}
       <View
         ref={viewRef}
