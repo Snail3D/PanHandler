@@ -1368,17 +1368,17 @@ export default function DimensionOverlay({
                     <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
                     <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main line */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
                     {/* End caps */}
-                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="3" strokeLinecap="round" />
+                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
                     {/* Point markers */}
                     <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                     <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'angle') {
@@ -1394,19 +1394,19 @@ export default function DimensionOverlay({
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main lines */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="4" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
                     <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
                     {/* Point markers */}
                     <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                     <Circle cx={p1.x} cy={p1.y} r="18" fill={color.main} opacity="0.1" />
                     <Circle cx={p1.x} cy={p1.y} r="14" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="10" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="10" fill={color.main} stroke="white" strokeWidth="2" />
                     <Circle cx={p2.x} cy={p2.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p2.x} cy={p2.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'circle') {
@@ -1422,11 +1422,11 @@ export default function DimensionOverlay({
                     <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
                     <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
                     {/* Main circle */}
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="4" />
+                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
                     {/* Center marker */}
                     <Circle cx={center.x} cy={center.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={center.x} cy={center.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'rectangle') {
@@ -1439,14 +1439,14 @@ export default function DimensionOverlay({
                     <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
                     <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
                     {/* Main rectangle */}
-                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.main} strokeWidth="4" />
+                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.main} strokeWidth="2.5" />
                     {/* Corner markers */}
                     <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                     <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
                     <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
                   </React.Fragment>
                 );
               }
@@ -1460,9 +1460,9 @@ export default function DimensionOverlay({
               const nextColor = getMeasurementColor(measurements.length, 'distance');
               return (
                 <>
-                  <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={nextColor.main} strokeWidth="3" />
-                  <Line x1={p0.x} y1={p0.y - 10} x2={p0.x} y2={p0.y + 10} stroke={nextColor.main} strokeWidth="2" />
-                  <Line x1={p1.x} y1={p1.y - 10} x2={p1.x} y2={p1.y + 10} stroke={nextColor.main} strokeWidth="2" />
+                  <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={nextColor.main} strokeWidth="2" />
+                  <Line x1={p0.x} y1={p0.y - 10} x2={p0.x} y2={p0.y + 10} stroke={nextColor.main} strokeWidth="1.5" />
+                  <Line x1={p1.x} y1={p1.y - 10} x2={p1.x} y2={p1.y + 10} stroke={nextColor.main} strokeWidth="1.5" />
                 </>
               );
             })()}
@@ -1475,11 +1475,11 @@ export default function DimensionOverlay({
               
               return (
                 <>
-                  <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={nextColor.main} strokeWidth="3" />
+                  <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={nextColor.main} strokeWidth="2" />
                   {p2 && (
                     <>
-                      <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={nextColor.main} strokeWidth="3" />
-                      <Path d={generateArcPath(p0, p1, p2)} stroke={nextColor.main} strokeWidth="2" fill="none" />
+                      <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={nextColor.main} strokeWidth="2" />
+                      <Path d={generateArcPath(p0, p1, p2)} stroke={nextColor.main} strokeWidth="1.5" fill="none" />
                     </>
                   )}
                 </>
@@ -1497,8 +1497,8 @@ export default function DimensionOverlay({
               
               return (
                 <>
-                  <Circle cx={center.x} cy={center.y} r={radius} fill="none" stroke={nextColor.main} strokeWidth="3" opacity="0.8" />
-                  <Line x1={center.x} y1={center.y} x2={edge.x} y2={edge.y} stroke={nextColor.main} strokeWidth="2" strokeDasharray="5,5" />
+                  <Circle cx={center.x} cy={center.y} r={radius} fill="none" stroke={nextColor.main} strokeWidth="2" opacity="0.8" />
+                  <Line x1={center.x} y1={center.y} x2={edge.x} y2={edge.y} stroke={nextColor.main} strokeWidth="1.5" strokeDasharray="5,5" />
                 </>
               );
             })()}
@@ -1517,7 +1517,7 @@ export default function DimensionOverlay({
                   height={Math.abs(p1.y - p0.y)} 
                   fill="none" 
                   stroke={nextColor.main} 
-                  strokeWidth="3" 
+                  strokeWidth="2" 
                   opacity="0.8"
                 />
               );
