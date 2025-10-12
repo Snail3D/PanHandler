@@ -1005,6 +1005,50 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               </View>
             </ScrollView>
 
+              {/* Easter Egg Hints Section */}
+              <View style={{ marginBottom: 20, marginTop: 8 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(800)}
+                  style={{
+                    backgroundColor: '#FFFBEA',
+                    borderRadius: 16,
+                    padding: 18,
+                    shadowColor: '#FFD700',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 8,
+                    elevation: 4,
+                    borderWidth: 2,
+                    borderColor: '#FFD700',
+                    borderStyle: 'dashed',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 24 }}>🥚</Text>
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#D97706', marginHorizontal: 8 }}>
+                      Hidden Surprises
+                    </Text>
+                    <Text style={{ fontSize: 24 }}>🥚</Text>
+                  </View>
+                  
+                  <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 21, textAlign: 'center', marginBottom: 12, fontStyle: 'italic' }}>
+                    Some badges hide secrets... if you are persistent enough 🤔
+                  </Text>
+
+                  <View style={{ backgroundColor: '#FEF3C7', borderRadius: 10, padding: 12, marginBottom: 8 }}>
+                    <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 19, textAlign: 'center' }}>
+                      💚 <Text style={{ fontWeight: '600' }}>The green badge</Text> guards a playful message from the past...
+                    </Text>
+                  </View>
+
+                  <View style={{ backgroundColor: '#FEF3C7', borderRadius: 10, padding: 12 }}>
+                    <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 19, textAlign: 'center' }}>
+                      ⚡ <Text style={{ fontWeight: '600' }}>The flash badge</Text> holds a legendary tune...
+                    </Text>
+                  </View>
+                </Animated.View>
+              </View>
+
             {/* Footer */}
             <View
               style={{

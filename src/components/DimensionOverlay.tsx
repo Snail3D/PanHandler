@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -171,6 +171,13 @@ export default function DimensionOverlay({
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   
+  // Easter egg states
+  const [calibratedTapCount, setCalibrateTapCount] = useState(0);
+  const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
+  const [showCalculatorWords, setShowCalculatorWords] = useState(false);
+  const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
@@ -220,6 +227,72 @@ export default function DimensionOverlay({
       // User tapped 3+ times, dismiss immediately
       dismissQuote();
     }
+  };
+  
+  // Calculator words for Easter egg (classic upside-down calculator words)
+  const CALCULATOR_WORDS = ['HELLO', 'BOOBS', '80085', '5318008', 'SHELL', '07734', 'GOOGLE', '376616', 'BOOBLESS', '553780085'];
+  
+  // Easter egg: Calibrated badge tap handler
+  const handleCalibratedTap = () => {
+    // Clear existing timeout
+    if (calibratedTapTimeoutRef.current) {
+      clearTimeout(calibratedTapTimeoutRef.current);
+    }
+    
+    const newCount = calibratedTapCount + 1;
+    setCalibrateTapCount(newCount);
+    
+    if (newCount >= 5) {
+      // Activate Easter egg!
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setShowCalculatorWords(true);
+      setCalibrateTapCount(0);
+      
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        setShowCalculatorWords(false);
+      }, 5000);
+    } else {
+      // Reset counter after 2 seconds of no taps
+      calibratedTapTimeoutRef.current = setTimeout(() => {
+        setCalibrateTapCount(0);
+      }, 2000);
+    }
+  };
+  
+  // Easter egg: AUTO LEVEL badge tap handler
+  const handleAutoLevelTap = () => {
+    // Clear existing timeout
+    if (autoLevelTapTimeoutRef.current) {
+      clearTimeout(autoLevelTapTimeoutRef.current);
+    }
+    
+    const newCount = autoLevelTapCount + 1;
+    setAutoLevelTapCount(newCount);
+    
+    if (newCount >= 7) {
+      // Activate Easter egg!
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setAutoLevelTapCount(0);
+      
+      // Open YouTube video with autoplay
+      const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
+      Linking.openURL(youtubeUrl).catch(err => {
+        Alert.alert('Error', 'Could not open video');
+        console.error('Failed to open URL:', err);
+      });
+    } else {
+      // Reset counter after 2 seconds of no taps
+      autoLevelTapTimeoutRef.current = setTimeout(() => {
+        setAutoLevelTapCount(0);
+      }, 2000);
+    }
+  };
+  
+  // Get calculator word for a measurement value
+  const getCalculatorWord = (value: string): string => {
+    const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return CALCULATOR_WORDS[hash % CALCULATOR_WORDS.length];
   };
   
   // Get color for measurement based on index
@@ -1041,7 +1114,8 @@ export default function DimensionOverlay({
     <>
       {/* Persistent "Calibration Locked" indicator */}
       {coinCircle && !showLockedInAnimation && (
-        <View 
+        <Pressable
+          onPress={handleCalibratedTap}
           className="absolute z-20"
           style={{
             top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
@@ -1058,13 +1132,12 @@ export default function DimensionOverlay({
             shadowRadius: 4,
             elevation: 5,
           }}
-          pointerEvents="none"
         >
           <Ionicons name="checkmark-circle" size={16} color="white" />
           <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
             Calibrated
           </Text>
-        </View>
+        </Pressable>
       )}
 
       {/* Draggable side tab - appears when menu is hidden */}
@@ -1871,7 +1944,7 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
-                    {measurement.value}
+                    {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
                   </Text>
                 </View>
               </View>
@@ -2029,7 +2102,8 @@ export default function DimensionOverlay({
           
           {/* Auto-capture badge - top-right corner */}
           {isAutoCaptured && (
-            <View
+            <Pressable
+              onPress={handleAutoLevelTap}
               style={{
                 position: 'absolute',
                 top: insets.top + 16,
@@ -2041,13 +2115,12 @@ export default function DimensionOverlay({
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
-              pointerEvents="none"
             >
               <Ionicons name="flash" size={12} color="white" />
               <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
                 AUTO LEVEL
               </Text>
-            </View>
+            </Pressable>
           )}
           
           {/* Label and scale info - upper-left corner (always visible when capturing) */}
@@ -2138,7 +2211,7 @@ export default function DimensionOverlay({
                     />
                     {/* Measurement value */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
-                      {measurement.value}
+                      {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
                     </Text>
                   </View>
                 );
