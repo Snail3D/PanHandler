@@ -139,7 +139,7 @@ export default function DimensionOverlay({
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
-  const HAPTIC_DISTANCE = 20;
+  const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
   
   // Initialize measurement mode based on whether there are existing measurements
@@ -1108,20 +1108,20 @@ export default function DimensionOverlay({
                 // First tap: place center point
                 placePoint(cursorPosition.x, cursorPosition.y);
                 setShowCursor(false);
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               } else if (currentPoints.length === 1) {
                 // Second tap: place edge point, which will auto-complete the circle via placePoint
                 placePoint(cursorPosition.x, cursorPosition.y);
                 setShowCursor(false);
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               }
             } else {
               // For other modes, place point normally
               placePoint(cursorPosition.x, cursorPosition.y);
               setShowCursor(false);
               
-              // Success haptic
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              // Heavy haptic for point placement
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }
           }}
         />
