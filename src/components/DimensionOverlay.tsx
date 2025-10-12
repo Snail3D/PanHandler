@@ -2705,7 +2705,7 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 52,
+            top: insets.top + 20,
             left: SCREEN_WIDTH / 2 - 13,
             zIndex: 50,
           }}
