@@ -430,6 +430,32 @@ export default function DimensionOverlay({
       >
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
+            {/* Define glow filters */}
+            <defs>
+              <filter id="blueGlow" height="300%" width="300%" x="-75%" y="-75%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="0 0 0 0 0.23
+                                                                0 0 0 0 0.51
+                                                                0 0 0 0 0.96
+                                                                0 0 0 0.6 0" result="glow"/>
+                <feMerge>
+                  <feMergeNode in="glow"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <filter id="greenGlow" height="300%" width="300%" x="-75%" y="-75%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="0 0 0 0 0.06
+                                                                0 0 0 0 0.73
+                                                                0 0 0 0 0.51
+                                                                0 0 0 0.6 0" result="glow"/>
+                <feMerge>
+                  <feMergeNode in="glow"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            
             {/* Lock-in animation - green blinking circle (only shows during animation) */}
             {showLockedInAnimation && coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
@@ -466,31 +492,50 @@ export default function DimensionOverlay({
                 
                 return (
                   <React.Fragment key={measurement.id}>
+                    {/* Glow layer */}
                     <Line
                       x1={p0.x}
                       y1={p0.y}
                       x2={p1.x}
                       y2={p1.y}
                       stroke="#3B82F6"
-                      strokeWidth="3"
+                      strokeWidth="8"
+                      opacity="0.3"
+                      filter="url(#blueGlow)"
                     />
+                    {/* Main line */}
                     <Line
                       x1={p0.x}
-                      y1={p0.y - 10}
-                      x2={p0.x}
-                      y2={p0.y + 10}
+                      y1={p0.y}
+                      x2={p1.x}
+                      y2={p1.y}
                       stroke="#3B82F6"
-                      strokeWidth="2"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                    />
+                    {/* End caps */}
+                    <Line
+                      x1={p0.x}
+                      y1={p0.y - 12}
+                      x2={p0.x}
+                      y2={p0.y + 12}
+                      stroke="#3B82F6"
+                      strokeWidth="3"
+                      strokeLinecap="round"
                     />
                     <Line
                       x1={p1.x}
-                      y1={p1.y - 10}
+                      y1={p1.y - 12}
                       x2={p1.x}
-                      y2={p1.y + 10}
+                      y2={p1.y + 12}
                       stroke="#3B82F6"
-                      strokeWidth="2"
+                      strokeWidth="3"
+                      strokeLinecap="round"
                     />
+                    {/* Point markers with glow */}
+                    <Circle cx={p0.x} cy={p0.y} r="10" fill="#3B82F6" opacity="0.3" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="10" fill="#3B82F6" opacity="0.3" />
                     <Circle cx={p1.x} cy={p1.y} r="8" fill="#3B82F6" stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
@@ -501,11 +546,19 @@ export default function DimensionOverlay({
                 
                 return (
                   <React.Fragment key={measurement.id}>
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="3" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="3" />
-                    <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" />
+                    {/* Glow layers */}
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="8" opacity="0.3" filter="url(#greenGlow)" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="8" opacity="0.3" filter="url(#greenGlow)" />
+                    {/* Main lines */}
+                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
+                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#10B981" strokeWidth="4" strokeLinecap="round" />
+                    <Path d={generateArcPath(p0, p1, p2)} stroke="#10B981" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    {/* Point markers with glow */}
+                    <Circle cx={p0.x} cy={p0.y} r="10" fill="#10B981" opacity="0.3" />
                     <Circle cx={p0.x} cy={p0.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill="#059669" stroke="white" strokeWidth="3" />
+                    <Circle cx={p1.x} cy={p1.y} r="12" fill="#059669" opacity="0.3" />
+                    <Circle cx={p1.x} cy={p1.y} r="10" fill="#059669" stroke="white" strokeWidth="3" />
+                    <Circle cx={p2.x} cy={p2.y} r="10" fill="#10B981" opacity="0.3" />
                     <Circle cx={p2.x} cy={p2.y} r="8" fill="#10B981" stroke="white" strokeWidth="3" />
                   </React.Fragment>
                 );
@@ -701,21 +754,21 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            backgroundColor: 'rgba(249, 249, 249, 0.78)',
             borderRadius: 28,
             paddingHorizontal: 20,
             paddingTop: 20,
             paddingBottom: 24,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.15,
+            shadowOpacity: 0.12,
             shadowRadius: 24,
             elevation: 12,
-            borderWidth: 1,
-            borderColor: 'rgba(0,0,0,0.04)',
+            borderWidth: 0.5,
+            borderColor: 'rgba(0,0,0,0.06)',
           }}>
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-4" style={{ backgroundColor: '#F2F2F7', borderRadius: 14, padding: 4 }}>
+          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(142, 142, 147, 0.12)', borderRadius: 14, padding: 4 }}>
             <Pressable
               onPress={() => {
                 if (isPanZoomLocked) return;
@@ -728,7 +781,7 @@ export default function DimensionOverlay({
                 flex: 1,
                 paddingVertical: 10,
                 borderRadius: 11,
-                backgroundColor: !measurementMode ? '#FFFFFF' : 'transparent',
+                backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
                 opacity: isPanZoomLocked ? 0.5 : 1,
               }}
             >
@@ -757,7 +810,7 @@ export default function DimensionOverlay({
                 flex: 1,
                 paddingVertical: 10,
                 borderRadius: 11,
-                backgroundColor: measurementMode ? '#FFFFFF' : 'transparent',
+                backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
@@ -779,17 +832,27 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-4" style={{ backgroundColor: '#F2F2F7', borderRadius: 14, padding: 4 }}>
+          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(142, 142, 147, 0.12)', borderRadius: 14, padding: 4 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
                 setCurrentPoints([]);
-                setMeasurementMode(true); // Auto-enable measurement mode
+                setMeasurementMode(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              className={`flex-1 py-2 rounded-md ${mode === 'distance' ? 'bg-white' : ''}`}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 11,
+                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+              }}
             >
-              <Text className={`text-center font-semibold ${mode === 'distance' ? 'text-blue-600' : 'text-gray-600'}`}>
+              <Text style={{
+                textAlign: 'center',
+                fontWeight: '600',
+                fontSize: 15,
+                color: mode === 'distance' ? '#007AFF' : '#8E8E93'
+              }}>
                 Distance
               </Text>
             </Pressable>
@@ -797,12 +860,22 @@ export default function DimensionOverlay({
               onPress={() => {
                 setMode('angle');
                 setCurrentPoints([]);
-                setMeasurementMode(true); // Auto-enable measurement mode
+                setMeasurementMode(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              className={`flex-1 py-2 rounded-md ${mode === 'angle' ? 'bg-white' : ''}`}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                borderRadius: 11,
+                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+              }}
             >
-              <Text className={`text-center font-semibold ${mode === 'angle' ? 'text-green-600' : 'text-gray-600'}`}>
+              <Text style={{
+                textAlign: 'center',
+                fontWeight: '600',
+                fontSize: 15,
+                color: mode === 'angle' ? '#34C759' : '#8E8E93'
+              }}>
                 Angle
               </Text>
             </Pressable>
