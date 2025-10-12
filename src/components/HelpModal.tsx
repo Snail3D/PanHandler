@@ -3,6 +3,7 @@ import { View, Text, Modal, ScrollView, Pressable, Linking } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Svg, Line, Circle, Path } from 'react-native-svg';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -297,7 +298,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="remove" size={18} color="#7E57C2" />
+                    {/* Custom distance icon matching menu */}
+                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                      <Line x1="3" y1="8" x2="13" y2="8" stroke="#7E57C2" strokeWidth="1.5" />
+                      <Circle cx="3" cy="8" r="2" fill="#7E57C2" />
+                      <Circle cx="13" cy="8" r="2" fill="#7E57C2" />
+                    </Svg>
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Distance Mode
                     </Text>
@@ -317,7 +323,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="git-compare" size={18} color="#FB8C00" />
+                    {/* Custom angle icon matching menu */}
+                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                      <Line x1="3" y1="13" x2="3" y2="3" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
+                      <Line x1="3" y1="13" x2="13" y2="13" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
+                      <Path d="M 7 13 A 4 4 0 0 1 3 9" stroke="#FB8C00" strokeWidth="1.3" fill="none" />
+                      <Line x1="5.3" y1="12.3" x2="5.7" y2="13.3" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
+                      <Line x1="3.7" y1="10.7" x2="2.7" y2="10.3" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
+                    </Svg>
                     <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Angle Mode
                     </Text>
@@ -422,9 +435,38 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
                     📄 <Text style={{ fontWeight: '600' }}>Original Reference</Text> - Clean photo with scale info
                   </Text>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22 }}>
+                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12 }}>
                     ✉️ <Text style={{ fontWeight: '600' }}>Email Reports</Text> - All photos + detailed measurement data
                   </Text>
+                </View>
+
+                {/* CAD Integration Tips */}
+                <View
+                  style={{
+                    backgroundColor: '#F0F4FF',
+                    borderRadius: 12,
+                    padding: 12,
+                    borderWidth: 2,
+                    borderColor: '#5856D6',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="cube" size={18} color="#5856D6" />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
+                      CAD Software Integration
+                    </Text>
+                  </View>
+                  <View style={{ marginLeft: 4 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20, marginBottom: 6 }}>
+                      • <Text style={{ fontWeight: '600' }}>Center alignment guides</Text> help position objects perfectly for CAD import
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20, marginBottom: 6 }}>
+                      • <Text style={{ fontWeight: '600' }}>Scale notes on every photo</Text> show exact Canvas Scale values for Fusion 360
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20 }}>
+                      • <Text style={{ fontWeight: '600' }}>No guesswork!</Text> Insert {`>`} Canvas {`>`} Set Scale X/Y to the provided value
+                    </Text>
+                  </View>
                 </View>
               </FeatureCard>
 
