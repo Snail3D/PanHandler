@@ -89,75 +89,6 @@ export default function ZoomCalibration({
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
-      {/* GUIDE LINES - ALWAYS VISIBLE FOR TESTING */}
-      <View
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 99999,
-        }}
-        pointerEvents="none"
-      >
-        {/* Horizontal level line - bright red for testing */}
-        <View
-          style={{
-            position: 'absolute',
-            top: SCREEN_HEIGHT * 0.25,
-            left: 0,
-            right: 0,
-            height: 4,
-            backgroundColor: 'red',
-          }}
-        />
-        
-        {/* Vertical center line - bright green */}
-        <View
-          style={{
-            position: 'absolute',
-            left: SCREEN_WIDTH / 2 - 2,
-            top: 0,
-            bottom: 0,
-            width: 4,
-            backgroundColor: 'lime',
-          }}
-        />
-        
-        {/* Horizontal center line - bright blue */}
-        <View
-          style={{
-            position: 'absolute',
-            top: SCREEN_HEIGHT / 2 - 2,
-            left: 0,
-            right: 0,
-            height: 4,
-            backgroundColor: 'cyan',
-          }}
-        />
-        
-        {/* LEVEL text - huge and obvious */}
-        <View
-          style={{
-            position: 'absolute',
-            top: 50,
-            left: SCREEN_WIDTH / 2 - 100,
-            width: 200,
-            height: 80,
-            backgroundColor: 'yellow',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 4,
-            borderColor: 'black',
-          }}
-        >
-          <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'black' }}>
-            LEVEL GUIDES
-          </Text>
-        </View>
-      </View>
-      
       {/* Zoomable Image */}
       <ZoomableImage
         imageUri={imageUri}
@@ -208,79 +139,32 @@ export default function ZoomCalibration({
         </View>
       </View>
 
-      {/* Level line and center crosshairs - very faint guides */}
+      {/* Subtle level guides - center crosshairs */}
       <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        {/* TEST: Red box in corner to verify this View renders */}
+        {/* Vertical center line - very subtle */}
         <View
           style={{
             position: 'absolute',
-            top: 100,
-            right: 20,
-            width: 50,
-            height: 50,
-            backgroundColor: 'red',
-            zIndex: 9999,
-          }}
-        />
-        
-        {/* Horizontal level line - 1/4 down from top */}
-        <View
-          style={{
-            position: 'absolute',
-            top: SCREEN_HEIGHT * 0.25,
-            left: 0,
-            right: 0,
-            height: 3,
-            backgroundColor: 'rgba(255, 0, 0, 0.8)',
-            zIndex: 9999,
-          }}
-        />
-        
-        {/* "LEVEL" text */}
-        <View
-          style={{
-            position: 'absolute',
-            top: SCREEN_HEIGHT * 0.25 - 25,
-            left: 12,
-            backgroundColor: 'rgba(255, 0, 0, 0.9)',
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 4,
-            zIndex: 9999,
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
-            LEVEL
-          </Text>
-        </View>
-        
-        {/* Center crosshairs - very faint */}
-        {/* Vertical center line */}
-        <View
-          style={{
-            position: 'absolute',
-            left: SCREEN_WIDTH / 2 - 1.5,
+            left: SCREEN_WIDTH / 2 - 0.5,
             top: 0,
             bottom: 0,
-            width: 3,
-            backgroundColor: 'rgba(0, 255, 0, 0.8)',
-            zIndex: 9999,
+            width: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
           }}
         />
         
-        {/* Horizontal center line */}
+        {/* Horizontal center line - very subtle */}
         <View
           style={{
             position: 'absolute',
-            top: SCREEN_HEIGHT / 2 - 1.5,
+            top: SCREEN_HEIGHT / 2 - 0.5,
             left: 0,
             right: 0,
-            height: 3,
-            backgroundColor: 'rgba(0, 255, 0, 0.8)',
-            zIndex: 9999,
+            height: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
           }}
         />
       </View>
@@ -342,29 +226,6 @@ export default function ZoomCalibration({
             </Pressable>
           </View>
         </View>
-      </View>
-      
-      {/* ABSOLUTE TOP LAYER - FINAL TEST */}
-      <View
-        style={{
-          position: 'absolute',
-          top: 200,
-          left: 20,
-          width: 200,
-          height: 100,
-          backgroundColor: 'yellow',
-          zIndex: 99999,
-          elevation: 99999,
-          borderWidth: 5,
-          borderColor: 'black',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        pointerEvents="none"
-      >
-        <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}>
-          TEST VISIBLE
-        </Text>
       </View>
     </View>
   );
