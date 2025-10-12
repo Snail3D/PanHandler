@@ -466,6 +466,7 @@ export default function MeasurementScreen() {
                   initialTranslateX={measurementZoom.translateX}
                   initialTranslateY={measurementZoom.translateY}
                   initialRotation={measurementZoom.rotation}
+                  showLevelLine={false}
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Image, Dimensions, StyleSheet } from 'react-native';
+import { Image, Dimensions, StyleSheet, View, Text } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -19,6 +19,7 @@ interface ZoomableImageProps {
   initialTranslateY?: number;
   initialRotation?: number;
   zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
+  showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
 }
 
 export default function ZoomableImage({ 
@@ -29,6 +30,7 @@ export default function ZoomableImage({
   initialTranslateY = 0,
   initialRotation = 0,
   zoomToCenter = false,
+  showLevelLine = false,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -129,14 +131,51 @@ export default function ZoomableImage({
   }));
 
   return (
-    <GestureDetector gesture={composedGesture}>
-      <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-        <Image
-          source={{ uri: imageUri }}
-          style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
-          resizeMode="contain"
-        />
-      </Animated.View>
-    </GestureDetector>
+    <>
+      <GestureDetector gesture={composedGesture}>
+        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          <Image
+            source={{ uri: imageUri }}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </GestureDetector>
+      
+      {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
+      {showLevelLine && (
+        <>
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.25,
+              left: 0,
+              right: 0,
+              height: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            }}
+            pointerEvents="none"
+          />
+          
+          {/* "LEVEL" text */}
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.25 - 20,
+              left: 12,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              borderRadius: 4,
+            }}
+            pointerEvents="none"
+          >
+            <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 10, fontWeight: '600' }}>
+              LEVEL
+            </Text>
+          </View>
+        </>
+      )}
+    </>
   );
 }
