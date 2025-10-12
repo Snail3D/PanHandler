@@ -139,6 +139,8 @@ export default function DimensionOverlay({
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticTime, setLastHapticTime] = useState<number>(Date.now());
+  const [fingerTouches, setFingerTouches] = useState<Array<{x: number, y: number, id: string}>>([]);
+  const fingerOpacity = useSharedValue(0);
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
@@ -1058,7 +1060,9 @@ export default function DimensionOverlay({
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
             
-
+            // Track finger touch for visual indicator
+            setFingerTouches([{ x: pageX, y: pageY, id: 'touch-0' }]);
+            fingerOpacity.value = withTiming(1, { duration: 150 });
             
             setShowCursor(true);
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
@@ -1072,6 +1076,14 @@ export default function DimensionOverlay({
             if (!touch) return;
             
             const { pageX, pageY } = touch;
+            
+            // Update finger touch positions for all touches
+            const touches = Array.from(event.nativeEvent.touches).map((t, idx) => ({
+              x: t.pageX,
+              y: t.pageY,
+              id: `touch-${idx}`
+            }));
+            setFingerTouches(touches);
             
             // Update cursor
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
@@ -1116,6 +1128,10 @@ export default function DimensionOverlay({
           }}
           onResponderRelease={() => {
             console.log('✅ Touch released');
+            
+            // Fade out finger touch indicators
+            fingerOpacity.value = withTiming(0, { duration: 200 });
+            setTimeout(() => setFingerTouches([]), 200);
             
             // For circle mode
             if (mode === 'circle') {
@@ -1348,6 +1364,61 @@ export default function DimensionOverlay({
           );
         })()}
       </View>
+
+      {/* Finger touch indicators - subtle shadows under fingers */}
+      {fingerTouches.map((touch) => {
+        const nextMeasurementIndex = currentPoints.length === requiredPoints 
+          ? measurements.length + 1 
+          : measurements.length;
+        const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
+        const fingerColor = nextColor.main;
+        
+        const animatedStyle = useAnimatedStyle(() => ({
+          opacity: fingerOpacity.value,
+        }));
+        
+        return (
+          <Animated.View
+            key={touch.id}
+            style={[
+              {
+                position: 'absolute',
+                left: touch.x - 20,
+                top: touch.y - 20,
+                width: 40,
+                height: 40,
+                pointerEvents: 'none',
+              },
+              animatedStyle
+            ]}
+          >
+            <Svg width={40} height={40}>
+              {/* Subtle shadow/glow */}
+              <Circle 
+                cx={20} 
+                cy={20} 
+                r={16} 
+                fill={fingerColor} 
+                opacity={0.15}
+              />
+              <Circle 
+                cx={20} 
+                cy={20} 
+                r={12} 
+                fill={fingerColor} 
+                opacity={0.2}
+              />
+              <Circle 
+                cx={20} 
+                cy={20} 
+                r={8} 
+                fill={fingerColor} 
+                opacity={0.25}
+              />
+            </Svg>
+          </Animated.View>
+        );
+      })}
 
       {/* Subtle guide lines - only show in Pan mode after calibration */}
       {!measurementMode && calibration && (
