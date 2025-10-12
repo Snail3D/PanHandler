@@ -2468,12 +2468,12 @@ export default function DimensionOverlay({
               }
             }}
             style={{
-              marginTop: 8,
-              paddingVertical: 3,
+              marginTop: 4,
+              paddingVertical: 1,
               alignItems: 'center',
             }}
           >
-            <Text style={{ fontSize: 9, color: 'rgba(0, 0, 0, 0.4)', fontWeight: '500' }}>
+            <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.4)', fontWeight: '500' }}>
               {isProUser ? '✨ Pro User' : 'Tap for Pro Features'}
             </Text>
           </Pressable>
