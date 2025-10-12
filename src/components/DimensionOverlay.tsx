@@ -15,6 +15,7 @@ import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import LabelModal from './LabelModal';
+import PaywallModal from './PaywallModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -114,6 +115,9 @@ export default function DimensionOverlay({
   const [showProModal, setShowProModal] = useState(false);
   const [proTapCount, setProTapCount] = useState(0);
   const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Paywall modal for halfway point (5 saves/emails)
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
   
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
@@ -800,6 +804,12 @@ export default function DimensionOverlay({
       return;
     }
     
+    // Show paywall at exactly 5 saves (halfway point)
+    if (!isProUser && monthlySaveCount === 4) {
+      setShowPaywallModal(true);
+      return;
+    }
+    
     // Show label modal first
     setPendingAction('save');
     setShowLabelModal(true);
@@ -932,6 +942,12 @@ export default function DimensionOverlay({
           { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
         ]
       );
+      return;
+    }
+    
+    // Show paywall at exactly 5 emails (halfway point)
+    if (!isProUser && monthlyEmailCount === 4) {
+      setShowPaywallModal(true);
       return;
     }
     
@@ -3409,27 +3425,17 @@ export default function DimensionOverlay({
           
           {/* Falling Tetris blocks */}
           {tetrisBlocks.map((block) => {
-            // Create animated style for falling animation
-            const blockAnimatedStyle = useAnimatedStyle(() => ({
-              top: withTiming(block.y, { 
-                duration: block.settled ? 1000 : 0,
-                easing: Easing.out(Easing.bounce)
-              }),
-            }));
-            
             return (
-              <Animated.View
+              <View
                 key={block.id}
-                style={[
-                  {
-                    position: 'absolute',
-                    left: block.x,
-                    width: 40,
-                    height: 40,
-                    transform: [{ rotate: `${block.rotation}deg` }],
-                  },
-                  blockAnimatedStyle
-                ]}
+                style={{
+                  position: 'absolute',
+                  left: block.x,
+                  top: block.y,
+                  width: 40,
+                  height: 40,
+                  transform: [{ rotate: `${block.rotation}deg` }],
+                }}
               >
                 {/* Tetris block shape - using colored squares */}
                 <View
@@ -3446,7 +3452,7 @@ export default function DimensionOverlay({
                     shadowRadius: 8,
                   }}
                 />
-              </Animated.View>
+              </View>
             );
           })}
           
@@ -3547,6 +3553,18 @@ export default function DimensionOverlay({
           )}
         </Animated.View>
       </Modal>
+      
+      {/* Paywall Modal - Shown at 5 saves/emails */}
+      <PaywallModal
+        visible={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+        onUpgrade={() => {
+          setShowPaywallModal(false);
+          setShowProModal(true);
+        }}
+        remainingSaves={10 - monthlySaveCount}
+        remainingEmails={10 - monthlyEmailCount}
+      />
     </>
   );
 }
