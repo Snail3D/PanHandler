@@ -1420,20 +1420,23 @@ export default function DimensionOverlay({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }}
           onResponderMove={(event) => {
+            // CACHE BUST: Fixed touch array handling
             const touch = event.nativeEvent.touches[0];
             if (!touch) return;
             
             const { pageX, pageY } = touch;
             
             // Update finger touch positions for all touches with pressure and random seeds
-            const touchArray = event.nativeEvent.touches || [];
-            const touches = Array.from(touchArray).map((t: any, idx: number) => ({
-              x: t.pageX,
-              y: t.pageY,
-              id: `touch-${idx}`,
-              pressure: t.force || 0.5, // Default to 0.5 if force not available
-              seed: Math.random() // New random seed for each frame for organic morphing
-            }));
+            const nativeTouches = event?.nativeEvent?.touches;
+            const touches = nativeTouches && Array.isArray(nativeTouches) 
+              ? Array.from(nativeTouches).map((t: any, idx: number) => ({
+                  x: t.pageX || 0,
+                  y: t.pageY || 0,
+                  id: `touch-${idx}`,
+                  pressure: t.force || 0.5,
+                  seed: Math.random()
+                }))
+              : [];
             setFingerTouches(touches);
             
             // Gradient horizontal offset: crosshair leans in direction of movement

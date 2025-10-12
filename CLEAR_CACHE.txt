@@ -1,0 +1,39 @@
+🔧 HOW TO CLEAR REACT NATIVE CACHE & FIX THE ERROR
+
+The code is already fixed, but your app may be running cached code.
+Try these steps in order:
+
+METHOD 1: Quick Reload (Try this first)
+- In the app, shake your device or press Cmd+D (iOS simulator)
+- Tap "Reload"
+
+METHOD 2: Clear Metro Bundler Cache
+Stop the dev server and run:
+```
+npx react-native start --reset-cache
+```
+
+METHOD 3: Nuclear Option (if error persists)
+```
+# Stop dev server (Ctrl+C)
+# Then run:
+rm -rf node_modules
+rm -rf ios/build
+rm -rf android/build
+rm -rf $TMPDIR/react-*
+rm -rf $TMPDIR/metro-*
+bun install
+npx react-native start --reset-cache
+```
+
+METHOD 4: Close and reopen the Vibecode preview
+- The Vibecode system auto-manages the dev server
+- Sometimes closing and reopening the preview helps
+
+The actual fix in the code:
+- Line 1428-1438 now has extra defensive checks
+- Checks if touches exists and is an array
+- Safely maps over touches with fallbacks
+- This prevents "Object is not a function" error
+
+The error you're seeing is from OLD cached JavaScript that hasn't reloaded yet.
