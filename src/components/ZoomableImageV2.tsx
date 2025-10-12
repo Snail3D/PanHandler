@@ -145,6 +145,7 @@ export default function ZoomableImage({
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
       {showLevelLine && (
         <>
+          {/* Horizontal level line */}
           <View
             style={{
               position: 'absolute',
@@ -152,7 +153,7 @@ export default function ZoomableImage({
               left: 0,
               right: 0,
               height: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
             }}
             pointerEvents="none"
           />
@@ -163,17 +164,44 @@ export default function ZoomableImage({
               position: 'absolute',
               top: SCREEN_HEIGHT * 0.25 - 20,
               left: 12,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
               paddingHorizontal: 8,
               paddingVertical: 3,
               borderRadius: 4,
             }}
             pointerEvents="none"
           >
-            <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 10, fontWeight: '600' }}>
+            <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: 10, fontWeight: '500' }}>
               LEVEL
             </Text>
           </View>
+          
+          {/* Center crosshairs - very faint for centering objects */}
+          {/* Vertical center line */}
+          <View
+            style={{
+              position: 'absolute',
+              left: SCREEN_WIDTH / 2,
+              top: 0,
+              bottom: 0,
+              width: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            }}
+            pointerEvents="none"
+          />
+          
+          {/* Horizontal center line */}
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT / 2,
+              left: 0,
+              right: 0,
+              height: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            }}
+            pointerEvents="none"
+          />
         </>
       )}
     </>
