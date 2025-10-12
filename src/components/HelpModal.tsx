@@ -15,6 +15,7 @@ import Animated, {
   FadeIn,
   SlideInRight
 } from 'react-native-reanimated';
+import useStore from '../state/measurementStore';
 
 interface HelpModalProps {
   visible: boolean;
@@ -210,6 +211,7 @@ const FeatureCard = ({
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
+  const globalDownloads = useStore((s) => s.globalDownloads);
   
   useEffect(() => {
     if (visible) {
@@ -949,6 +951,30 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 backgroundColor: 'white',
               }}
             >
+              {/* Heartfelt Message with Download Counter */}
+              <AnimatedView
+                entering={FadeIn.delay(750)}
+                style={{
+                  marginBottom: 16,
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  backgroundColor: '#FFF0F5',
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: '#FFB6C1',
+                }}
+              >
+                <Text style={{ 
+                  fontSize: 15, 
+                  color: '#1C1C1E', 
+                  textAlign: 'center',
+                  lineHeight: 22,
+                  fontWeight: '700'
+                }}>
+                  ❤️ Snail thanks {globalDownloads.toLocaleString()} people for using this app!
+                </Text>
+              </AnimatedView>
+
               <AnimatedPressable
                 entering={FadeIn.delay(700)}
                 onPress={onClose}

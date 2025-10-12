@@ -51,6 +51,7 @@ interface MeasurementStore {
   monthlySaveCount: number; // Track saves this month for free users
   monthlyEmailCount: number; // Track emails this month for free users
   lastResetDate: string | null; // Track when counters were last reset
+  globalDownloads: number; // Global download count (fetched from backend)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
@@ -104,6 +105,7 @@ const useStore = create<MeasurementStore>()(
       monthlySaveCount: 0,
       monthlyEmailCount: 0,
       lastResetDate: null,
+      globalDownloads: 1247, // TODO: Fetch from backend API
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
