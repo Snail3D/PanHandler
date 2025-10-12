@@ -69,6 +69,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         ref={cameraRef}
         style={{ flex: 1 }}
         facing={facing}
+        zoom={0}
       >
         {/* Top controls */}
         <View 
@@ -84,6 +85,27 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             >
               <Ionicons name="camera-reverse-outline" size={28} color="white" />
             </Pressable>
+          </View>
+        </View>
+
+        {/* Instructions */}
+        <View 
+          className="absolute top-0 left-0 right-0 z-10"
+          style={{ paddingTop: insets.top + 70, paddingHorizontal: 20 }}
+        >
+          <View 
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderRadius: 12,
+            }}
+          >
+            <Text className="text-white text-sm text-center font-medium leading-5">
+              • Center the object in frame{'\n'}
+              • Keep camera horizontal to the object{'\n'}
+              • Place coin near the center of the object
+            </Text>
           </View>
         </View>
 
