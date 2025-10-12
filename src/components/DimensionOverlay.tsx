@@ -739,7 +739,7 @@ export default function DimensionOverlay({
           })()}
       </View>
 
-      {/* Bottom toolbar */}
+      {/* Bottom toolbar - iOS 18 ultra-transparent style */}
       {!menuMinimized && (
         <View
           className="absolute left-0 right-0 z-20"
@@ -749,21 +749,21 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{
-            backgroundColor: 'rgba(249, 249, 249, 0.78)',
-            borderRadius: 28,
+            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+            borderRadius: 32,
             paddingHorizontal: 20,
             paddingTop: 20,
             paddingBottom: 24,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.12,
-            shadowRadius: 24,
-            elevation: 12,
-            borderWidth: 0.5,
-            borderColor: 'rgba(0,0,0,0.06)',
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.25,
+            shadowRadius: 32,
+            elevation: 16,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255, 255, 255, 0.3)',
           }}>
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(142, 142, 147, 0.12)', borderRadius: 14, padding: 4 }}>
+          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 16, padding: 3 }}>
             <Pressable
               onPress={() => {
                 if (isPanZoomLocked) return;
@@ -774,9 +774,9 @@ export default function DimensionOverlay({
               disabled={isPanZoomLocked}
               style={{
                 flex: 1,
-                paddingVertical: 10,
-                borderRadius: 11,
-                backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+                paddingVertical: 11,
+                borderRadius: 13,
+                backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                 opacity: isPanZoomLocked ? 0.5 : 1,
               }}
             >
@@ -784,13 +784,13 @@ export default function DimensionOverlay({
                 <Ionicons 
                   name={isPanZoomLocked ? "lock-closed" : "move-outline"}
                   size={18} 
-                  color={isPanZoomLocked ? '#8E8E93' : (!measurementMode ? '#007AFF' : '#8E8E93')} 
+                  color={isPanZoomLocked ? 'rgba(255, 255, 255, 0.5)' : (!measurementMode ? '#007AFF' : 'rgba(255, 255, 255, 0.7)')} 
                 />
                 <Text style={{
                   marginLeft: 6,
                   fontWeight: '600',
                   fontSize: 15,
-                  color: isPanZoomLocked ? '#8E8E93' : (!measurementMode ? '#007AFF' : '#8E8E93')
+                  color: isPanZoomLocked ? 'rgba(255, 255, 255, 0.5)' : (!measurementMode ? '#007AFF' : 'rgba(255, 255, 255, 0.7)')
                 }}>
                   {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
                 </Text>
@@ -803,22 +803,22 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 10,
-                borderRadius: 11,
-                backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+                paddingVertical: 11,
+                borderRadius: 13,
+                backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name="create-outline" 
                   size={18} 
-                  color={measurementMode ? '#34C759' : '#8E8E93'} 
+                  color={measurementMode ? '#34C759' : 'rgba(255, 255, 255, 0.7)'} 
                 />
                 <Text style={{
                   marginLeft: 6,
                   fontWeight: '600',
                   fontSize: 15,
-                  color: measurementMode ? '#34C759' : '#8E8E93'
+                  color: measurementMode ? '#34C759' : 'rgba(255, 255, 255, 0.7)'
                 }}>
                   Measure
                 </Text>
@@ -827,7 +827,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(142, 142, 147, 0.12)', borderRadius: 14, padding: 4 }}>
+          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 16, padding: 3 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
@@ -837,16 +837,16 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 10,
-                borderRadius: 11,
-                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+                paddingVertical: 11,
+                borderRadius: 13,
+                backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <Text style={{
                 textAlign: 'center',
                 fontWeight: '600',
                 fontSize: 15,
-                color: mode === 'distance' ? '#007AFF' : '#8E8E93'
+                color: mode === 'distance' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'
               }}>
                 Distance
               </Text>
@@ -860,16 +860,16 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 10,
-                borderRadius: 11,
-                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+                paddingVertical: 11,
+                borderRadius: 13,
+                backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <Text style={{
                 textAlign: 'center',
                 fontWeight: '600',
                 fontSize: 15,
-                color: mode === 'angle' ? '#34C759' : '#8E8E93'
+                color: mode === 'angle' ? '#34C759' : 'rgba(255, 255, 255, 0.7)'
               }}>
                 Angle
               </Text>
