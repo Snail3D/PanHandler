@@ -2024,31 +2024,11 @@ export default function DimensionOverlay({
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
                 
-                {/* Header with centered undo button */}
-                <View style={{ marginBottom: 8 }}>
-                  {/* Top row: Hide menu text and button */}
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 6 }}>
-                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
-                      Hide menu
-                    </Text>
-                    <Pressable
-                      onPress={collapseMenu}
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 14,
-                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
-                    </Pressable>
-                  </View>
-                  
-                  {/* Center row: Undo button - only show if there are measurements or current points */}
-                  {(measurements.length > 0 || currentPoints.length > 0) && (
-                    <View style={{ alignItems: 'center' }}>
+                {/* Header with undo button on same line */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  {/* Left side: Undo button - only show if there are measurements or current points */}
+                  <View style={{ flex: 1, alignItems: 'center' }}>
+                    {(measurements.length > 0 || currentPoints.length > 0) && (
                       <Pressable
                         onPress={handleClear}
                         style={{
@@ -2074,8 +2054,28 @@ export default function DimensionOverlay({
                             : 'Clear'}
                         </Text>
                       </Pressable>
-                    </View>
-                  )}
+                    )}
+                  </View>
+                  
+                  {/* Right side: Hide menu text and button */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
+                      Hide menu
+                    </Text>
+                    <Pressable
+                      onPress={collapseMenu}
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
+                    </Pressable>
+                  </View>
                 </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
