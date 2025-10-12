@@ -758,19 +758,30 @@ export default function DimensionOverlay({
                 backgroundColor: '#000',
               }}
             >
-              {currentImageUri && (
-                <Image
-                  source={{ uri: currentImageUri }}
-                  style={{
-                    position: 'absolute',
-                    width: SCREEN_WIDTH * MAGNIFICATION_SCALE * zoomScale,
-                    height: SCREEN_HEIGHT * MAGNIFICATION_SCALE * zoomScale,
-                    left: -(cursorPosition.x * MAGNIFICATION_SCALE * zoomScale - 45),
-                    top: -(cursorPosition.y * MAGNIFICATION_SCALE * zoomScale - 45),
-                  }}
-                  resizeMode="contain"
-                />
-              )}
+              {currentImageUri && (() => {
+                // Convert cursor screen position to image coordinates
+                const imageCoords = screenToImage(cursorPosition.x, cursorPosition.y);
+                
+                // Calculate the portion of the image to show in the magnified view
+                // We want to show the area around imageCoords, magnified by MAGNIFICATION_SCALE
+                const bubbleRadius = 45; // Half of 90px bubble
+                const imageAreaRadius = bubbleRadius / (zoomScale * MAGNIFICATION_SCALE);
+                
+                return (
+                  <Image
+                    source={{ uri: currentImageUri }}
+                    style={{
+                      position: 'absolute',
+                      width: SCREEN_WIDTH * MAGNIFICATION_SCALE,
+                      height: SCREEN_HEIGHT * MAGNIFICATION_SCALE,
+                      // Position image so cursor point is at center of bubble
+                      left: bubbleRadius - (imageCoords.x * zoomScale * MAGNIFICATION_SCALE),
+                      top: bubbleRadius - (imageCoords.y * zoomScale * MAGNIFICATION_SCALE),
+                    }}
+                    resizeMode="contain"
+                  />
+                );
+              })()}
             </View>
             
             {/* Crosshair overlay */}
