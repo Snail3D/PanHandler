@@ -2127,12 +2127,18 @@ export default function DimensionOverlay({
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
-                if (isPanZoomLocked) return;
+                if (isPanZoomLocked) {
+                  Alert.alert(
+                    '🔒 Panning Locked',
+                    'Panning is locked while measurements exist. Clear or undo all measurements to enable panning.',
+                    [{ text: 'OK', style: 'default' }]
+                  );
+                  return;
+                }
                 setMeasurementMode(false);
                 setShowCursor(false);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              disabled={isPanZoomLocked}
               style={{
                 flex: 1,
                 paddingVertical: 6,
