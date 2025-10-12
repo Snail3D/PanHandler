@@ -1654,13 +1654,9 @@ export default function DimensionOverlay({
                         height: 8,
                         backgroundColor: color.main,
                         borderRadius: 2,
-                        marginRight: 3,
+                        marginRight: 4,
                       }}
                     />
-                    {/* Color name */}
-                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '500', marginRight: 4 }}>
-                      {color.name}
-                    </Text>
                     {/* Measurement value */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       {measurement.value}
