@@ -2024,42 +2024,10 @@ export default function DimensionOverlay({
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
                 
-                {/* Header with undo button on same line */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  {/* Left side: Undo button - only show if there are measurements or current points */}
-                  {(measurements.length > 0 || currentPoints.length > 0) && (
-                    <Pressable
-                      onPress={handleClear}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                        borderRadius: 8,
-                        paddingVertical: 5,
-                        paddingHorizontal: 10,
-                        borderWidth: 0.5,
-                        borderColor: 'rgba(0, 0, 0, 0.08)',
-                      }}
-                    >
-                      <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
-                      <Text style={{
-                        color: 'rgba(0, 0, 0, 0.6)',
-                        fontWeight: '600',
-                        fontSize: 14,
-                        marginLeft: 5,
-                      }}>
-                        {measurements.length > 0 
-                          ? `Undo (${measurements.length})` 
-                          : 'Clear'}
-                      </Text>
-                    </Pressable>
-                  )}
-                  
-                  {/* Spacer to push "Hide menu" to the right when no undo button */}
-                  {!(measurements.length > 0 || currentPoints.length > 0) && <View style={{ flex: 1 }} />}
-                  
-                  {/* Right side: Hide menu text and button */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {/* Header with undo button centered */}
+                <View style={{ marginBottom: 8 }}>
+                  {/* Top right: Hide menu */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 6 : 0 }}>
                     <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
                       Hide menu
                     </Text>
@@ -2077,6 +2045,37 @@ export default function DimensionOverlay({
                       <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
                     </Pressable>
                   </View>
+                  
+                  {/* Center: Undo button - only show if there are measurements or current points */}
+                  {(measurements.length > 0 || currentPoints.length > 0) && (
+                    <View style={{ alignItems: 'center' }}>
+                      <Pressable
+                        onPress={handleClear}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                          borderRadius: 8,
+                          paddingVertical: 5,
+                          paddingHorizontal: 10,
+                          borderWidth: 0.5,
+                          borderColor: 'rgba(0, 0, 0, 0.08)',
+                        }}
+                      >
+                        <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
+                        <Text style={{
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          fontWeight: '600',
+                          fontSize: 14,
+                          marginLeft: 5,
+                        }}>
+                          {measurements.length > 0 
+                            ? `Undo (${measurements.length})` 
+                            : 'Clear'}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
 
           {/* Mode Toggle: Pan/Zoom vs Measure */}
