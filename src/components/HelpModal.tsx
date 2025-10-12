@@ -932,6 +932,45 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     🎯 <Text style={{ fontWeight: '600' }}>Use cursor guide</Text> - Measurement cursor appears above your finger for precise placement
                   </Text>
                 </View>
+                
+                {/* Epic Stress Test Showcase */}
+                <View style={{
+                  marginTop: 16,
+                  backgroundColor: '#F0F9FF',
+                  borderRadius: 12,
+                  padding: 14,
+                  borderWidth: 2,
+                  borderColor: '#0EA5E9',
+                }}>
+                  <Text style={{ 
+                    fontSize: 15, 
+                    fontWeight: '700', 
+                    color: '#0369A1', 
+                    textAlign: 'center',
+                    marginBottom: 10,
+                  }}>
+                    🚀 Add as many points as you want - you can't break it!
+                  </Text>
+                  <Image 
+                    source={{ uri: 'https://images.composerapi.com/93039A99-47C5-414B-80B6-3CF31EECDF86.jpg' }}
+                    style={{ 
+                      width: '100%', 
+                      height: 180,
+                      borderRadius: 8,
+                      marginBottom: 8,
+                    }}
+                    resizeMode="cover"
+                  />
+                  <Text style={{
+                    fontSize: 12,
+                    color: '#075985',
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                    lineHeight: 18,
+                  }}>
+                    Real stress test: 53 measurements! The app handles complex projects with ease. 📏✨
+                  </Text>
+                </View>
               </ExpandableSection>
 
               {/* About Section */}

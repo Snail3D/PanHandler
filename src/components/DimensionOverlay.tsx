@@ -2732,44 +2732,6 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
 
-          {/* Fun Showcase Section - "You can't break it!" */}
-          <View style={{ 
-            backgroundColor: 'rgba(147, 51, 234, 0.08)', 
-            borderRadius: 12, 
-            padding: 12, 
-            marginBottom: 12,
-            borderWidth: 1.5,
-            borderColor: 'rgba(147, 51, 234, 0.2)',
-          }}>
-            <Text style={{ 
-              fontSize: 13, 
-              fontWeight: '700', 
-              color: '#7C3AED', 
-              textAlign: 'center',
-              marginBottom: 8,
-            }}>
-              🚀 Add as many points as you want - you can't break it!
-            </Text>
-            <Image 
-              source={{ uri: 'https://images.composerapi.com/93039A99-47C5-414B-80B6-3CF31EECDF86.jpg' }}
-              style={{ 
-                width: '100%', 
-                height: 120, 
-                borderRadius: 8,
-                resizeMode: 'cover'
-              }}
-            />
-            <Text style={{
-              fontSize: 10,
-              color: 'rgba(124, 58, 237, 0.7)',
-              textAlign: 'center',
-              marginTop: 6,
-              fontStyle: 'italic'
-            }}>
-              Epic real-world stress test! 📏✨
-            </Text>
-          </View>
-
           {/* Tip */}
           {measurements.length === 0 && currentPoints.length === 0 && (
             <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
