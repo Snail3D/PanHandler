@@ -291,9 +291,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               showsVerticalScrollIndicator={true}
             >
               {/* Camera & Auto Level */}
-              <FeatureCard
+              <ExpandableSection
                 icon="camera"
-                title="Step 1: Take a Perfect Photo"
+                title="📸 Step 1: Take a Perfect Photo"
                 color="#34C759"
                 delay={0}
               >
@@ -361,16 +361,18 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* Calibration */}
-              <FeatureCard
+              <ExpandableSection
                 icon="analytics"
-                title="Step 2: Calibrate with Coin"
-                description="After capturing your photo, calibrate using the reference coin to enable precise measurements."
+                title="🪙 Step 2: Calibrate with Coin"
                 color="#FF9500"
                 delay={100}
               >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  After capturing your photo, calibrate using the reference coin to enable precise measurements.
+                </Text>
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
                     • <Text style={{ fontWeight: '600' }}>Search for your coin type</Text> - Over 100 coin types from around the world!
@@ -385,16 +387,19 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     • Tap "Lock In Calibration" when ready
                   </Text>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* Measurement Modes */}
-              <FeatureCard
+              <ExpandableSection
                 icon="resize"
-                title="Step 3: Place Measurements"
-                description="Choose from multiple measurement types to capture all dimensions of your object."
+                title="📏 Step 3: Place Measurements"
                 color="#AF52DE"
                 delay={200}
               >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  Choose from multiple measurement types to capture all dimensions of your object.
+                </Text>
+                
                 {/* Distance */}
                 <View
                   style={{
@@ -485,12 +490,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     Measure rectangular objects. Tap two opposite corners to get length and height measurements.
                   </Text>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* Controls & Navigation */}
-              <FeatureCard
+              <ExpandableSection
                 icon="navigate-circle"
-                title="Navigation & Controls"
+                title="🎮 Navigation & Controls"
                 color="#FF3B30"
                 delay={300}
               >
@@ -577,16 +582,18 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* Export Features */}
-              <FeatureCard
+              <ExpandableSection
                 icon="download"
-                title="Save & Share"
-                description="Export your measurements in multiple formats optimized for different uses."
+                title="💾 Save & Share"
                 color="#5856D6"
                 delay={400}
               >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  Export your measurements in multiple formats optimized for different uses.
+                </Text>
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
                     📸 <Text style={{ fontWeight: '600' }}>Labeled Photo</Text> - Full measurements with annotations
@@ -630,7 +637,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* Email Workflow - Expandable */}
               <ExpandableSection
@@ -905,9 +912,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               </View>
 
               {/* Pro Tips */}
-              <FeatureCard
+              <ExpandableSection
                 icon="bulb"
-                title="Pro Tips"
+                title="💡 Pro Tips"
                 color="#00C7BE"
                 delay={600}
               >
@@ -925,7 +932,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     🎯 <Text style={{ fontWeight: '600' }}>Use cursor guide</Text> - Measurement cursor appears above your finger for precise placement
                   </Text>
                 </View>
-              </FeatureCard>
+              </ExpandableSection>
 
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
