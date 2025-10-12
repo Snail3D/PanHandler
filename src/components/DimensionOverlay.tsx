@@ -999,19 +999,9 @@ export default function DimensionOverlay({
               <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name={tabSide === 'right' ? 'chevron-back' : 'chevron-forward'} 
-                  size={16} 
+                  size={20} 
                   color="rgba(255, 255, 255, 0.8)" 
                 />
-                <Text style={{ 
-                  fontSize: 8, 
-                  color: 'rgba(255, 255, 255, 0.8)', 
-                  fontWeight: '600',
-                  marginTop: 2,
-                  textAlign: 'center',
-                  lineHeight: 10
-                }}>
-                  Hide{'\n'}menu
-                </Text>
               </View>
             </Pressable>
           </Animated.View>
