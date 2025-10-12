@@ -1295,7 +1295,7 @@ export default function DimensionOverlay({
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
           pointerEvents="none"
         >
-          {/* Vertical center line - very subtle */}
+          {/* Vertical center line - subtle but visible */}
           <View
             style={{
               position: 'absolute',
@@ -1303,11 +1303,11 @@ export default function DimensionOverlay({
               top: 0,
               bottom: 0,
               width: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           />
           
-          {/* Horizontal center line - very subtle */}
+          {/* Horizontal center line - subtle but visible */}
           <View
             style={{
               position: 'absolute',
@@ -1315,7 +1315,7 @@ export default function DimensionOverlay({
               left: 0,
               right: 0,
               height: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           />
         </View>
