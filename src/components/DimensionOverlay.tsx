@@ -2100,29 +2100,6 @@ export default function DimensionOverlay({
             );
           })()}
           
-          {/* Auto-capture badge - top-right corner */}
-          {isAutoCaptured && (
-            <Pressable
-              onPress={handleAutoLevelTap}
-              style={{
-                position: 'absolute',
-                top: insets.top + 16,
-                right: 12,
-                backgroundColor: 'rgba(0, 200, 0, 0.9)',
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 6,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Ionicons name="flash" size={12} color="white" />
-              <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
-                AUTO LEVEL
-              </Text>
-            </Pressable>
-          )}
-          
           {/* Label and scale info - upper-left corner (always visible when capturing) */}
           {currentLabel && (
             <View
@@ -2251,6 +2228,30 @@ export default function DimensionOverlay({
             </View>
           )}
       </View>
+
+      {/* Auto-capture badge - top-right corner (OUTSIDE viewRef to allow taps) */}
+      {isAutoCaptured && (
+        <Pressable
+          onPress={handleAutoLevelTap}
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            right: 12,
+            backgroundColor: 'rgba(0, 200, 0, 0.9)',
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 6,
+            flexDirection: 'row',
+            alignItems: 'center',
+            zIndex: 30,
+          }}
+        >
+          <Ionicons name="flash" size={12} color="white" />
+          <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
+            AUTO LEVEL
+          </Text>
+        </Pressable>
+      )}
 
       {/* Bottom toolbar - Water droplet style with slide gesture */}
       {!menuMinimized && !isCapturing && (
