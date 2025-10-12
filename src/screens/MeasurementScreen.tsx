@@ -26,7 +26,7 @@ export default function MeasurementScreen() {
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
-  const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0 });
+  const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
   const [showHelpModal, setShowHelpModal] = useState(false);
   
   // Auto-capture states
@@ -142,9 +142,9 @@ export default function MeasurementScreen() {
       // Restore saved zoom state if available
       if (savedZoomState) {
         console.log('🔄 Restoring zoom state:', savedZoomState);
-        setMeasurementZoom(savedZoomState);
+        setMeasurementZoom({ ...savedZoomState, rotation: savedZoomState.rotation || 0 });
       } else {
-        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
       }
     }
   }, []); // Only run on mount
@@ -252,6 +252,7 @@ export default function MeasurementScreen() {
       scale: calibrationData.initialZoom.scale,
       translateX: calibrationData.initialZoom.translateX,
       translateY: calibrationData.initialZoom.translateY,
+      rotation: calibrationData.initialZoom.rotation || 0,
     });
     
     setMode('measurement');
@@ -267,7 +268,7 @@ export default function MeasurementScreen() {
     setCoinCircle(null);
     setCalibration(null);
     setImageOrientation(null);
-    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
     setMode('camera');
   };
 
@@ -464,8 +465,9 @@ export default function MeasurementScreen() {
                   initialScale={measurementZoom.scale}
                   initialTranslateX={measurementZoom.translateX}
                   initialTranslateY={measurementZoom.translateY}
-                  onTransformChange={(scale, translateX, translateY) => {
-                    const newZoom = { scale, translateX, translateY };
+                  initialRotation={measurementZoom.rotation}
+                  onTransformChange={(scale, translateX, translateY, rotation) => {
+                    const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
                     // Save zoom state to store for session restoration
                     setSavedZoomState(newZoom);

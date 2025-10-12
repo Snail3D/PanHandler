@@ -44,7 +44,7 @@ interface MeasurementStore {
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
   isProUser: boolean; // Pro user status for paywall
-  savedZoomState: { scale: number; translateX: number; translateY: number } | null; // Restore zoom/pan
+  savedZoomState: { scale: number; translateX: number; translateY: number; rotation: number } | null; // Restore zoom/pan/rotation
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
