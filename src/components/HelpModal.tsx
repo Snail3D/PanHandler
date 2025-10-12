@@ -76,19 +76,19 @@ const ExpandableSection = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, { marginBottom: 16 }]}>
+    <Animated.View style={[animatedStyle, { marginBottom: 14 }]}>
       <Pressable
         onPress={() => setExpanded(!expanded)}
         style={{
-          backgroundColor: 'white',
-          borderRadius: 16,
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          borderRadius: 18,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-          borderLeftWidth: 4,
-          borderLeftColor: color,
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
+          elevation: 3,
+          borderWidth: 0.5,
+          borderColor: 'rgba(0,0,0,0.06)',
         }}
       >
         <View
@@ -96,34 +96,40 @@ const ExpandableSection = ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 18,
+            padding: 16,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
             <View
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: color,
+                width: 38,
+                height: 38,
+                borderRadius: 19,
+                backgroundColor: `${color}15`,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: 12,
               }}
             >
-              <Ionicons name={icon as any} size={22} color="white" />
+              <Ionicons name={icon as any} size={20} color={color} />
             </View>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1C1C1E', flex: 1 }}>
+            <Text style={{ 
+              fontSize: 17, 
+              fontWeight: '600', 
+              color: '#1C1C1E', 
+              flex: 1,
+              letterSpacing: -0.3,
+            }}>
               {title}
             </Text>
           </View>
           <AnimatedView style={chevronAnimatedStyle}>
-            <Ionicons name="chevron-down" size={24} color={color} />
+            <Ionicons name="chevron-down" size={22} color={color} />
           </AnimatedView>
         </View>
         
         <AnimatedView style={contentAnimatedStyle}>
-          <View style={{ paddingHorizontal: 18, paddingBottom: 18 }}>
+          <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
             {children}
           </View>
         </AnimatedView>
@@ -233,63 +239,100 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
       transparent={true}
       onRequestClose={onClose}
     >
-      <BlurView intensity={40} tint="dark" style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
+      <BlurView intensity={50} tint="dark" style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <View
             style={{
               flex: 1,
               marginTop: insets.top + 20,
-              marginHorizontal: 20,
+              marginHorizontal: 16,
               marginBottom: insets.bottom + 20,
-              backgroundColor: '#F8F9FA',
-              borderRadius: 24,
+              borderRadius: 28,
               overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.4,
+              shadowRadius: 24,
               elevation: 24,
             }}
           >
-            {/* Header */}
-            <View
+            {/* Translucent Header with Blur */}
+            <BlurView 
+              intensity={95} 
+              tint="light"
               style={{
-                backgroundColor: '#007AFF',
-                paddingTop: 20,
-                paddingBottom: 16,
-                paddingHorizontal: 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                borderTopLeftRadius: 28,
+                borderTopRightRadius: 28,
+                overflow: 'hidden',
               }}
             >
-              <Animated.View style={[{ flexDirection: 'row', alignItems: 'center' }, headerAnimatedStyle]}>
-                <Ionicons name="help-circle" size={32} color="white" />
-                <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginLeft: 12 }}>
-                  PanHandler Guide
-                </Text>
-              </Animated.View>
-              <Pressable
-                onPress={onClose}
+              <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  justifyContent: 'center',
+                  paddingTop: 24,
+                  paddingBottom: 20,
+                  paddingHorizontal: 24,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
+                  backgroundColor: 'rgba(255,255,255,0.75)',
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: 'rgba(0,0,0,0.08)',
                 }}
               >
-                <Ionicons name="close" size={24} color="white" />
-              </Pressable>
-            </View>
+                <Animated.View style={[{ flexDirection: 'row', alignItems: 'center' }, headerAnimatedStyle]}>
+                  <View style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 21,
+                    backgroundColor: 'rgba(0,122,255,0.12)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 12,
+                  }}>
+                    <Ionicons name="help-circle" size={26} color="#007AFF" />
+                  </View>
+                  <View>
+                    <Text style={{ 
+                      color: '#1C1C1E', 
+                      fontSize: 22, 
+                      fontWeight: '700',
+                      letterSpacing: -0.5,
+                    }}>
+                      Guide
+                    </Text>
+                    <Text style={{ 
+                      color: '#8E8E93', 
+                      fontSize: 13, 
+                      fontWeight: '500',
+                      marginTop: -2,
+                    }}>
+                      Master PanHandler
+                    </Text>
+                  </View>
+                </Animated.View>
+                <Pressable
+                  onPress={onClose}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: 'rgba(120,120,128,0.16)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name="close" size={22} color="#3C3C43" />
+                </Pressable>
+              </View>
+            </BlurView>
 
-            {/* Content */}
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ padding: 20 }}
-              showsVerticalScrollIndicator={true}
-            >
+            {/* Content with subtle background */}
+            <View style={{ flex: 1, backgroundColor: '#F5F5F7' }}>
+              <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ padding: 20 }}
+                showsVerticalScrollIndicator={false}
+              >
               {/* Camera & Auto Level */}
               <ExpandableSection
                 icon="camera"
@@ -322,41 +365,41 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <View
                   style={{
                     marginTop: 12,
-                    backgroundColor: '#E8F5E9',
-                    borderRadius: 12,
+                    backgroundColor: 'rgba(76,175,80,0.08)',
+                    borderRadius: 14,
                     padding: 14,
-                    borderWidth: 2,
-                    borderColor: '#4CAF50',
+                    borderWidth: 1,
+                    borderColor: 'rgba(76,175,80,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="flash" size={18} color="#2E7D32" />
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
+                    <Ionicons name="flash" size={18} color="#34C759" />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
                       AUTO LEVEL Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 8 }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                     Enable Auto Level in camera for hands-free capture in portrait OR landscape orientation! The app monitors your device angle and stability in real-time.
                   </Text>
                   <View style={{ marginLeft: 8 }}>
-                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
                       • <Text style={{ fontWeight: '600' }}>Hold (press and hold) the shutter button</Text> - Don't just tap, keep it pressed down
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
                       • <Text style={{ fontWeight: '600' }}>Watch the color indicator</Text> - Red (too tilted) → Yellow (close) → Green (perfect alignment)
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
                       • <Text style={{ fontWeight: '600' }}>Works horizontally OR vertically</Text> - Orient your phone perpendicular (90°) to surface in either direction
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20, marginBottom: 4 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 4 }}>
                       • <Text style={{ fontWeight: '600' }}>Hold steady when green</Text> - A 3-second countdown begins automatically
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#1B5E20', lineHeight: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                       • <Text style={{ fontWeight: '600' }}>Photo captures automatically</Text> - No need to tap, just keep holding steady!
                     </Text>
                   </View>
-                  <View style={{ marginTop: 8, backgroundColor: 'rgba(46, 125, 50, 0.15)', borderRadius: 6, padding: 8 }}>
-                    <Text style={{ fontSize: 13, color: '#1B5E20', fontStyle: 'italic' }}>
+                  <View style={{ marginTop: 8, backgroundColor: 'rgba(76,175,80,0.12)', borderRadius: 8, padding: 10 }}>
+                    <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic' }}>
                       💡 Tip: If you move during countdown, it will cancel and restart when you're steady again
                     </Text>
                   </View>
@@ -403,24 +446,26 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Distance */}
                 <View
                   style={{
-                    backgroundColor: '#EDE7F6',
+                    backgroundColor: 'rgba(175,82,222,0.08)',
                     borderRadius: 12,
                     padding: 12,
                     marginBottom: 10,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(175,82,222,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     {/* Custom distance icon matching menu */}
                     <Svg width={18} height={18} viewBox="0 0 16 16">
-                      <Line x1="3" y1="8" x2="13" y2="8" stroke="#7E57C2" strokeWidth="1.5" />
-                      <Circle cx="3" cy="8" r="2" fill="#7E57C2" />
-                      <Circle cx="13" cy="8" r="2" fill="#7E57C2" />
+                      <Line x1="3" y1="8" x2="13" y2="8" stroke="#AF52DE" strokeWidth="1.5" />
+                      <Circle cx="3" cy="8" r="2" fill="#AF52DE" />
+                      <Circle cx="13" cy="8" r="2" fill="#AF52DE" />
                     </Svg>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Distance Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure straight-line distances. Tap to place two points and get the distance between them.
                   </Text>
                 </View>
@@ -428,26 +473,28 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Angle */}
                 <View
                   style={{
-                    backgroundColor: '#FFF3E0',
+                    backgroundColor: 'rgba(255,149,0,0.08)',
                     borderRadius: 12,
                     padding: 12,
                     marginBottom: 10,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(255,149,0,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     {/* Custom angle icon matching menu - 45 degree acute angle */}
                     <Svg width={18} height={18} viewBox="0 0 16 16">
-                      <Line x1="3" y1="13" x2="13" y2="3" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
-                      <Line x1="3" y1="13" x2="13" y2="13" stroke="#FB8C00" strokeWidth="1.5" strokeLinecap="round" />
-                      <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke="#FB8C00" strokeWidth="1.3" fill="none" />
-                      <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
-                      <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke="#FB8C00" strokeWidth="1" strokeLinecap="round" />
+                      <Line x1="3" y1="13" x2="13" y2="3" stroke="#FF9500" strokeWidth="1.5" strokeLinecap="round" />
+                      <Line x1="3" y1="13" x2="13" y2="13" stroke="#FF9500" strokeWidth="1.5" strokeLinecap="round" />
+                      <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke="#FF9500" strokeWidth="1.3" fill="none" />
+                      <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke="#FF9500" strokeWidth="1" strokeLinecap="round" />
+                      <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke="#FF9500" strokeWidth="1" strokeLinecap="round" />
                     </Svg>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Angle Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure angles between two lines. Place first endpoint, then vertex (corner), then second endpoint.
                   </Text>
                 </View>
@@ -455,19 +502,21 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Circle */}
                 <View
                   style={{
-                    backgroundColor: '#FCE4EC',
+                    backgroundColor: 'rgba(233,30,99,0.08)',
                     borderRadius: 12,
                     padding: 12,
                     marginBottom: 10,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(233,30,99,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     <Ionicons name="radio-button-off" size={18} color="#E91E63" />
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Circle Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure circular objects. Tap center point, then tap edge to define radius and diameter.
                   </Text>
                 </View>
@@ -475,18 +524,20 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Rectangle */}
                 <View
                   style={{
-                    backgroundColor: '#E3F2FD',
+                    backgroundColor: 'rgba(25,118,210,0.08)',
                     borderRadius: 12,
                     padding: 12,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(25,118,210,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     <Ionicons name="square-outline" size={18} color="#1976D2" />
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Rectangle Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure rectangular objects. Tap two opposite corners to get length and height measurements.
                   </Text>
                 </View>
@@ -612,11 +663,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* CAD Integration Tips */}
                 <View
                   style={{
-                    backgroundColor: '#F0F4FF',
+                    backgroundColor: 'rgba(88,86,214,0.08)',
                     borderRadius: 12,
                     padding: 12,
-                    borderWidth: 2,
-                    borderColor: '#5856D6',
+                    borderWidth: 1,
+                    borderColor: 'rgba(88,86,214,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -626,13 +677,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <View style={{ marginLeft: 4 }}>
-                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 6 }}>
                       • <Text style={{ fontWeight: '600' }}>Center alignment guides</Text> help position objects perfectly for CAD import
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 6 }}>
                       • <Text style={{ fontWeight: '600' }}>Scale notes on every photo</Text> show exact Canvas Scale values for Fusion 360
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C58', lineHeight: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                       • <Text style={{ fontWeight: '600' }}>No guesswork!</Text> Insert {`>`} Canvas {`>`} Set Scale X/Y to the provided value
                     </Text>
                   </View>
@@ -811,8 +862,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginBottom: 8 }}>
                         Right-click the canvas image and select <Text style={{ fontWeight: '600' }}>Calibrate</Text>. Look at the scale note on your exported photo.
                       </Text>
-                      <View style={{ backgroundColor: '#FFF3E0', borderRadius: 8, padding: 10, borderLeftWidth: 3, borderLeftColor: '#FF9500' }}>
-                        <Text style={{ fontSize: 13, color: '#E65100', lineHeight: 18 }}>
+                      <View style={{ backgroundColor: 'rgba(255,149,0,0.1)', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
                           <Text style={{ fontWeight: '700' }}>Example:</Text> If the scale note says "Canvas Scale: 0.0412", enter 0.0412 for both X and Y scale values.
                         </Text>
                       </View>
@@ -852,14 +903,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </View>
 
-                <View style={{ backgroundColor: '#E8F5E9', borderRadius: 10, padding: 12, marginTop: 8 }}>
+                <View style={{ backgroundColor: 'rgba(52,199,89,0.08)', borderRadius: 12, padding: 12, marginTop: 8, borderWidth: 1, borderColor: 'rgba(52,199,89,0.2)' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="checkmark-circle" size={18} color="#2E7D32" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
+                    <Ionicons name="checkmark-circle" size={18} color="#34C759" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
                       Pro Tip
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#1B5E20', lineHeight: 19 }}>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
                     The 50% opacity makes it easy to see your CAD lines while still having the reference visible. You can adjust canvas opacity in Fusion 360 if needed!
                   </Text>
                 </View>
@@ -936,18 +987,19 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Epic Stress Test Showcase */}
                 <View style={{
                   marginTop: 16,
-                  backgroundColor: '#F0F9FF',
-                  borderRadius: 12,
+                  backgroundColor: 'rgba(0,122,255,0.08)',
+                  borderRadius: 14,
                   padding: 14,
-                  borderWidth: 2,
-                  borderColor: '#0EA5E9',
+                  borderWidth: 1,
+                  borderColor: 'rgba(0,122,255,0.2)',
                 }}>
                   <Text style={{ 
                     fontSize: 15, 
                     fontWeight: '700', 
-                    color: '#0369A1', 
+                    color: '#1C1C1E', 
                     textAlign: 'center',
                     marginBottom: 10,
+                    letterSpacing: -0.3,
                   }}>
                     🚀 Add as many points as you want - you can't break it!
                   </Text>
@@ -956,14 +1008,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     style={{ 
                       width: '100%', 
                       height: 180,
-                      borderRadius: 8,
+                      borderRadius: 10,
                       marginBottom: 8,
                     }}
                     resizeMode="cover"
                   />
                   <Text style={{
                     fontSize: 12,
-                    color: '#075985',
+                    color: '#3C3C43',
                     textAlign: 'center',
                     fontStyle: 'italic',
                     lineHeight: 18,
@@ -978,55 +1030,55 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(650)}
                   style={{
-                    backgroundColor: '#FFF7ED',
-                    borderRadius: 16,
+                    backgroundColor: 'rgba(255,204,0,0.1)',
+                    borderRadius: 18,
                     padding: 18,
-                    shadowColor: '#F59E0B',
+                    shadowColor: '#000',
                     shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 8,
-                    elevation: 4,
-                    borderWidth: 2,
-                    borderColor: '#FED7AA',
+                    shadowOpacity: 0.06,
+                    shadowRadius: 12,
+                    elevation: 2,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,204,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="star" size={24} color="#F59E0B" />
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#92400E', marginLeft: 8 }}>
+                    <Ionicons name="star" size={22} color="#FFCC00" />
+                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
                       🎯 Amazing Accuracy!
                     </Text>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#78350F', lineHeight: 22, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 12 }}>
                     PanHandler achieves{' '}
-                    <Text style={{ fontWeight: '700', color: '#92400E' }}>
+                    <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>
                       ~0.2 mm accuracy
                     </Text>
                     {' '}(or better) with small objects!
                   </Text>
                   
                   <View style={{ 
-                    backgroundColor: '#FFFBEB', 
+                    backgroundColor: 'rgba(255,204,0,0.08)', 
                     borderRadius: 12, 
                     padding: 12, 
-                    borderWidth: 1, 
-                    borderColor: '#FDE68A' 
+                    borderWidth: 0.5, 
+                    borderColor: 'rgba(255,204,0,0.2)' 
                   }}>
-                    <Text style={{ fontSize: 14, color: '#92400E', lineHeight: 20, marginBottom: 6 }}>
-                      📐 <Text style={{ fontWeight: '600' }}>That's approximately:</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 6, fontWeight: '600' }}>
+                      📐 That's approximately:
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
                       • 0.0079 inches (less than 1/100th of an inch!)
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
                       • Thickness of 2-3 sheets of paper
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 20, marginLeft: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginLeft: 20 }}>
                       • Width of a human hair
                     </Text>
                   </View>
 
-                  <Text style={{ fontSize: 13, color: '#92400E', fontStyle: 'italic', marginTop: 12, lineHeight: 18 }}>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', marginTop: 12, lineHeight: 18 }}>
                     💡 Pro tip: Use higher resolution photos and proper lighting for maximum accuracy!
                   </Text>
                 </Animated.View>
@@ -1037,21 +1089,31 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(700)}
                   style={{
-                    backgroundColor: 'white',
-                    borderRadius: 16,
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderRadius: 18,
                     padding: 20,
                     shadowColor: '#000',
                     shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 8,
-                    elevation: 4,
-                    borderWidth: 2,
-                    borderColor: '#E5E5EA',
+                    shadowOpacity: 0.06,
+                    shadowRadius: 12,
+                    elevation: 2,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(0,0,0,0.08)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="information-circle" size={24} color="#007AFF" />
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1C1C1E', marginLeft: 8 }}>
+                    <View style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      backgroundColor: 'rgba(0,122,255,0.12)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                    }}>
+                      <Ionicons name="information-circle" size={22} color="#007AFF" />
+                    </View>
+                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       About PanHandler
                     </Text>
                   </View>
@@ -1077,21 +1139,21 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
                     style={{
                       backgroundColor: '#FF0000',
-                      borderRadius: 12,
-                      paddingVertical: 12,
+                      borderRadius: 13,
+                      paddingVertical: 13,
                       paddingHorizontal: 16,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                       shadowColor: '#FF0000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 4,
+                      shadowOffset: { width: 0, height: 3 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 6,
                       elevation: 4,
                     }}
                   >
-                    <Ionicons name="logo-youtube" size={24} color="white" />
-                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', marginLeft: 10 }}>
+                    <Ionicons name="logo-youtube" size={22} color="white" />
+                    <Text style={{ color: 'white', fontSize: 15, fontWeight: '600', marginLeft: 8, letterSpacing: -0.2 }}>
                       Follow on YouTube
                     </Text>
                   </Pressable>
@@ -1107,97 +1169,111 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(800)}
                   style={{
-                    backgroundColor: '#FFFBEA',
-                    borderRadius: 16,
+                    backgroundColor: 'rgba(255,215,0,0.12)',
+                    borderRadius: 18,
                     padding: 18,
-                    shadowColor: '#FFD700',
+                    shadowColor: '#000',
                     shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 8,
-                    elevation: 4,
-                    borderWidth: 2,
-                    borderColor: '#FFD700',
+                    shadowOpacity: 0.06,
+                    shadowRadius: 12,
+                    elevation: 2,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,215,0,0.35)',
                     borderStyle: 'dashed',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'center' }}>
                     <Text style={{ fontSize: 24 }}>🥚</Text>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#D97706', marginHorizontal: 8 }}>
+                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
                       Hidden Surprises
                     </Text>
                     <Text style={{ fontSize: 24 }}>🥚</Text>
                   </View>
                   
-                  <Text style={{ fontSize: 14, color: '#78350F', lineHeight: 21, textAlign: 'center', marginBottom: 12, fontStyle: 'italic' }}>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, textAlign: 'center', marginBottom: 12, fontStyle: 'italic' }}>
                     Some badges hide secrets... if you are persistent enough 🤔
                   </Text>
 
-                  <View style={{ backgroundColor: '#FEF3C7', borderRadius: 10, padding: 12, marginBottom: 8 }}>
-                    <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 19, textAlign: 'center' }}>
+                  <View style={{ backgroundColor: 'rgba(255,215,0,0.08)', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 0.5, borderColor: 'rgba(255,215,0,0.2)' }}>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, textAlign: 'center' }}>
                       💚 <Text style={{ fontWeight: '600' }}>The green badge</Text> guards a playful message from the past...
                     </Text>
                   </View>
 
-                  <View style={{ backgroundColor: '#FEF3C7', borderRadius: 10, padding: 12 }}>
-                    <Text style={{ fontSize: 13, color: '#92400E', lineHeight: 19, textAlign: 'center' }}>
+                  <View style={{ backgroundColor: 'rgba(255,215,0,0.08)', borderRadius: 12, padding: 12, borderWidth: 0.5, borderColor: 'rgba(255,215,0,0.2)' }}>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, textAlign: 'center' }}>
                       ⚡ <Text style={{ fontWeight: '600' }}>The flash badge</Text> holds a legendary tune...
                     </Text>
                   </View>
                 </Animated.View>
               </View>
             </ScrollView>
+            </View>
 
-            {/* Footer */}
-            <View
+            {/* Translucent Footer with Blur */}
+            <BlurView 
+              intensity={95} 
+              tint="light"
               style={{
-                borderTopWidth: 1,
-                borderTopColor: '#E5E5EA',
-                padding: 16,
-                backgroundColor: 'white',
+                borderBottomLeftRadius: 28,
+                borderBottomRightRadius: 28,
+                overflow: 'hidden',
               }}
             >
-              {/* Heartfelt Message with Download Counter */}
-              <AnimatedView
-                entering={FadeIn.delay(750)}
+              <View
                 style={{
-                  marginBottom: 16,
-                  paddingVertical: 12,
-                  paddingHorizontal: 16,
-                  backgroundColor: '#FFF0F5',
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: '#FFB6C1',
+                  paddingVertical: 20,
+                  paddingHorizontal: 24,
+                  backgroundColor: 'rgba(255,255,255,0.75)',
+                  borderTopWidth: 0.5,
+                  borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
               >
-                <Text style={{ 
-                  fontSize: 15, 
-                  color: '#1C1C1E', 
-                  textAlign: 'center',
-                  lineHeight: 22,
-                  fontWeight: '700'
-                }}>
-                  ❤️ Snail thanks {globalDownloads.toLocaleString()} people for using this app!
-                </Text>
-              </AnimatedView>
+                {/* Heartfelt Message with Download Counter */}
+                <AnimatedView
+                  entering={FadeIn.delay(750)}
+                  style={{
+                    marginBottom: 14,
+                    paddingVertical: 10,
+                    paddingHorizontal: 16,
+                    backgroundColor: 'rgba(255,105,180,0.08)',
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,105,180,0.2)',
+                  }}
+                >
+                  <Text style={{ 
+                    fontSize: 14, 
+                    color: '#1C1C1E', 
+                    textAlign: 'center',
+                    lineHeight: 20,
+                    fontWeight: '600'
+                  }}>
+                    ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
+                  </Text>
+                </AnimatedView>
 
-              <AnimatedPressable
-                entering={FadeIn.delay(700)}
-                onPress={onClose}
-                style={{
-                  backgroundColor: '#007AFF',
-                  paddingVertical: 14,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  shadowColor: '#007AFF',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 4,
-                }}
-              >
-                <Text style={{ color: 'white', fontSize: 17, fontWeight: '600' }}>Got It! Let's Measure 🎯</Text>
-              </AnimatedPressable>
-            </View>
+                <AnimatedPressable
+                  entering={FadeIn.delay(700)}
+                  onPress={onClose}
+                  style={{
+                    backgroundColor: '#007AFF',
+                    paddingVertical: 15,
+                    borderRadius: 14,
+                    alignItems: 'center',
+                    shadowColor: '#007AFF',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 8,
+                    elevation: 4,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', letterSpacing: -0.2 }}>
+                    Got It! Let's Measure 🎯
+                  </Text>
+                </AnimatedPressable>
+              </View>
+            </BlurView>
           </View>
         </View>
       </BlurView>
