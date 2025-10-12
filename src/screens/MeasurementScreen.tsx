@@ -252,22 +252,26 @@ export default function MeasurementScreen() {
 
           {/* Measurement Mode */}
           {mode === 'measurement' && (
-            <View ref={measurementViewRef} style={{ flex: 1 }}>
-              <ZoomableImage 
-                imageUri={currentImageUri}
-                initialScale={measurementZoom.scale}
-                initialTranslateX={measurementZoom.translateX}
-                initialTranslateY={measurementZoom.translateY}
-                onTransformChange={(scale, translateX, translateY) => {
-                  setMeasurementZoom({ scale, translateX, translateY });
-                }}
-              />
-              <DimensionOverlay 
-                zoomScale={measurementZoom.scale}
-                zoomTranslateX={measurementZoom.translateX}
-                zoomTranslateY={measurementZoom.translateY}
-                viewRef={measurementViewRef}
-              />
+            <View style={{ flex: 1 }}>
+              {/* Capture container for the image + measurements */}
+              <View ref={measurementViewRef} collapsable={false} style={{ flex: 1 }}>
+                <ZoomableImage 
+                  imageUri={currentImageUri}
+                  initialScale={measurementZoom.scale}
+                  initialTranslateX={measurementZoom.translateX}
+                  initialTranslateY={measurementZoom.translateY}
+                  onTransformChange={(scale, translateX, translateY) => {
+                    setMeasurementZoom({ scale, translateX, translateY });
+                  }}
+                />
+                {/* Measurement overlay needs to be sibling to image for capture */}
+                <DimensionOverlay 
+                  zoomScale={measurementZoom.scale}
+                  zoomTranslateX={measurementZoom.translateX}
+                  zoomTranslateY={measurementZoom.translateY}
+                  viewRef={measurementViewRef}
+                />
+              </View>
             </View>
           )}
 
