@@ -89,6 +89,75 @@ export default function ZoomCalibration({
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
+      {/* GUIDE LINES - ALWAYS VISIBLE FOR TESTING */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 99999,
+        }}
+        pointerEvents="none"
+      >
+        {/* Horizontal level line - bright red for testing */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT * 0.25,
+            left: 0,
+            right: 0,
+            height: 4,
+            backgroundColor: 'red',
+          }}
+        />
+        
+        {/* Vertical center line - bright green */}
+        <View
+          style={{
+            position: 'absolute',
+            left: SCREEN_WIDTH / 2 - 2,
+            top: 0,
+            bottom: 0,
+            width: 4,
+            backgroundColor: 'lime',
+          }}
+        />
+        
+        {/* Horizontal center line - bright blue */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT / 2 - 2,
+            left: 0,
+            right: 0,
+            height: 4,
+            backgroundColor: 'cyan',
+          }}
+        />
+        
+        {/* LEVEL text - huge and obvious */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 50,
+            left: SCREEN_WIDTH / 2 - 100,
+            width: 200,
+            height: 80,
+            backgroundColor: 'yellow',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 4,
+            borderColor: 'black',
+          }}
+        >
+          <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'black' }}>
+            LEVEL GUIDES
+          </Text>
+        </View>
+      </View>
+      
       {/* Zoomable Image */}
       <ZoomableImage
         imageUri={imageUri}
