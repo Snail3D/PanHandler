@@ -274,6 +274,29 @@ export default function ZoomCalibration({
           </View>
         </View>
       </View>
+      
+      {/* ABSOLUTE TOP LAYER - FINAL TEST */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 200,
+          left: 20,
+          width: 200,
+          height: 100,
+          backgroundColor: 'yellow',
+          zIndex: 99999,
+          elevation: 99999,
+          borderWidth: 5,
+          borderColor: 'black',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        pointerEvents="none"
+      >
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}>
+          TEST VISIBLE
+        </Text>
+      </View>
     </View>
   );
 }
