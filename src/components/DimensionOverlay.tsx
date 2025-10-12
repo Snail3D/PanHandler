@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -140,8 +140,10 @@ export default function DimensionOverlay({
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticTime, setLastHapticTime] = useState<number>(Date.now());
-  const [fingerTouches, setFingerTouches] = useState<Array<{x: number, y: number, id: string}>>([]);
+  const [fingerTouches, setFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
   const fingerOpacity = useSharedValue(0);
+  const fingerScale = useSharedValue(1);
+  const fingerRotation = useSharedValue(0);
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
@@ -1241,9 +1243,18 @@ export default function DimensionOverlay({
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
             
-            // Track finger touch for visual indicator
-            setFingerTouches([{ x: pageX, y: pageY, id: 'touch-0' }]);
+            // Track finger touch for visual indicator with random seed and pressure
+            const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
+            setFingerTouches([{ 
+              x: pageX, 
+              y: pageY, 
+              id: 'touch-0',
+              pressure: pressure,
+              seed: Math.random()
+            }]);
             fingerOpacity.value = withTiming(1, { duration: 150 });
+            fingerScale.value = 1;
+            fingerRotation.value = 0;
             
             // Adaptive horizontal offset: shift cursor away from nearest edge
             // ~0.5cm = ~20 pixels horizontal offset
@@ -1262,11 +1273,13 @@ export default function DimensionOverlay({
             
             const { pageX, pageY } = touch;
             
-            // Update finger touch positions for all touches
+            // Update finger touch positions for all touches with pressure and random seeds
             const touches = Array.from(event.nativeEvent.touches).map((t, idx) => ({
               x: t.pageX,
               y: t.pageY,
-              id: `touch-${idx}`
+              id: `touch-${idx}`,
+              pressure: t.force || 0.5, // Default to 0.5 if force not available
+              seed: Math.random() // New random seed for each frame for organic morphing
             }));
             setFingerTouches(touches);
             
@@ -1317,9 +1330,33 @@ export default function DimensionOverlay({
           onResponderRelease={() => {
             console.log('✅ Touch released');
             
-            // Fade out finger touch indicators
-            fingerOpacity.value = withTiming(0, { duration: 200 });
-            setTimeout(() => setFingerTouches([]), 200);
+            // Evaporation effect - organic fade with slight expansion and dissipation
+            // Like condensation evaporating from cold glass
+            fingerOpacity.value = withTiming(0, { 
+              duration: 450, // Fluid evaporation
+              easing: Easing.bezier(0.4, 0.0, 0.6, 1) // Organic easing curve
+            });
+            
+            // Slight expansion as it evaporates (like water spreading then disappearing)
+            fingerScale.value = withTiming(1.3, { 
+              duration: 450,
+              easing: Easing.out(Easing.quad)
+            });
+            
+            // Subtle random rotation for organic feel (±5 degrees)
+            const randomRotation = (Math.random() - 0.5) * 10;
+            fingerRotation.value = withTiming(randomRotation, { 
+              duration: 450,
+              easing: Easing.out(Easing.cubic)
+            });
+            
+            // Clear fingerprints after evaporation completes
+            setTimeout(() => {
+              setFingerTouches([]);
+              // Reset values for next touch
+              fingerScale.value = 1;
+              fingerRotation.value = 0;
+            }, 500);
             
             // For circle mode
             if (mode === 'circle') {
@@ -1553,7 +1590,7 @@ export default function DimensionOverlay({
         })()}
       </View>
 
-      {/* Finger touch indicators - subtle shadows under fingers */}
+      {/* Finger touch indicators - organic fingerprint-like patterns with evaporation */}
       {(() => {
         const nextMeasurementIndex = currentPoints.length === requiredPoints 
           ? measurements.length + 1 
@@ -1561,45 +1598,87 @@ export default function DimensionOverlay({
         const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
         const fingerColor = nextColor.main;
         
-        return fingerTouches.map((touch) => (
-          <Animated.View
-            key={touch.id}
-            style={{
-              position: 'absolute',
-              left: touch.x - 20,
-              top: touch.y - 20,
-              width: 40,
-              height: 40,
-              pointerEvents: 'none',
-              opacity: fingerOpacity.value,
-            }}
-          >
-            <Svg width={40} height={40}>
-              {/* Subtle shadow/glow */}
-              <Circle 
-                cx={20} 
-                cy={20} 
-                r={16} 
-                fill={fingerColor} 
-                opacity={0.15}
-              />
-              <Circle 
-                cx={20} 
-                cy={20} 
-                r={12} 
-                fill={fingerColor} 
-                opacity={0.2}
-              />
-              <Circle 
-                cx={20} 
-                cy={20} 
-                r={8} 
-                fill={fingerColor} 
-                opacity={0.25}
-              />
-            </Svg>
-          </Animated.View>
-        ));
+        // Animated style for evaporation effect
+        const evaporationStyle = useAnimatedStyle(() => ({
+          opacity: fingerOpacity.value,
+          transform: [
+            { scale: fingerScale.value },
+            { rotate: `${fingerRotation.value}deg` }
+          ]
+        }));
+        
+        return fingerTouches.map((touch) => {
+          // Size based on pressure (subtle variation: 85% to 115% of base size)
+          const pressureScale = 0.85 + (touch.pressure * 0.3);
+          const baseRadius = 18 * pressureScale;
+          
+          // Create organic fingerprint-like pattern with randomization
+          // Using the seed to create pseudo-random but consistent pattern
+          const ridges = [];
+          const numRidges = 5;
+          
+          for (let i = 0; i < numRidges; i++) {
+            const radiusOffset = (touch.seed * 2 - 1) * 3; // -3 to +3 variation
+            const radius = baseRadius * (0.3 + i * 0.15) + radiusOffset;
+            const opacityVariation = 0.05 + (Math.sin(touch.seed * 10 + i) * 0.03);
+            
+            ridges.push({
+              radius,
+              opacity: 0.18 - (i * 0.025) + opacityVariation
+            });
+          }
+          
+          return (
+            <Animated.View
+              key={touch.id}
+              style={[
+                {
+                  position: 'absolute',
+                  left: touch.x - baseRadius - 5,
+                  top: touch.y - baseRadius - 5,
+                  width: (baseRadius + 5) * 2,
+                  height: (baseRadius + 5) * 2,
+                  pointerEvents: 'none',
+                },
+                evaporationStyle
+              ]}
+            >
+              <Svg width={(baseRadius + 5) * 2} height={(baseRadius + 5) * 2}>
+                {/* Organic fingerprint ridges - outermost first for layering */}
+                {ridges.reverse().map((ridge, idx) => (
+                  <Circle 
+                    key={idx}
+                    cx={baseRadius + 5} 
+                    cy={baseRadius + 5} 
+                    r={ridge.radius} 
+                    fill={fingerColor} 
+                    opacity={ridge.opacity}
+                  />
+                ))}
+                
+                {/* Add some subtle irregular "pores" for realism */}
+                {[...Array(8)].map((_, idx) => {
+                  const angle = (touch.seed * Math.PI * 2) + (idx * Math.PI / 4);
+                  const distance = baseRadius * (0.4 + (Math.sin(touch.seed * 20 + idx) * 0.2));
+                  const poreX = (baseRadius + 5) + Math.cos(angle) * distance;
+                  const poreY = (baseRadius + 5) + Math.sin(angle) * distance;
+                  const poreSize = 0.8 + (Math.cos(touch.seed * 30 + idx) * 0.4);
+                  
+                  return (
+                    <Circle 
+                      key={`pore-${idx}`}
+                      cx={poreX} 
+                      cy={poreY} 
+                      r={poreSize} 
+                      fill={fingerColor} 
+                      opacity={0.12}
+                    />
+                  );
+                })}
+              </Svg>
+            </Animated.View>
+          );
+        });
       })()}
 
       {/* Subtle guide lines - only show in Pan mode after calibration */}
