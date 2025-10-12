@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, ScrollView, Pressable, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -22,6 +22,114 @@ interface HelpModalProps {
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedView = Animated.createAnimatedComponent(View);
+
+// Expandable section component
+const ExpandableSection = ({ 
+  title, 
+  icon, 
+  color, 
+  children, 
+  delay = 0 
+}: { 
+  title: string; 
+  icon: string; 
+  color: string; 
+  children: React.ReactNode; 
+  delay?: number;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const heightValue = useSharedValue(0);
+  const rotateValue = useSharedValue(0);
+  const scale = useSharedValue(0.8);
+  const opacity = useSharedValue(0);
+  
+  useEffect(() => {
+    scale.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 150 }));
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
+  }, [delay]);
+  
+  useEffect(() => {
+    if (expanded) {
+      heightValue.value = withSpring(1, { damping: 20, stiffness: 120 });
+      rotateValue.value = withTiming(180, { duration: 300, easing: Easing.out(Easing.cubic) });
+    } else {
+      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) });
+      rotateValue.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
+    }
+  }, [expanded]);
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+  
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    maxHeight: heightValue.value === 0 ? 0 : 2000,
+    opacity: heightValue.value,
+    overflow: 'hidden',
+  }));
+  
+  const chevronAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotateValue.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={[animatedStyle, { marginBottom: 16 }]}>
+      <Pressable
+        onPress={() => setExpanded(!expanded)}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 16,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 4,
+          borderLeftWidth: 4,
+          borderLeftColor: color,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: 18,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: color,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12,
+              }}
+            >
+              <Ionicons name={icon as any} size={22} color="white" />
+            </View>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1C1C1E', flex: 1 }}>
+              {title}
+            </Text>
+          </View>
+          <AnimatedView style={chevronAnimatedStyle}>
+            <Ionicons name="chevron-down" size={24} color={color} />
+          </AnimatedView>
+        </View>
+        
+        <AnimatedView style={contentAnimatedStyle}>
+          <View style={{ paddingHorizontal: 18, paddingBottom: 18 }}>
+            {children}
+          </View>
+        </AnimatedView>
+      </Pressable>
+    </Animated.View>
+  );
+};
 
 // Animated feature card component
 const FeatureCard = ({ 
@@ -469,6 +577,189 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </View>
               </FeatureCard>
+
+              {/* Email Workflow - Expandable */}
+              <ExpandableSection
+                title="📧 Email Workflow Guide"
+                icon="mail"
+                color="#34C759"
+                delay={450}
+              >
+                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
+                  How Email Reports Work
+                </Text>
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  When you tap the <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> button, PanHandler generates a comprehensive report containing:
+                </Text>
+                
+                <View style={{ backgroundColor: '#F8F9FA', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 4 }}>
+                    📎 <Text style={{ fontWeight: '600' }}>3 Attached Photos:</Text>
+                  </Text>
+                  <View style={{ marginLeft: 20 }}>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • Labeled photo with all measurements
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • Fusion 360 export (50% opacity)
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • Original reference photo with scale
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={{ backgroundColor: '#F8F9FA', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 4 }}>
+                    📊 <Text style={{ fontWeight: '600' }}>Detailed Measurement Table:</Text>
+                  </Text>
+                  <View style={{ marginLeft: 20 }}>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • All measurements with color coding
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • Measurement types (distance, angle, etc.)
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      • Precise values in your selected units
+                    </Text>
+                  </View>
+                </View>
+
+                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 8, marginTop: 8, fontWeight: '600' }}>
+                  Example Email Format
+                </Text>
+                
+                <View style={{ backgroundColor: '#FFFFFF', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
+                  <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
+                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>PanHandler Measurement Report</Text>
+                  </Text>
+                  <View style={{ height: 1, backgroundColor: '#E5E5EA', marginBottom: 10 }} />
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    Measurement Report from PanHandler{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>Calibration Scale:</Text> 24.26mm (US Quarter){'\n'}
+                    <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n'}
+                    <Text style={{ fontWeight: '600' }}>Canvas Scale (Fusion 360):</Text> 0.0412{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
+                    Blue Distance: 145.2mm{'\n'}
+                    Green Angle: 87.5°{'\n'}
+                    Red Circle: Ø 52.3mm{'\n\n'}
+                    Attached: 3 photos for reference and CAD import
+                  </Text>
+                </View>
+              </ExpandableSection>
+
+              {/* Fusion 360 Tutorial - Expandable */}
+              <ExpandableSection
+                title="🔧 Fusion 360 Import Tutorial"
+                icon="construct"
+                color="#FF9500"
+                delay={500}
+              >
+                <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
+                  Step-by-Step: Import to Fusion 360
+                </Text>
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 16 }}>
+                  Use the Fusion 360 Export image to trace your measurements perfectly in CAD software.
+                </Text>
+                
+                <View style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>1</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Open Fusion 360
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                        Create a new design or open an existing project where you want to import the reference image.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>2</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Insert Canvas Image
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                        Go to <Text style={{ fontWeight: '600' }}>Insert {`>`} Canvas</Text> from the toolbar. Select your Fusion 360 export image from PanHandler.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>3</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Set Canvas Scale
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20, marginBottom: 8 }}>
+                        Right-click the canvas image and select <Text style={{ fontWeight: '600' }}>Calibrate</Text>. Look at the scale note on your exported photo.
+                      </Text>
+                      <View style={{ backgroundColor: '#FFF3E0', borderRadius: 8, padding: 10, borderLeftWidth: 3, borderLeftColor: '#FF9500' }}>
+                        <Text style={{ fontSize: 13, color: '#E65100', lineHeight: 18 }}>
+                          <Text style={{ fontWeight: '700' }}>Example:</Text> If the scale note says "Canvas Scale: 0.0412", enter 0.0412 for both X and Y scale values.
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}>
+                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>4</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Position & Align
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                        Use the center crosshairs visible in the image to align your canvas to the origin point (0,0) in Fusion 360 for perfect positioning.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginBottom: 14 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#FF9500', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}>5</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Trace & Model
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 20 }}>
+                        Now you can trace over the 50% opacity image using sketches, lines, circles, and other CAD tools. All measurements will be perfectly scaled!
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ backgroundColor: '#E8F5E9', borderRadius: 10, padding: 12, marginTop: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                    <Ionicons name="checkmark-circle" size={18} color="#2E7D32" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
+                      Pro Tip
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#1B5E20', lineHeight: 19 }}>
+                    The 50% opacity makes it easy to see your CAD lines while still having the reference visible. You can adjust canvas opacity in Fusion 360 if needed!
+                  </Text>
+                </View>
+              </ExpandableSection>
 
               {/* Pro Features */}
               <View style={{ marginBottom: 20 }}>
