@@ -138,6 +138,42 @@ const ExpandableSection = ({
   );
 };
 
+// Comparison row component for Free vs Pro table
+const ComparisonRow = ({ 
+  feature, 
+  free, 
+  pro,
+  last = false 
+}: { 
+  feature: string; 
+  free: string; 
+  pro: string;
+  last?: boolean;
+}) => (
+  <View 
+    style={{ 
+      flexDirection: 'row', 
+      borderTopWidth: 1, 
+      borderTopColor: 'rgba(0,0,0,0.06)',
+    }}
+  >
+    <View style={{ flex: 1, padding: 12 }}>
+      <Text style={{ fontSize: 14, color: '#1C1C1E' }}>{feature}</Text>
+    </View>
+    <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
+      <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
+    </View>
+    <View style={{ 
+      width: 70, 
+      padding: 12, 
+      alignItems: 'center',
+      backgroundColor: 'rgba(255,149,0,0.08)',
+    }}>
+      <Text style={{ fontSize: 14, fontWeight: '600', color: '#FF9500' }}>{pro}</Text>
+    </View>
+  </View>
+);
+
 // Animated feature card component
 const FeatureCard = ({ 
   icon, 
@@ -943,49 +979,128 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </View>
               </ExpandableSection>
 
-              {/* Pro Features */}
+              {/* Pro Features with Comparison Chart */}
               <View style={{ marginBottom: 20 }}>
                 <Animated.View 
                   entering={SlideInRight.delay(500).springify()}
                   style={{
-                    backgroundColor: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                    borderRadius: 16,
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderRadius: 18,
                     padding: 20,
-                    shadowColor: '#FF9500',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.08,
                     shadowRadius: 12,
-                    elevation: 8,
-                    borderWidth: 2,
-                    borderColor: '#FFD700',
+                    elevation: 3,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,149,0,0.2)',
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="star" size={28} color="#FF9500" />
-                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1C1C1E', marginLeft: 8 }}>
-                      Unlock Pro Features
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                    <View style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      backgroundColor: 'rgba(255,149,0,0.15)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                    }}>
+                      <Ionicons name="star" size={20} color="#FF9500" />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                      Free vs Pro
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12 }}>
-                    Free users get 1 measurement per photo. Upgrade to Pro for unlimited precision:
-                  </Text>
-                  <View style={{ marginLeft: 8 }}>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 24, marginBottom: 4 }}>
-                      ✓ <Text style={{ fontWeight: '600' }}>Unlimited measurements</Text> per photo
+
+                  {/* Comparison Table */}
+                  <View style={{ 
+                    borderRadius: 12, 
+                    borderWidth: 1, 
+                    borderColor: 'rgba(0,0,0,0.08)',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Header Row */}
+                    <View style={{ flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.02)' }}>
+                      <View style={{ flex: 1, padding: 12 }}>
+                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Feature</Text>
+                      </View>
+                      <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Free</Text>
+                      </View>
+                      <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,149,0,0.08)' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF9500' }}>Pro</Text>
+                      </View>
+                    </View>
+
+                    {/* Feature Rows */}
+                    <ComparisonRow feature="Monthly Saves" free="10" pro="∞" />
+                    <ComparisonRow feature="Monthly Emails" free="10" pro="∞" />
+                    <ComparisonRow feature="Measurements" free="∞" pro="∞" />
+                    <ComparisonRow feature="All Measurement Types" free="✓" pro="✓" />
+                    <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
+                    <ComparisonRow feature="Fusion 360 Export" free="✓" pro="✓" last />
+                  </View>
+
+                  {/* Price */}
+                  <View style={{ marginTop: 16, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 24, fontWeight: '700', color: '#1C1C1E' }}>
+                      $9.97
                     </Text>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 24, marginBottom: 4 }}>
-                      ✓ <Text style={{ fontWeight: '600' }}>Mix all measurement types</Text> (distance, angle, circle, rectangle)
-                    </Text>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 24, marginBottom: 4 }}>
-                      ✓ <Text style={{ fontWeight: '600' }}>Vibrant color-coded</Text> measurements
-                    </Text>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 24, marginBottom: 4 }}>
-                      ✓ <Text style={{ fontWeight: '600' }}>Remove watermarks</Text> from exports
-                    </Text>
-                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 24, fontWeight: '700' }}>
-                      💎 One-time payment of $9.99 • Lifetime access
+                    <Text style={{ fontSize: 14, color: '#8E8E93', marginTop: 2 }}>
+                      One-time payment • Lifetime access
                     </Text>
                   </View>
+
+                  {/* Upgrade Button */}
+                  <Pressable
+                    onPress={() => {
+                      // TODO: Implement Pro upgrade
+                      console.log('Upgrade to Pro tapped');
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? '#E68900' : '#FF9500',
+                      paddingVertical: 16,
+                      borderRadius: 14,
+                      marginTop: 16,
+                      shadowColor: '#FF9500',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 8,
+                      elevation: 4,
+                    })}
+                  >
+                    <Text style={{ 
+                      color: 'white', 
+                      fontSize: 16, 
+                      fontWeight: '700', 
+                      textAlign: 'center',
+                      letterSpacing: -0.2,
+                    }}>
+                      Upgrade to Pro
+                    </Text>
+                  </Pressable>
+
+                  {/* Restore Purchase Link */}
+                  <Pressable
+                    onPress={() => {
+                      // TODO: Implement restore purchase
+                      console.log('Restore purchase tapped');
+                    }}
+                    style={({ pressed }) => ({
+                      paddingVertical: 12,
+                      opacity: pressed ? 0.6 : 1,
+                    })}
+                  >
+                    <Text style={{ 
+                      color: '#007AFF', 
+                      fontSize: 14, 
+                      fontWeight: '600', 
+                      textAlign: 'center' 
+                    }}>
+                      Restore Purchase
+                    </Text>
+                  </Pressable>
                 </Animated.View>
               </View>
 
