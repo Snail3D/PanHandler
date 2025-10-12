@@ -184,6 +184,12 @@ export default function DimensionOverlay({
   const undoIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const undoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Tetris Easter egg state
+  const [showTetris, setShowTetris] = useState(false);
+  const [tetrisBlocks, setTetrisBlocks] = useState<Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}>>([]);
+  const tetrisOpacity = useSharedValue(0);
+  const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
+  
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
@@ -299,6 +305,71 @@ export default function DimensionOverlay({
   const getCalculatorWord = (value: string): string => {
     const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return CALCULATOR_WORDS[hash % CALCULATOR_WORDS.length];
+  };
+  
+  // Tetris animation trigger
+  const triggerTetrisAnimation = () => {
+    setShowTetris(true);
+    
+    // Success haptic
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Fade in
+    tetrisOpacity.value = withTiming(1, { duration: 600 });
+    
+    // Generate falling Tetris blocks
+    const blockShapes = [
+      // I block
+      [[1,1,1,1]],
+      // O block  
+      [[1,1],[1,1]],
+      // T block
+      [[0,1,0],[1,1,1]],
+      // L block
+      [[1,0],[1,0],[1,1]],
+      // J block
+      [[0,1],[0,1],[1,1]],
+      // S block
+      [[0,1,1],[1,1,0]],
+      // Z block
+      [[1,1,0],[0,1,1]],
+    ];
+    
+    // Create 15 blocks that will fall over 15 seconds
+    const blocks: Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}> = [];
+    for (let i = 0; i < 15; i++) {
+      blocks.push({
+        id: `tetris-${i}`,
+        x: Math.random() * (SCREEN_WIDTH - 80), // Random x position
+        y: -100 - (i * 120), // Stagger vertically (start above screen)
+        rotation: Math.floor(Math.random() * 4) * 90, // Random rotation
+        shape: Math.floor(Math.random() * blockShapes.length),
+        settled: false,
+      });
+    }
+    
+    setTetrisBlocks(blocks);
+    
+    // Animate blocks falling one by one
+    blocks.forEach((block, idx) => {
+      setTimeout(() => {
+        setTetrisBlocks(prev => 
+          prev.map(b => 
+            b.id === block.id 
+              ? { ...b, y: SCREEN_HEIGHT - 100 - (idx * 8), settled: true } 
+              : b
+          )
+        );
+      }, idx * 1000); // Drop one every second
+    });
+    
+    // Fade out after 15 seconds
+    setTimeout(() => {
+      tetrisOpacity.value = withTiming(0, { duration: 800 }, () => {
+        runOnJS(setShowTetris)(false);
+        runOnJS(setTetrisBlocks)([]);
+      });
+    }, 15000);
   };
   
   // Get color for measurement based on index
@@ -592,6 +663,24 @@ export default function DimensionOverlay({
       if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
     };
   }, []);
+  
+  // Tetris Easter egg trigger - detect when legend fills screen
+  useEffect(() => {
+    if (hasTriggeredTetris || measurements.length === 0) return;
+    
+    // Calculate legend height: each measurement is ~10px + margins
+    const legendItemHeight = 10; // 8px font + 2px margin
+    const legendHeight = measurements.length * legendItemHeight + 8; // +8 for padding
+    
+    // Trigger if legend is taller than 70% of screen height
+    const triggerHeight = SCREEN_HEIGHT * 0.7;
+    
+    if (legendHeight >= triggerHeight) {
+      console.log('🎮 TETRIS EASTER EGG TRIGGERED!', measurements.length, 'measurements');
+      setHasTriggeredTetris(true);
+      triggerTetrisAnimation();
+    }
+  }, [measurements.length, hasTriggeredTetris]);
 
   const handleClear = () => {
     // Remove one measurement at a time (last first)
@@ -3201,6 +3290,139 @@ export default function DimensionOverlay({
             </Text>
           </Animated.View>
         </Pressable>
+      </Modal>
+      
+      {/* Tetris Easter Egg Overlay */}
+      <Modal
+        visible={showTetris}
+        transparent
+        animationType="none"
+        onRequestClose={() => {}}
+      >
+        <Animated.View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            opacity: tetrisOpacity.value,
+          }}
+        >
+          {/* Classic Tetris border */}
+          <View
+            style={{
+              position: 'absolute',
+              top: insets.top + 40,
+              left: 20,
+              right: 20,
+              bottom: insets.bottom + 40,
+              borderWidth: 4,
+              borderColor: '#00FF00',
+              borderRadius: 8,
+            }}
+          />
+          
+          {/* Score text */}
+          <Animated.View
+            style={{
+              position: 'absolute',
+              top: insets.top + 60,
+              alignSelf: 'center',
+              opacity: tetrisOpacity.value,
+            }}
+          >
+            <Text
+              style={{
+                color: '#00FF00',
+                fontSize: 24,
+                fontWeight: 'bold',
+                fontFamily: 'Courier',
+                textShadowColor: '#00FF00',
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 10,
+              }}
+            >
+              🎮 TETRIS MODE 🎮
+            </Text>
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 16,
+                fontFamily: 'Courier',
+                textAlign: 'center',
+                marginTop: 8,
+              }}
+            >
+              LEGENDARY! {measurements.length} MEASUREMENTS!
+            </Text>
+          </Animated.View>
+          
+          {/* Falling Tetris blocks */}
+          {tetrisBlocks.map((block) => {
+            // Create animated style for falling animation
+            const blockAnimatedStyle = useAnimatedStyle(() => ({
+              top: withTiming(block.y, { 
+                duration: block.settled ? 1000 : 0,
+                easing: Easing.out(Easing.bounce)
+              }),
+            }));
+            
+            return (
+              <Animated.View
+                key={block.id}
+                style={[
+                  {
+                    position: 'absolute',
+                    left: block.x,
+                    width: 40,
+                    height: 40,
+                    transform: [{ rotate: `${block.rotation}deg` }],
+                  },
+                  blockAnimatedStyle
+                ]}
+              >
+                {/* Tetris block shape - using colored squares */}
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    backgroundColor: ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'][block.shape],
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF',
+                    borderRadius: 4,
+                    shadowColor: ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'][block.shape],
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 8,
+                  }}
+                />
+              </Animated.View>
+            );
+          })}
+          
+          {/* Bottom congratulations text */}
+          <Animated.View
+            style={{
+              position: 'absolute',
+              bottom: insets.bottom + 60,
+              alignSelf: 'center',
+              opacity: tetrisOpacity.value,
+            }}
+          >
+            <Text
+              style={{
+                color: '#FFFF00',
+                fontSize: 18,
+                fontWeight: 'bold',
+                fontFamily: 'Courier',
+                textAlign: 'center',
+                textShadowColor: '#FFFF00',
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 10,
+              }}
+            >
+              YOU'RE A MEASUREMENT MASTER! 🏆
+            </Text>
+          </Animated.View>
+        </Animated.View>
       </Modal>
     </>
   );
