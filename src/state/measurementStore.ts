@@ -13,9 +13,21 @@ export interface CoinCircle {
   coinDiameter: number; // in mm
 }
 
+export interface CompletedMeasurement {
+  id: string;
+  points: Array<{ x: number; y: number }>;
+  value: string;
+  mode: 'distance' | 'angle';
+}
+
+export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
+
 interface MeasurementStore {
   currentImageUri: string | null;
+  imageOrientation: AppOrientation; // Track image orientation
   measurements: Measurement[];
+  completedMeasurements: CompletedMeasurement[]; // For DimensionOverlay
+  currentPoints: Array<{ x: number; y: number; id: string }>; // For DimensionOverlay
   tempPoints: Point[];
   measurementMode: 'distance' | 'angle';
   calibration: {
@@ -28,6 +40,9 @@ interface MeasurementStore {
   lastSelectedCoin: string | null; // Store coin name
   
   setImageUri: (uri: string | null) => void;
+  setImageOrientation: (orientation: AppOrientation) => void;
+  setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
+  setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
   addTempPoint: (point: Point) => void;
   clearTempPoints: () => void;
   completeMeasurement: () => void;
@@ -45,7 +60,10 @@ const useStore = create<MeasurementStore>()(
   persist(
     (set) => ({
       currentImageUri: null,
+      imageOrientation: null,
       measurements: [],
+      completedMeasurements: [],
+      currentPoints: [],
       tempPoints: [],
       measurementMode: 'distance',
       calibration: null,
@@ -53,7 +71,17 @@ const useStore = create<MeasurementStore>()(
       unitSystem: 'metric',
       lastSelectedCoin: null,
 
-      setImageUri: (uri) => set({ currentImageUri: uri, measurements: [], tempPoints: [], coinCircle: null }),
+      setImageUri: (uri) => set({ 
+        currentImageUri: uri,
+        // Only clear measurements if setting to null
+        ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null } : {})
+      }),
+
+      setImageOrientation: (orientation) => set({ imageOrientation: orientation }),
+
+      setCompletedMeasurements: (completedMeasurements) => set({ completedMeasurements }),
+      
+      setCurrentPoints: (currentPoints) => set({ currentPoints }),
 
       addTempPoint: (point) => set((state) => {
         const newTempPoints = [...state.tempPoints, point];
@@ -114,6 +142,15 @@ const useStore = create<MeasurementStore>()(
       partialize: (state) => ({ 
         unitSystem: state.unitSystem,
         lastSelectedCoin: state.lastSelectedCoin,
+        // Persist current work session
+        currentImageUri: state.currentImageUri,
+        imageOrientation: state.imageOrientation,
+        calibration: state.calibration,
+        coinCircle: state.coinCircle,
+        measurements: state.measurements,
+        completedMeasurements: state.completedMeasurements,
+        currentPoints: state.currentPoints,
+        measurementMode: state.measurementMode,
       }),
     }
   )
