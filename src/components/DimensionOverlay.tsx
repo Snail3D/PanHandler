@@ -538,10 +538,10 @@ export default function DimensionOverlay({
         const blankFilename = label ? `${label}_Reference` : 'PanHandler_Reference';
         const blankAsset = await MediaLibrary.createAssetAsync(blankUri);
         
-        console.log('✅ Saved both photos!');
+        console.log('✅ Saved reference photo!');
       }
       
-      // Capture Fusion 360 image (70% opacity, zoomed/rotated, no overlays)
+      // Capture Fusion 360 image (50% opacity, zoomed/rotated, no overlays)
       if (fusionViewRef.current) {
         console.log('📸 Capturing Fusion 360 image...');
         
@@ -561,6 +561,20 @@ export default function DimensionOverlay({
           console.log('✅ Saved Fusion 360 photo!');
         } catch (error) {
           console.error('Failed to capture Fusion 360 image:', error);
+        }
+      }
+      
+      // Save original photo as third image (zoomed out with scale info)
+      if (currentImageUri) {
+        console.log('📸 Saving original photo...');
+        
+        try {
+          const originalFilename = label ? `${label}_Original` : 'PanHandler_Original';
+          const originalAsset = await MediaLibrary.createAssetAsync(currentImageUri);
+          
+          console.log('✅ Saved original photo!');
+        } catch (error) {
+          console.error('Failed to save original image:', error);
         }
       }
       
@@ -782,6 +796,19 @@ export default function DimensionOverlay({
             console.log('✅ Added Fusion 360 photo to email');
           } catch (error) {
             console.error('Failed to capture Fusion 360 image:', error);
+          }
+        }
+        
+        // Add original image as third attachment (zoomed out reference)
+        if (currentImageUri) {
+          try {
+            const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
+            const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
+            await FileSystem.copyAsync({ from: currentImageUri, to: originalDest });
+            attachments.push(originalDest);
+            console.log('✅ Added original photo to email');
+          } catch (error) {
+            console.error('Failed to add original image:', error);
           }
         }
       } else if (currentImageUri) {
@@ -2574,7 +2601,7 @@ export default function DimensionOverlay({
         onDismiss={handleLabelDismiss}
       />
       
-      {/* Hidden view for capturing Fusion 360 image (70% opacity, zoomed/rotated, no overlays) */}
+      {/* Hidden view for capturing Fusion 360 image (50% opacity, zoomed/rotated, no overlays) */}
       <View
         ref={fusionViewRef}
         collapsable={false}
@@ -2593,7 +2620,7 @@ export default function DimensionOverlay({
               position: 'absolute',
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
-              opacity: 0.7,
+              opacity: 0.5,
               transform: [
                 { translateX: zoomTranslateX },
                 { translateY: zoomTranslateY },
