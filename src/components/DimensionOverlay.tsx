@@ -729,16 +729,38 @@ export default function DimensionOverlay({
       // Prepare attachments with proper filenames
       const attachments: string[] = [];
       
-      // Copy measurements photo with custom filename
-      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
+      // 1. Measurements photo (labeled with all measurements)
+      const measurementsFilename = label ? `${label}_Labeled.jpg` : 'PanHandler_Labeled.jpg';
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
       await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // Capture blank photo with label/scale if we have them
+      // 2. Fusion 360 image (50% opacity, zoomed/rotated, no overlays)
+      if (fusionViewRef.current) {
+        try {
+          console.log('📸 Capturing Fusion 360 image for email...');
+          
+          const fusionUri = await captureRef(fusionViewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
+          const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
+          await FileSystem.copyAsync({ from: fusionUri, to: fusionDest });
+          attachments.push(fusionDest);
+          
+          console.log('✅ Added Fusion 360 photo to email');
+        } catch (error) {
+          console.error('Failed to capture Fusion 360 image:', error);
+        }
+      }
+      
+      // 3. Original zoomed-out image with label and scale info overlay
       if (currentImageUri && (label || calibration)) {
         try {
-          // Hide measurements temporarily to capture just the blank with label
+          // Hide measurements temporarily, keep label and scale info
           const savedMeasurements = measurements;
           setMeasurements([]);
           setCurrentLabel(label);
@@ -746,8 +768,8 @@ export default function DimensionOverlay({
           // Wait for render
           await new Promise(resolve => setTimeout(resolve, 150));
           
-          // Capture blank photo with label overlay
-          const blankWithLabelUri = await captureRef(viewRef.current, {
+          // Capture original with label/scale overlay
+          const originalWithLabelUri = await captureRef(viewRef.current, {
             format: 'jpg',
             quality: 0.9,
             result: 'tmpfile',
@@ -757,62 +779,22 @@ export default function DimensionOverlay({
           setMeasurements(savedMeasurements);
           setCurrentLabel(null);
           
-          // Copy blank photo with custom filename
-          const blankFilename = label ? `${label}_Reference.jpg` : 'PanHandler_Reference.jpg';
-          const blankDest = `${FileSystem.cacheDirectory}${blankFilename}`;
-          await FileSystem.copyAsync({ from: blankWithLabelUri, to: blankDest });
-          attachments.push(blankDest);
+          const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
+          const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
+          await FileSystem.copyAsync({ from: originalWithLabelUri, to: originalDest });
+          attachments.push(originalDest);
           
-          console.log('✅ Created labeled blank photo with filename:', blankFilename);
+          console.log('✅ Added original photo with label to email');
         } catch (error) {
-          console.error('Failed to create labeled blank photo:', error);
-          // Fallback to original blank photo
-          if (currentImageUri) {
-            const fallbackFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
-            const fallbackDest = `${FileSystem.cacheDirectory}${fallbackFilename}`;
-            await FileSystem.copyAsync({ from: currentImageUri, to: fallbackDest });
-            attachments.push(fallbackDest);
-          }
-        }
-        
-        // Capture Fusion 360 image (70% opacity, zoomed/rotated, no overlays)
-        if (fusionViewRef.current) {
-          try {
-            console.log('📸 Capturing Fusion 360 image for email...');
-            
-            const fusionUri = await captureRef(fusionViewRef.current, {
-              format: 'jpg',
-              quality: 0.9,
-              result: 'tmpfile',
-            });
-            
-            // Insert as second attachment (after measurements, before reference)
-            const fusionFilename = label ? `${label}_Fusion360.jpg` : 'PanHandler_Fusion360.jpg';
-            const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
-            await FileSystem.copyAsync({ from: fusionUri, to: fusionDest });
-            // Insert at position 1 (after measurements photo)
-            attachments.splice(1, 0, fusionDest);
-            
-            console.log('✅ Added Fusion 360 photo to email');
-          } catch (error) {
-            console.error('Failed to capture Fusion 360 image:', error);
-          }
-        }
-        
-        // Add original image as third attachment (zoomed out reference)
-        if (currentImageUri) {
-          try {
-            const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
-            const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
-            await FileSystem.copyAsync({ from: currentImageUri, to: originalDest });
-            attachments.push(originalDest);
-            console.log('✅ Added original photo to email');
-          } catch (error) {
-            console.error('Failed to add original image:', error);
-          }
+          console.error('Failed to capture original with label:', error);
+          // Fallback to plain original
+          const fallbackFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
+          const fallbackDest = `${FileSystem.cacheDirectory}${fallbackFilename}`;
+          await FileSystem.copyAsync({ from: currentImageUri, to: fallbackDest });
+          attachments.push(fallbackDest);
         }
       } else if (currentImageUri) {
-        // No label or calibration, just attach original with filename
+        // No label or calibration, just attach plain original
         const originalFilename = label ? `${label}_Original.jpg` : 'PanHandler_Original.jpg';
         const originalDest = `${FileSystem.cacheDirectory}${originalFilename}`;
         await FileSystem.copyAsync({ from: currentImageUri, to: originalDest });
