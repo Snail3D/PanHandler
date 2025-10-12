@@ -3168,12 +3168,7 @@ export default function DimensionOverlay({
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
               opacity: 0.5,
-              transform: [
-                { translateX: zoomTranslateX },
-                { translateY: zoomTranslateY },
-                { scale: zoomScale },
-                { rotate: `${useStore.getState().savedZoomState?.rotation || 0}rad` },
-              ],
+              // NO TRANSFORM - export original unzoomed image for CAD calibration
             }}
           >
             <Image
