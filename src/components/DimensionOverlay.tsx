@@ -1997,7 +1997,7 @@ export default function DimensionOverlay({
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
-                      H: {heightLabel}
+                      H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
                     </Text>
                   </View>
                 </View>
@@ -2025,7 +2025,7 @@ export default function DimensionOverlay({
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
-                      L: {widthLabel}
+                      L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
                     </Text>
                   </View>
                 </View>
