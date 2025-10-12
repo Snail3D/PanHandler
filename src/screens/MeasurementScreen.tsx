@@ -31,10 +31,12 @@ export default function MeasurementScreen() {
   const calibration = useStore((s) => s.calibration);
   const coinCircle = useStore((s) => s.coinCircle);
   const imageOrientation = useStore((s) => s.imageOrientation);
+  const savedZoomState = useStore((s) => s.savedZoomState);
   const setImageUri = useStore((s) => s.setImageUri);
   const setImageOrientation = useStore((s) => s.setImageOrientation);
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
+  const setSavedZoomState = useStore((s) => s.setSavedZoomState);
 
   // Helper to detect orientation based on image (for future use)
   const detectOrientation = async (uri: string) => {
@@ -62,7 +64,13 @@ export default function MeasurementScreen() {
     if (currentImageUri && calibration && coinCircle) {
       console.log('📦 Restoring previous session');
       setMode('measurement');
-      setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+      // Restore saved zoom state if available
+      if (savedZoomState) {
+        console.log('🔄 Restoring zoom state:', savedZoomState);
+        setMeasurementZoom(savedZoomState);
+      } else {
+        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0 });
+      }
     }
   }, []); // Only run on mount
 
@@ -261,7 +269,10 @@ export default function MeasurementScreen() {
                   initialTranslateX={measurementZoom.translateX}
                   initialTranslateY={measurementZoom.translateY}
                   onTransformChange={(scale, translateX, translateY) => {
-                    setMeasurementZoom({ scale, translateX, translateY });
+                    const newZoom = { scale, translateX, translateY };
+                    setMeasurementZoom(newZoom);
+                    // Save zoom state to store for session restoration
+                    setSavedZoomState(newZoom);
                   }}
                 />
                 {/* Measurement overlay needs to be sibling to image for capture */}
