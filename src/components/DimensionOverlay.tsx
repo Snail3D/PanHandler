@@ -2027,35 +2027,36 @@ export default function DimensionOverlay({
                 {/* Header with undo button on same line */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   {/* Left side: Undo button - only show if there are measurements or current points */}
-                  <View style={{ flex: 1, alignItems: 'center' }}>
-                    {(measurements.length > 0 || currentPoints.length > 0) && (
-                      <Pressable
-                        onPress={handleClear}
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                          borderRadius: 8,
-                          paddingVertical: 5,
-                          paddingHorizontal: 10,
-                          borderWidth: 0.5,
-                          borderColor: 'rgba(0, 0, 0, 0.08)',
-                        }}
-                      >
-                        <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
-                        <Text style={{
-                          color: 'rgba(0, 0, 0, 0.6)',
-                          fontWeight: '600',
-                          fontSize: 14,
-                          marginLeft: 5,
-                        }}>
-                          {measurements.length > 0 
-                            ? `Undo (${measurements.length})` 
-                            : 'Clear'}
-                        </Text>
-                      </Pressable>
-                    )}
-                  </View>
+                  {(measurements.length > 0 || currentPoints.length > 0) && (
+                    <Pressable
+                      onPress={handleClear}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                        borderRadius: 8,
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        borderWidth: 0.5,
+                        borderColor: 'rgba(0, 0, 0, 0.08)',
+                      }}
+                    >
+                      <Ionicons name="arrow-undo-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        fontWeight: '600',
+                        fontSize: 14,
+                        marginLeft: 5,
+                      }}>
+                        {measurements.length > 0 
+                          ? `Undo (${measurements.length})` 
+                          : 'Clear'}
+                      </Text>
+                    </Pressable>
+                  )}
+                  
+                  {/* Spacer to push "Hide menu" to the right when no undo button */}
+                  {!(measurements.length > 0 || currentPoints.length > 0) && <View style={{ flex: 1 }} />}
                   
                   {/* Right side: Hide menu text and button */}
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
