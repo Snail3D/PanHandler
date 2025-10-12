@@ -746,6 +746,15 @@ export default function DimensionOverlay({
         const currentMeasurements = useStore.getState().completedMeasurements;
         const currentPointsState = useStore.getState().currentPoints;
         
+        // If nothing left to delete, stop the interval
+        if (currentMeasurements.length === 0 && currentPointsState.length === 0) {
+          if (undoIntervalRef.current) {
+            clearInterval(undoIntervalRef.current);
+            undoIntervalRef.current = null;
+          }
+          return;
+        }
+        
         if (currentMeasurements.length > 0) {
           setMeasurements(currentMeasurements.slice(0, -1));
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
