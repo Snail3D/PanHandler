@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as MediaLibrary from 'expo-media-library';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
@@ -19,6 +20,7 @@ type ScreenMode = 'camera' | 'selectCoin' | 'zoomCalibrate' | 'measurement';
 export default function MeasurementScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
+  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
@@ -118,7 +120,22 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        setImageUri(photo.uri);
+        // Request media library permission if not granted
+        if (!mediaLibraryPermission?.granted) {
+          const { granted } = await requestMediaLibraryPermission();
+          if (!granted) {
+            console.log('Media library permission not granted');
+          }
+        }
+
+        // Save to camera roll
+        if (mediaLibraryPermission?.granted) {
+          await MediaLibrary.saveToLibraryAsync(photo.uri);
+          console.log('✅ Photo saved to camera roll');
+        }
+
+        // Set image URI (not auto-captured in this flow)
+        setImageUri(photo.uri, false);
         await detectOrientation(photo.uri);
         setMode('selectCoin');
       }

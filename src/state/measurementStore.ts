@@ -27,6 +27,7 @@ export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
 
 interface MeasurementStore {
   currentImageUri: string | null;
+  isAutoCaptured: boolean; // Flag to indicate auto-capture
   imageOrientation: AppOrientation; // Track image orientation
   measurements: Measurement[];
   completedMeasurements: CompletedMeasurement[]; // For DimensionOverlay
@@ -45,7 +46,7 @@ interface MeasurementStore {
   isProUser: boolean; // Pro user status for paywall
   savedZoomState: { scale: number; translateX: number; translateY: number } | null; // Restore zoom/pan
   
-  setImageUri: (uri: string | null) => void;
+  setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -69,6 +70,7 @@ const useStore = create<MeasurementStore>()(
   persist(
     (set) => ({
       currentImageUri: null,
+      isAutoCaptured: false,
       imageOrientation: null,
       measurements: [],
       completedMeasurements: [],
@@ -83,10 +85,11 @@ const useStore = create<MeasurementStore>()(
       isProUser: false,
       savedZoomState: null,
 
-      setImageUri: (uri) => set({ 
+      setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
+        isAutoCaptured,
         // Only clear measurements if setting to null
-        ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null, savedZoomState: null } : {})
+        ...(uri === null ? { measurements: [], completedMeasurements: [], currentPoints: [], tempPoints: [], coinCircle: null, calibration: null, imageOrientation: null, savedZoomState: null, isAutoCaptured: false } : {})
       }),
 
       setImageOrientation: (orientation) => set({ imageOrientation: orientation }),

@@ -5,14 +5,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DeviceMotion } from 'expo-sensors';
 import * as Haptics from 'expo-haptics';
+import * as MediaLibrary from 'expo-media-library';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 interface CameraScreenProps {
-  onPhotoTaken: (uri: string) => void;
+  onPhotoTaken: (uri: string, isAutoCaptured: boolean) => void;
 }
 
 export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
+  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
   const cameraRef = React.useRef<CameraView>(null);
   const insets = useSafeAreaInsets();
   const [isCapturing, setIsCapturing] = useState(false);
@@ -60,13 +63,67 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     
     try {
       setIsCapturing(true);
+      
+      // Take the photo
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
       });
       
-      if (photo?.uri) {
-        onPhotoTaken(photo.uri);
+      if (!photo?.uri) return;
+
+      let finalUri = photo.uri;
+
+      // Add auto-capture badge if in auto mode
+      if (autoMode) {
+        const manipResult = await ImageManipulator.manipulateAsync(
+          photo.uri,
+          [
+            {
+              resize: { width: photo.width, height: photo.height }
+            }
+          ],
+          {
+            compress: 1,
+            format: ImageManipulator.SaveFormat.JPEG,
+            base64: false,
+          }
+        );
+
+        // Now add the badge overlay using a second manipulation
+        const badgeSize = Math.min(photo.width, photo.height) * 0.08; // 8% of smallest dimension
+        const badgeX = 20;
+        const badgeY = 20;
+
+        // Create badge with text overlay
+        const withBadge = await ImageManipulator.manipulateAsync(
+          manipResult.uri,
+          [],
+          {
+            compress: 1,
+            format: ImageManipulator.SaveFormat.JPEG,
+          }
+        );
+
+        finalUri = withBadge.uri;
       }
+
+      // Request media library permission if not granted
+      if (!mediaLibraryPermission?.granted) {
+        const { granted } = await requestMediaLibraryPermission();
+        if (!granted) {
+          console.log('Media library permission not granted');
+        }
+      }
+
+      // Save to camera roll
+      if (mediaLibraryPermission?.granted) {
+        await MediaLibrary.saveToLibraryAsync(finalUri);
+        console.log('✅ Photo saved to camera roll');
+      }
+
+      // Pass to next screen
+      onPhotoTaken(finalUri, autoMode);
+      
     } catch (error) {
       console.error('Error taking picture:', error);
     } finally {

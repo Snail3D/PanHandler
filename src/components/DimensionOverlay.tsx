@@ -90,6 +90,7 @@ export default function DimensionOverlay({
   const unitSystem = useStore((s) => s.unitSystem);
   const setUnitSystem = useStore((s) => s.setUnitSystem);
   const currentImageUri = useStore((s) => s.currentImageUri);
+  const isAutoCaptured = useStore((s) => s.isAutoCaptured);
   const coinCircle = useStore((s) => s.coinCircle);
   const currentPoints = useStore((s) => s.currentPoints);
   const setCurrentPoints = useStore((s) => s.setCurrentPoints);
@@ -1600,6 +1601,29 @@ export default function DimensionOverlay({
             );
           })()}
           
+          {/* Auto-capture badge - top-right corner */}
+          {isAutoCaptured && (
+            <View
+              style={{
+                position: 'absolute',
+                top: insets.top + 52,
+                right: 12,
+                backgroundColor: 'rgba(0, 200, 0, 0.9)',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 6,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              pointerEvents="none"
+            >
+              <Ionicons name="flash" size={12} color="white" />
+              <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
+                AUTO
+              </Text>
+            </View>
+          )}
+
           {/* Measurement legend in upper-left corner - only show if there are measurements */}
           {measurements.length > 0 && (
             <View
