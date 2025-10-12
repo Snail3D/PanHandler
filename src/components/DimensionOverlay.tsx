@@ -237,9 +237,15 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    if (!viewRef.current || !currentImageUri) return;
+    if (!viewRef || !viewRef.current || !currentImageUri) {
+      console.error('❌ Export failed: viewRef or currentImageUri is missing');
+      Alert.alert('Export Error', 'Unable to capture measurement. Please try again.');
+      return;
+    }
 
     try {
+      console.log('📸 Starting capture...');
+      
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -247,21 +253,34 @@ export default function DimensionOverlay({
         return;
       }
 
+      console.log('📸 Capturing view...');
       const uri = await captureRef(viewRef.current, {
         format: 'jpg',
-        quality: 1,
+        quality: 0.9,
+        result: 'tmpfile',
       });
 
+      console.log('📸 Captured URI:', uri);
+      console.log('💾 Saving to library...');
       await MediaLibrary.saveToLibraryAsync(uri);
+      
+      console.log('✅ Save successful!');
       Alert.alert('Success', 'Measurement saved to Photos!');
+      
+      // Haptic feedback for success
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      Alert.alert('Save Error', 'Failed to save image. Please try again.');
-      console.error('Export error:', error);
+      console.error('❌ Export error:', error);
+      Alert.alert('Save Error', `Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleEmail = async () => {
-    if (!viewRef.current || !currentImageUri) return;
+    if (!viewRef || !viewRef.current || !currentImageUri) {
+      console.error('❌ Email failed: viewRef or currentImageUri is missing');
+      Alert.alert('Email Error', 'Unable to capture measurement. Please try again.');
+      return;
+    }
 
     try {
       // Check if email is available
@@ -271,11 +290,15 @@ export default function DimensionOverlay({
         return;
       }
 
+      console.log('📸 Capturing view for email...');
       // Capture the image with measurements
       const uri = await captureRef(viewRef.current, {
         format: 'jpg',
-        quality: 1,
+        quality: 0.9,
+        result: 'tmpfile',
       });
+
+      console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text - one per line
       let measurementText = 'Measurements:\n\n';
@@ -283,15 +306,18 @@ export default function DimensionOverlay({
         measurementText += `${idx + 1}. ${m.value}\n`;
       });
 
+      console.log('📧 Opening email composer...');
       // Compose email with attachment
       await MailComposer.composeAsync({
         subject: 'Measurement Results',
         body: measurementText,
         attachments: [uri],
       });
+      
+      console.log('✅ Email composer opened');
     } catch (error) {
-      Alert.alert('Email Error', 'Failed to prepare email. Please try again.');
-      console.error('Email error:', error);
+      console.error('❌ Email error:', error);
+      Alert.alert('Email Error', `Failed to prepare email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -749,21 +775,21 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-            borderRadius: 32,
-            paddingHorizontal: 20,
-            paddingTop: 20,
-            paddingBottom: 24,
+            backgroundColor: 'rgba(255, 255, 255, 0.45)',
+            borderRadius: 26,
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 18,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 12 },
+            shadowOffset: { width: 0, height: 10 },
             shadowOpacity: 0.25,
-            shadowRadius: 32,
+            shadowRadius: 28,
             elevation: 16,
             borderWidth: 1.5,
             borderColor: 'rgba(255, 255, 255, 0.3)',
           }}>
           {/* Mode Toggle: Pan/Zoom vs Measure */}
-          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 16, padding: 3 }}>
+          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 13, padding: 2.5 }}>
             <Pressable
               onPress={() => {
                 if (isPanZoomLocked) return;
@@ -774,8 +800,8 @@ export default function DimensionOverlay({
               disabled={isPanZoomLocked}
               style={{
                 flex: 1,
-                paddingVertical: 11,
-                borderRadius: 13,
+                paddingVertical: 9,
+                borderRadius: 11,
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                 opacity: isPanZoomLocked ? 0.5 : 1,
               }}
@@ -783,13 +809,13 @@ export default function DimensionOverlay({
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name={isPanZoomLocked ? "lock-closed" : "move-outline"}
-                  size={18} 
+                  size={15} 
                   color={isPanZoomLocked ? 'rgba(255, 255, 255, 0.5)' : (!measurementMode ? '#007AFF' : 'rgba(255, 255, 255, 0.7)')} 
                 />
                 <Text style={{
-                  marginLeft: 6,
+                  marginLeft: 5,
                   fontWeight: '600',
-                  fontSize: 15,
+                  fontSize: 13,
                   color: isPanZoomLocked ? 'rgba(255, 255, 255, 0.5)' : (!measurementMode ? '#007AFF' : 'rgba(255, 255, 255, 0.7)')
                 }}>
                   {isPanZoomLocked ? 'Locked' : 'Pan/Zoom'}
@@ -803,21 +829,21 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 11,
-                borderRadius: 13,
+                paddingVertical: 9,
+                borderRadius: 11,
                 backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
                   name="create-outline" 
-                  size={18} 
+                  size={15} 
                   color={measurementMode ? '#34C759' : 'rgba(255, 255, 255, 0.7)'} 
                 />
                 <Text style={{
-                  marginLeft: 6,
+                  marginLeft: 5,
                   fontWeight: '600',
-                  fontSize: 15,
+                  fontSize: 13,
                   color: measurementMode ? '#34C759' : 'rgba(255, 255, 255, 0.7)'
                 }}>
                   Measure
@@ -827,7 +853,7 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle */}
-          <View className="flex-row mb-4" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 16, padding: 3 }}>
+          <View className="flex-row mb-3" style={{ backgroundColor: 'rgba(120, 120, 128, 0.16)', borderRadius: 13, padding: 2.5 }}>
             <Pressable
               onPress={() => {
                 setMode('distance');
@@ -837,19 +863,27 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 11,
-                borderRadius: 13,
+                paddingVertical: 9,
+                borderRadius: 11,
                 backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
-              <Text style={{
-                textAlign: 'center',
-                fontWeight: '600',
-                fontSize: 15,
-                color: mode === 'distance' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'
-              }}>
-                Distance
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons 
+                  name="resize-outline" 
+                  size={15} 
+                  color={mode === 'distance' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'} 
+                />
+                <Text style={{
+                  marginLeft: 5,
+                  textAlign: 'center',
+                  fontWeight: '600',
+                  fontSize: 13,
+                  color: mode === 'distance' ? '#007AFF' : 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Distance
+                </Text>
+              </View>
             </Pressable>
             <Pressable
               onPress={() => {
@@ -860,19 +894,27 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 11,
-                borderRadius: 13,
+                paddingVertical: 9,
+                borderRadius: 11,
                 backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
               }}
             >
-              <Text style={{
-                textAlign: 'center',
-                fontWeight: '600',
-                fontSize: 15,
-                color: mode === 'angle' ? '#34C759' : 'rgba(255, 255, 255, 0.7)'
-              }}>
-                Angle
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons 
+                  name="git-compare-outline" 
+                  size={15} 
+                  color={mode === 'angle' ? '#34C759' : 'rgba(255, 255, 255, 0.7)'} 
+                />
+                <Text style={{
+                  marginLeft: 5,
+                  textAlign: 'center',
+                  fontWeight: '600',
+                  fontSize: 13,
+                  color: mode === 'angle' ? '#34C759' : 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Angle
+                </Text>
+              </View>
             </Pressable>
           </View>
 
@@ -960,21 +1002,21 @@ export default function DimensionOverlay({
               </Pressable>
 
               {measurements.length > 0 && (
-                <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
+                <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
                   <Pressable
                     onPress={handleExport}
                     style={{
                       flex: 1,
                       backgroundColor: '#007AFF',
-                      borderRadius: 16,
-                      paddingVertical: 14,
+                      borderRadius: 14,
+                      paddingVertical: 12,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="square-outline" size={18} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>Save</Text>
+                    <Ionicons name="images-outline" size={16} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginLeft: 6 }}>Save</Text>
                   </Pressable>
                   
                   <Pressable
@@ -982,15 +1024,15 @@ export default function DimensionOverlay({
                     style={{
                       flex: 1,
                       backgroundColor: '#34C759',
-                      borderRadius: 16,
-                      paddingVertical: 14,
+                      borderRadius: 14,
+                      paddingVertical: 12,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="mail-outline" size={18} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 15, marginLeft: 8 }}>Email</Text>
+                    <Ionicons name="mail-outline" size={16} color="white" />
+                    <Text style={{ color: 'white', fontWeight: '600', fontSize: 14, marginLeft: 6 }}>Email</Text>
                   </Pressable>
                 </View>
               )}
