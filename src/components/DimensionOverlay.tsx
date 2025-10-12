@@ -3167,8 +3167,9 @@ export default function DimensionOverlay({
               position: 'absolute',
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
-              opacity: 0.5,
+              opacity: 0.25,
               // NO TRANSFORM - export original unzoomed image for CAD calibration
+              // Lower opacity (25%) = lighter/more transparent for easier CAD tracing
             }}
           >
             <Image
