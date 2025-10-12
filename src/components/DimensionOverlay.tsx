@@ -1403,9 +1403,13 @@ export default function DimensionOverlay({
             fingerScale.value = 1;
             fingerRotation.value = 0;
             
-            // Adaptive horizontal offset: shift cursor away from nearest edge
-            // ~0.5cm = ~20 pixels horizontal offset
-            const horizontalOffset = pageX > SCREEN_WIDTH / 2 ? 20 : -20;
+            // Gradient horizontal offset: smooth transition from center
+            // At center: 0 offset
+            // At edges: ±30px offset away from edge
+            const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
+            const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
+            const maxOffset = 30;
+            const horizontalOffset = -normalizedPosition * maxOffset;
             
             setShowCursor(true);
             setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
@@ -1431,10 +1435,18 @@ export default function DimensionOverlay({
             }));
             setFingerTouches(touches);
             
-            // Adaptive horizontal offset: shift cursor away from nearest edge
-            const horizontalOffset = pageX > SCREEN_WIDTH / 2 ? 20 : -20;
+            // Gradient horizontal offset: smooth transition from center
+            // At center: 0 offset
+            // At edges: ±30px offset away from edge
+            // Formula: offset moves crosshair AWAY from the edge you're near
+            const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
+            const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left edge) to +1 (right edge)
+            const maxOffset = 30; // Maximum offset at edges
             
-            // Update cursor with adaptive offset
+            // Negative offset when on right (shifts left), positive when on left (shifts right)
+            const horizontalOffset = -normalizedPosition * maxOffset;
+            
+            // Update cursor with gradient offset
             setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
             
             // Adaptive haptic feedback based on movement speed
