@@ -1097,6 +1097,11 @@ export default function DimensionOverlay({
               
               // Success haptic
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else if (mode === 'circle' && currentPoints.length === 1) {
+              // User just tapped without dragging in circle mode - ignore this release
+              // They need to drag to set the radius
+              setShowCursor(false);
+              console.log('⚠️ Circle mode: Need to drag to set radius');
             } else {
               // For other modes, place point normally
               placePoint(cursorPosition.x, cursorPosition.y);
