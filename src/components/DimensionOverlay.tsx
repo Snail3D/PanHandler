@@ -198,13 +198,10 @@ export default function DimensionOverlay({
   const undoIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const undoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Tetris Easter egg state
+  // Tetris Easter egg state - simplified static version
   const [showTetris, setShowTetris] = useState(false);
-  const [tetrisBlocks, setTetrisBlocks] = useState<Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}>>([]);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
-  const [showGameOver, setShowGameOver] = useState(false);
-  const gameOverOpacity = useSharedValue(0);
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
@@ -331,83 +328,30 @@ export default function DimensionOverlay({
   };
   
   // Tetris animation trigger - EPIC GAME OVER sequence!
+  // Static Tetris animation - simple fade in/out
   const triggerTetrisAnimation = () => {
     setShowTetris(true);
     
     // Success haptic
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     
-    // Fade in
+    // Fade in the static screen
     tetrisOpacity.value = withTiming(1, { duration: 600 });
     
-    // Create 30 blocks that will pile up FAST like runaway Tetris
-    const blocks: Array<{id: string, x: number, y: number, rotation: number, shape: number, settled: boolean}> = [];
-    const blockSize = 40;
-    const blocksPerRow = Math.floor(SCREEN_WIDTH / blockSize) - 1;
-    
-    // Generate blocks that will stack from bottom to top
-    for (let i = 0; i < 30; i++) {
-      const row = Math.floor(i / blocksPerRow);
-      const col = i % blocksPerRow;
-      
-      blocks.push({
-        id: `tetris-${i}`,
-        x: 20 + (col * blockSize), // Grid position
-        y: -100 - (i * 60), // Start way above screen, staggered
-        rotation: Math.floor(Math.random() * 4) * 90,
-        shape: Math.floor(Math.random() * 7),
-        settled: false,
-      });
-    }
-    
-    setTetrisBlocks(blocks);
-    
-    // Animate blocks falling FAST one by one (faster and faster = runaway!)
-    blocks.forEach((block, idx) => {
-      const row = Math.floor(idx / blocksPerRow);
-      // Get faster as it goes: start at 400ms, end at 100ms
-      const dropDelay = Math.max(100, 400 - (idx * 10));
-      
-      setTimeout(() => {
-        setTetrisBlocks(prev => 
-          prev.map(b => 
-            b.id === block.id 
-              ? { ...b, y: SCREEN_HEIGHT - 140 - (row * blockSize), settled: true } 
-              : b
-          )
-        );
-      }, idx * dropDelay);
-    });
-    
-    // Show GAME OVER when blocks reach top (after ~6 seconds)
-    setTimeout(() => {
-      // Huge success haptic
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      
-      // Show GAME OVER overlay
-      runOnJS(setShowGameOver)(true);
-      gameOverOpacity.value = withTiming(1, { duration: 400 });
-    }, 6000);
-    
-    // Fade out and CLEAR EVERYTHING after 8 seconds
+    // Hold for 3 seconds, then fade out and clear everything
     setTimeout(() => {
       tetrisOpacity.value = withTiming(0, { duration: 800 }, () => {
         runOnJS(setShowTetris)(false);
-        runOnJS(setTetrisBlocks)([]);
-        runOnJS(setShowGameOver)(false);
         
         // CLEAR ALL MEASUREMENTS! 🧹
         runOnJS(setMeasurements)([]);
         runOnJS(setCurrentPoints)([]);
         runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
         
-        // Reset game over
-        gameOverOpacity.value = 0;
-        
         // Success haptic for the reset
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       });
-    }, 8000);
+    }, 3000);
   };
   
   // Get color for measurement based on index
@@ -1402,15 +1346,13 @@ export default function DimensionOverlay({
             
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
-            // TEMPORARY: Disable fingerprint indicators to avoid cache issue
-            // setFingerTouches([{ 
-            //   x: pageX, 
-            //   y: pageY, 
-            //   id: 'touch-0',
-            //   pressure: pressure,
-            //   seed: Math.random()
-            // }]);
-            setFingerTouches([]); // Empty until cache clears
+            setFingerTouches([{ 
+              x: pageX, 
+              y: pageY, 
+              id: 'touch-0',
+              pressure: pressure,
+              seed: Math.random()
+            }]);
             fingerOpacity.value = withTiming(1, { duration: 150 });
             fingerScale.value = 1;
             fingerRotation.value = 0;
@@ -1450,9 +1392,7 @@ export default function DimensionOverlay({
                     seed: Math.random()
                   }))
                 : [];
-              // TEMPORARY: Disable fingerprint indicators to avoid cache issue
-              // setFingerTouches(touches);
-              setFingerTouches([]); // Empty array until cache clears
+              setFingerTouches(touches);
               
               // Gradient horizontal offset: crosshair leans in direction of movement
               // At center: 0 offset
@@ -3394,7 +3334,7 @@ export default function DimensionOverlay({
         </Animated.View>
       </Modal>
       
-      {/* Tetris Easter Egg Overlay */}
+      {/* Tetris Easter Egg Overlay - Static version */}
       <Modal
         visible={showTetris}
         transparent
@@ -3404,157 +3344,67 @@ export default function DimensionOverlay({
         <Animated.View
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
             opacity: tetrisOpacity.value,
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          {/* Classic Tetris border */}
+          {/* Static Tetris board with overflow */}
           <View
             style={{
-              position: 'absolute',
-              top: insets.top + 40,
-              left: 20,
-              right: 20,
-              bottom: insets.bottom + 40,
+              width: SCREEN_WIDTH - 40,
+              height: SCREEN_HEIGHT * 0.7,
               borderWidth: 4,
               borderColor: '#00FF00',
               borderRadius: 8,
-            }}
-          />
-          
-          {/* Score text */}
-          <Animated.View
-            style={{
-              position: 'absolute',
-              top: insets.top + 60,
-              alignSelf: 'center',
-              opacity: tetrisOpacity.value,
+              overflow: 'hidden',
+              position: 'relative',
             }}
           >
-            <Text
-              style={{
-                color: '#00FF00',
-                fontSize: 24,
-                fontWeight: 'bold',
-                fontFamily: 'Courier',
-                textShadowColor: '#00FF00',
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 10,
-              }}
-            >
-              🎮 TETRIS MODE 🎮
-            </Text>
-            <Text
-              style={{
-                color: '#FFFFFF',
-                fontSize: 16,
-                fontFamily: 'Courier',
-                textAlign: 'center',
-                marginTop: 8,
-              }}
-            >
-              LEGENDARY! {measurements.length} MEASUREMENTS!
-            </Text>
-          </Animated.View>
-          
-          {/* Falling Tetris blocks */}
-          {tetrisBlocks.map((block) => {
-            return (
-              <View
-                key={block.id}
-                style={{
-                  position: 'absolute',
-                  left: block.x,
-                  top: block.y,
-                  width: 40,
-                  height: 40,
-                  transform: [{ rotate: `${block.rotation}deg` }],
-                }}
-              >
-                {/* Tetris block shape - using colored squares */}
+            {/* Static overflowing Tetris blocks - creating a stacked board */}
+            {Array.from({ length: 50 }).map((_, idx) => {
+              const blockSize = 35;
+              const blocksPerRow = Math.floor((SCREEN_WIDTH - 48) / blockSize);
+              const row = Math.floor(idx / blocksPerRow);
+              const col = idx % blocksPerRow;
+              const colors = ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'];
+              
+              return (
                 <View
+                  key={`tetris-block-${idx}`}
                   style={{
-                    width: 40,
-                    height: 40,
-                    backgroundColor: ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'][block.shape],
-                    borderWidth: 2,
+                    position: 'absolute',
+                    left: col * blockSize,
+                    bottom: row * blockSize - 50, // Overflow at top
+                    width: blockSize - 2,
+                    height: blockSize - 2,
+                    backgroundColor: colors[idx % colors.length],
+                    borderWidth: 1.5,
                     borderColor: '#FFFFFF',
-                    borderRadius: 4,
-                    shadowColor: ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'][block.shape],
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.8,
-                    shadowRadius: 8,
+                    borderRadius: 3,
                   }}
                 />
-              </View>
-            );
-          })}
-          
-          {/* Bottom congratulations text - now centered */}
-          <Animated.View
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 0,
-              right: 0,
-              alignItems: 'center',
-              transform: [{ translateY: -40 }],
-              opacity: tetrisOpacity.value,
-              paddingHorizontal: 20,
-            }}
-          >
-            <Text
-              style={{
-                color: '#FFFF00',
-                fontSize: 20,
-                fontWeight: 'bold',
-                fontFamily: 'Courier',
-                textAlign: 'center',
-                textShadowColor: '#FFFF00',
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 10,
-                lineHeight: 28,
-              }}
-            >
-              WE CAN PLAY GAMES TOO {';)'}
-            </Text>
-            <Text
-              style={{
-                color: '#FFFFFF',
-                fontSize: 16,
-                fontWeight: 'bold',
-                fontFamily: 'Courier',
-                textAlign: 'center',
-                marginTop: 8,
-                textShadowColor: '#000000',
-                textShadowOffset: { width: 0, height: 2 },
-                textShadowRadius: 4,
-              }}
-            >
-              You're starting fresh
-            </Text>
-          </Animated.View>
-          
-          {/* GAME OVER overlay - appears when blocks reach top */}
-          {showGameOver && (
-            <Animated.View
+              );
+            })}
+            
+            {/* GAME OVER text overlay */}
+            <View
               style={{
                 position: 'absolute',
-                top: 0,
+                top: '35%',
                 left: 0,
                 right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(255, 0, 0, 0.3)',
-                justifyContent: 'center',
                 alignItems: 'center',
-                opacity: gameOverOpacity.value,
+                backgroundColor: 'rgba(255, 0, 0, 0.4)',
+                paddingVertical: 20,
               }}
             >
               <View
                 style={{
                   backgroundColor: '#FF0000',
-                  paddingHorizontal: 40,
-                  paddingVertical: 20,
+                  paddingHorizontal: 30,
+                  paddingVertical: 15,
                   borderRadius: 12,
                   borderWidth: 4,
                   borderColor: '#FFFFFF',
@@ -3563,7 +3413,7 @@ export default function DimensionOverlay({
                 <Text
                   style={{
                     color: '#FFFFFF',
-                    fontSize: 48,
+                    fontSize: 40,
                     fontWeight: 'bold',
                     fontFamily: 'Courier',
                     textAlign: 'center',
@@ -3573,38 +3423,55 @@ export default function DimensionOverlay({
                     letterSpacing: 4,
                   }}
                 >
-                  GAME
-                </Text>
-                <Text
-                  style={{
-                    color: '#FFFFFF',
-                    fontSize: 48,
-                    fontWeight: 'bold',
-                    fontFamily: 'Courier',
-                    textAlign: 'center',
-                    textShadowColor: '#000000',
-                    textShadowOffset: { width: 2, height: 2 },
-                    textShadowRadius: 4,
-                    letterSpacing: 4,
-                  }}
-                >
-                  OVER
-                </Text>
-                <Text
-                  style={{
-                    color: '#FFFF00',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    fontFamily: 'Courier',
-                    textAlign: 'center',
-                    marginTop: 12,
-                  }}
-                >
-                  CLEARING SCREEN...
+                  GAME OVER
                 </Text>
               </View>
-            </Animated.View>
-          )}
+            </View>
+          </View>
+          
+          {/* Centered congratulations text */}
+          <Animated.View
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              right: 0,
+              alignItems: 'center',
+              transform: [{ translateY: 100 }],
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text
+              style={{
+                color: '#FFFF00',
+                fontSize: 22,
+                fontWeight: 'bold',
+                fontFamily: 'Courier',
+                textAlign: 'center',
+                textShadowColor: '#FFFF00',
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 10,
+                lineHeight: 32,
+              }}
+            >
+              WE CAN PLAY GAMES TOO {';)'}
+            </Text>
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 18,
+                fontWeight: 'bold',
+                fontFamily: 'Courier',
+                textAlign: 'center',
+                marginTop: 12,
+                textShadowColor: '#000000',
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 4,
+              }}
+            >
+              {"You're starting fresh"}
+            </Text>
+          </Animated.View>
         </Animated.View>
       </Modal>
       
