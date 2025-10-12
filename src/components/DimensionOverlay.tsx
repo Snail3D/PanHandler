@@ -105,6 +105,12 @@ export default function DimensionOverlay({
   const [proTapCount, setProTapCount] = useState(0);
   const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Selected measurement for delete/drag
+  const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
+  const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
+  const dragStartPos = useSharedValue({ x: 0, y: 0 });
+  const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
+  
   // Get color for measurement based on index
   const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
     const colors = MEASUREMENT_COLORS[measurementMode];
@@ -151,6 +157,80 @@ export default function DimensionOverlay({
     }
     
     return `${angle.toFixed(1)}°`;
+  };
+
+  // Helper to check if a tap is near a measurement
+  const getTappedMeasurement = (tapX: number, tapY: number): string | null => {
+    const TAP_THRESHOLD = 30; // pixels
+    
+    for (const measurement of measurements) {
+      if (measurement.mode === 'distance') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const distToLine = distanceToLineSegment(tapX, tapY, p0.x, p0.y, p1.x, p1.y);
+        if (distToLine < TAP_THRESHOLD) return measurement.id;
+      } else if (measurement.mode === 'angle') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+        const dist1 = distanceToLineSegment(tapX, tapY, p1.x, p1.y, p0.x, p0.y);
+        const dist2 = distanceToLineSegment(tapX, tapY, p1.x, p1.y, p2.x, p2.y);
+        if (dist1 < TAP_THRESHOLD || dist2 < TAP_THRESHOLD) return measurement.id;
+      } else if (measurement.mode === 'circle') {
+        const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const radius = Math.sqrt(
+          Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+        );
+        const distFromCenter = Math.sqrt(
+          Math.pow(tapX - center.x, 2) + Math.pow(tapY - center.y, 2)
+        );
+        if (Math.abs(distFromCenter - radius) < TAP_THRESHOLD || distFromCenter < radius) {
+          return measurement.id;
+        }
+      } else if (measurement.mode === 'rectangle') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const minX = Math.min(p0.x, p1.x);
+        const maxX = Math.max(p0.x, p1.x);
+        const minY = Math.min(p0.y, p1.y);
+        const maxY = Math.max(p0.y, p1.y);
+        const onEdge = (
+          (Math.abs(tapX - minX) < TAP_THRESHOLD && tapY >= minY && tapY <= maxY) ||
+          (Math.abs(tapX - maxX) < TAP_THRESHOLD && tapY >= minY && tapY <= maxY) ||
+          (Math.abs(tapY - minY) < TAP_THRESHOLD && tapX >= minX && tapX <= maxX) ||
+          (Math.abs(tapY - maxY) < TAP_THRESHOLD && tapX >= minX && tapX <= maxX)
+        );
+        const inside = (tapX >= minX && tapX <= maxX && tapY >= minY && tapY <= maxY);
+        if (onEdge || inside) return measurement.id;
+      }
+    }
+    return null;
+  };
+
+  const distanceToLineSegment = (px: number, py: number, x1: number, y1: number, x2: number, y2: number): number => {
+    const A = px - x1;
+    const B = py - y1;
+    const C = x2 - x1;
+    const D = y2 - y1;
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+    if (lenSq !== 0) param = dot / lenSq;
+    let xx, yy;
+    if (param < 0) {
+      xx = x1;
+      yy = y1;
+    } else if (param > 1) {
+      xx = x2;
+      yy = y2;
+    } else {
+      xx = x1 + param * C;
+      yy = y1 + param * D;
+    }
+    const dx = px - xx;
+    const dy = py - yy;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   const placePoint = (x: number, y: number) => {
@@ -714,6 +794,12 @@ export default function DimensionOverlay({
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
+            
+            // Dismiss any selected measurement
+            if (selectedMeasurementId) {
+              setSelectedMeasurementId(null);
+            }
+            
             setShowCursor(true);
             setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
@@ -789,6 +875,128 @@ export default function DimensionOverlay({
               
               // Success haptic
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
+          }}
+        />
+      )}
+
+      {/* Tap detection overlay for selecting/deleting measurements - always active when not in measurement mode */}
+      {!measurementMode && measurements.length > 0 && (
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
+          onStartShouldSetResponder={() => true}
+          onMoveShouldSetResponder={(event) => {
+            // Only respond to move if we're dragging a circle or rectangle
+            return draggedMeasurementId !== null;
+          }}
+          onResponderGrant={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            const tappedId = getTappedMeasurement(pageX, pageY);
+            
+            if (tappedId) {
+              const measurement = measurements.find(m => m.id === tappedId);
+              
+              // Check if this is a draggable measurement (circle or rectangle)
+              if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
+                // Store start position for potential drag
+                dragStartPos.value = { x: pageX, y: pageY };
+                dragCurrentPos.value = { x: pageX, y: pageY };
+                
+                // Dismiss previous selection if tapping a different measurement
+                if (selectedMeasurementId && selectedMeasurementId !== tappedId) {
+                  setSelectedMeasurementId(null);
+                }
+              } else {
+                // For distance/angle measurements, just select for delete
+                if (selectedMeasurementId === tappedId) {
+                  setSelectedMeasurementId(null);
+                } else {
+                  setSelectedMeasurementId(tappedId);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }
+              }
+            } else {
+              // Tapped empty space - dismiss selection
+              if (selectedMeasurementId) {
+                setSelectedMeasurementId(null);
+              }
+            }
+          }}
+          onResponderMove={(event) => {
+            if (!draggedMeasurementId) {
+              const { pageX, pageY } = event.nativeEvent;
+              const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
+              
+              // Check if user moved enough to start dragging
+              const dragDistance = Math.sqrt(
+                Math.pow(pageX - dragStartPos.value.x, 2) +
+                Math.pow(pageY - dragStartPos.value.y, 2)
+              );
+              
+              if (dragDistance > 10 && tappedId) {
+                const measurement = measurements.find(m => m.id === tappedId);
+                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
+                  setDraggedMeasurementId(tappedId);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }
+              }
+            }
+            
+            if (draggedMeasurementId) {
+              const { pageX, pageY } = event.nativeEvent;
+              dragCurrentPos.value = { x: pageX, y: pageY };
+              
+              // Calculate offset from start
+              const deltaX = pageX - dragStartPos.value.x;
+              const deltaY = pageY - dragStartPos.value.y;
+              
+              // Update measurement position
+              const measurement = measurements.find(m => m.id === draggedMeasurementId);
+              if (measurement) {
+                const deltaImageX = deltaX / zoomScale;
+                const deltaImageY = deltaY / zoomScale;
+                
+                const updatedMeasurements = measurements.map(m => {
+                  if (m.id === draggedMeasurementId) {
+                    return {
+                      ...m,
+                      points: m.points.map(p => ({
+                        x: p.x + deltaImageX,
+                        y: p.y + deltaImageY,
+                      })),
+                    };
+                  }
+                  return m;
+                });
+                
+                setMeasurements(updatedMeasurements);
+                dragStartPos.value = { x: pageX, y: pageY };
+                
+                // Haptic feedback while dragging
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+            }
+          }}
+          onResponderRelease={() => {
+            if (draggedMeasurementId) {
+              // Finished dragging
+              setDraggedMeasurementId(null);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else {
+              // Was just a tap - handle selection
+              const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
+              if (tappedId) {
+                const measurement = measurements.find(m => m.id === tappedId);
+                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
+                  // Toggle selection for circle/rectangle
+                  if (selectedMeasurementId === tappedId) {
+                    setSelectedMeasurementId(null);
+                  } else {
+                    setSelectedMeasurementId(tappedId);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }
+                }
+              }
             }
           }}
         />
@@ -1241,6 +1449,71 @@ export default function DimensionOverlay({
             );
           })()}
       </View>
+
+      {/* Delete button for selected measurement */}
+      {selectedMeasurementId && (() => {
+        const selectedMeasurement = measurements.find(m => m.id === selectedMeasurementId);
+        if (!selectedMeasurement) return null;
+
+        let buttonX, buttonY;
+        if (selectedMeasurement.mode === 'distance') {
+          const p0 = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
+          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
+          buttonX = (p0.x + p1.x) / 2;
+          buttonY = (p0.y + p1.y) / 2 + 40;
+        } else if (selectedMeasurement.mode === 'angle') {
+          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
+          buttonX = p1.x;
+          buttonY = p1.y + 60;
+        } else if (selectedMeasurement.mode === 'circle') {
+          const center = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
+          buttonX = center.x;
+          buttonY = center.y + 50;
+        } else if (selectedMeasurement.mode === 'rectangle') {
+          const p0 = imageToScreen(selectedMeasurement.points[0].x, selectedMeasurement.points[0].y);
+          const p1 = imageToScreen(selectedMeasurement.points[1].x, selectedMeasurement.points[1].y);
+          buttonX = (p0.x + p1.x) / 2;
+          buttonY = Math.max(p0.y, p1.y) + 40;
+        }
+
+        return (
+          <View
+            style={{
+              position: 'absolute',
+              left: buttonX! - 28,
+              top: buttonY!,
+              zIndex: 50,
+            }}
+            pointerEvents="box-only"
+          >
+            <Pressable
+              onPress={() => {
+                const newMeasurements = measurements.filter(m => m.id !== selectedMeasurementId);
+                setMeasurements(newMeasurements);
+                setSelectedMeasurementId(null);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }}
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: 'rgba(255, 59, 48, 0.95)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 10,
+                borderWidth: 3,
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              <Ionicons name="trash-outline" size={28} color="white" />
+            </Pressable>
+          </View>
+        );
+      })()}
 
       {/* Bottom toolbar - Water droplet style with slide gesture */}
       {!menuMinimized && !isCapturing && (
