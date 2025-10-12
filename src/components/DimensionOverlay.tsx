@@ -1064,8 +1064,12 @@ export default function DimensionOverlay({
             setFingerTouches([{ x: pageX, y: pageY, id: 'touch-0' }]);
             fingerOpacity.value = withTiming(1, { duration: 150 });
             
+            // Adaptive horizontal offset: shift cursor away from nearest edge
+            // ~0.5cm = ~20 pixels horizontal offset
+            const horizontalOffset = pageX > SCREEN_WIDTH / 2 ? 20 : -20;
+            
             setShowCursor(true);
-            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
             setLastHapticPosition({ x: pageX, y: pageY });
             
             // Haptic for activation
@@ -1085,8 +1089,11 @@ export default function DimensionOverlay({
             }));
             setFingerTouches(touches);
             
-            // Update cursor
-            setCursorPosition({ x: pageX, y: pageY - cursorOffsetY });
+            // Adaptive horizontal offset: shift cursor away from nearest edge
+            const horizontalOffset = pageX > SCREEN_WIDTH / 2 ? 20 : -20;
+            
+            // Update cursor with adaptive offset
+            setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
             
             // Adaptive haptic feedback based on movement speed
             const distance = Math.sqrt(
