@@ -2064,7 +2064,13 @@ export default function DimensionOverlay({
               }}>
                 
                 {/* Header with undo button and hide menu on same line */}
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 8, position: 'relative' }}>
+                <View style={{ 
+                  flexDirection: 'row', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16, 
+                  position: 'relative' 
+                }}>
                   {/* Center: Undo button - only show if there are measurements or current points */}
                   {(measurements.length > 0 || currentPoints.length > 0) && (
                     <Pressable
