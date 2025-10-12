@@ -347,12 +347,14 @@ export default function DimensionOverlay({
       } else if (mode === 'angle') {
         value = calculateAngle(completedPoints[0], completedPoints[1], completedPoints[2]);
       } else if (mode === 'circle') {
-        // Calculate radius and diameter
+        // Calculate radius (in pixels) and convert to diameter
         radius = Math.sqrt(
           Math.pow(completedPoints[1].x - completedPoints[0].x, 2) + 
           Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
         );
-        const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+        // Convert radius in pixels to diameter in mm/inches
+        const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
+        const diameter = radiusInUnits * 2;
         value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
       } else {
         // Rectangle: calculate width and height
