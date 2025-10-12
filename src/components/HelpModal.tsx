@@ -705,25 +705,55 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 color="#5856D6"
                 delay={400}
               >
-                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Export your measurements in multiple formats optimized for different uses.
-                </Text>
-                <View style={{ marginLeft: 4 }}>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    📸 <Text style={{ fontWeight: '600' }}>Labeled Photo</Text> - Full measurements with annotations
-                  </Text>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    🔧 <Text style={{ fontWeight: '600' }}>Fusion 360 Export</Text> - 50% opacity, perfectly scaled for CAD
-                  </Text>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    📄 <Text style={{ fontWeight: '600' }}>Original Reference</Text> - Clean photo with scale info
-                  </Text>
-                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12 }}>
-                    ✉️ <Text style={{ fontWeight: '600' }}>Email Reports</Text> - All photos + detailed measurement data
+                {/* FREE badge */}
+                <View style={{ 
+                  backgroundColor: 'rgba(52,199,89,0.12)', 
+                  alignSelf: 'flex-start',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  marginBottom: 12,
+                }}>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#34C759' }}>
+                    ✓ FREE - 10 saves & 10 emails per month
                   </Text>
                 </View>
 
-                {/* CAD Integration Tips */}
+                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 12 }}>
+                  Export photos with measurements and detailed reports
+                </Text>
+
+                <View style={{ gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>📸</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Labeled Photo</Text> - All measurements shown
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>🔧</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>CAD Export</Text> - 50% opacity, perfectly scaled
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>📄</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Reference Photo</Text> - Clean with scale info
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>✉️</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Email Reports</Text> - All photos + data
+                    </Text>
+                  </View>
+                </View>
+
+                {/* CAD Integration */}
                 <View
                   style={{
                     backgroundColor: 'rgba(88,86,214,0.08)',
@@ -731,25 +761,18 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     padding: 12,
                     borderWidth: 1,
                     borderColor: 'rgba(88,86,214,0.2)',
+                    marginTop: 14,
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="cube" size={18} color="#5856D6" />
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
-                      CAD Software Integration
+                      Works with Any CAD Software
                     </Text>
                   </View>
-                  <View style={{ marginLeft: 4 }}>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 6 }}>
-                      • <Text style={{ fontWeight: '600' }}>Center alignment guides</Text> help position objects perfectly for CAD import
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 6 }}>
-                      • <Text style={{ fontWeight: '600' }}>Scale notes on every photo</Text> show exact Canvas Scale values for Fusion 360
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                      • <Text style={{ fontWeight: '600' }}>No guesswork!</Text> Insert {`>`} Canvas {`>`} Set Scale X/Y to the provided value
-                    </Text>
-                  </View>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                    Import photos as canvases in any CAD software. Scale values are included on every export for perfect alignment.
+                  </Text>
                 </View>
               </ExpandableSection>
 
