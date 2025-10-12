@@ -2690,7 +2690,7 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 16,
+            top: insets.top + 52,
             left: 20,
             zIndex: 50,
           }}
@@ -2700,9 +2700,9 @@ export default function DimensionOverlay({
             onPress={() => setShowHelpModal(true)}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
-              width: 32,
-              height: 32,
-              borderRadius: 16,
+              width: 26,
+              height: 26,
+              borderRadius: 13,
               justifyContent: 'center',
               alignItems: 'center',
               shadowColor: '#000',
@@ -2712,7 +2712,7 @@ export default function DimensionOverlay({
               elevation: 5,
             }}
           >
-            <Ionicons name="help-circle-outline" size={20} color="white" />
+            <Ionicons name="help-circle-outline" size={16} color="white" />
           </Pressable>
         </View>
       )}
