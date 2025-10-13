@@ -1415,16 +1415,11 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait longer for the UI to update and ensure view is ready
+      // Wait for the UI to update with label
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Double-check ref is still valid after waiting
-      if (!actualViewRef.current) {
-        throw new Error('View reference became null after UI update');
-      }
-      
       console.log(`📸 Email - Label set to: "${label || 'null'}"`);
-      console.log('📸 About to capture with ref:', actualViewRef, 'current:', actualViewRef.current);
+      console.log('📸 About to capture with ref:', actualViewRef, 'current:', !!actualViewRef.current);
       
       // Capture the image with measurements
       // Pass the ref object itself, not .current - react-native-view-shot handles this
