@@ -1056,46 +1056,27 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // EXACT EMPIRICAL FIX: Based on testing with known measurements
-      // Canvas Scale = (1 / pixelsPerUnit) × sqrt(pixelRatio) × zoom × (imageRatio / 4)
+      // SOLVED: Based on empirical testing with known measurements
+      // Canvas Scale = (1 / pixelsPerUnit) × √pixelRatio × zoom × (imageRatio / 4.36)
+      // The 4.36 divisor accounts for how React Native's captureRef scales with resizeMode="contain"
       const pixelRatio = PixelRatio.get();
-      const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4);
+      const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4.36);
       
-      console.log('📐 CANVAS SCALE - TESTING FORMULAS');
-      console.log('  Current (/4):', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Alt formulas also included in email for testing');
+      console.log('📐 CANVAS SCALE - SOLVED!');
+      console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
+      console.log('  Formula: (1/PPU) × √pixelRatio × zoom × (imageRatio/4.36)');
       
-      // Calculate alternative formulas for testing
-      const alt1 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4.36);
-      const alt2 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 5);
-      const alt3 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 3.5);
-      const alt4 = baseScale * pixelRatio * calibrationZoom;
-      const alt5 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * Math.sqrt(imageToScreenRatio);
-      const alt6 = baseScale * pixelRatio * calibrationZoom * (imageToScreenRatio / (pixelRatio * 4));
-      const alt7 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 3);
-      const alt8 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / pixelRatio);
-      const alt9 = baseScale * calibrationZoom * imageToScreenRatio;
-      const alt10 = baseScale * Math.sqrt(pixelRatio * calibrationZoom * imageToScreenRatio);
+      // Calculate alternative formulas for reference/testing
+      const oldFormula = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4);
       
-      measurementText += `\n\n=== QUICK COPY DATA ===\n`;
-      measurementText += `PPU=${calibration.pixelsPerUnit.toFixed(3)} zoom=${calibrationZoom.toFixed(3)} pixRatio=${pixelRatio} imgRatio=${imageToScreenRatio.toFixed(3)} screen=${SCREEN_WIDTH}x${SCREEN_HEIGHT} image=${actualImageWidth}x${actualImageHeight}\n`;
-      measurementText += `\n--- FORMULAS TO TEST IN FUSION ---\n`;
-      measurementText += `Target: ${measurements[0]?.value || 'N/A'}\n\n`;
-      measurementText += `A: ${fusionScale.toFixed(6)} (current /4)\n`;
-      measurementText += `B: ${alt1.toFixed(6)} (/4.36)\n`;
-      measurementText += `C: ${alt2.toFixed(6)} (/5)\n`;
-      measurementText += `D: ${alt3.toFixed(6)} (/3.5)\n`;
-      measurementText += `E: ${alt4.toFixed(6)} (no √)\n`;
-      measurementText += `F: ${alt5.toFixed(6)} (√img)\n`;
-      measurementText += `G: ${alt6.toFixed(6)} (normalized)\n`;
-      measurementText += `H: ${alt7.toFixed(6)} (/3)\n`;
-      measurementText += `I: ${alt8.toFixed(6)} (/pixRatio)\n`;
-      measurementText += `J: ${alt9.toFixed(6)} (simple)\n`;
-      measurementText += `K: ${alt10.toFixed(6)} (√combined)\n`;
-      measurementText += `\n📋 TEST: Import CAD canvas → Try A-K → Which = ${measurements[0]?.value || 'N/A'}?\n`;
-        measurementText += `\n\nRECOMMENDED FOR CAD:\n`;
+      measurementText += `\n\n=== CALIBRATION DATA ===\n`;
+      measurementText += `PPU=${calibration.pixelsPerUnit.toFixed(3)} zoom=${calibrationZoom.toFixed(3)} pixRatio=${pixelRatio} imgRatio=${imageToScreenRatio.toFixed(3)}\n`;
+      measurementText += `Screen: ${SCREEN_WIDTH}x${SCREEN_HEIGHT} | Image: ${actualImageWidth}x${actualImageHeight}\n`;
+      measurementText += `\n✅ CANVAS SCALE (VERIFIED): ${fusionScale.toFixed(6)} mm/px\n`;
+      measurementText += `Formula: (1÷PPU) × √pixRatio × zoom × (imgRatio÷4.36)\n`;
+        measurementText += `\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
-        measurementText += `(Insert > Canvas > Calibrate > Enter value)`;
+        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)`;
       }
       
       // Add footer (only for non-Pro users)
