@@ -1680,8 +1680,17 @@ export default function DimensionOverlay({
             if (resizingPoint) {
               setDidDrag(true);
               
+              // Check what type of measurement we're resizing
+              const measurement = measurements.find(m => m.id === resizingPoint.measurementId);
+              
+              // For circles, disable snapping when adjusting the edge point (radius adjustment)
+              // to allow smooth resizing. Only snap the center point.
+              const shouldSnap = !(measurement?.mode === 'circle' && resizingPoint.pointIndex === 1);
+              
               // Apply snapping when moving points - use larger threshold (7mm ~ half fingertip)
-              const snappedPosition = snapToNearbyPoint(pageX, pageY, true);
+              const snappedPosition = shouldSnap 
+                ? snapToNearbyPoint(pageX, pageY, true)
+                : { x: pageX, y: pageY, snapped: false };
               const imageCoords = screenToImage(snappedPosition.x, snappedPosition.y);
               
               // Stronger haptic feedback when snapping occurs in move mode
