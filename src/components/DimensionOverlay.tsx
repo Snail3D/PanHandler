@@ -1795,6 +1795,34 @@ export default function DimensionOverlay({
                 setFreehandActivating(false);
               }
               
+              // Evaporation effect for freehand mode - organic fade with slight expansion and dissipation
+              // Like condensation evaporating from cold glass
+              fingerOpacity.value = withTiming(0, { 
+                duration: 450, // Fluid evaporation
+                easing: Easing.bezier(0.4, 0.0, 0.6, 1) // Organic easing curve
+              });
+              
+              // Slight expansion as it evaporates (like water spreading then disappearing)
+              fingerScale.value = withTiming(1.3, { 
+                duration: 450,
+                easing: Easing.out(Easing.quad)
+              });
+              
+              // Subtle random rotation for organic feel (±5 degrees)
+              const randomRotation = (Math.random() - 0.5) * 10;
+              fingerRotation.value = withTiming(randomRotation, { 
+                duration: 450,
+                easing: Easing.out(Easing.cubic)
+              });
+              
+              // Clear fingerprints after evaporation completes
+              setTimeout(() => {
+                setFingerTouches([]);
+                // Reset values for next touch
+                fingerScale.value = 1;
+                fingerRotation.value = 0;
+              }, 500);
+              
               // IMPORTANT: Return early for freehand mode to prevent placing a stray point
               // The freehand logic above completely handles the touch lifecycle
               return;
