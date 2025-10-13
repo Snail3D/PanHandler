@@ -294,9 +294,10 @@ interface LabelModalProps {
   visible: boolean;
   onComplete: (label: string | null) => void;
   onDismiss: () => void;
+  initialValue?: string | null;
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss }: LabelModalProps) {
+export default function LabelModal({ visible, onComplete, onDismiss, initialValue }: LabelModalProps) {
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
 
@@ -306,8 +307,13 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
       const example1 = getRandomExample();
       const example2 = getRandomExample();
       setPlaceholder(`e.g., ${example1}, ${example2}...`);
+      
+      // Pre-fill with initial value if provided
+      if (initialValue) {
+        setLabel(initialValue);
+      }
     }
-  }, [visible]);
+  }, [visible, initialValue]);
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
