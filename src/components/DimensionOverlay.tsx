@@ -4153,7 +4153,8 @@ export default function DimensionOverlay({
           </View>
 
           {/* Tip */}
-          {measurements.length === 0 && currentPoints.length === 0 && (
+          {/* Helper instructions - always show based on mode */}
+          {currentPoints.length === 0 && (
             <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
               <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
                 {measurementMode 
@@ -4163,7 +4164,11 @@ export default function DimensionOverlay({
                     ? '⬜ Tap first corner, then tap opposite corner'
                     : mode === 'freehand'
                     ? '✏️ Touch and drag to draw freehand path'
-                    : '💡 Tap to place points • Pan/zoom will lock after first point'
+                    : mode === 'angle'
+                    ? '📐 Tap 3 points: start, vertex (center), end'
+                    : '📏 Tap to place 2 points for distance'
+                  : measurements.length > 0
+                  ? '✏️ Edit Mode: Tap any measurement to select • Tap trash icon to delete'
                   : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
                 }
               </Text>
