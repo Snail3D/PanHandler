@@ -202,6 +202,24 @@ export default function DimensionOverlay({
   const menuTranslateX = useSharedValue(0);
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   
+  // Vibrant colors for mode buttons - rotates each time a mode is selected
+  const [modeColorIndex, setModeColorIndex] = useState(0);
+  const vibrantColors = [
+    { main: '#3B82F6', glow: 'rgba(59, 130, 246, 0.6)' },  // Blue
+    { main: '#8B5CF6', glow: 'rgba(139, 92, 246, 0.6)' },  // Purple
+    { main: '#EC4899', glow: 'rgba(236, 72, 153, 0.6)' },  // Pink
+    { main: '#F59E0B', glow: 'rgba(245, 158, 11, 0.6)' },  // Amber
+    { main: '#10B981', glow: 'rgba(16, 185, 129, 0.6)' },  // Emerald
+    { main: '#EF4444', glow: 'rgba(239, 68, 68, 0.6)' },   // Red
+    { main: '#06B6D4', glow: 'rgba(6, 182, 212, 0.6)' },   // Cyan
+    { main: '#F43F5E', glow: 'rgba(244, 63, 94, 0.6)' },   // Rose
+    { main: '#84CC16', glow: 'rgba(132, 204, 22, 0.6)' },  // Lime
+    { main: '#A855F7', glow: 'rgba(168, 85, 247, 0.6)' },  // Violet
+  ];
+  
+  // Get current vibrant color
+  const getCurrentModeColor = () => vibrantColors[modeColorIndex % vibrantColors.length];
+  
   // Inspirational quote overlay state
   const [showQuote, setShowQuote] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
@@ -3574,6 +3592,7 @@ export default function DimensionOverlay({
                   setMode('rectangle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
@@ -3581,21 +3600,29 @@ export default function DimensionOverlay({
                   paddingVertical: 6,
                   paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'rectangle' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'rectangle' ? 0.8 : 0,
+                  shadowRadius: mode === 'rectangle' ? 8 : 0,
+                  elevation: mode === 'rectangle' ? 8 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons 
                     name="square-outline" 
                     size={20} 
-                    color={mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'} 
+                    color={mode === 'rectangle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
                   />
                   <Text style={{
                     marginTop: 2,
                     textAlign: 'center',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     fontSize: 10,
-                    color: mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'rectangle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'rectangle' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'rectangle' ? 4 : 0,
                   }}>
                     Box
                   </Text>
@@ -3608,6 +3635,7 @@ export default function DimensionOverlay({
                   setMode('circle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
@@ -3615,21 +3643,29 @@ export default function DimensionOverlay({
                   paddingVertical: 6,
                   paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'circle' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'circle' ? 0.8 : 0,
+                  shadowRadius: mode === 'circle' ? 8 : 0,
+                  elevation: mode === 'circle' ? 8 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons 
                     name="ellipse-outline" 
                     size={20} 
-                    color={mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'} 
+                    color={mode === 'circle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
                   />
                   <Text style={{
                     marginTop: 2,
                     textAlign: 'center',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     fontSize: 10,
-                    color: mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'circle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'circle' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'circle' ? 4 : 0,
                   }}>
                     Circle
                   </Text>
@@ -3642,6 +3678,7 @@ export default function DimensionOverlay({
                   setMode('angle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
@@ -3649,24 +3686,32 @@ export default function DimensionOverlay({
                   paddingVertical: 6,
                   paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'angle' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'angle' ? 0.8 : 0,
+                  shadowRadius: mode === 'angle' ? 8 : 0,
+                  elevation: mode === 'angle' ? 8 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   {/* Custom angle icon */}
                   <Svg width={20} height={20} viewBox="0 0 16 16">
-                    <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
-                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
-                    <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
-                    <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
-                    <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                    <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
+                    <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                    <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
                   </Svg>
                   <Text style={{
                     marginTop: 2,
                     textAlign: 'center',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     fontSize: 10,
-                    color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'angle' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'angle' ? 4 : 0,
                   }}>
                     Angle
                   </Text>
@@ -3681,6 +3726,7 @@ export default function DimensionOverlay({
                   setMeasurementMode(true);
                   setIsDrawingFreehand(false);
                   setShowFreehandCursor(true);
+                  setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
@@ -3688,14 +3734,19 @@ export default function DimensionOverlay({
                   paddingVertical: 6,
                   paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'freehand' ? 0.8 : 0,
+                  shadowRadius: mode === 'freehand' ? 8 : 0,
+                  elevation: mode === 'freehand' ? 8 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Svg width={20} height={20} viewBox="0 0 16 16">
                     <Path 
                       d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
-                      stroke={mode === 'freehand' ? '#10B981' : 'rgba(0, 0, 0, 0.45)'} 
+                      stroke={mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
                       strokeWidth="2" 
                       fill="none" 
                       strokeLinecap="round"
@@ -3704,9 +3755,12 @@ export default function DimensionOverlay({
                   <Text style={{
                     marginTop: 2,
                     textAlign: 'center',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     fontSize: 10,
-                    color: mode === 'freehand' ? '#10B981' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'freehand' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'freehand' ? 4 : 0,
                   }}>
                     Free
                   </Text>
@@ -3719,6 +3773,7 @@ export default function DimensionOverlay({
                   setMode('distance');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 onPressIn={() => {
@@ -3733,6 +3788,7 @@ export default function DimensionOverlay({
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
                     setShowFreehandCursor(true);
+                    setModeColorIndex((prev) => prev + 1); // Rotate color when long-press activates
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     console.log('🎨 Freehand mode activated via long-press');
                   }, 500); // 500ms long-press
@@ -3749,21 +3805,29 @@ export default function DimensionOverlay({
                   paddingVertical: 6,
                   paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'distance' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'distance' ? 0.8 : 0,
+                  shadowRadius: mode === 'distance' ? 8 : 0,
+                  elevation: mode === 'distance' ? 8 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   <Svg width={20} height={20} viewBox="0 0 16 16">
-                    <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
-                    <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
-                    <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
+                    <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
+                    <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} />
+                    <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} />
                   </Svg>
                   <Text style={{
                     marginTop: 2,
                     textAlign: 'center',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     fontSize: 10,
-                    color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'distance' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'distance' ? 4 : 0,
                   }}>
                     Line
                   </Text>
