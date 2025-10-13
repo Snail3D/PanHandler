@@ -52,8 +52,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
           top: insets.top + 60,
           left: 20,
           right: 20,
-          bottom: insets.bottom + 20,
-          maxHeight: 520,
+          maxHeight: selectedCoin ? 460 : 380,
           backgroundColor: 'rgba(28, 28, 30, 0.98)',
           borderRadius: 20,
           overflow: 'hidden',
@@ -64,54 +63,56 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
         }}>
           {/* Header */}
           <View style={{
-            paddingTop: 20,
-            paddingHorizontal: 20,
-            paddingBottom: 16,
+            paddingTop: 18,
+            paddingHorizontal: 18,
+            paddingBottom: 14,
             borderBottomWidth: 1,
             borderBottomColor: 'rgba(255, 255, 255, 0.1)',
           }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, marginRight: 10 }}>🪙</Text>
-                <Text style={{ fontSize: 20, fontWeight: '700', color: '#FFFFFF' }}>Select Coin</Text>
+                <Text style={{ fontSize: 22, marginRight: 10 }}>🪙</Text>
+                <Text style={{ fontSize: 19, fontWeight: '700', color: '#FFFFFF' }}>Select Coin</Text>
               </View>
               <Pressable
                 onPress={onDismiss}
                 style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
                   backgroundColor: 'rgba(255, 255, 255, 0.15)',
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
               >
-                <Ionicons name="close" size={18} color="#FFFFFF" />
+                <Ionicons name="close" size={17} color="#FFFFFF" />
               </Pressable>
             </View>
           </View>
 
           {/* Content */}
-          <View style={{ flex: 1, padding: 16 }}>
+          <View style={{ flex: 1 }}>
             {/* Selected Coin */}
             {selectedCoin && (
               <View style={{
-                marginBottom: 12,
+                marginHorizontal: 16,
+                marginTop: 12,
+                marginBottom: 10,
                 backgroundColor: 'rgba(76, 175, 80, 0.2)',
                 borderRadius: 12,
-                padding: 14,
+                padding: 12,
                 borderWidth: 1,
                 borderColor: 'rgba(76, 175, 80, 0.5)',
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#4CAF50', fontSize: 10, fontWeight: '700', marginBottom: 4, letterSpacing: 0.5 }}>
+                    <Text style={{ color: '#4CAF50', fontSize: 10, fontWeight: '700', marginBottom: 3, letterSpacing: 0.5 }}>
                       SELECTED
                     </Text>
                     <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 16 }}>
                       {selectedCoin.name}
                     </Text>
-                    <Text style={{ color: '#9CCC65', fontSize: 13, marginTop: 4, fontWeight: '500' }}>
+                    <Text style={{ color: '#9CCC65', fontSize: 13, marginTop: 3, fontWeight: '500' }}>
                       {selectedCoin.diameter}mm • {selectedCoin.country}
                     </Text>
                   </View>
@@ -130,13 +131,15 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
 
             {/* Search Bar */}
             <View style={{
+              marginHorizontal: 16,
+              marginTop: selectedCoin ? 0 : 12,
+              marginBottom: 10,
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
               borderRadius: 10,
               paddingHorizontal: 14,
               paddingVertical: 10,
-              marginBottom: 12,
             }}>
               <Ionicons name="search" size={18} color="rgba(255, 255, 255, 0.6)" />
               <TextInput
@@ -162,11 +165,11 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
             {/* Search Results */}
             <ScrollView 
               style={{ flex: 1 }} 
-              contentContainerStyle={{ paddingBottom: 16 }}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
               showsVerticalScrollIndicator={false}
             >
               {searchResults.length > 0 ? (
-                searchResults.slice(0, 8).map((coin) => (
+                searchResults.slice(0, 6).map((coin) => (
                   <Pressable
                     key={`${coin.country}-${coin.name}`}
                     onPress={() => {
@@ -176,7 +179,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                       setSearchQuery('');
                     }}
                     style={({ pressed }) => ({
-                      paddingVertical: 12,
+                      paddingVertical: 11,
                       paddingHorizontal: 14,
                       marginBottom: 6,
                       borderRadius: 10,
@@ -192,16 +195,16 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                   </Pressable>
                 ))
               ) : searchQuery.length > 0 ? (
-                <View style={{ paddingVertical: 30, alignItems: 'center' }}>
-                  <Ionicons name="search-outline" size={40} color="rgba(255, 255, 255, 0.3)" />
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginTop: 12 }}>
+                <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+                  <Ionicons name="search-outline" size={36} color="rgba(255, 255, 255, 0.3)" />
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginTop: 10 }}>
                     No coins found
                   </Text>
                 </View>
               ) : !selectedCoin ? (
-                <View style={{ paddingVertical: 30, alignItems: 'center' }}>
-                  <Ionicons name="search" size={40} color="rgba(255, 255, 255, 0.3)" />
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginTop: 12 }}>
+                <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+                  <Ionicons name="search" size={36} color="rgba(255, 255, 255, 0.3)" />
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14, marginTop: 10 }}>
                     Start typing to search
                   </Text>
                   <Text style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: 12, marginTop: 6 }}>
@@ -215,7 +218,8 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
           {/* Continue Button */}
           {selectedCoin && (
             <View style={{
-              padding: 16,
+              paddingHorizontal: 16,
+              paddingTop: 12,
               paddingBottom: 16,
               borderTopWidth: 1,
               borderTopColor: 'rgba(255, 255, 255, 0.1)',
@@ -226,9 +230,9 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                   handleContinue();
                 }}
                 style={({ pressed }) => ({
-                  backgroundColor: pressed ? '#FF8C00' : '#FFA500',
+                  backgroundColor: pressed ? '#E69500' : '#FFA500',
                   borderRadius: 12,
-                  paddingVertical: 14,
+                  paddingVertical: 13,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -238,7 +242,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                   shadowRadius: 8,
                 })}
               >
-                <Ionicons name="arrow-forward-circle" size={22} color="white" />
+                <Ionicons name="arrow-forward-circle" size={20} color="white" />
                 <Text style={{ color: 'white', fontWeight: '700', fontSize: 16, marginLeft: 8 }}>
                   Continue
                 </Text>
