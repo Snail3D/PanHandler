@@ -1087,13 +1087,29 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <ComparisonRow feature="CAD Canvas Photo" free="✓" pro="✓" last />
                   </View>
 
-                  {/* Price */}
-                  <View style={{ marginTop: 16, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 26, fontWeight: '700', color: '#1C1C1E' }}>
-                      $9.97
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#8E8E93', marginTop: 2 }}>
-                      One-time payment • Lifetime access
+                  {/* Price & Actions - Condensed */}
+                  <View style={{ marginTop: 20, alignItems: 'center' }}>
+                    <Text style={{ 
+                      fontSize: 15, 
+                      color: '#8E8E93', 
+                      textAlign: 'center',
+                      lineHeight: 24,
+                      marginBottom: 12,
+                    }}>
+                      Make a one-time payment of{' '}
+                      <Text style={{ fontSize: 22, fontWeight: '800', color: '#1C1C1E' }}>$9.97</Text>
+                      {' '}and{' '}
+                      <AnimatedText style={[{ 
+                        fontSize: 17,
+                        fontWeight: '800', 
+                        color: '#FF9500',
+                      }, textPulseStyle]}>
+                        Upgrade to Pro
+                      </AnimatedText>
+                      {' '}or{' '}
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: '#007AFF' }}>
+                        Restore your past purchase
+                      </Text>
                     </Text>
                   </View>
 
@@ -1107,7 +1123,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       backgroundColor: pressed ? '#E68900' : '#FF9500',
                       paddingVertical: 18,
                       borderRadius: 16,
-                      marginTop: 16,
+                      marginTop: 12,
                       shadowColor: '#FF9500',
                       shadowOffset: { width: 0, height: 0 },
                       shadowOpacity: pressed ? 0.5 : 0.35,

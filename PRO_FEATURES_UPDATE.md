@@ -1,162 +1,176 @@
-# Help Modal - Pro Features Update
+# Pro Features Section: Condensed & Professional Update
 
-**Date:** October 12, 2025  
-**Update:** Accurate Pro features + comparison chart + upgrade/restore links
+**Date**: Current Session  
+**File Modified**: `src/components/HelpModal.tsx`
 
-## ✅ What Changed
+## Changes Made
 
-### 1. **Corrected Pro Features**
-**Before (Incorrect):**
-- ❌ "Free users get 1 measurement per photo"
-- ❌ "Unlimited measurements per photo"
-- ❌ "Remove watermarks from exports"
+Redesigned the "Free vs Pro" pricing section to be more condensed, creative, and professional.
 
-**After (Accurate):**
-- ✅ Free: 10 saves + 10 emails per month
-- ✅ Pro: Unlimited saves + unlimited emails
-- ✅ Price: $9.97 (not $9.99)
-
-### 2. **Added Beautiful Comparison Chart**
-Clean table showing Free vs Pro:
-
-| Feature | Free | Pro |
-|---------|------|-----|
-| Monthly Saves | 10 | ∞ |
-| Monthly Emails | 10 | ∞ |
-| Measurements | ∞ | ∞ |
-| All Measurement Types | ✓ | ✓ |
-| Coin Calibration | ✓ | ✓ |
-| Fusion 360 Export | ✓ | ✓ |
-
-**Design:**
-- Subtle borders and backgrounds
-- Orange highlight for Pro column
-- Clean typography
-- Scannable layout
-
-### 3. **Added Action Buttons**
-
-**Upgrade to Pro Button:**
-```typescript
-onPress={() => {
-  // TODO: Implement Pro upgrade
-  console.log('Upgrade to Pro tapped');
-}}
+### Before:
 ```
-- Orange (#FF9500) with hover state
-- Prominent placement
-- Clear call-to-action
+$9.97
+One-time payment • Lifetime access
 
-**Restore Purchase Link:**
-```typescript
-onPress={() => {
-  // TODO: Implement restore purchase
-  console.log('Restore purchase tapped');
-}}
-```
-- Blue text link (#007AFF)
-- Standard iOS styling
-- Below upgrade button
+[Upgrade to Pro]
 
-### 4. **Simplified Design**
-- Removed garish gold gradient background
-- Clean white card with subtle orange accent
-- Matches the refined Help modal aesthetic
-- Professional and trustworthy
-
-## 🎨 Visual Design
-
-**Card Style:**
-- Background: `rgba(255,255,255,0.95)` (subtle translucency)
-- Border: `rgba(255,149,0,0.2)` (soft orange)
-- Shadow: Soft 12px blur
-- Radius: 18px (consistent with other cards)
-
-**Comparison Table:**
-- Header row: Light gray background
-- Pro column: `rgba(255,149,0,0.08)` orange tint
-- Borders: Ultra-subtle `rgba(0,0,0,0.06)`
-- Clean, scannable layout
-
-**Price Display:**
-- Large 24px bold price
-- Subtitle: "One-time payment • Lifetime access"
-- Centered for emphasis
-
-## 📊 New Component: ComparisonRow
-
-Created reusable comparison row component:
-
-```typescript
-const ComparisonRow = ({ 
-  feature, 
-  free, 
-  pro,
-  last = false 
-}: { 
-  feature: string; 
-  free: string; 
-  pro: string;
-  last?: boolean;
-}) => (
-  // 3-column row with feature name + free value + pro value
-);
+Restore Purchase
 ```
 
-**Used 6 times for all feature comparisons**
+### After:
+```
+Make a one-time payment of $9.97 and Upgrade to Pro
+or Restore your past purchase
 
-## 🔗 Integration Points
+[Upgrade to Pro]
 
-### For You to Implement:
-
-**1. Upgrade Button:**
-```typescript
-// In onPress handler for "Upgrade to Pro" button
-// Replace console.log with actual in-app purchase logic
-// Likely using expo-in-app-purchases or RevenueCat
+Restore Purchase
 ```
 
-**2. Restore Purchase:**
-```typescript
-// In onPress handler for "Restore Purchase" link
-// Implement restore purchase flow
-// Check if user has already purchased Pro
+## New Design Features
+
+### 1. Single Condensed Sentence
+All information in one flowing sentence instead of separate blocks:
+
+```
+Make a one-time payment of $9.97 and Upgrade to Pro or Restore your past purchase
 ```
 
-**3. Show Pro Badge (Optional):**
-You might want to hide these buttons if user is already Pro:
-```typescript
-const isProUser = useStore((s) => s.isProUser);
+### 2. Strategic Font Sizing & Weights
 
-{!isProUser && (
-  <>
-    <Pressable onPress={handleUpgrade}>
-      Upgrade to Pro
-    </Pressable>
-    <Pressable onPress={handleRestore}>
-      Restore Purchase
-    </Pressable>
-  </>
-)}
+| Element | Size | Weight | Color | Effect |
+|---------|------|--------|-------|--------|
+| "Make a one-time payment of" | 15px | Regular | #8E8E93 | Normal text |
+| **"$9.97"** | **22px** | **800** | **#1C1C1E** | **Bold, stands out** |
+| "and" | 15px | Regular | #8E8E93 | Normal text |
+| **"Upgrade to Pro"** | **17px** | **800** | **#FF9500** | **Bold, pulsing** |
+| "or" | 15px | Regular | #8E8E93 | Normal text |
+| **"Restore your past purchase"** | **16px** | **700** | **#007AFF** | **Bold blue link** |
+
+### 3. Visual Hierarchy
+
+```
+Make a one-time payment of $9.97 and Upgrade to Pro or Restore your past purchase
+                            ^^^^^^     ^^^^^^^^^^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          BIGGEST      PULSING              BOLD BLUE
 ```
 
-## ✨ User Experience
+### 4. Pulsing Animation
 
-**Before:** Confusing and inaccurate  
-**After:** 
-- ✅ Clear what's free vs paid
-- ✅ Accurate feature comparison
-- ✅ Easy upgrade path
-- ✅ Restore option visible
-- ✅ Professional presentation
+"Upgrade to Pro" text pulses with the existing animation:
+```typescript
+<AnimatedText style={[{ 
+  fontSize: 17,
+  fontWeight: '800', 
+  color: '#FF9500',
+}, textPulseStyle]}>
+  Upgrade to Pro
+</AnimatedText>
+```
 
-## 🎯 Next Steps
+Opacity pulses: 1.0 → 0.7 → 1.0 (4-second cycle)
 
-1. Implement in-app purchase logic for "Upgrade to Pro"
-2. Implement restore purchase logic
-3. (Optional) Hide buttons if already Pro
-4. Test the upgrade flow end-to-end
+## Implementation Details
 
----
+### Complete Sentence Structure:
+```jsx
+<Text style={{ 
+  fontSize: 15, 
+  color: '#8E8E93', 
+  textAlign: 'center',
+  lineHeight: 24,
+}}>
+  Make a one-time payment of{' '}
+  <Text style={{ fontSize: 22, fontWeight: '800', color: '#1C1C1E' }}>
+    $9.97
+  </Text>
+  {' '}and{' '}
+  <AnimatedText style={[{ 
+    fontSize: 17,
+    fontWeight: '800', 
+    color: '#FF9500',
+  }, textPulseStyle]}>
+    Upgrade to Pro
+  </AnimatedText>
+  {' '}or{' '}
+  <Text style={{ fontSize: 16, fontWeight: '700', color: '#007AFF' }}>
+    Restore your past purchase
+  </Text>
+</Text>
+```
 
-**Result:** Users now have a clear, accurate understanding of Free vs Pro with easy access to upgrade! 🎉
+### Key Features:
+- ✅ **Nested Text components** for inline styling
+- ✅ **Mixed font sizes** for visual hierarchy
+- ✅ **Pulsing animation** on "Upgrade to Pro"
+- ✅ **Color coding**: Black ($9.97), Orange (Upgrade), Blue (Restore)
+- ✅ **Single sentence** - more condensed
+- ✅ **Professional tone** - no bullet points
+
+## Visual Comparison
+
+### Before (Separate Blocks):
+```
+┌─────────────────────────┐
+│        $9.97            │ ← Big, isolated
+│ One-time • Lifetime     │ ← Subtitle
+│                         │
+│   [Upgrade to Pro]      │ ← Separate button
+│                         │
+│   Restore Purchase      │ ← Separate link
+└─────────────────────────┘
+```
+
+### After (Condensed Sentence):
+```
+┌─────────────────────────────────────────┐
+│  Make a one-time payment of $9.97 and   │
+│    Upgrade to Pro or Restore your       │
+│          past purchase                  │
+│                                         │
+│      [Upgrade to Pro]                   │
+│                                         │
+│      Restore Purchase                   │
+└─────────────────────────────────────────┘
+```
+
+## Typography Scale
+
+```
+Regular text:  15px  (base)
+Price:         22px  (+47% larger) ← BIGGEST
+Upgrade:       17px  (+13% larger) + PULSING
+Restore:       16px  (+7% larger)
+```
+
+## Benefits
+
+1. **More Condensed**: 3 lines instead of separate blocks
+2. **More Professional**: Reads like a natural sentence
+3. **Better Hierarchy**: Clear visual importance (price > upgrade > restore)
+4. **More Creative**: Mixed fonts and pulsing effect
+5. **Cleaner Layout**: Less vertical space used
+6. **Better Flow**: Information flows naturally
+7. **Attention Grabbing**: $9.97 stands out, "Upgrade" pulses
+
+## User Experience
+
+### Reading Flow:
+1. Eye catches **$9.97** (biggest, bold)
+2. Sees **"Upgrade to Pro"** (pulsing, orange)
+3. Notices **"Restore"** option (blue, familiar link color)
+
+### Psychology:
+- Price is prominent but not overwhelming
+- "Upgrade" pulses to draw attention
+- "Restore" is clearly an alternative option
+- Single sentence feels less pushy than stacked CTAs
+
+## Spacing
+
+- `marginTop: 20px` (from comparison table)
+- `marginBottom: 12px` (text to button)
+- `lineHeight: 24px` (readable text flow)
+- Buttons remain same spacing as before
+
+**Status**: ✅ Complete - Condensed, creative, and professional!
