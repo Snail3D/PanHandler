@@ -2700,7 +2700,11 @@ export default function DimensionOverlay({
               
               return (
                 <>
-                  <Path d={pathData} stroke={nextColor.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                  {/* Beautiful glow layers - same as completed measurements */}
+                  <Path d={pathData} stroke={nextColor.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d={pathData} stroke={nextColor.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  {/* Main path */}
+                  <Path d={pathData} stroke={nextColor.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                 </>
               );
             })()}
