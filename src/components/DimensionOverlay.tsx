@@ -4158,9 +4158,11 @@ export default function DimensionOverlay({
               <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
                 {measurementMode 
                   ? mode === 'circle' 
-                    ? '⭕ Press center, drag to size, release to finish'
+                    ? '⭕ Tap center, then tap edge of circle'
                     : mode === 'rectangle'
                     ? '⬜ Tap first corner, then tap opposite corner'
+                    : mode === 'freehand'
+                    ? '✏️ Touch and drag to draw freehand path'
                     : '💡 Tap to place points • Pan/zoom will lock after first point'
                   : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
                 }
@@ -4186,7 +4188,8 @@ export default function DimensionOverlay({
                 {mode === 'distance' && 'Tap to place 2 points'}
                 {mode === 'angle' && 'Tap to place 3 points (vertex in center)'}
                 {mode === 'circle' && 'Tap center, then tap edge of circle'}
-                {mode === 'rectangle' && 'Tap to place 2 corners'}
+                {mode === 'rectangle' && 'Tap first corner, then tap opposite corner'}
+                {mode === 'freehand' && 'Touch and drag to draw freehand path'}
               </Text>
             </View>
           )}
