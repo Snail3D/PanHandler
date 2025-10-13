@@ -143,6 +143,9 @@ export default function DimensionOverlay({
   const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
   const [didDrag, setDidDrag] = useState(false); // Track if user actually dragged
   
+  // Rapid tap to delete feature
+  const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
+  
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
   const [hasShownAnimation, setHasShownAnimation] = useState(coinCircle ? true : false); // Start true if coinCircle already exists
@@ -1937,7 +1940,47 @@ export default function DimensionOverlay({
               }
             }
           }}
-          onResponderRelease={() => {
+          onResponderRelease={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            
+            // Check for rapid tap to delete (only if didn't drag)
+            if (!didDrag) {
+              const tappedId = getTappedMeasurement(pageX, pageY);
+              if (tappedId) {
+                const now = Date.now();
+                const TAP_TIMEOUT = 500; // 500ms between taps
+                
+                if (tapDeleteState?.measurementId === tappedId && (now - tapDeleteState.lastTapTime) < TAP_TIMEOUT) {
+                  // Same measurement tapped within timeout
+                  const newCount = tapDeleteState.count + 1;
+                  
+                  if (newCount >= 4) {
+                    // 4th tap - delete the measurement!
+                    const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
+                    setMeasurements(updatedMeasurements);
+                    setTapDeleteState(null);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    console.log('🗑️ Measurement deleted via 4 rapid taps');
+                    
+                    // Reset all states and return early
+                    setDraggedMeasurementId(null);
+                    setResizingPoint(null);
+                    setDidDrag(false);
+                    setIsSnapped(false);
+                    return;
+                  } else {
+                    // Increment tap count
+                    setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                } else {
+                  // First tap or timeout expired - reset counter
+                  setTapDeleteState({ measurementId: tappedId, count: 1, lastTapTime: now });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+              }
+            }
+            
             if (resizingPoint) {
               // Recalculate measurement values after point movement completes
               const updatedMeasurements = measurements.map(m => {
