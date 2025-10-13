@@ -1056,9 +1056,10 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // SOLVED: Based on empirical testing with known measurements
+      // SOLVED: Based on empirical testing with known measurements  
       // Canvas Scale = (1 / pixelsPerUnit) × √pixelRatio × zoom × (imageRatio / 4.36)
-      // The 4.36 divisor accounts for how React Native's captureRef scales with resizeMode="contain"
+      // NOTE: 4.36 was determined empirically on iPhone (3x pixel ratio)
+      // TODO: Test on other devices to verify universality
       const pixelRatio = PixelRatio.get();
       const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4.36);
       
