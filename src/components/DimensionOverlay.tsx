@@ -203,6 +203,7 @@ export default function DimensionOverlay({
   // Menu states
   const [menuMinimized, setMenuMinimized] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [hideMeasurementsForCapture, setHideMeasurementsForCapture] = useState(false); // Hide measurements/legend for transparent capture
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [menuHidden, setMenuHidden] = useState(false);
   const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
@@ -1149,26 +1150,21 @@ export default function DimensionOverlay({
       
       console.log('✅ Saved measurements photo!');
       
-      // Wait longer to ensure fusion view has the label
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Capture SAME view but without measurements/legend for transparent CAD
+      setHideMeasurementsForCapture(true); // Hide measurements and legend
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture transparent CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, NO measurements or legend)
-      if (fusionZoomedViewRef.current) {
-        try {
-          console.log(`📸 Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
-          
-          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
-            format: 'png', // PNG for transparency support
-            quality: 1.0,
-            result: 'tmpfile',
-          });
-          
-          await MediaLibrary.createAssetAsync(zoomedUri);
-          console.log('✅ Saved transparent CAD canvas!');
-        } catch (error) {
-          console.error('Failed to capture transparent CAD canvas:', error);
-        }
-      }
+      const transparentUri = await captureRef(viewRef.current, {
+        format: 'png', // PNG for transparency
+        quality: 1.0,
+        result: 'tmpfile',
+      });
+      
+      await MediaLibrary.createAssetAsync(transparentUri);
+      
+      setHideMeasurementsForCapture(false); // Show measurements again
+      
+      console.log('✅ Saved transparent CAD canvas!');
       
       // Clear state
       setIsCapturing(false);
@@ -1341,30 +1337,24 @@ export default function DimensionOverlay({
       
       console.log('✅ Added measurements photo to email');
       
-      // Wait longer to ensure fusion view has the label
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // 2. Capture SAME view but without measurements/legend for transparent CAD
+      setHideMeasurementsForCapture(true); // Hide measurements and legend
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // 2. Transparent CAD canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, title + coin info, NO measurements or legend)
-      if (fusionZoomedViewRef.current) {
-        try {
-          console.log(`📸 Email - Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
-          
-          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
-            format: 'png', // PNG for transparency support
-            quality: 1.0,
-            result: 'tmpfile',
-          });
-          
-          const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
-          const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
-          await FileSystem.copyAsync({ from: zoomedUri, to: transparentDest });
-          attachments.push(transparentDest);
-          
-          console.log('✅ Added transparent CAD canvas to email');
-        } catch (error) {
-          console.error('Failed to capture transparent CAD canvas:', error);
-        }
-      }
+      const transparentUri = await captureRef(viewRef.current, {
+        format: 'png', // PNG for transparency
+        quality: 1.0,
+        result: 'tmpfile',
+      });
+      
+      const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
+      const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
+      await FileSystem.copyAsync({ from: transparentUri, to: transparentDest });
+      attachments.push(transparentDest);
+      
+      setHideMeasurementsForCapture(false); // Show measurements again
+      
+      console.log('✅ Added transparent CAD canvas to email');
       
       // Clear label and show menu again
       setIsCapturing(false);
@@ -2819,7 +2809,7 @@ export default function DimensionOverlay({
             })()}
 
             {/* Draw completed measurements */}
-            {measurements.map((measurement, idx) => {
+            {!hideMeasurementsForCapture && measurements.map((measurement, idx) => {
               const color = getMeasurementColor(idx, measurement.mode);
               
               if (measurement.mode === 'distance') {
@@ -3473,7 +3463,7 @@ export default function DimensionOverlay({
           )}
 
           {/* Measurement legend in upper-left corner - show when there are measurements */}
-          {measurements.length > 0 && (
+          {!hideMeasurementsForCapture && measurements.length > 0 && (
             <View
               style={{
                 position: 'absolute',
