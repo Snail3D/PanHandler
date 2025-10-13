@@ -1061,12 +1061,9 @@ export default function DimensionOverlay({
       const pixelRatio = PixelRatio.get();
       const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4);
       
-      console.log('📐 CANVAS SCALE - EMPIRICAL CORRECTION:');
-      console.log('  Device pixel ratio:', pixelRatio);
-      console.log('  Base scale:', baseScale.toFixed(6), 'mm/px');
-      console.log('  Calibration zoom:', calibrationZoom.toFixed(2), 'x');
+      console.log('📐 CANVAS SCALE - SOLVED!');
       console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1 / pixelsPerUnit) × sqrt(pixelRatio) × zoom');
+      console.log('  Formula: (1/pixelsPerUnit) × √pixelRatio × zoom × (imageRatio/4)');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
@@ -1080,7 +1077,7 @@ export default function DimensionOverlay({
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × sqrt(pixelRatio) × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × √${pixelRatio} × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `📐 Math: Canvas Scale = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × √${pixelRatio} × ${calibrationZoom.toFixed(2)} × ${(imageToScreenRatio/4).toFixed(3)} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
