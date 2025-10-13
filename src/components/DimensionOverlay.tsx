@@ -1618,6 +1618,7 @@ export default function DimensionOverlay({
             if (point) {
               setResizingPoint(point);
               setDidDrag(false);
+              setIsSnapped(false); // Reset snap state when starting to resize
               dragStartPos.value = { x: pageX, y: pageY };
               dragCurrentPos.value = { x: pageX, y: pageY };
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -1646,7 +1647,19 @@ export default function DimensionOverlay({
             // Handle point resizing/moving
             if (resizingPoint) {
               setDidDrag(true);
-              const imageCoords = screenToImage(pageX, pageY);
+              
+              // Apply snapping when moving points
+              const snappedPosition = snapToNearbyPoint(pageX, pageY);
+              const imageCoords = screenToImage(snappedPosition.x, snappedPosition.y);
+              
+              // Haptic feedback when snapping occurs
+              if (snappedPosition.snapped && !isSnapped) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setIsSnapped(true);
+              } else if (!snappedPosition.snapped && isSnapped) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setIsSnapped(false);
+              }
               
               const updatedMeasurements = measurements.map(m => {
                 if (m.id === resizingPoint.measurementId) {
@@ -1692,7 +1705,11 @@ export default function DimensionOverlay({
               });
               
               setMeasurements(updatedMeasurements);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              
+              // Only light haptic if not snapping
+              if (!snappedPosition.snapped) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
               return;
             }
             
@@ -1759,10 +1776,11 @@ export default function DimensionOverlay({
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             }
             
-            // Always reset drag state
+            // Always reset drag state and snap state
             setDraggedMeasurementId(null);
             setResizingPoint(null);
             setDidDrag(false);
+            setIsSnapped(false);
           }}
         />
       )}
