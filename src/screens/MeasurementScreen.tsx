@@ -27,6 +27,7 @@ export default function MeasurementScreen() {
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -471,6 +472,7 @@ export default function MeasurementScreen() {
                   initialRotation={measurementZoom.rotation}
                   showLevelLine={false}
                   locked={isPanZoomLocked}
+                  opacity={imageOpacity}
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
@@ -485,6 +487,7 @@ export default function MeasurementScreen() {
                   zoomTranslateY={measurementZoom.translateY}
                   zoomRotation={measurementZoom.rotation}
                   viewRef={measurementViewRef}
+                  setImageOpacity={setImageOpacity}
                 />
               </View>
             </View>

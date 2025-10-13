@@ -83,6 +83,7 @@ interface DimensionOverlayProps {
   zoomTranslateY?: number;
   zoomRotation?: number;
   viewRef?: React.RefObject<View | null>;
+  setImageOpacity?: (opacity: number) => void;
 }
 
 export default function DimensionOverlay({ 
@@ -90,7 +91,8 @@ export default function DimensionOverlay({
   zoomTranslateX = 0, 
   zoomTranslateY = 0,
   zoomRotation = 0,
-  viewRef: externalViewRef
+  viewRef: externalViewRef,
+  setImageOpacity,
 }: DimensionOverlayProps = {}) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -1150,8 +1152,9 @@ export default function DimensionOverlay({
       
       console.log('✅ Saved measurements photo!');
       
-      // Capture SAME view again but with measurements hidden (label + coin info only)
+      // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
       setHideMeasurementsForCapture(true); // Hide measurements and legend
+      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
       const labelOnlyUri = await captureRef(viewRef.current, {
@@ -1160,6 +1163,7 @@ export default function DimensionOverlay({
         result: 'tmpfile',
       });
       
+      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       await MediaLibrary.createAssetAsync(labelOnlyUri);
       
       setHideMeasurementsForCapture(false); // Show measurements again
@@ -1337,8 +1341,9 @@ export default function DimensionOverlay({
       
       console.log('✅ Added measurements photo to email');
       
-      // 2. Capture SAME view again but with measurements hidden (label + coin info only)
+      // 2. Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
       setHideMeasurementsForCapture(true); // Hide measurements and legend
+      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
       const labelOnlyUri = await captureRef(viewRef.current, {
@@ -1346,6 +1351,8 @@ export default function DimensionOverlay({
         quality: 1.0,
         result: 'tmpfile',
       });
+      
+      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       
       const labelOnlyFilename = label ? `${label}_Label.png` : 'PanHandler_Label.png';
       const labelOnlyDest = `${FileSystem.cacheDirectory}${labelOnlyFilename}`;
