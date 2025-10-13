@@ -1966,8 +1966,8 @@ export default function DimensionOverlay({
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
-                        // Snap threshold: 30 pixels
-                        if (distToStart < 30) {
+                        // Snap threshold: 15 pixels (reduced from 30 for less sensitivity)
+                        if (distToStart < 15) {
                           console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
                           // Strong haptic feedback for successful lasso close
                           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2115,10 +2115,14 @@ export default function DimensionOverlay({
                 // Check if path self-intersects
                 const selfIntersects = doesPathSelfIntersect(freehandPath);
                 console.log('🔍 Self-intersection check:', selfIntersects);
+                console.log('🔍 Closed loop state:', freehandClosedLoop);
+                console.log('🔍 Path length:', freehandPath.length);
                 
                 // Calculate area only if loop is closed AND doesn't self-intersect
                 let area = 0;
                 if (freehandClosedLoop && !selfIntersects && freehandPath.length >= 3) {
+                  console.log('✅ Conditions met for area calculation!');
+                  
                   // Shoelace formula for polygon area
                   for (let i = 0; i < freehandPath.length - 1; i++) {
                     area += freehandPath[i].x * freehandPath[i + 1].y;
@@ -2126,15 +2130,23 @@ export default function DimensionOverlay({
                   }
                   area = Math.abs(area) / 2;
                   
+                  console.log('📐 Raw area in pixels²:', area.toFixed(2));
+                  
                   // Convert from pixel² to physical units²
                   const physicalArea = area / (pixelsPerUnit * pixelsPerUnit);
                   
-                  console.log('📐 Lasso area calculated:', physicalArea.toFixed(2), 'square units');
+                  console.log('📐 Physical area:', physicalArea.toFixed(2), 'square units');
+                  console.log('📐 Calibration unit:', calibration?.unit);
+                  console.log('📐 Unit system:', unitSystem);
                   
                   // Format measurement with both perimeter and area
                   const perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   const areaStr = formatAreaMeasurement(physicalArea, calibration?.unit || 'mm', unitSystem);
                   const formattedValue = `${perimeterStr} ⊞ ${areaStr}`;
+                  
+                  console.log('📐 Formatted perimeter:', perimeterStr);
+                  console.log('📐 Formatted area:', areaStr);
+                  console.log('📐 Final value string:', formattedValue);
                   
                   // Create completed measurement with area
                   const newMeasurement: Measurement = {
@@ -2146,8 +2158,15 @@ export default function DimensionOverlay({
                     isClosed: true, // Mark as closed loop
                   };
                   
+                  console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
+                  
                   setMeasurements([...measurements, newMeasurement]);
                 } else {
+                  console.log('⚠️ Area calculation skipped - conditions not met:', {
+                    freehandClosedLoop,
+                    selfIntersects,
+                    pathLength: freehandPath.length,
+                  });
                   // Open path OR self-intersecting - just show length
                   const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   
