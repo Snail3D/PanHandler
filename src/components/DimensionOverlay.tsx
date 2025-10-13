@@ -3565,10 +3565,155 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
 
-          {/* Measurement Type Toggle - 2x2 Grid */}
+          {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <View style={{ marginBottom: 8 }}>
-            {/* Row 1: Distance and Angle */}
-            <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+              {/* Box (Rectangle) */}
+              <Pressable
+                onPress={() => {
+                  setMode('rectangle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="square-outline" 
+                    size={20} 
+                    color={mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginTop: 2,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Box
+                  </Text>
+                </View>
+              </Pressable>
+
+              {/* Circle */}
+              <Pressable
+                onPress={() => {
+                  setMode('circle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons 
+                    name="ellipse-outline" 
+                    size={20} 
+                    color={mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'} 
+                  />
+                  <Text style={{
+                    marginTop: 2,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Circle
+                  </Text>
+                </View>
+              </Pressable>
+
+              {/* Angle */}
+              <Pressable
+                onPress={() => {
+                  setMode('angle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  {/* Custom angle icon */}
+                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                    <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
+                    <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
+                    <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                    <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                  </Svg>
+                  <Text style={{
+                    marginTop: 2,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Angle
+                  </Text>
+                </View>
+              </Pressable>
+
+              {/* Freehand (activated by tapping here OR long-pressing Distance) */}
+              <Pressable
+                onPress={() => {
+                  setMode('freehand');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setIsDrawingFreehand(false);
+                  setShowFreehandCursor(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                    <Path 
+                      d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
+                      stroke={mode === 'freehand' ? '#10B981' : 'rgba(0, 0, 0, 0.45)'} 
+                      strokeWidth="2" 
+                      fill="none" 
+                      strokeLinecap="round"
+                    />
+                  </Svg>
+                  <Text style={{
+                    marginTop: 2,
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    fontSize: 10,
+                    color: mode === 'freehand' ? '#10B981' : 'rgba(0, 0, 0, 0.45)'
+                  }}>
+                    Free
+                  </Text>
+                </View>
+              </Pressable>
+
+              {/* Distance (long-press also activates freehand) */}
               <Pressable
                 onPress={() => {
                   setMode('distance');
@@ -3586,10 +3731,10 @@ export default function DimensionOverlay({
                     setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
-                    setIsDrawingFreehand(false); // Start in ready state, not drawing yet
+                    setIsDrawingFreehand(false);
                     setShowFreehandCursor(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    console.log('🎨 Freehand mode activated');
+                    console.log('🎨 Freehand mode activated via long-press');
                   }, 500); // 500ms long-press
                 }}
                 onPressOut={() => {
@@ -3601,142 +3746,26 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 5,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'distance' || mode === 'freehand' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Show freehand icon if in freehand mode, otherwise distance icon */}
-                  {mode === 'freehand' ? (
-                    <Svg width={18} height={18} viewBox="0 0 16 16">
-                      {/* Freehand/squiggle icon */}
-                      <Path 
-                        d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
-                        stroke="#10B981" 
-                        strokeWidth="2" 
-                        fill="none" 
-                        strokeLinecap="round"
-                      />
-                    </Svg>
-                  ) : (
-                    <Svg width={18} height={18} viewBox="0 0 16 16">
-                      <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
-                      <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
-                      <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
-                    </Svg>
-                  )}
-                  <Text style={{
-                    marginLeft: 4,
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    fontSize: 12,
-                    color: mode === 'freehand' ? '#10B981' : mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                  }}>
-                    {mode === 'freehand' ? 'Freehand' : 'Distance'}
-                  </Text>
-                </View>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setMode('angle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
-                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Custom angle icon: 45 degree acute angle with arc and measurement marks */}
-                  <Svg width={18} height={18} viewBox="0 0 16 16">
-                    {/* Acute angle lines - 45 degrees */}
-                    <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
-                    <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
-                    {/* Angle arc showing acute angle */}
-                    <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
-                    {/* Small tick marks on arc to show measurement */}
-                    <Line x1="6" y1="12" x2="6.8" y2="12.8" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
-                    <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke={mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                    <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
+                    <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
+                    <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
                   </Svg>
                   <Text style={{
-                    marginLeft: 4,
+                    marginTop: 2,
                     textAlign: 'center',
                     fontWeight: '600',
-                    fontSize: 12,
-                    color: mode === 'angle' ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
+                    fontSize: 10,
+                    color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
-                    Angle
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-
-            {/* Row 2: Circle and Rectangle */}
-            <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
-              <Pressable
-                onPress={() => {
-                  setMode('circle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
-                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons 
-                    name="ellipse-outline" 
-                    size={18} 
-                    color={mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'} 
-                  />
-                  <Text style={{
-                    marginLeft: 4,
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    fontSize: 12,
-                    color: mode === 'circle' ? '#EF4444' : 'rgba(0, 0, 0, 0.45)'
-                  }}>
-                    Circle
-                  </Text>
-                </View>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setMode('rectangle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
-                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons 
-                    name="square-outline" 
-                    size={18} 
-                    color={mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'} 
-                  />
-                  <Text style={{
-                    marginLeft: 4,
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    fontSize: 12,
-                    color: mode === 'rectangle' ? '#DC2626' : 'rgba(0, 0, 0, 0.45)'
-                  }}>
-                    Box
+                    Line
                   </Text>
                 </View>
               </Pressable>
