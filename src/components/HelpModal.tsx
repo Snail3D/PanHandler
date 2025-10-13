@@ -386,7 +386,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>📏</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Distance: 3-4 feet</Text> - About arm's length above
+                      <Text style={{ fontWeight: '600' }}>Distance matters:</Text>{'\n'}
+                      • Small objects: 18 inches (1.5 feet / 0.5m){'\n'}
+                      • Large objects: 3-4 feet away
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
