@@ -465,14 +465,14 @@ export default function DimensionOverlay({
   };
 
   // Helper to snap cursor to nearby existing measurement points
-  // tighterThreshold: when true (moving points), use 0.3mm threshold instead of 1mm
-  const snapToNearbyPoint = (cursorX: number, cursorY: number, tighterThreshold: boolean = false): { x: number, y: number, snapped: boolean } => {
+  // moveMode: when true (moving points), use larger threshold (7mm) for easier snapping
+  const snapToNearbyPoint = (cursorX: number, cursorY: number, moveMode: boolean = false): { x: number, y: number, snapped: boolean } => {
     // Calculate snap distance in pixels based on calibration
-    // Use tighter threshold (0.3mm) when moving points, normal (1mm) when placing
-    const SNAP_DISTANCE_MM = tighterThreshold ? 0.3 : 1;
+    // Use larger threshold (7mm ~ half fingertip) when moving points, normal (1mm) when placing
+    const SNAP_DISTANCE_MM = moveMode ? 7 : 1;
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
-      : (tighterThreshold ? 10 : 30); // fallback pixels if not calibrated
+      : (moveMode ? 60 : 30); // fallback pixels if not calibrated
     
     // Check all existing measurement points
     for (const measurement of measurements) {
@@ -1649,7 +1649,7 @@ export default function DimensionOverlay({
             if (resizingPoint) {
               setDidDrag(true);
               
-              // Apply snapping when moving points - use tighter threshold (0.3mm)
+              // Apply snapping when moving points - use larger threshold (7mm ~ half fingertip)
               const snappedPosition = snapToNearbyPoint(pageX, pageY, true);
               const imageCoords = screenToImage(snappedPosition.x, snappedPosition.y);
               
