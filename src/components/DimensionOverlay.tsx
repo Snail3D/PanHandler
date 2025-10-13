@@ -2647,9 +2647,21 @@ export default function DimensionOverlay({
                         marginRight: 4,
                       }}
                     />
-                    {/* Measurement value */}
+                    {/* Measurement value with area for circles and rectangles */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
-                      {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
+                      {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
+                        // Add area calculation for circles and rectangles
+                        if (measurement.mode === 'circle' && measurement.radius !== undefined) {
+                          const area = Math.PI * measurement.radius * measurement.radius;
+                          const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
+                          return `${measurement.value} (A: ${areaStr}²)`;
+                        } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
+                          const area = measurement.width * measurement.height;
+                          const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
+                          return `${measurement.value} (A: ${areaStr}²)`;
+                        }
+                        return measurement.value;
+                      })()}
                     </Text>
                   </View>
                 );
