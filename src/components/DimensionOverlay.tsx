@@ -1152,18 +1152,18 @@ export default function DimensionOverlay({
       // Wait longer to ensure fusion view has the label
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Capture transparent CAD Canvas - Full (35% opacity, unzoomed with rotation, NO measurements or legend)
-      if (fusionViewRef.current) {
+      // Capture transparent CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, NO measurements or legend)
+      if (fusionZoomedViewRef.current) {
         try {
           console.log(`📸 Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
           
-          const fullUri = await captureRef(fusionViewRef.current, {
+          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'png', // PNG for transparency support
             quality: 1.0,
             result: 'tmpfile',
           });
           
-          await MediaLibrary.createAssetAsync(fullUri);
+          await MediaLibrary.createAssetAsync(zoomedUri);
           console.log('✅ Saved transparent CAD canvas!');
         } catch (error) {
           console.error('Failed to capture transparent CAD canvas:', error);
@@ -1344,12 +1344,12 @@ export default function DimensionOverlay({
       // Wait longer to ensure fusion view has the label
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // 2. Transparent CAD canvas - Full (35% opacity, unzoomed with rotation, title + coin info, NO measurements or legend)
-      if (fusionViewRef.current) {
+      // 2. Transparent CAD canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, title + coin info, NO measurements or legend)
+      if (fusionZoomedViewRef.current) {
         try {
           console.log(`📸 Email - Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
           
-          const fullUri = await captureRef(fusionViewRef.current, {
+          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'png', // PNG for transparency support
             quality: 1.0,
             result: 'tmpfile',
@@ -1357,7 +1357,7 @@ export default function DimensionOverlay({
           
           const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
           const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
-          await FileSystem.copyAsync({ from: fullUri, to: transparentDest });
+          await FileSystem.copyAsync({ from: zoomedUri, to: transparentDest });
           attachments.push(transparentDest);
           
           console.log('✅ Added transparent CAD canvas to email');
