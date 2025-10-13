@@ -478,55 +478,55 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                   paddingTop: 4,
                   alignItems: 'center',
                 }}>
-                  <View style={{ flexDirection: 'row', gap: 16, width: '100%', maxWidth: 320 }}>
-                    {/* Continue Button - DARKER BLUE */}
+                  <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Save Button - BIGGER & DARKER */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
-                        flex: 1,
-                        backgroundColor: pressed ? '#005299' : '#0066CC',
-                        borderRadius: 12,
-                        paddingVertical: 12,
+                        flex: 1.4,
+                        backgroundColor: pressed ? '#003D7A' : '#004B99',
+                        borderRadius: 14,
+                        paddingVertical: 14,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        shadowColor: '#0066CC',
-                        shadowOffset: { width: 0, height: 0 },
-                        shadowOpacity: pressed ? 0.6 : 0.4,
-                        shadowRadius: pressed ? 12 : 8,
-                        elevation: 6,
+                        shadowColor: '#004B99',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: pressed ? 0.7 : 0.5,
+                        shadowRadius: pressed ? 14 : 10,
+                        elevation: 8,
                       })}
                     >
-                      <Ionicons name="checkmark" size={20} color="white" />
+                      <Ionicons name="save" size={20} color="white" />
                       <Text style={{ 
                         color: 'white', 
                         fontWeight: '700', 
-                        fontSize: 15, 
-                        marginLeft: 4,
+                        fontSize: 16, 
+                        marginLeft: 6,
                       }}>
-                        Continue
+                        Save
                       </Text>
                     </Pressable>
 
-                    {/* Skip Button - LIGHTER GRAY */}
+                    {/* Skip Button - SMALLER & LIGHTER */}
                     <Pressable
                       onPress={handleSkip}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.14)' : 'rgba(120,120,128,0.08)',
-                        borderRadius: 12,
-                        paddingVertical: 12,
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.12)' : 'rgba(120,120,128,0.06)',
+                        borderRadius: 10,
+                        paddingVertical: 10,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderWidth: 1.5,
-                        borderColor: 'rgba(120,120,128,0.18)',
+                        borderWidth: 1,
+                        borderColor: 'rgba(120,120,128,0.15)',
                       })}
                     >
                       <Text style={{ 
-                        color: '#6E6E73', 
+                        color: '#8E8E93', 
                         fontWeight: '600', 
-                        fontSize: 15, 
+                        fontSize: 14, 
                       }}>
                         Skip
                       </Text>
