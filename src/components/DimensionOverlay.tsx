@@ -17,6 +17,7 @@ import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import LabelModal from './LabelModal';
+import EmailPromptModal from './EmailPromptModal';
 import PaywallModal from './PaywallModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 
@@ -140,6 +141,7 @@ export default function DimensionOverlay({
   
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
+  const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
@@ -1160,31 +1162,25 @@ export default function DimensionOverlay({
       // Prompt for email if not set
       let emailToUse = userEmail;
       if (!emailToUse) {
+        // Show custom email prompt modal
         await new Promise<void>((resolve) => {
-          Alert.prompt(
-            'Email Address',
-            'Enter your email address to auto-populate for future use:\n\n(This is secure and not shared with us or anyone. It is simply to make sending emails faster for you in the future)',
-            [
-              {
-                text: 'Cancel',
-                style: 'cancel',
-                onPress: () => resolve(),
-              },
-              {
-                text: 'Save',
-                onPress: (email) => {
-                  if (email && email.trim()) {
-                    emailToUse = email.trim();
-                    setUserEmail(emailToUse);
-                  }
-                  resolve();
-                },
-              },
-            ],
-            'plain-text',
-            '',
-            'email-address'
-          );
+          const handleEmailComplete = (email: string | null) => {
+            if (email && email.trim()) {
+              emailToUse = email.trim();
+              setUserEmail(emailToUse);
+            }
+            setShowEmailPromptModal(false);
+            resolve();
+          };
+          
+          const handleEmailDismiss = () => {
+            setShowEmailPromptModal(false);
+            resolve();
+          };
+          
+          // Store handlers temporarily for modal callbacks
+          (window as any)._emailPromptHandlers = { handleEmailComplete, handleEmailDismiss };
+          setShowEmailPromptModal(true);
         });
       }
 
@@ -4256,7 +4252,22 @@ export default function DimensionOverlay({
         onDismiss={handleLabelDismiss}
       />
       
-      {/* Hidden view for capturing CAD canvas image (light/washed out, zoomed view matching measurements) */}
+      {/* Email Prompt Modal */}
+      <EmailPromptModal 
+        visible={showEmailPromptModal} 
+        onComplete={(email) => {
+          if ((window as any)._emailPromptHandlers) {
+            (window as any)._emailPromptHandlers.handleEmailComplete(email);
+          }
+        }}
+        onDismiss={() => {
+          if ((window as any)._emailPromptHandlers) {
+            (window as any)._emailPromptHandlers.handleEmailDismiss();
+          }
+        }}
+      />
+      
+      {/* Hidden view for capturing CAD canvas image (light/washed out, FULL unzoomed but with locked rotation) */}
       <View
         ref={fusionViewRef}
         collapsable={false}
@@ -4277,8 +4288,6 @@ export default function DimensionOverlay({
               height: SCREEN_HEIGHT,
               opacity: 0.35,
               transform: [
-                { translateX: zoomTranslateX },
-                { translateY: zoomTranslateY },
                 { rotate: `${zoomRotation}deg` },
               ],
             }}
@@ -4300,7 +4309,7 @@ export default function DimensionOverlay({
           }}
           pointerEvents="none"
         >
-          {/* Title */}
+          {/* Title - smaller secondary text */}
           <View
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -4310,8 +4319,11 @@ export default function DimensionOverlay({
               marginBottom: 4,
             }}
           >
-            <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
-              {currentLabel || 'PanHandler Measurements'}
+            <Text style={{ color: 'white', fontSize: 15, fontWeight: '700' }}>
+              {currentLabel || 'Measurement'}
+            </Text>
+            <Text style={{ color: '#A0A0A0', fontSize: 9, fontWeight: '500', marginTop: 1 }}>
+              PanHandler Import
             </Text>
           </View>
           
@@ -4383,7 +4395,7 @@ export default function DimensionOverlay({
           }}
           pointerEvents="none"
         >
-          {/* Title */}
+          {/* Title - smaller secondary text */}
           <View
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -4393,8 +4405,11 @@ export default function DimensionOverlay({
               marginBottom: 4,
             }}
           >
-            <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
-              {currentLabel || 'PanHandler Measurements'}
+            <Text style={{ color: 'white', fontSize: 15, fontWeight: '700' }}>
+              {currentLabel || 'Measurement'}
+            </Text>
+            <Text style={{ color: '#A0A0A0', fontSize: 9, fontWeight: '500', marginTop: 1 }}>
+              PanHandler Import
             </Text>
           </View>
           
