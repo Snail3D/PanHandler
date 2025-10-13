@@ -552,7 +552,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                    Measure circular objects. Tap center point, then tap edge to define radius and diameter.
+                    Measure circular objects. Tap center point, then tap edge to define radius and diameter. <Text style={{ fontWeight: '600', color: '#E91E63' }}>Area shown in legend!</Text>
                   </Text>
                 </View>
 
@@ -574,7 +574,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                    Measure rectangular objects. Tap two opposite corners to get length and height measurements. Edges snap to perfect horizontal and vertical lines automagically!
+                    Measure rectangular objects. Tap two opposite corners to get length and height measurements. <Text style={{ fontWeight: '600', color: '#1976D2' }}>Area shown in legend!</Text> Edges snap to perfect horizontal and vertical lines automagically!
                   </Text>
                 </View>
 
@@ -606,7 +606,24 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                     Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
                   </Text>
-                  <View style={{ backgroundColor: 'rgba(16,185,129,0.15)', borderRadius: 10, padding: 10, marginTop: 4 }}>
+                  
+                  {/* Lasso Mode Feature */}
+                  <View style={{ backgroundColor: 'rgba(16,185,129,0.20)', borderRadius: 12, padding: 12, marginTop: 8, borderWidth: 1.5, borderColor: 'rgba(16,185,129,0.35)' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                      <Text style={{ fontSize: 16, marginRight: 6 }}>🎯</Text>
+                      <Text style={{ fontSize: 14, color: '#2E7D32', fontWeight: '700' }}>
+                        LASSO MODE - Close the loop!
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
+                      When you draw close to your starting point, it <Text style={{ fontWeight: '600' }}>auto-snaps</Text> to close the loop! You will feel haptic feedback when it connects.
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', lineHeight: 19 }}>
+                      ✨ Closed loops show both <Text style={{ fontWeight: '800' }}>perimeter AND area</Text> in the legend!
+                    </Text>
+                  </View>
+                  
+                  <View style={{ backgroundColor: 'rgba(16,185,129,0.15)', borderRadius: 10, padding: 10, marginTop: 8 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
                       How to use:
                     </Text>

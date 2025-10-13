@@ -1267,7 +1267,7 @@ export default function DimensionOverlay({
       console.log(`📸 Label set to: "${label || 'null'}"`);
       
       // Capture measurements photo
-      const measurementsUri = await captureRef(actualViewRef.current!, {
+      const measurementsUri = await captureRef(actualViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1286,7 +1286,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(actualViewRef.current!, {
+      const labelOnlyUri = await captureRef(actualViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1418,7 +1418,8 @@ export default function DimensionOverlay({
       console.log(`📸 Email - Label set to: "${label || 'null'}"`);
       
       // Capture the image with measurements
-      const uri = await captureRef(actualViewRef.current!, {
+      // Pass the ref object itself, not .current - react-native-view-shot handles this
+      const uri = await captureRef(actualViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1497,7 +1498,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(actualViewRef.current!, {
+      const labelOnlyUri = await captureRef(actualViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
