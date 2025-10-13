@@ -2650,17 +2650,33 @@ export default function DimensionOverlay({
                     {/* Measurement value with area for circles and rectangles */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
-                        // Add area calculation for circles and rectangles
-                        if (measurement.mode === 'circle' && measurement.radius !== undefined) {
+                        // Recalculate display value based on current unit system
+                        let displayValue = measurement.value;
+                        
+                        if (measurement.mode === 'distance') {
+                          // Recalculate distance in current units
+                          displayValue = calculateDistance(measurement.points[0], measurement.points[1]);
+                        } else if (measurement.mode === 'angle') {
+                          // Recalculate angle
+                          displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
+                        } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
+                          // Recalculate circle diameter and area
+                          const diameter = measurement.radius * 2;
+                          displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * measurement.radius * measurement.radius;
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
-                          return `${measurement.value} (A: ${areaStr}²)`;
+                          return `${displayValue} (A: ${areaStr}²)`;
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
+                          // Recalculate rectangle dimensions and area
+                          const widthStr = formatMeasurement(measurement.width, calibration?.unit || 'mm', unitSystem, 2);
+                          const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
+                          displayValue = `${widthStr} × ${heightStr}`;
                           const area = measurement.width * measurement.height;
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
-                          return `${measurement.value} (A: ${areaStr}²)`;
+                          return `${displayValue} (A: ${areaStr}²)`;
                         }
-                        return measurement.value;
+                        
+                        return displayValue;
                       })()}
                     </Text>
                   </View>
