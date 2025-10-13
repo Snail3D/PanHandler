@@ -1107,63 +1107,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                         Upgrade to Pro
                       </AnimatedText>
                       {' '}or{' '}
-                      <Text style={{ fontSize: 16, fontWeight: '700', color: '#007AFF' }}>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#007AFF' }}>
                         Restore your past purchase
                       </Text>
                     </Text>
                   </View>
-
-                  {/* Upgrade Button */}
-                  <Pressable
-                    onPress={() => {
-                      // TODO: Implement Pro upgrade
-                      console.log('Upgrade to Pro tapped');
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? '#E68900' : '#FF9500',
-                      paddingVertical: 18,
-                      borderRadius: 16,
-                      marginTop: 12,
-                      shadowColor: '#FF9500',
-                      shadowOffset: { width: 0, height: 0 },
-                      shadowOpacity: pressed ? 0.5 : 0.35,
-                      shadowRadius: pressed ? 16 : 12,
-                      elevation: 8,
-                    })}
-                  >
-                    <AnimatedText style={[{ 
-                      color: '#1C1C1E', 
-                      fontSize: 18, 
-                      fontWeight: '800', 
-                      textAlign: 'center',
-                      letterSpacing: 0.3,
-                    }, textPulseStyle]}>
-                      Upgrade to Pro
-                    </AnimatedText>
-                  </Pressable>
-
-                  {/* Restore Purchase Link */}
-                  <Pressable
-                    onPress={() => {
-                      // TODO: Implement restore purchase
-                      console.log('Restore purchase tapped');
-                    }}
-                    style={({ pressed }) => ({
-                      paddingVertical: 16,
-                      paddingHorizontal: 20,
-                      marginTop: 4,
-                      opacity: pressed ? 0.6 : 1,
-                    })}
-                  >
-                    <Text style={{ 
-                      color: '#007AFF', 
-                      fontSize: 15, 
-                      fontWeight: '600', 
-                      textAlign: 'center' 
-                    }}>
-                      Restore Purchase
-                    </Text>
-                  </Pressable>
                 </Animated.View>
               </View>
 
