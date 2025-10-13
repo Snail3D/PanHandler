@@ -17,10 +17,11 @@ export interface CompletedMeasurement {
   id: string;
   points: Array<{ x: number; y: number }>;
   value: string;
-  mode: 'distance' | 'angle' | 'circle' | 'rectangle';
+  mode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
   radius?: number; // For circles
   width?: number;  // For rectangles  
   height?: number; // For rectangles
+  totalLength?: number; // For freehand - total path length
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
@@ -33,7 +34,7 @@ interface MeasurementStore {
   completedMeasurements: CompletedMeasurement[]; // For DimensionOverlay
   currentPoints: Array<{ x: number; y: number; id: string }>; // For DimensionOverlay
   tempPoints: Point[];
-  measurementMode: 'distance' | 'angle' | 'circle' | 'rectangle';
+  measurementMode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
   calibration: {
     pixelsPerUnit: number;
     unit: 'mm' | 'cm' | 'in';
@@ -188,7 +189,7 @@ const useStore = create<MeasurementStore>()(
         };
       }),
 
-      setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle') => set({ measurementMode: mode, tempPoints: [] }),
+      setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand') => set({ measurementMode: mode, tempPoints: [] }),
 
       deleteMeasurement: (id: string) => set((state) => ({
         measurements: state.measurements.filter((m) => m.id !== id),
