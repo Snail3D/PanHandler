@@ -1040,12 +1040,14 @@ export default function DimensionOverlay({
 
       console.log('📸 Hiding menu and capturing view...');
       
-      // Hide menu for capture
+      // Hide menu for capture and set label
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait a frame for the UI to update with label
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for the UI to update with label (increased wait time for off-screen views)
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      console.log(`📸 Label set to: "${label || 'null'}"`);
       
       // Capture measurements photo
       const measurementsUri = await captureRef(viewRef.current, {
@@ -1060,10 +1062,13 @@ export default function DimensionOverlay({
       const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Capture CAD Canvas - Zoomed (35% opacity, shows current zoom/pan)
+      // Wait a bit more to ensure fusion views are updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Capture CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation)
       if (fusionZoomedViewRef.current) {
         try {
-          console.log('📸 Capturing zoomed CAD canvas...');
+          console.log(`📸 Capturing zoomed CAD canvas with label: "${label || 'null'}"`);
           
           const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'jpg',
@@ -1078,10 +1083,10 @@ export default function DimensionOverlay({
         }
       }
       
-      // Capture CAD Canvas - Full (35% opacity, unzoomed full image)
+      // Capture CAD Canvas - Full (35% opacity, unzoomed but with locked rotation)
       if (fusionViewRef.current) {
         try {
-          console.log('📸 Capturing full CAD canvas...');
+          console.log(`📸 Capturing full CAD canvas with label: "${label || 'null'}"`);
           
           const fullUri = await captureRef(fusionViewRef.current, {
             format: 'jpg',
@@ -1191,8 +1196,10 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait a frame for the UI to update with label
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for the UI to update with label (increased wait time)
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      console.log(`📸 Email - Label set to: "${label || 'null'}"`);
       
       // Capture the image with measurements
       const uri = await captureRef(viewRef.current, {
@@ -1201,10 +1208,6 @@ export default function DimensionOverlay({
         result: 'tmpfile',
       });
       
-      // Show menu again and clear label
-      setIsCapturing(false);
-      setCurrentLabel(null);
-
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
@@ -1267,10 +1270,13 @@ export default function DimensionOverlay({
       await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // 2. CAD Canvas - Zoomed (35% opacity, shows current zoom/pan, with title + coin info)
+      // Wait a bit more to ensure fusion views have the label
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 2. CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, with title + coin info)
       if (fusionZoomedViewRef.current) {
         try {
-          console.log('📸 Capturing zoomed CAD canvas for email...');
+          console.log(`📸 Email - Capturing zoomed CAD canvas with label: "${label || 'null'}"`);
           
           const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'jpg',
@@ -1289,10 +1295,10 @@ export default function DimensionOverlay({
         }
       }
       
-      // 3. CAD Canvas - Full (35% opacity, unzoomed full image, with title + coin info)
+      // 3. CAD Canvas - Full (35% opacity, unzoomed but with rotation, with title + coin info)
       if (fusionViewRef.current) {
         try {
-          console.log('📸 Capturing full CAD canvas for email...');
+          console.log(`📸 Email - Capturing full CAD canvas with label: "${label || 'null'}"`);
           
           const fullUri = await captureRef(fusionViewRef.current, {
             format: 'jpg',
@@ -1310,6 +1316,10 @@ export default function DimensionOverlay({
           console.error('Failed to capture full CAD canvas:', error);
         }
       }
+      
+      // Clear label and show menu again
+      setIsCapturing(false);
+      setCurrentLabel(null);
       
       // Build subject with label
       const subject = label 
