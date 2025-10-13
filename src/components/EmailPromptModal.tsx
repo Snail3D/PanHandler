@@ -194,60 +194,62 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                   paddingHorizontal: 24,
                   paddingBottom: 24,
                   paddingTop: 8,
+                  alignItems: 'center',
                 }}>
-                  <View style={{ flexDirection: 'row', gap: 12 }}>
-                    {/* Cancel Button */}
+                  <View style={{ flexDirection: 'row', gap: 20, width: '100%', maxWidth: 320, alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Save Button - DARK text & icon, glassmorphic background */}
+                    <Pressable
+                      onPress={handleSave}
+                      style={({ pressed }) => ({
+                        flex: 1.4,
+                        backgroundColor: pressed ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.5)',
+                        borderRadius: 14,
+                        paddingVertical: 14,
+                        paddingHorizontal: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.35)',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                        elevation: 4,
+                      })}
+                    >
+                      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                        <Ionicons name="save" size={18} color="#1C1C1E" />
+                      </View>
+                      <Text style={{ 
+                        color: '#1C1C1E', 
+                        fontWeight: '700', 
+                        fontSize: 16, 
+                        marginLeft: 8,
+                      }}>
+                        Save
+                      </Text>
+                    </Pressable>
+
+                    {/* Skip Button - LIGHT text, minimal background */}
                     <Pressable
                       onPress={handleCancel}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
-                        borderRadius: 16,
-                        paddingVertical: 14,
-                        flexDirection: 'row',
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.08)' : 'transparent',
+                        borderRadius: 10,
+                        paddingVertical: 10,
+                        paddingHorizontal: 12,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderWidth: 2,
-                        borderColor: 'rgba(120,120,128,0.2)',
                       })}
                     >
-                      <Ionicons name="close" size={20} color="#8E8E93" />
                       <Text style={{ 
                         color: '#8E8E93', 
-                        fontWeight: '700', 
-                        fontSize: 16, 
-                        marginLeft: 6,
+                        fontWeight: '600', 
+                        fontSize: 14, 
                       }}>
-                        Cancel
-                      </Text>
-                    </Pressable>
-
-                    {/* Save Button */}
-                    <Pressable
-                      onPress={handleSave}
-                      style={({ pressed }) => ({
-                        flex: 1,
-                        backgroundColor: pressed ? '#2FAF5D' : '#34C759',
-                        borderRadius: 16,
-                        paddingVertical: 14,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        shadowColor: '#34C759',
-                        shadowOffset: { width: 0, height: 0 },
-                        shadowOpacity: pressed ? 0.6 : 0.4,
-                        shadowRadius: pressed ? 16 : 12,
-                        elevation: 8,
-                      })}
-                    >
-                      <Ionicons name="checkmark-circle" size={22} color="white" />
-                      <Text style={{ 
-                        color: 'white', 
-                        fontWeight: '700', 
-                        fontSize: 16, 
-                        marginLeft: 6,
-                      }}>
-                        Save
+                        Skip
                       </Text>
                     </Pressable>
                   </View>
