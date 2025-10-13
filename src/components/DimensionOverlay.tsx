@@ -187,6 +187,10 @@ export default function DimensionOverlay({
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
   
+  // Cursor movement speed tracking for dynamic glow
+  const [cursorSpeed, setCursorSpeed] = useState(0); // pixels per millisecond
+  const lastCursorUpdateRef = useRef({ x: 0, y: 0, time: Date.now() });
+  
   // Initialize measurement mode based on whether there are existing measurements
   // If there are measurements on reload, pan/zoom should be locked
   useEffect(() => {
@@ -1739,6 +1743,16 @@ export default function DimensionOverlay({
                 const rawCursorX = pageX + horizontalOffset;
                 const rawCursorY = pageY - cursorOffsetY;
                 
+                // Calculate speed for freehand cursor
+                const now = Date.now();
+                const deltaTime = now - lastCursorUpdateRef.current.time;
+                const deltaX = rawCursorX - lastCursorUpdateRef.current.x;
+                const deltaY = rawCursorY - lastCursorUpdateRef.current.y;
+                const cursorDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const cursorMoveSpeed = deltaTime > 0 ? cursorDistance / deltaTime : 0;
+                
+                lastCursorUpdateRef.current = { x: rawCursorX, y: rawCursorY, time: now };
+                setCursorSpeed(cursorMoveSpeed);
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
                 // If already drawing, add points to path
@@ -1794,7 +1808,16 @@ export default function DimensionOverlay({
                 ? pointSnapped 
                 : snapCursorToAlignment(rawCursorX, rawCursorY);
               
-              // Update cursor with final snapped position
+              // Update cursor with final snapped position AND calculate speed
+              const now = Date.now();
+              const deltaTime = now - lastCursorUpdateRef.current.time;
+              const deltaX = finalPosition.x - lastCursorUpdateRef.current.x;
+              const deltaY = finalPosition.y - lastCursorUpdateRef.current.y;
+              const cursorDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+              const cursorMoveSpeed = deltaTime > 0 ? cursorDistance / deltaTime : 0; // pixels per millisecond
+              
+              lastCursorUpdateRef.current = { x: finalPosition.x, y: finalPosition.y, time: now };
+              setCursorSpeed(cursorMoveSpeed);
               setCursorPosition({ x: finalPosition.x, y: finalPosition.y });
               
               // Haptic feedback when snapping occurs
@@ -2443,6 +2466,14 @@ export default function DimensionOverlay({
           const cursorColor = nextColor.main;
           const glowColor = getComplementaryColor(cursorColor);
           
+          // Calculate dynamic glow opacity based on cursor speed
+          // Speed ranges: 0 (still) to ~3+ (very fast) pixels per millisecond
+          // Map to opacity: 0.07 (slow/still) to 0.14 (fast) - 30% reduced from original
+          const minGlowOpacity = 0.07; // 30% less than 0.105
+          const maxGlowOpacity = 0.14; // 30% less than 0.2
+          const speedFactor = Math.min(cursorSpeed / 2, 1); // Normalize to 0-1 range
+          const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
+          
           // Determine label based on state
           let label = 'Hold to start';
           if (freehandActivating) {
@@ -2463,9 +2494,9 @@ export default function DimensionOverlay({
               pointerEvents="none"
             >
               <Svg width={100} height={100}>
-                {/* Outer ring glow layers - complementary color */}
-                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={0.15} />
-                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                {/* Outer ring glow layers - complementary color with dynamic opacity */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={dynamicGlowOpacity * 0.7} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
                 {/* Outer ring - pulses when activating */}
                 <Circle 
                   cx={50} 
@@ -2478,11 +2509,11 @@ export default function DimensionOverlay({
                 />
                 {/* Inner circle */}
                 <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
-                {/* Crosshair lines with complementary glow */}
-                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                {/* Crosshair lines with complementary glow and dynamic opacity */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
                 <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
@@ -2525,6 +2556,14 @@ export default function DimensionOverlay({
           const cursorColor = nextColor.main;
           const glowColor = getComplementaryColor(cursorColor);
           
+          // Calculate dynamic glow opacity based on cursor speed
+          // Speed ranges: 0 (still) to ~3+ (very fast) pixels per millisecond
+          // Map to opacity: 0.07 (slow/still) to 0.14 (fast) - 30% reduced from original
+          const minGlowOpacity = 0.07; // 30% less than 0.105
+          const maxGlowOpacity = 0.14; // 30% less than 0.2
+          const speedFactor = Math.min(cursorSpeed / 2, 1); // Normalize to 0-1 range
+          const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
+          
           return (
             <View
               style={{
@@ -2537,18 +2576,18 @@ export default function DimensionOverlay({
               pointerEvents="none"
             >
               <Svg width={100} height={100}>
-                {/* Outer ring glow layers - complementary color */}
-                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={0.15} />
-                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                {/* Outer ring glow layers - complementary color with dynamic opacity */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={dynamicGlowOpacity * 0.7} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
                 {/* Outer ring with next measurement color */}
                 <Circle cx={50} cy={50} r={30} fill="none" stroke={cursorColor} strokeWidth="3" opacity={0.8} />
                 {/* Inner circle with next measurement color */}
                 <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
-                {/* Crosshair lines with complementary glow */}
-                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={0.2} />
-                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                {/* Crosshair lines with complementary glow and dynamic opacity */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
                 <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
