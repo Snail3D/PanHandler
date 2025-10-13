@@ -1683,27 +1683,36 @@ export default function DimensionOverlay({
               // Check what type of measurement we're resizing
               const measurement = measurements.find(m => m.id === resizingPoint.measurementId);
               
-              // For circles, disable snapping when adjusting the edge point (radius adjustment)
-              // to allow smooth resizing. Only snap the center point.
-              const shouldSnap = !(measurement?.mode === 'circle' && resizingPoint.pointIndex === 1);
+              // For circles, disable snapping completely for smoother movement
+              // Circle center: allow snapping to other points
+              // Circle edge: no snapping for smooth radius adjustment
+              const shouldCheckSnapping = !(measurement?.mode === 'circle' && resizingPoint.pointIndex === 1);
               
-              // Apply snapping when moving points - use larger threshold (7mm ~ half fingertip)
-              const snappedPosition = shouldSnap 
-                ? snapToNearbyPoint(pageX, pageY, true)
-                : { x: pageX, y: pageY, snapped: false };
-              const imageCoords = screenToImage(snappedPosition.x, snappedPosition.y);
+              // Use raw position for smooth movement, only snap when actually close to a point
+              let finalPosition = { x: pageX, y: pageY };
+              let isCurrentlySnapped = false;
               
-              // Stronger haptic feedback when snapping occurs in move mode
-              if (snappedPosition.snapped && !isSnapped) {
-                // Double haptic for entering snap - very noticeable
+              if (shouldCheckSnapping) {
+                const snappedPosition = snapToNearbyPoint(pageX, pageY, true);
+                if (snappedPosition.snapped) {
+                  finalPosition = snappedPosition;
+                  isCurrentlySnapped = true;
+                }
+              }
+              
+              const imageCoords = screenToImage(finalPosition.x, finalPosition.y);
+              
+              // Haptic feedback only when snap state changes
+              if (isCurrentlySnapped && !isSnapped) {
+                // Entering snap - double haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).then(() => {
                   setTimeout(() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   }, 50);
                 });
                 setIsSnapped(true);
-              } else if (!snappedPosition.snapped && isSnapped) {
-                // Medium haptic for leaving snap
+              } else if (!isCurrentlySnapped && isSnapped) {
+                // Leaving snap - single haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setIsSnapped(false);
               }
@@ -1829,8 +1838,7 @@ export default function DimensionOverlay({
                 setMeasurements(updatedMeasurements);
                 dragStartPos.value = { x: pageX, y: pageY };
                 
-                // Haptic feedback while dragging
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                // No haptic during drag - smooth movement
               }
             }
           }}
