@@ -1367,9 +1367,11 @@ export default function DimensionOverlay({
         viewRefCurrent: !!viewRef?.current,
         externalViewRef: !!externalViewRef,
         externalViewRefCurrent: !!externalViewRef?.current,
-        currentImageUri: !!currentImageUri
+        currentImageUri: !!currentImageUri,
+        actualViewRef: !!actualViewRef,
+        actualViewRefCurrent: !!actualViewRef?.current,
       });
-      Alert.alert('Email Error', 'Unable to capture measurement. Please try again.');
+      Alert.alert('Email Error', 'Unable to capture measurement view. The view reference is not available. Please try again.');
       return;
     }
     
@@ -1412,10 +1414,16 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for the UI to update with label (increased wait time)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for the UI to update and ensure view is ready
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Double-check ref is still valid after waiting
+      if (!actualViewRef.current) {
+        throw new Error('View reference became null after UI update');
+      }
       
       console.log(`📸 Email - Label set to: "${label || 'null'}"`);
+      console.log('📸 About to capture with ref:', actualViewRef, 'current:', actualViewRef.current);
       
       // Capture the image with measurements
       // Pass the ref object itself, not .current - react-native-view-shot handles this
