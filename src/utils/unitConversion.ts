@@ -88,6 +88,51 @@ export function getCalibrationUnits(unitSystem: UnitSystem): MeasurementUnit[] {
   }
 }
 
+// Format area measurement with appropriate unit
+export function formatAreaMeasurement(
+  areaInBaseUnit: number, // area in square units of baseUnit
+  baseUnit: 'mm' | 'cm' | 'in',
+  unitSystem: UnitSystem,
+  decimals: number = 1
+): string {
+  // First convert to mm² (base area unit)
+  let areaInMm2: number;
+  if (baseUnit === 'mm') {
+    areaInMm2 = areaInBaseUnit;
+  } else if (baseUnit === 'cm') {
+    areaInMm2 = areaInBaseUnit * 100; // 1cm² = 100mm²
+  } else {
+    areaInMm2 = areaInBaseUnit * 645.16; // 1in² = 645.16mm²
+  }
+
+  if (unitSystem === 'metric') {
+    // Use mm² for small areas, cm² for medium, m² for large
+    if (areaInMm2 < 10000) { // Less than 100cm²
+      const roundedValue = Math.round(areaInMm2 * 2) / 2; // Round to nearest 0.5
+      if (roundedValue % 1 === 0) {
+        return `${roundedValue.toFixed(0)} mm²`;
+      } else {
+        return `${roundedValue.toFixed(1)} mm²`;
+      }
+    } else if (areaInMm2 < 1000000) { // Less than 1m²
+      const valueInCm2 = areaInMm2 / 100;
+      return `${valueInCm2.toFixed(1)} cm²`;
+    } else {
+      const valueInM2 = areaInMm2 / 1000000;
+      return `${valueInM2.toFixed(2)} m²`;
+    }
+  } else {
+    // Imperial: use in² for small areas, ft² for large
+    const valueInIn2 = areaInMm2 / 645.16;
+    if (valueInIn2 < 144) { // Less than 1ft²
+      return `${valueInIn2.toFixed(2)} in²`;
+    } else {
+      const valueInFt2 = valueInIn2 / 144;
+      return `${valueInFt2.toFixed(2)} ft²`;
+    }
+  }
+}
+
 // Get default calibration unit for unit system
 export function getDefaultCalibrationUnit(unitSystem: UnitSystem): 'mm' | 'cm' | 'in' {
   return unitSystem === 'metric' ? 'mm' : 'in';
