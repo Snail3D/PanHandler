@@ -1369,16 +1369,6 @@ export default function DimensionOverlay({
       measurementText += `  • Full measurements photo\n`;
       measurementText += `  • Transparent CAD canvas (50% opacity)\n`;
       
-      // Add simple CAD import instructions
-      if (calibration && coinCircle) {
-        measurementText += `\n\n═══ CAD Import Info ═══\n`;
-        measurementText += `Import the transparent photo as a canvas background.\n`;
-        const coinDiameterDisplay = unitSystem === 'imperial' 
-          ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
-          : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `Scale by measuring the coin: ${coinDiameterDisplay} diameter\n`;
-      }
-      
       // Add footer (only for non-Pro users)
       if (!isProUser) {
         measurementText += '\n\n';
