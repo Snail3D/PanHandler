@@ -161,6 +161,7 @@ export default function DimensionOverlay({
   
   // Rapid tap to delete feature
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
+  const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
   
   // Freehand drawing state
   const [isDrawingFreehand, setIsDrawingFreehand] = useState(false);
@@ -2083,6 +2084,9 @@ export default function DimensionOverlay({
             if (point) {
               const measurement = measurements.find(m => m.id === point.measurementId);
               
+              // Set selected measurement for context instructions
+              setSelectedMeasurementId(point.measurementId);
+              
               // Special case for circles: if tapping the center point (point 0) and the tap is
               // inside the circle area (not near the edge), treat it as a drag operation
               if (measurement && measurement.mode === 'circle' && point.pointIndex === 0) {
@@ -2532,6 +2536,13 @@ export default function DimensionOverlay({
             setResizingPoint(null);
             setDidDrag(false);
             setIsSnapped(false);
+            
+            // Clear selection after a delay if no longer dragging
+            setTimeout(() => {
+              if (!didDrag) {
+                setSelectedMeasurementId(null);
+              }
+            }, 2000); // Keep selection visible for 2 seconds
           }}
         />
       )}
@@ -3796,6 +3807,7 @@ export default function DimensionOverlay({
               onPress={() => {
                 setMeasurementMode(false);
                 setShowCursor(false);
+                setSelectedMeasurementId(null); // Clear selection when switching to Edit mode
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               style={{
@@ -4155,8 +4167,8 @@ export default function DimensionOverlay({
           {/* Tip */}
           {/* Helper instructions - always show based on mode */}
           {currentPoints.length === 0 && (
-            <View className={`${measurementMode ? 'bg-green-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
-              <Text className={`${measurementMode ? 'text-green-800' : 'text-blue-800'} text-xs text-center`}>
+            <View className={`${measurementMode ? 'bg-green-50' : selectedMeasurementId ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
+              <Text className={`${measurementMode ? 'text-green-800' : selectedMeasurementId ? 'text-purple-800' : 'text-blue-800'} text-xs text-center`}>
                 {measurementMode 
                   ? mode === 'circle' 
                     ? '⭕ Tap center, then tap edge of circle'
@@ -4167,6 +4179,22 @@ export default function DimensionOverlay({
                     : mode === 'angle'
                     ? '📐 Tap 3 points: start, vertex (center), end'
                     : '📏 Tap to place 2 points for distance'
+                  : selectedMeasurementId
+                  ? (() => {
+                      const selected = measurements.find(m => m.id === selectedMeasurementId);
+                      if (selected?.mode === 'circle') {
+                        return '⭕ Selected Circle: Drag center to move • Drag edge to resize';
+                      } else if (selected?.mode === 'rectangle') {
+                        return '⬜ Selected Rectangle: Drag corners to resize • Drag edges to move';
+                      } else if (selected?.mode === 'distance') {
+                        return '📏 Selected Line: Drag endpoints to adjust • Tap line to move';
+                      } else if (selected?.mode === 'angle') {
+                        return '📐 Selected Angle: Drag any point to adjust angle';
+                      } else if (selected?.mode === 'freehand') {
+                        return '✏️ Selected Path: Drag any point to reshape path';
+                      }
+                      return '✏️ Tap any measurement to select';
+                    })()
                   : measurements.length > 0
                   ? '✏️ Edit Mode: Tap any measurement to select • Tap trash icon to delete'
                   : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
