@@ -606,6 +606,16 @@ export default function DimensionOverlay({
         );
         const inside = (tapX >= minX && tapX <= maxX && tapY >= minY && tapY <= maxY);
         if (onEdge || inside) return measurement.id;
+      } else if (measurement.mode === 'freehand') {
+        // Check if tap is near any segment of the freehand path
+        if (measurement.points.length < 2) continue;
+        
+        for (let i = 1; i < measurement.points.length; i++) {
+          const p0 = imageToScreen(measurement.points[i - 1].x, measurement.points[i - 1].y);
+          const p1 = imageToScreen(measurement.points[i].x, measurement.points[i].y);
+          const distToSegment = distanceToLineSegment(tapX, tapY, p0.x, p0.y, p1.x, p1.y);
+          if (distToSegment < TAP_THRESHOLD) return measurement.id;
+        }
       }
     }
     return null;
@@ -1503,6 +1513,26 @@ export default function DimensionOverlay({
             fingerScale.value = 1;
             fingerRotation.value = 0;
             
+            // For freehand mode, start drawing immediately if pressure threshold is met
+            if (mode === 'freehand') {
+              setDrawingPressure(pressure);
+              
+              // High pressure triggers drawing (> 0.3)
+              if (pressure > 0.3) {
+                setIsDrawingFreehand(true);
+                const imageX = (pageX - zoomTranslateX) / zoomScale;
+                const imageY = (pageY - zoomTranslateY) / zoomScale;
+                setFreehandPath([{ x: imageX, y: imageY }]);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }
+              
+              // Update cursor position for freehand
+              setShowFreehandCursor(true);
+              setCursorPosition({ x: pageX, y: pageY });
+              return; // Skip normal cursor logic for freehand
+            }
+            
+            // Normal cursor logic for other modes...
             // Gradient horizontal offset: crosshair leans in direction of movement
             // At center: 0 offset
             // Moving left: crosshair shifts left (negative)
@@ -1551,6 +1581,40 @@ export default function DimensionOverlay({
                 : [];
               setFingerTouches(touches);
               
+              // Handle freehand drawing mode
+              if (mode === 'freehand') {
+                const pressure = touch.force || 0.5;
+                setDrawingPressure(pressure);
+                setCursorPosition({ x: pageX, y: pageY });
+                
+                // Start drawing if pressure threshold is met
+                if (pressure > 0.3 && !isDrawingFreehand) {
+                  setIsDrawingFreehand(true);
+                  const imageX = (pageX - zoomTranslateX) / zoomScale;
+                  const imageY = (pageY - zoomTranslateY) / zoomScale;
+                  setFreehandPath([{ x: imageX, y: imageY }]);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+                
+                // Continue drawing if already started
+                if (isDrawingFreehand && pressure > 0.3) {
+                  const imageX = (pageX - zoomTranslateX) / zoomScale;
+                  const imageY = (pageY - zoomTranslateY) / zoomScale;
+                  
+                  // Only add point if it's far enough from the last point (smooth path)
+                  if (freehandPath.length === 0 || 
+                      Math.sqrt(
+                        Math.pow(imageX - freehandPath[freehandPath.length - 1].x, 2) +
+                        Math.pow(imageY - freehandPath[freehandPath.length - 1].y, 2)
+                      ) > 2 / zoomScale) { // 2 pixels minimum distance
+                    setFreehandPath(prev => [...prev, { x: imageX, y: imageY }]);
+                  }
+                }
+                
+                return; // Skip normal cursor logic for freehand
+              }
+              
+              // Normal cursor logic for other modes...
               // Gradient horizontal offset: crosshair leans in direction of movement
               // At center: 0 offset
               // Moving left: crosshair shifts left (negative)
@@ -1633,6 +1697,49 @@ export default function DimensionOverlay({
             
             // Reset snap state
             setIsSnapped(false);
+            
+            // Handle freehand drawing completion
+            if (mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1) {
+              // Calculate total path length
+              let totalLength = 0;
+              for (let i = 1; i < freehandPath.length; i++) {
+                const dx = freehandPath[i].x - freehandPath[i - 1].x;
+                const dy = freehandPath[i].y - freehandPath[i - 1].y;
+                totalLength += Math.sqrt(dx * dx + dy * dy);
+              }
+              
+              // Convert to physical units
+              const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+              const physicalLength = totalLength / pixelsPerUnit;
+              
+              // Format the measurement
+              const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+              
+              // Create completed measurement
+              const newMeasurement: Measurement = {
+                id: Date.now().toString(),
+                points: freehandPath,
+                value: formattedValue,
+                mode: 'freehand',
+              };
+              
+              // Add to measurements list
+              setMeasurements([...measurements, newMeasurement]);
+              
+              // Reset freehand state
+              setFreehandPath([]);
+              setIsDrawingFreehand(false);
+              setDrawingPressure(0);
+              
+              // Success haptic
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              console.log('🎨 Freehand measurement completed:', formattedValue);
+            } else if (mode === 'freehand') {
+              // Reset if drawing was incomplete
+              setFreehandPath([]);
+              setIsDrawingFreehand(false);
+              setDrawingPressure(0);
+            }
             
             // Evaporation effect - organic fade with slight expansion and dissipation
             // Like condensation evaporating from cold glass
@@ -1917,7 +2024,7 @@ export default function DimensionOverlay({
               const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
               if (tappedId) {
                 const measurement = measurements.find(m => m.id === tappedId);
-                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
+                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle' || measurement.mode === 'freehand')) {
                   setDraggedMeasurementId(tappedId);
                   setDidDrag(true);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -2063,7 +2170,76 @@ export default function DimensionOverlay({
 
       {/* Floating cursor container */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }} pointerEvents="none">
-        {/* Floating cursor */}
+        {/* Freehand cursor with pressure feedback */}
+        {showFreehandCursor && mode === 'freehand' && (() => {
+          // Determine cursor color based on pressure (0 = red, 0.5 = yellow, 1 = green)
+          let cursorColor;
+          let pressureLabel;
+          if (drawingPressure < 0.3) {
+            cursorColor = '#EF4444'; // Red - no pressure / ready
+            pressureLabel = 'Ready';
+          } else if (drawingPressure < 0.6) {
+            cursorColor = '#F59E0B'; // Yellow/amber - medium pressure
+            pressureLabel = 'Drawing...';
+          } else {
+            cursorColor = '#10B981'; // Green - full pressure / drawing
+            pressureLabel = 'Drawing!';
+          }
+          
+          return (
+            <View
+              style={{
+                position: 'absolute',
+                left: cursorPosition.x - 50,
+                top: cursorPosition.y - 50,
+                width: 100,
+                height: 100,
+              }}
+              pointerEvents="none"
+            >
+              <Svg width={100} height={100}>
+                {/* Pressure ring - size increases with pressure */}
+                <Circle 
+                  cx={50} 
+                  cy={50} 
+                  r={20 + drawingPressure * 15} 
+                  fill="none" 
+                  stroke={cursorColor} 
+                  strokeWidth="3" 
+                  opacity={0.8 + drawingPressure * 0.2} 
+                />
+                {/* Inner filled circle */}
+                <Circle 
+                  cx={50} 
+                  cy={50} 
+                  r={10 + drawingPressure * 8} 
+                  fill={`${cursorColor}44`} 
+                  stroke={cursorColor} 
+                  strokeWidth="2" 
+                />
+                {/* Center dot */}
+                <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
+                <Circle cx={50} cy={50} r={1.5} fill={cursorColor} opacity={1} />
+              </Svg>
+              <View style={{ 
+                position: 'absolute', 
+                top: -35, 
+                left: 0, 
+                right: 0, 
+                backgroundColor: cursorColor, 
+                paddingHorizontal: 12, 
+                paddingVertical: 4, 
+                borderRadius: 12 
+              }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                  {pressureLabel}
+                </Text>
+              </View>
+            </View>
+          );
+        })()}
+        
+        {/* Regular cursor (for other modes) */}
         {showCursor && (() => {
           // Determine which measurement this will be (if completing current or starting new)
           const nextMeasurementIndex = currentPoints.length === requiredPoints 
@@ -2409,9 +2585,75 @@ export default function DimensionOverlay({
                     ))}
                   </React.Fragment>
                 );
+              } else if (measurement.mode === 'freehand') {
+                // Render freehand path
+                if (measurement.points.length < 2) return null;
+                
+                // Convert all points to screen coordinates
+                const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
+                
+                // Generate smooth path using Catmull-Rom spline or simple polyline
+                let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+                
+                // Use quadratic bezier curves for smooth path
+                for (let i = 1; i < screenPoints.length; i++) {
+                  const prev = screenPoints[i - 1];
+                  const curr = screenPoints[i];
+                  
+                  if (i === 1) {
+                    // First segment - use line
+                    pathData += ` L ${curr.x} ${curr.y}`;
+                  } else {
+                    // Smooth curves using quadratic bezier
+                    const midX = (prev.x + curr.x) / 2;
+                    const midY = (prev.y + curr.y) / 2;
+                    pathData += ` Q ${prev.x} ${prev.y}, ${midX} ${midY}`;
+                  }
+                }
+                
+                // Add final point if there are more than 2 points
+                if (screenPoints.length > 2) {
+                  const last = screenPoints[screenPoints.length - 1];
+                  pathData += ` L ${last.x} ${last.y}`;
+                }
+                
+                return (
+                  <React.Fragment key={measurement.id}>
+                    {/* Glow layers for freehand path */}
+                    <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    {/* Main freehand path */}
+                    <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    {/* Start and end point markers */}
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                  </React.Fragment>
+                );
               }
               return null;
             })}
+
+            {/* Draw live freehand path preview while drawing */}
+            {mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1 && (() => {
+              const screenPoints = freehandPath.map(p => imageToScreen(p.x, p.y));
+              const nextColor = getMeasurementColor(measurements.length, 'freehand');
+              
+              // Generate path
+              let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+              for (let i = 1; i < screenPoints.length; i++) {
+                pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
+              }
+              
+              return (
+                <>
+                  <Path d={pathData} stroke={nextColor.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                </>
+              );
+            })()}
 
             {/* Draw current points being placed */}
             {mode === 'distance' && currentPoints.length === 2 && (() => {
@@ -3135,28 +3377,64 @@ export default function DimensionOverlay({
                   setMeasurementMode(true);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
+                onPressIn={() => {
+                  // Start long-press timer for freehand mode
+                  if (freehandLongPressRef.current) {
+                    clearTimeout(freehandLongPressRef.current);
+                  }
+                  freehandLongPressRef.current = setTimeout(() => {
+                    // Activate freehand mode
+                    setMode('freehand');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setIsDrawingFreehand(false); // Start in ready state, not drawing yet
+                    setShowFreehandCursor(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    console.log('🎨 Freehand mode activated');
+                  }, 500); // 500ms long-press
+                }}
+                onPressOut={() => {
+                  // Cancel long-press if released before timeout
+                  if (freehandLongPressRef.current) {
+                    clearTimeout(freehandLongPressRef.current);
+                    freehandLongPressRef.current = null;
+                  }
+                }}
                 style={{
                   flex: 1,
                   paddingVertical: 5,
                   borderRadius: 7.5,
-                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  backgroundColor: mode === 'distance' || mode === 'freehand' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Custom distance icon: two points with line */}
-                  <Svg width={18} height={18} viewBox="0 0 16 16">
-                    <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
-                    <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
-                    <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
-                  </Svg>
+                  {/* Show freehand icon if in freehand mode, otherwise distance icon */}
+                  {mode === 'freehand' ? (
+                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                      {/* Freehand/squiggle icon */}
+                      <Path 
+                        d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
+                        stroke="#10B981" 
+                        strokeWidth="2" 
+                        fill="none" 
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  ) : (
+                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                      <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
+                      <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
+                      <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} />
+                    </Svg>
+                  )}
                   <Text style={{
                     marginLeft: 4,
                     textAlign: 'center',
                     fontWeight: '600',
                     fontSize: 12,
-                    color: mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                    color: mode === 'freehand' ? '#10B981' : mode === 'distance' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
-                    Distance
+                    {mode === 'freehand' ? 'Freehand' : 'Distance'}
                   </Text>
                 </View>
               </Pressable>

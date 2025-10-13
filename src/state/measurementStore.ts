@@ -69,7 +69,7 @@ interface MeasurementStore {
   addTempPoint: (point: Point) => void;
   clearTempPoints: () => void;
   completeMeasurement: () => void;
-  setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle') => void;
+  setMeasurementMode: (mode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand') => void;
   deleteMeasurement: (id: string) => void;
   clearAll: () => void;
   setCalibration: (calibration: MeasurementStore['calibration']) => void;
