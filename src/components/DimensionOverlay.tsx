@@ -1708,8 +1708,36 @@ export default function DimensionOverlay({
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   return;
                 }
+              } else if (measurement && measurement.mode === 'rectangle' && measurement.points.length === 4) {
+                // Special case for rectangles: check if tap is near a corner or away from corners
+                const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
+                const CORNER_THRESHOLD = 40; // pixels - if tap is within this distance of corner, resize that corner
+                
+                // Check distance to each corner
+                let nearCorner = false;
+                for (let i = 0; i < corners.length; i++) {
+                  const dist = Math.sqrt(
+                    Math.pow(pageX - corners[i].x, 2) + Math.pow(pageY - corners[i].y, 2)
+                  );
+                  if (dist < CORNER_THRESHOLD && point.pointIndex === i) {
+                    nearCorner = true;
+                    break;
+                  }
+                }
+                
+                // If tap is near a corner, allow corner resizing
+                if (nearCorner) {
+                  setResizingPoint(point);
+                  setDidDrag(false);
+                  setIsSnapped(false);
+                  dragStartPos.value = { x: pageX, y: pageY };
+                  dragCurrentPos.value = { x: pageX, y: pageY };
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  return;
+                }
+                // Otherwise, fall through to treat as rectangle drag
               } else {
-                // Not a circle center - normal point resize behavior
+                // Not a circle center or rectangle - normal point resize behavior
                 setResizingPoint(point);
                 setDidDrag(false);
                 setIsSnapped(false); // Reset snap state when starting to resize
