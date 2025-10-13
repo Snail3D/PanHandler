@@ -1794,6 +1794,10 @@ export default function DimensionOverlay({
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
               }
+              
+              // IMPORTANT: Return early for freehand mode to prevent placing a stray point
+              // The freehand logic above completely handles the touch lifecycle
+              return;
             }
             
             // Evaporation effect - organic fade with slight expansion and dissipation
