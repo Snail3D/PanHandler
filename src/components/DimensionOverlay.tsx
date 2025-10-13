@@ -1561,26 +1561,33 @@ export default function DimensionOverlay({
       }
     });
   
-  // Swipe gesture for cycling through measurement modes
+  // Swipe gesture for cycling through measurement modes - FLUID VERSION
   const modeSwitchGesture = Gesture.Pan()
     .onEnd((event) => {
-      // Only respond to primarily horizontal swipes
-      if (Math.abs(event.translationX) > Math.abs(event.translationY) * 1.5) {
-        const threshold = 50; // Minimum swipe distance
-        const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
-        const currentIndex = modes.indexOf(mode);
-        
-        if (event.translationX < -threshold && event.velocityX < -200) {
-          // Swipe left - next mode
+      // Very relaxed thresholds for fluid swiping
+      const threshold = 20; // Much lower - just 20px swipe
+      const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
+      const currentIndex = modes.indexOf(mode);
+      
+      // Detect primarily horizontal swipes (but not too strict)
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
+      
+      if (isHorizontal && Math.abs(event.translationX) > threshold) {
+        if (event.translationX < 0) {
+          // Swipe left - next mode (no velocity check needed)
           const nextIndex = (currentIndex + 1) % modes.length;
           runOnJS(setMode)(modes[nextIndex]);
           runOnJS(setModeColorIndex)(nextIndex);
+          runOnJS(setCurrentPoints)([]); // Clear points when switching
+          runOnJS(setMeasurementMode)(true); // Auto-enable measurement mode
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-        } else if (event.translationX > threshold && event.velocityX > 200) {
-          // Swipe right - previous mode
+        } else {
+          // Swipe right - previous mode (no velocity check needed)
           const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           runOnJS(setMode)(modes[prevIndex]);
           runOnJS(setModeColorIndex)(prevIndex);
+          runOnJS(setCurrentPoints)([]); // Clear points when switching
+          runOnJS(setMeasurementMode)(true); // Auto-enable measurement mode
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
       }
