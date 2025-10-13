@@ -3155,8 +3155,8 @@ export default function DimensionOverlay({
             );
           })()}
           
-          {/* Label and scale info - upper-left corner (always visible when capturing) */}
-          {currentLabel && (
+          {/* Label and coin info - upper-left corner (always visible when capturing) */}
+          {(currentLabel || isCapturing) && (
             <View
               style={{
                 position: 'absolute',
@@ -3165,6 +3165,7 @@ export default function DimensionOverlay({
               }}
               pointerEvents="none"
             >
+              {/* Title */}
               <View
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -3175,35 +3176,35 @@ export default function DimensionOverlay({
                 }}
               >
                 <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
-                  {currentLabel}
+                  {currentLabel || 'PanHandler Measurements'}
                 </Text>
               </View>
               
-              {calibration && (
+              {/* Coin reference info */}
+              {calibration && coinCircle && (
                 <View
                   style={{
                     backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderRadius: 5,
-                    marginBottom: 4,
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
+                    {coinCircle.coinName}
                   </Text>
-                  {coinCircle && (
-                    <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                      Ref: {coinCircle.coinName}
-                    </Text>
-                  )}
+                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                    {unitSystem === 'imperial' 
+                      ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+                      : `${coinCircle.coinDiameter.toFixed(2)}mm`}
+                  </Text>
                 </View>
               )}
             </View>
           )}
 
-          {/* Measurement legend in upper-left corner - only show if there are measurements */}
-          {measurements.length > 0 && (
+          {/* Measurement legend in upper-left corner - only show if there are measurements and capturing */}
+          {measurements.length > 0 && isCapturing && (
             <View
               style={{
                 position: 'absolute',
