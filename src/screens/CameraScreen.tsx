@@ -421,7 +421,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           }}
         />
 
-        {/* Center crosshairs with bubble level */}
+        {/* Center crosshairs with bubble level - ALWAYS VISIBLE */}
         <View
           style={{
             position: 'absolute',
@@ -432,7 +432,8 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             justifyContent: 'center',
             alignItems: 'center',
             pointerEvents: 'none',
-            zIndex: 30,
+            zIndex: 9999, // Maximum z-index to ensure visibility
+            backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent background to see the container
           }}
         >
           {/* Outer circle track for bubble */}
@@ -442,8 +443,9 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
               width: 140,
               height: 140,
               borderRadius: 70,
-              borderWidth: 2,
-              borderColor: 'rgba(255, 255, 255, 0.5)',
+              borderWidth: 3,
+              borderColor: 'rgba(255, 255, 255, 0.9)',
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
             }}
           />
           
@@ -454,52 +456,53 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
               width: 50,
               height: 50,
               borderRadius: 25,
-              borderWidth: 2,
-              borderColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+              borderWidth: 3,
+              borderColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 1)' : 'rgba(255, 255, 255, 0.9)',
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
             }}
           />
           
           {/* Crosshair lines - Horizontal */}
-          <View style={{ position: 'absolute', left: 30, top: 99, width: 40, height: 2, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
-          <View style={{ position: 'absolute', right: 30, top: 99, width: 40, height: 2, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          <View style={{ position: 'absolute', left: 25, top: 99, width: 45, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+          <View style={{ position: 'absolute', right: 25, top: 99, width: 45, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
           
           {/* Crosshair lines - Vertical */}
-          <View style={{ position: 'absolute', left: 99, top: 30, width: 2, height: 40, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
-          <View style={{ position: 'absolute', left: 99, bottom: 30, width: 2, height: 40, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          <View style={{ position: 'absolute', left: 99, top: 25, width: 3, height: 45, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+          <View style={{ position: 'absolute', left: 99, bottom: 25, width: 3, height: 45, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
           
           {/* Center dot when level */}
           {alignmentStatus === 'good' && (
             <View
               style={{
                 position: 'absolute',
-                width: 8,
-                height: 8,
-                borderRadius: 4,
+                width: 10,
+                height: 10,
+                borderRadius: 5,
                 backgroundColor: 'rgba(0, 255, 0, 1)',
               }}
             />
           )}
           
-          {/* Animated bubble */}
+          {/* Animated bubble - BRIGHT AND OBVIOUS */}
           <Animated.View
             style={[
               {
                 position: 'absolute',
-                width: 40,
-                height: 40,
-                borderRadius: 20,
+                width: 50,
+                height: 50,
+                borderRadius: 25,
                 backgroundColor: alignmentStatus === 'good' 
-                  ? 'rgba(0, 255, 0, 0.95)' 
+                  ? '#00FF00' 
                   : alignmentStatus === 'warning'
-                  ? 'rgba(255, 255, 0, 0.95)'
-                  : 'rgba(255, 0, 0, 0.95)',
-                borderWidth: 3,
+                  ? '#FFFF00'
+                  : '#FF0000',
+                borderWidth: 4,
                 borderColor: 'white',
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.8,
-                shadowRadius: 8,
-                elevation: 10,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 1,
+                shadowRadius: 10,
+                elevation: 20,
               },
               useAnimatedStyle(() => ({
                 transform: [
@@ -513,12 +516,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             <View
               style={{
                 position: 'absolute',
-                top: 4,
-                left: 8,
-                width: 14,
-                height: 14,
-                borderRadius: 7,
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                top: 6,
+                left: 10,
+                width: 18,
+                height: 18,
+                borderRadius: 9,
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
               }}
             />
           </Animated.View>
@@ -527,15 +530,17 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           <View
             style={{
               position: 'absolute',
-              top: -40,
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 4,
+              top: -50,
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: 'white',
             }}
           >
-            <Text style={{ color: 'white', fontSize: 10, fontFamily: 'monospace' }}>
-              Bubble Level Active
+            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+              🫧 BUBBLE LEVEL ACTIVE
             </Text>
           </View>
         </View>
