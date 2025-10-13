@@ -1039,10 +1039,13 @@ export default function DimensionOverlay({
       if (now - lastShakeTime < SHAKE_COOLDOWN) return; // Cooldown to prevent rapid toggles
 
       const { x, y, z } = data.acceleration;
-      const totalAcceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
+      
+      // Detect HORIZONTAL shake only (x and z axes, not y)
+      // This prevents karate chop (vertical Y motion) from triggering shake
+      const horizontalAcceleration = Math.abs(x) + Math.abs(z);
 
-      // Detect shake - need significant acceleration
-      if (totalAcceleration > SHAKE_THRESHOLD) {
+      // Detect shake - need significant HORIZONTAL acceleration
+      if (horizontalAcceleration > SHAKE_THRESHOLD) {
         lastShakeTime = now;
         
         // Toggle menu using menuHidden (same as swipe/tab controls)
