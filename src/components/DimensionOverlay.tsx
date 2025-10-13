@@ -417,8 +417,11 @@ export default function DimensionOverlay({
 
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    // Only snap when placing second point in distance mode
-    if (mode !== 'distance' || currentPoints.length !== 1) {
+    // Snap when placing second point in distance mode OR second point in angle mode (before vertex)
+    const shouldSnap = (mode === 'distance' && currentPoints.length === 1) || 
+                       (mode === 'angle' && currentPoints.length === 1);
+    
+    if (!shouldSnap) {
       return { x: cursorX, y: cursorY, snapped: false };
     }
     
@@ -435,11 +438,11 @@ export default function DimensionOverlay({
     // Calculate angle from first point
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
     
-    // Snap thresholds: different for entering vs exiting snap zone
+    // Snap thresholds: very subtle!
     // Smaller entry threshold = harder to enter snap
-    // Larger exit threshold = easier to break free
-    const snapEntryThreshold = 4;  // Only snap if within 4° (was 8°)
-    const snapExitThreshold = 12;  // Stay snapped until 12° away (easier to break free)
+    // Slightly larger exit threshold = easier to break free
+    const snapEntryThreshold = 3;  // Only snap if within 3° 
+    const snapExitThreshold = 4;   // Stay snapped until 4° away (very subtle)
     
     // Use different threshold based on whether we're already snapped
     const threshold = isSnapped ? snapExitThreshold : snapEntryThreshold;
