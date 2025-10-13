@@ -1202,7 +1202,35 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="star" size={24} color="#FFCC00" />
+                    <View style={{ position: 'relative' }}>
+                      {/* Black outline star (behind) */}
+                      <Ionicons name="star" size={24} color="#000000" style={{ 
+                        position: 'absolute',
+                        textShadowColor: '#000000',
+                        textShadowOffset: { width: 1, height: 0 },
+                        textShadowRadius: 1,
+                      }} />
+                      <Ionicons name="star" size={24} color="#000000" style={{ 
+                        position: 'absolute',
+                        textShadowColor: '#000000',
+                        textShadowOffset: { width: -1, height: 0 },
+                        textShadowRadius: 1,
+                      }} />
+                      <Ionicons name="star" size={24} color="#000000" style={{ 
+                        position: 'absolute',
+                        textShadowColor: '#000000',
+                        textShadowOffset: { width: 0, height: 1 },
+                        textShadowRadius: 1,
+                      }} />
+                      <Ionicons name="star" size={24} color="#000000" style={{ 
+                        position: 'absolute',
+                        textShadowColor: '#000000',
+                        textShadowOffset: { width: 0, height: -1 },
+                        textShadowRadius: 1,
+                      }} />
+                      {/* Yellow star on top */}
+                      <Ionicons name="star" size={24} color="#FFCC00" />
+                    </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
                       🎯 Amazing Accuracy
                     </Text>
