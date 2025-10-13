@@ -1338,47 +1338,53 @@ export default function DimensionOverlay({
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
-      let measurementText = 'PanHandler Measurements\n';
-      measurementText += '======================\n\n';
+      let measurementText = 'PanHandler Measurement Report\n';
+      measurementText += '================================\n\n';
       
       // Add label if provided
       if (label) {
         measurementText += `Item: ${label}\n\n`;
       }
       
-      // Add coin reference information at the top - simplified
+      // Add calibration and unit info
       if (coinCircle) {
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `Calibration Reference: ${coinDiameterDisplay} (the coin you selected)\n\n`;
+        measurementText += `Calibration Reference: ${coinDiameterDisplay} (the coin you selected)\n`;
       }
       
       measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
+      
+      // List measurements with their order numbers
       measurementText += 'Measurements:\n';
       measurementText += '-------------\n';
       
       measurements.forEach((m, idx) => {
-        const color = getMeasurementColor(idx, m.mode);
-        measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
+        measurementText += `${idx + 1}. ${m.value}\n`;
       });
       
-      // Add simple calibration information footer
+      // Add attachment info
+      measurementText += `\n\nAttached: 2 photos\n`;
+      measurementText += `  • Full measurements photo\n`;
+      measurementText += `  • Transparent CAD canvas (50% opacity)\n`;
+      
+      // Add simple CAD import instructions
       if (calibration && coinCircle) {
         measurementText += `\n\n═══ CAD Import Info ═══\n`;
-        measurementText += `The transparent photos can be imported as canvas backgrounds.\n`;
-        measurementText += `Calibrate using the reference coin:\n`;
+        measurementText += `Import the transparent photo as a canvas background.\n`;
+        measurementText += `Use the alignment brackets to position it.\n`;
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `  The coin you selected = ${coinDiameterDisplay} diameter\n`;
+        measurementText += `Scale by measuring the coin: ${coinDiameterDisplay} diameter\n`;
       }
       
       // Add footer (only for non-Pro users)
       if (!isProUser) {
-        measurementText += '\n\n\n';
+        measurementText += '\n\n';
         measurementText += '═══════════════════════════\n';
-        measurementText += '   Made with the PanHandler App on iOS\n';
+        measurementText += 'Made with PanHandler for iOS\n';
         measurementText += '═══════════════════════════';
       }
 
