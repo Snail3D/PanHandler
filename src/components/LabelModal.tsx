@@ -1,8 +1,294 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+
+// Small, inventive maker items for placeholder examples
+// Mix of real maker projects and absurdly funny ones
+const makerExamples = [
+  // Real Maker Stuff
+  "3D Printer Nozzle",
+  "Arduino Enclosure",
+  "Laser-cut Bracket",
+  "PCB Spacer",
+  "Servo Mount",
+  "LED Diffuser",
+  "Raspberry Pi Case",
+  "Cable Organizer",
+  "Phone Stand",
+  "Desk Organizer",
+  "Spool Holder",
+  "Filament Guide",
+  "Tool Holder",
+  "Wrench Organizer",
+  "Drill Bit Case",
+  "Soldering Station",
+  "Wire Stripper",
+  "Heat Sink Mount",
+  "Fan Bracket",
+  "GPIO Header",
+  "Breadboard Holder",
+  "Multimeter Stand",
+  "Oscilloscope Probe",
+  "USB Hub Mount",
+  "SD Card Holder",
+  "Battery Tray",
+  "Motor Controller",
+  "Stepper Driver",
+  "Limit Switch",
+  "E-Stop Button",
+  "Encoder Mount",
+  "Belt Tensioner",
+  "Linear Rail",
+  "Ball Bearing",
+  "Lead Screw Nut",
+  "Coupler Joint",
+  "Flex Cable",
+  "Ribbon Connector",
+  "Optical Sensor",
+  "Proximity Switch",
+  "Relay Module",
+  "Voltage Regulator",
+  "Buck Converter",
+  "Boost Module",
+  "Power Supply",
+  "Transformer Core",
+  "Inductor Coil",
+  "Capacitor Bank",
+  "Resistor Array",
+  "Potentiometer Knob",
+  
+  // Funny/Absurd Maker Items
+  "Left-Handed Screwdriver",
+  "Bacon Stretcher",
+  "Wifi Signal Booster (tinfoil hat)",
+  "Anti-Gravity Boots",
+  "Sarcasm Detector",
+  "Procrastination Timer",
+  "Invisible Ink Pen",
+  "Self-Stirring Coffee Mug",
+  "Diet Water Bottle",
+  "Rubber Crutch",
+  "Glass Hammer",
+  "Chocolate Teapot",
+  "Screen Door (for submarine)",
+  "Ejector Seat (for helicopter)",
+  "Waterproof Tea Bag",
+  "Fireproof Match",
+  "Solar-Powered Flashlight",
+  "Inflatable Dartboard",
+  "Parachute (that opens on impact)",
+  "Silent Alarm Clock",
+  "Mesh Umbrella",
+  "Wooden Frying Pan",
+  "Battery-Powered Battery",
+  "Helium-Filled Anchor",
+  "Braille Speedometer",
+  "Glow-in-the-Dark Sunglasses",
+  "Watermelon Slicer (for soup)",
+  "Non-Stick Glue",
+  "Dehydrated Water",
+  "Pre-Sharpened Pencil Shavings",
+  "Training Wheels (for unicycle)",
+  "Kickstand (for shopping cart)",
+  "Turn Signals (for wheelchair)",
+  "Rearview Mirror (for stroller)",
+  "Ejection Seat (for motorcycle)",
+  "Windshield Wipers (for glasses)",
+  "Anti-Theft Device (for trash can)",
+  "Temperature Gauge (for ice cube)",
+  "Volume Knob (for library)",
+  "Mute Button (for awkward silence)",
+  "Turbo Button (for snail)",
+  "Cruise Control (for treadmill)",
+  "Parking Brake (for office chair)",
+  "Fog Lights (for shower)",
+  "High Beams (for bedside lamp)",
+  "Hazard Lights (for toaster)",
+  
+  // Hilariously Specific Maker Projects
+  "Cat Video Thumbnail Generator",
+  "Regex Anger Management Tool",
+  "Meeting Escape Hatch",
+  "Email Delay Procrastinator",
+  "Code Comment Excuse Generator",
+  "Bug Report Translator",
+  "Infinite Loop Detector",
+  "Stack Overflow Search Optimizer",
+  "Coffee-to-Code Converter",
+  "Keyboard Smash Preventer",
+  "Tab vs Space Arbitrator",
+  "Git Commit Message Creator",
+  "Semicolon Location Device",
+  "Null Pointer Exception Shield",
+  "Memory Leak Finder",
+  "Rubber Duck Holder",
+  "Second Monitor Arm",
+  "Standing Desk Adapter",
+  "Cable Management Nightmare",
+  "USB-C Dongle Collection",
+  "Mechanical Keyboard Switch",
+  "Keycap Puller Tool",
+  "Mousepad Edge Protector",
+  "Monitor Stand Riser",
+  "Headphone Hanger Hook",
+  "Webcam Privacy Slider",
+  "Laptop Cooling Pad",
+  "Phone Charging Dock",
+  "Tablet Stylus Holder",
+  "Smart Home Hub",
+  "IoT Doorbell Mount",
+  "Security Camera Bracket",
+  "Light Switch Cover",
+  "Outlet Extender Box",
+  "Cord Concealer Channel",
+  
+  // More Absurd Items
+  "Edible Napkin",
+  "Sandwich Bag (made of bread)",
+  "Liquid Scissors",
+  "Transparent Eraser",
+  "Square Basketball",
+  "Stripey Paint",
+  "Left-Handed Smoke Shifter",
+  "Bucket of Steam",
+  "Long Weight",
+  "Tartan Paint",
+  "Elbow Grease Jar",
+  "Sky Hook",
+  "Muffler Bearing",
+  "Headlight Fluid",
+  "Turn Signal Fluid",
+  "Exhaust Sample",
+  "Piston Return Spring",
+  "Spark Plug Gap Inspector",
+  "Flux Capacitor",
+  "Quantum Carburetor",
+  "Retroencabulator",
+  "Turboencabulator",
+  "Prefabulated Amulite",
+  "Spurving Bearing",
+  "Dingle Arm",
+  "Magneto Reluctance",
+  "Cardinal Grammeters",
+  "Panametric Fan",
+  "Drawn Reciprocation Dingle Arm",
+  "Modial Interaction",
+  "Hydrocoptic Marzelvanes",
+  
+  // Actually Useful But Funny Names
+  "Widget Thingy",
+  "Doohickey Adapter",
+  "Thingamabob Mount",
+  "Whatchamacallit Holder",
+  "Gizmo Container",
+  "Contraption Part",
+  "Mechanism Piece",
+  "Apparatus Component",
+  "Device Element",
+  "Gadget Segment",
+  
+  // Maker In-Jokes
+  "Calibration Cube #47",
+  "Benchy the Boat",
+  "Test Print Graveyard Item",
+  "Failed First Layer",
+  "Spaghetti Detector",
+  "Bed Adhesion Tester",
+  "Z-Wobble Compensator",
+  "Bridging Test Piece",
+  "Overhang Challenge",
+  "Support Material Nightmare",
+  "Stringing Test Tower",
+  "Temperature Tower Section",
+  "Retraction Test Sample",
+  "Flow Rate Calibrator",
+  "Elephant Foot Fixer",
+  "Layer Shift Preventer",
+  "Warping Solution",
+  "Ghosting Reducer",
+  "Ringing Damper",
+  "Infill Pattern Viewer",
+  
+  // Random Household Absurdities
+  "Soup Can Lid",
+  "Dirty Gym Socks",
+  "Coffee Mug Chip",
+  "Remote Control Battery Cover",
+  "Mismatched Tupperware Lid",
+  "Single Earring",
+  "Incomplete Jigsaw Puzzle Piece",
+  "Broken Shoelace Aglet",
+  "Dried Out Marker Cap",
+  "Forgotten USB Cable",
+  "Mystery Key",
+  "Rattling Dashboard Thing",
+  "Unidentified Screw",
+  "Spare Button",
+  "Lint Ball",
+  "Crumb Tray",
+  "Dust Bunny",
+  "Pet Hair Clump",
+  "Lost LEGO Piece",
+  "Stubborn Sticker Residue",
+  "Potato Chip Bag Clip",
+  "Twist Tie Collection",
+  "Rubber Band Ball",
+  "Paper Clip Chain",
+  "Staple Remover",
+  "Thumbtack Point",
+  "Pushpin Head",
+  "Binder Clip Spring",
+  "Highlighter Cap",
+  "Pen Spring",
+  "Mechanical Pencil Lead",
+  "Eraser Shavings",
+  "Pencil Sharpener Blade",
+  "Crayon Wrapper",
+  "Marker Stain",
+  "Glue Stick Residue",
+  "Tape Dispenser Blade",
+  "Scissors Rivet",
+  "Ruler Edge",
+  "Protractor Degree Mark",
+  "Compass Point",
+  "Calculator Button",
+  "Stapler Spring",
+  "Hole Punch Circles",
+  
+  // More Tech Humor
+  "404 Error Page",
+  "Blue Screen Snapshot",
+  "Spinning Beach Ball",
+  "Hourglass Cursor",
+  "Loading Bar Animation",
+  "Progress Indicator",
+  "Buffer Overflow",
+  "Segmentation Fault",
+  "Core Dump File",
+  "Kernel Panic Screenshot",
+  "Permission Denied Message",
+  "Access Violation Report",
+  "Timeout Exception",
+  "Connection Refused Notice",
+  "Certificate Expired Warning",
+  "Low Battery Icon",
+  "No Signal Bars",
+  "Wifi Symbol (but sad)",
+  "Bluetooth (but lonely)",
+  "USB Not Recognized",
+  "Driver Update Nag",
+  "Windows Update Delay",
+  "MacOS Spinning Wheel",
+  "Android Boot Loop",
+  "iOS Loading Circle",
+];
+
+const getRandomExample = () => {
+  const idx = Math.floor(Math.random() * makerExamples.length);
+  return makerExamples[idx];
+};
 
 interface LabelModalProps {
   visible: boolean;
@@ -12,6 +298,16 @@ interface LabelModalProps {
 
 export default function LabelModal({ visible, onComplete, onDismiss }: LabelModalProps) {
   const [label, setLabel] = useState('');
+  const [placeholder, setPlaceholder] = useState('');
+
+  // Generate a new random example whenever modal becomes visible
+  useEffect(() => {
+    if (visible) {
+      const example1 = getRandomExample();
+      const example2 = getRandomExample();
+      setPlaceholder(`e.g., ${example1}, ${example2}...`);
+    }
+  }, [visible]);
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -144,7 +440,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                       <TextInput
                         value={label}
                         onChangeText={setLabel}
-                        placeholder="e.g., Kitchen Table, Door Frame..."
+                        placeholder={placeholder || "e.g., Arduino Case, LED Mount..."}
                         placeholderTextColor="#8E8E93"
                         style={{
                           flex: 1,
@@ -180,20 +476,21 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                   paddingHorizontal: 20,
                   paddingBottom: 16,
                   paddingTop: 4,
+                  alignItems: 'center',
                 }}>
-                  <View style={{ flexDirection: 'row', gap: 10 }}>
-                    {/* Continue Button - Now on LEFT */}
+                  <View style={{ flexDirection: 'row', gap: 16, width: '100%', maxWidth: 320 }}>
+                    {/* Continue Button - DARKER BLUE */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? '#0066CC' : '#007AFF',
+                        backgroundColor: pressed ? '#005299' : '#0066CC',
                         borderRadius: 12,
                         paddingVertical: 12,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        shadowColor: '#007AFF',
+                        shadowColor: '#0066CC',
                         shadowOffset: { width: 0, height: 0 },
                         shadowOpacity: pressed ? 0.6 : 0.4,
                         shadowRadius: pressed ? 12 : 8,
@@ -211,23 +508,23 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                       </Text>
                     </Pressable>
 
-                    {/* Skip Button - Now on RIGHT */}
+                    {/* Skip Button - LIGHTER GRAY */}
                     <Pressable
                       onPress={handleSkip}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.14)' : 'rgba(120,120,128,0.08)',
                         borderRadius: 12,
                         paddingVertical: 12,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderWidth: 1.5,
-                        borderColor: 'rgba(120,120,128,0.2)',
+                        borderColor: 'rgba(120,120,128,0.18)',
                       })}
                     >
                       <Text style={{ 
-                        color: '#3C3C43', 
+                        color: '#6E6E73', 
                         fontWeight: '600', 
                         fontSize: 15, 
                       }}>
