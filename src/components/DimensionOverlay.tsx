@@ -1615,9 +1615,10 @@ export default function DimensionOverlay({
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
                 // If already drawing, add points to path
+                // IMPORTANT: Use cursor position (rawCursorX, rawCursorY), not finger position (pageX, pageY)
                 if (isDrawingFreehand) {
-                  const imageX = (pageX - zoomTranslateX) / zoomScale;
-                  const imageY = (pageY - zoomTranslateY) / zoomScale;
+                  const imageX = (rawCursorX - zoomTranslateX) / zoomScale;
+                  const imageY = (rawCursorY - zoomTranslateY) / zoomScale;
                   
                   // Only add point if it's far enough from the last point (smooth path)
                   // Use functional update to ensure we have the latest state
@@ -1743,8 +1744,8 @@ export default function DimensionOverlay({
                 console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
-              } else if (isDrawingFreehand && freehandPath.length >= 2) {
-                // If they were drawing, complete the measurement
+              } else if (isDrawingFreehand && freehandPath.length >= 5) {
+                // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
                 console.log('🎨 Freehand path points captured:', freehandPath.length);
                 
                 // Calculate total path length
@@ -1770,6 +1771,8 @@ export default function DimensionOverlay({
                   mode: 'freehand',
                 };
                 
+                console.log('🎨 Creating freehand measurement with mode:', newMeasurement.mode, 'points:', newMeasurement.points.length);
+                
                 // Add to measurements list
                 setMeasurements([...measurements, newMeasurement]);
                 
@@ -1784,7 +1787,7 @@ export default function DimensionOverlay({
                 console.log('🎨 Freehand measurement completed:', formattedValue, 'with', freehandPath.length, 'points');
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
-                console.log('⚠️ Path too short, discarding');
+                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
