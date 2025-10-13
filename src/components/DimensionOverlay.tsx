@@ -1061,23 +1061,41 @@ export default function DimensionOverlay({
       const pixelRatio = PixelRatio.get();
       const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4);
       
-      console.log('📐 CANVAS SCALE - SOLVED!');
-      console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1/pixelsPerUnit) × √pixelRatio × zoom × (imageRatio/4)');
+      console.log('📐 CANVAS SCALE - TESTING FORMULAS');
+      console.log('  Current (/4):', fusionScale.toFixed(6), 'mm/px');
+      console.log('  Alt formulas also included in email for testing');
       
-      measurementText += `\n\n=== DEBUG INFO ===\n`;
-      measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
-      measurementText += `Actual Image Size: ${actualImageWidth} × ${actualImageHeight}\n`;
-      measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(2)}x\n`;
-      measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(2)}x\n`;
-      measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/mm (in screen space)\n`;
-      measurementText += `Device Pixel Ratio: ${pixelRatio}x\n`;
-      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px\n`;
-      measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
+      // Calculate alternative formulas for testing
+      const alt1 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4.36);
+      const alt2 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 5);
+      const alt3 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 3.5);
+      const alt4 = baseScale * pixelRatio * calibrationZoom;
+      const alt5 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * Math.sqrt(imageToScreenRatio);
+      const alt6 = baseScale * pixelRatio * calibrationZoom * (imageToScreenRatio / (pixelRatio * 4));
+      
+      measurementText += `\n\n=== DEBUG DATA (copy for analysis) ===\n`;
+      measurementText += `PPU=${calibration.pixelsPerUnit.toFixed(3)} `;
+      measurementText += `zoom=${calibrationZoom.toFixed(3)} `;
+      measurementText += `pixRatio=${pixelRatio} `;
+      measurementText += `imgRatio=${imageToScreenRatio.toFixed(3)} `;
+      measurementText += `screen=${SCREEN_WIDTH}x${SCREEN_HEIGHT} `;
+      measurementText += `image=${actualImageWidth}x${actualImageHeight}\n`;
+      measurementText += `\n--- FORMULA TESTS (try each in Fusion) ---\n`;
+      measurementText += `Current (/4):    ${fusionScale.toFixed(6)} mm/px\n`;
+      measurementText += `Test A  (/4.36): ${alt1.toFixed(6)} mm/px\n`;
+      measurementText += `Test B  (/5):    ${alt2.toFixed(6)} mm/px\n`;
+      measurementText += `Test C  (/3.5):  ${alt3.toFixed(6)} mm/px\n`;
+      measurementText += `Test D  (no √):  ${alt4.toFixed(6)} mm/px\n`;
+      measurementText += `Test E  (√img):  ${alt5.toFixed(6)} mm/px\n`;
+      measurementText += `Test F  (norm):  ${alt6.toFixed(6)} mm/px\n`;
+      measurementText += `\nTEST INSTRUCTIONS:\n`;
+      measurementText += `1. Import CAD canvas to Fusion 360\n`;
+      measurementText += `2. Try each Canvas Scale value above\n`;
+      measurementText += `3. Measure the blue line in Fusion\n`;
+      measurementText += `4. Report which formula gave: ${measurements[0]?.value || 'N/A'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
-        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × √${pixelRatio} × ${calibrationZoom.toFixed(2)} × ${(imageToScreenRatio/4).toFixed(3)} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)`;
       }
       
       // Add footer (only for non-Pro users)
@@ -1137,8 +1155,7 @@ export default function DimensionOverlay({
           
           // Add to email text so user can see it
           if (exportedWidth > 0) {
-            measurementText += `\n🎯 EXPORTED CAD CANVAS: ${exportedWidth} × ${exportedHeight} pixels\n`;
-            measurementText += `Ratio to screen: ${(exportedWidth / SCREEN_WIDTH).toFixed(2)}x\n`;
+            measurementText += `exported_canvas=${exportedWidth}x${exportedHeight} (ratio=${(exportedWidth / SCREEN_WIDTH).toFixed(2)}x)\n`;
           }
           
           const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
