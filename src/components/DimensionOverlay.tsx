@@ -12,6 +12,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
 import * as FileSystem from 'expo-file-system';
+import { DeviceMotion } from 'expo-sensors';
 import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
 import { formatMeasurement } from '../utils/unitConversion';
@@ -955,6 +956,40 @@ export default function DimensionOverlay({
       triggerTetrisAnimation();
     }
   }, [measurements.length, hasTriggeredTetris]);
+
+  // Shake detection to toggle menu visibility
+  useEffect(() => {
+    DeviceMotion.setUpdateInterval(100);
+    let lastShakeTime = 0;
+    const SHAKE_THRESHOLD = 3; // 3g acceleration
+    const SHAKE_COOLDOWN = 1000; // 1 second cooldown between shakes
+
+    const subscription = DeviceMotion.addListener((data) => {
+      if (!data.acceleration) return;
+
+      const now = Date.now();
+      if (now - lastShakeTime < SHAKE_COOLDOWN) return; // Cooldown to prevent rapid toggles
+
+      const { x, y, z } = data.acceleration;
+      const totalAcceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
+
+      // Detect shake
+      if (totalAcceleration > SHAKE_THRESHOLD) {
+        lastShakeTime = now;
+        
+        // Toggle menu
+        setMenuMinimized(prev => {
+          const newState = !prev;
+          Haptics.impactAsync(
+            newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light
+          );
+          return newState;
+        });
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   // Recalculate all measurement values when unit system changes
   useEffect(() => {
