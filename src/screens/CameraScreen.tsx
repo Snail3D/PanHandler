@@ -241,6 +241,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           mass: 0.5,
         });
         
+        // Debug: Log bubble position occasionally
+        if (Math.random() < 0.05) { // Log ~5% of updates
+          console.log('🫧 Bubble position:', finalX.toFixed(1), finalY.toFixed(1), '| Tilt:', absTilt.toFixed(1), '°');
+        }
+        
         // Track angles for stability check
         recentAngles.current.push(absTilt);
         if (recentAngles.current.length > 10) {
@@ -428,6 +433,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             justifyContent: 'center',
             alignItems: 'center',
             pointerEvents: 'none',
+            zIndex: 30, // Make sure it's on top
           }}
         >
           <Svg width={200} height={200}>
@@ -501,20 +507,21 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             style={[
               {
                 position: 'absolute',
-                width: 30,
-                height: 30,
-                borderRadius: 15,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
                 backgroundColor: alignmentStatus === 'good' 
-                  ? 'rgba(0, 255, 0, 0.8)' 
+                  ? 'rgba(0, 255, 0, 0.95)' 
                   : alignmentStatus === 'warning'
-                  ? 'rgba(255, 255, 0, 0.8)'
-                  : 'rgba(255, 0, 0, 0.8)',
-                borderWidth: 2,
+                  ? 'rgba(255, 255, 0, 0.95)'
+                  : 'rgba(255, 0, 0, 0.95)',
+                borderWidth: 3,
                 borderColor: 'white',
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 4,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.8,
+                shadowRadius: 8,
+                elevation: 10, // For Android
               },
               useAnimatedStyle(() => ({
                 transform: [
@@ -528,12 +535,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             <View
               style={{
                 position: 'absolute',
-                top: 3,
-                left: 6,
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                top: 4,
+                left: 8,
+                width: 14,
+                height: 14,
+                borderRadius: 7,
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
               }}
             />
           </Animated.View>
