@@ -2592,29 +2592,11 @@ export default function DimensionOverlay({
                 // Convert all points to screen coordinates
                 const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
                 
-                // Generate smooth path using Catmull-Rom spline or simple polyline
+                // Generate simple polyline that exactly follows the drawn path
+                // This prevents morphing issues from Bezier curve interpolation
                 let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
-                
-                // Use quadratic bezier curves for smooth path
                 for (let i = 1; i < screenPoints.length; i++) {
-                  const prev = screenPoints[i - 1];
-                  const curr = screenPoints[i];
-                  
-                  if (i === 1) {
-                    // First segment - use line
-                    pathData += ` L ${curr.x} ${curr.y}`;
-                  } else {
-                    // Smooth curves using quadratic bezier
-                    const midX = (prev.x + curr.x) / 2;
-                    const midY = (prev.y + curr.y) / 2;
-                    pathData += ` Q ${prev.x} ${prev.y}, ${midX} ${midY}`;
-                  }
-                }
-                
-                // Add final point if there are more than 2 points
-                if (screenPoints.length > 2) {
-                  const last = screenPoints[screenPoints.length - 1];
-                  pathData += ` L ${last.x} ${last.y}`;
+                  pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
                 }
                 
                 return (
