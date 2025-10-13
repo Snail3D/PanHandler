@@ -52,9 +52,16 @@ const MEASUREMENT_COLORS = {
     { main: '#4F46E5', glow: '#4F46E5', name: 'Indigo' },    // Royal indigo
     { main: '#0EA5E9', glow: '#0EA5E9', name: 'Blue' },      // Sky blue
   ],
+  freehand: [
+    { main: '#10B981', glow: '#10B981', name: 'Green' },     // Start with green for freehand
+    { main: '#3B82F6', glow: '#3B82F6', name: 'Blue' },      
+    { main: '#F59E0B', glow: '#F59E0B', name: 'Amber' },     
+    { main: '#EC4899', glow: '#EC4899', name: 'Pink' },      
+    { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    
+  ],
 };
 
-type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle';
+type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
 
 interface Measurement {
   id: string;
@@ -145,6 +152,12 @@ export default function DimensionOverlay({
   
   // Rapid tap to delete feature
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
+  
+  // Freehand drawing state
+  const [isDrawingFreehand, setIsDrawingFreehand] = useState(false);
+  const [freehandPath, setFreehandPath] = useState<Array<{ x: number; y: number }>>([]);
+  const [drawingPressure, setDrawingPressure] = useState(0); // 0-1 for red->yellow->green
+  const [showFreehandCursor, setShowFreehandCursor] = useState(false);
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);

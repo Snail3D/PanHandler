@@ -6,13 +6,14 @@ export interface Point {
 
 export interface Measurement {
   id: string;
-  type: 'distance' | 'angle' | 'circle' | 'rectangle';
+  type: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
   points: Point[];
   value?: number;
   label?: string;
   radius?: number; // For circles
   width?: number;  // For rectangles
   height?: number; // For rectangles
+  totalLength?: number; // For freehand paths
 }
 
 export interface MeasurementData {
