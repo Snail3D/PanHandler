@@ -72,6 +72,7 @@ interface DimensionOverlayProps {
   zoomScale?: number;
   zoomTranslateX?: number;
   zoomTranslateY?: number;
+  zoomRotation?: number;
   viewRef?: React.RefObject<View | null>;
 }
 
@@ -79,6 +80,7 @@ export default function DimensionOverlay({
   zoomScale = 1, 
   zoomTranslateX = 0, 
   zoomTranslateY = 0,
+  zoomRotation = 0,
   viewRef: externalViewRef
 }: DimensionOverlayProps = {}) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
@@ -3188,8 +3190,9 @@ export default function DimensionOverlay({
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
               opacity: 0.35,
-              // NO TRANSFORM - export unzoomed image
-              // Canvas Scale formula will account for calibration zoom
+              transform: [
+                { rotate: `${zoomRotation}deg` },
+              ],
             }}
           >
             <Image
@@ -3271,6 +3274,7 @@ export default function DimensionOverlay({
                 { translateX: zoomTranslateX },
                 { translateY: zoomTranslateY },
                 { scale: zoomScale },
+                { rotate: `${zoomRotation}deg` },
               ],
             }}
           >

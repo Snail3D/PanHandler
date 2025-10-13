@@ -485,6 +485,7 @@ export default function MeasurementScreen() {
                   zoomScale={measurementZoom.scale}
                   zoomTranslateX={measurementZoom.translateX}
                   zoomTranslateY={measurementZoom.translateY}
+                  zoomRotation={measurementZoom.rotation}
                   viewRef={measurementViewRef}
                 />
               </View>
