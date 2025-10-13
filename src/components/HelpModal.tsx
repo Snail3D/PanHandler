@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, ScrollView, Pressable, Linking, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { 
@@ -25,7 +26,7 @@ interface HelpModalProps {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedView = Animated.createAnimatedComponent(View);
 
-// Expandable section component
+// Expandable section component with GLOWING VIBRANT AESTHETIC
 const ExpandableSection = ({ 
   title, 
   icon, 
@@ -78,17 +79,20 @@ const ExpandableSection = ({
   return (
     <Animated.View style={[animatedStyle, { marginBottom: 14 }]}>
       <Pressable
-        onPress={() => setExpanded(!expanded)}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setExpanded(!expanded);
+        }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.95)',
-          borderRadius: 18,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.08,
+          backgroundColor: 'rgba(255,255,255,0.85)',
+          borderRadius: 20,
+          shadowColor: color,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.3,
           shadowRadius: 12,
-          elevation: 3,
-          borderWidth: 0.5,
-          borderColor: 'rgba(0,0,0,0.06)',
+          elevation: 6,
+          borderWidth: 2,
+          borderColor: `${color}40`,
         }}
       >
         <View
@@ -96,26 +100,30 @@ const ExpandableSection = ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: 16,
+            padding: 18,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
             <View
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 19,
-                backgroundColor: `${color}15`,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: `${color}20`,
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginRight: 12,
+                marginRight: 14,
+                shadowColor: color,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.5,
+                shadowRadius: 8,
               }}
             >
-              <Ionicons name={icon as any} size={20} color={color} />
+              <Ionicons name={icon as any} size={24} color={color} />
             </View>
             <Text style={{ 
               fontSize: 17, 
-              fontWeight: '600', 
+              fontWeight: '700', 
               color: '#1C1C1E', 
               flex: 1,
               letterSpacing: -0.3,
@@ -124,12 +132,12 @@ const ExpandableSection = ({
             </Text>
           </View>
           <AnimatedView style={chevronAnimatedStyle}>
-            <Ionicons name="chevron-down" size={22} color={color} />
+            <Ionicons name="chevron-down" size={24} color={color} />
           </AnimatedView>
         </View>
         
         <AnimatedView style={contentAnimatedStyle}>
-          <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+          <View style={{ paddingHorizontal: 18, paddingBottom: 18 }}>
             {children}
           </View>
         </AnimatedView>
@@ -174,82 +182,6 @@ const ComparisonRow = ({
   </View>
 );
 
-// Animated feature card component
-const FeatureCard = ({ 
-  icon, 
-  title, 
-  description, 
-  color, 
-  delay = 0,
-  children 
-}: { 
-  icon: string; 
-  title: string; 
-  description?: string; 
-  color: string; 
-  delay?: number;
-  children?: React.ReactNode;
-}) => {
-  const scale = useSharedValue(0.8);
-  const opacity = useSharedValue(0);
-  
-  useEffect(() => {
-    scale.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 150 }));
-    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
-  }, [delay]);
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  return (
-    <Animated.View style={[animatedStyle, { marginBottom: 20 }]}>
-      <View
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 16,
-          padding: 18,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-          borderLeftWidth: 4,
-          borderLeftColor: color,
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: color,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 12,
-            }}
-          >
-            <Ionicons name={icon as any} size={22} color="white" />
-          </View>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1C1C1E', flex: 1 }}>
-            {title}
-          </Text>
-        </View>
-        
-        {description && (
-          <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 8 }}>
-            {description}
-          </Text>
-        )}
-        
-        {children}
-      </View>
-    </Animated.View>
-  );
-};
-
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
@@ -275,30 +207,30 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
       transparent={true}
       onRequestClose={onClose}
     >
-      <BlurView intensity={50} tint="dark" style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }}>
           <View
             style={{
               flex: 1,
               marginTop: insets.top + 20,
               marginHorizontal: 16,
               marginBottom: insets.bottom + 20,
-              borderRadius: 28,
+              borderRadius: 32,
               overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 12 },
-              shadowOpacity: 0.4,
-              shadowRadius: 24,
+              shadowOffset: { width: 0, height: 16 },
+              shadowOpacity: 0.5,
+              shadowRadius: 32,
               elevation: 24,
             }}
           >
             {/* Translucent Header with Blur */}
             <BlurView 
-              intensity={95} 
+              intensity={100} 
               tint="light"
               style={{
-                borderTopLeftRadius: 28,
-                borderTopRightRadius: 28,
+                borderTopLeftRadius: 32,
+                borderTopRightRadius: 32,
                 overflow: 'hidden',
               }}
             >
@@ -310,27 +242,31 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  backgroundColor: 'rgba(255,255,255,0.75)',
-                  borderBottomWidth: 0.5,
+                  backgroundColor: 'rgba(255,255,255,0.85)',
+                  borderBottomWidth: 1,
                   borderBottomColor: 'rgba(0,0,0,0.08)',
                 }}
               >
                 <Animated.View style={[{ flexDirection: 'row', alignItems: 'center' }, headerAnimatedStyle]}>
                   <View style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 21,
-                    backgroundColor: 'rgba(0,122,255,0.12)',
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: 'rgba(0,122,255,0.15)',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginRight: 12,
+                    marginRight: 14,
+                    shadowColor: '#007AFF',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 10,
                   }}>
-                    <Ionicons name="help-circle" size={26} color="#007AFF" />
+                    <Ionicons name="help-circle" size={28} color="#007AFF" />
                   </View>
                   <View>
                     <Text style={{ 
                       color: '#1C1C1E', 
-                      fontSize: 22, 
+                      fontSize: 24, 
                       fontWeight: '700',
                       letterSpacing: -0.5,
                     }}>
@@ -339,7 +275,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <Text style={{ 
                       color: '#8E8E93', 
                       fontSize: 13, 
-                      fontWeight: '500',
+                      fontWeight: '600',
                       marginTop: -2,
                     }}>
                       By CAD pros, for CAD pros
@@ -347,28 +283,32 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </Animated.View>
                 <Pressable
-                  onPress={onClose}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onClose();
+                  }}
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
                     backgroundColor: 'rgba(120,120,128,0.16)',
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                 >
-                  <Ionicons name="close" size={22} color="#3C3C43" />
+                  <Ionicons name="close" size={24} color="#3C3C43" />
                 </Pressable>
               </View>
             </BlurView>
 
-            {/* Content with subtle background */}
-            <View style={{ flex: 1, backgroundColor: '#F5F5F7' }}>
-              <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ padding: 20 }}
-                showsVerticalScrollIndicator={false}
-              >
+            {/* Content with glassmorphism background */}
+            <BlurView intensity={95} tint="light" style={{ flex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(245,245,247,0.75)' }}>
+                <ScrollView
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{ padding: 20 }}
+                  showsVerticalScrollIndicator={false}
+                >
               {/* Camera & Auto Level */}
               <ExpandableSection
                 icon="camera"
@@ -403,16 +343,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <View
                   style={{
                     marginTop: 12,
-                    backgroundColor: 'rgba(76,175,80,0.08)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 1,
-                    borderColor: 'rgba(76,175,80,0.2)',
+                    backgroundColor: 'rgba(52,199,89,0.12)',
+                    borderRadius: 16,
+                    padding: 16,
+                    borderWidth: 2,
+                    borderColor: 'rgba(52,199,89,0.3)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                    <Ionicons name="flash" size={20} color="#34C759" />
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
+                    <Ionicons name="flash" size={22} color="#34C759" />
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
                       AUTO LEVEL Mode
                     </Text>
                   </View>
@@ -420,16 +360,20 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   {/* Visual: Finger holding button */}
                   <View style={{ alignItems: 'center', marginBottom: 12 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <Text style={{ fontSize: 32 }}>👆</Text>
+                      <Text style={{ fontSize: 36 }}>👆</Text>
                       <View style={{
-                        backgroundColor: 'rgba(52,199,89,0.15)',
-                        paddingHorizontal: 16,
-                        paddingVertical: 10,
-                        borderRadius: 24,
-                        borderWidth: 2,
+                        backgroundColor: 'rgba(52,199,89,0.2)',
+                        paddingHorizontal: 18,
+                        paddingVertical: 12,
+                        borderRadius: 26,
+                        borderWidth: 3,
                         borderColor: '#34C759',
+                        shadowColor: '#34C759',
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowOpacity: 0.4,
+                        shadowRadius: 8,
                       }}>
-                        <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32' }}>HOLD SHUTTER</Text>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#2E7D32' }}>HOLD SHUTTER</Text>
                       </View>
                     </View>
                   </View>
@@ -456,7 +400,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                   </View>
                   
-                  <View style={{ marginTop: 8, backgroundColor: 'rgba(76,175,80,0.12)', borderRadius: 8, padding: 10 }}>
+                  <View style={{ marginTop: 8, backgroundColor: 'rgba(52,199,89,0.15)', borderRadius: 10, padding: 10 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic', textAlign: 'center' }}>
                       💡 Green = Auto countdown starts → Photo captures automatically
                     </Text>
@@ -504,17 +448,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Distance */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(175,82,222,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
+                    backgroundColor: 'rgba(175,82,222,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
                     marginBottom: 10,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(175,82,222,0.2)',
+                    borderWidth: 2,
+                    borderColor: 'rgba(175,82,222,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     {/* Custom distance icon matching menu */}
-                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                    <Svg width={20} height={20} viewBox="0 0 16 16">
                       <Line x1="3" y1="8" x2="13" y2="8" stroke="#AF52DE" strokeWidth="1.5" />
                       <Circle cx="3" cy="8" r="2" fill="#AF52DE" />
                       <Circle cx="13" cy="8" r="2" fill="#AF52DE" />
@@ -531,17 +475,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Angle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(255,149,0,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
+                    backgroundColor: 'rgba(255,149,0,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
                     marginBottom: 10,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(255,149,0,0.2)',
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,149,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     {/* Custom angle icon matching menu - 45 degree acute angle */}
-                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                    <Svg width={20} height={20} viewBox="0 0 16 16">
                       <Line x1="3" y1="13" x2="13" y2="3" stroke="#FF9500" strokeWidth="1.5" strokeLinecap="round" />
                       <Line x1="3" y1="13" x2="13" y2="13" stroke="#FF9500" strokeWidth="1.5" strokeLinecap="round" />
                       <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke="#FF9500" strokeWidth="1.3" fill="none" />
@@ -560,16 +504,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Circle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(233,30,99,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
+                    backgroundColor: 'rgba(233,30,99,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
                     marginBottom: 10,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(233,30,99,0.2)',
+                    borderWidth: 2,
+                    borderColor: 'rgba(233,30,99,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="radio-button-off" size={18} color="#E91E63" />
+                    <Ionicons name="radio-button-off" size={20} color="#E91E63" />
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Circle Mode
                     </Text>
@@ -582,16 +526,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Rectangle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(25,118,210,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
+                    backgroundColor: 'rgba(25,118,210,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
                     marginBottom: 10,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(25,118,210,0.2)',
+                    borderWidth: 2,
+                    borderColor: 'rgba(25,118,210,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="square-outline" size={18} color="#1976D2" />
+                    <Ionicons name="square-outline" size={20} color="#1976D2" />
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Rectangle Mode
                     </Text>
@@ -604,16 +548,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Freehand/Free Measure */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(16,185,129,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(16,185,129,0.2)',
+                    backgroundColor: 'rgba(16,185,129,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(16,185,129,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     {/* Freehand squiggle icon */}
-                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                    <Svg width={20} height={20} viewBox="0 0 16 16">
                       <Path 
                         d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
                         stroke="#10B981" 
@@ -629,7 +573,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                     Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
                   </Text>
-                  <View style={{ backgroundColor: 'rgba(16,185,129,0.12)', borderRadius: 8, padding: 10, marginTop: 4 }}>
+                  <View style={{ backgroundColor: 'rgba(16,185,129,0.15)', borderRadius: 10, padding: 10, marginTop: 4 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
                       How to use:
                     </Text>
@@ -709,7 +653,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
 
                   {/* Visual Sample */}
-                  <View style={{ marginTop: 12, alignItems: 'center', backgroundColor: '#F8F9FA', borderRadius: 12, padding: 16 }}>
+                  <View style={{ marginTop: 12, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 14, padding: 16 }}>
                     <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 12, fontWeight: '600' }}>
                       Example measurement:
                     </Text>
@@ -788,12 +732,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   {/* 4-Tap Delete */}
                   <View
                     style={{
-                      backgroundColor: 'rgba(255,45,85,0.08)',
-                      borderRadius: 12,
-                      padding: 12,
+                      backgroundColor: 'rgba(255,45,85,0.12)',
+                      borderRadius: 14,
+                      padding: 14,
                       marginTop: 4,
-                      borderWidth: 1,
-                      borderColor: 'rgba(255,45,85,0.2)',
+                      borderWidth: 2,
+                      borderColor: 'rgba(255,45,85,0.25)',
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -831,11 +775,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               >
                 {/* FREE badge */}
                 <View style={{ 
-                  backgroundColor: 'rgba(52,199,89,0.12)', 
+                  backgroundColor: 'rgba(52,199,89,0.15)', 
                   alignSelf: 'flex-start',
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 20,
+                  paddingHorizontal: 14,
+                  paddingVertical: 8,
+                  borderRadius: 22,
                   marginBottom: 12,
                 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: '#34C759' }}>
@@ -880,16 +824,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* CAD Integration */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(88,86,214,0.08)',
-                    borderRadius: 12,
-                    padding: 12,
-                    borderWidth: 1,
-                    borderColor: 'rgba(88,86,214,0.2)',
+                    backgroundColor: 'rgba(88,86,214,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(88,86,214,0.25)',
                     marginTop: 14,
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="cube" size={18} color="#5856D6" />
+                    <Ionicons name="cube" size={20} color="#5856D6" />
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
                       Works with Any CAD Software
                     </Text>
@@ -915,7 +859,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   Example Email Format
                 </Text>
                 
-                <View style={{ backgroundColor: '#FFFFFF', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
+                <View style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
                   <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
                     Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>PanHandler Measurement Report</Text>
                   </Text>
@@ -972,7 +916,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       '🎯 TIP: Higher resolution photos = more pixels per mm = better precision!'
                     );
                   }}
-                  style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#F0F4FF', borderRadius: 8, alignSelf: 'flex-start' }}
+                  style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: 'rgba(0,122,255,0.1)', borderRadius: 10, alignSelf: 'flex-start' }}
                 >
                   <Text style={{ fontSize: 13, color: '#007AFF', fontWeight: '600' }}>
                     🤓 Read "the nerdy stuff" - How the math works
@@ -1038,7 +982,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                         Use the scale value shown on the photo to calibrate your canvas
                       </Text>
-                      <View style={{ backgroundColor: 'rgba(255,149,0,0.1)', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
+                      <View style={{ backgroundColor: 'rgba(255,149,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
                         <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
                           <Text style={{ fontWeight: '700' }}>Example:</Text> If the photo shows "Canvas Scale: 0.0412", enter this value in your CAD software's canvas calibration settings
                         </Text>
@@ -1063,9 +1007,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </View>
 
-                <View style={{ backgroundColor: 'rgba(52,199,89,0.08)', borderRadius: 12, padding: 12, marginTop: 8, borderWidth: 1, borderColor: 'rgba(52,199,89,0.2)' }}>
+                <View style={{ backgroundColor: 'rgba(52,199,89,0.12)', borderRadius: 14, padding: 12, marginTop: 8, borderWidth: 2, borderColor: 'rgba(52,199,89,0.25)' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="checkmark-circle" size={18} color="#34C759" />
+                    <Ionicons name="checkmark-circle" size={20} color="#34C759" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
                       Pro Tip
                     </Text>
@@ -1081,38 +1025,42 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={SlideInRight.delay(500).springify()}
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.95)',
-                    borderRadius: 18,
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.08,
-                    shadowRadius: 12,
-                    elevation: 3,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,149,0,0.2)',
+                    shadowColor: '#FF9500',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 14,
+                    elevation: 8,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,149,0,0.3)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
                     <View style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 18,
-                      backgroundColor: 'rgba(255,149,0,0.15)',
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(255,149,0,0.2)',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 10,
+                      shadowColor: '#FF9500',
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 8,
                     }}>
-                      <Ionicons name="star" size={20} color="#FF9500" />
+                      <Ionicons name="star" size={22} color="#FF9500" />
                     </View>
-                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                    <Text style={{ fontSize: 19, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       Free vs Pro
                     </Text>
                   </View>
 
                   {/* Comparison Table */}
                   <View style={{ 
-                    borderRadius: 12, 
+                    borderRadius: 14, 
                     borderWidth: 1, 
                     borderColor: 'rgba(0,0,0,0.08)',
                     overflow: 'hidden',
@@ -1141,7 +1089,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
                   {/* Price */}
                   <View style={{ marginTop: 16, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 24, fontWeight: '700', color: '#1C1C1E' }}>
+                    <Text style={{ fontSize: 26, fontWeight: '700', color: '#1C1C1E' }}>
                       $9.97
                     </Text>
                     <Text style={{ fontSize: 14, color: '#8E8E93', marginTop: 2 }}>
@@ -1158,18 +1106,18 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? '#E68900' : '#FF9500',
                       paddingVertical: 16,
-                      borderRadius: 14,
+                      borderRadius: 16,
                       marginTop: 16,
                       shadowColor: '#FF9500',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 8,
-                      elevation: 4,
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: pressed ? 0.5 : 0.35,
+                      shadowRadius: pressed ? 16 : 12,
+                      elevation: 8,
                     })}
                   >
                     <Text style={{ 
                       color: 'white', 
-                      fontSize: 16, 
+                      fontSize: 17, 
                       fontWeight: '700', 
                       textAlign: 'center',
                       letterSpacing: -0.2,
@@ -1232,14 +1180,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 {/* Epic Stress Test Showcase */}
                 <View style={{
                   marginTop: 16,
-                  backgroundColor: 'rgba(0,122,255,0.08)',
-                  borderRadius: 14,
-                  padding: 14,
-                  borderWidth: 1,
-                  borderColor: 'rgba(0,122,255,0.2)',
+                  backgroundColor: 'rgba(0,122,255,0.12)',
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 2,
+                  borderColor: 'rgba(0,122,255,0.25)',
                 }}>
                   <Text style={{ 
-                    fontSize: 15, 
+                    fontSize: 16, 
                     fontWeight: '700', 
                     color: '#1C1C1E', 
                     textAlign: 'center',
@@ -1253,7 +1201,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     style={{ 
                       width: '100%', 
                       height: 180,
-                      borderRadius: 10,
+                      borderRadius: 12,
                       marginBottom: 8,
                     }}
                     resizeMode="cover"
@@ -1275,21 +1223,21 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(650)}
                   style={{
-                    backgroundColor: 'rgba(255,204,0,0.1)',
-                    borderRadius: 18,
+                    backgroundColor: 'rgba(255,204,0,0.15)',
+                    borderRadius: 20,
                     padding: 18,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 12,
-                    elevation: 2,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,204,0,0.25)',
+                    shadowColor: '#FFCC00',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 14,
+                    elevation: 6,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,204,0,0.35)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="star" size={22} color="#FFCC00" />
-                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
+                    <Ionicons name="star" size={24} color="#FFCC00" />
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
                       🎯 Amazing Accuracy
                     </Text>
                   </View>
@@ -1303,10 +1251,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </Text>
                   
                   <View style={{ 
-                    backgroundColor: 'rgba(255,204,0,0.08)', 
-                    borderRadius: 12, 
+                    backgroundColor: 'rgba(255,204,0,0.1)', 
+                    borderRadius: 14, 
                     padding: 14, 
-                    borderWidth: 0.5, 
+                    borderWidth: 1, 
                     borderColor: 'rgba(255,204,0,0.2)',
                     gap: 6,
                   }}>
@@ -1335,31 +1283,31 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(700)}
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.95)',
-                    borderRadius: 18,
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.06,
+                    shadowColor: '#007AFF',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.2,
                     shadowRadius: 12,
-                    elevation: 2,
-                    borderWidth: 0.5,
-                    borderColor: 'rgba(0,0,0,0.08)',
+                    elevation: 4,
+                    borderWidth: 1,
+                    borderColor: 'rgba(0,122,255,0.2)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                     <View style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 18,
-                      backgroundColor: 'rgba(0,122,255,0.12)',
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(0,122,255,0.15)',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 10,
                     }}>
-                      <Ionicons name="information-circle" size={22} color="#007AFF" />
+                      <Ionicons name="information-circle" size={24} color="#007AFF" />
                     </View>
-                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       About PanHandler
                     </Text>
                   </View>
@@ -1385,21 +1333,21 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
                     style={{
                       backgroundColor: '#FF0000',
-                      borderRadius: 13,
-                      paddingVertical: 13,
+                      borderRadius: 14,
+                      paddingVertical: 14,
                       paddingHorizontal: 16,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
                       shadowColor: '#FF0000',
-                      shadowOffset: { width: 0, height: 3 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 6,
-                      elevation: 4,
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.35,
+                      shadowRadius: 10,
+                      elevation: 6,
                     }}
                   >
-                    <Ionicons name="logo-youtube" size={22} color="white" />
-                    <Text style={{ color: 'white', fontSize: 15, fontWeight: '600', marginLeft: 8, letterSpacing: -0.2 }}>
+                    <Ionicons name="logo-youtube" size={24} color="white" />
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', marginLeft: 8, letterSpacing: -0.2 }}>
                       Follow on YouTube
                     </Text>
                   </Pressable>
@@ -1415,25 +1363,25 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <Animated.View 
                   entering={FadeIn.delay(800)}
                   style={{
-                    backgroundColor: 'rgba(255,215,0,0.12)',
-                    borderRadius: 18,
+                    backgroundColor: 'rgba(255,215,0,0.15)',
+                    borderRadius: 20,
                     padding: 18,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 12,
-                    elevation: 2,
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(255,215,0,0.35)',
+                    shadowColor: '#FFD700',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 14,
+                    elevation: 6,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,215,0,0.4)',
                     borderStyle: 'dashed',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 24 }}>🥚</Text>
-                    <Text style={{ fontSize: 17, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
+                    <Text style={{ fontSize: 28 }}>🥚</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 10, letterSpacing: -0.3 }}>
                       Hidden Surprises
                     </Text>
-                    <Text style={{ fontSize: 24 }}>🥚</Text>
+                    <Text style={{ fontSize: 28 }}>🥚</Text>
                   </View>
                   
                   <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, textAlign: 'center', fontStyle: 'italic' }}>
@@ -1442,15 +1390,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
             </ScrollView>
-            </View>
+              </View>
+            </BlurView>
 
             {/* Translucent Footer with Blur */}
             <BlurView 
-              intensity={95} 
+              intensity={100} 
               tint="light"
               style={{
-                borderBottomLeftRadius: 28,
-                borderBottomRightRadius: 28,
+                borderBottomLeftRadius: 32,
+                borderBottomRightRadius: 32,
                 overflow: 'hidden',
               }}
             >
@@ -1458,8 +1407,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 style={{
                   paddingVertical: 20,
                   paddingHorizontal: 24,
-                  backgroundColor: 'rgba(255,255,255,0.75)',
-                  borderTopWidth: 0.5,
+                  backgroundColor: 'rgba(255,255,255,0.85)',
+                  borderTopWidth: 1,
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
               >
@@ -1470,10 +1419,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     marginBottom: 14,
                     paddingVertical: 10,
                     paddingHorizontal: 16,
-                    backgroundColor: 'rgba(255,105,180,0.08)',
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,105,180,0.2)',
+                    backgroundColor: 'rgba(255,105,180,0.12)',
+                    borderRadius: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,105,180,0.25)',
                   }}
                 >
                   <Text style={{ 
@@ -1489,20 +1438,23 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
                 <AnimatedPressable
                   entering={FadeIn.delay(700)}
-                  onPress={onClose}
-                  style={{
-                    backgroundColor: '#007AFF',
-                    paddingVertical: 15,
-                    borderRadius: 14,
+                  onPress={() => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    onClose();
+                  }}
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed ? '#0066CC' : '#007AFF',
+                    paddingVertical: 16,
+                    borderRadius: 16,
                     alignItems: 'center',
                     shadowColor: '#007AFF',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 8,
-                    elevation: 4,
-                  }}
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: pressed ? 0.5 : 0.35,
+                    shadowRadius: pressed ? 16 : 12,
+                    elevation: 8,
+                  })}
                 >
-                  <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', letterSpacing: -0.2 }}>
+                  <Text style={{ color: 'white', fontSize: 17, fontWeight: '700', letterSpacing: -0.2 }}>
                     Got It! Let's Measure 🎯
                   </Text>
                 </AnimatedPressable>
