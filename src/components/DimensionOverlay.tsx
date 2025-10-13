@@ -62,7 +62,7 @@ interface Measurement {
   value: string;
   mode: MeasurementMode;
   // For circles: points[0] = center, points[1] = edge point (defines radius)
-  // For rectangles: points[0] = first corner, points[1] = opposite corner
+  // For rectangles: points[0-3] = all 4 corners (top-left, top-right, bottom-right, bottom-left)
   radius?: number; // For circles
   width?: number;  // For rectangles
   height?: number; // For rectangles
@@ -638,7 +638,7 @@ export default function DimensionOverlay({
       setCurrentPoints([...currentPoints, newPoint]);
     } else {
       // This completes a measurement
-      const completedPoints = [...currentPoints, newPoint];
+      let completedPoints = [...currentPoints, newPoint];
       
       // Calculate measurement value
       let value: string;
@@ -661,7 +661,7 @@ export default function DimensionOverlay({
         const diameter = radiusInUnits * 2;
         value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
       } else {
-        // Rectangle: calculate width and height
+        // Rectangle: calculate width and height, and store all 4 corners
         const p0 = completedPoints[0];
         const p1 = completedPoints[1];
         const widthPx = Math.abs(p1.x - p0.x);
@@ -671,6 +671,20 @@ export default function DimensionOverlay({
         const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
         const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
         value = `${widthStr} × ${heightStr}`;
+        
+        // Calculate all 4 corners from the 2 opposite corners
+        const minX = Math.min(p0.x, p1.x);
+        const maxX = Math.max(p0.x, p1.x);
+        const minY = Math.min(p0.y, p1.y);
+        const maxY = Math.max(p0.y, p1.y);
+        
+        // Store all 4 corners: top-left, top-right, bottom-right, bottom-left
+        completedPoints = [
+          { x: minX, y: minY, id: Date.now().toString() + '-0' },        // top-left
+          { x: maxX, y: minY, id: Date.now().toString() + '-1' },        // top-right
+          { x: maxX, y: maxY, id: Date.now().toString() + '-2' },        // bottom-right
+          { x: minX, y: maxY, id: Date.now().toString() + '-3' },        // bottom-left
+        ];
       }
       
       // Save as completed measurement
@@ -1790,6 +1804,39 @@ export default function DimensionOverlay({
                     };
                   }
                   
+                  // Special case: moving rectangle corner - update adjacent corners to maintain axis-aligned rectangle
+                  if (m.mode === 'rectangle' && m.points.length === 4) {
+                    // Update the dragged corner
+                    newPoints[resizingPoint.pointIndex] = imageCoords;
+                    
+                    // Rectangle corners: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
+                    // Update adjacent corners to maintain axis alignment
+                    const movedIdx = resizingPoint.pointIndex;
+                    
+                    if (movedIdx === 0) {
+                      // Moving top-left: update top-right's Y and bottom-left's X
+                      newPoints[1] = { ...newPoints[1], y: imageCoords.y };
+                      newPoints[3] = { ...newPoints[3], x: imageCoords.x };
+                    } else if (movedIdx === 1) {
+                      // Moving top-right: update top-left's Y and bottom-right's X
+                      newPoints[0] = { ...newPoints[0], y: imageCoords.y };
+                      newPoints[2] = { ...newPoints[2], x: imageCoords.x };
+                    } else if (movedIdx === 2) {
+                      // Moving bottom-right: update bottom-left's Y and top-right's X
+                      newPoints[3] = { ...newPoints[3], y: imageCoords.y };
+                      newPoints[1] = { ...newPoints[1], x: imageCoords.x };
+                    } else if (movedIdx === 3) {
+                      // Moving bottom-left: update bottom-right's Y and top-left's X
+                      newPoints[2] = { ...newPoints[2], y: imageCoords.y };
+                      newPoints[0] = { ...newPoints[0], x: imageCoords.x };
+                    }
+                    
+                    return {
+                      ...m,
+                      points: newPoints,
+                    };
+                  }
+                  
                   // Normal point movement - update points immediately, skip expensive calculations
                   // Value will be recalculated on release for better performance
                   newPoints[resizingPoint.pointIndex] = imageCoords;
@@ -1883,8 +1930,11 @@ export default function DimensionOverlay({
                     const diameter = radius * 2;
                     newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                   } else if (m.mode === 'rectangle') {
-                    const widthPx = Math.abs(m.points[1].x - m.points[0].x);
-                    const heightPx = Math.abs(m.points[1].y - m.points[0].y);
+                    // Recalculate width and height from all 4 corners
+                    const xCoords = m.points.map(p => p.x);
+                    const yCoords = m.points.map(p => p.y);
+                    const widthPx = Math.max(...xCoords) - Math.min(...xCoords);
+                    const heightPx = Math.max(...yCoords) - Math.min(...yCoords);
                     width = widthPx / (calibration?.pixelsPerUnit || 1);
                     height = heightPx / (calibration?.pixelsPerUnit || 1);
                     const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
@@ -2215,23 +2265,34 @@ export default function DimensionOverlay({
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'rectangle') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                // Get all 4 corners
+                const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
+                
+                // Calculate bounding box for rectangle rendering
+                const xCoords = corners.map(c => c.x);
+                const yCoords = corners.map(c => c.y);
+                const minX = Math.min(...xCoords);
+                const maxX = Math.max(...xCoords);
+                const minY = Math.min(...yCoords);
+                const maxY = Math.max(...yCoords);
+                const width = maxX - minX;
+                const height = maxY - minY;
                 
                 return (
                   <React.Fragment key={measurement.id}>
                     {/* Glow layers */}
-                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
-                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
                     {/* Main rectangle */}
-                    <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Corner markers */}
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
+                    {/* Corner markers - all 4 corners */}
+                    {corners.map((corner, cornerIdx) => (
+                      <React.Fragment key={`corner-${cornerIdx}`}>
+                        <Circle cx={corner.x} cy={corner.y} r="8" fill={color.main} opacity="0.1" />
+                        <Circle cx={corner.x} cy={corner.y} r="6" fill={color.main} opacity="0.2" />
+                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                      </React.Fragment>
+                    ))}
                   </React.Fragment>
                 );
               }
