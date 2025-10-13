@@ -1384,13 +1384,91 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     Some badges hide secrets... if you are persistent enough 🤔
                   </Text>
                 </Animated.View>
+
+                {/* Download Counter & Rating - Inside ScrollView at bottom */}
+                <View style={{ marginTop: 24, paddingBottom: 20 }}>
+                  {/* Heartfelt Message with Download Counter */}
+                  <AnimatedView
+                    entering={FadeIn.delay(750)}
+                    style={{
+                      marginBottom: 14,
+                      paddingVertical: 10,
+                      paddingHorizontal: 16,
+                      backgroundColor: 'rgba(255,105,180,0.12)',
+                      borderRadius: 14,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255,105,180,0.25)',
+                    }}
+                  >
+                    <Text style={{ 
+                      fontSize: 14, 
+                      color: '#1C1C1E', 
+                      textAlign: 'center',
+                      lineHeight: 20,
+                      fontWeight: '600'
+                    }}>
+                      ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
+                    </Text>
+                  </AnimatedView>
+
+                  {/* Rating Section */}
+                  <AnimatedView
+                    entering={FadeIn.delay(800)}
+                    style={{
+                      paddingVertical: 14,
+                      paddingHorizontal: 18,
+                      backgroundColor: 'rgba(255,215,0,0.12)',
+                      borderRadius: 16,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255,215,0,0.25)',
+                    }}
+                  >
+                    <Text style={{ 
+                      fontSize: 15, 
+                      color: '#1C1C1E', 
+                      textAlign: 'center',
+                      lineHeight: 22,
+                      fontWeight: '700',
+                      marginBottom: 8,
+                    }}>
+                      Do you like this app?
+                    </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
+                      <Text style={{ fontSize: 24, letterSpacing: 2 }}>⭐⭐⭐⭐⭐</Text>
+                    </View>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        Linking.openURL('https://apps.apple.com/app/id6738328692?action=write-review');
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'rgba(255,215,0,0.25)' : 'rgba(255,215,0,0.18)',
+                        paddingVertical: 10,
+                        paddingHorizontal: 16,
+                        borderRadius: 12,
+                        borderWidth: 1.5,
+                        borderColor: 'rgba(255,215,0,0.4)',
+                      })}
+                    >
+                      <Text style={{ 
+                        color: '#B8860B', 
+                        fontSize: 14, 
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        letterSpacing: -0.2,
+                      }}>
+                        Leave a Review ⭐
+                      </Text>
+                    </Pressable>
+                  </AnimatedView>
+                </View>
               </View>
             </ScrollView>
                 </GestureDetector>
               </View>
             </BlurView>
 
-            {/* Translucent Footer with Blur */}
+            {/* Translucent Footer with Blur - Now empty/minimal */}
             <BlurView 
               intensity={100} 
               tint="light"
@@ -1402,87 +1480,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
             >
               <View
                 style={{
-                  paddingVertical: 20,
+                  paddingVertical: 12,
                   paddingHorizontal: 24,
                   backgroundColor: 'rgba(255,255,255,0.85)',
                   borderTopWidth: 1,
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
               >
-                {/* Heartfelt Message with Download Counter */}
-                <AnimatedView
-                  entering={FadeIn.delay(750)}
-                  style={{
-                    marginBottom: 14,
-                    paddingVertical: 10,
-                    paddingHorizontal: 16,
-                    backgroundColor: 'rgba(255,105,180,0.12)',
-                    borderRadius: 14,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,105,180,0.25)',
-                  }}
-                >
-                  <Text style={{ 
-                    fontSize: 14, 
-                    color: '#1C1C1E', 
-                    textAlign: 'center',
-                    lineHeight: 20,
-                    fontWeight: '600'
-                  }}>
-                    ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
-                  </Text>
-                </AnimatedView>
-
-                {/* Rating Section - At the bottom, non-obnoxious */}
-                <AnimatedView
-                  entering={FadeIn.delay(800)}
-                  style={{
-                    paddingVertical: 14,
-                    paddingHorizontal: 18,
-                    backgroundColor: 'rgba(255,215,0,0.12)',
-                    borderRadius: 16,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,215,0,0.25)',
-                  }}
-                >
-                  <Text style={{ 
-                    fontSize: 15, 
-                    color: '#1C1C1E', 
-                    textAlign: 'center',
-                    lineHeight: 22,
-                    fontWeight: '700',
-                    marginBottom: 8,
-                  }}>
-                    Do you like this app?
-                  </Text>
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
-                    <Text style={{ fontSize: 24, letterSpacing: 2 }}>⭐⭐⭐⭐⭐</Text>
-                  </View>
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      Linking.openURL('https://apps.apple.com/app/id6738328692?action=write-review');
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(255,215,0,0.25)' : 'rgba(255,215,0,0.18)',
-                      paddingVertical: 10,
-                      paddingHorizontal: 16,
-                      borderRadius: 12,
-                      borderWidth: 1.5,
-                      borderColor: 'rgba(255,215,0,0.4)',
-                    })}
-                  >
-                    <Text style={{ 
-                      color: '#B8860B', 
-                      fontSize: 14, 
-                      fontWeight: '700',
-                      textAlign: 'center',
-                      letterSpacing: -0.2,
-                    }}>
-                      Leave a Review ⭐
-                    </Text>
-                  </Pressable>
-                </AnimatedView>
+                {/* Footer is now minimal - content moved to ScrollView */}
               </View>
             </BlurView>
           </View>
