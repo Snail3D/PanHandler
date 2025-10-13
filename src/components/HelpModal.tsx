@@ -1314,20 +1314,15 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   
-                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
-                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1, flexWrap: 'wrap' }}>
                       Created by{' '}
-                    </Text>
-                    <Image 
-                      source={require('../../assets/snail-logo.png')} 
-                      style={{ width: 20, height: 20, marginRight: 4 }}
-                      resizeMode="contain"
-                    />
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', lineHeight: 22 }}>
-                      Snail
-                    </Text>
-                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
-                      , a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
+                      <Image 
+                        source={require('../../assets/snail-logo.png')} 
+                        style={{ width: 20, height: 20, marginRight: 4 }}
+                        resizeMode="contain"
+                      />
+                      <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
                     </Text>
                   </View>
 
