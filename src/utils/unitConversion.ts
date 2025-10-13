@@ -62,8 +62,12 @@ export function formatMeasurement(
   // Round to nearest 0.5mm for millimeters (metric)
   if (unit === 'mm') {
     const roundedValue = Math.round(value * 2) / 2; // Round to nearest 0.5
-    // Format to show .0 or .5 only
-    return `${roundedValue.toFixed(1)} ${unit}`;
+    // Only show decimal if it's .5, hide .0
+    if (roundedValue % 1 === 0) {
+      return `${roundedValue.toFixed(0)} ${unit}`; // 49mm, 50mm
+    } else {
+      return `${roundedValue.toFixed(1)} ${unit}`; // 49.5mm
+    }
   }
   
   // For imperial (inches and feet), use 2 decimal places
