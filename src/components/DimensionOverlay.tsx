@@ -716,21 +716,10 @@ export default function DimensionOverlay({
     // Trigger if legend is taller than 70% of screen height
     const triggerHeight = SCREEN_HEIGHT * 0.7;
     
-    // TEMPORARY: Tetris disabled until cache clears (v4.0 safety)
-    // Re-enable by uncommenting the code below after Vibecode cache refresh
-    /*
     if (legendHeight >= triggerHeight) {
       console.log('🎮 TETRIS EASTER EGG TRIGGERED!', measurements.length, 'measurements');
       setHasTriggeredTetris(true);
       triggerTetrisAnimation();
-    }
-    */
-    
-    // Cache-safe alternative: Just log for now
-    if (legendHeight >= triggerHeight && !hasTriggeredTetris) {
-      console.log('🎮 Tetris would trigger here (temporarily disabled for cache safety)');
-      console.log('📊 Measurements:', measurements.length);
-      setHasTriggeredTetris(true); // Prevent spam
     }
   }, [measurements.length, hasTriggeredTetris]);
 
