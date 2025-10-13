@@ -99,6 +99,7 @@ export default function DimensionOverlay({
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
+  const overlayOnlyRef = useRef<View>(null); // For capturing just the overlay without the photo
   const viewRef = externalViewRef || internalViewRef; // Use external ref if provided
   
   // Lock-in animation
@@ -1150,19 +1151,22 @@ export default function DimensionOverlay({
       
       console.log('✅ Saved measurements photo!');
       
-      // Capture SAME view but without measurements/legend for transparent CAD
-      setHideMeasurementsForCapture(true); // Hide measurements and legend
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
-      
-      const transparentUri = await captureRef(viewRef.current, {
-        format: 'png', // PNG for transparency
-        quality: 1.0,
-        result: 'tmpfile',
-      });
-      
-      await MediaLibrary.createAssetAsync(transparentUri);
-      
-      setHideMeasurementsForCapture(false); // Show measurements again
+      // Capture overlay only (without photo background) for transparent CAD
+      // Use overlayOnlyRef which wraps just the SVG overlay content
+      if (overlayOnlyRef.current) {
+        setHideMeasurementsForCapture(true); // Hide measurements and legend
+        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
+        
+        const transparentUri = await captureRef(overlayOnlyRef.current, {
+          format: 'png', // PNG for transparency
+          quality: 1.0,
+          result: 'tmpfile',
+        });
+        
+        await MediaLibrary.createAssetAsync(transparentUri);
+        
+        setHideMeasurementsForCapture(false); // Show measurements again
+      }
       
       console.log('✅ Saved transparent CAD canvas!');
       
@@ -1337,22 +1341,25 @@ export default function DimensionOverlay({
       
       console.log('✅ Added measurements photo to email');
       
-      // 2. Capture SAME view but without measurements/legend for transparent CAD
-      setHideMeasurementsForCapture(true); // Hide measurements and legend
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
-      
-      const transparentUri = await captureRef(viewRef.current, {
-        format: 'png', // PNG for transparency
-        quality: 1.0,
-        result: 'tmpfile',
-      });
-      
-      const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
-      const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
-      await FileSystem.copyAsync({ from: transparentUri, to: transparentDest });
-      attachments.push(transparentDest);
-      
-      setHideMeasurementsForCapture(false); // Show measurements again
+      // 2. Capture overlay only (without photo background) for transparent CAD
+      // Use overlayOnlyRef which wraps just the SVG overlay content
+      if (overlayOnlyRef.current) {
+        setHideMeasurementsForCapture(true); // Hide measurements and legend
+        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
+        
+        const transparentUri = await captureRef(overlayOnlyRef.current, {
+          format: 'png', // PNG for transparency
+          quality: 1.0,
+          result: 'tmpfile',
+        });
+        
+        const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
+        const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
+        await FileSystem.copyAsync({ from: transparentUri, to: transparentDest });
+        attachments.push(transparentDest);
+        
+        setHideMeasurementsForCapture(false); // Show measurements again
+      }
       
       console.log('✅ Added transparent CAD canvas to email');
       
@@ -2774,12 +2781,19 @@ export default function DimensionOverlay({
         </View>
       )}
 
-      {/* Visual overlay for measurements */}
+      {/* Visual overlay for measurements - wrapped for dual capture */}
       <View
         ref={viewRef}
+        collapsable={false}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
+        <View
+          ref={overlayOnlyRef}
+          collapsable={false}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          pointerEvents="none"
+        >
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Lock-in animation - green blinking circle (only shows during animation) */}
@@ -3108,7 +3122,7 @@ export default function DimensionOverlay({
           )}
 
           {/* Measurement labels for completed measurements with smart positioning */}
-          {(() => {
+          {!hideMeasurementsForCapture && (() => {
             // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
             const labelData = measurements
               .filter(m => m.mode !== 'rectangle')
@@ -3596,6 +3610,7 @@ export default function DimensionOverlay({
               </View>
             </View>
           )}
+        </View>
       </View>
 
       {/* Auto-capture badge - top-right corner (OUTSIDE viewRef to allow taps) */}
