@@ -1741,6 +1741,7 @@ export default function DimensionOverlay({
               if (freehandActivating && !isDrawingFreehand) {
                 setFreehandActivating(false);
                 setShowFreehandCursor(false);
+                setFreehandPath([]); // IMPORTANT: Clear any points that might have been captured
                 console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
@@ -2016,6 +2017,7 @@ export default function DimensionOverlay({
                   }
                   
                   // Special case: moving rectangle corner - update adjacent corners to maintain axis-aligned rectangle
+                  // IMPORTANT: Only apply to actual rectangles, NOT freehand paths
                   if (m.mode === 'rectangle' && m.points.length === 4) {
                     // Rectangle corners: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
                     // Update adjacent corners to maintain axis alignment
@@ -2050,6 +2052,7 @@ export default function DimensionOverlay({
                   
                   // Normal point movement - update points immediately, skip expensive calculations
                   // Value will be recalculated on release for better performance
+                  // This applies to: distance, angle, freehand, and any other measurement types
                   newPoints[resizingPoint.pointIndex] = imageCoords;
                   
                   return {
