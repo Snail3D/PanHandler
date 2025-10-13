@@ -173,6 +173,7 @@ export default function DimensionOverlay({
   const freehandActivationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [freehandActivating, setFreehandActivating] = useState(false); // Waiting for activation
   const [freehandClosedLoop, setFreehandClosedLoop] = useState(false); // Track if loop is closed (lasso mode)
+  const freehandClosedLoopRef = useRef(false); // Sync ref to avoid async state issues
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -1972,6 +1973,7 @@ export default function DimensionOverlay({
                           // Strong haptic feedback for successful lasso close
                           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                           setFreehandClosedLoop(true);
+                          freehandClosedLoopRef.current = true; // Update ref synchronously
                           // Snap to exact start point to close the loop
                           return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
                         }
@@ -2098,7 +2100,9 @@ export default function DimensionOverlay({
                 // Continue to evaporation effect
               } else if (isDrawingFreehand && freehandPath.length >= 5) {
                 // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
-                console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', freehandClosedLoop);
+                // Use ref instead of state to avoid async state issues
+                const isClosedLoop = freehandClosedLoopRef.current;
+                console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
                 
                 // Calculate total path length (perimeter)
                 let totalLength = 0;
@@ -2115,12 +2119,12 @@ export default function DimensionOverlay({
                 // Check if path self-intersects
                 const selfIntersects = doesPathSelfIntersect(freehandPath);
                 console.log('🔍 Self-intersection check:', selfIntersects);
-                console.log('🔍 Closed loop state:', freehandClosedLoop);
+                console.log('🔍 Closed loop state:', isClosedLoop);
                 console.log('🔍 Path length:', freehandPath.length);
                 
                 // Calculate area only if loop is closed AND doesn't self-intersect
                 let area = 0;
-                if (freehandClosedLoop && !selfIntersects && freehandPath.length >= 3) {
+                if (isClosedLoop && !selfIntersects && freehandPath.length >= 3) {
                   console.log('✅ Conditions met for area calculation!');
                   
                   // Shoelace formula for polygon area
@@ -2163,10 +2167,11 @@ export default function DimensionOverlay({
                   setMeasurements([...measurements, newMeasurement]);
                 } else {
                   console.log('⚠️ Area calculation skipped - conditions not met:', {
-                    freehandClosedLoop,
+                    isClosedLoop,
                     selfIntersects,
                     pathLength: freehandPath.length,
                   });
+                  
                   // Open path OR self-intersecting - just show length
                   const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   
@@ -2175,13 +2180,13 @@ export default function DimensionOverlay({
                     points: [...freehandPath],
                     value: formattedValue,
                     mode: 'freehand',
-                    isClosed: freehandClosedLoop, // Still mark as closed even if self-intersecting
+                    isClosed: isClosedLoop, // Still mark as closed even if self-intersecting
                   };
                   
                   setMeasurements([...measurements, newMeasurement]);
                   
                   // Log reason for no area
-                  if (freehandClosedLoop && selfIntersects) {
+                  if (isClosedLoop && selfIntersects) {
                     console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
                   }
                 }
@@ -2194,7 +2199,7 @@ export default function DimensionOverlay({
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
                 setFreehandClosedLoop(false); // Reset closed loop state
-                
+                freehandClosedLoopRef.current = false; // Reset ref too
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
