@@ -1119,16 +1119,22 @@ export default function DimensionOverlay({
             result: 'tmpfile',
           });
           
-          // Get actual dimensions of exported CAD canvas
-          Image.getSize(
-            fusionUri,
-            (width, height) => {
-              console.log('🎯 EXPORTED CAD CANVAS DIMENSIONS:', width, 'x', height);
-              console.log('  If this matches screen size (440x956), Canvas Scale = 1/pixelsPerUnit is correct');
-              console.log('  If this matches image size (1856x4032), we need to multiply by imageRatio');
-            },
-            (error) => console.error('Could not get CAD canvas dimensions:', error)
-          );
+          // CRITICAL: Get actual dimensions of exported CAD canvas to solve this mystery
+          await new Promise<void>((resolve) => {
+            Image.getSize(
+              fusionUri,
+              (width, height) => {
+                console.log('🎯 EXPORTED CAD CANVAS ACTUAL DIMENSIONS:', width, 'x', height);
+                console.log('  Screen size:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
+                console.log('  Ratio to screen:', (width / SCREEN_WIDTH).toFixed(2), 'x');
+                resolve();
+              },
+              (error) => {
+                console.error('Could not get CAD canvas dimensions:', error);
+                resolve();
+              }
+            );
+          });
           
           const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
           const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
