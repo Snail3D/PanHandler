@@ -1072,30 +1072,30 @@ export default function DimensionOverlay({
       const alt4 = baseScale * pixelRatio * calibrationZoom;
       const alt5 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * Math.sqrt(imageToScreenRatio);
       const alt6 = baseScale * pixelRatio * calibrationZoom * (imageToScreenRatio / (pixelRatio * 4));
+      const alt7 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 3);
+      const alt8 = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / pixelRatio);
+      const alt9 = baseScale * calibrationZoom * imageToScreenRatio;
+      const alt10 = baseScale * Math.sqrt(pixelRatio * calibrationZoom * imageToScreenRatio);
       
-      measurementText += `\n\n=== DEBUG DATA (copy for analysis) ===\n`;
-      measurementText += `PPU=${calibration.pixelsPerUnit.toFixed(3)} `;
-      measurementText += `zoom=${calibrationZoom.toFixed(3)} `;
-      measurementText += `pixRatio=${pixelRatio} `;
-      measurementText += `imgRatio=${imageToScreenRatio.toFixed(3)} `;
-      measurementText += `screen=${SCREEN_WIDTH}x${SCREEN_HEIGHT} `;
-      measurementText += `image=${actualImageWidth}x${actualImageHeight}\n`;
-      measurementText += `\n--- FORMULA TESTS (try each in Fusion) ---\n`;
-      measurementText += `Current (/4):    ${fusionScale.toFixed(6)} mm/px\n`;
-      measurementText += `Test A  (/4.36): ${alt1.toFixed(6)} mm/px\n`;
-      measurementText += `Test B  (/5):    ${alt2.toFixed(6)} mm/px\n`;
-      measurementText += `Test C  (/3.5):  ${alt3.toFixed(6)} mm/px\n`;
-      measurementText += `Test D  (no √):  ${alt4.toFixed(6)} mm/px\n`;
-      measurementText += `Test E  (√img):  ${alt5.toFixed(6)} mm/px\n`;
-      measurementText += `Test F  (norm):  ${alt6.toFixed(6)} mm/px\n`;
-      measurementText += `\nTEST INSTRUCTIONS:\n`;
-      measurementText += `1. Import CAD canvas to Fusion 360\n`;
-      measurementText += `2. Try each Canvas Scale value above\n`;
-      measurementText += `3. Measure the blue line in Fusion\n`;
-      measurementText += `4. Report which formula gave: ${measurements[0]?.value || 'N/A'}\n`;
-        measurementText += `\n\nFor CAD Canvas Import:\n`;
+      measurementText += `\n\n=== QUICK COPY DATA ===\n`;
+      measurementText += `PPU=${calibration.pixelsPerUnit.toFixed(3)} zoom=${calibrationZoom.toFixed(3)} pixRatio=${pixelRatio} imgRatio=${imageToScreenRatio.toFixed(3)} screen=${SCREEN_WIDTH}x${SCREEN_HEIGHT} image=${actualImageWidth}x${actualImageHeight}\n`;
+      measurementText += `\n--- FORMULAS TO TEST IN FUSION ---\n`;
+      measurementText += `Target: ${measurements[0]?.value || 'N/A'}\n\n`;
+      measurementText += `A: ${fusionScale.toFixed(6)} (current /4)\n`;
+      measurementText += `B: ${alt1.toFixed(6)} (/4.36)\n`;
+      measurementText += `C: ${alt2.toFixed(6)} (/5)\n`;
+      measurementText += `D: ${alt3.toFixed(6)} (/3.5)\n`;
+      measurementText += `E: ${alt4.toFixed(6)} (no √)\n`;
+      measurementText += `F: ${alt5.toFixed(6)} (√img)\n`;
+      measurementText += `G: ${alt6.toFixed(6)} (normalized)\n`;
+      measurementText += `H: ${alt7.toFixed(6)} (/3)\n`;
+      measurementText += `I: ${alt8.toFixed(6)} (/pixRatio)\n`;
+      measurementText += `J: ${alt9.toFixed(6)} (simple)\n`;
+      measurementText += `K: ${alt10.toFixed(6)} (√combined)\n`;
+      measurementText += `\n📋 TEST: Import CAD canvas → Try A-K → Which = ${measurements[0]?.value || 'N/A'}?\n`;
+        measurementText += `\n\nRECOMMENDED FOR CAD:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
-        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)`;
+        measurementText += `(Insert > Canvas > Calibrate > Enter value)`;
       }
       
       // Add footer (only for non-Pro users)
