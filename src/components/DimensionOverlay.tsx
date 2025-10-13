@@ -1113,11 +1113,15 @@ export default function DimensionOverlay({
             result: 'tmpfile',
           });
           
-          // CRITICAL: Get actual dimensions of exported CAD canvas to solve this mystery
+          // CRITICAL: Get actual dimensions of exported CAD canvas
+          let exportedWidth = 0;
+          let exportedHeight = 0;
           await new Promise<void>((resolve) => {
             Image.getSize(
               fusionUri,
               (width, height) => {
+                exportedWidth = width;
+                exportedHeight = height;
                 console.log('🎯 EXPORTED CAD CANVAS ACTUAL DIMENSIONS:', width, 'x', height);
                 console.log('  Screen size:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
                 console.log('  Ratio to screen:', (width / SCREEN_WIDTH).toFixed(2), 'x');
@@ -1129,6 +1133,12 @@ export default function DimensionOverlay({
               }
             );
           });
+          
+          // Add to email text so user can see it
+          if (exportedWidth > 0) {
+            measurementText += `\n🎯 EXPORTED CAD CANVAS: ${exportedWidth} × ${exportedHeight} pixels\n`;
+            measurementText += `Ratio to screen: ${(exportedWidth / SCREEN_WIDTH).toFixed(2)}x\n`;
+          }
           
           const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
           const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
