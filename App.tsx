@@ -38,6 +38,7 @@ export default function App() {
   const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
   const [displayedText, setDisplayedText] = useState('');
   const introOpacity = useSharedValue(0);
+  const appOpacity = useSharedValue(0);
   
   // Get random quote on mount
   useEffect(() => {
@@ -64,14 +65,21 @@ export default function App() {
         currentIndex++;
       } else {
         clearInterval(typeInterval);
-        // Hold for 2 seconds after typing, then fade out
+        // Hold for 2 seconds after typing, then cross-fade
         setTimeout(() => {
+          // Fade out intro and fade in app simultaneously
           introOpacity.value = withTiming(0, { 
-            duration: 600,
+            duration: 1000,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1)
           }, () => {
             runOnJS(setShowIntro)(false);
           });
+          
+          // Graceful fade-in for the main app
+          appOpacity.value = withDelay(200, withTiming(1, { 
+            duration: 1200,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1) // Smoother, more gradual
+          }));
         }, 2000);
       }
     }, typingSpeed);
@@ -81,6 +89,10 @@ export default function App() {
   
   const introAnimatedStyle = useAnimatedStyle(() => ({
     opacity: introOpacity.value,
+  }));
+  
+  const appAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: appOpacity.value,
   }));
   
   // RATING PROMPT TEMPORARILY DISABLED - Will work in production build
@@ -145,19 +157,25 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        {showIntro ? (
-          // Intro Screen - White background with black text
+        {showIntro && (
+          // Intro Screen - White background with black text (positioned absolutely during transition)
           <Animated.View
             style={[
               {
-                flex: 1,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
                 backgroundColor: '#FFFFFF',
                 justifyContent: 'center',
                 alignItems: 'center',
                 paddingHorizontal: 40,
+                zIndex: 1000,
               },
               introAnimatedStyle
             ]}
+            pointerEvents={introOpacity.value > 0.5 ? 'auto' : 'none'}
           >
             <Text
               style={{
@@ -173,13 +191,16 @@ export default function App() {
               {displayedText}
             </Text>
           </Animated.View>
-        ) : (
-          // Main App
+        )}
+        
+        {/* Main App - Fades in gracefully after intro */}
+        <Animated.View style={[{ flex: 1 }, appAnimatedStyle]}>
           <NavigationContainer>
             <MeasurementScreen />
             <StatusBar style="auto" />
           </NavigationContainer>
-        )}
+        </Animated.View>
+        
         {/* Rating prompt will be enabled in production build */}
         {/* <RatingPromptModal 
           visible={showRatingPrompt}
