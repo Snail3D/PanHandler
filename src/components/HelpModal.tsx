@@ -585,6 +585,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     backgroundColor: 'rgba(25,118,210,0.08)',
                     borderRadius: 12,
                     padding: 12,
+                    marginBottom: 10,
                     borderWidth: 0.5,
                     borderColor: 'rgba(25,118,210,0.2)',
                   }}
@@ -598,6 +599,52 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure rectangular objects. Tap two opposite corners to get length and height measurements.
                   </Text>
+                </View>
+
+                {/* Freehand/Free Measure */}
+                <View
+                  style={{
+                    backgroundColor: 'rgba(16,185,129,0.08)',
+                    borderRadius: 12,
+                    padding: 12,
+                    borderWidth: 0.5,
+                    borderColor: 'rgba(16,185,129,0.2)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                    {/* Freehand squiggle icon */}
+                    <Svg width={18} height={18} viewBox="0 0 16 16">
+                      <Path 
+                        d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
+                        stroke="#10B981" 
+                        strokeWidth="2" 
+                        fill="none" 
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
+                      Freehand Mode (Free Measure)
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                    Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
+                  </Text>
+                  <View style={{ backgroundColor: 'rgba(16,185,129,0.12)', borderRadius: 8, padding: 10, marginTop: 4 }}>
+                    <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
+                      How to use:
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                      1. Long-press the Distance button{'\n'}
+                      2. Place finger and hold for 1.5 seconds{'\n'}
+                      3. Draw your path{'\n'}
+                      4. Release to complete
+                    </Text>
+                  </View>
+                  <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(16,185,129,0.15)' }}>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', lineHeight: 18 }}>
+                      💡 Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!
+                    </Text>
+                  </View>
                 </View>
               </ExpandableSection>
 
