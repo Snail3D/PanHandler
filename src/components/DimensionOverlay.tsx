@@ -448,6 +448,76 @@ export default function DimensionOverlay({
     return colors[index % colors.length];
   };
 
+  // Get complementary/opposing vibrant color for cursor glow
+  const getComplementaryColor = (hexColor: string): string => {
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+    
+    // Convert to RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Calculate complementary color (rotate hue by 180 degrees)
+    // Convert RGB to HSL
+    const rNorm = r / 255;
+    const gNorm = g / 255;
+    const bNorm = b / 255;
+    
+    const max = Math.max(rNorm, gNorm, bNorm);
+    const min = Math.min(rNorm, gNorm, bNorm);
+    const l = (max + min) / 2;
+    
+    let h = 0;
+    let s = 0;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      if (max === rNorm) {
+        h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) / 6;
+      } else if (max === gNorm) {
+        h = ((bNorm - rNorm) / d + 2) / 6;
+      } else {
+        h = ((rNorm - gNorm) / d + 4) / 6;
+      }
+    }
+    
+    // Rotate hue by 180 degrees for complementary color
+    h = (h + 0.5) % 1;
+    
+    // Convert back to RGB
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    
+    let rComp, gComp, bComp;
+    
+    if (s === 0) {
+      rComp = gComp = bComp = l;
+    } else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      rComp = hue2rgb(p, q, h + 1/3);
+      gComp = hue2rgb(p, q, h);
+      bComp = hue2rgb(p, q, h - 1/3);
+    }
+    
+    // Convert back to hex
+    const toHex = (n: number) => {
+      const hex = Math.round(n * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(rComp)}${toHex(gComp)}${toHex(bComp)}`;
+  };
+
   // Helper to check if tap is near any measurement point (works for all types)
   const getTappedMeasurementPoint = (tapX: number, tapY: number): { measurementId: string, pointIndex: number } | null => {
     const POINT_THRESHOLD = 40; // pixels
@@ -1062,8 +1132,8 @@ export default function DimensionOverlay({
       const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Wait a bit more to ensure fusion views are updated
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait longer to ensure fusion views have the label (increased from 100ms to 200ms)
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Capture CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation)
       if (fusionZoomedViewRef.current) {
@@ -1270,8 +1340,8 @@ export default function DimensionOverlay({
       await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // Wait a bit more to ensure fusion views have the label
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait longer to ensure fusion views have the label (increased from 100ms to 200ms)
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // 2. CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, with title + coin info)
       if (fusionZoomedViewRef.current) {
@@ -1424,12 +1494,11 @@ export default function DimensionOverlay({
       }
     })
     .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.2;
+      const threshold = SCREEN_WIDTH * 0.3; // Changed from 20% to 30%
       if (Math.abs(event.translationX) > threshold) {
-        // Hide menu to the right
-        menuTranslateX.value = withSpring(SCREEN_WIDTH, {}, () => {
-          runOnJS(setMenuHidden)(true);
-        });
+        // Hide menu to the right - instant collapse
+        menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
+        runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       } else {
         // Show menu
@@ -1460,14 +1529,14 @@ export default function DimensionOverlay({
       menuTranslateX.value = withSpring(0);
       setMenuHidden(false);
     } else {
-      menuTranslateX.value = withSpring(SCREEN_WIDTH);
+      menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
       setMenuHidden(true);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
   
   const collapseMenu = () => {
-    menuTranslateX.value = withSpring(SCREEN_WIDTH);
+    menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
     setMenuHidden(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
@@ -2372,6 +2441,7 @@ export default function DimensionOverlay({
           const nextMeasurementIndex = measurements.length;
           const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
           const cursorColor = nextColor.main;
+          const glowColor = getComplementaryColor(cursorColor);
           
           // Determine label based on state
           let label = 'Hold to start';
@@ -2393,6 +2463,9 @@ export default function DimensionOverlay({
               pointerEvents="none"
             >
               <Svg width={100} height={100}>
+                {/* Outer ring glow layers - complementary color */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={0.15} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={0.2} />
                 {/* Outer ring - pulses when activating */}
                 <Circle 
                   cx={50} 
@@ -2405,13 +2478,19 @@ export default function DimensionOverlay({
                 />
                 {/* Inner circle */}
                 <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
-                {/* Crosshair lines */}
+                {/* Crosshair lines with complementary glow */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={0.2} />
                 <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
                 
-                {/* Center dot - yellow like the regular cursor */}
+                {/* Center dot - yellow with glow */}
+                <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
+                <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
                 <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
@@ -2444,6 +2523,7 @@ export default function DimensionOverlay({
           // Get the color for the next measurement
           const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
           const cursorColor = nextColor.main;
+          const glowColor = getComplementaryColor(cursorColor);
           
           return (
             <View
@@ -2457,22 +2537,28 @@ export default function DimensionOverlay({
               pointerEvents="none"
             >
               <Svg width={100} height={100}>
+                {/* Outer ring glow layers - complementary color */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={0.15} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={0.2} />
                 {/* Outer ring with next measurement color */}
                 <Circle cx={50} cy={50} r={30} fill="none" stroke={cursorColor} strokeWidth="3" opacity={0.8} />
                 {/* Inner circle with next measurement color */}
                 <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
-                {/* Crosshair lines with next measurement color */}
+                {/* Crosshair lines with complementary glow */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={0.2} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={0.2} />
                 <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
                 
-                {/* Neon yellow center dot - smaller and less glowy */}
-                {/* Black outline for contrast */}
+                {/* Neon yellow center dot with glow */}
+                <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
+                <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
-                {/* Minimal glow - just one layer */}
                 <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
-                {/* Core neon yellow dot - smaller for precision */}
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
               <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
@@ -4305,9 +4391,6 @@ export default function DimensionOverlay({
               height: SCREEN_HEIGHT,
               opacity: 0.35,
               transform: [
-                { translateX: 0 },
-                { translateY: 0 },
-                { scale: 1 },
                 { rotate: `${zoomRotation}deg` },
               ],
             }}

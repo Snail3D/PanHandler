@@ -652,6 +652,39 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                   </View>
 
+                  {/* Menu Controls */}
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(255,59,48,0.12)',
+                      borderRadius: 14,
+                      padding: 14,
+                      marginTop: 8,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255,59,48,0.25)',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                      <Ionicons name="menu" size={20} color="#FF3B30" />
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#FF3B30', marginLeft: 6 }}>
+                        Menu Controls
+                      </Text>
+                    </View>
+                    <View style={{ gap: 8 }}>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        • <Text style={{ fontWeight: '600' }}>Swipe left anywhere on menu</Text> to collapse it off-screen
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        • <Text style={{ fontWeight: '600' }}>Tap side tab</Text> to bring menu back
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        • <Text style={{ fontWeight: '600' }}>Drag side tab up/down</Text> to reposition it
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        • Menu collapses instantly for quick workspace access
+                      </Text>
+                    </View>
+                  </View>
+
                   {/* Visual Sample */}
                   <View style={{ marginTop: 12, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 14, padding: 16 }}>
                     <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 12, fontWeight: '600' }}>
