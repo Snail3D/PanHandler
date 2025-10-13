@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -218,6 +218,14 @@ export default function DimensionOverlay({
     opacity: quoteOpacity.value,
   }));
   
+  // Animated style for toast notification
+  const toastAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: toastOpacity.value,
+    transform: [
+      { translateY: interpolate(toastOpacity.value, [0, 1], [20, 0]) }
+    ],
+  }));
+  
   // Easter egg states
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
@@ -233,6 +241,11 @@ export default function DimensionOverlay({
   const [showTetris, setShowTetris] = useState(false);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
+  
+  // Toast notification state (for save success)
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const toastOpacity = useSharedValue(0);
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
@@ -290,6 +303,25 @@ export default function DimensionOverlay({
       // User tapped 3+ times, dismiss immediately
       dismissQuote();
     }
+  };
+  
+  // Toast notification functions
+  const showToastNotification = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    
+    // Fade in
+    toastOpacity.value = withSpring(1, {
+      damping: 15,
+      stiffness: 100,
+    });
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      toastOpacity.value = withTiming(0, { duration: 300 }, () => {
+        runOnJS(setShowToast)(false);
+      });
+    }, 3000);
   };
   
   // Calculator words for Easter egg (classic upside-down calculator words)
@@ -1048,7 +1080,8 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       
       console.log('✅ Save successful!');
-      Alert.alert('Success', label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
+      // Show toast notification instead of Alert (so it appears behind the quote modal)
+      showToastNotification(label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
       
       // Increment save counter for free users
       incrementSaveCount();
@@ -4264,6 +4297,34 @@ export default function DimensionOverlay({
           )}
         </View>
       </View>
+      
+      {/* Toast Notification - appears behind modals */}
+      {showToast && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              bottom: insets.bottom + 100,
+              alignSelf: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              paddingHorizontal: 20,
+              paddingVertical: 12,
+              borderRadius: 25,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 5,
+            },
+            toastAnimatedStyle
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>
+            {toastMessage}
+          </Text>
+        </Animated.View>
+      )}
       
       {/* Inspirational Quote Overlay */}
       <Modal
