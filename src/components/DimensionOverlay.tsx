@@ -1834,29 +1834,29 @@ export default function DimensionOverlay({
                   
                   // Special case: moving rectangle corner - update adjacent corners to maintain axis-aligned rectangle
                   if (m.mode === 'rectangle' && m.points.length === 4) {
-                    // Update the dragged corner
-                    newPoints[resizingPoint.pointIndex] = imageCoords;
-                    
                     // Rectangle corners: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
                     // Update adjacent corners to maintain axis alignment
                     const movedIdx = resizingPoint.pointIndex;
                     
+                    // Update the dragged corner
+                    newPoints[movedIdx] = imageCoords;
+                    
                     if (movedIdx === 0) {
                       // Moving top-left: update top-right's Y and bottom-left's X
-                      newPoints[1] = { ...newPoints[1], y: imageCoords.y };
-                      newPoints[3] = { ...newPoints[3], x: imageCoords.x };
+                      newPoints[1] = { ...m.points[1], y: imageCoords.y };
+                      newPoints[3] = { ...m.points[3], x: imageCoords.x };
                     } else if (movedIdx === 1) {
                       // Moving top-right: update top-left's Y and bottom-right's X
-                      newPoints[0] = { ...newPoints[0], y: imageCoords.y };
-                      newPoints[2] = { ...newPoints[2], x: imageCoords.x };
+                      newPoints[0] = { ...m.points[0], y: imageCoords.y };
+                      newPoints[2] = { ...m.points[2], x: imageCoords.x };
                     } else if (movedIdx === 2) {
                       // Moving bottom-right: update bottom-left's Y and top-right's X
-                      newPoints[3] = { ...newPoints[3], y: imageCoords.y };
-                      newPoints[1] = { ...newPoints[1], x: imageCoords.x };
+                      newPoints[3] = { ...m.points[3], y: imageCoords.y };
+                      newPoints[1] = { ...m.points[1], x: imageCoords.x };
                     } else if (movedIdx === 3) {
                       // Moving bottom-left: update bottom-right's Y and top-left's X
-                      newPoints[2] = { ...newPoints[2], y: imageCoords.y };
-                      newPoints[0] = { ...newPoints[0], x: imageCoords.x };
+                      newPoints[2] = { ...m.points[2], y: imageCoords.y };
+                      newPoints[0] = { ...m.points[0], x: imageCoords.x };
                     }
                     
                     return {
