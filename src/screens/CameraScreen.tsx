@@ -342,6 +342,26 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         facing={facing}
         zoom={0}
       >
+        {/* TEST BUBBLE - Simple red circle that should ALWAYS be visible */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 200,
+            left: SCREEN_WIDTH / 2 - 50,
+            width: 100,
+            height: 100,
+            backgroundColor: '#FF0000',
+            borderRadius: 50,
+            borderWidth: 5,
+            borderColor: '#FFFFFF',
+            zIndex: 99999,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginTop: 35 }}>
+            TEST
+          </Text>
+        </View>
+
         {/* Top controls */}
         <View 
           className="absolute top-0 left-0 right-0 z-10"
@@ -697,6 +717,128 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           ]}
         />
       </CameraView>
+      
+      {/* BUBBLE LEVEL OVERLAY - Outside CameraView for guaranteed visibility */}
+      <View
+        style={{
+          position: 'absolute',
+          top: SCREEN_HEIGHT / 2 - 100,
+          left: SCREEN_WIDTH / 2 - 100,
+          width: 200,
+          height: 200,
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        {/* Outer circle track for bubble */}
+        <View
+          style={{
+            position: 'absolute',
+            width: 140,
+            height: 140,
+            borderRadius: 70,
+            borderWidth: 3,
+            borderColor: 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          }}
+        />
+        
+        {/* Center target circle */}
+        <View
+          style={{
+            position: 'absolute',
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            borderWidth: 3,
+            borderColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 1)' : 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          }}
+        />
+        
+        {/* Crosshair lines - Horizontal */}
+        <View style={{ position: 'absolute', left: 25, top: 99, width: 45, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+        <View style={{ position: 'absolute', right: 25, top: 99, width: 45, height: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+        
+        {/* Crosshair lines - Vertical */}
+        <View style={{ position: 'absolute', left: 99, top: 25, width: 3, height: 45, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+        <View style={{ position: 'absolute', left: 99, bottom: 25, width: 3, height: 45, backgroundColor: 'rgba(255, 255, 255, 0.9)' }} />
+        
+        {/* Center dot when level */}
+        {alignmentStatus === 'good' && (
+          <View
+            style={{
+              position: 'absolute',
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: 'rgba(0, 255, 0, 1)',
+            }}
+          />
+        )}
+        
+        {/* Animated bubble - BRIGHT AND OBVIOUS */}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              backgroundColor: alignmentStatus === 'good' 
+                ? '#00FF00' 
+                : alignmentStatus === 'warning'
+                ? '#FFFF00'
+                : '#FF0000',
+              borderWidth: 4,
+              borderColor: 'white',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 1,
+              shadowRadius: 10,
+              elevation: 20,
+            },
+            useAnimatedStyle(() => ({
+              transform: [
+                { translateX: bubbleX.value },
+                { translateY: bubbleY.value },
+              ],
+            })),
+          ]}
+        >
+          {/* Inner shine for 3D effect */}
+          <View
+            style={{
+              position: 'absolute',
+              top: 6,
+              left: 10,
+              width: 18,
+              height: 18,
+              borderRadius: 9,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            }}
+          />
+        </Animated.View>
+        
+        {/* Debug label */}
+        <View
+          style={{
+            position: 'absolute',
+            top: -50,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 6,
+            borderWidth: 2,
+            borderColor: 'white',
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+            🫧 BUBBLE LEVEL
+          </Text>
+        </View>
+      </View>
       
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
