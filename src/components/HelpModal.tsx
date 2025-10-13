@@ -12,6 +12,7 @@ import Animated, {
   withDelay,
   withSequence,
   withTiming,
+  withRepeat,
   Easing,
   FadeIn,
   SlideInRight
@@ -25,6 +26,7 @@ interface HelpModalProps {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedView = Animated.createAnimatedComponent(View);
+const AnimatedText = Animated.createAnimatedComponent(Text);
 
 // Expandable section component with GLOWING VIBRANT AESTHETIC
 const ExpandableSection = ({ 
@@ -186,6 +188,27 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
+  
+  // Pulsing glow animation for "Upgrade to Pro" text
+  const glowOpacity = useSharedValue(0.3);
+  
+  useEffect(() => {
+    // Gentle, slow pulsing animation
+    glowOpacity.value = withRepeat(
+      withTiming(1, {
+        duration: 2000, // 2 seconds to fade in
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1, // Infinite repeat
+      true // Reverse (fade back out)
+    );
+  }, []);
+  
+  const glowAnimatedStyle = useAnimatedStyle(() => ({
+    textShadowColor: `rgba(255, 59, 48, ${glowOpacity.value * 0.8})`, // Red glow
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12 * glowOpacity.value,
+  }));
   
   useEffect(() => {
     if (visible) {
@@ -1199,15 +1222,15 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       elevation: 8,
                     })}
                   >
-                    <Text style={{ 
+                    <AnimatedText style={[{ 
                       color: '#1C1C1E', 
                       fontSize: 18, 
                       fontWeight: '800', 
                       textAlign: 'center',
                       letterSpacing: 0.3,
-                    }}>
+                    }, glowAnimatedStyle]}>
                       Upgrade to Pro
-                    </Text>
+                    </AnimatedText>
                   </Pressable>
 
                   {/* Restore Purchase Link */}
