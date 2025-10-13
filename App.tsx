@@ -3,7 +3,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
 // import * as StoreReview from 'expo-store-review';
 import MeasurementScreen from "./src/screens/MeasurementScreen";
@@ -40,6 +40,31 @@ export default function App() {
   const introOpacity = useSharedValue(0);
   const appOpacity = useSharedValue(0);
   
+  // Track typing/animation state for cleanup
+  const [typeIntervalId, setTypeIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const [holdTimeoutId, setHoldTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  
+  // Function to gracefully skip intro
+  const skipIntro = () => {
+    // Clear any active intervals/timeouts
+    if (typeIntervalId) clearInterval(typeIntervalId);
+    if (holdTimeoutId) clearTimeout(holdTimeoutId);
+    
+    // Fade out intro and fade in app immediately
+    introOpacity.value = withTiming(0, { 
+      duration: 600,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
+    }, () => {
+      runOnJS(setShowIntro)(false);
+    });
+    
+    // Graceful fade-in for the main app
+    appOpacity.value = withDelay(100, withTiming(1, { 
+      duration: 800,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1)
+    }));
+  };
+  
   // Get random quote on mount
   useEffect(() => {
     const quote = getRandomQuote();
@@ -59,14 +84,16 @@ export default function App() {
     let currentIndex = 0;
     const typingSpeed = 25; // Fast typing for intro
     
-    const typeInterval = setInterval(() => {
+    const intervalId = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         currentIndex++;
       } else {
-        clearInterval(typeInterval);
+        clearInterval(intervalId);
+        setTypeIntervalId(null);
+        
         // Hold for 2 seconds after typing, then cross-fade
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           // Fade out intro and fade in app simultaneously
           introOpacity.value = withTiming(0, { 
             duration: 1000,
@@ -81,10 +108,17 @@ export default function App() {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1) // Smoother, more gradual
           }));
         }, 2000);
+        
+        setHoldTimeoutId(timeoutId);
       }
     }, typingSpeed);
     
-    return () => clearInterval(typeInterval);
+    setTypeIntervalId(intervalId);
+    
+    return () => {
+      clearInterval(intervalId);
+      if (holdTimeoutId) clearTimeout(holdTimeoutId);
+    };
   }, []);
   
   const introAnimatedStyle = useAnimatedStyle(() => ({
@@ -177,19 +211,29 @@ export default function App() {
             ]}
             pointerEvents={introOpacity.value > 0.5 ? 'auto' : 'none'}
           >
-            <Text
+            <Pressable
+              onPress={skipIntro}
               style={{
-                color: '#000000',
-                fontSize: 22,
-                fontWeight: '400',
-                textAlign: 'center',
-                lineHeight: 34,
-                fontFamily: 'System',
-                letterSpacing: 0.5,
+                flex: 1,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              {displayedText}
-            </Text>
+              <Text
+                style={{
+                  color: '#000000',
+                  fontSize: 22,
+                  fontWeight: '400',
+                  textAlign: 'center',
+                  lineHeight: 34,
+                  fontFamily: 'System',
+                  letterSpacing: 0.5,
+                }}
+              >
+                {displayedText}
+              </Text>
+            </Pressable>
           </Animated.View>
         )}
         
