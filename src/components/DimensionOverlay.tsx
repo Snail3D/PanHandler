@@ -247,12 +247,6 @@ export default function DimensionOverlay({
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useSharedValue(0);
   
-  // Karate Chop Easter egg state - for Mom! 🥋 (must be before animated styles)
-  const [showKarateChop, setShowKarateChop] = useState(false);
-  const [karateChopText, setKarateChopText] = useState('');
-  const [karateChopTapCount, setKarateChopTapCount] = useState(0);
-  const karateChopOpacity = useSharedValue(0);
-  
   // Animated styles for quote overlay
   const quoteBackgroundStyle = useAnimatedStyle(() => ({
     backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
@@ -268,15 +262,6 @@ export default function DimensionOverlay({
     transform: [
       { translateY: interpolate(toastOpacity.value, [0, 1], [20, 0]) }
     ],
-  }));
-  
-  // Animated styles for karate chop overlay
-  const karateChopBackgroundStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(255, 255, 255, ${karateChopOpacity.value})`,
-  }));
-  
-  const karateChopContentStyle = useAnimatedStyle(() => ({
-    opacity: karateChopOpacity.value,
   }));
   
   // Easter egg states
@@ -350,58 +335,6 @@ export default function DimensionOverlay({
     if (quoteTapCount >= 2) {
       // User tapped 3+ times, dismiss immediately
       dismissQuote();
-    }
-  };
-  
-  // Karate Chop Easter egg functions - for Mom! 🥋
-  const showKarateChopOverlay = () => {
-    const message = "Don't worry Mom, I'll give 'em a karate chop!";
-    setKarateChopText('');
-    setKarateChopTapCount(0);
-    setShowKarateChop(true);
-    
-    // Fade to white
-    karateChopOpacity.value = withTiming(1, {
-      duration: 500,
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
-    });
-    
-    // Type out the message
-    let currentIndex = 0;
-    const typingSpeed = 50; // Slightly slower for comedic effect
-    
-    const typeInterval = setInterval(() => {
-      if (currentIndex < message.length) {
-        setKarateChopText(message.substring(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        clearInterval(typeInterval);
-        // Auto-dismiss after 4 seconds
-        setTimeout(() => {
-          dismissKarateChop();
-        }, 4000);
-      }
-    }, typingSpeed);
-    
-    // Haptic feedback for the karate chop!
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-  };
-  
-  const dismissKarateChop = () => {
-    karateChopOpacity.value = withTiming(0, {
-      duration: 500,
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
-    }, () => {
-      runOnJS(setShowKarateChop)(false);
-      runOnJS(setKarateChopText)('');
-    });
-  };
-  
-  const handleKarateChopTap = () => {
-    setKarateChopTapCount(prev => prev + 1);
-    if (karateChopTapCount >= 2) {
-      // User tapped 3+ times, dismiss immediately
-      dismissKarateChop();
     }
   };
   
@@ -1075,41 +1008,6 @@ export default function DimensionOverlay({
           return newState;
         });
       }
-    });
-
-    return () => subscription.remove();
-  }, []);
-
-  // Karate Chop detection - Easter egg for Mom! 🥋
-  useEffect(() => {
-    DeviceMotion.setUpdateInterval(50); // Faster sampling for quick chop
-    let lastChopTime = 0;
-    const CHOP_THRESHOLD = 25; // High threshold - need a fast downward chop!
-    const CHOP_COOLDOWN = 5000; // 5 seconds - don't spam mom's joke
-    let prevY = 0;
-
-    const subscription = DeviceMotion.addListener((data) => {
-      if (!data.acceleration || !data.rotation) return;
-
-      const now = Date.now();
-      if (now - lastChopTime < CHOP_COOLDOWN) return;
-
-      const { y } = data.acceleration;
-      const { beta } = data.rotation; // Phone tilt (portrait = beta near 0)
-
-      // Check if phone is roughly vertical (portrait orientation)
-      const isPortrait = Math.abs(beta) < 0.5; // Within ~30 degrees of vertical
-
-      // Detect fast downward motion (karate chop!)
-      const yAcceleration = Math.abs(y);
-      const isDownwardChop = y < -CHOP_THRESHOLD && prevY > y - 5; // Rapid downward
-
-      if (isPortrait && isDownwardChop && yAcceleration > CHOP_THRESHOLD) {
-        lastChopTime = now;
-        showKarateChopOverlay();
-      }
-
-      prevY = y;
     });
 
     return () => subscription.remove();
@@ -4862,71 +4760,6 @@ export default function DimensionOverlay({
               >
                 {displayedText}
               </Text>
-            </Animated.View>
-          </Pressable>
-        </Animated.View>
-      </Modal>
-      
-      {/* Karate Chop Easter Egg - for Mom! 🥋 */}
-      <Modal
-        visible={showKarateChop}
-        transparent
-        animationType="none"
-        onRequestClose={dismissKarateChop}
-      >
-        <Animated.View
-          style={[
-            {
-              flex: 1,
-            },
-            karateChopBackgroundStyle
-          ]}
-        >
-          <Pressable
-            onPress={handleKarateChopTap}
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 40,
-            }}
-          >
-            <Animated.View
-              style={[
-                {
-                  maxWidth: 600,
-                },
-                karateChopContentStyle
-              ]}
-            >
-              <Text
-                style={{
-                  color: '#000000',
-                  fontSize: 32,
-                  fontWeight: '700',
-                  textAlign: 'center',
-                  lineHeight: 44,
-                  fontFamily: 'System',
-                  letterSpacing: 0.5,
-                  textShadowColor: 'rgba(255, 255, 255, 0.8)',
-                  textShadowOffset: { width: 0, height: 0 },
-                  textShadowRadius: 20,
-                }}
-              >
-                {karateChopText}
-              </Text>
-              {karateChopText.length > 0 && (
-                <Text
-                  style={{
-                    color: '#666666',
-                    fontSize: 48,
-                    textAlign: 'center',
-                    marginTop: 20,
-                  }}
-                >
-                  🥋
-                </Text>
-              )}
             </Animated.View>
           </Pressable>
         </Animated.View>
