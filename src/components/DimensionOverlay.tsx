@@ -3273,12 +3273,12 @@ export default function DimensionOverlay({
             </View>
           )}
 
-          {/* Measurement legend in upper-left corner - only show if there are measurements and capturing */}
-          {measurements.length > 0 && isCapturing && (
+          {/* Measurement legend in upper-left corner - show when there are measurements */}
+          {measurements.length > 0 && (
             <View
               style={{
                 position: 'absolute',
-                top: currentLabel ? insets.top + 16 + 70 : insets.top + 16,
+                top: (currentLabel || isCapturing) ? insets.top + 16 + 80 : insets.top + 16,
                 left: 12,
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: 6,
