@@ -2225,17 +2225,17 @@ export default function DimensionOverlay({
                 <View
                   style={{
                     backgroundColor: color.main,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 8,
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 6,
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
+                    shadowOffset: { width: 0, height: 1.5 },
                     shadowOpacity: 0.25,
-                    shadowRadius: 4,
-                    elevation: 5,
+                    shadowRadius: 3,
+                    elevation: 4,
                   }}
                 >
-                  <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
                     {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
                   </Text>
                 </View>
@@ -2278,17 +2278,17 @@ export default function DimensionOverlay({
                   <View
                     style={{
                       backgroundColor: color.main,
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
-                      borderRadius: 6,
+                      paddingHorizontal: 6,
+                      paddingVertical: 3,
+                      borderRadius: 4,
                       shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
+                      shadowOffset: { width: 0, height: 1.5 },
                       shadowOpacity: 0.2,
-                      shadowRadius: 3,
-                      elevation: 4,
+                      shadowRadius: 2,
+                      elevation: 3,
                     }}
                   >
-                    <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
                     </Text>
                   </View>
@@ -2306,17 +2306,17 @@ export default function DimensionOverlay({
                   <View
                     style={{
                       backgroundColor: color.main,
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
-                      borderRadius: 6,
+                      paddingHorizontal: 6,
+                      paddingVertical: 3,
+                      borderRadius: 4,
                       shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
+                      shadowOffset: { width: 0, height: 1.5 },
                       shadowOpacity: 0.2,
-                      shadowRadius: 3,
-                      elevation: 4,
+                      shadowRadius: 2,
+                      elevation: 3,
                     }}
                   >
-                    <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
                     </Text>
                   </View>
