@@ -484,49 +484,52 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                   paddingTop: 4,
                   alignItems: 'center',
                 }}>
-                  <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
-                    {/* Save Button - BIGGER & DARKER */}
+                  <View style={{ flexDirection: 'row', gap: 20, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Save Button - DARK text & icon, glassmorphic background */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
                         flex: 1.4,
-                        backgroundColor: pressed ? '#003D7A' : '#004B99',
+                        backgroundColor: pressed ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.5)',
                         borderRadius: 14,
                         paddingVertical: 14,
+                        paddingHorizontal: 16,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        shadowColor: '#004B99',
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.35)',
+                        shadowColor: '#000',
                         shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: pressed ? 0.7 : 0.5,
-                        shadowRadius: pressed ? 14 : 10,
-                        elevation: 8,
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                        elevation: 4,
                       })}
                     >
-                      <Ionicons name="save" size={20} color="white" />
+                      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                        <Ionicons name="save" size={18} color="#1C1C1E" />
+                      </View>
                       <Text style={{ 
-                        color: 'white', 
+                        color: '#1C1C1E', 
                         fontWeight: '700', 
                         fontSize: 16, 
-                        marginLeft: 6,
+                        marginLeft: 8,
                       }}>
                         Save
                       </Text>
                     </Pressable>
 
-                    {/* Skip Button - SMALLER & LIGHTER */}
+                    {/* Skip Button - LIGHT text, minimal background */}
                     <Pressable
                       onPress={handleSkip}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.12)' : 'rgba(120,120,128,0.06)',
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.08)' : 'transparent',
                         borderRadius: 10,
                         paddingVertical: 10,
-                        flexDirection: 'row',
+                        paddingHorizontal: 12,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderWidth: 1,
-                        borderColor: 'rgba(120,120,128,0.15)',
                       })}
                     >
                       <Text style={{ 
