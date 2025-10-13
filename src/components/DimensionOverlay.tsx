@@ -1056,36 +1056,19 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // UNIVERSAL CANVAS SCALE FORMULA (empirically verified across multiple tests)
-      // 
-      // After extensive testing with multiple calibrations and zoom levels:
-      //   Canvas Scale = (1 / pixelsPerUnit) × calibrationZoom × 0.8
-      //
-      // This formula is UNIVERSAL - works on all devices (iPhone, iPad, Android)
-      // regardless of pixel ratio, screen size, or image resolution.
-      //
-      // The 0.8 constant accounts for how React Native's captureRef exports the canvas
-      // relative to the coordinate space used during calibration.
-      //
+      // Remove unreliable Canvas Scale calculation - provide coin reference for manual calibration
       const pixelRatio = PixelRatio.get();
-      const CANVAS_SCALE_CONSTANT = 0.8;
-      const fusionScale = baseScale * calibrationZoom * CANVAS_SCALE_CONSTANT;
       
-      console.log('📐 CANVAS SCALE - VERIFIED UNIVERSAL FORMULA');
-      console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1/PPU) × zoom × 0.8');
+      console.log('📐 CALIBRATION DATA FOR CAD IMPORT');
+      console.log('  Coin:', coinCircle?.coinName, '-', calibration.referenceDistance, 'mm');
       
-      measurementText += `\n\n=== CALIBRATION DATA ===\n`;
-      measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(3)} px/mm\n`;
-      measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(3)}x\n`;
-      measurementText += `Device Pixel Ratio: ${pixelRatio}x\n`;
-      measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(3)}x\n`;
-      measurementText += `\n✅ CANVAS SCALE: ${fusionScale.toFixed(6)} mm/px\n`;
-      measurementText += `Formula: (1 ÷ PPU) × zoom × 0.8\n`;
-      measurementText += `         = (1 ÷ ${calibration.pixelsPerUnit.toFixed(3)}) × ${calibrationZoom.toFixed(3)} × 0.8\n`;
-        measurementText += `\nFor CAD Canvas Import:\n`;
-        measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
-        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)`;
+      measurementText += `\n\n=== CALIBRATION INFO ===\n`;
+      measurementText += `Reference Coin: ${coinCircle?.coinName || 'Unknown'}\n`;
+      measurementText += `Coin Diameter: ${calibration.referenceDistance.toFixed(2)} mm\n`;
+      measurementText += `\n📋 For CAD Import:\n`;
+      measurementText += `The attached transparent photo can be imported as a canvas.\n`;
+      measurementText += `Calibrate it in your CAD software using the reference coin:\n`;
+      measurementText += `${coinCircle?.coinName} = ${calibration.referenceDistance.toFixed(2)}mm diameter\n`;
       }
       
       // Add footer (only for non-Pro users)
