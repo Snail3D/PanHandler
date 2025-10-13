@@ -354,16 +354,19 @@ export default function DimensionOverlay({
     
     // Hold for 3 seconds, then fade out and clear everything
     setTimeout(() => {
-      tetrisOpacity.value = withTiming(0, { duration: 800 }, () => {
-        runOnJS(setShowTetris)(false);
-        
-        // CLEAR ALL MEASUREMENTS! 🧹
-        runOnJS(setMeasurements)([]);
-        runOnJS(setCurrentPoints)([]);
-        runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
-        
-        // Success haptic for the reset
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      tetrisOpacity.value = withTiming(0, { duration: 800 }, (finished) => {
+        'worklet';
+        if (finished) {
+          runOnJS(setShowTetris)(false);
+          
+          // CLEAR ALL MEASUREMENTS! 🧹
+          runOnJS(setMeasurements)([]);
+          runOnJS(setCurrentPoints)([]);
+          runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
+          
+          // Success haptic for the reset - wrapped in runOnJS
+          runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Success);
+        }
       });
     }, 3000);
   };
