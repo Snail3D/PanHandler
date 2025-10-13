@@ -1936,12 +1936,12 @@ export default function DimensionOverlay({
                     <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
                     {/* Point markers */}
-                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
-                    <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'angle') {
@@ -1961,15 +1961,15 @@ export default function DimensionOverlay({
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
                     <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
                     {/* Point markers */}
-                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
-                    <Circle cx={p1.x} cy={p1.y} r="18" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="14" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="10" fill={color.main} stroke="white" strokeWidth="2" />
-                    <Circle cx={p2.x} cy={p2.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={p1.x} cy={p1.y} r="9" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="7" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="5" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p2.x} cy={p2.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'circle') {
@@ -1987,9 +1987,9 @@ export default function DimensionOverlay({
                     {/* Main circle */}
                     <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
                     {/* Center marker */}
-                    <Circle cx={center.x} cy={center.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={center.x} cy={center.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
+                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={center.x} cy={center.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
               } else if (measurement.mode === 'rectangle') {
@@ -2004,12 +2004,12 @@ export default function DimensionOverlay({
                     {/* Main rectangle */}
                     <Rect x={Math.min(p0.x, p1.x)} y={Math.min(p0.y, p1.y)} width={Math.abs(p1.x - p0.x)} height={Math.abs(p1.y - p0.y)} fill="none" stroke={color.main} strokeWidth="2.5" />
                     {/* Corner markers */}
-                    <Circle cx={p0.x} cy={p0.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
-                    <Circle cx={p1.x} cy={p1.y} r="16" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="12" fill={color.main} opacity="0.2" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} stroke="white" strokeWidth="2" />
+                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} opacity="0.1" />
+                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
               }

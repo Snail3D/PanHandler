@@ -1169,7 +1169,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 14, textAlign: 'center' }}>
                     PanHandler achieves{' '}
                     <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>
-                      ~0.2 mm accuracy
+                      ~0.5 mm accuracy
                     </Text>
                     {'\n'}with small objects
                   </Text>
@@ -1186,13 +1186,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       📐 That's approximately:
                     </Text>
                     <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
-                      • 1/100th of an inch
+                      • 1/50th of an inch
                     </Text>
                     <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
-                      • 2-3 sheets of paper
+                      • Thickness of a credit card
                     </Text>
                     <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
-                      • Width of a human hair
+                      • 5-6 sheets of paper
                     </Text>
                   </View>
 
