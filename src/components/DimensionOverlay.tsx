@@ -1338,8 +1338,8 @@ export default function DimensionOverlay({
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
-      let measurementText = 'PanHandler Measurement Report\n';
-      measurementText += '================================\n\n';
+      let measurementText = 'Measurement Report from PanHandler\n';
+      measurementText += '========================================\n\n';
       
       // Add label if provided
       if (label) {
@@ -1351,17 +1351,17 @@ export default function DimensionOverlay({
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `Calibration Reference: ${coinDiameterDisplay} (the coin you selected)\n`;
+        const coinName = coinCircle.coinName || 'the coin you selected';
+        measurementText += `Calibration Reference: ${coinDiameterDisplay} (${coinName})\n`;
       }
       
       measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
       
-      // List measurements with their order numbers
+      // List measurements exactly as they appear in the legend
       measurementText += 'Measurements:\n';
-      measurementText += '-------------\n';
       
-      measurements.forEach((m, idx) => {
-        measurementText += `${idx + 1}. ${m.value}\n`;
+      measurements.forEach((m) => {
+        measurementText += `${m.value}\n`;
       });
       
       // Add attachment info
@@ -1373,7 +1373,6 @@ export default function DimensionOverlay({
       if (calibration && coinCircle) {
         measurementText += `\n\n═══ CAD Import Info ═══\n`;
         measurementText += `Import the transparent photo as a canvas background.\n`;
-        measurementText += `Use the alignment brackets to position it.\n`;
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
