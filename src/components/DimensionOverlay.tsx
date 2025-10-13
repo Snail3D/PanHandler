@@ -1147,42 +1147,26 @@ export default function DimensionOverlay({
       const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Wait longer to ensure fusion views have the label (increased from 100ms to 200ms)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      console.log('✅ Saved measurements photo!');
       
-      // Capture CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation)
-      if (fusionZoomedViewRef.current) {
-        try {
-          console.log(`📸 Capturing zoomed CAD canvas with label: "${label || 'null'}"`);
-          
-          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
-            result: 'tmpfile',
-          });
-          
-          await MediaLibrary.createAssetAsync(zoomedUri);
-          console.log('✅ Saved zoomed CAD canvas!');
-        } catch (error) {
-          console.error('Failed to capture zoomed CAD canvas:', error);
-        }
-      }
+      // Wait longer to ensure fusion view has the label
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Capture CAD Canvas - Full (35% opacity, unzoomed but with locked rotation)
+      // Capture transparent CAD Canvas - Full (35% opacity, unzoomed with rotation, NO measurements or legend)
       if (fusionViewRef.current) {
         try {
-          console.log(`📸 Capturing full CAD canvas with label: "${label || 'null'}"`);
+          console.log(`📸 Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
           
           const fullUri = await captureRef(fusionViewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
+            format: 'png', // PNG for transparency support
+            quality: 1.0,
             result: 'tmpfile',
           });
           
           await MediaLibrary.createAssetAsync(fullUri);
-          console.log('✅ Saved full CAD canvas!');
+          console.log('✅ Saved transparent CAD canvas!');
         } catch (error) {
-          console.error('Failed to capture full CAD canvas:', error);
+          console.error('Failed to capture transparent CAD canvas:', error);
         }
       }
       
@@ -1349,56 +1333,36 @@ export default function DimensionOverlay({
       // Prepare attachments with proper filenames
       const attachments: string[] = [];
       
-      // 1. Measurements photo (labeled with all measurements)
-      const measurementsFilename = label ? `${label}_Labeled.jpg` : 'PanHandler_Labeled.jpg';
+      // 1. Full measurements photo (with legend, label, coin, and all measurements)
+      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
       await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // Wait longer to ensure fusion views have the label (increased from 100ms to 200ms)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      console.log('✅ Added measurements photo to email');
       
-      // 2. CAD Canvas - Zoomed (35% opacity, shows current zoom/pan/rotation, with title + coin info)
-      if (fusionZoomedViewRef.current) {
-        try {
-          console.log(`📸 Email - Capturing zoomed CAD canvas with label: "${label || 'null'}"`);
-          
-          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
-            result: 'tmpfile',
-          });
-          
-          const zoomedFilename = label ? `${label}_CAD_Zoomed.jpg` : 'PanHandler_CAD_Zoomed.jpg';
-          const zoomedDest = `${FileSystem.cacheDirectory}${zoomedFilename}`;
-          await FileSystem.copyAsync({ from: zoomedUri, to: zoomedDest });
-          attachments.push(zoomedDest);
-          
-          console.log('✅ Added zoomed CAD canvas to email');
-        } catch (error) {
-          console.error('Failed to capture zoomed CAD canvas:', error);
-        }
-      }
+      // Wait longer to ensure fusion view has the label
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // 3. CAD Canvas - Full (35% opacity, unzoomed but with rotation, with title + coin info)
+      // 2. Transparent CAD canvas - Full (35% opacity, unzoomed with rotation, title + coin info, NO measurements or legend)
       if (fusionViewRef.current) {
         try {
-          console.log(`📸 Email - Capturing full CAD canvas with label: "${label || 'null'}"`);
+          console.log(`📸 Email - Capturing transparent CAD canvas with label: "${label || currentLabel || 'null'}"`);
           
           const fullUri = await captureRef(fusionViewRef.current, {
-            format: 'jpg',
-            quality: 0.9,
+            format: 'png', // PNG for transparency support
+            quality: 1.0,
             result: 'tmpfile',
           });
           
-          const fullFilename = label ? `${label}_CAD_Full.jpg` : 'PanHandler_CAD_Full.jpg';
-          const fullDest = `${FileSystem.cacheDirectory}${fullFilename}`;
-          await FileSystem.copyAsync({ from: fullUri, to: fullDest });
-          attachments.push(fullDest);
+          const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
+          const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
+          await FileSystem.copyAsync({ from: fullUri, to: transparentDest });
+          attachments.push(transparentDest);
           
-          console.log('✅ Added full CAD canvas to email');
+          console.log('✅ Added transparent CAD canvas to email');
         } catch (error) {
-          console.error('Failed to capture full CAD canvas:', error);
+          console.error('Failed to capture transparent CAD canvas:', error);
         }
       }
       
