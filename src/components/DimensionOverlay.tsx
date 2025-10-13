@@ -2195,7 +2195,7 @@ export default function DimensionOverlay({
       })()}
 
       {/* Subtle guide lines - only show in Pan mode after calibration, hide when measurements exist */}
-      {!measurementMode && calibration && measurements.length === 0 && (
+      {!measurementMode && calibration && Array.isArray(measurements) && measurements.length === 0 && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
           pointerEvents="none"
