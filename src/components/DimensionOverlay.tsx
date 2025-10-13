@@ -1056,17 +1056,17 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // SOLVED: The exported CAD canvas is at device pixel ratio (3x on iPhone)
-      // pixelsPerUnit is in screen-space, but export is at native resolution
-      // Canvas Scale = (1 / pixelsPerUnit) × pixelRatio
+      // CORRECTED: Export is unzoomed but pixelsPerUnit was calculated at zoom
+      // Canvas Scale = (1 / pixelsPerUnit) × pixelRatio × zoom
       const pixelRatio = PixelRatio.get();
-      const fusionScale = baseScale * pixelRatio;
+      const fusionScale = baseScale * pixelRatio * calibrationZoom;
       
-      console.log('📐 CANVAS SCALE - SOLVED!');
+      console.log('📐 CANVAS SCALE - CORRECTED FORMULA:');
       console.log('  Device pixel ratio:', pixelRatio);
       console.log('  Base scale:', baseScale.toFixed(6), 'mm/px');
+      console.log('  Calibration zoom:', calibrationZoom.toFixed(2), 'x');
       console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1 / pixelsPerUnit) × pixelRatio');
+      console.log('  Formula: (1 / pixelsPerUnit) × pixelRatio × zoom');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
@@ -1080,7 +1080,7 @@ export default function DimensionOverlay({
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × pixelRatio = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${pixelRatio} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × pixelRatio × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${pixelRatio} × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
@@ -3267,12 +3267,8 @@ export default function DimensionOverlay({
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
               opacity: 0.35,
-              // Apply saved zoom transformation to match calibrated view
-              transform: [
-                { translateX: savedZoomState?.translateX || 0 },
-                { translateY: savedZoomState?.translateY || 0 },
-                { scale: savedZoomState?.scale || 1 },
-              ],
+              // NO TRANSFORM - export unzoomed image
+              // Canvas Scale formula will account for calibration zoom
             }}
           >
             <Image
