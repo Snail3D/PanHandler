@@ -99,7 +99,6 @@ export default function DimensionOverlay({
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
-  const overlayOnlyRef = useRef<View>(null); // For capturing just the overlay without the photo
   const viewRef = externalViewRef || internalViewRef; // Use external ref if provided
   
   // Lock-in animation
@@ -1151,24 +1150,21 @@ export default function DimensionOverlay({
       
       console.log('✅ Saved measurements photo!');
       
-      // Capture overlay only (without photo background) for transparent CAD
-      // Use overlayOnlyRef which wraps just the SVG overlay content
-      if (overlayOnlyRef.current) {
-        setHideMeasurementsForCapture(true); // Hide measurements and legend
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
-        
-        const transparentUri = await captureRef(overlayOnlyRef.current, {
-          format: 'png', // PNG for transparency
-          quality: 1.0,
-          result: 'tmpfile',
-        });
-        
-        await MediaLibrary.createAssetAsync(transparentUri);
-        
-        setHideMeasurementsForCapture(false); // Show measurements again
-      }
+      // Capture SAME view again but with measurements hidden (label + coin info only)
+      setHideMeasurementsForCapture(true); // Hide measurements and legend
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      console.log('✅ Saved transparent CAD canvas!');
+      const labelOnlyUri = await captureRef(viewRef.current, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
+      
+      await MediaLibrary.createAssetAsync(labelOnlyUri);
+      
+      setHideMeasurementsForCapture(false); // Show measurements again
+      
+      console.log('✅ Saved label-only photo!');
       
       // Clear state
       setIsCapturing(false);
@@ -1341,27 +1337,24 @@ export default function DimensionOverlay({
       
       console.log('✅ Added measurements photo to email');
       
-      // 2. Capture overlay only (without photo background) for transparent CAD
-      // Use overlayOnlyRef which wraps just the SVG overlay content
-      if (overlayOnlyRef.current) {
-        setHideMeasurementsForCapture(true); // Hide measurements and legend
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
-        
-        const transparentUri = await captureRef(overlayOnlyRef.current, {
-          format: 'png', // PNG for transparency
-          quality: 1.0,
-          result: 'tmpfile',
-        });
-        
-        const transparentFilename = label ? `${label}_CAD_Transparent.png` : 'PanHandler_CAD_Transparent.png';
-        const transparentDest = `${FileSystem.cacheDirectory}${transparentFilename}`;
-        await FileSystem.copyAsync({ from: transparentUri, to: transparentDest });
-        attachments.push(transparentDest);
-        
-        setHideMeasurementsForCapture(false); // Show measurements again
-      }
+      // 2. Capture SAME view again but with measurements hidden (label + coin info only)
+      setHideMeasurementsForCapture(true); // Hide measurements and legend
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      console.log('✅ Added transparent CAD canvas to email');
+      const labelOnlyUri = await captureRef(viewRef.current, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
+      
+      const labelOnlyFilename = label ? `${label}_Label.png` : 'PanHandler_Label.png';
+      const labelOnlyDest = `${FileSystem.cacheDirectory}${labelOnlyFilename}`;
+      await FileSystem.copyAsync({ from: labelOnlyUri, to: labelOnlyDest });
+      attachments.push(labelOnlyDest);
+      
+      setHideMeasurementsForCapture(false); // Show measurements again
+      
+      console.log('✅ Added label-only photo to email');
       
       // Clear label and show menu again
       setIsCapturing(false);
@@ -2781,19 +2774,13 @@ export default function DimensionOverlay({
         </View>
       )}
 
-      {/* Visual overlay for measurements - wrapped for dual capture */}
+      {/* Visual overlay for measurements */}
       <View
         ref={viewRef}
         collapsable={false}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
-        <View
-          ref={overlayOnlyRef}
-          collapsable={false}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          pointerEvents="none"
-        >
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
             {/* Lock-in animation - green blinking circle (only shows during animation) */}
@@ -3610,7 +3597,6 @@ export default function DimensionOverlay({
               </View>
             </View>
           )}
-        </View>
       </View>
 
       {/* Auto-capture badge - top-right corner (OUTSIDE viewRef to allow taps) */}
