@@ -1524,7 +1524,7 @@ export default function DimensionOverlay({
     top: tabPositionY.value - 40, // Center the 80px tall tab
   }));
   
-  // Pan gesture for sliding menu in/out
+  // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
     .onUpdate((event) => {
       // Only respond to horizontal swipes
@@ -1539,19 +1539,50 @@ export default function DimensionOverlay({
       }
     })
     .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.3; // Changed from 20% to 30%
-      if (Math.abs(event.translationX) > threshold) {
-        // Hide menu to the right - instant collapse
-        menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
-        menuOpacity.value = 1; // Reset opacity for next show
+      const threshold = SCREEN_WIDTH * 0.3;
+      // Require FAST swipe (high velocity) to collapse menu - prevents accidental collapse when swiping modes
+      const minVelocity = 800; // pixels/second - must be a fast swipe
+      const isFastSwipe = Math.abs(event.velocityX) > minVelocity;
+      
+      if (Math.abs(event.translationX) > threshold && isFastSwipe) {
+        // Hide menu to the right - fast swipe detected
+        menuTranslateX.value = SCREEN_WIDTH;
+        menuOpacity.value = 1;
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       } else {
-        // Show menu
+        // Show menu - slow swipe or didn't cross threshold
         menuTranslateX.value = withSpring(0);
-        menuOpacity.value = 1; // Ensure visible
+        menuOpacity.value = 1;
         runOnJS(setMenuHidden)(false);
-        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        if (Math.abs(event.translationX) > 20) {
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        }
+      }
+    });
+  
+  // Swipe gesture for cycling through measurement modes
+  const modeSwitchGesture = Gesture.Pan()
+    .onEnd((event) => {
+      // Only respond to primarily horizontal swipes
+      if (Math.abs(event.translationX) > Math.abs(event.translationY) * 1.5) {
+        const threshold = 50; // Minimum swipe distance
+        const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
+        const currentIndex = modes.indexOf(mode);
+        
+        if (event.translationX < -threshold && event.velocityX < -200) {
+          // Swipe left - next mode
+          const nextIndex = (currentIndex + 1) % modes.length;
+          runOnJS(setMode)(modes[nextIndex]);
+          runOnJS(setModeColorIndex)(nextIndex);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        } else if (event.translationX > threshold && event.velocityX > 200) {
+          // Swipe right - previous mode
+          const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
+          runOnJS(setMode)(modes[prevIndex]);
+          runOnJS(setModeColorIndex)(prevIndex);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+        }
       }
     });
   
@@ -3877,10 +3908,11 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
-          <View style={{ marginBottom: 8 }}>
-            <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
-              {/* Box (Rectangle) */}
-              <Pressable
+          <GestureDetector gesture={modeSwitchGesture}>
+            <View style={{ marginBottom: 8 }}>
+              <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+                {/* Box (Rectangle) */}
+                <Pressable
                 onPress={() => {
                   setMode('rectangle');
                   setCurrentPoints([]);
@@ -4128,6 +4160,7 @@ export default function DimensionOverlay({
               </Pressable>
             </View>
           </View>
+          </GestureDetector>
 
           {/* Unit System Toggle: Metric vs Imperial - Moved below measurement types */}
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
