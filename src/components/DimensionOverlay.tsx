@@ -466,7 +466,12 @@ export default function DimensionOverlay({
 
   // Helper to snap cursor to nearby existing measurement points
   const snapToNearbyPoint = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    const SNAP_DISTANCE = 30; // pixels - very close range for magnetic snap
+    // Calculate 1mm in pixels based on calibration
+    // If not calibrated, fallback to 30 pixels
+    const SNAP_DISTANCE_MM = 1; // 1mm snap threshold
+    const SNAP_DISTANCE = calibration 
+      ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
+      : 30; // fallback to 30 pixels if not calibrated
     
     // Check all existing measurement points
     for (const measurement of measurements) {
