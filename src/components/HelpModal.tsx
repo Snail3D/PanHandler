@@ -189,23 +189,23 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
   
-  // Pulsing glow animation for "Upgrade to Pro" button
-  const glowOpacity = useSharedValue(0.3);
+  // Pulsing animation for "Upgrade to Pro" button text
+  const textPulse = useSharedValue(1);
   
   useEffect(() => {
-    // Gentle, slow pulsing animation
-    glowOpacity.value = withRepeat(
-      withTiming(1, {
-        duration: 2000, // 2 seconds to fade in
+    // Gentle, slow pulsing animation - subtle opacity change
+    textPulse.value = withRepeat(
+      withTiming(0.7, {
+        duration: 2000, // 2 seconds to fade down
         easing: Easing.inOut(Easing.ease),
       }),
       -1, // Infinite repeat
-      true // Reverse (fade back out)
+      true // Reverse (fade back up)
     );
   }, []);
   
-  const glowAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
+  const textPulseStyle = useAnimatedStyle(() => ({
+    opacity: textPulse.value,
   }));
   
   useEffect(() => {
@@ -1178,34 +1178,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       shadowOpacity: pressed ? 0.5 : 0.35,
                       shadowRadius: pressed ? 16 : 12,
                       elevation: 8,
-                      position: 'relative',
                     })}
                   >
-                    {/* Pulsing red glow layer behind text */}
-                    <AnimatedView 
-                      style={[{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        borderRadius: 16,
-                        shadowColor: '#FF3B30',
-                        shadowOffset: { width: 0, height: 0 },
-                        shadowOpacity: 0.8,
-                        shadowRadius: 12,
-                      }, glowAnimatedStyle]}
-                      pointerEvents="none"
-                    />
-                    <Text style={{ 
+                    <AnimatedText style={[{ 
                       color: '#1C1C1E', 
                       fontSize: 18, 
                       fontWeight: '800', 
                       textAlign: 'center',
                       letterSpacing: 0.3,
-                    }}>
+                    }, textPulseStyle]}>
                       Upgrade to Pro
-                    </Text>
+                    </AnimatedText>
                   </Pressable>
 
                   {/* Restore Purchase Link */}
