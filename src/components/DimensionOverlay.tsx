@@ -3993,7 +3993,7 @@ export default function DimensionOverlay({
                   setCurrentPoints([]);
                   setMeasurementMode(true);
                   setIsDrawingFreehand(false);
-                  setShowFreehandCursor(true);
+                  // Don't show cursor until user touches screen
                   setModeColorIndex((prev) => prev + 1); // Rotate color
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
@@ -4055,7 +4055,7 @@ export default function DimensionOverlay({
                     setCurrentPoints([]);
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
-                    setShowFreehandCursor(true);
+                    // Don't show cursor until user touches screen
                     setModeColorIndex((prev) => prev + 1); // Rotate color when long-press activates
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     console.log('🎨 Freehand mode activated via long-press');
