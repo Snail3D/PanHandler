@@ -4,33 +4,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 
-interface LabelModalProps {
+interface EmailPromptModalProps {
   visible: boolean;
-  onComplete: (label: string | null) => void;
+  onComplete: (email: string | null) => void;
   onDismiss: () => void;
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss }: LabelModalProps) {
-  const [label, setLabel] = useState('');
+export default function EmailPromptModal({ visible, onComplete, onDismiss }: EmailPromptModalProps) {
+  const [email, setEmail] = useState('');
 
-  const handleContinue = () => {
+  const handleSave = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Keyboard.dismiss();
-    onComplete(label.trim() || null);
-    setLabel(''); // Reset for next time
-  };
-
-  const handleSkip = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Keyboard.dismiss();
-    onComplete(null);
-    setLabel(''); // Reset for next time
+    onComplete(email.trim() || null);
+    setEmail(''); // Reset for next time
   };
 
   const handleCancel = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Keyboard.dismiss();
-    setLabel('');
+    setEmail('');
     onDismiss();
   };
 
@@ -76,16 +69,16 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         width: 44,
                         height: 44,
                         borderRadius: 22,
-                        backgroundColor: 'rgba(88,86,214,0.15)',
+                        backgroundColor: 'rgba(52,199,89,0.15)',
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginRight: 12,
-                        shadowColor: '#5856D6',
+                        shadowColor: '#34C759',
                         shadowOffset: { width: 0, height: 0 },
                         shadowOpacity: 0.4,
                         shadowRadius: 10,
                       }}>
-                        <Ionicons name="pricetag" size={24} color="#5856D6" />
+                        <Ionicons name="mail" size={24} color="#34C759" />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ 
@@ -94,7 +87,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                           color: '#1C1C1E',
                           letterSpacing: -0.5,
                         }}>
-                          Label This Item
+                          Email Address
                         </Text>
                         <Text style={{ 
                           color: '#8E8E93', 
@@ -102,7 +95,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                           fontWeight: '500',
                           marginTop: -2,
                         }}>
-                          Optional - helps organize
+                          Auto-populate for future use
                         </Text>
                       </View>
                     </View>
@@ -124,6 +117,29 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
 
                 {/* Content */}
                 <View style={{ paddingHorizontal: 24, paddingVertical: 24 }}>
+                  {/* Security note */}
+                  <View style={{
+                    backgroundColor: 'rgba(52,199,89,0.12)',
+                    borderRadius: 14,
+                    padding: 14,
+                    marginBottom: 16,
+                    borderWidth: 2,
+                    borderColor: 'rgba(52,199,89,0.25)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="lock-closed" size={18} color="#34C759" style={{ marginTop: 2, marginRight: 8 }} />
+                      <Text style={{ 
+                        flex: 1,
+                        color: '#2E7D32', 
+                        fontSize: 13, 
+                        fontWeight: '600',
+                        lineHeight: 18,
+                      }}>
+                        This is secure and not shared with us or anyone. It simply makes sending emails faster for you in the future.
+                      </Text>
+                    </View>
+                  </View>
+
                   {/* Input Field */}
                   <View style={{ marginBottom: 8 }}>
                     <Text style={{ 
@@ -132,7 +148,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                       fontWeight: '600', 
                       marginBottom: 10,
                     }}>
-                      What is this?
+                      Your email address
                     </Text>
                     <View style={{
                       flexDirection: 'row',
@@ -144,11 +160,11 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                       borderWidth: 2,
                       borderColor: 'rgba(120,120,128,0.25)',
                     }}>
-                      <Ionicons name="pricetag-outline" size={22} color="#8E8E93" />
+                      <Ionicons name="at" size={22} color="#8E8E93" />
                       <TextInput
-                        value={label}
-                        onChangeText={setLabel}
-                        placeholder="e.g., Kitchen Table, Door Frame..."
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="your@email.com"
                         placeholderTextColor="#8E8E93"
                         style={{
                           flex: 1,
@@ -159,24 +175,18 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         }}
                         autoFocus
                         returnKeyType="done"
-                        onSubmitEditing={handleContinue}
-                        maxLength={50}
+                        onSubmitEditing={handleSave}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
                       />
-                      {label.length > 0 && (
-                        <Pressable onPress={() => setLabel('')}>
+                      {email.length > 0 && (
+                        <Pressable onPress={() => setEmail('')}>
                           <Ionicons name="close-circle" size={22} color="#8E8E93" />
                         </Pressable>
                       )}
                     </View>
                   </View>
-
-                  <Text style={{ 
-                    color: '#8E8E93', 
-                    fontSize: 12,
-                    fontWeight: '500',
-                  }}>
-                    This label will appear in emails and saved photos
-                  </Text>
                 </View>
 
                 {/* Footer Buttons */}
@@ -186,9 +196,9 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                   paddingTop: 8,
                 }}>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
-                    {/* Skip Button */}
+                    {/* Cancel Button */}
                     <Pressable
-                      onPress={handleSkip}
+                      onPress={handleCancel}
                       style={({ pressed }) => ({
                         flex: 1,
                         backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
@@ -201,29 +211,29 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         borderColor: 'rgba(120,120,128,0.2)',
                       })}
                     >
-                      <Ionicons name="arrow-forward" size={20} color="#8E8E93" />
+                      <Ionicons name="close" size={20} color="#8E8E93" />
                       <Text style={{ 
                         color: '#8E8E93', 
                         fontWeight: '700', 
                         fontSize: 16, 
                         marginLeft: 6,
                       }}>
-                        Skip
+                        Cancel
                       </Text>
                     </Pressable>
 
-                    {/* Continue Button */}
+                    {/* Save Button */}
                     <Pressable
-                      onPress={handleContinue}
+                      onPress={handleSave}
                       style={({ pressed }) => ({
                         flex: 1,
-                        backgroundColor: pressed ? '#0066CC' : '#007AFF',
+                        backgroundColor: pressed ? '#2FAF5D' : '#34C759',
                         borderRadius: 16,
                         paddingVertical: 14,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        shadowColor: '#007AFF',
+                        shadowColor: '#34C759',
                         shadowOffset: { width: 0, height: 0 },
                         shadowOpacity: pressed ? 0.6 : 0.4,
                         shadowRadius: pressed ? 16 : 12,
@@ -237,7 +247,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         fontSize: 16, 
                         marginLeft: 6,
                       }}>
-                        {label.trim() ? 'Continue' : 'Skip'}
+                        Save
                       </Text>
                     </Pressable>
                   </View>
