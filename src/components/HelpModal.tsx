@@ -5,6 +5,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -221,6 +222,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     transform: [{ scale: headerScale.value }],
   }));
 
+  // Swipe gesture to close modal (left to right)
+  const swipeGesture = Gesture.Pan()
+    .onEnd((event) => {
+      // Check if swipe is left-to-right and crosses halfway
+      if (event.translationX > 150 && event.velocityX > 0) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onClose();
+      }
+    });
+
   return (
     <Modal
       visible={visible}
@@ -325,11 +336,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
             {/* Content with glassmorphism background */}
             <BlurView intensity={95} tint="light" style={{ flex: 1 }}>
               <View style={{ flex: 1, backgroundColor: 'rgba(245,245,247,0.75)' }}>
-                <ScrollView
-                  style={{ flex: 1 }}
-                  contentContainerStyle={{ padding: 20 }}
-                  showsVerticalScrollIndicator={false}
-                >
+                <GestureDetector gesture={swipeGesture}>
+                  <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ padding: 20 }}
+                    showsVerticalScrollIndicator={false}
+                  >
               {/* Camera & Auto Level */}
               <ExpandableSection
                 icon="camera"
@@ -1457,6 +1469,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
             </ScrollView>
+                </GestureDetector>
               </View>
             </BlurView>
 
@@ -1483,7 +1496,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 <AnimatedView
                   entering={FadeIn.delay(750)}
                   style={{
-                    marginBottom: 14,
                     paddingVertical: 10,
                     paddingHorizontal: 16,
                     backgroundColor: 'rgba(255,105,180,0.12)',
@@ -1502,29 +1514,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
                   </Text>
                 </AnimatedView>
-
-                <AnimatedPressable
-                  entering={FadeIn.delay(700)}
-                  onPress={() => {
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    onClose();
-                  }}
-                  style={({ pressed }) => ({
-                    backgroundColor: pressed ? '#0066CC' : '#007AFF',
-                    paddingVertical: 16,
-                    borderRadius: 16,
-                    alignItems: 'center',
-                    shadowColor: '#007AFF',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: pressed ? 0.5 : 0.35,
-                    shadowRadius: pressed ? 16 : 12,
-                    elevation: 8,
-                  })}
-                >
-                  <Text style={{ color: 'white', fontSize: 17, fontWeight: '700', letterSpacing: -0.2 }}>
-                    Got It! Let's Measure 🎯
-                  </Text>
-                </AnimatedPressable>
               </View>
             </BlurView>
           </View>
