@@ -906,17 +906,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 
                 <View style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
                   <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
-                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>Measurement Report from PanHandler</Text>
+                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>Arduino Case - Measurements</Text>
                   </Text>
                   <View style={{ height: 1, backgroundColor: '#E5E5EA', marginBottom: 10 }} />
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    Measurement Report from PanHandler{'\n\n'}
+                    Arduino Case - Measurements by PanHandler{'\n\n'}
                     <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (the coin you selected){'\n'}
                     <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n\n'}
                     <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
-                    Distance: 145.2mm{'\n'}
-                    Angle: 87.5°{'\n'}
-                    Circle: Ø 52.3mm{'\n\n'}
+                    Distance: 145.2mm (Blue){'\n'}
+                    Angle: 87.5° (Green){'\n'}
+                    Circle: Ø 52.3mm (Red){'\n\n'}
                     Attached: 2 photos{'\n'}
                     {'\u2022'} Full measurements photo{'\n'}
                     {'\u2022'} Transparent CAD canvas (50% opacity)
