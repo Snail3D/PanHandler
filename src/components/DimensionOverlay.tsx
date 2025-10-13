@@ -132,6 +132,9 @@ export default function DimensionOverlay({
   const [proTapCount, setProTapCount] = useState(0);
   const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Freehand mode activation (long-press on Distance button)
+  const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Paywall modal for halfway point (5 saves/emails)
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   
