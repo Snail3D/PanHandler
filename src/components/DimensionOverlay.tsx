@@ -1341,13 +1341,15 @@ export default function DimensionOverlay({
       console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
-      let measurementText = 'Measurement Report from PanHandler\n';
-      measurementText += '========================================\n\n';
+      let measurementText = '';
       
-      // Add label if provided
+      // First line with label and PanHandler branding
       if (label) {
-        measurementText += `Item: ${label}\n\n`;
+        measurementText += `${label} - Measurements by PanHandler\n`;
+      } else {
+        measurementText += 'PanHandler Measurements\n';
       }
+      measurementText += '========================================\n\n';
       
       // Add calibration and unit info
       if (coinCircle) {
@@ -1360,11 +1362,18 @@ export default function DimensionOverlay({
       
       measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
       
-      // List measurements exactly as they appear in the legend
+      // List measurements with color names in parentheses
       measurementText += 'Measurements:\n';
       
-      measurements.forEach((m) => {
-        measurementText += `${m.value}\n`;
+      measurements.forEach((m, idx) => {
+        // Get color name for this measurement
+        const colorInfo = getMeasurementColor(idx, m.mode);
+        const colorName = colorInfo.name;
+        
+        // Extract just the measurement value without any existing color prefix
+        const valueOnly = m.value.replace(/^(Blue|Green|Red|Purple|Orange|Yellow|Pink|Amber|Cyan|Rose|Teal|Violet|Crimson|Magenta|Indigo|Sky|Lime)\s+/i, '');
+        
+        measurementText += `${valueOnly} (${colorName})\n`;
       });
       
       // Add attachment info
@@ -1423,9 +1432,9 @@ export default function DimensionOverlay({
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      // Build subject with label
+      // Build subject with label first, then "Measurements"
       const subject = label 
-        ? `PanHandler Measurements - ${label}` 
+        ? `${label} - Measurements` 
         : 'PanHandler Measurements';
       
       // Compose email with attachments
