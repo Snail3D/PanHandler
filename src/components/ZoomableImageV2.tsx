@@ -21,6 +21,7 @@ interface ZoomableImageProps {
   zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
   showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
   locked?: boolean; // If true, disable pan/zoom gestures
+  opacity?: number; // Opacity of the image (0-1), default 1
 }
 
 export default function ZoomableImage({ 
@@ -33,6 +34,7 @@ export default function ZoomableImage({
   zoomToCenter = false,
   showLevelLine = false,
   locked = false,
+  opacity = 1,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -142,7 +144,7 @@ export default function ZoomableImage({
         <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
           <Image
             source={{ uri: imageUri }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
             resizeMode="contain"
           />
         </Animated.View>
