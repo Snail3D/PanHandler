@@ -39,6 +39,9 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
   
+  // Camera flash animation
+  const flashOpacity = useSharedValue(0);
+  
   // Stability tracking
   const recentAngles = React.useRef<number[]>([]);
   const stabilityCheckInterval = React.useRef<NodeJS.Timeout | null>(null);
@@ -73,6 +76,17 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     
     try {
       setIsCapturing(true);
+      
+      // Camera flash effect - quick bright flash
+      flashOpacity.value = 1;
+      flashOpacity.value = withSpring(0, {
+        damping: 20,
+        stiffness: 200,
+        mass: 0.3,
+      });
+      
+      // Haptic feedback
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       
       // Take the photo
       const photo = await cameraRef.current.takePictureAsync({
@@ -658,6 +672,24 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             </Text>
           </View>
         </View>
+        
+        {/* Camera flash overlay */}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'white',
+              pointerEvents: 'none',
+            },
+            useAnimatedStyle(() => ({
+              opacity: flashOpacity.value,
+            })),
+          ]}
+        />
       </CameraView>
       
       {/* Help Modal */}
