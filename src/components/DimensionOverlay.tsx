@@ -137,7 +137,7 @@ export default function DimensionOverlay({
   
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
-  const [resizingCorner, setResizingCorner] = useState<{ measurementId: string, cornerIndex: 0 | 1 } | null>(null);
+  const [resizingPoint, setResizingPoint] = useState<{ measurementId: string, pointIndex: number } | null>(null);
   const dragStartPos = useSharedValue({ x: 0, y: 0 });
   const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
   const [didDrag, setDidDrag] = useState(false); // Track if user actually dragged
@@ -370,31 +370,32 @@ export default function DimensionOverlay({
     return colors[index % colors.length];
   };
 
-  // Helper to check if tap is near a rectangle corner
-  const getTappedRectangleCorner = (tapX: number, tapY: number): { measurementId: string, cornerIndex: 0 | 1 } | null => {
-    const CORNER_THRESHOLD = 40; // pixels
+  // Helper to check if tap is near any measurement point (works for all types)
+  const getTappedMeasurementPoint = (tapX: number, tapY: number): { measurementId: string, pointIndex: number } | null => {
+    const POINT_THRESHOLD = 40; // pixels
     
     for (const measurement of measurements) {
-      if (measurement.mode === 'rectangle') {
-        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+      // Check all points in the measurement
+      for (let i = 0; i < measurement.points.length; i++) {
+        const point = imageToScreen(measurement.points[i].x, measurement.points[i].y);
         
-        // Check distance to corner 0
-        const distToCorner0 = Math.sqrt(
-          Math.pow(tapX - p0.x, 2) + Math.pow(tapY - p0.y, 2)
+        const distToPoint = Math.sqrt(
+          Math.pow(tapX - point.x, 2) + Math.pow(tapY - point.y, 2)
         );
-        if (distToCorner0 < CORNER_THRESHOLD) {
-          return { measurementId: measurement.id, cornerIndex: 0 };
-        }
         
-        // Check distance to corner 1
-        const distToCorner1 = Math.sqrt(
-          Math.pow(tapX - p1.x, 2) + Math.pow(tapY - p1.y, 2)
-        );
-        if (distToCorner1 < CORNER_THRESHOLD) {
-          return { measurementId: measurement.id, cornerIndex: 1 };
+        if (distToPoint < POINT_THRESHOLD) {
+          return { measurementId: measurement.id, pointIndex: i };
         }
       }
+    }
+    return null;
+  };
+
+  // Helper to check if tap is near a rectangle corner (kept for backward compatibility)
+  const getTappedRectangleCorner = (tapX: number, tapY: number): { measurementId: string, pointIndex: 0 | 1 } | null => {
+    const point = getTappedMeasurementPoint(tapX, tapY);
+    if (point && measurements.find(m => m.id === point.measurementId)?.mode === 'rectangle') {
+      return { measurementId: point.measurementId, pointIndex: point.pointIndex as 0 | 1 };
     }
     return null;
   };
@@ -1564,28 +1565,29 @@ export default function DimensionOverlay({
           onStartShouldSetResponder={() => true}
           onMoveShouldSetResponder={(event) => {
             // Only respond to move if we're dragging or resizing
-            return draggedMeasurementId !== null || resizingCorner !== null;
+            return draggedMeasurementId !== null || resizingPoint !== null;
           }}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
             
-            // Check if tapping a rectangle corner first
-            const corner = getTappedRectangleCorner(pageX, pageY);
-            if (corner) {
-              setResizingCorner(corner);
+            // Check if tapping any measurement point first (distance, angle, circle, rectangle)
+            const point = getTappedMeasurementPoint(pageX, pageY);
+            if (point) {
+              setResizingPoint(point);
               setDidDrag(false);
               dragStartPos.value = { x: pageX, y: pageY };
               dragCurrentPos.value = { x: pageX, y: pageY };
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               return;
             }
             
-            // Check if tapping a measurement
+            // Check if tapping a measurement body (for dragging whole measurement)
             const tappedId = getTappedMeasurement(pageX, pageY);
             
             // Reset drag flag and states
             setDidDrag(false);
             setDraggedMeasurementId(null);
-            setResizingCorner(null);
+            setResizingPoint(null);
             
             if (tappedId) {
               // Store start position for potential drag
@@ -1599,14 +1601,14 @@ export default function DimensionOverlay({
             const { pageX, pageY } = event.nativeEvent;
             
             // Handle corner resizing
-            if (resizingCorner) {
+            if (resizingPoint) {
               setDidDrag(true);
               const imageCoords = screenToImage(pageX, pageY);
               
               const updatedMeasurements = measurements.map(m => {
-                if (m.id === resizingCorner.measurementId) {
+                if (m.id === resizingPoint.measurementId) {
                   const newPoints = [...m.points];
-                  newPoints[resizingCorner.cornerIndex] = imageCoords;
+                  newPoints[resizingPoint.pointIndex] = imageCoords;
                   
                   // Recalculate width and height
                   const widthPx = Math.abs(newPoints[1].x - newPoints[0].x);
@@ -1687,7 +1689,7 @@ export default function DimensionOverlay({
             }
           }}
           onResponderRelease={() => {
-            if (resizingCorner) {
+            if (resizingPoint) {
               // Finished resizing
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             } else if (draggedMeasurementId) {
@@ -1697,7 +1699,7 @@ export default function DimensionOverlay({
             
             // Always reset drag state
             setDraggedMeasurementId(null);
-            setResizingCorner(null);
+            setResizingPoint(null);
             setDidDrag(false);
           }}
         />
@@ -2642,18 +2644,10 @@ export default function DimensionOverlay({
                   </View>
                 </View>
 
-          {/* Mode Toggle: Pan/Zoom vs Measure */}
+          {/* Mode Toggle: Edit/Move vs Measure */}
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
-                if (isPanZoomLocked) {
-                  Alert.alert(
-                    '🔒 Panning Locked',
-                    'Panning is locked while measurements exist. Clear or undo all measurements to enable panning.',
-                    [{ text: 'OK', style: 'default' }]
-                  );
-                  return;
-                }
                 setMeasurementMode(false);
                 setShowCursor(false);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -2663,22 +2657,21 @@ export default function DimensionOverlay({
                 paddingVertical: 6,
                 borderRadius: 7.5,
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                opacity: isPanZoomLocked ? 0.5 : 1,
               }}
             >
               <View className="flex-row items-center justify-center">
                 <Ionicons 
-                  name={isPanZoomLocked ? "lock-closed" : "move-outline"}
+                  name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
                   size={14} 
-                  color={isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')} 
+                  color={!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
                 />
                 <Text style={{
                   marginLeft: 4,
                   fontWeight: '600',
                   fontSize: 12,
-                  color: isPanZoomLocked ? 'rgba(0, 0, 0, 0.3)' : (!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)')
+                  color: !measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  {isPanZoomLocked ? 'Locked' : 'Pan'}
+                  {isPanZoomLocked ? 'Edit' : 'Pan'}
                 </Text>
               </View>
             </Pressable>
