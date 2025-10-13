@@ -747,6 +747,81 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </View>
               </ExpandableSection>
 
+              {/* Move & Edit Mode */}
+              <ExpandableSection
+                icon="move"
+                title="✏️ Move & Edit Measurements"
+                color="#FF2D55"
+                delay={350}
+              >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  After placing measurements, you can move and edit them in Pan/Zoom mode.
+                </Text>
+                
+                <View style={{ gap: 12 }}>
+                  {/* Move Whole Measurements */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>👆</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Move Measurements
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Tap and drag circles, rectangles, or freehand paths to move them around
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Edit Individual Points */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>🎯</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Edit Points
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Tap and drag any point to adjust measurements. Freehand paths can be reshaped by moving individual points!
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* 4-Tap Delete */}
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(255,45,85,0.08)',
+                      borderRadius: 12,
+                      padding: 12,
+                      marginTop: 4,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,45,85,0.2)',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Text style={{ fontSize: 18, marginRight: 8 }}>🗑️</Text>
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#FF2D55' }}>
+                        Quick Delete: 4 Rapid Taps
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!
+                    </Text>
+                  </View>
+
+                  {/* Snap to Points */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: 4 }}>
+                    <Text style={{ fontSize: 18, marginRight: 10 }}>🧲</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Magnetic Snapping
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Points snap to nearby existing points (7mm range) when moving, making precise alignment easy
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </ExpandableSection>
+
               {/* Export Features */}
               <ExpandableSection
                 icon="download"
@@ -1143,8 +1218,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🔄 <Text style={{ fontWeight: '600' }}>Switch units anytime</Text> - Toggle between metric ⇄ imperial instantly
                   </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🎯 <Text style={{ fontWeight: '600' }}>Use cursor guide</Text> - Measurement cursor appears above your finger for precise placement
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
+                    ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points in Pan/Zoom mode
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement 4 times rapidly to delete it
                   </Text>
                 </View>
                 
