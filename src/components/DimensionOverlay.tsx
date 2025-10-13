@@ -2223,6 +2223,30 @@ export default function DimensionOverlay({
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           />
+          
+          {/* Upper horizontal red guide line - for leveling assistance */}
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.25 - 0.5,
+              left: 0,
+              right: 0,
+              height: 1,
+              backgroundColor: 'rgba(255, 0, 0, 0.5)',
+            }}
+          />
+          
+          {/* Lower horizontal red guide line - for leveling assistance */}
+          <View
+            style={{
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.6 - 0.5,
+              left: 0,
+              right: 0,
+              height: 1,
+              backgroundColor: 'rgba(255, 0, 0, 0.5)',
+            }}
+          />
         </View>
       )}
 
