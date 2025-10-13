@@ -1200,14 +1200,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     })}
                   >
                     <Text style={{ 
-                      color: '#FFFFFF', 
+                      color: '#1C1C1E', 
                       fontSize: 18, 
                       fontWeight: '800', 
                       textAlign: 'center',
                       letterSpacing: 0.3,
-                      textShadowColor: 'rgba(0, 0, 0, 0.15)',
-                      textShadowOffset: { width: 0, height: 1 },
-                      textShadowRadius: 2,
                     }}>
                       Upgrade to Pro
                     </Text>
