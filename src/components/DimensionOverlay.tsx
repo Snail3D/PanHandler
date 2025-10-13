@@ -2228,7 +2228,7 @@ export default function DimensionOverlay({
           <View
             style={{
               position: 'absolute',
-              top: SCREEN_HEIGHT * 0.25 - 0.5,
+              top: SCREEN_HEIGHT * 0.2 - 0.5,
               left: 0,
               right: 0,
               height: 1,
@@ -2240,7 +2240,7 @@ export default function DimensionOverlay({
           <View
             style={{
               position: 'absolute',
-              top: SCREEN_HEIGHT * 0.4 - 0.5,
+              top: SCREEN_HEIGHT * 0.35 - 0.5,
               left: 0,
               right: 0,
               height: 1,
