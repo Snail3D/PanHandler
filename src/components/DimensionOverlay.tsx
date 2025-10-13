@@ -23,8 +23,11 @@ import { getRandomQuote } from '../utils/makerQuotes';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+// Define type first before using it
+type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
+
 // Vibrant color palette for measurements (professional but fun)
-const MEASUREMENT_COLORS = {
+const MEASUREMENT_COLORS: Record<MeasurementMode, Array<{ main: string; glow: string; name: string }>> = {
   distance: [
     { main: '#3B82F6', glow: '#3B82F6', name: 'Blue' },      // Classic blue
     { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    // Vibrant purple
@@ -61,8 +64,6 @@ const MEASUREMENT_COLORS = {
     { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    
   ],
 };
-
-type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
 
 interface Measurement {
   id: string;
