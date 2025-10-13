@@ -464,6 +464,43 @@ export default function DimensionOverlay({
     return { x: cursorX, y: cursorY, snapped: false };
   };
 
+  // Helper to snap cursor to nearby existing measurement points
+  const snapToNearbyPoint = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
+    const SNAP_DISTANCE = 30; // pixels - very close range for magnetic snap
+    
+    // Check all existing measurement points
+    for (const measurement of measurements) {
+      for (const point of measurement.points) {
+        const screenPoint = imageToScreen(point.x, point.y);
+        const distance = Math.sqrt(
+          Math.pow(cursorX - screenPoint.x, 2) + 
+          Math.pow(cursorY - screenPoint.y, 2)
+        );
+        
+        // If cursor is close enough, snap to this point
+        if (distance < SNAP_DISTANCE) {
+          return { x: screenPoint.x, y: screenPoint.y, snapped: true };
+        }
+      }
+    }
+    
+    // Also check current points being placed (for connecting within same measurement)
+    for (const point of currentPoints) {
+      const screenPoint = imageToScreen(point.x, point.y);
+      const distance = Math.sqrt(
+        Math.pow(cursorX - screenPoint.x, 2) + 
+        Math.pow(cursorY - screenPoint.y, 2)
+      );
+      
+      // If cursor is close enough, snap to this point
+      if (distance < SNAP_DISTANCE) {
+        return { x: screenPoint.x, y: screenPoint.y, snapped: true };
+      }
+    }
+    
+    return { x: cursorX, y: cursorY, snapped: false };
+  };
+
   // Calculate distance in pixels and convert to real units
   const calculateDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
     const pixelDistance = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
@@ -1384,14 +1421,19 @@ export default function DimensionOverlay({
             const maxOffset = 30;
             const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
             
-            // Apply snapping logic for horizontal/vertical alignment
+            // Calculate raw cursor position
             const rawCursorX = pageX + horizontalOffset;
             const rawCursorY = pageY - cursorOffsetY;
-            const snappedPosition = snapCursorToAlignment(rawCursorX, rawCursorY);
+            
+            // Apply point snapping FIRST (highest priority), then alignment snapping
+            const pointSnapped = snapToNearbyPoint(rawCursorX, rawCursorY);
+            const finalPosition = pointSnapped.snapped 
+              ? pointSnapped 
+              : snapCursorToAlignment(rawCursorX, rawCursorY);
             
             setShowCursor(true);
-            setCursorPosition({ x: snappedPosition.x, y: snappedPosition.y });
-            setIsSnapped(snappedPosition.snapped);
+            setCursorPosition({ x: finalPosition.x, y: finalPosition.y });
+            setIsSnapped(finalPosition.snapped);
             setLastHapticPosition({ x: pageX, y: pageY });
             
             // Haptic for activation
@@ -1427,20 +1469,27 @@ export default function DimensionOverlay({
               const maxOffset = 30;
               const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
               
-              // Apply snapping logic for horizontal/vertical alignment
+              // Calculate raw cursor position
               const rawCursorX = pageX + horizontalOffset;
               const rawCursorY = pageY - cursorOffsetY;
-              const snappedPosition = snapCursorToAlignment(rawCursorX, rawCursorY);
               
-              // Update cursor with snapped position
-              setCursorPosition({ x: snappedPosition.x, y: snappedPosition.y });
+              // Apply point snapping FIRST (highest priority - magnetic snap to existing points)
+              const pointSnapped = snapToNearbyPoint(rawCursorX, rawCursorY);
+              
+              // If not snapped to a point, try horizontal/vertical alignment snapping
+              const finalPosition = pointSnapped.snapped 
+                ? pointSnapped 
+                : snapCursorToAlignment(rawCursorX, rawCursorY);
+              
+              // Update cursor with final snapped position
+              setCursorPosition({ x: finalPosition.x, y: finalPosition.y });
               
               // Haptic feedback when snapping occurs
-              if (snappedPosition.snapped && !isSnapped) {
+              if (finalPosition.snapped && !isSnapped) {
                 // Just entered snap zone - medium haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setIsSnapped(true);
-              } else if (!snappedPosition.snapped && isSnapped) {
+              } else if (!finalPosition.snapped && isSnapped) {
                 // Just left snap zone - light haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setIsSnapped(false);
