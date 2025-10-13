@@ -3453,7 +3453,8 @@ export default function DimensionOverlay({
                 Math.pow(currentPoints[1].x - currentPoints[0].x, 2) + 
                 Math.pow(currentPoints[1].y - currentPoints[0].y, 2)
               );
-              const diameter = radius * 2 * (calibration?.pixelsPerUnit || 1);
+              const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
+              const diameter = radiusInUnits * 2;
               value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
             } else if (mode === 'rectangle' && currentPoints.length >= 2) {
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
@@ -3623,9 +3624,11 @@ export default function DimensionOverlay({
                           displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
                           // Recalculate circle diameter and area
-                          const diameter = measurement.radius * 2;
+                          // measurement.radius is stored in PIXELS, convert to real units
+                          const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
+                          const diameter = radiusInUnits * 2;
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                          const area = Math.PI * measurement.radius * measurement.radius;
+                          const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
                           return `${displayValue} (A: ${areaStr}²)`;
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
