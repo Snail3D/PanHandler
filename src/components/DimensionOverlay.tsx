@@ -1602,13 +1602,25 @@ export default function DimensionOverlay({
                   const imageY = (pageY - zoomTranslateY) / zoomScale;
                   
                   // Only add point if it's far enough from the last point (smooth path)
-                  if (freehandPath.length === 0 || 
-                      Math.sqrt(
-                        Math.pow(imageX - freehandPath[freehandPath.length - 1].x, 2) +
-                        Math.pow(imageY - freehandPath[freehandPath.length - 1].y, 2)
-                      ) > 2 / zoomScale) { // 2 pixels minimum distance
-                    setFreehandPath(prev => [...prev, { x: imageX, y: imageY }]);
-                  }
+                  // Use functional update to ensure we have the latest state
+                  setFreehandPath(prevPath => {
+                    if (prevPath.length === 0) {
+                      return [{ x: imageX, y: imageY }];
+                    }
+                    
+                    const lastPoint = prevPath[prevPath.length - 1];
+                    const distance = Math.sqrt(
+                      Math.pow(imageX - lastPoint.x, 2) +
+                      Math.pow(imageY - lastPoint.y, 2)
+                    );
+                    
+                    // Minimum distance: 2 image pixels (zoom independent)
+                    if (distance > 2) {
+                      return [...prevPath, { x: imageX, y: imageY }];
+                    }
+                    
+                    return prevPath;
+                  });
                 }
                 
                 return; // Skip normal cursor logic for freehand
@@ -1699,46 +1711,55 @@ export default function DimensionOverlay({
             setIsSnapped(false);
             
             // Handle freehand drawing completion
-            if (mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1) {
-              // Calculate total path length
-              let totalLength = 0;
-              for (let i = 1; i < freehandPath.length; i++) {
-                const dx = freehandPath[i].x - freehandPath[i - 1].x;
-                const dy = freehandPath[i].y - freehandPath[i - 1].y;
-                totalLength += Math.sqrt(dx * dx + dy * dy);
-              }
-              
-              // Convert to physical units
-              const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
-              const physicalLength = totalLength / pixelsPerUnit;
-              
-              // Format the measurement
-              const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
-              
-              // Create completed measurement
-              const newMeasurement: Measurement = {
-                id: Date.now().toString(),
-                points: freehandPath,
-                value: formattedValue,
-                mode: 'freehand',
-              };
-              
-              // Add to measurements list
-              setMeasurements([...measurements, newMeasurement]);
-              
-              // Reset freehand state
-              setFreehandPath([]);
-              setIsDrawingFreehand(false);
-              setDrawingPressure(0);
-              
-              // Success haptic
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              console.log('🎨 Freehand measurement completed:', formattedValue);
-            } else if (mode === 'freehand') {
-              // Reset if drawing was incomplete
-              setFreehandPath([]);
-              setIsDrawingFreehand(false);
-              setDrawingPressure(0);
+            if (mode === 'freehand' && isDrawingFreehand) {
+              // Use functional update to get the latest path state
+              setFreehandPath(currentPath => {
+                console.log('🎨 Freehand path points captured:', currentPath.length);
+                
+                if (currentPath.length < 2) {
+                  console.log('⚠️ Path too short, discarding');
+                  // Reset state
+                  setIsDrawingFreehand(false);
+                  setDrawingPressure(0);
+                  return [];
+                }
+                
+                // Calculate total path length
+                let totalLength = 0;
+                for (let i = 1; i < currentPath.length; i++) {
+                  const dx = currentPath[i].x - currentPath[i - 1].x;
+                  const dy = currentPath[i].y - currentPath[i - 1].y;
+                  totalLength += Math.sqrt(dx * dx + dy * dy);
+                }
+                
+                // Convert to physical units
+                const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+                const physicalLength = totalLength / pixelsPerUnit;
+                
+                // Format the measurement
+                const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                
+                // Create completed measurement
+                const newMeasurement: Measurement = {
+                  id: Date.now().toString(),
+                  points: [...currentPath], // Create a copy of the path
+                  value: formattedValue,
+                  mode: 'freehand',
+                };
+                
+                // Add to measurements list
+                setMeasurements([...measurements, newMeasurement]);
+                
+                // Reset freehand state
+                setIsDrawingFreehand(false);
+                setDrawingPressure(0);
+                
+                // Success haptic
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                console.log('🎨 Freehand measurement completed:', formattedValue, 'with', currentPath.length, 'points');
+                
+                return []; // Clear the path
+              });
             }
             
             // Evaporation effect - organic fade with slight expansion and dissipation
