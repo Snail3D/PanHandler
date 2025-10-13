@@ -2188,6 +2188,16 @@ export default function DimensionOverlay({
                     const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
                     const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
                     newValue = `${widthStr} × ${heightStr}`;
+                  } else if (m.mode === 'freehand') {
+                    // Recalculate total path length
+                    let totalLength = 0;
+                    for (let i = 1; i < m.points.length; i++) {
+                      const dx = m.points[i].x - m.points[i - 1].x;
+                      const dy = m.points[i].y - m.points[i - 1].y;
+                      totalLength += Math.sqrt(dx * dx + dy * dy);
+                    }
+                    const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
+                    newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   }
                   
                   return {
@@ -2988,6 +2998,48 @@ export default function DimensionOverlay({
                   </View>
                 </View>
               </React.Fragment>
+            );
+          })}
+
+          {/* Path length label for freehand measurements - shown at midpoint */}
+          {measurements.filter(m => m.mode === 'freehand').map((measurement, idx) => {
+            const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
+            
+            // Find the midpoint of the path (middle segment)
+            if (measurement.points.length < 2) return null;
+            
+            const midIndex = Math.floor(measurement.points.length / 2);
+            const midPoint = measurement.points[midIndex];
+            const screenMid = imageToScreen(midPoint.x, midPoint.y);
+            
+            return (
+              <View
+                key={`${measurement.id}-path-label`}
+                style={{
+                  position: 'absolute',
+                  left: screenMid.x - 35,
+                  top: screenMid.y - 35,
+                }}
+                pointerEvents="none"
+              >
+                <View
+                  style={{
+                    backgroundColor: color.main,
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 6,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3,
+                    elevation: 4,
+                  }}
+                >
+                  <Text style={{ color: 'white', fontSize: 10, fontWeight: '600' }}>
+                    {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
+                  </Text>
+                </View>
+              </View>
             );
           })}
 
