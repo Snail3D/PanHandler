@@ -3065,9 +3065,9 @@ export default function DimensionOverlay({
             const centerY = (minY + maxY) / 2;
             const centerX = (minX + maxX) / 2;
             
-            // Calculate width and height with 2 decimals
-            const widthPx = Math.abs(p1.x - p0.x) / zoomScale;
-            const heightPx = Math.abs(p1.y - p0.y) / zoomScale;
+            // Calculate width and height using IMAGE coordinates, not screen coordinates
+            const widthPx = Math.abs(measurement.points[1].x - measurement.points[0].x);
+            const heightPx = Math.abs(measurement.points[1].y - measurement.points[0].y);
             const widthValue = widthPx / (calibration?.pixelsPerUnit || 1);
             const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
