@@ -1711,6 +1711,28 @@ export default function DimensionOverlay({
               const updatedMeasurements = measurements.map(m => {
                 if (m.id === resizingPoint.measurementId) {
                   const newPoints = [...m.points];
+                  
+                  // Special case: moving circle center point - move both points to maintain radius
+                  if (m.mode === 'circle' && resizingPoint.pointIndex === 0) {
+                    const oldCenter = m.points[0];
+                    const deltaX = imageCoords.x - oldCenter.x;
+                    const deltaY = imageCoords.y - oldCenter.y;
+                    
+                    // Move both center and edge point by the same delta
+                    newPoints[0] = imageCoords;
+                    newPoints[1] = {
+                      x: m.points[1].x + deltaX,
+                      y: m.points[1].y + deltaY
+                    };
+                    
+                    // Value stays the same (radius unchanged)
+                    return {
+                      ...m,
+                      points: newPoints,
+                    };
+                  }
+                  
+                  // Normal point movement for other cases
                   newPoints[resizingPoint.pointIndex] = imageCoords;
                   
                   // Recalculate value based on measurement type
@@ -1753,10 +1775,8 @@ export default function DimensionOverlay({
               
               setMeasurements(updatedMeasurements);
               
-              // Only light haptic if not snapping
-              if (!snappedPosition.snapped) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }
+              // Reduced haptic feedback - only if not snapping and movement is significant
+              // This prevents jittery feeling from too many haptics
               return;
             }
             
