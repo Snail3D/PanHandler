@@ -3082,19 +3082,22 @@ export default function DimensionOverlay({
           {/* Side labels for rectangles - Width on left, Height on top */}
           {measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
             const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
-            const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-            const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
             
-            const minX = Math.min(p0.x, p1.x);
-            const maxX = Math.max(p0.x, p1.x);
-            const minY = Math.min(p0.y, p1.y);
-            const maxY = Math.max(p0.y, p1.y);
+            // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
+            // Use points[0] (top-left) and points[2] (bottom-right) for opposite corners
+            const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+            const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+            
+            const minX = Math.min(p0.x, p2.x);
+            const maxX = Math.max(p0.x, p2.x);
+            const minY = Math.min(p0.y, p2.y);
+            const maxY = Math.max(p0.y, p2.y);
             const centerY = (minY + maxY) / 2;
             const centerX = (minX + maxX) / 2;
             
-            // Calculate width and height using IMAGE coordinates, not screen coordinates
-            const widthPx = Math.abs(measurement.points[1].x - measurement.points[0].x);
-            const heightPx = Math.abs(measurement.points[1].y - measurement.points[0].y);
+            // Calculate width and height using IMAGE coordinates from opposite corners
+            const widthPx = Math.abs(measurement.points[2].x - measurement.points[0].x);
+            const heightPx = Math.abs(measurement.points[2].y - measurement.points[0].y);
             const widthValue = widthPx / (calibration?.pixelsPerUnit || 1);
             const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
