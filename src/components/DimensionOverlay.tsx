@@ -211,6 +211,7 @@ export default function DimensionOverlay({
   const [menuHidden, setMenuHidden] = useState(false);
   const [tabSide, setTabSide] = useState<'left' | 'right'>('right'); // Which side the tab is on
   const menuTranslateX = useSharedValue(0);
+  const menuOpacity = useSharedValue(1); // For shake fade animation
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   
   // Legend collapse state
@@ -981,19 +982,21 @@ export default function DimensionOverlay({
         setMenuHidden(prev => {
           const newState = !prev;
           
-          // Animate menu position
+          // Animate menu position AND opacity
           if (newState) {
-            // Hide menu
+            // Hide menu - fade out while sliding
             menuTranslateX.value = withSpring(SCREEN_WIDTH, {
               damping: 25,
               stiffness: 300,
             });
+            menuOpacity.value = withTiming(0, { duration: 300 });
           } else {
-            // Show menu
+            // Show menu - fade in while sliding
             menuTranslateX.value = withSpring(0, {
               damping: 25,
               stiffness: 300,
             });
+            menuOpacity.value = withTiming(1, { duration: 300 });
           }
           
           Haptics.impactAsync(
@@ -1499,6 +1502,7 @@ export default function DimensionOverlay({
   // Animated style for menu sliding
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: menuTranslateX.value }],
+    opacity: menuOpacity.value,
   }));
   
   // Animated style for tab position
@@ -1525,11 +1529,13 @@ export default function DimensionOverlay({
       if (Math.abs(event.translationX) > threshold) {
         // Hide menu to the right - instant collapse
         menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
+        menuOpacity.value = 1; // Reset opacity for next show
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       } else {
         // Show menu
         menuTranslateX.value = withSpring(0);
+        menuOpacity.value = 1; // Ensure visible
         runOnJS(setMenuHidden)(false);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
       }
@@ -1554,9 +1560,11 @@ export default function DimensionOverlay({
   const toggleMenuFromTab = () => {
     if (menuHidden) {
       menuTranslateX.value = withSpring(0);
+      menuOpacity.value = 1; // Ensure visible
       setMenuHidden(false);
     } else {
       menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
+      menuOpacity.value = 1; // Reset for next show
       setMenuHidden(true);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -1564,6 +1572,7 @@ export default function DimensionOverlay({
   
   const collapseMenu = () => {
     menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
+    menuOpacity.value = 1; // Reset for next show
     setMenuHidden(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
