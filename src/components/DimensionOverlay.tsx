@@ -528,8 +528,13 @@ export default function DimensionOverlay({
   // Helper to check if tap is near any measurement point (works for all types)
   const getTappedMeasurementPoint = (tapX: number, tapY: number): { measurementId: string, pointIndex: number } | null => {
     const POINT_THRESHOLD = 40; // pixels
+    const RECTANGLE_CORNER_THRESHOLD = 25; // Tighter threshold for rectangle corners
     
     for (const measurement of measurements) {
+      // For rectangles, use a much tighter threshold for corner points
+      // This makes it easier to drag the whole rectangle vs editing corners
+      const threshold = measurement.mode === 'rectangle' ? RECTANGLE_CORNER_THRESHOLD : POINT_THRESHOLD;
+      
       // Check all points in the measurement
       for (let i = 0; i < measurement.points.length; i++) {
         const point = imageToScreen(measurement.points[i].x, measurement.points[i].y);
@@ -538,7 +543,7 @@ export default function DimensionOverlay({
           Math.pow(tapX - point.x, 2) + Math.pow(tapY - point.y, 2)
         );
         
-        if (distToPoint < POINT_THRESHOLD) {
+        if (distToPoint < threshold) {
           return { measurementId: measurement.id, pointIndex: i };
         }
       }
@@ -2078,33 +2083,15 @@ export default function DimensionOverlay({
                   return;
                 }
               } else if (measurement && measurement.mode === 'rectangle' && measurement.points.length === 4) {
-                // Special case for rectangles: check if tap is near a corner or away from corners
-                const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
-                const CORNER_THRESHOLD = 40; // pixels - if tap is within this distance of corner, resize that corner
-                
-                // Check distance to each corner
-                let nearCorner = false;
-                for (let i = 0; i < corners.length; i++) {
-                  const dist = Math.sqrt(
-                    Math.pow(pageX - corners[i].x, 2) + Math.pow(pageY - corners[i].y, 2)
-                  );
-                  if (dist < CORNER_THRESHOLD && point.pointIndex === i) {
-                    nearCorner = true;
-                    break;
-                  }
-                }
-                
-                // If tap is near a corner, allow corner resizing
-                if (nearCorner) {
-                  setResizingPoint(point);
-                  setDidDrag(false);
-                  setIsSnapped(false);
-                  dragStartPos.value = { x: pageX, y: pageY };
-                  dragCurrentPos.value = { x: pageX, y: pageY };
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  return;
-                }
-                // Otherwise, fall through to treat as rectangle drag
+                // For rectangles, getTappedMeasurementPoint already uses a tight 25px threshold
+                // If we're here, we're within 25px of a corner, so allow corner resizing
+                setResizingPoint(point);
+                setDidDrag(false);
+                setIsSnapped(false);
+                dragStartPos.value = { x: pageX, y: pageY };
+                dragCurrentPos.value = { x: pageX, y: pageY };
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                return;
               } else {
                 // Not a circle center or rectangle - normal point resize behavior
                 setResizingPoint(point);
