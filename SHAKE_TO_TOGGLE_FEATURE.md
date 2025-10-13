@@ -1,7 +1,7 @@
 # Shake to Toggle Menu Feature
 
 ## Overview
-Users can now shake their phone to instantly show/hide the control menu - making it super easy to get a clean workspace or bring the controls back without reaching for the side tab!
+Users can now shake their phone to instantly show/hide the control menu - making it super easy to get a clean workspace or bring the controls back without reaching for the side tab! Works seamlessly with existing swipe and tap controls.
 
 ## Implementation
 
@@ -9,9 +9,11 @@ Users can now shake their phone to instantly show/hide the control menu - making
 
 1. **DimensionOverlay.tsx**:
    - Added `DeviceMotion` import from expo-sensors
-   - Added shake detection useEffect (line ~960)
-   - Detects total acceleration > 3g to trigger shake
-   - 1-second cooldown prevents rapid toggling
+   - Added shake detection useEffect (line ~961)
+   - Detects total acceleration > 15g to trigger shake
+   - 1.5-second cooldown prevents rapid toggling
+   - Uses same `menuHidden` state as swipe/tab controls
+   - Animates menu with spring physics
    - Provides haptic feedback on toggle
 
 2. **HelpModal.tsx**:
@@ -23,8 +25,8 @@ Users can now shake their phone to instantly show/hide the control menu - making
 
 ### Shake Detection:
 ```typescript
-const SHAKE_THRESHOLD = 3; // 3g acceleration
-const SHAKE_COOLDOWN = 1000; // 1 second between shakes
+const SHAKE_THRESHOLD = 15; // 15g acceleration - proper shake needed
+const SHAKE_COOLDOWN = 1500; // 1.5 seconds between shakes
 
 // Monitor device acceleration
 DeviceMotion.addListener((data) => {
@@ -32,19 +34,25 @@ DeviceMotion.addListener((data) => {
   const totalAcceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
   
   if (totalAcceleration > SHAKE_THRESHOLD) {
-    // Toggle menu visibility
-    setMenuMinimized(prev => !prev);
+    // Toggle menu visibility with animation
+    setMenuHidden(prev => !prev);
+    menuTranslateX.value = withSpring(newState ? SCREEN_WIDTH : 0);
     // Haptic feedback
   }
 });
 ```
 
 ### User Experience:
-1. **Shake phone** → Menu toggles (hide/show)
+1. **Shake phone** → Menu toggles (hide/show) with smooth animation
 2. **Haptic feedback**:
    - Medium impact when hiding menu
    - Light impact when showing menu
-3. **1-second cooldown** prevents accidental double-toggles
+3. **1.5-second cooldown** prevents accidental double-toggles
+4. **Works with existing controls**:
+   - ✅ Swipe left to hide
+   - ✅ Shake to toggle
+   - ✅ Tap side tab to show
+   - ✅ Drag tab to reposition
 
 ## Use Cases
 
@@ -64,16 +72,17 @@ DeviceMotion.addListener((data) => {
 ## Technical Details
 
 ### Acceleration Threshold:
-- **3g total acceleration** = noticeable shake but not violent
+- **15g total acceleration** = deliberate shake (not accidental)
 - Calculated as: `|x| + |y| + |z|`
 - Typical values:
   - Resting: ~1g (gravity)
-  - Gentle shake: 2-2.5g
-  - **Trigger shake: 3+g** ✅
-  - Vigorous shake: 4-6g
+  - Walking: 1-3g
+  - Gentle movement: 3-8g
+  - **Trigger shake: 15+g** ✅ (deliberate shake)
+  - Strong shake: 20-30g
 
 ### Cooldown Period:
-- **1000ms (1 second)** between shake detections
+- **1500ms (1.5 seconds)** between shake detections
 - Prevents:
   - Accidental double-toggles
   - Oscillating menu state
