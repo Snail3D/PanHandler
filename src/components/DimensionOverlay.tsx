@@ -209,6 +209,9 @@ export default function DimensionOverlay({
   const menuTranslateX = useSharedValue(0);
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   
+  // Legend collapse state
+  const [legendCollapsed, setLegendCollapsed] = useState(false);
+  
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
   const vibrantColors = [
@@ -3465,9 +3468,35 @@ export default function DimensionOverlay({
                 paddingVertical: 4,
                 borderRadius: 4,
               }}
-              pointerEvents="none"
+              pointerEvents={isCapturing ? 'none' : 'box-none'}
             >
-              {measurements.map((measurement, idx) => {
+              {/* Header with collapse/expand button */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 2 }}>
+                <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', opacity: 0.7 }}>
+                  LEGEND
+                </Text>
+                {/* Collapse/Expand button - only visible when NOT capturing */}
+                {!isCapturing && (
+                  <Pressable
+                    onPress={() => {
+                      setLegendCollapsed(!legendCollapsed);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={{
+                      marginLeft: 8,
+                      paddingHorizontal: 4,
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
+                      {legendCollapsed ? '+' : '−'}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+              
+              {/* Measurement items - hidden when collapsed (except during capture) */}
+              {(!legendCollapsed || isCapturing) && measurements.map((measurement, idx) => {
                 const color = getMeasurementColor(idx, measurement.mode);
                 return (
                   <View
