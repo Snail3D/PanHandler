@@ -52,7 +52,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
       animationType="fade"
       onRequestClose={onDismiss}
     >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)' }}>
+      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
         <Pressable 
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
           onPress={onDismiss}
@@ -64,7 +64,6 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
               maxHeight: '75%',
               borderRadius: 32,
               overflow: 'hidden',
-              backgroundColor: '#FFFFFF',
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 16 },
               shadowOpacity: 0.5,
@@ -73,8 +72,8 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
             }}
             onPress={(e) => e.stopPropagation()}
           >
-            <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-              <View style={{ flex: 1, backgroundColor: '#F8F9FA' }}>
+            <BlurView intensity={100} tint="light" style={{ flex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.85)' }}>
                 {/* Glowing Header */}
                 <View style={{
                   paddingTop: 24,
@@ -364,10 +363,10 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                   </View>
                 )}
               </View>
-            </View>
+            </BlurView>
           </Pressable>
         </Pressable>
-      </View>
+      </BlurView>
     </Modal>
   );
 }
