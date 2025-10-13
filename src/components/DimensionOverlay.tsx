@@ -247,6 +247,12 @@ export default function DimensionOverlay({
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useSharedValue(0);
   
+  // Karate Chop Easter egg state - for Mom! 🥋 (must be before animated styles)
+  const [showKarateChop, setShowKarateChop] = useState(false);
+  const [karateChopText, setKarateChopText] = useState('');
+  const [karateChopTapCount, setKarateChopTapCount] = useState(0);
+  const karateChopOpacity = useSharedValue(0);
+  
   // Animated styles for quote overlay
   const quoteBackgroundStyle = useAnimatedStyle(() => ({
     backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
@@ -288,12 +294,6 @@ export default function DimensionOverlay({
   const [showTetris, setShowTetris] = useState(false);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
-  
-  // Karate Chop Easter egg state - for Mom! 🥋
-  const [showKarateChop, setShowKarateChop] = useState(false);
-  const [karateChopText, setKarateChopText] = useState('');
-  const [karateChopTapCount, setKarateChopTapCount] = useState(0);
-  const karateChopOpacity = useSharedValue(0);
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
