@@ -161,6 +161,8 @@ export default function DimensionOverlay({
   const [freehandPath, setFreehandPath] = useState<Array<{ x: number; y: number }>>([]);
   const [drawingPressure, setDrawingPressure] = useState(0); // 0-1 for red->yellow->green
   const [showFreehandCursor, setShowFreehandCursor] = useState(false);
+  const freehandActivationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [freehandActivating, setFreehandActivating] = useState(false); // Waiting for activation
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -1513,22 +1515,41 @@ export default function DimensionOverlay({
             fingerScale.value = 1;
             fingerRotation.value = 0;
             
-            // For freehand mode, start drawing immediately if pressure threshold is met
+            // For freehand mode, start activation timer (1.5 seconds)
             if (mode === 'freehand') {
-              setDrawingPressure(pressure);
+              setFreehandActivating(true);
+              setShowFreehandCursor(true);
               
-              // High pressure triggers drawing (> 0.3)
-              if (pressure > 0.3) {
+              // Gradient horizontal offset for cursor positioning
+              const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
+              const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2);
+              const maxOffset = 30;
+              const horizontalOffset = normalizedPosition * maxOffset;
+              const rawCursorX = pageX + horizontalOffset;
+              const rawCursorY = pageY - cursorOffsetY;
+              
+              setCursorPosition({ x: rawCursorX, y: rawCursorY });
+              
+              // Start activation timer (1.5 seconds)
+              if (freehandActivationTimerRef.current) {
+                clearTimeout(freehandActivationTimerRef.current);
+              }
+              
+              freehandActivationTimerRef.current = setTimeout(() => {
+                // Activation complete - start drawing!
                 setIsDrawingFreehand(true);
+                setFreehandActivating(false);
                 const imageX = (pageX - zoomTranslateX) / zoomScale;
                 const imageY = (pageY - zoomTranslateY) / zoomScale;
                 setFreehandPath([{ x: imageX, y: imageY }]);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              }
+                
+                // Strong haptic feedback to signal drawing has started
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                console.log('🎨 Freehand drawing activated!');
+              }, 1500); // 1.5 seconds
               
-              // Update cursor position for freehand
-              setShowFreehandCursor(true);
-              setCursorPosition({ x: pageX, y: pageY });
+              // Light haptic on initial press
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               return; // Skip normal cursor logic for freehand
             }
             
@@ -1583,21 +1604,18 @@ export default function DimensionOverlay({
               
               // Handle freehand drawing mode
               if (mode === 'freehand') {
-                const pressure = touch.force || 0.5;
-                setDrawingPressure(pressure);
-                setCursorPosition({ x: pageX, y: pageY });
+                // Update cursor position with offset (above finger)
+                const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
+                const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2);
+                const maxOffset = 30;
+                const horizontalOffset = normalizedPosition * maxOffset;
+                const rawCursorX = pageX + horizontalOffset;
+                const rawCursorY = pageY - cursorOffsetY;
                 
-                // Start drawing if pressure threshold is met
-                if (pressure > 0.3 && !isDrawingFreehand) {
-                  setIsDrawingFreehand(true);
-                  const imageX = (pageX - zoomTranslateX) / zoomScale;
-                  const imageY = (pageY - zoomTranslateY) / zoomScale;
-                  setFreehandPath([{ x: imageX, y: imageY }]);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
+                setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
-                // Continue drawing if already started
-                if (isDrawingFreehand && pressure > 0.3) {
+                // If already drawing, add points to path
+                if (isDrawingFreehand) {
                   const imageX = (pageX - zoomTranslateX) / zoomScale;
                   const imageY = (pageY - zoomTranslateY) / zoomScale;
                   
@@ -1710,56 +1728,74 @@ export default function DimensionOverlay({
             // Reset snap state
             setIsSnapped(false);
             
-            // Handle freehand drawing completion
-            if (mode === 'freehand' && isDrawingFreehand) {
-              // Use functional update to get the latest path state
-              setFreehandPath(currentPath => {
-                console.log('🎨 Freehand path points captured:', currentPath.length);
+            // Handle freehand mode
+            if (mode === 'freehand') {
+              // Cancel activation timer if they released early
+              if (freehandActivationTimerRef.current) {
+                clearTimeout(freehandActivationTimerRef.current);
+                freehandActivationTimerRef.current = null;
+              }
+              
+              // If they were just waiting (not drawing yet), reset
+              if (freehandActivating && !isDrawingFreehand) {
+                setFreehandActivating(false);
+                setShowFreehandCursor(false);
+                console.log('⚠️ Freehand activation cancelled (released too early)');
                 
-                if (currentPath.length < 2) {
-                  console.log('⚠️ Path too short, discarding');
-                  // Reset state
+                // Continue to evaporation effect
+              } else if (isDrawingFreehand) {
+                // If they were drawing, complete the measurement
+                // Use functional update to get the latest path state
+                setFreehandPath(currentPath => {
+                  console.log('🎨 Freehand path points captured:', currentPath.length);
+                  
+                  if (currentPath.length < 2) {
+                    console.log('⚠️ Path too short, discarding');
+                    // Reset state
+                    setIsDrawingFreehand(false);
+                    setShowFreehandCursor(false);
+                    setFreehandActivating(false);
+                    return [];
+                  }
+                  
+                  // Calculate total path length
+                  let totalLength = 0;
+                  for (let i = 1; i < currentPath.length; i++) {
+                    const dx = currentPath[i].x - currentPath[i - 1].x;
+                    const dy = currentPath[i].y - currentPath[i - 1].y;
+                    totalLength += Math.sqrt(dx * dx + dy * dy);
+                  }
+                  
+                  // Convert to physical units
+                  const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+                  const physicalLength = totalLength / pixelsPerUnit;
+                  
+                  // Format the measurement
+                  const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                  
+                  // Create completed measurement
+                  const newMeasurement: Measurement = {
+                    id: Date.now().toString(),
+                    points: [...currentPath], // Create a copy of the path
+                    value: formattedValue,
+                    mode: 'freehand',
+                  };
+                  
+                  // Add to measurements list
+                  setMeasurements([...measurements, newMeasurement]);
+                  
+                  // Reset freehand state
                   setIsDrawingFreehand(false);
-                  setDrawingPressure(0);
-                  return [];
-                }
-                
-                // Calculate total path length
-                let totalLength = 0;
-                for (let i = 1; i < currentPath.length; i++) {
-                  const dx = currentPath[i].x - currentPath[i - 1].x;
-                  const dy = currentPath[i].y - currentPath[i - 1].y;
-                  totalLength += Math.sqrt(dx * dx + dy * dy);
-                }
-                
-                // Convert to physical units
-                const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
-                const physicalLength = totalLength / pixelsPerUnit;
-                
-                // Format the measurement
-                const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
-                
-                // Create completed measurement
-                const newMeasurement: Measurement = {
-                  id: Date.now().toString(),
-                  points: [...currentPath], // Create a copy of the path
-                  value: formattedValue,
-                  mode: 'freehand',
-                };
-                
-                // Add to measurements list
-                setMeasurements([...measurements, newMeasurement]);
-                
-                // Reset freehand state
-                setIsDrawingFreehand(false);
-                setDrawingPressure(0);
-                
-                // Success haptic
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                console.log('🎨 Freehand measurement completed:', formattedValue, 'with', currentPath.length, 'points');
-                
-                return []; // Clear the path
-              });
+                  setShowFreehandCursor(false);
+                  setFreehandActivating(false);
+                  
+                  // Success haptic
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  console.log('🎨 Freehand measurement completed:', formattedValue, 'with', currentPath.length, 'points');
+                  
+                  return []; // Clear the path
+                });
+              }
             }
             
             // Evaporation effect - organic fade with slight expansion and dissipation
@@ -2191,20 +2227,18 @@ export default function DimensionOverlay({
 
       {/* Floating cursor container */}
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }} pointerEvents="none">
-        {/* Freehand cursor with pressure feedback */}
-        {showFreehandCursor && mode === 'freehand' && (() => {
-          // Determine cursor color based on pressure (0 = red, 0.5 = yellow, 1 = green)
-          let cursorColor;
-          let pressureLabel;
-          if (drawingPressure < 0.3) {
-            cursorColor = '#EF4444'; // Red - no pressure / ready
-            pressureLabel = 'Ready';
-          } else if (drawingPressure < 0.6) {
-            cursorColor = '#F59E0B'; // Yellow/amber - medium pressure
-            pressureLabel = 'Drawing...';
-          } else {
-            cursorColor = '#10B981'; // Green - full pressure / drawing
-            pressureLabel = 'Drawing!';
+        {/* Freehand cursor - looks like regular cursor but with activation states */}
+        {(showFreehandCursor || showCursor) && mode === 'freehand' && (() => {
+          const nextMeasurementIndex = measurements.length;
+          const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
+          const cursorColor = nextColor.main;
+          
+          // Determine label based on state
+          let label = 'Hold to start';
+          if (freehandActivating) {
+            label = 'Hold...';
+          } else if (isDrawingFreehand) {
+            label = 'Drawing';
           }
           
           return (
@@ -2219,28 +2253,28 @@ export default function DimensionOverlay({
               pointerEvents="none"
             >
               <Svg width={100} height={100}>
-                {/* Pressure ring - size increases with pressure */}
+                {/* Outer ring - pulses when activating */}
                 <Circle 
                   cx={50} 
                   cy={50} 
-                  r={20 + drawingPressure * 15} 
+                  r={30} 
                   fill="none" 
                   stroke={cursorColor} 
                   strokeWidth="3" 
-                  opacity={0.8 + drawingPressure * 0.2} 
+                  opacity={freehandActivating ? 0.6 : 0.8} 
                 />
-                {/* Inner filled circle */}
-                <Circle 
-                  cx={50} 
-                  cy={50} 
-                  r={10 + drawingPressure * 8} 
-                  fill={`${cursorColor}44`} 
-                  stroke={cursorColor} 
-                  strokeWidth="2" 
-                />
-                {/* Center dot */}
+                {/* Inner circle */}
+                <Circle cx={50} cy={50} r={15} fill={`${cursorColor}33`} stroke={cursorColor} strokeWidth="2" />
+                {/* Crosshair lines */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
+                
+                {/* Center dot - yellow like the regular cursor */}
                 <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
-                <Circle cx={50} cy={50} r={1.5} fill={cursorColor} opacity={1} />
+                <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
+                <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
               <View style={{ 
                 position: 'absolute', 
@@ -2253,7 +2287,7 @@ export default function DimensionOverlay({
                 borderRadius: 12 
               }}>
                 <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
-                  {pressureLabel}
+                  {label}
                 </Text>
               </View>
             </View>
@@ -2261,7 +2295,7 @@ export default function DimensionOverlay({
         })()}
         
         {/* Regular cursor (for other modes) */}
-        {showCursor && (() => {
+        {showCursor && mode !== 'freehand' && (() => {
           // Determine which measurement this will be (if completing current or starting new)
           const nextMeasurementIndex = currentPoints.length === requiredPoints 
             ? measurements.length + 1  // Current measurement will be saved, this is the next one
