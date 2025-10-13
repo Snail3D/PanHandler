@@ -961,8 +961,8 @@ export default function DimensionOverlay({
   useEffect(() => {
     DeviceMotion.setUpdateInterval(100);
     let lastShakeTime = 0;
-    const SHAKE_THRESHOLD = 3; // 3g acceleration
-    const SHAKE_COOLDOWN = 1000; // 1 second cooldown between shakes
+    const SHAKE_THRESHOLD = 15; // Higher threshold - need a proper shake!
+    const SHAKE_COOLDOWN = 1500; // 1.5 seconds cooldown between shakes
 
     const subscription = DeviceMotion.addListener((data) => {
       if (!data.acceleration) return;
@@ -973,13 +973,29 @@ export default function DimensionOverlay({
       const { x, y, z } = data.acceleration;
       const totalAcceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
 
-      // Detect shake
+      // Detect shake - need significant acceleration
       if (totalAcceleration > SHAKE_THRESHOLD) {
         lastShakeTime = now;
         
-        // Toggle menu
-        setMenuMinimized(prev => {
+        // Toggle menu using menuHidden (same as swipe/tab controls)
+        setMenuHidden(prev => {
           const newState = !prev;
+          
+          // Animate menu position
+          if (newState) {
+            // Hide menu
+            menuTranslateX.value = withSpring(SCREEN_WIDTH, {
+              damping: 25,
+              stiffness: 300,
+            });
+          } else {
+            // Show menu
+            menuTranslateX.value = withSpring(0, {
+              damping: 25,
+              stiffness: 300,
+            });
+          }
+          
           Haptics.impactAsync(
             newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light
           );
