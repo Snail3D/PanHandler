@@ -448,6 +448,9 @@ export default function DimensionOverlay({
           runOnJS(setCurrentPoints)([]);
           runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
           
+          // Clear the saved label since measurements are cleared
+          runOnJS(setCurrentLabel)(null);
+          
           // Success haptic for the reset - wrapped in runOnJS
           runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Success);
         }
@@ -1483,6 +1486,9 @@ export default function DimensionOverlay({
   // Handle label modal completion
   const handleLabelComplete = (label: string | null) => {
     setShowLabelModal(false);
+    
+    // Remember the label for this session
+    setCurrentLabel(label);
     
     if (pendingAction === 'save') {
       performSave(label);
@@ -4532,6 +4538,7 @@ export default function DimensionOverlay({
         visible={showLabelModal} 
         onComplete={handleLabelComplete}
         onDismiss={handleLabelDismiss}
+        initialValue={currentLabel}
       />
       
       {/* Email Prompt Modal */}
