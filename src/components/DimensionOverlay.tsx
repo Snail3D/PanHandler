@@ -435,18 +435,24 @@ export default function DimensionOverlay({
     // Calculate angle from first point
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
     
-    // Snap threshold: within 8 degrees of horizontal or vertical
-    const snapThreshold = 8;
+    // Snap thresholds: different for entering vs exiting snap zone
+    // Smaller entry threshold = harder to enter snap
+    // Larger exit threshold = easier to break free
+    const snapEntryThreshold = 4;  // Only snap if within 4° (was 8°)
+    const snapExitThreshold = 12;  // Stay snapped until 12° away (easier to break free)
+    
+    // Use different threshold based on whether we're already snapped
+    const threshold = isSnapped ? snapExitThreshold : snapEntryThreshold;
     
     // Check for horizontal snap (0° or 180°)
     const horizontalAngle = Math.abs(angle) % 180;
-    if (horizontalAngle < snapThreshold || horizontalAngle > (180 - snapThreshold)) {
+    if (horizontalAngle < threshold || horizontalAngle > (180 - threshold)) {
       return { x: cursorX, y: firstPoint.y, snapped: true };
     }
     
     // Check for vertical snap (90° or -90°)
     const verticalAngle = Math.abs(Math.abs(angle) - 90);
-    if (verticalAngle < snapThreshold) {
+    if (verticalAngle < threshold) {
       return { x: firstPoint.x, y: cursorY, snapped: true };
     }
     
