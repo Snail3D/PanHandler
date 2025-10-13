@@ -1958,10 +1958,13 @@ export default function DimensionOverlay({
               // Check what type of measurement we're resizing
               const measurement = measurements.find(m => m.id === resizingPoint.measurementId);
               
-              // For circles, disable snapping completely for smoother movement
-              // Circle center: allow snapping to other points
-              // Circle edge: no snapping for smooth radius adjustment
-              const shouldCheckSnapping = !(measurement?.mode === 'circle' && resizingPoint.pointIndex === 1);
+              // Disable snapping for:
+              // - Circle edge points (for smooth radius adjustment)
+              // - Freehand paths (to preserve organic shapes and prevent distortion when crossing other measurements)
+              const shouldCheckSnapping = !(
+                (measurement?.mode === 'circle' && resizingPoint.pointIndex === 1) ||
+                (measurement?.mode === 'freehand')
+              );
               
               // Use raw position for smooth movement, only snap when actually close to a point
               let finalPosition = { x: pageX, y: pageY };
