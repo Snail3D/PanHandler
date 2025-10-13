@@ -2692,18 +2692,18 @@ export default function DimensionOverlay({
                     {/* End caps */}
                     <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
-                    {/* Point markers with glow */}
+                    {/* Point markers with reduced glow (50%) */}
                     {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                     {/* P1 glow layers */}
-                    <Circle cx={p1.x} cy={p1.y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={p1.x} cy={p1.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={p1.x} cy={p1.y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={p1.x} cy={p1.y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
@@ -2723,24 +2723,24 @@ export default function DimensionOverlay({
                     <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
                     <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
                     <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
-                    {/* Point markers with glow */}
+                    {/* Point markers with reduced glow (50%) */}
                     {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={p0.x} cy={p0.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                     {/* P1 (vertex) - slightly larger */}
-                    <Circle cx={p1.x} cy={p1.y} r="13" fill={color.glow} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="11" fill={color.glow} opacity="0.15" />
-                    <Circle cx={p1.x} cy={p1.y} r="9" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="7" fill={color.main} opacity="0.2" />
+                    <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
+                    <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
+                    <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
                     <Circle cx={p1.x} cy={p1.y} r="5" fill={color.main} stroke="white" strokeWidth="1" />
                     {/* P2 glow layers */}
-                    <Circle cx={p2.x} cy={p2.y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={p2.x} cy={p2.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={p2.x} cy={p2.y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
@@ -2758,11 +2758,11 @@ export default function DimensionOverlay({
                     <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
                     {/* Main circle */}
                     <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Center marker with glow */}
-                    <Circle cx={center.x} cy={center.y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={center.x} cy={center.y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={center.x} cy={center.y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={center.x} cy={center.y} r="6" fill={color.main} opacity="0.2" />
+                    {/* Center marker with reduced glow (50%) */}
+                    <Circle cx={center.x} cy={center.y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={center.x} cy={center.y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={center.x} cy={center.y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
@@ -2787,13 +2787,13 @@ export default function DimensionOverlay({
                     <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
                     {/* Main rectangle */}
                     <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Corner markers - all 4 corners with glow */}
+                    {/* Corner markers - all 4 corners with reduced glow (50%) */}
                     {corners.map((corner, cornerIdx) => (
                       <React.Fragment key={`corner-${cornerIdx}`}>
-                        <Circle cx={corner.x} cy={corner.y} r="12" fill={color.glow} opacity="0.1" />
-                        <Circle cx={corner.x} cy={corner.y} r="10" fill={color.glow} opacity="0.15" />
-                        <Circle cx={corner.x} cy={corner.y} r="8" fill={color.main} opacity="0.1" />
-                        <Circle cx={corner.x} cy={corner.y} r="6" fill={color.main} opacity="0.2" />
+                        <Circle cx={corner.x} cy={corner.y} r="6" fill={color.glow} opacity="0.05" />
+                        <Circle cx={corner.x} cy={corner.y} r="5" fill={color.glow} opacity="0.075" />
+                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} opacity="0.05" />
+                        <Circle cx={corner.x} cy={corner.y} r="3" fill={color.main} opacity="0.1" />
                         <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                       </React.Fragment>
                     ))}
@@ -2820,18 +2820,18 @@ export default function DimensionOverlay({
                     <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                     {/* Main freehand path */}
                     <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    {/* Start and end point markers with glow */}
+                    {/* Start and end point markers with reduced glow (50%) */}
                     {/* Start point */}
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                     {/* End point */}
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="12" fill={color.glow} opacity="0.1" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="10" fill={color.glow} opacity="0.15" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="8" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.main} opacity="0.2" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.glow} opacity="0.05" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="5" fill={color.glow} opacity="0.075" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
+                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
                     <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
                   </React.Fragment>
                 );
@@ -2937,10 +2937,10 @@ export default function DimensionOverlay({
               const nextColor = getMeasurementColor(measurements.length, mode);
               return (
                 <React.Fragment key={point.id}>
-                  <Circle cx={screenPos.x} cy={screenPos.y} r="12" fill={nextColor.glow} opacity="0.1" />
-                  <Circle cx={screenPos.x} cy={screenPos.y} r="10" fill={nextColor.glow} opacity="0.15" />
-                  <Circle cx={screenPos.x} cy={screenPos.y} r="8" fill={nextColor.main} opacity="0.1" />
-                  <Circle cx={screenPos.x} cy={screenPos.y} r="6" fill={nextColor.main} opacity="0.2" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="6" fill={nextColor.glow} opacity="0.05" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="5" fill={nextColor.glow} opacity="0.075" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="4" fill={nextColor.main} opacity="0.05" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="3" fill={nextColor.main} opacity="0.1" />
                   <Circle cx={screenPos.x} cy={screenPos.y} r="4" fill={nextColor.main} stroke="white" strokeWidth="1" />
                 </React.Fragment>
               );
@@ -4305,6 +4305,9 @@ export default function DimensionOverlay({
               height: SCREEN_HEIGHT,
               opacity: 0.35,
               transform: [
+                { translateX: 0 },
+                { translateY: 0 },
+                { scale: 1 },
                 { rotate: `${zoomRotation}deg` },
               ],
             }}
