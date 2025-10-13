@@ -209,6 +209,11 @@ export default function DimensionOverlay({
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   
+  // Toast notification state (for save success) - must be before animated styles
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const toastOpacity = useSharedValue(0);
+  
   // Animated styles for quote overlay
   const quoteBackgroundStyle = useAnimatedStyle(() => ({
     backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
@@ -241,11 +246,6 @@ export default function DimensionOverlay({
   const [showTetris, setShowTetris] = useState(false);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
-  
-  // Toast notification state (for save success)
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const toastOpacity = useSharedValue(0);
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
