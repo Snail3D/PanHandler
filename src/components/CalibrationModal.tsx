@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import useStore from '../state/measurementStore';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
 
@@ -50,122 +52,321 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
       animationType="fade"
       onRequestClose={onDismiss}
     >
-      <Pressable 
-        className="flex-1 bg-black/60 justify-center items-center px-6"
-        onPress={onDismiss}
-      >
+      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
         <Pressable 
-          className="bg-gray-900 rounded-3xl w-full max-w-md"
-          style={{ maxHeight: '70%' }}
-          onPress={(e) => e.stopPropagation()}
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
+          onPress={onDismiss}
         >
-          {/* Header with close button */}
-          <View className="flex-row items-center justify-between px-6 pt-6 pb-4 border-b border-gray-700">
-            <Text className="text-white text-xl font-bold">Select Coin</Text>
-            <Pressable onPress={onDismiss} className="w-10 h-10 items-center justify-center -mr-2">
-              <Ionicons name="close" size={28} color="#9CA3AF" />
-            </Pressable>
-          </View>
-
-          {/* Content */}
-          <View className="px-6 py-4">
-            {/* Selected Coin Display */}
-            {selectedCoin && (
-              <View className="mb-4 bg-blue-500/20 border-2 border-blue-500 rounded-2xl p-4">
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-1">
-                    <Text className="text-blue-400 text-xs font-semibold mb-1">SELECTED</Text>
-                    <Text className="text-white font-bold text-lg">
-                      {selectedCoin.name}
-                    </Text>
-                    <Text className="text-blue-300 text-sm mt-1">
-                      {selectedCoin.diameter}mm • {selectedCoin.country}
-                    </Text>
+          <Pressable 
+            style={{
+              width: '100%',
+              maxWidth: 420,
+              maxHeight: '75%',
+              borderRadius: 32,
+              overflow: 'hidden',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 16 },
+              shadowOpacity: 0.5,
+              shadowRadius: 32,
+              elevation: 24,
+            }}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <BlurView intensity={100} tint="light" style={{ flex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.85)' }}>
+                {/* Glowing Header */}
+                <View style={{
+                  paddingTop: 24,
+                  paddingHorizontal: 24,
+                  paddingBottom: 20,
+                  borderBottomWidth: 1,
+                  borderBottomColor: 'rgba(0,0,0,0.08)',
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: 'rgba(255,149,0,0.15)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginRight: 12,
+                        shadowColor: '#FF9500',
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowOpacity: 0.4,
+                        shadowRadius: 10,
+                      }}>
+                        <Text style={{ fontSize: 26 }}>🪙</Text>
+                      </View>
+                      <Text style={{ 
+                        fontSize: 24, 
+                        fontWeight: '700',
+                        color: '#1C1C1E',
+                        letterSpacing: -0.5,
+                      }}>
+                        Select Coin
+                      </Text>
+                    </View>
+                    <Pressable 
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        onDismiss();
+                      }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
+                        backgroundColor: 'rgba(120,120,128,0.16)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="close" size={24} color="#3C3C43" />
+                    </Pressable>
                   </View>
-                  <Pressable 
-                    onPress={() => setSelectedCoin(null)}
-                    className="w-8 h-8 items-center justify-center"
-                  >
-                    <Ionicons name="close-circle" size={24} color="#60A5FA" />
-                  </Pressable>
                 </View>
-              </View>
-            )}
 
-            {/* Search Bar */}
-            <View className="mb-4">
-              <View className="flex-row items-center bg-gray-800 rounded-xl px-4 py-3 border-2 border-gray-700">
-                <Ionicons name="search" size={20} color="#6B7280" />
-                <TextInput
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Search coins..."
-                  placeholderTextColor="#6B7280"
-                  className="flex-1 ml-3 text-white text-base"
-                  autoFocus={!selectedCoin}
-                />
-                {searchQuery.length > 0 && (
-                  <Pressable onPress={() => setSearchQuery('')}>
-                    <Ionicons name="close-circle" size={20} color="#6B7280" />
-                  </Pressable>
+                {/* Content */}
+                <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 20 }}>
+                  {/* Selected Coin Display - Vibrant Glowing Style */}
+                  {selectedCoin && (
+                    <View style={{
+                      marginBottom: 16,
+                      backgroundColor: 'rgba(255,255,255,0.95)',
+                      borderRadius: 20,
+                      padding: 16,
+                      borderWidth: 3,
+                      borderColor: '#10B981',
+                      shadowColor: '#10B981',
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.5,
+                      shadowRadius: 12,
+                      elevation: 8,
+                    }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ 
+                            color: '#10B981', 
+                            fontSize: 11, 
+                            fontWeight: '700', 
+                            marginBottom: 4,
+                            letterSpacing: 0.5,
+                          }}>
+                            SELECTED
+                          </Text>
+                          <Text style={{ 
+                            color: '#1C1C1E', 
+                            fontWeight: '700', 
+                            fontSize: 19,
+                            textShadowColor: 'rgba(16,185,129,0.3)',
+                            textShadowOffset: { width: 0, height: 0 },
+                            textShadowRadius: 4,
+                          }}>
+                            {selectedCoin.name}
+                          </Text>
+                          <Text style={{ 
+                            color: '#10B981', 
+                            fontSize: 15, 
+                            marginTop: 4,
+                            fontWeight: '600',
+                          }}>
+                            {selectedCoin.diameter}mm • {selectedCoin.country}
+                          </Text>
+                        </View>
+                        <Pressable 
+                          onPress={() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            setSelectedCoin(null);
+                          }}
+                          style={{
+                            width: 36,
+                            height: 36,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Ionicons name="close-circle" size={32} color="#10B981" />
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Search Bar - Glassmorphism Style */}
+                  <View style={{ marginBottom: 16 }}>
+                    <View style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: 'rgba(255,255,255,0.9)',
+                      borderRadius: 16,
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      borderWidth: 2,
+                      borderColor: 'rgba(120,120,128,0.25)',
+                    }}>
+                      <Ionicons name="search" size={22} color="#8E8E93" />
+                      <TextInput
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search coins..."
+                        placeholderTextColor="#8E8E93"
+                        style={{
+                          flex: 1,
+                          marginLeft: 12,
+                          fontSize: 16,
+                          fontWeight: '500',
+                          color: '#1C1C1E',
+                        }}
+                        autoFocus={!selectedCoin}
+                      />
+                      {searchQuery.length > 0 && (
+                        <Pressable onPress={() => setSearchQuery('')}>
+                          <Ionicons name="close-circle" size={22} color="#8E8E93" />
+                        </Pressable>
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Search Results */}
+                  {searchResults.length > 0 ? (
+                    <View style={{ flex: 1 }}>
+                      {searchResults.slice(0, 8).map((coin) => (
+                        <Pressable
+                          key={`${coin.country}-${coin.name}`}
+                          onPress={() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                            Keyboard.dismiss();
+                            setSelectedCoin(coin);
+                            setSearchQuery('');
+                          }}
+                          style={({ pressed }) => ({
+                            paddingVertical: 14,
+                            paddingHorizontal: 16,
+                            marginBottom: 10,
+                            borderRadius: 16,
+                            backgroundColor: pressed ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.7)',
+                            borderWidth: 2,
+                            borderColor: pressed ? '#007AFF' : 'rgba(120,120,128,0.2)',
+                            shadowColor: pressed ? '#007AFF' : 'transparent',
+                            shadowOffset: { width: 0, height: 0 },
+                            shadowOpacity: pressed ? 0.4 : 0,
+                            shadowRadius: pressed ? 8 : 0,
+                          })}
+                        >
+                          <Text style={{ 
+                            color: '#1C1C1E', 
+                            fontWeight: '700', 
+                            fontSize: 16,
+                          }}>
+                            {coin.name}
+                          </Text>
+                          <Text style={{ 
+                            color: '#8E8E93', 
+                            fontSize: 14, 
+                            marginTop: 4,
+                            fontWeight: '500',
+                          }}>
+                            {coin.diameter}mm • {coin.country}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  ) : searchQuery.length > 0 ? (
+                    <View style={{ paddingVertical: 60, alignItems: 'center' }}>
+                      <View style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: 32,
+                        backgroundColor: 'rgba(142,142,147,0.1)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: 16,
+                      }}>
+                        <Ionicons name="search-outline" size={32} color="#8E8E93" />
+                      </View>
+                      <Text style={{ color: '#8E8E93', fontSize: 16, fontWeight: '600' }}>
+                        No coins found
+                      </Text>
+                    </View>
+                  ) : !selectedCoin ? (
+                    <View style={{ paddingVertical: 60, alignItems: 'center' }}>
+                      <View style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: 32,
+                        backgroundColor: 'rgba(142,142,147,0.1)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginBottom: 16,
+                      }}>
+                        <Ionicons name="search" size={32} color="#8E8E93" />
+                      </View>
+                      <Text style={{ 
+                        color: '#8E8E93', 
+                        fontSize: 16, 
+                        fontWeight: '600',
+                        marginBottom: 8,
+                      }}>
+                        Start typing to search
+                      </Text>
+                      <Text style={{ 
+                        color: '#C7C7CC', 
+                        fontSize: 13,
+                        fontWeight: '500',
+                      }}>
+                        Try "penny", "nickel", "quarter"
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Footer - Glowing Continue Button */}
+                {selectedCoin && (
+                  <View style={{
+                    paddingHorizontal: 24,
+                    paddingVertical: 20,
+                    borderTopWidth: 1,
+                    borderTopColor: 'rgba(0,0,0,0.08)',
+                  }}>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        handleContinue();
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? '#0066CC' : '#007AFF',
+                        borderRadius: 16,
+                        paddingVertical: 16,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        shadowColor: '#007AFF',
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowOpacity: pressed ? 0.6 : 0.4,
+                        shadowRadius: pressed ? 16 : 12,
+                        elevation: 8,
+                      })}
+                    >
+                      <Ionicons name="checkmark-circle" size={24} color="white" />
+                      <Text style={{ 
+                        color: 'white', 
+                        fontWeight: '700', 
+                        fontSize: 17, 
+                        marginLeft: 8,
+                        textShadowColor: 'rgba(0,0,0,0.2)',
+                        textShadowOffset: { width: 0, height: 1 },
+                        textShadowRadius: 2,
+                      }}>
+                        Continue
+                      </Text>
+                    </Pressable>
+                  </View>
                 )}
               </View>
-            </View>
-
-            {/* Search Results */}
-            {searchResults.length > 0 ? (
-              <View style={{ maxHeight: 300 }}>
-                {searchResults.slice(0, 8).map((coin) => (
-                  <Pressable
-                    key={`${coin.country}-${coin.name}`}
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      setSelectedCoin(coin);
-                      setSearchQuery('');
-                    }}
-                    className="py-3 px-4 mb-2 rounded-xl bg-gray-800 border-2 border-gray-700 active:border-blue-500"
-                  >
-                    <Text className="text-white font-semibold">
-                      {coin.name}
-                    </Text>
-                    <Text className="text-gray-400 text-sm mt-1">
-                      {coin.diameter}mm • {coin.country}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : searchQuery.length > 0 ? (
-              <View className="py-8 items-center">
-                <Ionicons name="search-outline" size={40} color="#4B5563" />
-                <Text className="text-gray-400 mt-3">No coins found</Text>
-              </View>
-            ) : !selectedCoin ? (
-              <View className="py-8 items-center">
-                <Ionicons name="search" size={40} color="#4B5563" />
-                <Text className="text-gray-400 mt-3">Start typing to search</Text>
-                <Text className="text-gray-600 text-xs mt-2">
-                  Try "penny", "nickel", "quarter"
-                </Text>
-              </View>
-            ) : null}
-          </View>
-
-          {/* Footer */}
-          {selectedCoin && (
-            <View className="px-6 py-4 border-t border-gray-700">
-              <Pressable
-                onPress={handleContinue}
-                className="bg-blue-500 rounded-xl py-4 flex-row items-center justify-center active:bg-blue-600"
-              >
-                <Ionicons name="checkmark-circle" size={22} color="white" />
-                <Text className="text-white font-bold text-base ml-2">
-                  Continue
-                </Text>
-              </Pressable>
-            </View>
-          )}
+            </BlurView>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </BlurView>
     </Modal>
   );
 }
