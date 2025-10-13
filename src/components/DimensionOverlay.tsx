@@ -3265,6 +3265,8 @@ export default function DimensionOverlay({
               height: SCREEN_HEIGHT,
               opacity: 0.35,
               transform: [
+                { translateX: zoomTranslateX },
+                { translateY: zoomTranslateY },
                 { rotate: `${zoomRotation}deg` },
               ],
             }}
