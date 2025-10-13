@@ -489,7 +489,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                    Measure straight-line distances. Tap to place two points and get the distance between them.
+                    Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!
                   </Text>
                 </View>
 
@@ -562,7 +562,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                    Measure rectangular objects. Tap two opposite corners to get length and height measurements.
+                    Measure rectangular objects. Tap two opposite corners to get length and height measurements. Edges snap to perfect horizontal and vertical lines automagically!
                   </Text>
                 </View>
 
