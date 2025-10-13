@@ -1589,7 +1589,7 @@ export default function DimensionOverlay({
           onResponderMove={(event) => {
             const { pageX, pageY } = event.nativeEvent;
             
-            // Handle corner resizing
+            // Handle point resizing/moving
             if (resizingPoint) {
               setDidDrag(true);
               const imageCoords = screenToImage(pageX, pageY);
@@ -1599,20 +1599,39 @@ export default function DimensionOverlay({
                   const newPoints = [...m.points];
                   newPoints[resizingPoint.pointIndex] = imageCoords;
                   
-                  // Recalculate width and height
-                  const widthPx = Math.abs(newPoints[1].x - newPoints[0].x);
-                  const heightPx = Math.abs(newPoints[1].y - newPoints[0].y);
-                  const width = widthPx / (calibration?.pixelsPerUnit || 1);
-                  const height = heightPx / (calibration?.pixelsPerUnit || 1);
-                  const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
-                  const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+                  // Recalculate value based on measurement type
+                  let newValue = m.value;
+                  let width, height, radius;
+                  
+                  if (m.mode === 'distance') {
+                    newValue = calculateDistance(newPoints[0], newPoints[1]);
+                  } else if (m.mode === 'angle') {
+                    newValue = calculateAngle(newPoints[0], newPoints[1], newPoints[2]);
+                  } else if (m.mode === 'circle') {
+                    const radiusPx = Math.sqrt(
+                      Math.pow(newPoints[1].x - newPoints[0].x, 2) + 
+                      Math.pow(newPoints[1].y - newPoints[0].y, 2)
+                    );
+                    radius = radiusPx / (calibration?.pixelsPerUnit || 1);
+                    const diameter = radius * 2;
+                    newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+                  } else if (m.mode === 'rectangle') {
+                    const widthPx = Math.abs(newPoints[1].x - newPoints[0].x);
+                    const heightPx = Math.abs(newPoints[1].y - newPoints[0].y);
+                    width = widthPx / (calibration?.pixelsPerUnit || 1);
+                    height = heightPx / (calibration?.pixelsPerUnit || 1);
+                    const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+                    const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+                    newValue = `${widthStr} × ${heightStr}`;
+                  }
                   
                   return {
                     ...m,
                     points: newPoints,
-                    value: `${widthStr} × ${heightStr}`,
-                    width,
-                    height,
+                    value: newValue,
+                    ...(width !== undefined && { width }),
+                    ...(height !== undefined && { height }),
+                    ...(radius !== undefined && { radius }),
                   };
                 }
                 return m;
