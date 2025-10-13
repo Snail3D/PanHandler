@@ -1351,7 +1351,7 @@ export default function DimensionOverlay({
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `Calibration Coin: ${coinCircle.coinName} (${coinDiameterDisplay})\n\n`;
+        measurementText += `Calibration Reference: ${coinDiameterDisplay} (the coin you selected)\n\n`;
       }
       
       measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
@@ -1371,7 +1371,7 @@ export default function DimensionOverlay({
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `  ${coinCircle.coinName} = ${coinDiameterDisplay} diameter\n`;
+        measurementText += `  The coin you selected = ${coinDiameterDisplay} diameter\n`;
       }
       
       // Add footer (only for non-Pro users)
