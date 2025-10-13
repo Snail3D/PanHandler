@@ -1734,49 +1734,20 @@ export default function DimensionOverlay({
                       y: m.points[1].y + deltaY
                     };
                     
-                    // Value stays the same (radius unchanged)
+                    // Value stays the same (radius unchanged) - just update points
                     return {
                       ...m,
                       points: newPoints,
                     };
                   }
                   
-                  // Normal point movement for other cases
+                  // Normal point movement - update points immediately, skip expensive calculations
+                  // Value will be recalculated on release for better performance
                   newPoints[resizingPoint.pointIndex] = imageCoords;
-                  
-                  // Recalculate value based on measurement type
-                  let newValue = m.value;
-                  let width, height, radius;
-                  
-                  if (m.mode === 'distance') {
-                    newValue = calculateDistance(newPoints[0], newPoints[1]);
-                  } else if (m.mode === 'angle') {
-                    newValue = calculateAngle(newPoints[0], newPoints[1], newPoints[2]);
-                  } else if (m.mode === 'circle') {
-                    const radiusPx = Math.sqrt(
-                      Math.pow(newPoints[1].x - newPoints[0].x, 2) + 
-                      Math.pow(newPoints[1].y - newPoints[0].y, 2)
-                    );
-                    radius = radiusPx / (calibration?.pixelsPerUnit || 1);
-                    const diameter = radius * 2;
-                    newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                  } else if (m.mode === 'rectangle') {
-                    const widthPx = Math.abs(newPoints[1].x - newPoints[0].x);
-                    const heightPx = Math.abs(newPoints[1].y - newPoints[0].y);
-                    width = widthPx / (calibration?.pixelsPerUnit || 1);
-                    height = heightPx / (calibration?.pixelsPerUnit || 1);
-                    const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
-                    const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
-                    newValue = `${widthStr} × ${heightStr}`;
-                  }
                   
                   return {
                     ...m,
                     points: newPoints,
-                    value: newValue,
-                    ...(width !== undefined && { width }),
-                    ...(height !== undefined && { height }),
-                    ...(radius !== undefined && { radius }),
                   };
                 }
                 return m;
@@ -1844,6 +1815,47 @@ export default function DimensionOverlay({
           }}
           onResponderRelease={() => {
             if (resizingPoint) {
+              // Recalculate measurement values after point movement completes
+              const updatedMeasurements = measurements.map(m => {
+                if (m.id === resizingPoint.measurementId) {
+                  let newValue = m.value;
+                  let width, height, radius;
+                  
+                  if (m.mode === 'distance') {
+                    newValue = calculateDistance(m.points[0], m.points[1]);
+                  } else if (m.mode === 'angle') {
+                    newValue = calculateAngle(m.points[0], m.points[1], m.points[2]);
+                  } else if (m.mode === 'circle') {
+                    const radiusPx = Math.sqrt(
+                      Math.pow(m.points[1].x - m.points[0].x, 2) + 
+                      Math.pow(m.points[1].y - m.points[0].y, 2)
+                    );
+                    radius = radiusPx / (calibration?.pixelsPerUnit || 1);
+                    const diameter = radius * 2;
+                    newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+                  } else if (m.mode === 'rectangle') {
+                    const widthPx = Math.abs(m.points[1].x - m.points[0].x);
+                    const heightPx = Math.abs(m.points[1].y - m.points[0].y);
+                    width = widthPx / (calibration?.pixelsPerUnit || 1);
+                    height = heightPx / (calibration?.pixelsPerUnit || 1);
+                    const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+                    const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+                    newValue = `${widthStr} × ${heightStr}`;
+                  }
+                  
+                  return {
+                    ...m,
+                    value: newValue,
+                    ...(width !== undefined && { width }),
+                    ...(height !== undefined && { height }),
+                    ...(radius !== undefined && { radius }),
+                  };
+                }
+                return m;
+              });
+              
+              setMeasurements(updatedMeasurements);
+              
               // Finished resizing
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             } else if (draggedMeasurementId) {
