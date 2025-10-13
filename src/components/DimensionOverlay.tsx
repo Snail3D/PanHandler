@@ -236,6 +236,9 @@ export default function DimensionOverlay({
   // Get current vibrant color
   const getCurrentModeColor = () => vibrantColors[modeColorIndex % vibrantColors.length];
   
+  // Mode swipe animation for finger tracking
+  const modeSwipeOffset = useSharedValue(0);
+  
   // Inspirational quote overlay state
   const [showQuote, setShowQuote] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
@@ -1461,26 +1464,16 @@ export default function DimensionOverlay({
   };
 
   const handleReset = () => {
-    Alert.alert(
-      'Reset Measurements',
-      'This will clear all measurements and return to the camera. Continue?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Reset', 
-          style: 'destructive',
-          onPress: () => {
-            const setImageUri = useStore.getState().setImageUri;
-            const setCoinCircle = useStore.getState().setCoinCircle;
-            const setCalibration = useStore.getState().setCalibration;
-            
-            setImageUri(null);
-            setCoinCircle(null);
-            setCalibration(null);
-          }
-        },
-      ]
-    );
+    // Instant reset without confirmation popup
+    const setImageUri = useStore.getState().setImageUri;
+    const setCoinCircle = useStore.getState().setCoinCircle;
+    const setCalibration = useStore.getState().setCalibration;
+    
+    setImageUri(null);
+    setCoinCircle(null);
+    setCalibration(null);
+    
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
@@ -1561,20 +1554,28 @@ export default function DimensionOverlay({
       }
     });
   
-  // Swipe gesture for cycling through measurement modes - FLUID VERSION
+  // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
+    .onStart(() => {
+      // Reset offset when gesture starts
+      modeSwipeOffset.value = 0;
+    })
+    .onUpdate((event) => {
+      // Track finger position in real-time for fluid feedback
+      modeSwipeOffset.value = event.translationX;
+    })
     .onEnd((event) => {
       // Very relaxed thresholds for fluid swiping
-      const threshold = 20; // Much lower - just 20px swipe
+      const threshold = 30; // 30px swipe to trigger mode change
       const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
       const currentIndex = modes.indexOf(mode);
       
-      // Detect primarily horizontal swipes (but not too strict)
+      // Detect primarily horizontal swipes
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
       
       if (isHorizontal && Math.abs(event.translationX) > threshold) {
         if (event.translationX < 0) {
-          // Swipe left - next mode (no velocity check needed)
+          // Swipe left - next mode
           const nextIndex = (currentIndex + 1) % modes.length;
           runOnJS(setMode)(modes[nextIndex]);
           runOnJS(setModeColorIndex)(nextIndex);
@@ -1582,7 +1583,7 @@ export default function DimensionOverlay({
           runOnJS(setMeasurementMode)(true); // Auto-enable measurement mode
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         } else {
-          // Swipe right - previous mode (no velocity check needed)
+          // Swipe right - previous mode
           const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           runOnJS(setMode)(modes[prevIndex]);
           runOnJS(setModeColorIndex)(prevIndex);
@@ -1591,6 +1592,12 @@ export default function DimensionOverlay({
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
       }
+      
+      // Reset offset with spring animation
+      modeSwipeOffset.value = withSpring(0, {
+        damping: 20,
+        stiffness: 300,
+      });
     });
   
   // Drag gesture for repositioning tab vertically
@@ -3916,7 +3923,9 @@ export default function DimensionOverlay({
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <GestureDetector gesture={modeSwitchGesture}>
-            <View style={{ marginBottom: 8 }}>
+            <Animated.View style={[{ marginBottom: 8 }, useAnimatedStyle(() => ({
+              transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
+            }))]}>
               <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
@@ -4166,7 +4175,7 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
             </View>
-          </View>
+            </Animated.View>
           </GestureDetector>
 
           {/* Unit System Toggle: Metric vs Imperial - Moved below measurement types */}
