@@ -58,6 +58,20 @@ export function formatMeasurement(
   decimals: number = 1
 ): string {
   const { value, unit } = getDisplayUnit(valueInBaseUnit, baseUnit, unitSystem);
+  
+  // Round to nearest 0.5mm for millimeters (metric)
+  if (unit === 'mm') {
+    const roundedValue = Math.round(value * 2) / 2; // Round to nearest 0.5
+    // Format to show .0 or .5 only
+    return `${roundedValue.toFixed(1)} ${unit}`;
+  }
+  
+  // For imperial (inches and feet), use 2 decimal places
+  if (unit === 'in' || unit === 'ft') {
+    return `${value.toFixed(2)} ${unit}`;
+  }
+  
+  // For cm (if used), keep original decimals
   return `${value.toFixed(decimals)} ${unit}`;
 }
 
