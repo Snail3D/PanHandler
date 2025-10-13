@@ -717,7 +717,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                     <View style={{ gap: 8 }}>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                        • <Text style={{ fontWeight: '600' }}>Swipe left anywhere on menu</Text> to collapse it off-screen
+                        • <Text style={{ fontWeight: '600' }}>Swipe right anywhere on menu</Text> to collapse it off-screen
                       </Text>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Shake your phone</Text> to toggle menu visibility
