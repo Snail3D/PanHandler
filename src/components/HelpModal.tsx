@@ -1189,7 +1189,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     }}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? '#E68900' : '#FF9500',
-                      paddingVertical: 16,
+                      paddingVertical: 18,
                       borderRadius: 16,
                       marginTop: 16,
                       shadowColor: '#FF9500',
@@ -1200,11 +1200,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     })}
                   >
                     <Text style={{ 
-                      color: 'white', 
-                      fontSize: 17, 
-                      fontWeight: '700', 
+                      color: '#FFFFFF', 
+                      fontSize: 18, 
+                      fontWeight: '800', 
                       textAlign: 'center',
-                      letterSpacing: -0.2,
+                      letterSpacing: 0.3,
+                      textShadowColor: 'rgba(0, 0, 0, 0.15)',
+                      textShadowOffset: { width: 0, height: 1 },
+                      textShadowRadius: 2,
                     }}>
                       Upgrade to Pro
                     </Text>
@@ -1217,13 +1220,15 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       console.log('Restore purchase tapped');
                     }}
                     style={({ pressed }) => ({
-                      paddingVertical: 12,
+                      paddingVertical: 16,
+                      paddingHorizontal: 20,
+                      marginTop: 4,
                       opacity: pressed ? 0.6 : 1,
                     })}
                   >
                     <Text style={{ 
                       color: '#007AFF', 
-                      fontSize: 14, 
+                      fontSize: 15, 
                       fontWeight: '600', 
                       textAlign: 'center' 
                     }}>
