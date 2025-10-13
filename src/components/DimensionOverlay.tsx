@@ -2108,15 +2108,11 @@ export default function DimensionOverlay({
               const screenPos = imageToScreen(point.x, point.y);
               const nextColor = getMeasurementColor(measurements.length, mode);
               return (
-                <Circle
-                  key={point.id}
-                  cx={screenPos.x}
-                  cy={screenPos.y}
-                  r="8"
-                  fill={nextColor.main}
-                  stroke="white"
-                  strokeWidth="3"
-                />
+                <React.Fragment key={point.id}>
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="8" fill={nextColor.main} opacity="0.1" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="6" fill={nextColor.main} opacity="0.2" />
+                  <Circle cx={screenPos.x} cy={screenPos.y} r="4" fill={nextColor.main} stroke="white" strokeWidth="1" />
+                </React.Fragment>
               );
             })}
           </Svg>
