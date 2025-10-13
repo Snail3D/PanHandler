@@ -2088,7 +2088,43 @@ export default function DimensionOverlay({
                   // Normal point movement - update points immediately, skip expensive calculations
                   // Value will be recalculated on release for better performance
                   // This applies to: distance, angle, freehand, and any other measurement types
-                  newPoints[resizingPoint.pointIndex] = imageCoords;
+                  
+                  // Special smoothing for freehand paths - make reshaping more fluid and organic
+                  if (m.mode === 'freehand' && m.points.length > 3) {
+                    const draggedIdx = resizingPoint.pointIndex;
+                    newPoints[draggedIdx] = imageCoords;
+                    
+                    // Calculate influence radius (how many neighboring points to smooth)
+                    const influenceRadius = 2; // Affect 2 points on each side
+                    
+                    // Smooth neighboring points for organic curve reshaping
+                    for (let i = 1; i <= influenceRadius; i++) {
+                      // Smooth points BEFORE the dragged point
+                      const beforeIdx = draggedIdx - i;
+                      if (beforeIdx >= 0) {
+                        const weight = 1 - (i / (influenceRadius + 1)); // Decreasing influence (0.67, 0.33)
+                        const originalPoint = m.points[beforeIdx];
+                        newPoints[beforeIdx] = {
+                          x: originalPoint.x + (imageCoords.x - m.points[draggedIdx].x) * weight,
+                          y: originalPoint.y + (imageCoords.y - m.points[draggedIdx].y) * weight,
+                        };
+                      }
+                      
+                      // Smooth points AFTER the dragged point
+                      const afterIdx = draggedIdx + i;
+                      if (afterIdx < m.points.length) {
+                        const weight = 1 - (i / (influenceRadius + 1)); // Decreasing influence
+                        const originalPoint = m.points[afterIdx];
+                        newPoints[afterIdx] = {
+                          x: originalPoint.x + (imageCoords.x - m.points[draggedIdx].x) * weight,
+                          y: originalPoint.y + (imageCoords.y - m.points[draggedIdx].y) * weight,
+                        };
+                      }
+                    }
+                  } else {
+                    // For non-freehand measurements, just update the single point
+                    newPoints[resizingPoint.pointIndex] = imageCoords;
+                  }
                   
                   return {
                     ...m,
@@ -2116,7 +2152,8 @@ export default function DimensionOverlay({
               const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
               if (tappedId) {
                 const measurement = measurements.find(m => m.id === tappedId);
-                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle' || measurement.mode === 'freehand')) {
+                // Allow dragging for circles and rectangles, but NOT freehand (freehand can only be reshaped by points)
+                if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
                   setDraggedMeasurementId(tappedId);
                   setDidDrag(true);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
