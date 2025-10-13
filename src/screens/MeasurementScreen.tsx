@@ -114,14 +114,40 @@ export default function MeasurementScreen() {
 
         setAlignmentStatus(status);
 
-        // Haptic feedback on status change (only when holding)
-        if (isHoldingShutter && status !== lastHapticRef.current) {
-          if (status === 'good') {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        // Progressive haptic feedback "hot and cold" style (only when holding)
+        if (isHoldingShutter) {
+          if (status === 'bad') {
+            // Far away / RED = Slow, light tapping (tap...tap...tap)
+            if (status !== lastHapticRef.current) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              lastHapticRef.current = status;
+            }
           } else if (status === 'warning') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            // Getting warmer / YELLOW = Medium speed tapping (tap.tap.tap.tap.tap)
+            if (status !== lastHapticRef.current) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              // Create burst pattern for warning
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
+              lastHapticRef.current = status;
+            }
+          } else if (status === 'good') {
+            // HOT! / GREEN = Fast rapid tapping then SNAP! (taptaptaptaptap...SNAP!)
+            if (status !== lastHapticRef.current) {
+              // Rapid fire taps
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 40);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 240);
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 280);
+              // Success notification will come when photo is taken
+              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 320);
+              lastHapticRef.current = status;
+            }
           }
-          lastHapticRef.current = status;
         }
       }
     });
