@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as Haptics from 'expo-haptics';
@@ -20,7 +20,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 type ScreenMode = 'camera' | 'selectCoin' | 'zoomCalibrate' | 'measurement';
 
 export default function MeasurementScreen() {
-  const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
   const [mode, setMode] = useState<ScreenMode>('camera');
@@ -234,10 +233,6 @@ export default function MeasurementScreen() {
 
   const wasAutoCapture = alignmentStatus === 'good' && isStable;
 
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === 'back' ? 'front' : 'back'));
-  };
-
   const handleCoinSelected = (coin: CoinReference) => {
     setSelectedCoin(coin);
     setMode('zoomCalibrate');
@@ -298,7 +293,7 @@ export default function MeasurementScreen() {
         <CameraView 
           ref={cameraRef}
           style={{ flex: 1 }}
-          facing={facing}
+          facing="back"
         >
           {/* Top controls */}
           <View 
@@ -317,12 +312,8 @@ export default function MeasurementScreen() {
                 <Ionicons name="help-circle-outline" size={28} color="white" />
               </Pressable>
               <Text className="text-white text-lg font-semibold">Take Photo</Text>
-              <Pressable
-                onPress={toggleCameraFacing}
-                className="w-10 h-10 items-center justify-center"
-              >
-                <Ionicons name="camera-reverse-outline" size={28} color="white" />
-              </Pressable>
+              {/* Spacer to keep title centered */}
+              <View className="w-10 h-10" />
             </View>
           </View>
 
