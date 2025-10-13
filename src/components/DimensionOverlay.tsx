@@ -1539,9 +1539,9 @@ export default function DimensionOverlay({
                 // Activation complete - start drawing!
                 setIsDrawingFreehand(true);
                 setFreehandActivating(false);
-                const imageX = (pageX - zoomTranslateX) / zoomScale;
-                const imageY = (pageY - zoomTranslateY) / zoomScale;
-                setFreehandPath([{ x: imageX, y: imageY }]);
+                
+                // Don't add first point here - let onResponderMove handle it
+                // This ensures the path starts from the current finger position, not where they initially pressed
                 
                 // Strong haptic feedback to signal drawing has started
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
