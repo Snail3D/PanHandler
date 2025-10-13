@@ -102,7 +102,7 @@ export default function DimensionOverlay({
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
-  const viewRef = externalViewRef || internalViewRef; // Use external ref if provided
+  const viewRef = externalViewRef !== undefined ? externalViewRef : internalViewRef; // Use external ref if provided
   
   // Lock-in animation
   const lockInOpacity = useSharedValue(0);
@@ -1184,7 +1184,10 @@ export default function DimensionOverlay({
   };
 
   const performSave = async (label: string | null) => {
-    if (!viewRef || !viewRef.current || !currentImageUri) {
+    // Use externalViewRef directly if available
+    const actualViewRef = externalViewRef || viewRef;
+    
+    if (!actualViewRef || !actualViewRef.current || !currentImageUri) {
       console.error('❌ Export failed: viewRef or currentImageUri is missing');
       Alert.alert('Export Error', 'Unable to capture measurement. Please try again.');
       return;
@@ -1212,7 +1215,7 @@ export default function DimensionOverlay({
       console.log(`📸 Label set to: "${label || 'null'}"`);
       
       // Capture measurements photo
-      const measurementsUri = await captureRef(viewRef.current, {
+      const measurementsUri = await captureRef(actualViewRef.current!, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1231,7 +1234,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(viewRef.current, {
+      const labelOnlyUri = await captureRef(actualViewRef.current!, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1294,8 +1297,26 @@ export default function DimensionOverlay({
   };
 
   const performEmail = async (label: string | null) => {
-    if (!viewRef || !viewRef.current || !currentImageUri) {
-      console.error('❌ Email failed: viewRef or currentImageUri is missing');
+    console.log('📧 performEmail called with:', { 
+      hasViewRef: !!viewRef, 
+      hasViewRefCurrent: !!viewRef?.current,
+      hasCurrentImageUri: !!currentImageUri,
+      viewRefType: viewRef?.current?.constructor?.name,
+      externalViewRef: !!externalViewRef,
+      externalViewRefCurrent: !!externalViewRef?.current
+    });
+    
+    // Use externalViewRef directly if available, as viewRef might be incorrectly set
+    const actualViewRef = externalViewRef || viewRef;
+    
+    if (!actualViewRef || !actualViewRef.current || !currentImageUri) {
+      console.error('❌ Email failed: viewRef or currentImageUri is missing', {
+        viewRef: !!viewRef,
+        viewRefCurrent: !!viewRef?.current,
+        externalViewRef: !!externalViewRef,
+        externalViewRefCurrent: !!externalViewRef?.current,
+        currentImageUri: !!currentImageUri
+      });
       Alert.alert('Email Error', 'Unable to capture measurement. Please try again.');
       return;
     }
@@ -1345,7 +1366,7 @@ export default function DimensionOverlay({
       console.log(`📸 Email - Label set to: "${label || 'null'}"`);
       
       // Capture the image with measurements
-      const uri = await captureRef(viewRef.current, {
+      const uri = await captureRef(actualViewRef.current!, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1424,7 +1445,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(viewRef.current, {
+      const labelOnlyUri = await captureRef(actualViewRef.current!, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
