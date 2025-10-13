@@ -28,19 +28,27 @@ Users can now shake their phone to instantly show/hide the control menu - making
 const SHAKE_THRESHOLD = 15; // 15g acceleration - proper shake needed
 const SHAKE_COOLDOWN = 1500; // 1.5 seconds between shakes
 
-// Monitor device acceleration
+// Monitor device acceleration - HORIZONTAL ONLY (X and Z axes)
 DeviceMotion.addListener((data) => {
   const { x, y, z } = data.acceleration;
-  const totalAcceleration = Math.abs(x) + Math.abs(y) + Math.abs(z);
+  const horizontalAcceleration = Math.abs(x) + Math.abs(z); // Excludes Y!
   
-  if (totalAcceleration > SHAKE_THRESHOLD) {
+  if (horizontalAcceleration > SHAKE_THRESHOLD) {
     // Toggle menu visibility with animation
     setMenuHidden(prev => !prev);
     menuTranslateX.value = withSpring(newState ? SCREEN_WIDTH : 0);
+    menuOpacity.value = withTiming(newState ? 0 : 1);
     // Haptic feedback
   }
 });
 ```
+
+### Why Horizontal Only?
+- **X axis**: Left-right shake
+- **Z axis**: Forward-backward shake  
+- **Y axis**: Up-down motion (EXCLUDED - reserved for karate chop Easter egg!)
+
+This prevents the karate chop gesture from accidentally triggering the menu toggle.
 
 ### User Experience:
 1. **Shake phone** → Menu toggles (hide/show) with smooth animation
