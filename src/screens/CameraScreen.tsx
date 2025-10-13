@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Dimensions } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DeviceMotion } from 'expo-sensors';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { Svg, Circle, Line } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
 import HelpModal from '../components/HelpModal';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface CameraScreenProps {
   onPhotoTaken: (uri: string, isAutoCaptured: boolean) => void;
@@ -30,6 +34,10 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  
+  // Bubble level animation
+  const bubbleX = useSharedValue(0);
+  const bubbleY = useSharedValue(0);
   
   // Stability tracking
   const recentAngles = React.useRef<number[]>([]);
@@ -169,6 +177,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
         const beta = data.rotation.beta * (180 / Math.PI); // Forward/backward tilt in degrees
+        const gamma = data.rotation.gamma * (180 / Math.PI); // Left/right tilt in degrees
         
         // Auto-detect orientation based on device angle
         const absBeta = Math.abs(beta);
@@ -187,6 +196,36 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         }
         
         setTiltAngle(absTilt);
+        
+        // Update bubble position based on device tilt
+        // Bubble moves opposite to tilt (if device tilts right, bubble moves left)
+        // Scale: ±30° = ±60px movement (max radius of bubble track)
+        const maxBubbleOffset = 60; // pixels
+        const bubbleXOffset = -(gamma / 30) * maxBubbleOffset; // Inverted: tilt right = bubble left
+        const bubbleYOffset = (beta / 30) * maxBubbleOffset; // Forward tilt = bubble down
+        
+        // Clamp to circular boundary
+        const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
+        let finalX = bubbleXOffset;
+        let finalY = bubbleYOffset;
+        
+        if (distance > maxBubbleOffset) {
+          const scale = maxBubbleOffset / distance;
+          finalX = bubbleXOffset * scale;
+          finalY = bubbleYOffset * scale;
+        }
+        
+        // Animate bubble with spring physics for realistic movement
+        bubbleX.value = withSpring(finalX, {
+          damping: 15,
+          stiffness: 150,
+          mass: 0.5,
+        });
+        bubbleY.value = withSpring(finalY, {
+          damping: 15,
+          stiffness: 150,
+          mass: 0.5,
+        });
         
         // Track angles for stability check
         recentAngles.current.push(absTilt);
@@ -363,6 +402,128 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             pointerEvents: 'none',
           }}
         />
+
+        {/* Center crosshairs with bubble level */}
+        <View
+          style={{
+            position: 'absolute',
+            top: SCREEN_HEIGHT / 2 - 100,
+            left: SCREEN_WIDTH / 2 - 100,
+            width: 200,
+            height: 200,
+            justifyContent: 'center',
+            alignItems: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Svg width={200} height={200}>
+            {/* Outer circle track for bubble */}
+            <Circle
+              cx={100}
+              cy={100}
+              r={70}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.4)"
+              strokeWidth="2"
+            />
+            
+            {/* Center target circle */}
+            <Circle
+              cx={100}
+              cy={100}
+              r={25}
+              fill="none"
+              stroke={alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)'}
+              strokeWidth="2"
+            />
+            
+            {/* Crosshair lines */}
+            <Line
+              x1={30}
+              y1={100}
+              x2={70}
+              y2={100}
+              stroke="rgba(255, 255, 255, 0.6)"
+              strokeWidth="2"
+            />
+            <Line
+              x1={130}
+              y1={100}
+              x2={170}
+              y2={100}
+              stroke="rgba(255, 255, 255, 0.6)"
+              strokeWidth="2"
+            />
+            <Line
+              x1={100}
+              y1={30}
+              x2={100}
+              y2={70}
+              stroke="rgba(255, 255, 255, 0.6)"
+              strokeWidth="2"
+            />
+            <Line
+              x1={100}
+              y1={130}
+              x2={100}
+              y2={170}
+              stroke="rgba(255, 255, 255, 0.6)"
+              strokeWidth="2"
+            />
+            
+            {/* Center dot when level */}
+            {alignmentStatus === 'good' && (
+              <Circle
+                cx={100}
+                cy={100}
+                r={4}
+                fill="rgba(0, 255, 0, 1)"
+              />
+            )}
+          </Svg>
+          
+          {/* Animated bubble */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                backgroundColor: alignmentStatus === 'good' 
+                  ? 'rgba(0, 255, 0, 0.8)' 
+                  : alignmentStatus === 'warning'
+                  ? 'rgba(255, 255, 0, 0.8)'
+                  : 'rgba(255, 0, 0, 0.8)',
+                borderWidth: 2,
+                borderColor: 'white',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 4,
+              },
+              useAnimatedStyle(() => ({
+                transform: [
+                  { translateX: bubbleX.value },
+                  { translateY: bubbleY.value },
+                ],
+              })),
+            ]}
+          >
+            {/* Inner shine for 3D effect */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 3,
+                left: 6,
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              }}
+            />
+          </Animated.View>
+        </View>
 
         {/* Alignment status indicator */}
         <View 
