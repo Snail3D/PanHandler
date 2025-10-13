@@ -129,7 +129,8 @@ export default function DimensionOverlay({
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
-  const fusionViewRef = useRef<View>(null); // For capturing zoomed/rotated image for Fusion 360
+  const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
+  const fusionZoomedViewRef = useRef<View>(null); // For capturing zoomed transparent canvas
   const [currentLabel, setCurrentLabel] = useState<string | null>(null);
   
   // Selected measurement for delete/drag
@@ -825,36 +826,43 @@ export default function DimensionOverlay({
       const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Save measurements temporarily and hide them for remaining captures
-      const savedMeasurements = measurements;
-      
-      // Capture Fusion 360 image (50% opacity, zoomed/rotated, no overlays)
-      if (fusionViewRef.current) {
-        console.log('📸 Capturing Fusion 360 image...');
-        
+      // Capture CAD Canvas - Zoomed (35% opacity, shows current zoom/pan)
+      if (fusionZoomedViewRef.current) {
         try {
-          const fusionUri = await captureRef(fusionViewRef.current, {
+          console.log('📸 Capturing zoomed CAD canvas...');
+          
+          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'jpg',
             quality: 0.9,
             result: 'tmpfile',
           });
           
-          console.log('📸 Captured Fusion 360 URI:', fusionUri);
-          
-          // Save Fusion photo with custom filename
-          const fusionFilename = label ? `${label}_Fusion360` : 'PanHandler_Fusion360';
-          const fusionAsset = await MediaLibrary.createAssetAsync(fusionUri);
-          
-          console.log('✅ Saved Fusion 360 photo!');
+          await MediaLibrary.createAssetAsync(zoomedUri);
+          console.log('✅ Saved zoomed CAD canvas!');
         } catch (error) {
-          console.error('Failed to capture Fusion 360 image:', error);
+          console.error('Failed to capture zoomed CAD canvas:', error);
         }
       }
       
-      // Original photo removed - only save labeled measurements and CAD canvas photo
+      // Capture CAD Canvas - Full (35% opacity, unzoomed full image)
+      if (fusionViewRef.current) {
+        try {
+          console.log('📸 Capturing full CAD canvas...');
+          
+          const fullUri = await captureRef(fusionViewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          await MediaLibrary.createAssetAsync(fullUri);
+          console.log('✅ Saved full CAD canvas!');
+        } catch (error) {
+          console.error('Failed to capture full CAD canvas:', error);
+        }
+      }
       
-      // Restore measurements and clear state
-      setMeasurements(savedMeasurements);
+      // Clear state
       setIsCapturing(false);
       setCurrentLabel(null);
       
@@ -979,10 +987,12 @@ export default function DimensionOverlay({
         measurementText += `Item: ${label}\n\n`;
       }
       
-      // Add coin reference information at the top
+      // Add coin reference information at the top - simplified
       if (coinCircle) {
-        measurementText += `Reference Coin: ${coinCircle.coinName}\n`;
-        measurementText += `Coin Diameter: ${coinCircle.coinDiameter.toFixed(2)} mm\n\n`;
+        const coinDiameterDisplay = unitSystem === 'imperial' 
+          ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+          : `${coinCircle.coinDiameter.toFixed(2)}mm`;
+        measurementText += `Calibration Coin: ${coinCircle.coinName} (${coinDiameterDisplay})\n\n`;
       }
       
       measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
@@ -994,81 +1004,15 @@ export default function DimensionOverlay({
         measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
       });
       
-      // Add calibration/scale information
-      if (calibration) {
-        measurementText += `\n---\nCalibration Info:\n`;
-        measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/${calibration.unit}\n`;
-        measurementText += `Reference Distance: ${calibration.referenceDistance.toFixed(2)} ${calibration.unit}`;
-        if (coinCircle) {
-          measurementText += ` (${coinCircle.coinName})`;
-        }
-      // CRITICAL FIX: Get actual image dimensions for correct Canvas Scale
-      // The pixelsPerUnit is calculated for screen-space rendering, but CAD imports the full-res image
-      let actualImageWidth = SCREEN_WIDTH;
-      let actualImageHeight = SCREEN_HEIGHT;
-      
-      if (currentImageUri) {
-        try {
-          // Get actual image dimensions synchronously-ish using a promise
-          await new Promise<void>((resolve) => {
-            Image.getSize(
-              currentImageUri,
-              (width, height) => {
-                actualImageWidth = width;
-                actualImageHeight = height;
-                console.log('✅ Got actual image dimensions:', width, 'x', height);
-                resolve();
-              },
-              (error) => {
-                console.error('❌ Failed to get image size:', error);
-                resolve(); // Continue anyway with screen dimensions
-              }
-            );
-          });
-        } catch (error) {
-          console.error('Error getting image dimensions:', error);
-        }
-      }
-      
-      // Calculate how the image is rendered on screen with resizeMode="contain"
-      const imageAspect = actualImageWidth / actualImageHeight;
-      const screenAspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-      
-      let renderedWidth, renderedHeight;
-      if (imageAspect > screenAspect) {
-        // Image is wider - constrained by width
-        renderedWidth = SCREEN_WIDTH;
-        renderedHeight = SCREEN_WIDTH / imageAspect;
-      } else {
-        // Image is taller - constrained by height
-        renderedHeight = SCREEN_HEIGHT;
-        renderedWidth = SCREEN_HEIGHT * imageAspect;
-      }
-      
-      // The scale factor between actual image and rendered size
-      const imageToScreenRatio = actualImageWidth / renderedWidth;
-      
-      // CRITICAL: pixelsPerUnit was calculated during zoomed calibration
-      // The measurements in the app are CORRECT because screenToImage accounts for zoom
-      // For CAD canvas, we need to match the zoomed coordinate space, not unzoomed
-      const calibrationZoom = savedZoomState?.scale || 1;
-      
-      // Base Canvas Scale (for screen-space at calibration zoom)
-      const baseScale = 1 / calibration.pixelsPerUnit;
-      
-      // Remove unreliable Canvas Scale calculation - provide coin reference for manual calibration
-      const pixelRatio = PixelRatio.get();
-      
-      console.log('📐 CALIBRATION DATA FOR CAD IMPORT');
-      console.log('  Coin:', coinCircle?.coinName, '-', calibration.referenceDistance, 'mm');
-      
-      measurementText += `\n\n=== CALIBRATION INFO ===\n`;
-      measurementText += `Reference Coin: ${coinCircle?.coinName || 'Unknown'}\n`;
-      measurementText += `Coin Diameter: ${calibration.referenceDistance.toFixed(2)} mm\n`;
-      measurementText += `\n📋 For CAD Import:\n`;
-      measurementText += `The attached transparent photo can be imported as a canvas.\n`;
-      measurementText += `Calibrate it in your CAD software using the reference coin:\n`;
-      measurementText += `${coinCircle?.coinName} = ${calibration.referenceDistance.toFixed(2)}mm diameter\n`;
+      // Add simple calibration information footer
+      if (calibration && coinCircle) {
+        measurementText += `\n\n═══ CAD Import Info ═══\n`;
+        measurementText += `The transparent photos can be imported as canvas backgrounds.\n`;
+        measurementText += `Calibrate using the reference coin:\n`;
+        const coinDiameterDisplay = unitSystem === 'imperial' 
+          ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+          : `${coinCircle.coinDiameter.toFixed(2)}mm`;
+        measurementText += `  ${coinCircle.coinName} = ${coinDiameterDisplay} diameter\n`;
       }
       
       // Add footer (only for non-Pro users)
@@ -1094,55 +1038,49 @@ export default function DimensionOverlay({
       await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // 2. Fusion 360 image (50% opacity, zoomed/rotated, no overlays)
-      if (fusionViewRef.current) {
+      // 2. CAD Canvas - Zoomed (35% opacity, shows current zoom/pan, with title + coin info)
+      if (fusionZoomedViewRef.current) {
         try {
-          console.log('📸 Capturing Fusion 360 image for email...');
+          console.log('📸 Capturing zoomed CAD canvas for email...');
           
-          const fusionUri = await captureRef(fusionViewRef.current, {
+          const zoomedUri = await captureRef(fusionZoomedViewRef.current, {
             format: 'jpg',
             quality: 0.9,
             result: 'tmpfile',
           });
           
-          // CRITICAL: Get actual dimensions of exported CAD canvas
-          let exportedWidth = 0;
-          let exportedHeight = 0;
-          await new Promise<void>((resolve) => {
-            Image.getSize(
-              fusionUri,
-              (width, height) => {
-                exportedWidth = width;
-                exportedHeight = height;
-                console.log('🎯 EXPORTED CAD CANVAS ACTUAL DIMENSIONS:', width, 'x', height);
-                console.log('  Screen size:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
-                console.log('  Ratio to screen:', (width / SCREEN_WIDTH).toFixed(2), 'x');
-                resolve();
-              },
-              (error) => {
-                console.error('Could not get CAD canvas dimensions:', error);
-                resolve();
-              }
-            );
-          });
+          const zoomedFilename = label ? `${label}_CAD_Zoomed.jpg` : 'PanHandler_CAD_Zoomed.jpg';
+          const zoomedDest = `${FileSystem.cacheDirectory}${zoomedFilename}`;
+          await FileSystem.copyAsync({ from: zoomedUri, to: zoomedDest });
+          attachments.push(zoomedDest);
           
-          // Add to email text so user can see it
-          if (exportedWidth > 0) {
-            measurementText += `exported_canvas=${exportedWidth}x${exportedHeight} (ratio=${(exportedWidth / SCREEN_WIDTH).toFixed(2)}x)\n`;
-          }
-          
-          const fusionFilename = label ? `${label}_Transparent.jpg` : 'PanHandler_Transparent.jpg';
-          const fusionDest = `${FileSystem.cacheDirectory}${fusionFilename}`;
-          await FileSystem.copyAsync({ from: fusionUri, to: fusionDest });
-          attachments.push(fusionDest);
-          
-          console.log('✅ Added Fusion 360 photo to email');
+          console.log('✅ Added zoomed CAD canvas to email');
         } catch (error) {
-          console.error('Failed to capture Fusion 360 image:', error);
+          console.error('Failed to capture zoomed CAD canvas:', error);
         }
       }
       
-      // Original photo removed - only email labeled measurements and CAD canvas photo
+      // 3. CAD Canvas - Full (35% opacity, unzoomed full image, with title + coin info)
+      if (fusionViewRef.current) {
+        try {
+          console.log('📸 Capturing full CAD canvas for email...');
+          
+          const fullUri = await captureRef(fusionViewRef.current, {
+            format: 'jpg',
+            quality: 0.9,
+            result: 'tmpfile',
+          });
+          
+          const fullFilename = label ? `${label}_CAD_Full.jpg` : 'PanHandler_CAD_Full.jpg';
+          const fullDest = `${FileSystem.cacheDirectory}${fullFilename}`;
+          await FileSystem.copyAsync({ from: fullUri, to: fullDest });
+          attachments.push(fullDest);
+          
+          console.log('✅ Added full CAD canvas to email');
+        } catch (error) {
+          console.error('Failed to capture full CAD canvas:', error);
+        }
+      }
       
       // Build subject with label
       const subject = label 
@@ -3262,7 +3200,7 @@ export default function DimensionOverlay({
           </Animated.View>
         )}
         
-        {/* Label and scale info overlay for CAD canvas export - ALWAYS SHOW */}
+        {/* Title and coin info overlay - ALWAYS SHOW */}
         <View
           style={{
             position: 'absolute',
@@ -3271,23 +3209,23 @@ export default function DimensionOverlay({
           }}
           pointerEvents="none"
         >
-          {currentLabel && (
-            <View
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                borderRadius: 6,
-                marginBottom: 4,
-              }}
-            >
-              <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
-                {currentLabel}
-              </Text>
-            </View>
-          )}
+          {/* Title */}
+          <View
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: 6,
+              marginBottom: 4,
+            }}
+          >
+            <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
+              {currentLabel || 'PanHandler Measurements'}
+            </Text>
+          </View>
           
-          {calibration && (
+          {/* Coin reference info */}
+          {calibration && coinCircle && (
             <View
               style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -3296,14 +3234,96 @@ export default function DimensionOverlay({
                 borderRadius: 5,
               }}
             >
-                <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  CAD Scale: {(1 / calibration.pixelsPerUnit).toFixed(6)} mm/px
-                </Text>
-              {coinCircle && (
-                <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  Ref: {coinCircle.coinName}
-                </Text>
-              )}
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                {coinCircle.coinName}
+              </Text>
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                {unitSystem === 'imperial' 
+                  ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+                  : `${coinCircle.coinDiameter.toFixed(2)}mm`}
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+      
+      {/* Hidden view for capturing CAD canvas image - ZOOMED (35% opacity, current zoom/pan) */}
+      <View
+        ref={fusionZoomedViewRef}
+        collapsable={false}
+        style={{
+          position: 'absolute',
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT,
+          top: 0,
+          left: -10000, // Position off-screen
+          backgroundColor: 'white', // White background makes image appear lighter
+        }}
+      >
+        {currentImageUri && (
+          <Animated.View
+            style={{
+              position: 'absolute',
+              width: SCREEN_WIDTH,
+              height: SCREEN_HEIGHT,
+              opacity: 0.35,
+              transform: [
+                { translateX: zoomTranslateX },
+                { translateY: zoomTranslateY },
+                { scale: zoomScale },
+              ],
+            }}
+          >
+            <Image
+              source={{ uri: currentImageUri }}
+              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        )}
+        
+        {/* Title and coin info overlay - ALWAYS SHOW */}
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            left: 12,
+          }}
+          pointerEvents="none"
+        >
+          {/* Title */}
+          <View
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: 6,
+              marginBottom: 4,
+            }}
+          >
+            <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
+              {currentLabel || 'PanHandler Measurements'}
+            </Text>
+          </View>
+          
+          {/* Coin reference info */}
+          {calibration && coinCircle && (
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                {coinCircle.coinName}
+              </Text>
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                {unitSystem === 'imperial' 
+                  ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+                  : `${coinCircle.coinDiameter.toFixed(2)}mm`}
+              </Text>
             </View>
           )}
         </View>
