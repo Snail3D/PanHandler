@@ -1056,41 +1056,43 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // UNIVERSAL CANVAS SCALE FORMULA (mathematically derived and empirically verified)
-      // 
-      // After extensive testing and mathematical analysis, the formula simplifies to:
-      //   Canvas Scale = (1 / pixelsPerUnit) × calibrationZoom × √2.8
-      //
-      // Why this works:
-      // - pixelsPerUnit is measured in screen space during calibration
-      // - calibrationZoom accounts for the zoom level used during calibration
-      // - √2.8 (≈1.673) is a constant that accounts for how React Native's captureRef
-      //   exports images relative to the coordinate space used during calibration
-      // 
-      // This formula is UNIVERSAL - works on all devices (iPhone, iPad, Android)
-      // regardless of pixel ratio, screen size, or image resolution.
-      //
-      const pixelRatio = PixelRatio.get(); // Still get it for logging
-      const CANVAS_SCALE_CONSTANT = Math.sqrt(2.8);
-      const fusionScale = baseScale * calibrationZoom * CANVAS_SCALE_CONSTANT;
+      // TESTING MULTIPLE FORMULAS - We need more data to find the universal one
+      const pixelRatio = PixelRatio.get();
       
-      console.log('📐 CANVAS SCALE - UNIVERSAL FORMULA');
-      console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1/PPU) × zoom × √2.8');
-      console.log('  Device pixel ratio:', pixelRatio, '(not used in formula)');
+      // Calculate all candidate formulas
+      const formulas = {
+        A: baseScale * calibrationZoom * Math.sqrt(2.8), // Test 1 worked
+        B: baseScale * calibrationZoom * 0.8, // Simpler constant
+        C: baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4.36), // Original Test A
+        D: baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / (imageToScreenRatio * Math.sqrt(pixelRatio) / Math.sqrt(2.8))), // Derived
+        E: baseScale * calibrationZoom * (imageToScreenRatio / pixelRatio), // Simple ratio
+        F: baseScale * calibrationZoom * imageToScreenRatio / (pixelRatio * 1.5), // Adjusted
+      };
       
-      // No alternative formulas needed - we have the universal solution
+      const fusionScale = formulas.A; // Default to A for now
+      
+      console.log('📐 CANVAS SCALE - TESTING MULTIPLE FORMULAS');
+      console.log('  Formula A:', formulas.A.toFixed(6), 'mm/px');
+      console.log('  Formula C:', formulas.C.toFixed(6), 'mm/px');
       
       measurementText += `\n\n=== CALIBRATION DATA ===\n`;
       measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(3)} px/mm\n`;
       measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(3)}x\n`;
       measurementText += `Device Pixel Ratio: ${pixelRatio}x\n`;
-      measurementText += `\n✅ CANVAS SCALE: ${fusionScale.toFixed(6)} mm/px\n`;
-      measurementText += `Formula: (1 ÷ PPU) × zoom × √2.8\n`;
-      measurementText += `         = (1 ÷ ${calibration.pixelsPerUnit.toFixed(3)}) × ${calibrationZoom.toFixed(3)} × 1.673\n`;
-        measurementText += `\nFor CAD Canvas Import:\n`;
+      measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(3)}x\n`;
+      measurementText += `Screen: ${SCREEN_WIDTH}×${SCREEN_HEIGHT} | Image: ${actualImageWidth}×${actualImageHeight}\n`;
+      measurementText += `\n--- TEST THESE FORMULAS IN FUSION ---\n`;
+      measurementText += `Target measurement: ${measurements[0]?.value || 'N/A'}\n\n`;
+      measurementText += `A: ${formulas.A.toFixed(6)} mm/px — (1/PPU) × zoom × √2.8\n`;
+      measurementText += `B: ${formulas.B.toFixed(6)} mm/px — (1/PPU) × zoom × 0.8\n`;
+      measurementText += `C: ${formulas.C.toFixed(6)} mm/px — (1/PPU) × √pxR × zoom × (imgR/4.36)\n`;
+      measurementText += `D: ${formulas.D.toFixed(6)} mm/px — Derived formula\n`;
+      measurementText += `E: ${formulas.E.toFixed(6)} mm/px — (1/PPU) × zoom × imgR/pxR\n`;
+      measurementText += `F: ${formulas.F.toFixed(6)} mm/px — (1/PPU) × zoom × imgR/(pxR×1.5)\n`;
+        measurementText += `\n📋 REPORT BACK: Which formula (A-F) gives ${measurements[0]?.value || 'N/A'}?\n`;
+        measurementText += `\nRecommended (testing): Formula A\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
-        measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)`;
+        measurementText += `(Insert > Canvas > Calibrate > Enter this value)`;
       }
       
       // Add footer (only for non-Pro users)
