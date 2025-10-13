@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DeviceMotion } from 'expo-sensors';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import { Svg, Circle, Line } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -433,74 +432,53 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             justifyContent: 'center',
             alignItems: 'center',
             pointerEvents: 'none',
-            zIndex: 30, // Make sure it's on top
+            zIndex: 30,
           }}
         >
-          <Svg width={200} height={200}>
-            {/* Outer circle track for bubble */}
-            <Circle
-              cx={100}
-              cy={100}
-              r={70}
-              fill="none"
-              stroke="rgba(255, 255, 255, 0.4)"
-              strokeWidth="2"
+          {/* Outer circle track for bubble */}
+          <View
+            style={{
+              position: 'absolute',
+              width: 140,
+              height: 140,
+              borderRadius: 70,
+              borderWidth: 2,
+              borderColor: 'rgba(255, 255, 255, 0.5)',
+            }}
+          />
+          
+          {/* Center target circle */}
+          <View
+            style={{
+              position: 'absolute',
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              borderWidth: 2,
+              borderColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+            }}
+          />
+          
+          {/* Crosshair lines - Horizontal */}
+          <View style={{ position: 'absolute', left: 30, top: 99, width: 40, height: 2, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          <View style={{ position: 'absolute', right: 30, top: 99, width: 40, height: 2, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          
+          {/* Crosshair lines - Vertical */}
+          <View style={{ position: 'absolute', left: 99, top: 30, width: 2, height: 40, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          <View style={{ position: 'absolute', left: 99, bottom: 30, width: 2, height: 40, backgroundColor: 'rgba(255, 255, 255, 0.7)' }} />
+          
+          {/* Center dot when level */}
+          {alignmentStatus === 'good' && (
+            <View
+              style={{
+                position: 'absolute',
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: 'rgba(0, 255, 0, 1)',
+              }}
             />
-            
-            {/* Center target circle */}
-            <Circle
-              cx={100}
-              cy={100}
-              r={25}
-              fill="none"
-              stroke={alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.8)' : 'rgba(255, 255, 255, 0.6)'}
-              strokeWidth="2"
-            />
-            
-            {/* Crosshair lines */}
-            <Line
-              x1={30}
-              y1={100}
-              x2={70}
-              y2={100}
-              stroke="rgba(255, 255, 255, 0.6)"
-              strokeWidth="2"
-            />
-            <Line
-              x1={130}
-              y1={100}
-              x2={170}
-              y2={100}
-              stroke="rgba(255, 255, 255, 0.6)"
-              strokeWidth="2"
-            />
-            <Line
-              x1={100}
-              y1={30}
-              x2={100}
-              y2={70}
-              stroke="rgba(255, 255, 255, 0.6)"
-              strokeWidth="2"
-            />
-            <Line
-              x1={100}
-              y1={130}
-              x2={100}
-              y2={170}
-              stroke="rgba(255, 255, 255, 0.6)"
-              strokeWidth="2"
-            />
-            
-            {/* Center dot when level */}
-            {alignmentStatus === 'good' && (
-              <Circle
-                cx={100}
-                cy={100}
-                r={4}
-                fill="rgba(0, 255, 0, 1)"
-              />
-            )}
-          </Svg>
+          )}
           
           {/* Animated bubble */}
           <Animated.View
@@ -521,7 +499,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.8,
                 shadowRadius: 8,
-                elevation: 10, // For Android
+                elevation: 10,
               },
               useAnimatedStyle(() => ({
                 transform: [
@@ -544,6 +522,22 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
               }}
             />
           </Animated.View>
+          
+          {/* Debug: Show bubble position */}
+          <View
+            style={{
+              position: 'absolute',
+              top: -40,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: 'white', fontSize: 10, fontFamily: 'monospace' }}>
+              Bubble Level Active
+            </Text>
+          </View>
         </View>
 
         {/* Alignment status indicator */}
