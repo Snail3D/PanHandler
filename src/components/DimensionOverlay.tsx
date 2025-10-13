@@ -2376,6 +2376,42 @@ export default function DimensionOverlay({
               }
             }
             
+            if (resizingPoint && !didDrag) {
+              // Released without dragging - check for 4-tap delete
+              const tappedId = resizingPoint.measurementId;
+              const now = Date.now();
+              const TAP_TIMEOUT = 500; // 500ms between taps
+              
+              if (tapDeleteState?.measurementId === tappedId && (now - tapDeleteState.lastTapTime) < TAP_TIMEOUT) {
+                // Same measurement tapped within timeout
+                const newCount = tapDeleteState.count + 1;
+                
+                if (newCount >= 4) {
+                  // 4th tap - delete the measurement!
+                  const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
+                  setMeasurements(updatedMeasurements);
+                  setTapDeleteState(null);
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  console.log('🗑️ Measurement deleted via 4 rapid taps');
+                  
+                  // Reset all states and return early
+                  setDraggedMeasurementId(null);
+                  setResizingPoint(null);
+                  setDidDrag(false);
+                  setIsSnapped(false);
+                  return;
+                } else {
+                  // Increment tap count
+                  setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+              } else {
+                // First tap or timeout expired - reset counter
+                setTapDeleteState({ measurementId: tappedId, count: 1, lastTapTime: now });
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+            }
+            
             if (resizingPoint) {
               // Recalculate measurement values after point movement completes
               const updatedMeasurements = measurements.map(m => {
