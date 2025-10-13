@@ -851,7 +851,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, marginRight: 10 }}>🔧</Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>CAD Export</Text> - 50% opacity, perfectly scaled
+                      <Text style={{ fontWeight: '600' }}>CAD Export</Text> - 50% opacity with alignment brackets
                     </Text>
                   </View>
 
@@ -1058,14 +1058,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Set Canvas Scale
+                        Scale Using Coin Reference
                       </Text>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
-                        Use the scale value shown on the photo to calibrate your canvas
+                        Use the coin information in the photo label to quickly scale your canvas in CAD
                       </Text>
                       <View style={{ backgroundColor: 'rgba(255,149,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, marginBottom: 8 }}>
+                          <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows your coin type and size (e.g., "US Quarter - Ø 24.26mm"). Use this to set your canvas scale by measuring the coin in the photo!
+                        </Text>
                         <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
-                          <Text style={{ fontWeight: '700' }}>Example:</Text> If the photo shows "Canvas Scale: 0.0412", enter this value in your CAD software's canvas calibration settings
+                          <Text style={{ fontWeight: '700' }}>Alignment Brackets:</Text> The 50% opacity image includes corner alignment brackets to make positioning in CAD quick and easy
                         </Text>
                       </View>
                     </View>
@@ -1082,7 +1085,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                         Trace & Model
                       </Text>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                        Trace over the 50% opacity image using your CAD tools. All measurements are perfectly scaled!
+                        Trace over the 50% opacity image using your CAD tools. Use the alignment brackets to position the image precisely!
                       </Text>
                     </View>
                   </View>
