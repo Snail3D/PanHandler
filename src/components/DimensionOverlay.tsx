@@ -3267,7 +3267,12 @@ export default function DimensionOverlay({
               width: SCREEN_WIDTH,
               height: SCREEN_HEIGHT,
               opacity: 0.35,
-              // NO TRANSFORM - export original image to match pixelsPerUnit calculation
+              // Apply saved zoom transformation to match calibrated view
+              transform: [
+                { translateX: savedZoomState?.translateX || 0 },
+                { translateY: savedZoomState?.translateY || 0 },
+                { scale: savedZoomState?.scale || 1 },
+              ],
             }}
           >
             <Image
