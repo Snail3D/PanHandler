@@ -4547,11 +4547,11 @@ export default function DimensionOverlay({
           height: SCREEN_HEIGHT,
           top: 0,
           left: -10000, // Position off-screen
-          backgroundColor: 'white', // White background makes image appear lighter
+          backgroundColor: 'transparent', // Transparent for PNG export
         }}
       >
         {currentImageUri && (
-          <Animated.View
+          <View
             style={{
               position: 'absolute',
               width: SCREEN_WIDTH,
@@ -4570,7 +4570,7 @@ export default function DimensionOverlay({
               style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
               resizeMode="contain"
             />
-          </Animated.View>
+          </View>
         )}
         
         {/* Title and coin info overlay - ALWAYS SHOW */}
