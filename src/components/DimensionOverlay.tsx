@@ -4224,6 +4224,12 @@ export default function DimensionOverlay({
         >
           <Pressable
             onPress={() => setShowHelpModal(true)}
+            onLongPress={() => {
+              // Secret: Long-press to clear saved email (for testing)
+              setUserEmail(null);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              Alert.alert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!');
+            }}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
               width: 26,

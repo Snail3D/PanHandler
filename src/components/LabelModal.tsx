@@ -186,37 +186,40 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                   paddingTop: 8,
                 }}>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
-                    {/* Skip Button */}
-                    <Pressable
-                      onPress={handleSkip}
-                      style={({ pressed }) => ({
-                        flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
-                        borderRadius: 16,
-                        paddingVertical: 14,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 2,
-                        borderColor: 'rgba(120,120,128,0.2)',
-                      })}
-                    >
-                      <Ionicons name="arrow-forward" size={20} color="#8E8E93" />
-                      <Text style={{ 
-                        color: '#8E8E93', 
-                        fontWeight: '700', 
-                        fontSize: 16, 
-                        marginLeft: 6,
-                      }}>
-                        Skip
-                      </Text>
-                    </Pressable>
+                    {/* Skip Button - Only show if user has typed something */}
+                    {label.trim() ? (
+                      <Pressable
+                        onPress={handleSkip}
+                        style={({ pressed }) => ({
+                          flex: 1,
+                          backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
+                          borderRadius: 16,
+                          paddingVertical: 14,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderWidth: 2,
+                          borderColor: 'rgba(120,120,128,0.2)',
+                        })}
+                      >
+                        <Ionicons name="close" size={20} color="#8E8E93" />
+                        <Text style={{ 
+                          color: '#8E8E93', 
+                          fontWeight: '700', 
+                          fontSize: 16, 
+                          marginLeft: 6,
+                        }}>
+                          Clear
+                        </Text>
+                      </Pressable>
+                    ) : null}
 
                     {/* Continue Button */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
-                        flex: 1,
+                        flex: label.trim() ? 1 : undefined,
+                        width: label.trim() ? undefined : '100%',
                         backgroundColor: pressed ? '#0066CC' : '#007AFF',
                         borderRadius: 16,
                         paddingVertical: 14,
@@ -237,7 +240,7 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         fontSize: 16, 
                         marginLeft: 6,
                       }}>
-                        {label.trim() ? 'Continue' : 'Skip'}
+                        Continue
                       </Text>
                     </Pressable>
                   </View>
