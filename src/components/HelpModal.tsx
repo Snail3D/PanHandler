@@ -721,43 +721,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       </Text>
                     </View>
                   </View>
-
-                  {/* Visual Sample */}
-                  <View style={{ marginTop: 12, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 14, padding: 16 }}>
-                    <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 12, fontWeight: '600' }}>
-                      Example measurement:
-                    </Text>
-                    <View style={{ position: 'relative', width: 220, height: 80 }}>
-                      <Svg width={220} height={80} viewBox="0 0 220 80">
-                        {/* Measurement line */}
-                        <Line x1={30} y1={40} x2={190} y2={40} stroke="#3B82F6" strokeWidth="3" />
-                        
-                        {/* Start point */}
-                        <Circle cx={30} cy={40} r={8} fill="#3B82F6" stroke="white" strokeWidth="2" />
-                        
-                        {/* End point */}
-                        <Circle cx={190} cy={40} r={8} fill="#3B82F6" stroke="white" strokeWidth="2" />
-                        
-                        {/* Label background */}
-                        <Rect x={85} y={10} width={50} height={20} rx={4} fill="#3B82F6" />
-                      </Svg>
-                      <Text style={{ 
-                        position: 'absolute', 
-                        top: 13, 
-                        left: 0, 
-                        right: 0, 
-                        textAlign: 'center',
-                        fontSize: 12, 
-                        color: 'white', 
-                        fontWeight: '600' 
-                      }}>
-                        145.2 mm
-                      </Text>
-                    </View>
-                    <Text style={{ fontSize: 12, color: '#8E8E93', marginTop: 8, fontStyle: 'italic', textAlign: 'center' }}>
-                      Measurements show as colored lines with labeled values
-                    </Text>
-                  </View>
                 </View>
               </ExpandableSection>
 
