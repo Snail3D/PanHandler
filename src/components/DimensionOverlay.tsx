@@ -100,6 +100,7 @@ export default function DimensionOverlay({
   const calibration = useStore((s) => s.calibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const setUnitSystem = useStore((s) => s.setUnitSystem);
+  const prevUnitSystemRef = useRef(unitSystem); // Track previous unit system to avoid infinite loops
   const currentImageUri = useStore((s) => s.currentImageUri);
   const isAutoCaptured = useStore((s) => s.isAutoCaptured);
   const coinCircle = useStore((s) => s.coinCircle);
@@ -768,7 +769,13 @@ export default function DimensionOverlay({
 
   // Recalculate all measurement values when unit system changes
   useEffect(() => {
-    if (measurements.length === 0) return;
+    // Only recalculate if unit system actually changed (not on initial mount or measurement changes)
+    if (prevUnitSystemRef.current === unitSystem || measurements.length === 0) {
+      prevUnitSystemRef.current = unitSystem;
+      return;
+    }
+    
+    prevUnitSystemRef.current = unitSystem;
     
     const updatedMeasurements = measurements.map(m => {
       let newValue = m.value;
@@ -806,7 +813,7 @@ export default function DimensionOverlay({
     });
     
     setMeasurements(updatedMeasurements);
-  }, [unitSystem]); // Only recalculate when unit system changes
+  }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
 
   const handleClear = () => {
     // Remove one measurement at a time (last first)
