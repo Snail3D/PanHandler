@@ -15,7 +15,7 @@ import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
 import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
-import { formatMeasurement } from '../utils/unitConversion';
+import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
@@ -76,6 +76,8 @@ interface Measurement {
   radius?: number; // For circles
   width?: number;  // For rectangles
   height?: number; // For rectangles
+  area?: number;   // For closed freehand loops (lasso mode)
+  isClosed?: boolean; // For freehand paths - indicates if it's a closed loop
 }
 
 interface DimensionOverlayProps {
@@ -170,6 +172,7 @@ export default function DimensionOverlay({
   const [showFreehandCursor, setShowFreehandCursor] = useState(false);
   const freehandActivationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [freehandActivating, setFreehandActivating] = useState(false); // Waiting for activation
+  const [freehandClosedLoop, setFreehandClosedLoop] = useState(false); // Track if loop is closed (lasso mode)
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -636,6 +639,47 @@ export default function DimensionOverlay({
     return { x: cursorX, y: cursorY, snapped: false };
   };
 
+  // Helper to detect if a path self-intersects
+  const doesPathSelfIntersect = (path: Array<{ x: number; y: number }>): boolean => {
+    if (path.length < 4) return false; // Need at least 4 points to self-intersect
+    
+    // Check each line segment against all other non-adjacent line segments
+    for (let i = 0; i < path.length - 1; i++) {
+      const seg1Start = path[i];
+      const seg1End = path[i + 1];
+      
+      // Start checking from i+2 to avoid adjacent segments
+      for (let j = i + 2; j < path.length - 1; j++) {
+        // Don't check the last segment against the first (they're supposed to connect in a loop)
+        if (i === 0 && j === path.length - 2) continue;
+        
+        const seg2Start = path[j];
+        const seg2End = path[j + 1];
+        
+        // Check if segments intersect
+        if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+  
+  // Helper to check if two line segments intersect
+  const doSegmentsIntersect = (
+    p1: { x: number; y: number },
+    p2: { x: number; y: number },
+    p3: { x: number; y: number },
+    p4: { x: number; y: number }
+  ): boolean => {
+    const ccw = (A: { x: number; y: number }, B: { x: number; y: number }, C: { x: number; y: number }) => {
+      return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
+    };
+    
+    return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
+  };
+
   // Helper to snap cursor to nearby existing measurement points
   // moveMode: when true (moving points), use larger threshold (7mm) for easier snapping
   const snapToNearbyPoint = (cursorX: number, cursorY: number, moveMode: boolean = false): { x: number, y: number, snapped: boolean } => {
@@ -1063,7 +1107,15 @@ export default function DimensionOverlay({
           totalLength += Math.sqrt(dx * dx + dy * dy);
         }
         const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
-        newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+        
+        // If it has area (closed non-intersecting loop), recalculate area too
+        if (m.area !== undefined) {
+          const perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+          const areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
+          newValue = `${perimeterStr} ⊞ ${areaStr}`;
+        } else {
+          newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+        }
       }
       
       return {
@@ -1898,6 +1950,24 @@ export default function DimensionOverlay({
                     
                     // Minimum distance: 2 image pixels (zoom independent)
                     if (distance > 2) {
+                      // LASSO SNAP: Check if we're close to the starting point (to close the loop)
+                      if (prevPath.length >= 10) { // Need at least 10 points to make a meaningful loop
+                        const firstPoint = prevPath[0];
+                        const distToStart = Math.sqrt(
+                          Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
+                        );
+                        
+                        // Snap threshold: 30 pixels
+                        if (distToStart < 30) {
+                          console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
+                          // Strong haptic feedback for successful lasso close
+                          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                          setFreehandClosedLoop(true);
+                          // Snap to exact start point to close the loop
+                          return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
+                        }
+                      }
+                      
                       return [...prevPath, { x: imageX, y: imageY }];
                     }
                     
@@ -2019,9 +2089,9 @@ export default function DimensionOverlay({
                 // Continue to evaporation effect
               } else if (isDrawingFreehand && freehandPath.length >= 5) {
                 // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
-                console.log('🎨 Freehand path points captured:', freehandPath.length);
+                console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', freehandClosedLoop);
                 
-                // Calculate total path length
+                // Calculate total path length (perimeter)
                 let totalLength = 0;
                 for (let i = 1; i < freehandPath.length; i++) {
                   const dx = freehandPath[i].x - freehandPath[i - 1].x;
@@ -2033,31 +2103,73 @@ export default function DimensionOverlay({
                 const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
                 const physicalLength = totalLength / pixelsPerUnit;
                 
-                // Format the measurement
-                const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                // Check if path self-intersects
+                const selfIntersects = doesPathSelfIntersect(freehandPath);
+                console.log('🔍 Self-intersection check:', selfIntersects);
                 
-                // Create completed measurement
-                const newMeasurement: Measurement = {
-                  id: Date.now().toString(),
-                  points: [...freehandPath], // Create a copy of the path
-                  value: formattedValue,
-                  mode: 'freehand',
-                };
+                // Calculate area only if loop is closed AND doesn't self-intersect
+                let area = 0;
+                if (freehandClosedLoop && !selfIntersects && freehandPath.length >= 3) {
+                  // Shoelace formula for polygon area
+                  for (let i = 0; i < freehandPath.length - 1; i++) {
+                    area += freehandPath[i].x * freehandPath[i + 1].y;
+                    area -= freehandPath[i + 1].x * freehandPath[i].y;
+                  }
+                  area = Math.abs(area) / 2;
+                  
+                  // Convert from pixel² to physical units²
+                  const physicalArea = area / (pixelsPerUnit * pixelsPerUnit);
+                  
+                  console.log('📐 Lasso area calculated:', physicalArea.toFixed(2), 'square units');
+                  
+                  // Format measurement with both perimeter and area
+                  const perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                  const areaStr = formatAreaMeasurement(physicalArea, calibration?.unit || 'mm', unitSystem);
+                  const formattedValue = `${perimeterStr} ⊞ ${areaStr}`;
+                  
+                  // Create completed measurement with area
+                  const newMeasurement: Measurement = {
+                    id: Date.now().toString(),
+                    points: [...freehandPath],
+                    value: formattedValue,
+                    mode: 'freehand',
+                    area: physicalArea, // Store raw area value
+                    isClosed: true, // Mark as closed loop
+                  };
+                  
+                  setMeasurements([...measurements, newMeasurement]);
+                } else {
+                  // Open path OR self-intersecting - just show length
+                  const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                  
+                  const newMeasurement: Measurement = {
+                    id: Date.now().toString(),
+                    points: [...freehandPath],
+                    value: formattedValue,
+                    mode: 'freehand',
+                    isClosed: freehandClosedLoop, // Still mark as closed even if self-intersecting
+                  };
+                  
+                  setMeasurements([...measurements, newMeasurement]);
+                  
+                  // Log reason for no area
+                  if (freehandClosedLoop && selfIntersects) {
+                    console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
+                  }
+                }
                 
-                console.log('🎨 Creating freehand measurement with mode:', newMeasurement.mode, 'points:', newMeasurement.points.length);
-                
-                // Add to measurements list
-                setMeasurements([...measurements, newMeasurement]);
+                console.log('🎨 Creating freehand measurement with', freehandPath.length, 'points');
                 
                 // Reset freehand state
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
+                setFreehandClosedLoop(false); // Reset closed loop state
                 
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                console.log('🎨 Freehand measurement completed:', formattedValue, 'with', freehandPath.length, 'points');
+                console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
                 console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');

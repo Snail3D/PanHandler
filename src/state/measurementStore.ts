@@ -22,6 +22,8 @@ export interface CompletedMeasurement {
   width?: number;  // For rectangles  
   height?: number; // For rectangles
   totalLength?: number; // For freehand - total path length
+  area?: number; // For closed non-intersecting freehand loops (lasso mode)
+  isClosed?: boolean; // For freehand - indicates if it's a closed loop
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
