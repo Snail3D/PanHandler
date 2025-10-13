@@ -766,6 +766,48 @@ export default function DimensionOverlay({
     }
   }, [measurements.length, hasTriggeredTetris]);
 
+  // Recalculate all measurement values when unit system changes
+  useEffect(() => {
+    if (measurements.length === 0) return;
+    
+    const updatedMeasurements = measurements.map(m => {
+      let newValue = m.value;
+      let width, height, radius;
+      
+      if (m.mode === 'distance') {
+        newValue = calculateDistance(m.points[0], m.points[1]);
+      } else if (m.mode === 'angle') {
+        newValue = calculateAngle(m.points[0], m.points[1], m.points[2]);
+      } else if (m.mode === 'circle') {
+        const radiusPx = Math.sqrt(
+          Math.pow(m.points[1].x - m.points[0].x, 2) + 
+          Math.pow(m.points[1].y - m.points[0].y, 2)
+        );
+        radius = radiusPx / (calibration?.pixelsPerUnit || 1);
+        const diameter = radius * 2;
+        newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+      } else if (m.mode === 'rectangle') {
+        const widthPx = Math.abs(m.points[1].x - m.points[0].x);
+        const heightPx = Math.abs(m.points[1].y - m.points[0].y);
+        width = widthPx / (calibration?.pixelsPerUnit || 1);
+        height = heightPx / (calibration?.pixelsPerUnit || 1);
+        const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+        const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+        newValue = `${widthStr} × ${heightStr}`;
+      }
+      
+      return {
+        ...m,
+        value: newValue,
+        ...(width !== undefined && { width }),
+        ...(height !== undefined && { height }),
+        ...(radius !== undefined && { radius }),
+      };
+    });
+    
+    setMeasurements(updatedMeasurements);
+  }, [unitSystem]); // Only recalculate when unit system changes
+
   const handleClear = () => {
     // Remove one measurement at a time (last first)
     if (measurements.length > 0) {
