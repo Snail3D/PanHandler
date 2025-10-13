@@ -1743,58 +1743,52 @@ export default function DimensionOverlay({
                 console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
-              } else if (isDrawingFreehand) {
+              } else if (isDrawingFreehand && freehandPath.length >= 2) {
                 // If they were drawing, complete the measurement
-                // Use functional update to get the latest path state
-                setFreehandPath(currentPath => {
-                  console.log('🎨 Freehand path points captured:', currentPath.length);
-                  
-                  if (currentPath.length < 2) {
-                    console.log('⚠️ Path too short, discarding');
-                    // Reset state
-                    setIsDrawingFreehand(false);
-                    setShowFreehandCursor(false);
-                    setFreehandActivating(false);
-                    return [];
-                  }
-                  
-                  // Calculate total path length
-                  let totalLength = 0;
-                  for (let i = 1; i < currentPath.length; i++) {
-                    const dx = currentPath[i].x - currentPath[i - 1].x;
-                    const dy = currentPath[i].y - currentPath[i - 1].y;
-                    totalLength += Math.sqrt(dx * dx + dy * dy);
-                  }
-                  
-                  // Convert to physical units
-                  const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
-                  const physicalLength = totalLength / pixelsPerUnit;
-                  
-                  // Format the measurement
-                  const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
-                  
-                  // Create completed measurement
-                  const newMeasurement: Measurement = {
-                    id: Date.now().toString(),
-                    points: [...currentPath], // Create a copy of the path
-                    value: formattedValue,
-                    mode: 'freehand',
-                  };
-                  
-                  // Add to measurements list
-                  setMeasurements([...measurements, newMeasurement]);
-                  
-                  // Reset freehand state
-                  setIsDrawingFreehand(false);
-                  setShowFreehandCursor(false);
-                  setFreehandActivating(false);
-                  
-                  // Success haptic
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  console.log('🎨 Freehand measurement completed:', formattedValue, 'with', currentPath.length, 'points');
-                  
-                  return []; // Clear the path
-                });
+                console.log('🎨 Freehand path points captured:', freehandPath.length);
+                
+                // Calculate total path length
+                let totalLength = 0;
+                for (let i = 1; i < freehandPath.length; i++) {
+                  const dx = freehandPath[i].x - freehandPath[i - 1].x;
+                  const dy = freehandPath[i].y - freehandPath[i - 1].y;
+                  totalLength += Math.sqrt(dx * dx + dy * dy);
+                }
+                
+                // Convert to physical units
+                const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+                const physicalLength = totalLength / pixelsPerUnit;
+                
+                // Format the measurement
+                const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                
+                // Create completed measurement
+                const newMeasurement: Measurement = {
+                  id: Date.now().toString(),
+                  points: [...freehandPath], // Create a copy of the path
+                  value: formattedValue,
+                  mode: 'freehand',
+                };
+                
+                // Add to measurements list
+                setMeasurements([...measurements, newMeasurement]);
+                
+                // Reset freehand state
+                setFreehandPath([]);
+                setIsDrawingFreehand(false);
+                setShowFreehandCursor(false);
+                setFreehandActivating(false);
+                
+                // Success haptic
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                console.log('🎨 Freehand measurement completed:', formattedValue, 'with', freehandPath.length, 'points');
+              } else if (isDrawingFreehand) {
+                // Path too short, just reset
+                console.log('⚠️ Path too short, discarding');
+                setFreehandPath([]);
+                setIsDrawingFreehand(false);
+                setShowFreehandCursor(false);
+                setFreehandActivating(false);
               }
             }
             
