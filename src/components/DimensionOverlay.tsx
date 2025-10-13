@@ -465,13 +465,14 @@ export default function DimensionOverlay({
   };
 
   // Helper to snap cursor to nearby existing measurement points
-  const snapToNearbyPoint = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    // Calculate 1mm in pixels based on calibration
-    // If not calibrated, fallback to 30 pixels
-    const SNAP_DISTANCE_MM = 1; // 1mm snap threshold
+  // tighterThreshold: when true (moving points), use 0.3mm threshold instead of 1mm
+  const snapToNearbyPoint = (cursorX: number, cursorY: number, tighterThreshold: boolean = false): { x: number, y: number, snapped: boolean } => {
+    // Calculate snap distance in pixels based on calibration
+    // Use tighter threshold (0.3mm) when moving points, normal (1mm) when placing
+    const SNAP_DISTANCE_MM = tighterThreshold ? 0.3 : 1;
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
-      : 30; // fallback to 30 pixels if not calibrated
+      : (tighterThreshold ? 10 : 30); // fallback pixels if not calibrated
     
     // Check all existing measurement points
     for (const measurement of measurements) {
@@ -1648,16 +1649,22 @@ export default function DimensionOverlay({
             if (resizingPoint) {
               setDidDrag(true);
               
-              // Apply snapping when moving points
-              const snappedPosition = snapToNearbyPoint(pageX, pageY);
+              // Apply snapping when moving points - use tighter threshold (0.3mm)
+              const snappedPosition = snapToNearbyPoint(pageX, pageY, true);
               const imageCoords = screenToImage(snappedPosition.x, snappedPosition.y);
               
-              // Haptic feedback when snapping occurs
+              // Stronger haptic feedback when snapping occurs in move mode
               if (snappedPosition.snapped && !isSnapped) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                // Double haptic for entering snap - very noticeable
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).then(() => {
+                  setTimeout(() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }, 50);
+                });
                 setIsSnapped(true);
               } else if (!snappedPosition.snapped && isSnapped) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                // Medium haptic for leaving snap
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setIsSnapped(false);
               }
               
