@@ -178,42 +178,18 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                 {/* Footer Buttons */}
                 <View style={{
                   paddingHorizontal: 20,
-                  paddingBottom: 20,
+                  paddingBottom: 16,
                   paddingTop: 4,
                 }}>
                   <View style={{ flexDirection: 'row', gap: 10 }}>
-                    {/* Skip Button - Always visible */}
-                    <Pressable
-                      onPress={handleSkip}
-                      style={({ pressed }) => ({
-                        flex: 1,
-                        backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
-                        borderRadius: 12,
-                        paddingVertical: 13,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1.5,
-                        borderColor: 'rgba(120,120,128,0.2)',
-                      })}
-                    >
-                      <Text style={{ 
-                        color: '#3C3C43', 
-                        fontWeight: '600', 
-                        fontSize: 15, 
-                      }}>
-                        Skip
-                      </Text>
-                    </Pressable>
-
-                    {/* Continue Button */}
+                    {/* Continue Button - Now on LEFT */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
                         flex: 1,
                         backgroundColor: pressed ? '#0066CC' : '#007AFF',
                         borderRadius: 12,
-                        paddingVertical: 13,
+                        paddingVertical: 12,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -232,6 +208,30 @@ export default function LabelModal({ visible, onComplete, onDismiss }: LabelModa
                         marginLeft: 4,
                       }}>
                         Continue
+                      </Text>
+                    </Pressable>
+
+                    {/* Skip Button - Now on RIGHT */}
+                    <Pressable
+                      onPress={handleSkip}
+                      style={({ pressed }) => ({
+                        flex: 1,
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
+                        borderRadius: 12,
+                        paddingVertical: 12,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 1.5,
+                        borderColor: 'rgba(120,120,128,0.2)',
+                      })}
+                    >
+                      <Text style={{ 
+                        color: '#3C3C43', 
+                        fontWeight: '600', 
+                        fontSize: 15, 
+                      }}>
+                        Skip
                       </Text>
                     </Pressable>
                   </View>
