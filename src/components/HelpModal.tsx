@@ -885,7 +885,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 delay={450}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 3 photos and a detailed measurement table.
+                  Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 2 photos and a detailed measurement table.
                 </Text>
                 
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 8, fontWeight: '600' }}>
@@ -912,7 +912,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       Scale calculation: 1000 pixels ÷ 24.26mm = 41.23 px/mm{'\n'}
                     </Text>
                     {'\n'}
-                    Attached: 2 photos (labeled + CAD canvas)
+                    Attached: 2 photos (measurements + transparent CAD canvas)
                   </Text>
                 </View>
 
