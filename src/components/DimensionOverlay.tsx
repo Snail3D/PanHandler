@@ -1315,8 +1315,8 @@ export default function DimensionOverlay({
       // Increment email counter for free users (counts when composer opens)
       incrementEmailCount();
       
-      // Show inspirational quote overlay
-      setTimeout(() => showQuoteOverlay(), 500);
+      // Note: We don't show quote here because composeAsync() returns when composer opens,
+      // not when email is sent. We can't distinguish between "sent" and "cancelled".
     } catch (error) {
       setIsCapturing(false);
       console.error('❌ Email error:', error);

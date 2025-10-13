@@ -2,9 +2,12 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { View, Text } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
 // import * as StoreReview from 'expo-store-review';
 import MeasurementScreen from "./src/screens/MeasurementScreen";
+import { getRandomQuote } from "./src/utils/makerQuotes";
 // import RatingPromptModal from "./src/components/RatingPromptModal";
 // import useStore from "./src/state/measurementStore";
 
@@ -30,6 +33,56 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
+  // Intro screen state
+  const [showIntro, setShowIntro] = useState(true);
+  const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
+  const [displayedText, setDisplayedText] = useState('');
+  const introOpacity = useSharedValue(0);
+  
+  // Get random quote on mount
+  useEffect(() => {
+    const quote = getRandomQuote();
+    setIntroQuote(quote);
+    
+    // Fade in the intro screen
+    introOpacity.value = withDelay(300, withTiming(1, { 
+      duration: 800,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
+    }));
+    
+    // Type out the quote text
+    const fullText = `"${quote.text}"`;
+    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    const completeText = `${fullText}\n\n${authorText}`;
+    
+    let currentIndex = 0;
+    const typingSpeed = 25; // Fast typing for intro
+    
+    const typeInterval = setInterval(() => {
+      if (currentIndex < completeText.length) {
+        setDisplayedText(completeText.substring(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typeInterval);
+        // Hold for 2 seconds after typing, then fade out
+        setTimeout(() => {
+          introOpacity.value = withTiming(0, { 
+            duration: 600,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1)
+          }, () => {
+            runOnJS(setShowIntro)(false);
+          });
+        }, 2000);
+      }
+    }, typingSpeed);
+    
+    return () => clearInterval(typeInterval);
+  }, []);
+  
+  const introAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: introOpacity.value,
+  }));
+  
   // RATING PROMPT TEMPORARILY DISABLED - Will work in production build
   // const [showRatingPrompt, setShowRatingPrompt] = useState(false);
   // const sessionCount = useStore((s) => s.sessionCount);
@@ -92,10 +145,41 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <NavigationContainer>
-          <MeasurementScreen />
-          <StatusBar style="auto" />
-        </NavigationContainer>
+        {showIntro ? (
+          // Intro Screen - White background with black text
+          <Animated.View
+            style={[
+              {
+                flex: 1,
+                backgroundColor: '#FFFFFF',
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 40,
+              },
+              introAnimatedStyle
+            ]}
+          >
+            <Text
+              style={{
+                color: '#000000',
+                fontSize: 22,
+                fontWeight: '400',
+                textAlign: 'center',
+                lineHeight: 34,
+                fontFamily: 'System',
+                letterSpacing: 0.5,
+              }}
+            >
+              {displayedText}
+            </Text>
+          </Animated.View>
+        ) : (
+          // Main App
+          <NavigationContainer>
+            <MeasurementScreen />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        )}
         {/* Rating prompt will be enabled in production build */}
         {/* <RatingPromptModal 
           visible={showRatingPrompt}
