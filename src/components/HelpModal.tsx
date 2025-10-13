@@ -189,7 +189,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
   
-  // Pulsing glow animation for "Upgrade to Pro" text
+  // Pulsing glow animation for "Upgrade to Pro" button
   const glowOpacity = useSharedValue(0.3);
   
   useEffect(() => {
@@ -205,9 +205,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   }, []);
   
   const glowAnimatedStyle = useAnimatedStyle(() => ({
-    textShadowColor: `rgba(255, 59, 48, ${glowOpacity.value * 0.8})`, // Red glow
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12 * glowOpacity.value,
+    opacity: glowOpacity.value,
   }));
   
   useEffect(() => {
@@ -1220,17 +1218,34 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       shadowOpacity: pressed ? 0.5 : 0.35,
                       shadowRadius: pressed ? 16 : 12,
                       elevation: 8,
+                      position: 'relative',
                     })}
                   >
-                    <AnimatedText style={[{ 
+                    {/* Pulsing red glow layer behind text */}
+                    <AnimatedView 
+                      style={[{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        borderRadius: 16,
+                        shadowColor: '#FF3B30',
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowOpacity: 0.8,
+                        shadowRadius: 12,
+                      }, glowAnimatedStyle]}
+                      pointerEvents="none"
+                    />
+                    <Text style={{ 
                       color: '#1C1C1E', 
                       fontSize: 18, 
                       fontWeight: '800', 
                       textAlign: 'center',
                       letterSpacing: 0.3,
-                    }, glowAnimatedStyle]}>
+                    }}>
                       Upgrade to Pro
-                    </AnimatedText>
+                    </Text>
                   </Pressable>
 
                   {/* Restore Purchase Link */}
