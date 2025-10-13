@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "clear-cache": "rm -rf .expo/web-cache .expo/metro-cache .expo/typed-routes node_modules/.cache && expo start --clear"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
