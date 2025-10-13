@@ -906,99 +906,22 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 
                 <View style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
                   <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
-                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>PanHandler Measurement Report</Text>
+                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>Measurement Report from PanHandler</Text>
                   </Text>
                   <View style={{ height: 1, backgroundColor: '#E5E5EA', marginBottom: 10 }} />
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     Measurement Report from PanHandler{'\n\n'}
-                    <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (US Quarter){'\n'}
-                    <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Pixels Per Unit:</Text> 41.23 px/mm{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Canvas Scale:</Text> 41.23 px/mm{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Image Resolution:</Text> 3024 × 4032 pixels{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (the coin you selected){'\n'}
+                    <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n\n'}
                     <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
-                    🔵 Blue Distance: 145.2mm{'\n'}
-                    🟢 Green Angle: 87.5°{'\n'}
-                    🔴 Red Circle: Ø 52.3mm{'\n\n'}
-                    <Text style={{ fontSize: 12, color: '#8E8E93', fontStyle: 'italic' }}>
-                      Scale calculation: 1000 pixels ÷ 24.26mm = 41.23 px/mm{'\n'}
-                    </Text>
-                    {'\n'}
-                    Attached: 2 photos (measurements + transparent CAD canvas)
+                    Distance: 145.2mm{'\n'}
+                    Angle: 87.5°{'\n'}
+                    Circle: Ø 52.3mm{'\n\n'}
+                    Attached: 2 photos{'\n'}
+                    {'\u2022'} Full measurements photo{'\n'}
+                    {'\u2022'} Transparent CAD canvas (50% opacity)
                   </Text>
                 </View>
-
-                {/* "The Nerdy Stuff" Link */}
-                <Pressable
-                  onPress={() => {
-                    Alert.alert(
-                      '🤓 The Nerdy Stuff: How PanHandler Works',
-                      '═══ CALIBRATION ═══\n\n' +
-                      '1️⃣ COIN REFERENCE SETUP:\n' +
-                      'You place a calibration circle over the coin in your photo. The circle is 200px diameter on screen. When you zoom the photo to match the circle to the coin, we calculate:\n\n' +
-                      'coinPixelSize = 200px ÷ currentZoomScale\n' +
-                      'pixelsPerUnit = coinPixelSize ÷ actualCoinDiameter\n\n' +
-                      'Example: If you zoom 2x to match a 24.26mm quarter:\n' +
-                      '• coinPixelSize = 200px ÷ 2 = 100px\n' +
-                      '• pixelsPerUnit = 100px ÷ 24.26mm = 4.12 px/mm\n\n' +
-                      'This ratio stays constant for the entire photo!\n\n' +
-                      '═══ MEASUREMENTS ═══\n\n' +
-                      '2️⃣ DISTANCE (Line Mode):\n' +
-                      'Two points define a line. We use the Pythagorean theorem:\n\n' +
-                      'pixelDistance = √((x₂-x₁)² + (y₂-y₁)²)\n' +
-                      'realDistance = pixelDistance ÷ pixelsPerUnit\n\n' +
-                      'Example: 412px ÷ 4.12 px/mm = 100mm\n\n' +
-                      '3️⃣ ANGLE MODE:\n' +
-                      'Three points: endpoint₁, vertex (corner), endpoint₂\n' +
-                      'We calculate the angle at the vertex using atan2:\n\n' +
-                      'angle₁ = atan2(y₁-yᵥ, x₁-xᵥ)\n' +
-                      'angle₂ = atan2(y₂-yᵥ, x₂-xᵥ)\n' +
-                      'finalAngle = |angle₂ - angle₁| × (180/π)\n\n' +
-                      '4️⃣ CIRCLE MODE:\n' +
-                      'Two points: center + edge point\n' +
-                      'Radius in pixels, then convert:\n\n' +
-                      'radiusPixels = √((xₑ-xᴄ)² + (yₑ-yᴄ)²)\n' +
-                      'radiusReal = radiusPixels ÷ pixelsPerUnit\n' +
-                      'diameter = radiusReal × 2\n\n' +
-                      '5️⃣ RECTANGLE (Box Mode):\n' +
-                      'Four corners stored (top-left, top-right, bottom-right, bottom-left)\n' +
-                      'We use opposite corners (points[0] and points[2]):\n\n' +
-                      'widthPixels = |x₂ - x₀|\n' +
-                      'heightPixels = |y₂ - y₀|\n' +
-                      'width = widthPixels ÷ pixelsPerUnit\n' +
-                      'height = heightPixels ÷ pixelsPerUnit\n\n' +
-                      '6️⃣ FREEHAND (Free Measure) - THE COOL ONE! 🎨\n' +
-                      'You draw a custom path by dragging your finger!\n' +
-                      'We capture points along your path (every few pixels) and calculate the TOTAL path length:\n\n' +
-                      'totalLength = 0\n' +
-                      'for each consecutive point pair:\n' +
-                      '  segmentLength = √((xᵢ₊₁-xᵢ)² + (yᵢ₊₁-yᵢ)²)\n' +
-                      '  totalLength += segmentLength\n\n' +
-                      'realLength = totalLength ÷ pixelsPerUnit\n\n' +
-                      'This works for ANY shape: curves, zigzags, wire paths, irregular contours - you name it! Perfect for measuring things like:\n' +
-                      '• Electrical wire routing paths\n' +
-                      '• Curved edges of objects\n' +
-                      '• Irregular perimeters\n' +
-                      '• Any non-straight distance\n\n' +
-                      'You can even EDIT the path after drawing by dragging individual points!\n\n' +
-                      '═══ CAD EXPORT ═══\n\n' +
-                      '7️⃣ CANVAS SCALING:\n' +
-                      'For CAD import, we provide the inverse ratio:\n\n' +
-                      'canvasScale = 1 ÷ pixelsPerUnit\n' +
-                      'Example: 1 ÷ 4.12 px/mm = 0.2427 mm/px\n\n' +
-                      'Set this as your canvas scale (X/Y) in CAD software for perfect 1:1 alignment!\n\n' +
-                      '═══ WHY IT WORKS ═══\n\n' +
-                      'The coin calibration creates a pixels-to-real-world ratio that applies to the ENTIRE photo (assuming the surface is flat and parallel to the camera).\n\n' +
-                      'All measurements - whether straight lines, curves, angles, or complex paths - use this same ratio for accurate dimensions!\n\n' +
-                      '🎯 PRO TIP: Higher resolution photos = more pixels per mm = better precision (we achieve ~0.5mm accuracy!)'
-                    );
-                  }}
-                  style={{ marginTop: 12, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: 'rgba(0,122,255,0.1)', borderRadius: 10, alignSelf: 'flex-start' }}
-                >
-                  <Text style={{ fontSize: 13, color: '#007AFF', fontWeight: '600' }}>
-                    🤓 Read "the nerdy stuff" - How the math works
-                  </Text>
-                </Pressable>
               </ExpandableSection>
 
               {/* CAD Import Tutorial - Expandable */}
@@ -1061,7 +984,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       </Text>
                       <View style={{ backgroundColor: 'rgba(255,149,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
                         <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
-                          <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows your coin type and size (e.g., "US Quarter - Ø 24.26mm"). Use this to set your canvas scale by measuring the coin in the photo!
+                          <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows the coin you selected and its size (e.g., "US Quarter - Ø 24.26mm" or "Euro 1 - Ø 23.25mm"). Use this to set your canvas scale by measuring the coin in the photo!
                         </Text>
                       </View>
                     </View>
