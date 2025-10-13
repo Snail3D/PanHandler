@@ -151,6 +151,7 @@ export default function DimensionOverlay({
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+  const [isSnapped, setIsSnapped] = useState(false); // Track if cursor is snapped to horizontal/vertical
   const [lastHapticPosition, setLastHapticPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [lastHapticTime, setLastHapticTime] = useState<number>(Date.now());
   const [fingerTouches, setFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
@@ -412,6 +413,45 @@ export default function DimensionOverlay({
     const screenX = imageX * zoomScale + zoomTranslateX;
     const screenY = imageY * zoomScale + zoomTranslateY;
     return { x: screenX, y: screenY };
+  };
+
+  // Helper to snap cursor to horizontal/vertical alignment with first point
+  const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
+    // Only snap when placing second point in distance mode
+    if (mode !== 'distance' || currentPoints.length !== 1) {
+      return { x: cursorX, y: cursorY, snapped: false };
+    }
+    
+    const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+    const dx = cursorX - firstPoint.x;
+    const dy = cursorY - firstPoint.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // Don't snap if too close to first point (less than 20px)
+    if (distance < 20) {
+      return { x: cursorX, y: cursorY, snapped: false };
+    }
+    
+    // Calculate angle from first point
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    
+    // Snap threshold: within 8 degrees of horizontal or vertical
+    const snapThreshold = 8;
+    
+    // Check for horizontal snap (0° or 180°)
+    const horizontalAngle = Math.abs(angle) % 180;
+    if (horizontalAngle < snapThreshold || horizontalAngle > (180 - snapThreshold)) {
+      return { x: cursorX, y: firstPoint.y, snapped: true };
+    }
+    
+    // Check for vertical snap (90° or -90°)
+    const verticalAngle = Math.abs(Math.abs(angle) - 90);
+    if (verticalAngle < snapThreshold) {
+      return { x: firstPoint.x, y: cursorY, snapped: true };
+    }
+    
+    // No snap
+    return { x: cursorX, y: cursorY, snapped: false };
   };
 
   // Calculate distance in pixels and convert to real units
@@ -1345,8 +1385,14 @@ export default function DimensionOverlay({
             const maxOffset = 30;
             const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
             
+            // Apply snapping logic for horizontal/vertical alignment
+            const rawCursorX = pageX + horizontalOffset;
+            const rawCursorY = pageY - cursorOffsetY;
+            const snappedPosition = snapCursorToAlignment(rawCursorX, rawCursorY);
+            
             setShowCursor(true);
-            setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
+            setCursorPosition({ x: snappedPosition.x, y: snappedPosition.y });
+            setIsSnapped(snappedPosition.snapped);
             setLastHapticPosition({ x: pageX, y: pageY });
             
             // Haptic for activation
@@ -1382,8 +1428,24 @@ export default function DimensionOverlay({
               const maxOffset = 30;
               const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
               
-              // Update cursor with gradient offset
-              setCursorPosition({ x: pageX + horizontalOffset, y: pageY - cursorOffsetY });
+              // Apply snapping logic for horizontal/vertical alignment
+              const rawCursorX = pageX + horizontalOffset;
+              const rawCursorY = pageY - cursorOffsetY;
+              const snappedPosition = snapCursorToAlignment(rawCursorX, rawCursorY);
+              
+              // Update cursor with snapped position
+              setCursorPosition({ x: snappedPosition.x, y: snappedPosition.y });
+              
+              // Haptic feedback when snapping occurs
+              if (snappedPosition.snapped && !isSnapped) {
+                // Just entered snap zone - medium haptic
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setIsSnapped(true);
+              } else if (!snappedPosition.snapped && isSnapped) {
+                // Just left snap zone - light haptic
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setIsSnapped(false);
+              }
               
               // Adaptive haptic feedback based on movement speed
               const distance = Math.sqrt(
@@ -1429,6 +1491,9 @@ export default function DimensionOverlay({
           }}
           onResponderRelease={() => {
             console.log('✅ Touch released');
+            
+            // Reset snap state
+            setIsSnapped(false);
             
             // Evaporation effect - organic fade with slight expansion and dissipation
             // Like condensation evaporating from cold glass
