@@ -1,7 +1,7 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -1058,16 +1058,17 @@ export default function DimensionOverlay({
       
       // FINAL CORRECTED Canvas Scale:
       // The CAD canvas exports at SCREEN resolution (not original image resolution)
+      // BUT on iOS with Retina displays, captureRef captures at native pixel resolution (2x or 3x)
       // pixelsPerUnit is in screen coordinate space (already accounts for zoom via screenToImage)
-      // Therefore: Canvas Scale = 1 / pixelsPerUnit (no additional corrections needed!)
-      const fusionScale = baseScale;
+      // We need to account for the device pixel ratio
+      const pixelRatio = PixelRatio.get();
+      const fusionScale = baseScale * pixelRatio;
       
-      console.log('📐 CANVAS SCALE - FUNDAMENTAL SOLUTION:');
-      console.log('  Key insight: screenToImage() returns unzoomed SCREEN coordinates, not original image coords');
-      console.log('  Therefore pixelsPerUnit:', calibration.pixelsPerUnit.toFixed(2), 'px/mm is in screen-space');
-      console.log('  CAD canvas exports at screen size:', SCREEN_WIDTH, 'x', SCREEN_HEIGHT);
-      console.log('  Canvas Scale = 1 / pixelsPerUnit =', fusionScale.toFixed(6), 'mm/px');
-      console.log('  (No imageRatio or zoom corrections needed!)');
+      console.log('📐 CANVAS SCALE - PIXEL RATIO SOLUTION:');
+      console.log('  Device pixel ratio:', pixelRatio);
+      console.log('  Calibration: ', calibration.pixelsPerUnit.toFixed(2), 'px/mm in screen space');
+      console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
+      console.log('  Formula: (1 / pixelsPerUnit) × pixelRatio');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
@@ -1075,12 +1076,13 @@ export default function DimensionOverlay({
       measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(2)}x\n`;
       measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(2)}x\n`;
       measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/mm (in screen space)\n`;
-      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px (simply 1 ÷ pixelsPerUnit)\n`;
+      measurementText += `Device Pixel Ratio: ${pixelRatio}x\n`;
+      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px (= 1 ÷ pixelsPerUnit × pixelRatio)\n`;
       measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = 1 ÷ pixelsPerUnit = 1 ÷ ${calibration.pixelsPerUnit.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × pixelRatio = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${pixelRatio} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
