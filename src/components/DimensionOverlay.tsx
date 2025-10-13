@@ -1617,13 +1617,44 @@ export default function DimensionOverlay({
             // Check if tapping any measurement point first (distance, angle, circle, rectangle)
             const point = getTappedMeasurementPoint(pageX, pageY);
             if (point) {
-              setResizingPoint(point);
-              setDidDrag(false);
-              setIsSnapped(false); // Reset snap state when starting to resize
-              dragStartPos.value = { x: pageX, y: pageY };
-              dragCurrentPos.value = { x: pageX, y: pageY };
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              return;
+              const measurement = measurements.find(m => m.id === point.measurementId);
+              
+              // Special case for circles: if tapping the center point (point 0) and the tap is
+              // inside the circle area (not near the edge), treat it as a drag operation
+              if (measurement && measurement.mode === 'circle' && point.pointIndex === 0) {
+                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                const radius = Math.sqrt(
+                  Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+                );
+                const distFromCenter = Math.sqrt(
+                  Math.pow(pageX - center.x, 2) + Math.pow(pageY - center.y, 2)
+                );
+                
+                // If tap is inside the circle but not very close to center (> 20px from center),
+                // treat as whole circle drag instead of point resize
+                if (distFromCenter > 20 && distFromCenter < radius - 20) {
+                  // This is a circle drag, not point resize - fall through to measurement tap logic
+                } else {
+                  // Near center or edge - allow point resize
+                  setResizingPoint(point);
+                  setDidDrag(false);
+                  setIsSnapped(false);
+                  dragStartPos.value = { x: pageX, y: pageY };
+                  dragCurrentPos.value = { x: pageX, y: pageY };
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  return;
+                }
+              } else {
+                // Not a circle center - normal point resize behavior
+                setResizingPoint(point);
+                setDidDrag(false);
+                setIsSnapped(false); // Reset snap state when starting to resize
+                dragStartPos.value = { x: pageX, y: pageY };
+                dragCurrentPos.value = { x: pageX, y: pageY };
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                return;
+              }
             }
             
             // Check if tapping a measurement body (for dragging whole measurement)
