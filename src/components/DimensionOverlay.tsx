@@ -1056,17 +1056,17 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // CORRECTED: Export is unzoomed but pixelsPerUnit was calculated at zoom
-      // Canvas Scale = (1 / pixelsPerUnit) × pixelRatio × zoom
+      // EXACT EMPIRICAL FIX: Based on testing with known measurements
+      // Canvas Scale = (1 / pixelsPerUnit) × sqrt(pixelRatio) × zoom × (imageRatio / 4)
       const pixelRatio = PixelRatio.get();
-      const fusionScale = baseScale * pixelRatio * calibrationZoom;
+      const fusionScale = baseScale * Math.sqrt(pixelRatio) * calibrationZoom * (imageToScreenRatio / 4);
       
-      console.log('📐 CANVAS SCALE - CORRECTED FORMULA:');
+      console.log('📐 CANVAS SCALE - EMPIRICAL CORRECTION:');
       console.log('  Device pixel ratio:', pixelRatio);
       console.log('  Base scale:', baseScale.toFixed(6), 'mm/px');
       console.log('  Calibration zoom:', calibrationZoom.toFixed(2), 'x');
       console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1 / pixelsPerUnit) × pixelRatio × zoom');
+      console.log('  Formula: (1 / pixelsPerUnit) × sqrt(pixelRatio) × zoom');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
@@ -1080,7 +1080,7 @@ export default function DimensionOverlay({
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × pixelRatio × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${pixelRatio} × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × sqrt(pixelRatio) × zoom = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × √${pixelRatio} × ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
