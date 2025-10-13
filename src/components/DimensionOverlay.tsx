@@ -1464,22 +1464,16 @@ export default function DimensionOverlay({
   };
 
   const handleReset = () => {
-    try {
-      // Instant reset without confirmation popup
-      console.log('🔄 handleReset called - resetting to camera');
-      const setImageUri = useStore.getState().setImageUri;
-      const setCoinCircle = useStore.getState().setCoinCircle;
-      const setCalibration = useStore.getState().setCalibration;
-      
-      setImageUri(null);
-      setCoinCircle(null);
-      setCalibration(null);
-      
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      console.log('✅ handleReset completed successfully');
-    } catch (error) {
-      console.error('❌ Error in handleReset:', error);
-    }
+    // Instant reset without confirmation
+    const setImageUri = useStore.getState().setImageUri;
+    const setCoinCircle = useStore.getState().setCoinCircle;
+    const setCalibration = useStore.getState().setCalibration;
+    
+    setImageUri(null);
+    setCoinCircle(null);
+    setCalibration(null);
+    
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
