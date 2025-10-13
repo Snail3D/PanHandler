@@ -1054,6 +1054,16 @@ export default function DimensionOverlay({
         const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
         const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
         newValue = `${widthStr} × ${heightStr}`;
+      } else if (m.mode === 'freehand') {
+        // Recalculate freehand path length
+        let totalLength = 0;
+        for (let i = 1; i < m.points.length; i++) {
+          const dx = m.points[i].x - m.points[i - 1].x;
+          const dy = m.points[i].y - m.points[i - 1].y;
+          totalLength += Math.sqrt(dx * dx + dy * dy);
+        }
+        const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
+        newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
       }
       
       return {
