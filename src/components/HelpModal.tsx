@@ -1492,11 +1492,34 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
               >
-                {/* Rating Section */}
+                {/* Heartfelt Message with Download Counter */}
                 <AnimatedView
-                  entering={FadeIn.delay(700)}
+                  entering={FadeIn.delay(750)}
                   style={{
                     marginBottom: 14,
+                    paddingVertical: 10,
+                    paddingHorizontal: 16,
+                    backgroundColor: 'rgba(255,105,180,0.12)',
+                    borderRadius: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,105,180,0.25)',
+                  }}
+                >
+                  <Text style={{ 
+                    fontSize: 14, 
+                    color: '#1C1C1E', 
+                    textAlign: 'center',
+                    lineHeight: 20,
+                    fontWeight: '600'
+                  }}>
+                    ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
+                  </Text>
+                </AnimatedView>
+
+                {/* Rating Section - At the bottom, non-obnoxious */}
+                <AnimatedView
+                  entering={FadeIn.delay(800)}
+                  style={{
                     paddingVertical: 14,
                     paddingHorizontal: 18,
                     backgroundColor: 'rgba(255,215,0,0.12)',
@@ -1542,29 +1565,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       Leave a Review ⭐
                     </Text>
                   </Pressable>
-                </AnimatedView>
-
-                {/* Heartfelt Message with Download Counter */}
-                <AnimatedView
-                  entering={FadeIn.delay(750)}
-                  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 16,
-                    backgroundColor: 'rgba(255,105,180,0.12)',
-                    borderRadius: 14,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,105,180,0.25)',
-                  }}
-                >
-                  <Text style={{ 
-                    fontSize: 14, 
-                    color: '#1C1C1E', 
-                    textAlign: 'center',
-                    lineHeight: 20,
-                    fontWeight: '600'
-                  }}>
-                    ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
-                  </Text>
                 </AnimatedView>
               </View>
             </BlurView>
