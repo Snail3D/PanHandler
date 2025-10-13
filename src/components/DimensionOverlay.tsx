@@ -1056,19 +1056,14 @@ export default function DimensionOverlay({
       // Base Canvas Scale (for screen-space at calibration zoom)
       const baseScale = 1 / calibration.pixelsPerUnit;
       
-      // FINAL CORRECTED Canvas Scale:
-      // The CAD canvas exports at SCREEN resolution (not original image resolution)
-      // BUT on iOS with Retina displays, captureRef captures at native pixel resolution (2x or 3x)
-      // pixelsPerUnit is in screen coordinate space (already accounts for zoom via screenToImage)
-      // We need to account for the device pixel ratio
-      const pixelRatio = PixelRatio.get();
-      const fusionScale = baseScale * pixelRatio;
+      // SIMPLE SOLUTION: The zoom level when calibrating IS the scale factor!
+      // When user locks onto the coin at 6.55x zoom, that's the actual scale of the exported canvas
+      const fusionScale = calibrationZoom;
       
-      console.log('📐 CANVAS SCALE - PIXEL RATIO SOLUTION:');
-      console.log('  Device pixel ratio:', pixelRatio);
-      console.log('  Calibration: ', calibration.pixelsPerUnit.toFixed(2), 'px/mm in screen space');
+      console.log('📐 CANVAS SCALE - SIMPLE SOLUTION:');
+      console.log('  The calibration zoom IS the scale factor!');
+      console.log('  Calibration zoom:', calibrationZoom.toFixed(2), 'x');
       console.log('  Canvas Scale:', fusionScale.toFixed(6), 'mm/px');
-      console.log('  Formula: (1 / pixelsPerUnit) × pixelRatio');
       
       measurementText += `\n\n=== DEBUG INFO ===\n`;
       measurementText += `Screen Size: ${SCREEN_WIDTH} × ${SCREEN_HEIGHT}\n`;
@@ -1076,13 +1071,12 @@ export default function DimensionOverlay({
       measurementText += `Image-to-Screen Ratio: ${imageToScreenRatio.toFixed(2)}x\n`;
       measurementText += `Calibration Zoom: ${calibrationZoom.toFixed(2)}x\n`;
       measurementText += `Pixels Per Unit: ${calibration.pixelsPerUnit.toFixed(2)} px/mm (in screen space)\n`;
-      measurementText += `Device Pixel Ratio: ${pixelRatio}x\n`;
-      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px (= 1 ÷ pixelsPerUnit × pixelRatio)\n`;
+      measurementText += `Canvas Scale: ${fusionScale.toFixed(6)} mm/px (= calibration zoom)\n`;
       measurementText += `Saved Zoom Scale: ${savedZoomState?.scale || 'none'}\n`;
         measurementText += `\n\nFor CAD Canvas Import:\n`;
         measurementText += `Canvas Scale X/Y: ${fusionScale.toFixed(6)} ${calibration.unit}/px\n`;
         measurementText += `(Insert > Canvas > Calibrate > Enter this value for X and Y scale)\n\n`;
-        measurementText += `📐 Math: Canvas Scale = (1 ÷ pixelsPerUnit) × pixelRatio = (1 ÷ ${calibration.pixelsPerUnit.toFixed(2)}) × ${pixelRatio} = ${fusionScale.toFixed(6)} mm/px`;
+        measurementText += `📐 Math: Canvas Scale = calibration zoom = ${calibrationZoom.toFixed(2)} = ${fusionScale.toFixed(6)} mm/px`;
       }
       
       // Add footer (only for non-Pro users)
