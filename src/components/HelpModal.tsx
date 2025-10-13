@@ -661,7 +661,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
                   {/* Cursor */}
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 18, marginRight: 10 }}>🎯</Text>
+                    <View style={{ marginRight: 10, marginTop: 2 }}>
+                      <Ionicons name="add" size={18} color="#007AFF" />
+                    </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Precision Cursor
