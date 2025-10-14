@@ -292,16 +292,31 @@ export default function ZoomCalibration({
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
-            {/* Current Zoom Display */}
-            <Text style={{
-              color: 'rgba(0, 0, 0, 0.6)',
-              textAlign: 'center',
-              fontSize: 15,
+            {/* Current Zoom Display - button-like badge with dynamic color */}
+            <View style={{
+              backgroundColor: `${currentColor}20`,
+              borderRadius: 12,
+              paddingHorizontal: 16,
+              paddingVertical: 10,
+              alignSelf: 'center',
               marginBottom: 16,
-              fontWeight: '600',
+              borderWidth: 2,
+              borderColor: `${currentColor}40`,
+              shadowColor: currentColor,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 6,
             }}>
-              Current <Text style={{ fontWeight: '700', color: '#F59E0B' }}>Zoom: {zoomScale.toFixed(2)}x</Text>
-            </Text>
+              <Text style={{
+                color: currentColor,
+                textAlign: 'center',
+                fontSize: 17,
+                fontWeight: '800',
+                letterSpacing: 0.5,
+              }}>
+                Zoom: {zoomScale.toFixed(2)}×
+              </Text>
+            </View>
             
             {/* GIANT Lock In Button - obvious, clickable button styling */}
             <Pressable
