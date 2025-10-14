@@ -52,20 +52,18 @@ interface MeasurementStore {
   sessionCount: number; // Track app sessions for rating prompt
   hasRatedApp: boolean; // Track if user has been prompted/rated
   lastRatingPromptDate: string | null; // Track when user was last prompted
-  monthlySaveCount: number; // Track saves this month for free users
-  monthlyEmailCount: number; // Track emails this month for free users
-  lastResetDate: string | null; // Track when counters were last reset
+  exportedSessions: string[]; // Track which image URIs have been exported (saved or emailed) - counts as 1 per session
   globalDownloads: number; // Global download count (fetched from backend)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
   setHasRatedApp: (hasRated: boolean) => void;
   setLastRatingPromptDate: (date: string) => void;
-  incrementSaveCount: () => void;
-  incrementEmailCount: () => void;
-  canSave: () => boolean;
-  canEmail: () => boolean;
-  resetMonthlyLimits: () => void;
+  markSessionExported: (imageUri: string) => void;
+  hasSessionBeenExported: (imageUri: string) => boolean;
+  canExport: () => boolean;
+  getRemainingExports: () => number;
+  resetExportLimits: () => void; // For testing - reset counters
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -106,10 +104,8 @@ const useStore = create<MeasurementStore>()(
       sessionCount: 0,
       hasRatedApp: false,
       lastRatingPromptDate: null,
-      monthlySaveCount: 0,
-      monthlyEmailCount: 0,
-      lastResetDate: null,
-      globalDownloads: 1247, // TODO: Fetch from backend API
+      exportedSessions: [],
+      globalDownloads: 1247,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -124,44 +120,34 @@ const useStore = create<MeasurementStore>()(
 
       setLastRatingPromptDate: (date) => set({ lastRatingPromptDate: date }),
 
-      incrementSaveCount: () => set((state) => ({ monthlySaveCount: state.monthlySaveCount + 1 })),
-
-      incrementEmailCount: () => set((state) => ({ monthlyEmailCount: state.monthlyEmailCount + 1 })),
-
-      canSave: () => {
-        const state = get();
-        if (state.isProUser) return true;
-        
-        // Check if we need to reset monthly counters
-        const now = new Date();
-        const lastReset = state.lastResetDate ? new Date(state.lastResetDate) : null;
-        if (!lastReset || now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
-          get().resetMonthlyLimits();
-          return true;
+      markSessionExported: (imageUri: string) => set((state) => {
+        // Only add if not already exported
+        if (!state.exportedSessions.includes(imageUri)) {
+          return { exportedSessions: [...state.exportedSessions, imageUri] };
         }
-        
-        return state.monthlySaveCount < 10;
+        return {};
+      }),
+
+      hasSessionBeenExported: (imageUri: string) => {
+        const state = get();
+        return state.exportedSessions.includes(imageUri);
       },
 
-      canEmail: () => {
+      canExport: () => {
         const state = get();
         if (state.isProUser) return true;
-        
-        // Check if we need to reset monthly counters
-        const now = new Date();
-        const lastReset = state.lastResetDate ? new Date(state.lastResetDate) : null;
-        if (!lastReset || now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
-          get().resetMonthlyLimits();
-          return true;
-        }
-        
-        return state.monthlyEmailCount < 10;
+        // Free users get 20 total exports (sessions)
+        return state.exportedSessions.length < 20;
       },
 
-      resetMonthlyLimits: () => set({ 
-        monthlySaveCount: 0, 
-        monthlyEmailCount: 0, 
-        lastResetDate: new Date().toISOString() 
+      getRemainingExports: () => {
+        const state = get();
+        if (state.isProUser) return Infinity;
+        return Math.max(0, 20 - state.exportedSessions.length);
+      },
+
+      resetExportLimits: () => set({ 
+        exportedSessions: [],
       }),
 
       setImageOrientation: (orientation: AppOrientation) => set({ imageOrientation: orientation }),
@@ -240,9 +226,7 @@ const useStore = create<MeasurementStore>()(
         sessionCount: state.sessionCount, // Persist session count
         hasRatedApp: state.hasRatedApp, // Persist rating status
         lastRatingPromptDate: state.lastRatingPromptDate, // Persist last prompt date
-        monthlySaveCount: state.monthlySaveCount, // Persist monthly save count
-        monthlyEmailCount: state.monthlyEmailCount, // Persist monthly email count
-        lastResetDate: state.lastResetDate, // Persist last reset date
+        exportedSessions: state.exportedSessions, // Persist exported session URIs
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
