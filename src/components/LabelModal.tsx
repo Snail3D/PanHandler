@@ -352,18 +352,22 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
             style={{
               width: '100%',
               maxWidth: 400,
-              borderRadius: 24,
+              borderRadius: 20,
               overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 12 },
-              shadowOpacity: 0.4,
-              shadowRadius: 24,
-              elevation: 20,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.2,
+              shadowRadius: 20,
+              elevation: 16,
             }}
             onPress={(e) => e.stopPropagation()}
           >
-            <BlurView intensity={100} tint="light">
-              <View style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}>
+            <BlurView intensity={35} tint="light">
+              <View style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.35)',
+              }}>
                 {/* Header */}
                 <View style={{
                   paddingTop: 20,
@@ -480,19 +484,19 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                 {/* Footer Buttons */}
                 <View style={{
                   paddingHorizontal: 20,
-                  paddingBottom: 16,
-                  paddingTop: 4,
+                  paddingBottom: 12,
+                  paddingTop: 0,
                   alignItems: 'center',
                 }}>
-                  <View style={{ flexDirection: 'row', gap: 20, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
-                    {/* Save Button - DARK text & icon, glassmorphic background */}
+                  <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Save Button - Larger, glassmorphic background */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
-                        flex: 1.4,
+                        flex: 1.8,
                         backgroundColor: pressed ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.5)',
                         borderRadius: 14,
-                        paddingVertical: 14,
+                        paddingVertical: 16,
                         paddingHorizontal: 16,
                         flexDirection: 'row',
                         alignItems: 'center',
