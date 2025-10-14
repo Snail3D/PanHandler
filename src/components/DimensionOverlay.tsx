@@ -1422,9 +1422,6 @@ export default function DimensionOverlay({
       
       showToastNotification(label ? `"${label}" saved!` : 'Saved to Photos!');
       
-      if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
-        markSessionExported(currentImageUri);
-      }
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setTimeout(() => showQuoteOverlay(), 500);
@@ -1567,9 +1564,6 @@ export default function DimensionOverlay({
         attachments,
       });
       
-      if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
-        markSessionExported(currentImageUri);
-      }
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
