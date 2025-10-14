@@ -21,6 +21,7 @@ import VerbalScaleModal from './VerbalScaleModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import { getRandomQuote } from '../utils/makerQuotes';
+import SnailIcon from './SnailIcon';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -4294,11 +4295,9 @@ export default function DimensionOverlay({
                         borderColor: 'rgba(0, 0, 0, 0.08)',
                       }}
                     >
-                      <Image 
-                        source={require('../../assets/snail-logo.png')} 
-                        style={{ width: 16, height: 16, opacity: 0.6 }}
-                        resizeMode="contain"
-                      />
+                      <View style={{ opacity: 0.6 }}>
+                        <SnailIcon size={16} color="#1C1C1E" />
+                      </View>
                       <Text style={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         fontWeight: '600',
