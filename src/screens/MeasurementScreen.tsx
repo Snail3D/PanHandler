@@ -512,6 +512,7 @@ export default function MeasurementScreen() {
                   zoomTranslateX={measurementZoom.translateX}
                   zoomTranslateY={measurementZoom.translateY}
                   zoomRotation={measurementZoom.rotation}
+                  viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
                 />
               </View>
