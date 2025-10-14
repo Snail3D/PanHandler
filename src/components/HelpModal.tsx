@@ -1057,20 +1057,20 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               </ExpandableSection>
 
               {/* Pro Features with Comparison Chart */}
-              <View style={{ marginBottom: 20 }}>
+              <View style={{ marginBottom: 20, marginTop: 8 }}>
                 <Animated.View 
                   entering={SlideInRight.delay(500).springify()}
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'rgba(255,255,255,0.5)',
                     borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#FF9500',
+                    shadowColor: '#5856D6',
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.25,
+                    shadowOpacity: 0.2,
                     shadowRadius: 14,
                     elevation: 8,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,149,0,0.3)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.35)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
@@ -1078,16 +1078,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      backgroundColor: 'rgba(255,149,0,0.2)',
+                      backgroundColor: 'rgba(88, 86, 214, 0.2)',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 10,
-                      shadowColor: '#FF9500',
+                      shadowColor: '#5856D6',
                       shadowOffset: { width: 0, height: 0 },
                       shadowOpacity: 0.4,
                       shadowRadius: 8,
                     }}>
-                      <Ionicons name="star" size={22} color="#FF9500" />
+                      <Ionicons name="star" size={22} color="#5856D6" />
                     </View>
                     <Text style={{ fontSize: 19, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       Free vs Pro
