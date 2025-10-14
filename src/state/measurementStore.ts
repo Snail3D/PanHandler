@@ -47,23 +47,17 @@ interface MeasurementStore {
   unitSystem: UnitSystem;
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
-  isProUser: boolean; // Pro user status for paywall
+  isProUser: boolean; // Pro user status for paywall (only for Freehand tool)
   savedZoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null; // Restore zoom/pan/rotation
   sessionCount: number; // Track app sessions for rating prompt
   hasRatedApp: boolean; // Track if user has been prompted/rated
   lastRatingPromptDate: string | null; // Track when user was last prompted
-  exportedSessions: string[]; // Track which image URIs have been exported (saved or emailed) - counts as 1 per session
   globalDownloads: number; // Global download count (fetched from backend)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
   setHasRatedApp: (hasRated: boolean) => void;
   setLastRatingPromptDate: (date: string) => void;
-  markSessionExported: (imageUri: string) => void;
-  hasSessionBeenExported: (imageUri: string) => boolean;
-  canExport: () => boolean;
-  getRemainingExports: () => number;
-  resetExportLimits: () => void; // For testing - reset counters
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -104,7 +98,6 @@ const useStore = create<MeasurementStore>()(
       sessionCount: 0,
       hasRatedApp: false,
       lastRatingPromptDate: null,
-      exportedSessions: [],
       globalDownloads: 1247,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
@@ -119,36 +112,6 @@ const useStore = create<MeasurementStore>()(
       setHasRatedApp: (hasRated) => set({ hasRatedApp: hasRated }),
 
       setLastRatingPromptDate: (date) => set({ lastRatingPromptDate: date }),
-
-      markSessionExported: (imageUri: string) => set((state) => {
-        // Only add if not already exported
-        if (!state.exportedSessions.includes(imageUri)) {
-          return { exportedSessions: [...state.exportedSessions, imageUri] };
-        }
-        return {};
-      }),
-
-      hasSessionBeenExported: (imageUri: string) => {
-        const state = get();
-        return state.exportedSessions.includes(imageUri);
-      },
-
-      canExport: () => {
-        const state = get();
-        if (state.isProUser) return true;
-        // Free users get 20 total exports (sessions)
-        return state.exportedSessions.length < 20;
-      },
-
-      getRemainingExports: () => {
-        const state = get();
-        if (state.isProUser) return Infinity;
-        return Math.max(0, 20 - state.exportedSessions.length);
-      },
-
-      resetExportLimits: () => set({ 
-        exportedSessions: [],
-      }),
 
       setImageOrientation: (orientation: AppOrientation) => set({ imageOrientation: orientation }),
 
@@ -226,7 +189,6 @@ const useStore = create<MeasurementStore>()(
         sessionCount: state.sessionCount, // Persist session count
         hasRatedApp: state.hasRatedApp, // Persist rating status
         lastRatingPromptDate: state.lastRatingPromptDate, // Persist last prompt date
-        exportedSessions: state.exportedSessions, // Persist exported session URIs
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
