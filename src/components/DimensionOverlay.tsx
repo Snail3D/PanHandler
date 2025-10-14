@@ -3419,30 +3419,36 @@ export default function DimensionOverlay({
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
                 
+                // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
+                // In normal mode, draw from p1 (vertex) to p0 and p2
+                const vertex = isMapMode ? p0 : p1;
+                const arm1 = isMapMode ? p1 : p0;
+                const arm2 = isMapMode ? p2 : p2;
+                
                 return (
                   <React.Fragment key={measurement.id}>
                     {/* Glow layers */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
                     {/* Main lines */}
-                    <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Path d={generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+                    <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
                     {/* Point markers with reduced glow (50%) */}
                     {/* P0 glow layers */}
                     <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
                     <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
                     <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
                     <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P1 (vertex) - slightly larger */}
+                    <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
+                    {/* P1 (vertex in normal mode, north ref in map mode) */}
                     <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
                     <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
                     <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
                     <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="5" fill={color.main} stroke="white" strokeWidth="1" />
+                    <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
                     {/* P2 glow layers */}
                     <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
                     <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
@@ -3695,7 +3701,10 @@ export default function DimensionOverlay({
                 screenX = (p0.x + p1.x) / 2;
                 screenY = (p0.y + p1.y) / 2 - 25; // Position slightly above the line
               } else if (measurement.mode === 'angle') {
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                // In map mode, label at starting point (p0)
+                // In normal mode, label at vertex (p1)
+                const labelPoint = isMapMode ? measurement.points[0] : measurement.points[1];
+                const p1 = imageToScreen(labelPoint.x, labelPoint.y);
                 screenX = p1.x;
                 screenY = p1.y - 70;
               } else if (measurement.mode === 'circle') {
