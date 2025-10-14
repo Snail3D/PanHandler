@@ -4265,72 +4265,6 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
-              <Pressable
-                onPress={() => {
-                  if (!isProUser) {
-                    setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                    return;
-                  }
-                  setMode('freehand');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setIsDrawingFreehand(false);
-                  setModeColorIndex((prev) => prev + 1);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
-                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
-                  shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'freehand' ? 0.8 : 0,
-                  shadowRadius: mode === 'freehand' ? 8 : 0,
-                  elevation: mode === 'freehand' ? 8 : 0,
-                }}
-              >
-                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Svg width={20} height={20} viewBox="0 0 16 16">
-                    <Path 
-                      d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
-                      stroke={mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
-                      strokeWidth="2" 
-                      fill="none" 
-                      strokeLinecap="round"
-                    />
-                  </Svg>
-                  <Text style={{
-                    marginTop: 2,
-                    textAlign: 'center',
-                    fontWeight: '700',
-                    fontSize: 10,
-                    color: mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
-                    textShadowColor: mode === 'freehand' ? getCurrentModeColor().glow : 'transparent',
-                    textShadowOffset: { width: 0, height: 0 },
-                    textShadowRadius: mode === 'freehand' ? 4 : 0,
-                  }}>
-                    Free
-                  </Text>
-                </View>
-                  {!isProUser && (
-                    <View style={{
-                      position: 'absolute',
-                      top: -2,
-                      right: -2,
-                      backgroundColor: '#FFD700',
-                      paddingHorizontal: 3,
-                      paddingVertical: 1,
-                      borderRadius: 4,
-                    }}>
-                      <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
-                    </View>
-                  )}
-              </Pressable>
-
               {/* Distance (long-press also activates freehand) */}
               <Pressable
                 onPress={() => {
@@ -4401,6 +4335,72 @@ export default function DimensionOverlay({
                     Line
                   </Text>
                 </View>
+              </Pressable>
+
+              {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
+              <Pressable
+                onPress={() => {
+                  if (!isProUser) {
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
+                  setMode('freehand');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setIsDrawingFreehand(false);
+                  setModeColorIndex((prev) => prev + 1);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 6,
+                  paddingHorizontal: 2,
+                  borderRadius: 7.5,
+                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                  shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: mode === 'freehand' ? 0.8 : 0,
+                  shadowRadius: mode === 'freehand' ? 8 : 0,
+                  elevation: mode === 'freehand' ? 8 : 0,
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                    <Path 
+                      d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
+                      stroke={mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
+                      strokeWidth="2" 
+                      fill="none" 
+                      strokeLinecap="round"
+                    />
+                  </Svg>
+                  <Text style={{
+                    marginTop: 2,
+                    textAlign: 'center',
+                    fontWeight: '700',
+                    fontSize: 10,
+                    color: mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
+                    textShadowColor: mode === 'freehand' ? getCurrentModeColor().glow : 'transparent',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: mode === 'freehand' ? 4 : 0,
+                  }}>
+                    Free
+                  </Text>
+                </View>
+                  {!isProUser && (
+                    <View style={{
+                      position: 'absolute',
+                      top: -2,
+                      right: -2,
+                      backgroundColor: '#FFD700',
+                      paddingHorizontal: 3,
+                      paddingVertical: 1,
+                      borderRadius: 4,
+                    }}>
+                      <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
+                    </View>
+                  )}
               </Pressable>
             </View>
             </Animated.View>
