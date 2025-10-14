@@ -1360,19 +1360,17 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Check if user can export (20 lifetime limit for free users)
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
+    // TEMPORARILY DISABLED - Show measurements as text instead
+    let measurementText = 'Your Measurements:\n\n';
+    measurements.forEach((m, idx) => {
+      const color = getMeasurementColor(idx, m.mode);
+      measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
+    });
+    measurementText += `\nUnit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}`;
+    if (coinCircle) {
+      measurementText += `\nCalibrated with: ${coinCircle.coinName}`;
     }
-    
-    // Show label modal first
-    setPendingAction('save');
-    setShowLabelModal(true);
+    Alert.alert('Measurements', measurementText);
   };
 
   const performSave = async (label: string | null) => {
@@ -1458,19 +1456,17 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Check if user can export (20 lifetime limit for free users)
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
+    // TEMPORARILY DISABLED - Show measurements as text instead
+    let measurementText = 'Your Measurements:\n\n';
+    measurements.forEach((m, idx) => {
+      const color = getMeasurementColor(idx, m.mode);
+      measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
+    });
+    measurementText += `\nUnit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}`;
+    if (coinCircle) {
+      measurementText += `\nCalibrated with: ${coinCircle.coinName}`;
     }
-    
-    // Show label modal first
-    setPendingAction('email');
-    setShowLabelModal(true);
+    Alert.alert('Measurements', measurementText);
   };
 
   const performEmail = async (label: string | null) => {
