@@ -1354,15 +1354,15 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Check if user can export (20 lifetime limit for free users)
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
+    // Temporarily bypass export limit check to debug hooks error
+    // if (!canExport()) {
+    //   Alert.alert(
+    //     'Export Limit Reached',
+    //     'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+    //     [{ text: 'OK' }]
+    //   );
+    //   return;
+    // }
     
     // Show label modal first
     setPendingAction('save');
@@ -1446,15 +1446,15 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Check if user can export (20 lifetime limit for free users)
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
+    // Temporarily bypass export limit check to debug hooks error
+    // if (!canExport()) {
+    //   Alert.alert(
+    //     'Export Limit Reached',
+    //     'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+    //     [{ text: 'OK' }]
+    //   );
+    //   return;
+    // }
     
     // Show label modal first
     setPendingAction('email');
