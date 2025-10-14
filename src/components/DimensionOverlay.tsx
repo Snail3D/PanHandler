@@ -3568,20 +3568,7 @@ export default function DimensionOverlay({
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = (p0.x + p1.x) / 2;
-                screenY = (p0.y + p1.y) / 2;
-                
-                // Position label perpendicular to the line (offset to the side)
-                const dx = p1.x - p0.x;
-                const dy = p1.y - p0.y;
-                const length = Math.sqrt(dx * dx + dy * dy);
-                if (length > 0) {
-                  // Perpendicular vector (rotated 90 degrees)
-                  const perpX = -dy / length;
-                  const perpY = dx / length;
-                  // Offset 40 pixels perpendicular to the line
-                  screenX += perpX * 40;
-                  screenY += perpY * 40;
-                }
+                screenY = (p0.y + p1.y) / 2 - 25; // Position slightly above the line
               } else if (measurement.mode === 'angle') {
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = p1.x;
@@ -3688,7 +3675,11 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                    {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
+                    {/* For closed freehand loops, show only perimeter on label (area is in legend) */}
+                    {measurement.mode === 'freehand' && measurement.perimeter
+                      ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
+                      : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
+                    }
                   </Text>
                 </View>
               </View>
