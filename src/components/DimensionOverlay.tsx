@@ -2053,13 +2053,23 @@ export default function DimensionOverlay({
                         
                         // Snap threshold: 15 pixels (reduced from 30 for less sensitivity)
                         if (distToStart < 15) {
-                          console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
-                          // Strong haptic feedback for successful lasso close
-                          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                          setFreehandClosedLoop(true);
-                          freehandClosedLoopRef.current = true; // Update ref synchronously
-                          // Snap to exact start point to close the loop
-                          return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
+                          // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
+                          const testPath = [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
+                          const selfIntersects = doesPathSelfIntersect(testPath);
+                          
+                          if (!selfIntersects) {
+                            console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
+                            // Strong haptic feedback for successful lasso close
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            setFreehandClosedLoop(true);
+                            freehandClosedLoopRef.current = true; // Update ref synchronously
+                            // Snap to exact start point to close the loop
+                            return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
+                          } else {
+                            console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
+                            // Continue drawing normally without snapping
+                            return [...prevPath, { x: imageX, y: imageY }];
+                          }
                         }
                       }
                       
