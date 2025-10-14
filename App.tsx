@@ -5,10 +5,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
-import * as StoreReview from 'expo-store-review';
+// import * as StoreReview from 'expo-store-review'; // Temporarily disabled - native module not loaded
 import MeasurementScreen from "./src/screens/MeasurementScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
-import RatingPromptModal from "./src/components/RatingPromptModal";
+// import RatingPromptModal from "./src/components/RatingPromptModal"; // Temporarily disabled
 import useStore from "./src/state/measurementStore";
 
 /*
@@ -129,6 +129,7 @@ export default function App() {
     opacity: appOpacity.value,
   }));
   
+  /* Review prompt system - TEMPORARILY DISABLED (native module not loaded)
   // Review prompt system - Ask at 20 opens, then at 50 opens (max 2 times)
   const [showRatingPrompt, setShowRatingPrompt] = useState(false);
   const sessionCount = useStore((s) => s.sessionCount);
@@ -190,6 +191,7 @@ export default function App() {
     setLastReviewPromptDate(new Date().toISOString());
     incrementReviewPromptCount();
   };
+  */
 
   // v2.2.2 - Fixed touch responder to allow pinch/pan with single-finger hold
   return (
@@ -249,12 +251,13 @@ export default function App() {
           </NavigationContainer>
         </Animated.View>
         
-        {/* Review prompt - Shows after 20 & 50 app opens */}
+        {/* Review prompt - TEMPORARILY DISABLED (native module not loaded)
         <RatingPromptModal 
           visible={showRatingPrompt}
           onClose={handleDismiss}
           onRate={handleRate}
         />
+        */}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
