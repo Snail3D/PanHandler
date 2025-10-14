@@ -1113,9 +1113,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
 
                     {/* Feature Rows */}
-                    <ComparisonRow feature="Total Exports" free="20" pro="∞" />
+                    <ComparisonRow feature="Total Exports" free="∞" pro="∞" />
                     <ComparisonRow feature="Measurements" free="∞" pro="∞" />
-                    <ComparisonRow feature="All Measurement Types" free="✓" pro="✓" />
+                    <ComparisonRow feature="Freehand Tool" free="✗" pro="✓" />
                     <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
                     <ComparisonRow feature="CAD Canvas Photo" free="✓" pro="✓" last />
                   </View>
