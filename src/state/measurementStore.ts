@@ -24,6 +24,7 @@ export interface CompletedMeasurement {
   totalLength?: number; // For freehand - total path length
   area?: number; // For closed non-intersecting freehand loops (lasso mode)
   isClosed?: boolean; // For freehand - indicates if it's a closed loop
+  perimeter?: string; // For closed freehand loops - just the perimeter for inline display
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
