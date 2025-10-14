@@ -138,25 +138,20 @@ export default function ZoomableImage({
     ],
   }));
 
-  const imageContent = (
-    <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-      <Image
-        source={{ uri: imageUri }}
-        style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
-        resizeMode="contain"
-      />
-    </Animated.View>
-  );
-
   return (
     <>
-      {locked ? (
-        imageContent
-      ) : (
-        <GestureDetector gesture={composedGesture}>
-          {imageContent}
-        </GestureDetector>
-      )}
+      <GestureDetector gesture={composedGesture}>
+        <Animated.View 
+          style={[StyleSheet.absoluteFill, animatedStyle]}
+          pointerEvents={locked ? 'none' : 'auto'}
+        >
+          <Image
+            source={{ uri: imageUri }}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </GestureDetector>
       
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
       {showLevelLine && (
