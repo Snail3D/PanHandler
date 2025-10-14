@@ -312,6 +312,14 @@ export default function DimensionOverlay({
     }
   }, [mode]);
 
+  // Clear map scale when new photo is loaded
+  useEffect(() => {
+    // Clear map scale state when image URI changes (new photo loaded)
+    setMapScale(null);
+    setIsMapMode(false);
+    setShowMapScaleModal(false);
+  }, [currentImageUri]);
+
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
     setCurrentQuote(quote);
@@ -4724,12 +4732,18 @@ export default function DimensionOverlay({
             <Pressable
               onPress={() => {
                 if (!isMapMode) {
-                  // Turning ON map mode - show modal to set scale
-                  setShowMapScaleModal(true);
+                  // Turning ON map mode
+                  if (mapScale) {
+                    // Scale already exists for this photo - just activate map mode
+                    setIsMapMode(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  } else {
+                    // No scale yet - show modal to set scale
+                    setShowMapScaleModal(true);
+                  }
                 } else {
-                  // Turning OFF map mode - clear scale
+                  // Turning OFF map mode - keep scale for this photo session
                   setIsMapMode(false);
-                  setMapScale(null);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
               }}
