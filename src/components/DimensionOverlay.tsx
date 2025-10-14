@@ -1397,15 +1397,14 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 200));
       
       // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef) {
+      if (!externalViewRef || !externalViewRef.current) {
         throw new Error('No view ref available for capture');
       }
       
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(externalViewRef, {
+      const measurementsUri = await captureRef(externalViewRef.current, {
         format: 'jpg',
         quality: 0.9,
-        result: 'tmpfile',
       });
       
       // Save measurements photo
@@ -1416,14 +1415,13 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
       
-      if (!externalViewRef) {
+      if (!externalViewRef || !externalViewRef.current) {
         throw new Error('View ref lost after hiding measurements');
       }
       
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureRef(externalViewRef.current, {
         format: 'png',
         quality: 1.0,
-        result: 'tmpfile',
       });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
@@ -1520,15 +1518,14 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 200));
       
       // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef) {
+      if (!externalViewRef || !externalViewRef.current) {
         throw new Error('No view ref available for capture');
       }
       
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(externalViewRef, {
+      const uri = await captureRef(externalViewRef.current, {
         format: 'jpg',
         quality: 0.9,
-        result: 'tmpfile',
       });
 
       // Build measurement text with scale information
@@ -1603,15 +1600,14 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
       
       // Check ref is still available
-      if (!externalViewRef) {
-        throw new Error('ViewShot ref is not available');
+      if (!externalViewRef || !externalViewRef.current) {
+        throw new Error('ViewShot ref is not available for second capture');
       }
       
       // Capture label-only photo with same ref
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureRef(externalViewRef.current, {
         format: 'png',
         quality: 1.0,
-        result: 'tmpfile',
       });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
