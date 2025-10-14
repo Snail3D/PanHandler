@@ -1872,10 +1872,12 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
-    .minDistance(20) // Require 20px movement before activating
-    .onUpdate((event) => {
-      // Only respond to horizontal swipes
-      if (Math.abs(event.translationX) > Math.abs(event.translationY)) {
+    .minDistance(40) // Increased from 20 to 40px to reduce interference with taps
+    .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
+    .enableTrackpadTwoFingerGesture(false) // Disable trackpad
+      // Only respond to horizontal swipes AND require significant movement
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
+      if (isHorizontal) {
         if (event.translationX < -50 && !menuHidden) {
           // Swipe left to hide (to right side)
           menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
