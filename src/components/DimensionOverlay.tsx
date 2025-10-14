@@ -1932,7 +1932,6 @@ export default function DimensionOverlay({
   const modeSwitchGesture = Gesture.Pan()
     .minDistance(15) // Require 15px swipe before activating - prevents tap interference
     .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
-    .maxDuration(2000) // Auto-cancel after 2 seconds
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
