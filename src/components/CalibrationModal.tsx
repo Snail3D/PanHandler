@@ -48,10 +48,12 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
         <View style={{
-          width: '90%',
-          maxWidth: 400,
+          position: 'absolute',
+          top: insets.top + 60,
+          left: 20,
+          right: 20,
           maxHeight: selectedCoin ? 520 : 440,
           borderRadius: 20,
           overflow: 'hidden',
