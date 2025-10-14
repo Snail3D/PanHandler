@@ -85,7 +85,7 @@ interface DimensionOverlayProps {
   zoomTranslateX?: number;
   zoomTranslateY?: number;
   zoomRotation?: number;
-  viewRef?: React.RefObject<View | null>;
+  viewRef?: React.RefObject<any>; // Changed to any to support ViewShot component
   setImageOpacity?: (opacity: number) => void;
 }
 
@@ -1393,23 +1393,13 @@ export default function DimensionOverlay({
       // Wait for UI to update before capturing
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef) {
+      // Use external ref (from parent) - it's a ViewShot component
+      if (!externalViewRef || !externalViewRef.current) {
         throw new Error('No view ref available for capture');
       }
       
-      // Get the node handle - this ensures we have the actual native component
-      const node = findNodeHandle(externalViewRef.current);
-      if (!node) {
-        throw new Error('Could not find native component from ref');
-      }
-      
-      // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(node, {
-        format: 'jpg',
-        quality: 0.9,
-        result: 'tmpfile',
-      });
+      // ViewShot components have a .capture() method
+      const measurementsUri = await externalViewRef.current.capture();
       
       // Save measurements photo
       await MediaLibrary.createAssetAsync(measurementsUri);
@@ -1419,11 +1409,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(node, {
-        format: 'png',
-        quality: 1.0,
-        result: 'tmpfile',
-      });
+      const labelOnlyUri = await externalViewRef.current.capture();
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       await MediaLibrary.createAssetAsync(labelOnlyUri);
@@ -1518,23 +1504,13 @@ export default function DimensionOverlay({
       // Wait for UI to update before capturing
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef) {
+      // Use external ref (from parent) - it's a ViewShot component
+      if (!externalViewRef || !externalViewRef.current) {
         throw new Error('No view ref available for capture');
       }
       
-      // Get the node handle - this ensures we have the actual native component
-      const node = findNodeHandle(externalViewRef.current);
-      if (!node) {
-        throw new Error('Could not find native component from ref');
-      }
-      
-      // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(node, {
-        format: 'jpg',
-        quality: 0.9,
-        result: 'tmpfile',
-      });
+      // ViewShot components have a .capture() method
+      const uri = await externalViewRef.current.capture();
 
       // Build measurement text with scale information
       let measurementText = '';
@@ -1607,12 +1583,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo with same node
-      const labelOnlyUri = await captureRef(node, {
-        format: 'png',
-        quality: 1.0,
-        result: 'tmpfile',
-      });
+      // Capture label-only photo
+      const labelOnlyUri = await externalViewRef.current.capture();
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       
