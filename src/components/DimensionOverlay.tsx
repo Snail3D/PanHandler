@@ -4245,21 +4245,8 @@ export default function DimensionOverlay({
 
               {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
               <Pressable
-              onPress={() => {
+                onPress={() => {
                   if (!isProUser) {
-                    setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                    return;
-                  }
-                  setMode('freehand');
-              onPress={() => {
-                  if (!isProUser) {
-                    setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                    return;
-                  }
-                  setMode('freehand');
-                    // Show paywall modal
                     setShowProModal(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
@@ -4268,8 +4255,7 @@ export default function DimensionOverlay({
                   setCurrentPoints([]);
                   setMeasurementMode(true);
                   setIsDrawingFreehand(false);
-                  // Don't show cursor until user touches screen
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
+                  setModeColorIndex((prev) => prev + 1);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
@@ -4339,7 +4325,12 @@ export default function DimensionOverlay({
                   }
                   freehandLongPressRef.current = setTimeout(() => {
                     // Activate freehand mode
-                    if (!isProUser) { setShowProModal(true); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); return; } setMode('freehand');
+                    if (!isProUser) {
+                      setShowProModal(true);
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                      return;
+                    }
+                    setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
