@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Image, Dimensions } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -39,6 +39,7 @@ export default function MeasurementScreen() {
   const [alignmentStatus, setAlignmentStatus] = useState<'good' | 'warning' | 'bad'>('bad');
   const recentAngles = useRef<number[]>([]);
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
+  const lastCaptureTimeRef = useRef<number>(0); // Cooldown tracking
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
@@ -265,7 +266,19 @@ export default function MeasurementScreen() {
   }
 
   const takePicture = async () => {
-    if (!cameraRef.current || isCapturing) return;
+    // Check if camera is ready
+    if (!cameraRef.current || isCapturing) {
+      console.log('⚠️ Camera not ready or already capturing');
+      return;
+    }
+    
+    // Cooldown: Prevent captures within 500ms of each other
+    const now = Date.now();
+    if (now - lastCaptureTimeRef.current < 500) {
+      console.log('⚠️ Camera cooldown active, please wait');
+      return;
+    }
+    lastCaptureTimeRef.current = now;
     
     const wasAutoCapture = alignmentStatus === 'good' && isStable;
     
@@ -273,38 +286,62 @@ export default function MeasurementScreen() {
       setIsCapturing(true);
       setIsHoldingShutter(false); // Release hold state
       
+      // Small delay to ensure camera is ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      console.log('📸 Taking picture...');
+      
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
+        skipProcessing: false,
       });
       
-      if (photo?.uri) {
-        // Request media library permission if not granted
-        let canSave = mediaLibraryPermission?.granted || false;
-        if (!canSave) {
-          const { granted } = await requestMediaLibraryPermission();
-          canSave = granted;
-          if (!granted) {
-            console.log('Media library permission not granted');
-          }
-        }
-
-        // Save to camera roll
-        if (canSave) {
-          try {
-            await MediaLibrary.saveToLibraryAsync(photo.uri);
-            console.log('✅ Photo saved to camera roll');
-          } catch (saveError) {
-            console.error('Failed to save to camera roll:', saveError);
-          }
-        }
-
-        // Set image URI (auto-captured if it was via hold)
-        setImageUri(photo.uri, wasAutoCapture);
-        await detectOrientation(photo.uri);
-        setMode('selectCoin');
+      if (!photo || !photo.uri) {
+        console.error('❌ No photo returned from camera');
+        Alert.alert(
+          'Camera Error',
+          'Failed to capture photo. Please try again.'
+        );
+        return;
       }
-    } catch (error) {
-      console.error('Error taking picture:', error);
+      
+      console.log('✅ Photo captured:', photo.uri);
+      
+      // Request media library permission if not granted
+      let canSave = mediaLibraryPermission?.granted || false;
+      if (!canSave) {
+        const { granted } = await requestMediaLibraryPermission();
+        canSave = granted;
+        if (!granted) {
+          console.log('⚠️ Media library permission not granted');
+        }
+      }
+
+      // Save to camera roll
+      if (canSave) {
+        try {
+          await MediaLibrary.saveToLibraryAsync(photo.uri);
+          console.log('✅ Photo saved to camera roll');
+        } catch (saveError) {
+          console.error('⚠️ Failed to save to camera roll:', saveError);
+          // Don't block the flow if save fails
+        }
+      }
+
+      // Set image URI (auto-captured if it was via hold)
+      setImageUri(photo.uri, wasAutoCapture);
+      await detectOrientation(photo.uri);
+      setMode('selectCoin');
+      
+    } catch (error: any) {
+      console.error('❌ Error taking picture:', error);
+      
+      // Show user-friendly error message
+      Alert.alert(
+        'Camera Error',
+        error.message || 'Could not capture photo. Please try again.',
+        [{ text: 'OK', onPress: () => {} }]
+      );
     } finally {
       setIsCapturing(false);
     }
