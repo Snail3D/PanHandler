@@ -188,7 +188,7 @@ export default function ZoomCalibration({
               fill="url(#glowGradient)"
             />
             
-            {/* Main circle - clean, minimal stroke */}
+            {/* Main circle - clean, minimal stroke, 10% darker */}
             <Circle
               cx={referenceCenterX}
               cy={referenceCenterY}
@@ -196,7 +196,7 @@ export default function ZoomCalibration({
               fill="none"
               stroke={currentColor}
               strokeWidth="3"
-              opacity="0.6"
+              opacity="0.7"
             />
             
             {/* Inner highlight ring for depth */}
