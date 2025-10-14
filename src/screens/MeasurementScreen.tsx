@@ -42,6 +42,7 @@ export default function MeasurementScreen() {
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
+  const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -582,6 +583,12 @@ export default function MeasurementScreen() {
                     // Save zoom state to store for session restoration
                     setSavedZoomState(newZoom);
                   }}
+                  onDoubleTapWhenLocked={() => {
+                    // Call the DimensionOverlay's measure mode switcher
+                    if (doubleTapToMeasureRef.current) {
+                      doubleTapToMeasureRef.current();
+                    }
+                  }}
                 />
                 {/* Measurement overlay needs to be sibling to image for capture */}
                 <DimensionOverlay 
@@ -591,6 +598,9 @@ export default function MeasurementScreen() {
                   zoomRotation={measurementZoom.rotation}
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
+                  onRegisterDoubleTapCallback={(callback) => {
+                    doubleTapToMeasureRef.current = callback;
+                  }}
                 />
               </View>
             </View>
