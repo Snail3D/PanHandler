@@ -1373,10 +1373,10 @@ export default function DimensionOverlay({
   };
 
   const performSave = async (label: string | null) => {
-    // MUST use externalViewRef - the internal viewRef is not attached to anything
-    if (!externalViewRef || !externalViewRef.current || !currentImageUri) {
-      console.error('❌ Export failed: externalViewRef or currentImageUri is missing');
-      Alert.alert('Export Error', 'Unable to capture measurement. Please try again.');
+    // Check if we have image URI (can't check ref yet, it might not be ready)
+    if (!currentImageUri) {
+      console.error('❌ Export failed: currentImageUri is missing');
+      Alert.alert('Export Error', 'No image to export. Please take a photo first.');
       return;
     }
 
@@ -1387,6 +1387,20 @@ export default function DimensionOverlay({
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Please grant photo library access to save images.');
+        return;
+      }
+      
+      // NOW check the view reference after we're sure we need it
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Check if external ref is available, otherwise try internal
+      if (!externalViewRef?.current && !internalViewRef.current) {
+        console.error('❌ Save failed: No view ref available', {
+          externalViewRef: !!externalViewRef,
+          externalViewRefCurrent: !!externalViewRef?.current,
+          internalViewRefCurrent: !!internalViewRef.current,
+        });
+        Alert.alert('Export Error', 'Unable to capture measurement view. Please try again.');
         return;
       }
 
@@ -1498,14 +1512,10 @@ export default function DimensionOverlay({
       externalViewRefCurrent: !!externalViewRef?.current
     });
     
-    // MUST use externalViewRef - the internal viewRef is not attached to anything
-    if (!externalViewRef || !externalViewRef.current || !currentImageUri) {
-      console.error('❌ Email failed: externalViewRef or currentImageUri is missing', {
-        externalViewRef: !!externalViewRef,
-        externalViewRefCurrent: !!externalViewRef?.current,
-        currentImageUri: !!currentImageUri,
-      });
-      Alert.alert('Email Error', 'Unable to capture measurement view. The view reference is not available. Please try again.');
+    // Check if we have image URI (can't check ref yet, it might not be ready)
+    if (!currentImageUri) {
+      console.error('❌ Email failed: currentImageUri is missing');
+      Alert.alert('Email Error', 'No image to export. Please take a photo first.');
       return;
     }
     
@@ -1542,12 +1552,19 @@ export default function DimensionOverlay({
         });
       }
       
-      // Capture the view reference NOW, after modal interactions
+      // NOW check the view reference after modal interactions
       // Add small delay to ensure ref is attached after modal closes
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      if (!externalViewRef && !internalViewRef.current) {
-        throw new Error('View reference is null before capture');
+      // Check if external ref is available, otherwise try internal
+      if (!externalViewRef?.current && !internalViewRef.current) {
+        console.error('❌ Email failed: No view ref available', {
+          externalViewRef: !!externalViewRef,
+          externalViewRefCurrent: !!externalViewRef?.current,
+          internalViewRefCurrent: !!internalViewRef.current,
+        });
+        Alert.alert('Email Error', 'Unable to capture measurement view. Please try again.');
+        return;
       }
 
       console.log('📸 Starting capture for email...');
