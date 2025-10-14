@@ -1408,7 +1408,7 @@ export default function DimensionOverlay({
       console.log('📸 Capturing measurements photo with label and coin info...');
       
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(externalViewRef || internalViewRef, {
+      const measurementsUri = await captureRef((externalViewRef || internalViewRef) as any, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1427,7 +1427,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef || internalViewRef, {
+      const labelOnlyUri = await captureRef((externalViewRef || internalViewRef) as any, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1638,7 +1638,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef || internalViewRef, {
+      const labelOnlyUri = await captureRef((externalViewRef || internalViewRef) as any, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
