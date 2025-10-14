@@ -61,6 +61,7 @@ export default function ZoomCalibration({
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
+  const [isLocked, setIsLocked] = useState(false); // Track if calibration is locked
   
   // Pick ONE random color on mount (don't rotate during use)
   const [currentColor] = useState(() => VIBRANT_COLORS[Math.floor(Math.random() * VIBRANT_COLORS.length)]);
@@ -96,6 +97,17 @@ export default function ZoomCalibration({
   const handleLockIn = () => {
     if (!selectedCoin) return;
     
+    if (isLocked) {
+      // Unlock - allow user to re-adjust
+      setIsLocked(false);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      return;
+    }
+    
+    // Lock and complete calibration
+    setIsLocked(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
     // Save coin preference
     setLastSelectedCoin(selectedCoin.name);
     
@@ -117,23 +129,26 @@ export default function ZoomCalibration({
     const originalImageCenterY = (referenceCenterY - zoomTranslate.y) / zoomScale;
     const originalImageRadius = referenceRadiusPixels / zoomScale;
 
-    onComplete({
-      pixelsPerUnit: pixelsPerMM,
-      unit: 'mm',
-      referenceDistance: selectedCoin.diameter,
-      coinCircle: {
-        centerX: originalImageCenterX,
-        centerY: originalImageCenterY,
-        radius: originalImageRadius,
-        coinName: selectedCoin.name,
-        coinDiameter: selectedCoin.diameter,
-      },
-      initialZoom: {
-        scale: zoomScale,
-        translateX: zoomTranslate.x,
-        translateY: zoomTranslate.y,
-      },
-    });
+    // Small delay for the lock animation/haptic to feel right
+    setTimeout(() => {
+      onComplete({
+        pixelsPerUnit: pixelsPerMM,
+        unit: 'mm',
+        referenceDistance: selectedCoin.diameter,
+        coinCircle: {
+          centerX: originalImageCenterX,
+          centerY: originalImageCenterY,
+          radius: originalImageRadius,
+          coinName: selectedCoin.name,
+          coinDiameter: selectedCoin.diameter,
+        },
+        initialZoom: {
+          scale: zoomScale,
+          translateX: zoomTranslate.x,
+          translateY: zoomTranslate.y,
+        },
+      });
+    }, 300);
   };
 
   return (
@@ -143,8 +158,10 @@ export default function ZoomCalibration({
         imageUri={imageUri}
         zoomToCenter={true}
         onTransformChange={(scale, translateX, translateY) => {
-          setZoomScale(scale);
-          setZoomTranslate({ x: translateX, y: translateY });
+          if (!isLocked) {
+            setZoomScale(scale);
+            setZoomTranslate({ x: translateX, y: translateY });
+          }
         }}
       />
 
@@ -276,14 +293,15 @@ export default function ZoomCalibration({
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       setSelectedCoin(null);
+                      setIsLocked(false); // Reset lock state when changing coin
                     }}
                     style={{
-                      padding: 4,
+                      padding: 5,
                       backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                      borderRadius: 12,
+                      borderRadius: 14,
                     }}
                   >
-                    <Ionicons name="swap-horizontal" size={16} color="rgba(0, 0, 0, 0.5)" />
+                    <Ionicons name="swap-horizontal" size={18} color="rgba(0, 0, 0, 0.5)" />
                   </Pressable>
                 </View>
                 <Text style={{ 
@@ -517,7 +535,11 @@ export default function ZoomCalibration({
             <Pressable
               onPress={handleLockIn}
               style={({ pressed }) => ({
-                backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
+                backgroundColor: pressed 
+                  ? `${currentColor}E6` 
+                  : isLocked 
+                  ? '#10B981F2' // Green when locked
+                  : `${currentColor}F2`,
                 borderRadius: 24,
                 paddingVertical: 22,
                 alignItems: 'center',
@@ -525,8 +547,15 @@ export default function ZoomCalibration({
                 borderWidth: 2,
                 borderColor: 'rgba(255, 255, 255, 0.4)',
                 transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                flexDirection: 'row',
               })}
             >
+              <Ionicons 
+                name={isLocked ? "lock-closed" : "lock-open"} 
+                size={28} 
+                color="#FFFFFF" 
+                style={{ marginRight: 12 }}
+              />
               <Text style={{ 
                 color: '#FFFFFF', 
                 fontWeight: '900', 
@@ -537,7 +566,7 @@ export default function ZoomCalibration({
                 textShadowOffset: { width: 0, height: 2 },
                 textShadowRadius: 4,
               }}>
-                LOCK IN
+                {isLocked ? 'UNLOCK' : 'LOCK IN'}
               </Text>
             </Pressable>
           </BlurView>
