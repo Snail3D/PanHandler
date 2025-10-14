@@ -1930,6 +1930,7 @@ export default function DimensionOverlay({
   
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
+    .minDistance(15) // Require 15px swipe before activating - prevents tap interference
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
