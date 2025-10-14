@@ -3553,7 +3553,20 @@ export default function DimensionOverlay({
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = (p0.x + p1.x) / 2;
-                screenY = (p0.y + p1.y) / 2 - 50;
+                screenY = (p0.y + p1.y) / 2;
+                
+                // Position label perpendicular to the line (offset to the side)
+                const dx = p1.x - p0.x;
+                const dy = p1.y - p0.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                if (length > 0) {
+                  // Perpendicular vector (rotated 90 degrees)
+                  const perpX = -dy / length;
+                  const perpY = dx / length;
+                  // Offset 40 pixels perpendicular to the line
+                  screenX += perpX * 40;
+                  screenY += perpY * 40;
+                }
               } else if (measurement.mode === 'angle') {
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = p1.x;
@@ -4107,29 +4120,29 @@ export default function DimensionOverlay({
                 }}>
                   {/* Left side: Hide labels toggle - only show if there are measurements */}
                   {measurements.length > 0 && (
-                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center' }}>
-                      <Pressable
-                        onPress={() => {
-                          setHideMeasurementLabels(!hideMeasurementLabels);
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }}
-                        style={{
-                          width: 28,
-                          height: 28,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
+                    <Pressable
+                      onPress={() => {
+                        setHideMeasurementLabels(!hideMeasurementLabels);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <View style={{
+                        width: 28,
+                        height: 28,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
                         <Ionicons 
                           name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"} 
                           size={16} 
                           color="rgba(0, 0, 0, 0.5)" 
                         />
-                      </Pressable>
+                      </View>
                       <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
                         {hideMeasurementLabels ? "Show labels" : "Hide labels"}
                       </Text>
-                    </View>
+                    </Pressable>
                   )}
 
                   {/* Center: Undo button - only show if there are measurements or current points */}
