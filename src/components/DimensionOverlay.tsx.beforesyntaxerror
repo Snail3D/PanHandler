@@ -1,7 +1,7 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -1618,7 +1618,7 @@ export default function DimensionOverlay({
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        showAlert('Permission Required', 'Please grant photo library access.', 'warning');
+        Alert.alert('Permission Required', 'Please grant photo library access.');
         return;
       }
       
@@ -1627,7 +1627,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('View Error', 'View ref not available. Try again.', 'error');
+        Alert.alert('View Error', 'View ref not available. Try again.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1645,7 +1645,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during capture.', 'error');
+        Alert.alert('Error', 'View lost during capture.');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1674,7 +1674,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      showAlert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      Alert.alert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -1686,14 +1686,14 @@ export default function DimensionOverlay({
 
   const performEmail = async (label: string | null) => {
     if (!currentImageUri) {
-      showAlert('Email Error', 'No image to export.', 'error');
+      Alert.alert('Email Error', 'No image to export.');
       return;
     }
     
     try {
       const isAvailable = await MailComposer.isAvailableAsync();
       if (!isAvailable) {
-        showAlert('Email Not Available', 'No email app is configured.', 'warning');
+        Alert.alert('Email Not Available', 'No email app is configured.');
         return;
       }
 
@@ -1724,7 +1724,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View not ready. Wait and try again.', 'error');
+        Alert.alert('Error', 'View not ready. Wait and try again.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1775,7 +1775,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during label capture.', 'error');
+        Alert.alert('Error', 'View lost during label capture.');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1814,7 +1814,7 @@ export default function DimensionOverlay({
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      Alert.alert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -1875,12 +1875,10 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
-    .minDistance(40) // Increased from 20 to 40px to reduce interference with taps
-    .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
+    .minDistance(20) // Require 20px movement before activating
     .onUpdate((event) => {
-      // Only respond to horizontal swipes - stricter detection
-      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
-      if (isHorizontal) {
+      // Only respond to horizontal swipes
+      if (Math.abs(event.translationX) > Math.abs(event.translationY)) {
         if (event.translationX < -50 && !menuHidden) {
           // Swipe left to hide (to right side)
           menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
@@ -4978,11 +4976,11 @@ export default function DimensionOverlay({
                 
                 if (newProStatus) {
                   // Switched to Pro
-                  showAlert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!', 'success');
+                  Alert.alert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 } else {
                   // Switched to Free
-                  showAlert('🔄 Free User Mode', 'Switched to Free User for testing!', 'info');
+                  Alert.alert('🔄 Free User Mode', 'Switched to Free User for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                 }
               } else {
@@ -5160,7 +5158,7 @@ export default function DimensionOverlay({
                   <Pressable
                     onPress={() => {
                       setShowProModal(false);
-                      showAlert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!', 'info');
+                      Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
                     }}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
@@ -5179,7 +5177,7 @@ export default function DimensionOverlay({
                   {/* Restore Purchase Button */}
                   <Pressable
                     onPress={() => {
-                      showAlert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)', 'info');
+                      Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
                     }}
                     style={{ paddingVertical: 12, marginBottom: 8 }}
                   >
@@ -5217,7 +5215,7 @@ export default function DimensionOverlay({
               // Secret: Long-press to clear saved email (for testing)
               setUserEmail(null);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
+              Alert.alert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!');
             }}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
@@ -5669,21 +5667,6 @@ export default function DimensionOverlay({
           setIsMapMode(false);
           setShowMapScaleModal(false);
         }}
-      />
-
-      {/* Alert Modal */}
-      <AlertModal
-        visible={alertConfig.visible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        confirmText={alertConfig.confirmText}
-        cancelText={alertConfig.cancelText}
-        onConfirm={() => {
-          if (alertConfig.onConfirm) alertConfig.onConfirm();
-          closeAlert();
-        }}
-        onDismiss={closeAlert}
       />
     </>
   );
