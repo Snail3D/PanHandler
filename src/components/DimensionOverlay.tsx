@@ -4261,9 +4261,8 @@ export default function DimensionOverlay({
         </Pressable>
       )}
 
-      {/* Bottom toolbar - Water droplet style with slide gesture */}
+      {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
-        <GestureDetector gesture={menuPanGesture}>
           <Animated.View
             className="absolute left-0 right-0 z-20"
             style={[
@@ -5014,7 +5013,6 @@ export default function DimensionOverlay({
         </View>
         </BlurView>
           </Animated.View>
-        </GestureDetector>
       )}
       
       {/* Pro Upgrade Modal */}
