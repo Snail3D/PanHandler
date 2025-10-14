@@ -203,15 +203,6 @@ export default function DimensionOverlay({
   const [cursorSpeed, setCursorSpeed] = useState(0); // pixels per millisecond
   const lastCursorUpdateRef = useRef({ x: 0, y: 0, time: Date.now() });
   
-  // Initialize measurement mode based on whether there are existing measurements
-  // If there are measurements on reload, pan/zoom should be locked
-  useEffect(() => {
-    if (measurements.length > 0) {
-      // Pan/zoom is locked when measurements exist
-      setMeasurementMode(false); // Keep in pan mode but locked
-    }
-  }, []); // Only run on mount
-  
   // Menu states
   const [menuMinimized, setMenuMinimized] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -294,6 +285,15 @@ export default function DimensionOverlay({
   const [showTetris, setShowTetris] = useState(false);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
+  
+  // Initialize measurement mode based on whether there are existing measurements
+  // If there are measurements on reload, pan/zoom should be locked
+  // IMPORTANT: This useEffect must be AFTER all other hooks to avoid hooks order issues
+  useEffect(() => {
+    if (measurements.length > 0) {
+      setMeasurementMode(false); // Keep in pan mode but locked
+    }
+  }, []); // Only run on mount
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
