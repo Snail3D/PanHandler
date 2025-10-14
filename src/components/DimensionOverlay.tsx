@@ -1414,7 +1414,11 @@ export default function DimensionOverlay({
       // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
       setHideMeasurementsForCapture(true); // Hide measurements and legend
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
+      await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
+      
+      if (!externalViewRef) {
+        throw new Error('View ref lost after hiding measurements');
+      }
       
       const labelOnlyUri = await captureRef(externalViewRef, {
         format: 'png',
@@ -1596,7 +1600,12 @@ export default function DimensionOverlay({
       // 2. Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
       setHideMeasurementsForCapture(true); // Hide measurements and legend
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
+      await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
+      
+      // Check ref is still available
+      if (!externalViewRef) {
+        throw new Error('ViewShot ref is not available');
+      }
       
       // Capture label-only photo with same ref
       const labelOnlyUri = await captureRef(externalViewRef, {
