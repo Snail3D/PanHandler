@@ -419,13 +419,13 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Help button - top-left, tasteful like camera */}
+      {/* Help button - top-left, moved in 20% from corner */}
       {onHelp && (
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 20,
-            left: 20,
+            top: insets.top + 28, // Moved down from 20
+            left: 28, // Moved right from 20
           }}
         >
           <BlurView
