@@ -1373,16 +1373,12 @@ export default function DimensionOverlay({
   };
 
   const performSave = async (label: string | null) => {
-    // Check if we have image URI (can't check ref yet, it might not be ready)
     if (!currentImageUri) {
-      console.error('❌ Export failed: currentImageUri is missing');
       Alert.alert('Export Error', 'No image to export. Please take a photo first.');
       return;
     }
 
     try {
-      console.log('📸 Starting capture with label:', label);
-      
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -1390,60 +1386,34 @@ export default function DimensionOverlay({
         return;
       }
       
-      // NOW check the view reference after we're sure we need it
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Check if external ref is available, otherwise try internal
-      if (!externalViewRef?.current && !internalViewRef.current) {
-        console.error('❌ Save failed: No view ref available', {
-          externalViewRef: !!externalViewRef,
-          externalViewRefCurrent: !!externalViewRef?.current,
-          internalViewRefCurrent: !!internalViewRef.current,
-        });
-        Alert.alert('Export Error', 'Unable to capture measurement view. Please try again.');
-        return;
-      }
-
-      console.log('📸 Setting capture state to show label/coin info and hide menu...');
-      
       // Set state to show label + coin info and hide control menu
       setIsCapturing(true);
       setCurrentLabel(label);
       
       // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      console.log('📸 Capturing measurements photo with label and coin info...');
-      
-      // Use the ref object directly, not ref.current!
-      // captureRef can accept a ref object
-      const refToCapture = externalViewRef || internalViewRef;
-      
-      if (!refToCapture) {
-        throw new Error('View reference object is null');
+      // Use external ref (from parent) - it wraps both image and overlay
+      if (!externalViewRef) {
+        throw new Error('No view ref available for capture');
       }
       
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(refToCapture as any, {
+      const measurementsUri = await captureRef(externalViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
       });
-
-      console.log('📸 Captured measurements URI:', measurementsUri);
       
-      // Save measurements photo with custom filename
-      const measurementsFilename = label ? `${label}_Measurements` : 'PanHandler_Measurements';
-      const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
-      
-      console.log('✅ Saved measurements photo!');
+      // Save measurements photo
+      await MediaLibrary.createAssetAsync(measurementsUri);
       
       // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
       setHideMeasurementsForCapture(true); // Hide measurements and legend
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef((externalViewRef || internalViewRef) as any, {
+      const labelOnlyUri = await captureRef(externalViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1499,18 +1469,7 @@ export default function DimensionOverlay({
   };
 
   const performEmail = async (label: string | null) => {
-    console.log('📧 performEmail called with:', { 
-      hasViewRef: !!viewRef, 
-      hasViewRefCurrent: !!viewRef?.current,
-      hasCurrentImageUri: !!currentImageUri,
-      viewRefType: viewRef?.current?.constructor?.name,
-      externalViewRef: !!externalViewRef,
-      externalViewRefCurrent: !!externalViewRef?.current
-    });
-    
-    // Check if we have image URI (can't check ref yet, it might not be ready)
     if (!currentImageUri) {
-      console.error('❌ Email failed: currentImageUri is missing');
       Alert.alert('Email Error', 'No image to export. Please take a photo first.');
       return;
     }
@@ -1526,7 +1485,6 @@ export default function DimensionOverlay({
       // Prompt for email if not set
       let emailToUse = userEmail;
       if (!emailToUse) {
-        // Show custom email prompt modal
         await new Promise<void>((resolve) => {
           const handleEmailComplete = (email: string | null) => {
             if (email && email.trim()) {
@@ -1542,65 +1500,29 @@ export default function DimensionOverlay({
             resolve();
           };
           
-          // Store handlers temporarily for modal callbacks
           (window as any)._emailPromptHandlers = { handleEmailComplete, handleEmailDismiss };
           setShowEmailPromptModal(true);
         });
       }
-      
-      // NOW check the view reference after modal interactions
-      // Add delay to ensure ref is attached after modal closes
-      console.log('⏳ Waiting for ref to attach...');
-      await new Promise(resolve => setTimeout(resolve, 300)); // Increased from 100ms
-      
-      // Check if external ref is available, otherwise try internal
-      if (!externalViewRef?.current && !internalViewRef.current) {
-        console.error('❌ Email failed: No view ref available after 300ms wait', {
-          externalViewRef: !!externalViewRef,
-          externalViewRefCurrent: !!externalViewRef?.current,
-          internalViewRefCurrent: !!internalViewRef.current,
-        });
-        Alert.alert('Email Error', 'Unable to capture measurement view. Please try again.');
-        return;
-      }
-
-      console.log('📸 Starting capture for email...');
       
       // Set state to show label + coin info and hide control menu
       setIsCapturing(true);
       setCurrentLabel(label);
       
       // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      console.log('📸 Capturing main measurement photo with label and coin info...');
-      console.log('🔍 Debug refs:', {
-        viewRefExists: !!viewRef,
-        viewRefCurrent: !!viewRef?.current,
-        internalRefCurrent: !!internalViewRef?.current,
-        externalRefExists: !!externalViewRef,
-        externalRefCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
-      });
-      
-      // Use the ref object directly, not ref.current!
-      // captureRef can accept a ref object
-      const refToCapture = externalViewRef || internalViewRef;
-      
-      if (!refToCapture) {
-        console.error('❌ No ref object available!');
-        throw new Error('View reference object is null');
+      // Use external ref (from parent) - it wraps both image and overlay
+      if (!externalViewRef) {
+        throw new Error('No view ref available for capture');
       }
       
-      console.log('📸 Using ref object:', !!refToCapture, 'current:', !!refToCapture?.current);
-      
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(refToCapture as any, {
+      const uri = await captureRef(externalViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
       });
-      
-      console.log('📸 Captured URI for email:', uri);
 
       // Build measurement text with scale information
       let measurementText = '';
@@ -1673,8 +1595,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Reuse the same ref from first capture
-      const labelOnlyUri = await captureRef(refToCapture as any, {
+      // Capture label-only photo with same ref
+      const labelOnlyUri = await captureRef(externalViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
