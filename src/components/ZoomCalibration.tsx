@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Svg, Circle } from 'react-native-svg';
+import { Svg, Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CoinReference } from '../utils/coinReferences';
@@ -114,83 +114,72 @@ export default function ZoomCalibration({
         }}
       />
 
-      {/* Reference Circle Overlay - FIXED in center, doesn't move */}
+      {/* Reference Circle Overlay - Beautiful glowing ring */}
       <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
       >
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-          {/* Vibrant colored circle with glow */}
+          <Defs>
+            <RadialGradient id="glowGradient" cx="50%" cy="50%">
+              <Stop offset="0%" stopColor={currentColor} stopOpacity="0.08" />
+              <Stop offset="70%" stopColor={currentColor} stopOpacity="0.03" />
+              <Stop offset="100%" stopColor={currentColor} stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          
+          {/* Outer glow */}
+          <Circle
+            cx={referenceCenterX}
+            cy={referenceCenterY}
+            r={referenceRadiusPixels + 30}
+            fill="url(#glowGradient)"
+          />
+          
+          {/* Main circle - clean, minimal stroke */}
           <Circle
             cx={referenceCenterX}
             cy={referenceCenterY}
             r={referenceRadiusPixels}
-            fill={`${currentColor}15`}
+            fill="none"
             stroke={currentColor}
-            strokeWidth="4"
+            strokeWidth="3"
+            opacity="0.6"
           />
           
-          {/* Center dot for precision */}
+          {/* Inner highlight ring for depth */}
           <Circle
             cx={referenceCenterX}
             cy={referenceCenterY}
-            r="5"
-            fill={currentColor}
+            r={referenceRadiusPixels - 3}
+            fill="none"
+            stroke="rgba(255, 255, 255, 0.3)"
+            strokeWidth="1.5"
           />
         </Svg>
         
-        {/* Coin text inside the circle - BIGGER and vibrant color */}
+        {/* Coin name - floating beautifully inside */}
         <View
           style={{
             position: 'absolute',
             left: referenceCenterX - 120,
-            top: referenceCenterY - 50,
+            top: referenceCenterY - 15,
             width: 240,
           }}
         >
           <Text style={{ 
-            color: currentColor, 
-            fontSize: 28, 
-            fontWeight: '900', 
+            color: 'white', 
+            fontSize: 20, 
+            fontWeight: '700', 
             textAlign: 'center', 
-            textShadowColor: 'rgba(0,0,0,0.9)', 
-            textShadowOffset: { width: 0, height: 3 }, 
+            textShadowColor: 'rgba(0,0,0,0.6)', 
+            textShadowOffset: { width: 0, height: 2 }, 
             textShadowRadius: 8,
-            letterSpacing: 0.5,
+            letterSpacing: 0.3,
           }}>
-            Cover the{'\n'}{selectedCoin.name}
+            {selectedCoin.name}
           </Text>
         </View>
-      </View>
-
-      {/* Subtle level guides - center crosshairs */}
-      <View
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        pointerEvents="none"
-      >
-        {/* Vertical center line - very subtle */}
-        <View
-          style={{
-            position: 'absolute',
-            left: SCREEN_WIDTH / 2 - 0.5,
-            top: 0,
-            bottom: 0,
-            width: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-          }}
-        />
-        
-        {/* Horizontal center line - very subtle */}
-        <View
-          style={{
-            position: 'absolute',
-            top: SCREEN_HEIGHT / 2 - 0.5,
-            left: 0,
-            right: 0,
-            height: 1,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-          }}
-        />
       </View>
 
       {/* Instructions - watery glassmorphic */}
@@ -209,10 +198,10 @@ export default function ZoomCalibration({
           style={{
             borderRadius: 20,
             overflow: 'hidden',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 8 },
+            shadowColor: currentColor,
+            shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.2,
-            shadowRadius: 20,
+            shadowRadius: 16,
           }}
         >
           <View style={{
@@ -229,8 +218,9 @@ export default function ZoomCalibration({
               fontSize: 20,
               textAlign: 'center',
               marginBottom: 8,
+              letterSpacing: -0.3,
             }}>
-              Zoom to Match Coin
+              Zoom to Match 🎯
             </Text>
             <Text style={{
               color: 'rgba(0, 0, 0, 0.65)',
@@ -239,137 +229,119 @@ export default function ZoomCalibration({
               fontWeight: '500',
               lineHeight: 20,
             }}>
-              Pinch to zoom until the <Text style={{ fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>{selectedCoin.name}</Text> in your photo matches the circle
+              Pinch to zoom until your <Text style={{ fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>{selectedCoin.name}</Text> matches the circle perfectly
             </Text>
-            <View style={{
-              marginTop: 12,
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: 10,
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderWidth: 1,
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-            }}>
-              <Text style={{
-                color: 'rgba(0, 0, 0, 0.6)',
-                textAlign: 'center',
-                fontSize: 13,
-                fontWeight: '600',
-              }}>
-                📏 Reference: {selectedCoin.diameter}mm diameter
-              </Text>
-            </View>
           </View>
         </BlurView>
       </View>
 
-      {/* Bottom Controls - Moved up but not TOO much */}
+      {/* Bottom Controls - REDESIGNED with fluid aesthetic */}
       <View
         style={{
           position: 'absolute',
-          bottom: SCREEN_HEIGHT / 2 - referenceRadiusPixels - 210, // Halfway between original and too-high position
+          bottom: insets.bottom + 40,
           left: 20,
           right: 20,
         }}
       >
+        {/* Small zoom indicator on the left */}
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          zIndex: 10,
+        }}>
+          <BlurView
+            intensity={30}
+            tint="light"
+            style={{
+              borderRadius: 12,
+              overflow: 'hidden',
+            }}
+          >
+            <View style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.4)',
+              borderRadius: 12,
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+            }}>
+              <Text style={{
+                color: 'rgba(0, 0, 0, 0.7)',
+                fontSize: 12,
+                fontWeight: '700',
+                letterSpacing: 0.3,
+              }}>
+                {zoomScale.toFixed(2)}×
+              </Text>
+            </View>
+          </BlurView>
+        </View>
+
+        {/* LOCK IN Button - centered, dynamic color, HUGE */}
         <BlurView
           intensity={35}
           tint="light"
           style={{
-            borderRadius: 20,
+            borderRadius: 24,
             overflow: 'hidden',
-            shadowColor: '#000',
+            shadowColor: currentColor,
             shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.2,
-            shadowRadius: 20,
+            shadowOpacity: 0.4,
+            shadowRadius: 24,
           }}
         >
-          <View style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderRadius: 20,
-            paddingHorizontal: 20,
-            paddingVertical: 20,
-            borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.35)',
-          }}>
-            {/* Current Zoom Display - button-like badge with dynamic color */}
-            <View style={{
-              backgroundColor: `${currentColor}20`,
-              borderRadius: 12,
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              alignSelf: 'center',
-              marginBottom: 16,
+          <Pressable
+            onPress={handleLockIn}
+            style={({ pressed }) => ({
+              backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
+              borderRadius: 24,
+              paddingVertical: 22,
+              alignItems: 'center',
+              justifyContent: 'center',
               borderWidth: 2,
-              borderColor: `${currentColor}40`,
-              shadowColor: currentColor,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 6,
+              borderColor: 'rgba(255, 255, 255, 0.4)',
+              transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+            })}
+          >
+            <Text style={{ 
+              color: '#FFFFFF', 
+              fontWeight: '900', 
+              fontSize: 32,
+              textAlign: 'center',
+              letterSpacing: 2,
+              textShadowColor: 'rgba(0, 0, 0, 0.3)',
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 4,
             }}>
-              <Text style={{
-                color: currentColor,
-                textAlign: 'center',
-                fontSize: 17,
-                fontWeight: '800',
-                letterSpacing: 0.5,
-              }}>
-                Zoom: {zoomScale.toFixed(2)}×
-              </Text>
-            </View>
-            
-            {/* GIANT Lock In Button - obvious, clickable button styling */}
-            <Pressable
-              onPress={handleLockIn}
-              style={({ pressed }) => ({
-                backgroundColor: pressed ? '#10B981' : '#34C759',
-                borderRadius: 16,
-                paddingVertical: 20,
-                marginBottom: 12,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderWidth: 2,
-                borderColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.3,
-                shadowRadius: 16,
-              })}
-            >
-              <Text style={{ 
-                color: '#FFFFFF', 
-                fontWeight: '800', 
-                fontSize: 26,
-                textAlign: 'center',
-                letterSpacing: 1,
-              }}>
-                LOCK IN
-              </Text>
-            </Pressable>
-            
-            {/* Go Back button - with icon */}
-            <Pressable
-              onPress={onCancel}
-              style={({ pressed }) => ({
-                backgroundColor: 'transparent',
-                paddingVertical: 10,
-                alignItems: 'center',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <Ionicons name="arrow-back" size={18} color="rgba(0, 0, 0, 0.5)" style={{ marginRight: 6 }} />
-              <Text style={{ 
-                color: 'rgba(0, 0, 0, 0.5)', 
-                fontWeight: '600', 
-                fontSize: 15,
-              }}>
-                Go Back
-              </Text>
-            </Pressable>
-          </View>
+              LOCK IN
+            </Text>
+          </Pressable>
         </BlurView>
+        
+        {/* Go Back button - subtle, bottom */}
+        <Pressable
+          onPress={onCancel}
+          style={({ pressed }) => ({
+            paddingVertical: 12,
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            opacity: pressed ? 0.5 : 1,
+            marginTop: 12,
+          })}
+        >
+          <Ionicons name="arrow-back" size={16} color="rgba(255, 255, 255, 0.6)" style={{ marginRight: 6 }} />
+          <Text style={{ 
+            color: 'rgba(255, 255, 255, 0.6)', 
+            fontWeight: '600', 
+            fontSize: 14,
+            letterSpacing: 0.2,
+          }}>
+            Go Back
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
