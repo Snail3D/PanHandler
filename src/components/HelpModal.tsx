@@ -1577,32 +1577,36 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                   </View>
 
+                  {/* Simple YouTube text link */}
                   <Pressable
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
-                    style={{
-                      backgroundColor: '#FF0000',
-                      borderRadius: 12,
-                      paddingVertical: 10,
-                      paddingHorizontal: 14,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      shadowColor: '#FF0000',
-                      shadowOffset: { width: 0, height: 0 },
-                      shadowOpacity: 0.35,
-                      shadowRadius: 10,
-                      elevation: 6,
-                    }}
+                    style={{ marginBottom: 20, alignItems: 'center' }}
                   >
-                    <Ionicons name="logo-youtube" size={20} color="white" />
-                    <Text style={{ color: 'white', fontSize: 15, fontWeight: '600', marginLeft: 6, letterSpacing: -0.2 }}>
+                    <Text style={{ fontSize: 14, color: '#007AFF', textDecorationLine: 'underline' }}>
                       Follow on YouTube
                     </Text>
                   </Pressable>
 
-                  <Text style={{ fontSize: 13, color: '#8E8E93', textAlign: 'center', marginTop: 12, lineHeight: 18 }}>
-                    Get CAD tips, tutorials, and updates on new features
-                  </Text>
+                  {/* Beautiful dedication to grandfather */}
+                  <View style={{
+                    paddingTop: 16,
+                    borderTopWidth: 1,
+                    borderTopColor: 'rgba(0,0,0,0.08)',
+                  }}>
+                    <Text style={{ 
+                      fontSize: 12, 
+                      color: '#8E8E93', 
+                      textAlign: 'center', 
+                      lineHeight: 18,
+                      fontStyle: 'italic',
+                      letterSpacing: 0.3,
+                    }}>
+                      Dedicated to my grandfather{'\n'}
+                      <Text style={{ fontSize: 11, color: '#A8A8A8' }}>
+                        (who is actually good at math)
+                      </Text>
+                    </Text>
+                  </View>
                 </Animated.View>
               </View>
 
