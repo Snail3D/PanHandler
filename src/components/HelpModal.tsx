@@ -1148,6 +1148,114 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
 
+              {/* Map Mode */}
+              <ExpandableSection
+                icon="map"
+                title="🗺️ Map Mode"
+                color="#0066FF"
+                delay={500}
+              >
+                <View style={{ marginLeft: 4 }}>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginBottom: 10 }}>
+                    Measure Real-World Distances on Maps
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
+                    Map Mode converts your measurements from screen dimensions to actual geographic distances using a verbal scale. Perfect for planning routes, estimating areas, or measuring features directly from printed or digital maps.
+                  </Text>
+
+                  {/* How It Works */}
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    📐 How It Works
+                  </Text>
+                  <View style={{ marginLeft: 12, marginBottom: 14 }}>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      1. Take a photo of your map with a coin on it
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      2. Trace the coin to calibrate (establishes pixel density)
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      3. Tap <Text style={{ fontWeight: '600' }}>🗺️ Map</Text> button and enter the verbal scale
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#6A6A6A', lineHeight: 21, marginLeft: 12, marginBottom: 6 }}>
+                      Example: "1 cm = 5 km" or "1 inch = 10 miles"
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                      4. All measurements now display in real-world units!
+                    </Text>
+                  </View>
+
+                  {/* Tools in Map Mode */}
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    🛠️ Tools in Map Mode
+                  </Text>
+                  <View style={{ marginLeft: 12, marginBottom: 14 }}>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      📏 <Text style={{ fontWeight: '600' }}>Distance</Text> - Measure straight-line distances (as the crow flies)
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🧭 <Text style={{ fontWeight: '600' }}>Azimuth</Text> - Get compass bearings from point to point
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#6A6A6A', lineHeight: 21, marginLeft: 12, marginBottom: 6 }}>
+                      Place: Start → North reference → Destination
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      ⬜ <Text style={{ fontWeight: '600' }}>Rectangle</Text> - Calculate area of regions or zones
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      ⭕ <Text style={{ fontWeight: '600' }}>Circle</Text> - Measure radial distances and circular areas
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                      ✏️ <Text style={{ fontWeight: '600' }}>Freehand</Text> - Trace irregular boundaries for perimeter and area
+                    </Text>
+                  </View>
+
+                  {/* Common Use Cases */}
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    🎯 Common Use Cases
+                  </Text>
+                  <View style={{ marginLeft: 12, marginBottom: 14 }}>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🥾 <Text style={{ fontWeight: '600' }}>Hiking & Trail Planning</Text> - Measure trail distances and elevation routes
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🏠 <Text style={{ fontWeight: '600' }}>Real Estate & Property</Text> - Calculate lot sizes and property boundaries
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🚗 <Text style={{ fontWeight: '600' }}>Route Planning</Text> - Estimate travel distances and alternative routes
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🏛️ <Text style={{ fontWeight: '600' }}>Historical Maps</Text> - Study old city layouts and territorial changes
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      ⛰️ <Text style={{ fontWeight: '600' }}>Topographic Analysis</Text> - Measure contour intervals and terrain features
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🗺️ <Text style={{ fontWeight: '600' }}>Urban Planning</Text> - Calculate district areas and infrastructure spacing
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                      🌍 <Text style={{ fontWeight: '600' }}>Geographic Education</Text> - Teach map skills and spatial reasoning
+                    </Text>
+                  </View>
+
+                  {/* Pro Tip */}
+                  <View style={{
+                    backgroundColor: 'rgba(0,102,255,0.1)',
+                    borderRadius: 12,
+                    padding: 12,
+                    borderLeftWidth: 3,
+                    borderLeftColor: '#0066FF',
+                  }}>
+                    <Text style={{ fontSize: 13, color: '#0066FF', fontWeight: '600', marginBottom: 4 }}>
+                      💡 Pro Tip
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
+                      Toggle between Metric and Imperial anytime! If your map shows "1 cm = 5 km" but you prefer miles, just switch units and measurements convert automatically.
+                    </Text>
+                  </View>
+                </View>
+              </ExpandableSection>
+
               {/* Pro Tips */}
               <ExpandableSection
                 icon="bulb"
