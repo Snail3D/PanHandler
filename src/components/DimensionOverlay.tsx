@@ -1880,36 +1880,36 @@ export default function DimensionOverlay({
       if (isHorizontal && Math.abs(event.translationX) > threshold) {
         if (event.translationX < 0) {
           // Swipe left - next mode
-          const nextIndex = (currentIndex + 1) % modes.length;
-          const nextMode = modes[nextIndex];
+          let nextIndex = (currentIndex + 1) % modes.length;
+          let nextMode = modes[nextIndex];
           
-          // Check if trying to switch to freehand without Pro
+          // Skip freehand if not Pro (keep bouncing through modes)
           if (nextMode === 'freehand' && !isProUser) {
-            runOnJS(setShowProModal)(true);
-            runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Warning);
-          } else {
-            runOnJS(setMode)(nextMode);
-            runOnJS(setModeColorIndex)(nextIndex);
-            runOnJS(setCurrentPoints)([]);
-            runOnJS(setMeasurementMode)(true);
-            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+            nextIndex = (nextIndex + 1) % modes.length;
+            nextMode = modes[nextIndex];
           }
+          
+          runOnJS(setMode)(nextMode);
+          runOnJS(setModeColorIndex)(nextIndex);
+          runOnJS(setCurrentPoints)([]);
+          runOnJS(setMeasurementMode)(true);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         } else {
           // Swipe right - previous mode
-          const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
-          const prevMode = modes[prevIndex];
+          let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
+          let prevMode = modes[prevIndex];
           
-          // Check if trying to switch to freehand without Pro
+          // Skip freehand if not Pro (keep bouncing through modes)
           if (prevMode === 'freehand' && !isProUser) {
-            runOnJS(setShowProModal)(true);
-            runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Warning);
-          } else {
-            runOnJS(setMode)(prevMode);
-            runOnJS(setModeColorIndex)(prevIndex);
-            runOnJS(setCurrentPoints)([]);
-            runOnJS(setMeasurementMode)(true);
-            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+            prevIndex = (prevIndex - 1 + modes.length) % modes.length;
+            prevMode = modes[prevIndex];
           }
+          
+          runOnJS(setMode)(prevMode);
+          runOnJS(setModeColorIndex)(prevIndex);
+          runOnJS(setCurrentPoints)([]);
+          runOnJS(setMeasurementMode)(true);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
       }
       
@@ -4942,119 +4942,146 @@ export default function DimensionOverlay({
         animationType="fade"
         onRequestClose={() => setShowProModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-          <ScrollView 
-            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
-            showsVerticalScrollIndicator={false}
+        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+          <Pressable
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+            onPress={() => setShowProModal(false)}
           >
-            <BlurView
-              intensity={100}
-              tint="light"
-              style={{ borderRadius: 24, overflow: 'hidden', width: '100%', maxWidth: 420, marginVertical: 20 }}
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: 400,
+                borderRadius: 20,
+                overflow: 'hidden',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.2,
+                shadowRadius: 20,
+                elevation: 16,
+              }}
             >
-              <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', padding: 24 }}>
-                {/* Header */}
-                <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                  <View style={{ backgroundColor: '#007AFF', width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
-                    <Ionicons name="star" size={32} color="white" />
+              <BlurView intensity={35} tint="light">
+                <View style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255, 255, 255, 0.35)',
+                  padding: 28,
+                }}>
+                  {/* Header */}
+                  <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                    <View style={{ 
+                      backgroundColor: 'rgba(88, 86, 214, 0.85)', 
+                      width: 64, 
+                      height: 64, 
+                      borderRadius: 32, 
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      marginBottom: 12 
+                    }}>
+                      <Ionicons name="star" size={32} color="white" />
+                    </View>
+                    <Text style={{ fontSize: 24, fontWeight: '700', color: '#1C1C1E', marginBottom: 4 }}>
+                      Upgrade to Pro
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', textAlign: 'center' }}>
+                      Unlock the Freehand tool
+                    </Text>
                   </View>
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#000', marginBottom: 4 }}>
-                    Upgrade to Pro
-                  </Text>
-                  <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
-                    Unlock the Freehand tool
-                  </Text>
-                </View>
-                
-                
-                {/* Comparison Chart */}
-                <View style={{ marginBottom: 20 }}>
-                  {/* Table Header */}
-                  <View style={{ flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: '#E5E7EB', paddingBottom: 12, marginBottom: 12 }}>
-                    <View style={{ flex: 2 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#666' }}>FEATURE</Text>
-                    </View>
-                    <View style={{ flex: 1, alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#666' }}>FREE</Text>
-                    </View>
-                    <View style={{ flex: 1, alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#007AFF' }}>PRO</Text>
+                  
+                  {/* Comparison Chart */}
+                  <View style={{ marginBottom: 20 }}>
+                    <View style={{ 
+                      borderRadius: 14, 
+                      borderWidth: 1, 
+                      borderColor: 'rgba(0,0,0,0.08)',
+                      overflow: 'hidden',
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                    }}>
+                      {/* Table Header */}
+                      <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.12)', paddingVertical: 12 }}>
+                        <View style={{ flex: 2, paddingHorizontal: 12 }}>
+                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#3C3C43' }}>FEATURE</Text>
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
+                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
+                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>PRO</Text>
+                        </View>
+                      </View>
+                      
+                      {/* Table Row */}
+                      <View style={{ flexDirection: 'row', paddingVertical: 12, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' }}>
+                        <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12 }}>
+                          <Text style={{ fontSize: 14, color: '#1C1C1E' }}>Freehand Tool</Text>
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                          <Ionicons name="close-circle" size={20} color="#D1D5DB" />
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                          <Ionicons name="checkmark-circle" size={20} color="#5856D6" />
+                        </View>
+                      </View>
                     </View>
                   </View>
                   
-                  {/* Table Rows */}
-                  {[
-                    { feature: 'Freehand Tool', free: false, pro: true },
-                  ].map((row, idx) => (
-                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 0, borderBottomColor: '#F3F4F6' }}>
-                      <View style={{ flex: 2, justifyContent: 'center' }}>
-                        <Text style={{ fontSize: 14, color: '#333' }}>{row.feature}</Text>
-                      </View>
-                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        {typeof row.free === 'boolean' ? (
-                          row.free ? (
-                            <Ionicons name="checkmark-circle" size={20} color="#34C759" />
-                          ) : (
-                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
-                          )
-                        ) : (
-                          <Text style={{ fontSize: 14, fontWeight: '600', color: '#666' }}>{row.free}</Text>
-                        )}
-                      </View>
-                      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        {typeof row.pro === 'boolean' ? (
-                          row.pro ? (
-                            <Ionicons name="checkmark-circle" size={20} color="#007AFF" />
-                          ) : (
-                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
-                          )
-                        ) : (
-                          <Text style={{ fontSize: 16, fontWeight: '700', color: '#007AFF' }}>{row.pro}</Text>
-                        )}
-                      </View>
-                    </View>
-                  ))}
+                  {/* Price */}
+                  <View style={{ 
+                    backgroundColor: 'rgba(88, 86, 214, 0.12)', 
+                    borderRadius: 12, 
+                    padding: 16, 
+                    marginBottom: 20, 
+                    alignItems: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(88, 86, 214, 0.2)',
+                  }}>
+                    <Text style={{ fontSize: 36, fontWeight: '700', color: '#5856D6' }}>$9.97</Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43' }}>One-time purchase • Lifetime access</Text>
+                  </View>
+                  
+                  {/* Purchase Button */}
+                  <Pressable
+                    onPress={() => {
+                      setShowProModal(false);
+                      Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
+                      borderRadius: 14,
+                      paddingVertical: 16,
+                      marginBottom: 12,
+                      shadowColor: '#5856D6',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                    })}
+                  >
+                    <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Purchase Pro</Text>
+                  </Pressable>
+                  
+                  {/* Restore Purchase Button */}
+                  <Pressable
+                    onPress={() => {
+                      Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
+                    }}
+                    style={{ paddingVertical: 12, marginBottom: 8 }}
+                  >
+                    <Text style={{ color: '#5856D6', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Restore Purchase</Text>
+                  </Pressable>
+                  
+                  {/* Maybe Later Button */}
+                  <Pressable
+                    onPress={() => setShowProModal(false)}
+                    style={{ paddingVertical: 12 }}
+                  >
+                    <Text style={{ color: '#8E8E93', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Maybe Later</Text>
+                  </Pressable>
                 </View>
-                
-                {/* Price */}
-                <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20, alignItems: 'center' }}>
-                  <Text style={{ fontSize: 36, fontWeight: 'bold', color: '#007AFF' }}>$9.97</Text>
-                  <Text style={{ fontSize: 13, color: '#666' }}>One-time purchase • Lifetime access</Text>
-                </View>
-                
-                {/* Purchase Button */}
-                <Pressable
-                  onPress={() => {
-                    setShowProModal(false);
-                    // Here you would integrate actual payment (Stripe, RevenueCat, etc.)
-                    Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
-                  }}
-                  style={{ backgroundColor: '#007AFF', borderRadius: 14, paddingVertical: 16, marginBottom: 12 }}
-                >
-                  <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Purchase Pro</Text>
-                </Pressable>
-                
-                {/* Restore Purchase Button */}
-                <Pressable
-                  onPress={() => {
-                    Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
-                  }}
-                  style={{ paddingVertical: 12, marginBottom: 8 }}
-                >
-                  <Text style={{ color: '#007AFF', fontSize: 15, textAlign: 'center', fontWeight: '500' }}>Restore Purchase</Text>
-                </Pressable>
-                
-                {/* Maybe Later Button */}
-                <Pressable
-                  onPress={() => setShowProModal(false)}
-                  style={{ paddingVertical: 12 }}
-                >
-                  <Text style={{ color: '#666', fontSize: 15, textAlign: 'center' }}>Maybe Later</Text>
-                </Pressable>
-              </View>
-            </BlurView>
-          </ScrollView>
-        </View>
+              </BlurView>
+            </Pressable>
+          </Pressable>
+        </BlurView>
       </Modal>
 
       {/* Help Button - Floating centered horizontally */}
