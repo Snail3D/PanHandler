@@ -14,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
 import { BlurView } from 'expo-blur';
-import useStore from '../state/measurementStore';
+import useStore, { CompletedMeasurement } from '../state/measurementStore';
 import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
@@ -72,6 +72,8 @@ interface Measurement {
   points: Array<{ x: number; y: number }>;
   value: string;
   mode: MeasurementMode;
+  calibrationMode?: 'coin' | 'map'; // Track which calibration mode was used when creating this measurement
+  mapScaleData?: {screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'}; // Store map scale if created in map mode
   // For circles: points[0] = center, points[1] = edge point (defines radius)
   // For rectangles: points[0-3] = all 4 corners (top-left, top-right, bottom-right, bottom-left)
   radius?: number; // For circles
@@ -1220,6 +1222,8 @@ export default function DimensionOverlay({
         points: completedPoints.map(p => ({ x: p.x, y: p.y })),
         value,
         mode,
+        calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
+        ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
         ...(radius !== undefined && { radius }),
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
@@ -2448,6 +2452,8 @@ export default function DimensionOverlay({
                     mode: 'freehand',
                     area: physicalArea, // Store raw area value
                     isClosed: true, // Mark as closed loop
+                    calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
+                    ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
                   };
                   
                   console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
@@ -2476,6 +2482,8 @@ export default function DimensionOverlay({
                     value: formattedValue,
                     mode: 'freehand',
                     isClosed: isClosedLoop, // Still mark as closed even if self-intersecting
+                    calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
+                    ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
                   };
                   
                   setMeasurements([...measurements, newMeasurement]);
