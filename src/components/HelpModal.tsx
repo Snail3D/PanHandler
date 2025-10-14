@@ -87,15 +87,15 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.85)',
+          backgroundColor: 'rgba(255,255,255,0.5)',
           borderRadius: 20,
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.3,
+          shadowOpacity: 0.2,
           shadowRadius: 12,
           elevation: 6,
-          borderWidth: 2,
-          borderColor: `${color}40`,
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.35)',
         }}
       >
         <View
@@ -178,9 +178,9 @@ const ComparisonRow = ({
       width: 70, 
       padding: 12, 
       alignItems: 'center',
-      backgroundColor: 'rgba(255,149,0,0.08)',
+      backgroundColor: 'rgba(88, 86, 214, 0.15)',
     }}>
-      <Text style={{ fontSize: 14, fontWeight: '600', color: '#FF9500' }}>{pro}</Text>
+      <Text style={{ fontSize: 14, fontWeight: '600', color: '#5856D6' }}>{pro}</Text>
     </View>
   </View>
 );
@@ -247,22 +247,22 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               marginTop: insets.top + 20,
               marginHorizontal: 16,
               marginBottom: insets.bottom + 20,
-              borderRadius: 32,
+              borderRadius: 20,
               overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 16 },
-              shadowOpacity: 0.5,
-              shadowRadius: 32,
-              elevation: 24,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.2,
+              shadowRadius: 20,
+              elevation: 16,
             }}
           >
             {/* Translucent Header with Blur */}
             <BlurView 
-              intensity={100} 
+              intensity={35} 
               tint="light"
               style={{
-                borderTopLeftRadius: 32,
-                borderTopRightRadius: 32,
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
                 overflow: 'hidden',
               }}
             >
@@ -274,7 +274,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  backgroundColor: 'rgba(255,255,255,0.85)',
+                  backgroundColor: 'rgba(255,255,255,0.5)',
                   borderBottomWidth: 1,
                   borderBottomColor: 'rgba(0,0,0,0.08)',
                 }}
@@ -334,8 +334,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
             </BlurView>
 
             {/* Content with glassmorphism background */}
-            <BlurView intensity={95} tint="light" style={{ flex: 1 }}>
-              <View style={{ flex: 1, backgroundColor: 'rgba(245,245,247,0.75)' }}>
+            <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
+              <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}>
                 <GestureDetector gesture={swipeGesture}>
                   <ScrollView
                     style={{ flex: 1 }}
@@ -1107,8 +1107,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
                         <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Free</Text>
                       </View>
-                      <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,149,0,0.08)' }}>
-                        <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF9500' }}>Pro</Text>
+                      <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(88, 86, 214, 0.15)' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>Pro</Text>
                       </View>
                     </View>
 
@@ -1135,12 +1135,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       <AnimatedText style={[{ 
                         fontSize: 17,
                         fontWeight: '800', 
-                        color: '#FF9500',
+                        color: '#5856D6',
                       }, textPulseStyle]}>
                         Upgrade to Pro
                       </AnimatedText>
                       {' '}or{' '}
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#007AFF' }}>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6' }}>
                         Restore your past purchase
                       </Text>
                     </Text>
