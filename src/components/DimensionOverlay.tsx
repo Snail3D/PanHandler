@@ -1401,8 +1401,14 @@ export default function DimensionOverlay({
       
       console.log('📸 Capturing measurements photo with label and coin info...');
       
-      // Ensure ref is valid before capture
-      const refToUse = viewRef.current;
+      // Ensure ref is valid before capture with retry
+      let refToUse = viewRef.current;
+      if (!refToUse) {
+        console.log('⏳ Ref not ready for save, waiting 200ms more...');
+        await new Promise(resolve => setTimeout(resolve, 200));
+        refToUse = viewRef.current;
+      }
+      
       if (!refToUse) {
         throw new Error('View reference is null before measurements capture');
       }
@@ -1537,6 +1543,9 @@ export default function DimensionOverlay({
       }
       
       // Capture the view reference NOW, after modal interactions
+      // Add small delay to ensure ref is attached after modal closes
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       if (!externalViewRef && !internalViewRef.current) {
         throw new Error('View reference is null before capture');
       }
@@ -1559,13 +1568,22 @@ export default function DimensionOverlay({
         externalRefCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
       });
       
-      // Ensure ref is valid before capture
-      const emailRefToUse = viewRef.current;
+      // Double-check ref is still valid with another small wait if needed
+      let emailRefToUse = viewRef.current;
       if (!emailRefToUse) {
-        console.error('❌ Ref is null! Full debug:', {
+        console.log('⏳ Ref not ready, waiting 200ms more...');
+        await new Promise(resolve => setTimeout(resolve, 200));
+        emailRefToUse = viewRef.current;
+      }
+      
+      // Ensure ref is valid before capture
+      if (!emailRefToUse) {
+        console.error('❌ Ref is STILL null after wait! Full debug:', {
           viewRef,
           viewRefCurrent: viewRef?.current,
           internalViewRef: internalViewRef.current,
+          externalViewRef,
+          externalViewRefCurrent: externalViewRef?.current,
         });
         throw new Error('View reference is null before email capture');
       }
