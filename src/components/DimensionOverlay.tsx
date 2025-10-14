@@ -4281,6 +4281,7 @@ export default function DimensionOverlay({
       {!menuMinimized && !isCapturing && (
           <Animated.View
             className="absolute left-0 right-0 z-20"
+            pointerEvents="box-none"
             style={[
               { 
                 bottom: insets.bottom + 16,
@@ -4433,6 +4434,7 @@ export default function DimensionOverlay({
             </Pressable>
             <Pressable
               onPress={() => {
+                __DEV__ && console.log('🔥 MEASURE BUTTON PRESSED!');
                 setMeasurementMode(true);
                 // Show cursor immediately at center for instant feedback
                 setShowCursor(true);
