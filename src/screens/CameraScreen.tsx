@@ -351,26 +351,6 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         zoom={0}
         enableTorch={flashEnabled}
       >
-        {/* TEST BUBBLE - Simple red circle that should ALWAYS be visible */}
-        <View
-          style={{
-            position: 'absolute',
-            top: 200,
-            left: SCREEN_WIDTH / 2 - 50,
-            width: 100,
-            height: 100,
-            backgroundColor: '#FF0000',
-            borderRadius: 50,
-            borderWidth: 5,
-            borderColor: '#FFFFFF',
-            zIndex: 99999,
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', textAlign: 'center', marginTop: 35 }}>
-            TEST
-          </Text>
-        </View>
-
         {/* Top controls */}
         <View 
           className="absolute top-0 left-0 right-0 z-10"
