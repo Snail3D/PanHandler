@@ -1686,19 +1686,35 @@ export default function DimensionOverlay({
         if (event.translationX < 0) {
           // Swipe left - next mode
           const nextIndex = (currentIndex + 1) % modes.length;
-          runOnJS(setMode)(modes[nextIndex]);
-          runOnJS(setModeColorIndex)(nextIndex);
-          runOnJS(setCurrentPoints)([]); // Clear points when switching
-          runOnJS(setMeasurementMode)(true); // Auto-enable measurement mode
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          const nextMode = modes[nextIndex];
+          
+          // Check if trying to switch to freehand without Pro
+          if (nextMode === 'freehand' && !isProUser) {
+            runOnJS(setShowProModal)(true);
+            runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Warning);
+          } else {
+            runOnJS(setMode)(nextMode);
+            runOnJS(setModeColorIndex)(nextIndex);
+            runOnJS(setCurrentPoints)([]);
+            runOnJS(setMeasurementMode)(true);
+            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          }
         } else {
           // Swipe right - previous mode
           const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
-          runOnJS(setMode)(modes[prevIndex]);
-          runOnJS(setModeColorIndex)(prevIndex);
-          runOnJS(setCurrentPoints)([]); // Clear points when switching
-          runOnJS(setMeasurementMode)(true); // Auto-enable measurement mode
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          const prevMode = modes[prevIndex];
+          
+          // Check if trying to switch to freehand without Pro
+          if (prevMode === 'freehand' && !isProUser) {
+            runOnJS(setShowProModal)(true);
+            runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Warning);
+          } else {
+            runOnJS(setMode)(prevMode);
+            runOnJS(setModeColorIndex)(prevIndex);
+            runOnJS(setCurrentPoints)([]);
+            runOnJS(setMeasurementMode)(true);
+            runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          }
         }
       }
       
