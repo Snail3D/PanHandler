@@ -154,18 +154,27 @@ const ComparisonRow = ({
   feature, 
   free, 
   pro,
-  last = false 
+  last = false,
+  isLastFree = false
 }: { 
   feature: string; 
   free: string; 
   pro: string;
   last?: boolean;
+  isLastFree?: boolean;
 }) => (
   <View 
     style={{ 
       flexDirection: 'row', 
       borderTopWidth: 1, 
       borderTopColor: 'rgba(0,0,0,0.06)',
+      ...(isLastFree && {
+        shadowColor: '#FF3B30',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+        backgroundColor: 'rgba(255, 59, 48, 0.02)',
+      }),
     }}
   >
     <View style={{ flex: 1, padding: 12 }}>
@@ -1141,7 +1150,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     {/* Feature Rows */}
                     <ComparisonRow feature="Total Exports" free="∞" pro="∞" />
                     <ComparisonRow feature="Measurements" free="∞" pro="∞" />
-                    <ComparisonRow feature="Freehand Tool" free="✗" pro="✓" />
+                    <ComparisonRow feature="Freehand Tool" free="✗" pro="✓" isLastFree />
                     <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
                     <ComparisonRow feature="CAD Canvas Photo" free="✓" pro="✓" last />
                   </View>
