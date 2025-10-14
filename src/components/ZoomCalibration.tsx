@@ -42,12 +42,14 @@ interface ZoomCalibrationProps {
     };
   }) => void;
   onCancel: () => void;
+  onHelp?: () => void;
 }
 
 export default function ZoomCalibration({
   imageUri,
   onComplete,
   onCancel,
+  onHelp,
 }: ZoomCalibrationProps) {
   const insets = useSafeAreaInsets();
   const [zoomScale, setZoomScale] = useState(1);
@@ -414,12 +416,52 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
+      {/* Help button - top-left, tasteful like camera */}
+      {onHelp && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 20,
+            left: 20,
+          }}
+        >
+          <BlurView
+            intensity={30}
+            tint="light"
+            style={{
+              borderRadius: 20,
+              overflow: 'hidden',
+            }}
+          >
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onHelp();
+              }}
+              style={({ pressed }) => ({
+                backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.7 : 1,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.25)',
+              })}
+            >
+              <Ionicons name="help-circle-outline" size={24} color="rgba(0, 0, 0, 0.7)" />
+            </Pressable>
+          </BlurView>
+        </View>
+      )}
+
       {/* Bottom Controls - only show when coin is selected */}
       {selectedCoin && (
         <View
           style={{
             position: 'absolute',
-            bottom: insets.bottom + 40,
+            bottom: insets.bottom + 80, // Raised 10% higher (was 40, now 80)
             left: 20,
             right: 20,
           }}
@@ -502,19 +544,19 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Back button - left middle edge */}
+      {/* Back button - left middle edge, 2× bigger */}
       <View
         style={{
           position: 'absolute',
           left: 20,
-          top: SCREEN_HEIGHT / 2 - 24,
+          top: SCREEN_HEIGHT / 2 - 40, // Adjusted for bigger size
         }}
       >
         <BlurView
           intensity={30}
           tint="light"
           style={{
-            borderRadius: 24,
+            borderRadius: 40,
             overflow: 'hidden',
           }}
         >
@@ -522,9 +564,9 @@ export default function ZoomCalibration({
             onPress={onCancel}
             style={({ pressed }) => ({
               backgroundColor: 'rgba(255, 255, 255, 0.35)',
-              width: 48,
-              height: 48,
-              borderRadius: 24,
+              width: 80, // 2× bigger (was 48)
+              height: 80, // 2× bigger (was 48)
+              borderRadius: 40, // 2× bigger (was 24)
               alignItems: 'center',
               justifyContent: 'center',
               opacity: pressed ? 0.7 : 1,
@@ -532,7 +574,7 @@ export default function ZoomCalibration({
               borderColor: 'rgba(255, 255, 255, 0.25)',
             })}
           >
-            <Ionicons name="arrow-back" size={24} color="rgba(0, 0, 0, 0.7)" />
+            <Ionicons name="arrow-back" size={36} color="rgba(0, 0, 0, 0.7)" />
           </Pressable>
         </BlurView>
       </View>

@@ -33,7 +33,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
-  const [flashEnabled, setFlashEnabled] = useState(true); // Flash ON by default
+  const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   
   // Bubble level animation
   const bubbleX = useSharedValue(0);
