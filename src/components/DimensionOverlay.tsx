@@ -2413,7 +2413,12 @@ export default function DimensionOverlay({
                     perimeterStr = formatMapScaleDistance(totalPixelLength);
                     
                     // Convert area to map scale
-                    const areaDist2 = convertToMapScale(Math.sqrt(area)) ** 2;
+                    // Get a linear pixel measurement to establish scale ratio
+                    const samplePixelLength = Math.sqrt(area); // approximate side length
+                    const sampleMapLength = convertToMapScale(samplePixelLength);
+                    // Area scales by the square of linear scale
+                    const scaleRatio = sampleMapLength / samplePixelLength;
+                    const areaDist2 = area * (scaleRatio * scaleRatio);
                     areaStr = formatMapScaleArea(areaDist2);
                   } else {
                     perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
@@ -4104,8 +4109,8 @@ export default function DimensionOverlay({
                           const diameter = radiusInUnits * 2;
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * radiusInUnits * radiusInUnits;
-                          const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
-                          return `${displayValue} (A: ${areaStr}²)`;
+                          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+                          return `${displayValue} (A: ${areaStr})`;
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
                           
@@ -4124,8 +4129,8 @@ export default function DimensionOverlay({
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
                           const area = measurement.width * measurement.height;
-                          const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
-                          return `${displayValue} (A: ${areaStr}²)`;
+                          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+                          return `${displayValue} (A: ${areaStr})`;
                         }
                         
                         return displayValue;
