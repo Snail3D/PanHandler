@@ -19,7 +19,6 @@ import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversio
 import HelpModal from './HelpModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
-import PaywallModal from './PaywallModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -128,21 +127,17 @@ export default function DimensionOverlay({
   const setUserEmail = useStore((s) => s.setUserEmail);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
-  const canSave = useStore((s) => s.canSave);
-  const canEmail = useStore((s) => s.canEmail);
-  const incrementSaveCount = useStore((s) => s.incrementSaveCount);
-  const incrementEmailCount = useStore((s) => s.incrementEmailCount);
-  const monthlySaveCount = useStore((s) => s.monthlySaveCount);
-  const monthlyEmailCount = useStore((s) => s.monthlyEmailCount);
+  const canExport = useStore((s) => s.canExport);
+  const getRemainingExports = useStore((s) => s.getRemainingExports);
+  const markSessionExported = useStore((s) => s.markSessionExported);
+  const hasSessionBeenExported = useStore((s) => s.hasSessionBeenExported);
+  const resetExportLimits = useStore((s) => s.resetExportLimits);
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Paywall modal for halfway point (5 saves/emails)
-  const [showPaywallModal, setShowPaywallModal] = useState(false);
   
   // 5-tap Pro/Free toggle for testing (REMOVE IN PRODUCTION)
   const [proToggleTapCount, setProToggleTapCount] = useState(0);
@@ -1362,15 +1357,12 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Check if user can save (monthly limit for free users)
-    if (!canSave()) {
+    // Check if user can export (20 lifetime limit for free users)
+    if (!canExport()) {
       Alert.alert(
-        'Monthly Limit Reached',
-        `You have used all 10 saves this month. Upgrade to Pro for unlimited saves!\n\nUsed this month: ${monthlySaveCount}/10`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
-        ]
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
       );
       return;
     }
@@ -1456,12 +1448,9 @@ export default function DimensionOverlay({
       // Show toast notification instead of Alert (so it appears behind the quote modal)
       showToastNotification(label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
       
-      // Increment save counter for free users
-      incrementSaveCount();
-      
-      // Show paywall at exactly 5 saves (halfway point) - AFTER successful save
-      if (!isProUser && monthlySaveCount === 4) {
-        setTimeout(() => setShowPaywallModal(true), 1000); // Show after quote
+      // Mark this session as exported (only counts once per image)
+      if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
+        markSessionExported(currentImageUri);
       }
       
       // Haptic feedback for success
@@ -1478,15 +1467,12 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Check if user can email (monthly limit for free users)
-    if (!canEmail()) {
+    // Check if user can export (20 lifetime limit for free users)
+    if (!canExport()) {
       Alert.alert(
-        'Monthly Limit Reached',
-        `You have used all 10 emails this month. Upgrade to Pro for unlimited emails!\n\nUsed this month: ${monthlyEmailCount}/10`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
-        ]
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
       );
       return;
     }
@@ -1702,12 +1688,9 @@ export default function DimensionOverlay({
       
       console.log('✅ Email composer opened');
       
-      // Increment email counter for free users (counts when composer opens)
-      incrementEmailCount();
-      
-      // Show paywall at exactly 5 emails (halfway point) - AFTER successful email
-      if (!isProUser && monthlyEmailCount === 4) {
-        setTimeout(() => setShowPaywallModal(true), 500);
+      // Mark this session as exported (only counts once per image)
+      if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
+        markSessionExported(currentImageUri);
       }
       
       // Note: We don't show quote here because composeAsync() returns when composer opens,
@@ -4620,9 +4603,10 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleExport}
+                disabled={!canExport()}
                 style={{
                   flex: 1,
-                  backgroundColor: 'rgba(0, 122, 255, 0.85)',
+                  backgroundColor: canExport() ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4630,15 +4614,16 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="images-outline" size={12} color="white" />
-                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+                <Ionicons name="images-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
               </Pressable>
               
               <Pressable
                 onPress={handleEmail}
+                disabled={!canExport()}
                 style={{
                   flex: 1,
-                  backgroundColor: 'rgba(52, 199, 89, 0.85)',
+                  backgroundColor: canExport() ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4646,8 +4631,8 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="mail-outline" size={12} color="white" />
-                <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+                <Ionicons name="mail-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
               </Pressable>
             </>
 
@@ -4668,6 +4653,22 @@ export default function DimensionOverlay({
               <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
             </Pressable>
           </View>
+          
+          {/* Export Counter - Only show for free users */}
+          {!isProUser && (
+            <View style={{ 
+              marginTop: 8, 
+              paddingVertical: 6, 
+              paddingHorizontal: 12, 
+              alignItems: 'center',
+              borderTopWidth: 1,
+              borderTopColor: 'rgba(0, 0, 0, 0.08)',
+            }}>
+              <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.5)', fontWeight: '600' }}>
+                {getRemainingExports()} {getRemainingExports() === 1 ? 'export' : 'exports'} remaining
+              </Text>
+            </View>
+          )}
           
           {/* Pro status footer */}
           <Pressable
@@ -4698,9 +4699,8 @@ export default function DimensionOverlay({
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 } else {
                   // Switched to Free - RESET ALL COUNTERS
-                  const resetMonthlyLimits = useStore.getState().resetMonthlyLimits;
-                  resetMonthlyLimits();
-                  Alert.alert('🔄 Free User Mode', 'Switched to Free User. All monthly counters have been reset for testing!');
+                  resetExportLimits();
+                  Alert.alert('🔄 Free User Mode', 'Switched to Free User. Export counter has been reset for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                 }
               } else {
@@ -4766,35 +4766,6 @@ export default function DimensionOverlay({
                   </Text>
                 </View>
                 
-                {/* Usage Tracker - Only show for free users */}
-                {!isProUser && (
-                  <View style={{ backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#666', marginBottom: 12, textAlign: 'center' }}>
-                      YOUR MONTHLY USAGE
-                    </Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                      <View style={{ alignItems: 'center', flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 4 }}>
-                          <Text style={{ fontSize: 28, fontWeight: 'bold', color: monthlySaveCount >= 10 ? '#FF3B30' : '#007AFF' }}>
-                            {10 - monthlySaveCount}
-                          </Text>
-                          <Text style={{ fontSize: 16, color: '#666', marginLeft: 2 }}>/10</Text>
-                        </View>
-                        <Text style={{ fontSize: 12, color: '#666' }}>Saves Left</Text>
-                      </View>
-                      <View style={{ width: 1, backgroundColor: '#D1D5DB', marginHorizontal: 12 }} />
-                      <View style={{ alignItems: 'center', flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 4 }}>
-                          <Text style={{ fontSize: 28, fontWeight: 'bold', color: monthlyEmailCount >= 10 ? '#FF3B30' : '#007AFF' }}>
-                            {10 - monthlyEmailCount}
-                          </Text>
-                          <Text style={{ fontSize: 16, color: '#666', marginLeft: 2 }}>/10</Text>
-                        </View>
-                        <Text style={{ fontSize: 12, color: '#666' }}>Emails Left</Text>
-                      </View>
-                    </View>
-                  </View>
-                )}
                 
                 {/* Comparison Chart */}
                 <View style={{ marginBottom: 20 }}>
@@ -4813,12 +4784,11 @@ export default function DimensionOverlay({
                   
                   {/* Table Rows */}
                   {[
-                    { feature: 'Saves per month', free: '10', pro: '∞' },
-                    { feature: 'Emails per month', free: '10', pro: '∞' },
+                    { feature: 'Total exports (save/email)', free: '20', pro: '∞' },
                     { feature: 'Measurements per photo', free: '∞', pro: '∞' },
                     { feature: 'Remove watermarks', free: false, pro: true },
                   ].map((row, idx) => (
-                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 3 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
+                    <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 2 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
                       <View style={{ flex: 2, justifyContent: 'center' }}>
                         <Text style={{ fontSize: 14, color: '#333' }}>{row.feature}</Text>
                       </View>
@@ -5343,18 +5313,6 @@ export default function DimensionOverlay({
           </Animated.View>
         </Animated.View>
       </Modal>
-      
-      {/* Paywall Modal - Shown at 5 saves/emails */}
-      <PaywallModal
-        visible={showPaywallModal}
-        onClose={() => setShowPaywallModal(false)}
-        onUpgrade={() => {
-          setShowPaywallModal(false);
-          setShowProModal(true);
-        }}
-        remainingSaves={10 - monthlySaveCount}
-        remainingEmails={10 - monthlyEmailCount}
-      />
     </>
   );
 }
