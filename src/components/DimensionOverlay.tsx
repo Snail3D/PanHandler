@@ -4661,7 +4661,7 @@ export default function DimensionOverlay({
                   
                   {/* Table Rows */}
                   {[
-                    { feature: 'Total exports (save/email)', free: '20', pro: '∞' },
+                    { feature: 'Total exports (save/email)', free: '∞', pro: '∞' },
                     { feature: 'Measurements per photo', free: '∞', pro: '∞' },
                     { feature: 'Remove watermarks', free: false, pro: true },
                   ].map((row, idx) => (
