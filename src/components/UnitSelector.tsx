@@ -1,3 +1,4 @@
+// UnitSelector v1.1 - Imperial=Red, Metric=Blue
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import useStore from '../state/measurementStore';
@@ -16,13 +17,6 @@ export default function UnitSelector() {
     <View className="flex-row bg-gray-100 rounded-lg p-1">
       {options.map((option) => {
         const isSelected = unitSystem === option.value;
-        const isMetric = option.value === 'metric';
-        
-        // Determine color based on which system is selected
-        let textColor = '#6B7280'; // Gray when not selected
-        if (isSelected) {
-          textColor = isMetric ? '#3B82F6' : '#EF4444'; // Blue for Metric, Red for Imperial
-        }
         
         return (
           <Pressable
@@ -43,7 +37,11 @@ export default function UnitSelector() {
               style={{
                 textAlign: 'center',
                 fontWeight: '600',
-                color: textColor,
+                color: !isSelected 
+                  ? '#6B7280' // Gray when not selected
+                  : option.value === 'metric' 
+                    ? '#3B82F6' // Blue for Metric when selected
+                    : '#EF4444', // Red for Imperial when selected
               }}
             >
               {option.label}
