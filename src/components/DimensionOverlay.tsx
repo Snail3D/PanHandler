@@ -3584,6 +3584,19 @@ export default function DimensionOverlay({
                 const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
                 screenX = (p0.x + p1.x) / 2;
                 screenY = Math.min(p0.y, p1.y) - 40;
+              } else if (measurement.mode === 'freehand') {
+                // Label at centroid of freehand path
+                if (measurement.points && measurement.points.length > 0) {
+                  // Calculate centroid
+                  let sumX = 0, sumY = 0;
+                  measurement.points.forEach(p => {
+                    const screenPoint = imageToScreen(p.x, p.y);
+                    sumX += screenPoint.x;
+                    sumY += screenPoint.y;
+                  });
+                  screenX = sumX / measurement.points.length;
+                  screenY = sumY / measurement.points.length;
+                }
               }
               return { measurement, idx, color, screenX, screenY };
             });
