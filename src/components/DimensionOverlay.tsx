@@ -124,11 +124,14 @@ export default function DimensionOverlay({
   const setUserEmail = useStore((s) => s.setUserEmail);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
-  const canExport = useStore((s) => s.canExport);
-  const getRemainingExports = useStore((s) => s.getRemainingExports);
+  const exportedSessions = useStore((s) => s.exportedSessions);
   const markSessionExported = useStore((s) => s.markSessionExported);
   const hasSessionBeenExported = useStore((s) => s.hasSessionBeenExported);
   const resetExportLimits = useStore((s) => s.resetExportLimits);
+  
+  // Compute canExport as a derived value (don't call store methods during render)
+  const canExport = isProUser || exportedSessions.length < 20;
+  const remainingExports = isProUser ? Infinity : Math.max(0, 20 - exportedSessions.length);
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
@@ -1376,35 +1379,32 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait longer for UI to be ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for UI to update
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use captureScreen instead of ref-based capture
-      // This captures the entire screen, which includes our measurements
-      const measurementsUri = await captureScreen({
+      // Capture using viewRef like it worked before
+      const measurementsUri = await captureRef(viewRef, {
         format: 'jpg',
         quality: 0.9,
-        result: 'tmpfile',
       });
       
       // Save measurements photo
       await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
-      setHideMeasurementsForCapture(true); // Hide measurements and legend
-      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
-      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
+      // Hide measurements for second capture
+      setHideMeasurementsForCapture(true);
+      if (setImageOpacity) setImageOpacity(0.5);
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      const labelOnlyUri = await captureScreen({
+      const labelOnlyUri = await captureRef(viewRef, {
         format: 'png',
         quality: 1.0,
-        result: 'tmpfile',
       });
       
-      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
+      if (setImageOpacity) setImageOpacity(1);
       await MediaLibrary.createAssetAsync(labelOnlyUri);
       
-      setHideMeasurementsForCapture(false); // Show measurements again
+      setHideMeasurementsForCapture(false);
       
       console.log('✅ Saved label-only photo!');
       
@@ -1480,14 +1480,13 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait longer for UI to be ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for UI to update
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use captureScreen instead of ref-based capture
-      const uri = await captureScreen({
+      // Capture using viewRef (includes photo + overlay)
+      const measurementsUri = await captureRef(viewRef, {
         format: 'jpg',
         quality: 0.9,
-        result: 'tmpfile',
       });
 
       // Build measurement text with scale information
@@ -1551,7 +1550,7 @@ export default function DimensionOverlay({
       // 1. Full measurements photo (with legend, label, coin, and all measurements)
       const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
-      await FileSystem.copyAsync({ from: uri, to: measurementsDest });
+      await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
       attachments.push(measurementsDest);
       
       console.log('✅ Added measurements photo to email');
@@ -1561,11 +1560,10 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo
-      const labelOnlyUri = await captureScreen({
+      // Capture label-only photo using viewRef
+      const labelOnlyUri = await captureRef(viewRef, {
         format: 'png',
         quality: 1.0,
-        result: 'tmpfile',
       });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
@@ -4499,10 +4497,10 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleExport}
-                disabled={!canExport()}
+                disabled={!canExport}
                 style={{
                   flex: 1,
-                  backgroundColor: canExport() ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: canExport ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4510,16 +4508,16 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="images-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+                <Ionicons name="images-outline" size={12} color={canExport ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
               </Pressable>
               
               <Pressable
                 onPress={handleEmail}
-                disabled={!canExport()}
+                disabled={!canExport}
                 style={{
                   flex: 1,
-                  backgroundColor: canExport() ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: canExport ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4527,8 +4525,8 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="mail-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+                <Ionicons name="mail-outline" size={12} color={canExport ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
               </Pressable>
             </>
 
@@ -4561,7 +4559,7 @@ export default function DimensionOverlay({
               borderTopColor: 'rgba(0, 0, 0, 0.08)',
             }}>
               <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.5)', fontWeight: '600' }}>
-                {getRemainingExports()} {getRemainingExports() === 1 ? 'export' : 'exports'} remaining
+                {remainingExports} {remainingExports === 1 ? 'export' : 'exports'} remaining
               </Text>
             </View>
           )}
