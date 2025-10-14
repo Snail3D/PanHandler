@@ -4098,7 +4098,11 @@ export default function DimensionOverlay({
             <Pressable
               onPress={() => {
                 setMeasurementMode(true);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                // Show cursor immediately at center for instant feedback
+                setShowCursor(true);
+                setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
+                // Stronger haptic to signal mode change
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
