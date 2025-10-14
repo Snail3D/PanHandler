@@ -13,6 +13,13 @@ export interface CoinCircle {
   coinDiameter: number; // in mm
 }
 
+export interface VerbalScale {
+  screenDistance: number;
+  screenUnit: 'cm' | 'in';
+  realDistance: number;
+  realUnit: 'km' | 'mi' | 'm' | 'ft';
+}
+
 export interface CompletedMeasurement {
   id: string;
   points: Array<{ x: number; y: number }>;
@@ -42,6 +49,8 @@ interface MeasurementStore {
     pixelsPerUnit: number;
     unit: 'mm' | 'cm' | 'in';
     referenceDistance: number;
+    calibrationType?: 'coin' | 'verbal';
+    verbalScale?: VerbalScale;
   } | null;
   coinCircle: CoinCircle | null;
   unitSystem: UnitSystem;
