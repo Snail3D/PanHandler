@@ -4639,7 +4639,7 @@ export default function DimensionOverlay({
                     Upgrade to Pro
                   </Text>
                   <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
-                    Unlock unlimited precision
+                    Unlock the Freehand tool
                   </Text>
                 </View>
                 
@@ -4661,8 +4661,7 @@ export default function DimensionOverlay({
                   
                   {/* Table Rows */}
                   {[
-                    { feature: 'Total exports (save/email)', free: '∞', pro: '∞' },
-                    { feature: 'Measurements per photo', free: '∞', pro: '∞' },
+                    { feature: 'Freehand Tool', free: false, pro: true },
                     { feature: 'Remove watermarks', free: false, pro: true },
                   ].map((row, idx) => (
                     <View key={idx} style={{ flexDirection: 'row', paddingVertical: 10, borderBottomWidth: idx < 2 ? 1 : 0, borderBottomColor: '#F3F4F6' }}>
