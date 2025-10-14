@@ -58,15 +58,17 @@ interface MeasurementStore {
   userEmail: string | null; // User's email for auto-population
   isProUser: boolean; // Pro user status for paywall (only for Freehand tool)
   savedZoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null; // Restore zoom/pan/rotation
-  sessionCount: number; // Track app sessions for rating prompt
-  hasRatedApp: boolean; // Track if user has been prompted/rated
-  lastRatingPromptDate: string | null; // Track when user was last prompted
+  sessionCount: number; // Track app opens (incremented each time app becomes active)
+  reviewPromptCount: number; // Track how many times we've asked (max 2)
+  hasReviewedApp: boolean; // True if user tapped "Rate" button
+  lastReviewPromptDate: string | null; // Track when user was last prompted
   globalDownloads: number; // Global download count (fetched from backend)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
-  setHasRatedApp: (hasRated: boolean) => void;
-  setLastRatingPromptDate: (date: string) => void;
+  incrementReviewPromptCount: () => void;
+  setHasReviewedApp: (hasReviewed: boolean) => void;
+  setLastReviewPromptDate: (date: string) => void;
   setImageOrientation: (orientation: AppOrientation) => void;
   setCompletedMeasurements: (measurements: CompletedMeasurement[]) => void;
   setCurrentPoints: (points: Array<{ x: number; y: number; id: string }>) => void;
@@ -105,8 +107,9 @@ const useStore = create<MeasurementStore>()(
       isProUser: false,
       savedZoomState: null,
       sessionCount: 0,
-      hasRatedApp: false,
-      lastRatingPromptDate: null,
+      reviewPromptCount: 0,
+      hasReviewedApp: false,
+      lastReviewPromptDate: null,
       globalDownloads: 1247,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
@@ -118,9 +121,11 @@ const useStore = create<MeasurementStore>()(
 
       incrementSessionCount: () => set((state) => ({ sessionCount: state.sessionCount + 1 })),
 
-      setHasRatedApp: (hasRated) => set({ hasRatedApp: hasRated }),
+      incrementReviewPromptCount: () => set((state) => ({ reviewPromptCount: state.reviewPromptCount + 1 })),
 
-      setLastRatingPromptDate: (date) => set({ lastRatingPromptDate: date }),
+      setHasReviewedApp: (hasReviewed) => set({ hasReviewedApp: hasReviewed }),
+
+      setLastReviewPromptDate: (date) => set({ lastReviewPromptDate: date }),
 
       setImageOrientation: (orientation: AppOrientation) => set({ imageOrientation: orientation }),
 
@@ -196,8 +201,9 @@ const useStore = create<MeasurementStore>()(
         userEmail: state.userEmail, // Persist user email
         isProUser: state.isProUser, // Persist pro status
         sessionCount: state.sessionCount, // Persist session count
-        hasRatedApp: state.hasRatedApp, // Persist rating status
-        lastRatingPromptDate: state.lastRatingPromptDate, // Persist last prompt date
+        reviewPromptCount: state.reviewPromptCount, // Persist review prompt count
+        hasReviewedApp: state.hasReviewedApp, // Persist review status
+        lastReviewPromptDate: state.lastReviewPromptDate, // Persist last prompt date
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
