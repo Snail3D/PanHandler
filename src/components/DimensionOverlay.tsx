@@ -1,7 +1,7 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio, findNodeHandle } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -1398,8 +1398,14 @@ export default function DimensionOverlay({
         throw new Error('No view ref available for capture');
       }
       
+      // Get the node handle - this ensures we have the actual native component
+      const node = findNodeHandle(externalViewRef.current);
+      if (!node) {
+        throw new Error('Could not find native component from ref');
+      }
+      
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(externalViewRef, {
+      const measurementsUri = await captureRef(node, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1413,7 +1419,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureRef(node, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1517,8 +1523,14 @@ export default function DimensionOverlay({
         throw new Error('No view ref available for capture');
       }
       
+      // Get the node handle - this ensures we have the actual native component
+      const node = findNodeHandle(externalViewRef.current);
+      if (!node) {
+        throw new Error('Could not find native component from ref');
+      }
+      
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(externalViewRef, {
+      const uri = await captureRef(node, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1595,8 +1607,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo with same ref
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      // Capture label-only photo with same node
+      const labelOnlyUri = await captureRef(node, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
