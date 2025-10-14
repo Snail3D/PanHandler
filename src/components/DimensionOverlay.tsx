@@ -1276,9 +1276,6 @@ export default function DimensionOverlay({
       Alert.alert('Export Error', 'Unable to capture measurement. Please try again.');
       return;
     }
-    
-    // Capture the view reference NOW before any state changes
-    const viewToCapture = externalViewRef.current;
 
     try {
       console.log('📸 Starting capture with label:', label);
@@ -1290,19 +1287,13 @@ export default function DimensionOverlay({
         return;
       }
 
-      console.log('📸 Hiding menu and capturing view...');
+      console.log('📸 Capturing view without state changes...');
       
-      // Hide menu for capture and set label
-      setIsCapturing(true);
-      setCurrentLabel(label);
+      // DON'T use setIsCapturing or setCurrentLabel - they cause re-renders that unmount the view
+      // Just capture AS-IS
       
-      // Wait for the UI to update with label (increased wait time for off-screen views)
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      console.log(`📸 Label set to: "${label || 'null'}"`);
-      
-      // Capture measurements photo using the pre-captured view reference
-      const measurementsUri = await captureRef(viewToCapture, {
+      // Capture measurements photo directly without state changes
+      const measurementsUri = await captureRef(externalViewRef || internalViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1321,7 +1312,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(viewToCapture, {
+      const labelOnlyUri = await captureRef(externalViewRef || internalViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1333,10 +1324,6 @@ export default function DimensionOverlay({
       setHideMeasurementsForCapture(false); // Show measurements again
       
       console.log('✅ Saved label-only photo!');
-      
-      // Clear state
-      setIsCapturing(false);
-      setCurrentLabel(null);
       
       console.log('✅ Save successful!');
       // Show toast notification instead of Alert (so it appears behind the quote modal)
@@ -1404,10 +1391,6 @@ export default function DimensionOverlay({
       return;
     }
     
-    // Capture the view reference NOW before any state changes
-    const viewToCapture = externalViewRef.current;
-    console.log('📸 Captured view reference:', !!viewToCapture);
-    
     try {
       // Check if email is available
       const isAvailable = await MailComposer.isAvailableAsync();
@@ -1440,21 +1423,21 @@ export default function DimensionOverlay({
           setShowEmailPromptModal(true);
         });
       }
+      
+      // Capture the view reference NOW, after modal interactions
+      if (!externalViewRef.current) {
+        throw new Error('View reference is null before capture');
+      }
 
-      console.log('📸 Hiding menu and capturing view for email...');
+      console.log('📸 Starting capture for email...');
       
-      // Hide menu for capture and set label
-      setIsCapturing(true);
-      setCurrentLabel(label);
+      // DON'T use setIsCapturing or setCurrentLabel - they cause re-renders that unmount the view
+      // Instead, capture multiple times with different states
       
-      // Wait for the UI to update with label
-      await new Promise(resolve => setTimeout(resolve, 300));
+      console.log('📸 Capturing main measurement photo...');
       
-      console.log(`📸 Email - Label set to: "${label || 'null'}"`);
-      console.log('📸 About to capture - view still valid:', !!viewToCapture);
-      
-      // Capture the image with measurements using the pre-captured view reference
-      const uri = await captureRef(viewToCapture, {
+      // Capture the image with measurements AS-IS (without changing any state)
+      const uri = await captureRef(externalViewRef || internalViewRef, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1533,7 +1516,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(viewToCapture, {
+      const labelOnlyUri = await captureRef(externalViewRef || internalViewRef, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1549,10 +1532,6 @@ export default function DimensionOverlay({
       setHideMeasurementsForCapture(false); // Show measurements again
       
       console.log('✅ Added label-only photo to email');
-      
-      // Clear label and show menu again
-      setIsCapturing(false);
-      setCurrentLabel(null);
       
       // Build subject with label first, then "Measurements"
       const subject = label 
