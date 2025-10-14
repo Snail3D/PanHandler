@@ -9,11 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
+import VerbalScaleModal from '../components/VerbalScaleModal';
 import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
 import { CoinReference } from '../utils/coinReferences';
+import { VerbalScale } from '../state/measurementStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -28,6 +30,7 @@ export default function MeasurementScreen() {
   const [measurementZoom, setMeasurementZoom] = useState({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
+  const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -76,6 +79,55 @@ export default function MeasurementScreen() {
     } catch (error) {
       console.error('Error detecting orientation:', error);
     }
+  };
+
+  // Helper to calculate pixelsPerUnit from verbal scale
+  const calculatePixelsPerUnitFromScale = (scale: VerbalScale, imageWidth: number): number => {
+    // 1. Convert screen distance to pixels
+    // Assume standard phone screen physical dimensions
+    const screenWidthCm = 10.8; // ~4.25 inches
+    const screenWidthIn = 4.25;
+    const screenWidthPhysical = scale.screenUnit === 'cm' ? screenWidthCm : screenWidthIn;
+    const pixelsPerScreenUnit = imageWidth / screenWidthPhysical;
+    const screenDistancePixels = scale.screenDistance * pixelsPerScreenUnit;
+    
+    // 2. Convert real distance to mm (internal unit)
+    let realDistanceMM: number;
+    switch (scale.realUnit) {
+      case 'km':
+        realDistanceMM = scale.realDistance * 1000000; // 1 km = 1,000,000 mm
+        break;
+      case 'mi':
+        realDistanceMM = scale.realDistance * 1609344; // 1 mi = 1,609,344 mm
+        break;
+      case 'm':
+        realDistanceMM = scale.realDistance * 1000; // 1 m = 1,000 mm
+        break;
+      case 'ft':
+        realDistanceMM = scale.realDistance * 304.8; // 1 ft = 304.8 mm
+        break;
+    }
+    
+    // 3. Calculate pixels per mm
+    return screenDistancePixels / realDistanceMM;
+  };
+
+  // Handle verbal scale calibration
+  const handleVerbalScaleComplete = (scale: VerbalScale) => {
+    const imageWidth = SCREEN_WIDTH * 2; // Assume 2x pixel density (retina)
+    const pixelsPerUnit = calculatePixelsPerUnitFromScale(scale, imageWidth);
+    
+    setCalibration({
+      pixelsPerUnit,
+      unit: 'mm',
+      referenceDistance: 1,
+      calibrationType: 'verbal',
+      verbalScale: scale,
+    });
+    
+    setCoinCircle(null); // No coin circle for verbal scale
+    setShowVerbalScaleModal(false);
+    setMode('measurement'); // Skip ZoomCalibration, go straight to measurement
   };
 
   // Monitor device tilt for auto-capture when holding shutter
@@ -541,6 +593,20 @@ export default function MeasurementScreen() {
             visible={mode === 'selectCoin'}
             onComplete={handleCoinSelected}
             onDismiss={handleRetakePhoto}
+            onMapScale={() => {
+              setMode('camera'); // Close coin modal
+              setShowVerbalScaleModal(true); // Open verbal scale modal
+            }}
+          />
+
+          {/* Verbal Scale Modal */}
+          <VerbalScaleModal
+            visible={showVerbalScaleModal}
+            onComplete={handleVerbalScaleComplete}
+            onDismiss={() => {
+              setShowVerbalScaleModal(false);
+              setMode('selectCoin'); // Go back to coin selection
+            }}
           />
         </>
       )}

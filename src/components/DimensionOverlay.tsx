@@ -1496,6 +1496,9 @@ export default function DimensionOverlay({
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
         measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
+      } else if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
+        const scale = calibration.verbalScale;
+        measurementText += `Calibration: Map Scale (${scale.screenDistance}${scale.screenUnit} = ${scale.realDistance}${scale.realUnit})\n`;
       }
       
       measurementText += `Unit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\nMeasurements:\n`;
@@ -1791,7 +1794,12 @@ export default function DimensionOverlay({
             fontWeight: '500', 
             marginTop: 2 
           }}>
-            {coinCircle.coinName} • {coinCircle.coinDiameter.toFixed(1)}mm
+            {calibration?.calibrationType === 'verbal' && calibration.verbalScale
+              ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
+              : coinCircle
+              ? `${coinCircle.coinName} • ${coinCircle.coinDiameter.toFixed(1)}mm`
+              : 'Calibrated'
+            }
           </Text>
         </Pressable>
       )}

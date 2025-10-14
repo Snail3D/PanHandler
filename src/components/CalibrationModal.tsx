@@ -11,9 +11,10 @@ interface CalibrationModalProps {
   visible: boolean;
   onComplete: (coin: CoinReference) => void;
   onDismiss: () => void;
+  onMapScale?: () => void; // Optional callback for map scale
 }
 
-export default function CalibrationModal({ visible, onComplete, onDismiss }: CalibrationModalProps) {
+export default function CalibrationModal({ visible, onComplete, onDismiss, onMapScale }: CalibrationModalProps) {
   const insets = useSafeAreaInsets();
   const lastSelectedCoin = useStore((s) => s.lastSelectedCoin);
   const setLastSelectedCoin = useStore((s) => s.setLastSelectedCoin);
@@ -377,6 +378,55 @@ export default function CalibrationModal({ visible, onComplete, onDismiss }: Cal
                       Continue
                     </Text>
                     <Ionicons name="arrow-forward-circle" size={20} color="rgba(0, 0, 0, 0.6)" />
+                  </Pressable>
+                </View>
+              )}
+
+              {/* Map Scale Option */}
+              {onMapScale && !selectedCoin && (
+                <View style={{
+                  paddingHorizontal: 16,
+                  paddingTop: 14,
+                  paddingBottom: 18,
+                  borderTopWidth: 0.5,
+                  borderTopColor: 'rgba(0, 0, 0, 0.08)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                }}>
+                  <Text style={{
+                    fontSize: 13,
+                    color: 'rgba(0, 0, 0, 0.5)',
+                    textAlign: 'center',
+                    marginBottom: 10,
+                    fontWeight: '500',
+                  }}>
+                    — or —
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      onMapScale();
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed 
+                        ? 'rgba(100, 150, 255, 0.15)' 
+                        : 'rgba(100, 150, 255, 0.1)',
+                      borderRadius: 14,
+                      paddingVertical: 14,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: 'rgba(100, 150, 255, 0.3)',
+                    })}
+                  >
+                    <Text style={{ fontSize: 18, marginRight: 8 }}>🗺️</Text>
+                    <Text style={{ 
+                      color: 'rgba(0, 0, 0, 0.75)', 
+                      fontWeight: '600', 
+                      fontSize: 15,
+                    }}>
+                      Use Map Scale Instead
+                    </Text>
                   </Pressable>
                 </View>
               )}
