@@ -1615,7 +1615,7 @@ export default function DimensionOverlay({
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant photo library access.');
+        showAlert('Permission Required', 'Please grant photo library access.', 'warning');
         return;
       }
       
@@ -1624,7 +1624,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('View Error', 'View ref not available. Try again.');
+        showAlert('View Error', 'View ref not available. Try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1642,7 +1642,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View lost during capture.');
+        showAlert('Error', 'View lost during capture.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1671,7 +1671,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      Alert.alert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`);
+      showAlert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
@@ -1683,14 +1683,14 @@ export default function DimensionOverlay({
 
   const performEmail = async (label: string | null) => {
     if (!currentImageUri) {
-      Alert.alert('Email Error', 'No image to export.');
+      showAlert('Email Error', 'No image to export.', 'error');
       return;
     }
     
     try {
       const isAvailable = await MailComposer.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Email Not Available', 'No email app is configured.');
+        showAlert('Email Not Available', 'No email app is configured.', 'warning');
         return;
       }
 
@@ -1721,7 +1721,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View not ready. Wait and try again.');
+        showAlert('Error', 'View not ready. Wait and try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1772,7 +1772,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View lost during label capture.');
+        showAlert('Error', 'View lost during label capture.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1811,7 +1811,7 @@ export default function DimensionOverlay({
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      Alert.alert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
@@ -4970,7 +4970,6 @@ export default function DimensionOverlay({
           </Pressable>
         </View>
         </BlurView>
-        </BlurView>
           </Animated.View>
         </GestureDetector>
       )}
@@ -5118,7 +5117,7 @@ export default function DimensionOverlay({
                   <Pressable
                     onPress={() => {
                       setShowProModal(false);
-                      Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
+                      showAlert('Pro Upgrade', 'Payment integration would go here. For now, tap the easter egg to unlock!', 'info');
                     }}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
@@ -5137,7 +5136,7 @@ export default function DimensionOverlay({
                   {/* Restore Purchase Button */}
                   <Pressable
                     onPress={() => {
-                      Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
+                      showAlert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)', 'info');
                     }}
                     style={{ paddingVertical: 12, marginBottom: 8 }}
                   >
@@ -5175,7 +5174,7 @@ export default function DimensionOverlay({
               // Secret: Long-press to clear saved email (for testing)
               setUserEmail(null);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              Alert.alert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!');
+              showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
             }}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
