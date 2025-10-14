@@ -353,7 +353,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>📐</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Hold perpendicular</Text> - Camera straight down (90°)
+                      <Text style={{ fontWeight: '600' }}>Hold perpendicular</Text> - Camera straight down (90°) or facing directly at vertical surfaces
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
+                    <Text style={{ fontSize: 16, marginRight: 8 }}>🔄</Text>
+                    <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Works horizontally & vertically</Text> - Measure flat surfaces from above or walls/objects straight-on
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
