@@ -83,6 +83,7 @@ export default function ZoomableImage({
 
   const pinchGesture = Gesture.Pinch()
     .enabled(!locked)
+    .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
@@ -91,23 +92,28 @@ export default function ZoomableImage({
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
+      gestureWasActive.value = false; // Mark gesture as complete
     })
     .onFinalize(() => {
       // Ensure gesture is fully complete
       savedScale.value = scale.value;
+      gestureWasActive.value = false; // Ensure gesture state is cleared
     });
   
   const rotationGesture = Gesture.Rotation()
     .enabled(!locked)
+    .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       rotation.value = savedRotation.value + event.rotation;
     })
     .onEnd(() => {
       savedRotation.value = rotation.value;
+      gestureWasActive.value = false; // Mark gesture as complete
     })
     .onFinalize(() => {
       // Ensure gesture is fully complete
       savedRotation.value = rotation.value;
+      gestureWasActive.value = false; // Ensure gesture state is cleared
     });
 
   const panGesture = Gesture.Pan()
@@ -118,6 +124,7 @@ export default function ZoomableImage({
     .activeOffsetY([-10, 10]) // Require 10px vertical movement to activate
     .failOffsetX([-5, 5]) // Fail if finger stays within 5px
     .failOffsetY([-5, 5]) // Fail if finger stays within 5px
+    .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
@@ -127,11 +134,13 @@ export default function ZoomableImage({
     .onEnd(() => {
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
+      gestureWasActive.value = false; // Mark gesture as complete
     })
     .onFinalize(() => {
-      // Ensure gesture is fully complete
+      // Ensure gesture is fully complete and release control
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
+      gestureWasActive.value = false; // Ensure gesture state is cleared
     });
 
   const doubleTapGesture = Gesture.Tap()

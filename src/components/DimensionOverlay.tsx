@@ -1931,6 +1931,8 @@ export default function DimensionOverlay({
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
     .minDistance(15) // Require 15px swipe before activating - prevents tap interference
+    .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
+    .maxDuration(2000) // Auto-cancel after 2 seconds
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
@@ -4403,11 +4405,14 @@ export default function DimensionOverlay({
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
+                showToastNotification('Edit button pressed!');
                 setMeasurementMode(false);
                 setShowCursor(false);
-                setSelectedMeasurementId(null); // Clear selection when switching to Edit mode
+                setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
+              delayPressIn={0}
+              delayPressOut={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
@@ -4434,14 +4439,15 @@ export default function DimensionOverlay({
             </Pressable>
             <Pressable
               onPress={() => {
+                showToastNotification('Measure pressed!');
                 __DEV__ && console.log('🔥 MEASURE BUTTON PRESSED!');
                 setMeasurementMode(true);
-                // Show cursor immediately at center for instant feedback
                 setShowCursor(true);
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
-                // Stronger haptic to signal mode change
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               }}
+              delayPressIn={0}
+              delayPressOut={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
