@@ -915,7 +915,7 @@ export default function DimensionOverlay({
       const value = `${widthStr} × ${heightStr}`;
       return { ...measurement, value, width, height };
     } else if (mode === 'freehand' && measurement.isClosed) {
-      // Recalculate perimeter and area for closed loops
+      // Recalculate perimeter for closed loops
       let perimeter = 0;
       for (let i = 0; i < points.length; i++) {
         const p1 = points[i];
@@ -928,7 +928,21 @@ export default function DimensionOverlay({
       const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
       const perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
       
-      // Recalculate area using Shoelace formula
+      // Check if path self-intersects after editing
+      const selfIntersects = doesPathSelfIntersect(points);
+      
+      if (selfIntersects) {
+        // Path now self-intersects - remove area, keep perimeter only
+        console.log('⚠️ Path self-intersects after editing - removing area from legend');
+        return { 
+          ...measurement, 
+          perimeter: perimeterStr, 
+          area: undefined, // Clear area
+          isClosed: true // Still marked as closed, just no area
+        };
+      }
+      
+      // No self-intersection - calculate area using Shoelace formula
       let areaSum = 0;
       for (let i = 0; i < points.length; i++) {
         const p1 = points[i];
@@ -4091,6 +4105,33 @@ export default function DimensionOverlay({
                   marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16, 
                   position: 'relative' 
                 }}>
+                  {/* Left side: Hide labels toggle - only show if there are measurements */}
+                  {measurements.length > 0 && (
+                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center' }}>
+                      <Pressable
+                        onPress={() => {
+                          setHideMeasurementLabels(!hideMeasurementLabels);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }}
+                        style={{
+                          width: 28,
+                          height: 28,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Ionicons 
+                          name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"} 
+                          size={16} 
+                          color="rgba(0, 0, 0, 0.5)" 
+                        />
+                      </Pressable>
+                      <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
+                        {hideMeasurementLabels ? "Show labels" : "Hide labels"}
+                      </Text>
+                    </View>
+                  )}
+
                   {/* Center: Undo button - only show if there are measurements or current points */}
                   {(measurements.length > 0 || currentPoints.length > 0) && (
                     <Pressable
