@@ -96,9 +96,13 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
-}: DimensionOverlayProps = {}) {
+}: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
+  console.log('🔍 Component mount - viewRef:', {
+    hasViewRef: !!externalViewRef,
+    hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
+  });
   
   const insets = useSafeAreaInsets();
   
@@ -1390,8 +1394,14 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log('🔍 Save ref check:', {
+        hasExternal: !!externalViewRef,
+        hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A',
+        captureMethod: externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'
+      });
       
       // Use external ref (from parent) - it's a ViewShot component
       if (!externalViewRef || !externalViewRef.current) {
@@ -1501,8 +1511,14 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log('🔍 Email ref check:', {
+        hasExternal: !!externalViewRef,
+        hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A',
+        captureMethod: externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'
+      });
       
       // Use external ref (from parent) - it's a ViewShot component
       if (!externalViewRef || !externalViewRef.current) {
