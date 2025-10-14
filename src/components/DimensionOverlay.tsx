@@ -1387,6 +1387,18 @@ export default function DimensionOverlay({
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 200));
       
+      // Final check that ref is valid before capture
+      if (!viewRef?.current) {
+        console.error('❌ viewRef.current is null after waiting. Debug info:', {
+          hasExternalViewRef: externalViewRef !== undefined,
+          hasViewRef: !!viewRef,
+          viewRefType: typeof viewRef,
+        });
+        throw new Error('View reference is not ready. Please try again.');
+      }
+      
+      console.log('✅ Capturing with viewRef.current:', viewRef.current.constructor?.name);
+      
       // Capture using viewRef.current like it worked before
       const measurementsUri = await captureRef(viewRef.current, {
         format: 'jpg',
@@ -1450,10 +1462,13 @@ export default function DimensionOverlay({
       return;
     }
     
-    if (!viewRef.current) {
-      Alert.alert('Email Error', 'View not ready. Please try again.');
-      return;
-    }
+    // Debug logging
+    console.log('📸 Email capture attempt:', {
+      hasExternalViewRef: externalViewRef !== undefined,
+      hasViewRef: !!viewRef,
+      hasViewRefCurrent: !!viewRef?.current,
+      viewRefCurrentType: viewRef?.current?.constructor?.name,
+    });
     
     try {
       // Check if email is available
@@ -1492,6 +1507,18 @@ export default function DimensionOverlay({
       
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Final check that ref is valid before capture
+      if (!viewRef?.current) {
+        console.error('❌ viewRef.current is null after waiting. Debug info:', {
+          hasExternalViewRef: externalViewRef !== undefined,
+          hasViewRef: !!viewRef,
+          viewRefType: typeof viewRef,
+        });
+        throw new Error('View reference is not ready. Please try again.');
+      }
+      
+      console.log('✅ Capturing with viewRef.current:', viewRef.current.constructor?.name);
       
       // Capture using viewRef.current (includes photo + overlay)
       const measurementsUri = await captureRef(viewRef.current, {
@@ -3138,7 +3165,6 @@ export default function DimensionOverlay({
 
       {/* Visual overlay for measurements */}
       <View
-        ref={viewRef}
         collapsable={false}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
