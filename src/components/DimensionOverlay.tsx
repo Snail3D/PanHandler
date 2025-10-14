@@ -5046,11 +5046,35 @@ export default function DimensionOverlay({
                         shadowRadius: 8,
                         backgroundColor: 'rgba(255, 59, 48, 0.06)',
                       }}>
-                        <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12 }}>
-                          <Text style={{ fontSize: 14, color: '#1C1C1E' }}>Freehand Tool</Text>
+                        <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center' }}>
+                          <Text style={{ fontSize: 14, color: '#1C1C1E', marginRight: 6 }}>Freehand Tool</Text>
+                          {/* Small illustrative icon */}
+                          <Svg width="20" height="20" viewBox="0 0 20 20">
+                            {/* Curvy freehand line */}
+                            <Path
+                              d="M 3 10 Q 6 6, 10 10 T 17 10"
+                              stroke="#5856D6"
+                              strokeWidth="1.5"
+                              fill="none"
+                              strokeLinecap="round"
+                            />
+                            {/* Measurement markers */}
+                            <Circle cx="3" cy="10" r="1.5" fill="#5856D6" />
+                            <Circle cx="17" cy="10" r="1.5" fill="#5856D6" />
+                          </Svg>
                         </View>
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                          <Ionicons name="close-circle" size={20} color="#D1D5DB" />
+                          {/* X icon with darker background shadow */}
+                          <View style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                            borderRadius: 10,
+                            width: 20,
+                            height: 20,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
+                          </View>
                         </View>
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                           <Ionicons name="checkmark-circle" size={20} color="#5856D6" />
