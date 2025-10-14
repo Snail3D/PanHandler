@@ -14,30 +14,39 @@ export default function UnitSelector() {
 
   return (
     <View className="flex-row bg-gray-100 rounded-lg p-1">
-      {options.map((option) => (
-        <Pressable
-          key={option.value}
-          onPress={() => setUnitSystem(option.value)}
-          className={`flex-1 py-2 px-4 rounded-md ${
-            unitSystem === option.value ? 'bg-white' : 'bg-transparent'
-          }`}
-          style={{
-            shadowColor: unitSystem === option.value ? '#000' : 'transparent',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: unitSystem === option.value ? 0.1 : 0,
-            shadowRadius: 2,
-            elevation: unitSystem === option.value ? 2 : 0,
-          }}
-        >
-          <Text
-            className={`text-center font-medium ${
-              unitSystem === option.value ? 'text-blue-600' : 'text-gray-600'
+      {options.map((option) => {
+        const isSelected = unitSystem === option.value;
+        const isImperial = option.value === 'imperial';
+        
+        return (
+          <Pressable
+            key={option.value}
+            onPress={() => setUnitSystem(option.value)}
+            className={`flex-1 py-2 px-4 rounded-md ${
+              isSelected ? 'bg-white' : 'bg-transparent'
             }`}
+            style={{
+              shadowColor: isSelected ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: isSelected ? 0.1 : 0,
+              shadowRadius: 2,
+              elevation: isSelected ? 2 : 0,
+            }}
           >
-            {option.label}
-          </Text>
-        </Pressable>
-      ))}
+            <Text
+              style={{
+                textAlign: 'center',
+                fontWeight: '600',
+                color: isSelected 
+                  ? (isImperial ? '#EF4444' : '#3B82F6') // Red for Imperial, Blue for Metric
+                  : '#6B7280', // Gray when not selected
+              }}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
