@@ -1354,19 +1354,8 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Temporarily bypass export limit check to debug hooks error
-    // if (!canExport()) {
-    //   Alert.alert(
-    //     'Export Limit Reached',
-    //     'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-    //     [{ text: 'OK' }]
-    //   );
-    //   return;
-    // }
-    
-    // Show label modal first
-    setPendingAction('save');
-    setShowLabelModal(true);
+    // Temporarily bypass label modal to debug hooks error
+    performSave(null); // Skip label, just save directly
   };
 
   const performSave = async (label: string | null) => {
@@ -1446,19 +1435,8 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Temporarily bypass export limit check to debug hooks error
-    // if (!canExport()) {
-    //   Alert.alert(
-    //     'Export Limit Reached',
-    //     'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-    //     [{ text: 'OK' }]
-    //   );
-    //   return;
-    // }
-    
-    // Show label modal first
-    setPendingAction('email');
-    setShowLabelModal(true);
+    // Temporarily bypass label modal to debug hooks error
+    performEmail(null); // Skip label, just email directly
   };
 
   const performEmail = async (label: string | null) => {
