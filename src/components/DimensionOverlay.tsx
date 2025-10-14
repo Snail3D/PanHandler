@@ -7,7 +7,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, run
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { captureRef } from 'react-native-view-shot';
+import { captureRef, captureScreen } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
@@ -1394,20 +1394,12 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
+      // Wait longer for UI to be ready
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Debug on screen
-      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}`;
-      
-      // Use external ref - pass the REF OBJECT to captureRef, not .current
-      if (!externalViewRef) {
-        Alert.alert('Debug: No Ref', `Save ref check failed:\n\n${debugInfo}`);
-        throw new Error('No view ref available for capture');
-      }
-      
-      // captureRef accepts the ref object itself
-      const measurementsUri = await captureRef(externalViewRef, {
+      // Use captureScreen instead of ref-based capture
+      // This captures the entire screen, which includes our measurements
+      const measurementsUri = await captureScreen({
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1421,7 +1413,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureScreen({
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1517,20 +1509,11 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
+      // Wait longer for UI to be ready
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Debug on screen
-      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}`;
-      
-      // Use external ref - pass the REF OBJECT to captureRef, not .current
-      if (!externalViewRef) {
-        Alert.alert('Debug: No Ref', `Email ref check failed:\n\n${debugInfo}`);
-        throw new Error('No view ref available for capture');
-      }
-      
-      // captureRef accepts the ref object itself
-      const uri = await captureRef(externalViewRef, {
+      // Use captureScreen instead of ref-based capture
+      const uri = await captureScreen({
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1608,7 +1591,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
       // Capture label-only photo
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureScreen({
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
