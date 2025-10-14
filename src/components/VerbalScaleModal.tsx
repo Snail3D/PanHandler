@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VerbalScale } from '../state/measurementStore';
+import Svg, { Path } from 'react-native-svg';
 
 interface VerbalScaleModalProps {
   visible: boolean;
@@ -89,7 +90,31 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 24, marginRight: 10 }}>🗺️</Text>
+                    {/* Folded map icon */}
+                    <Svg width={28} height={28} viewBox="0 0 24 24" style={{ marginRight: 10 }}>
+                      {/* Three vertical panels of a folded map */}
+                      <Path
+                        d="M3 4 L8 2 L8 22 L3 20 Z"
+                        stroke="rgba(0, 0, 0, 0.7)"
+                        strokeWidth={1.5}
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
+                      <Path
+                        d="M8 2 L16 4 L16 22 L8 22"
+                        stroke="rgba(0, 0, 0, 0.7)"
+                        strokeWidth={1.5}
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
+                      <Path
+                        d="M16 4 L21 2 L21 20 L16 22"
+                        stroke="rgba(0, 0, 0, 0.7)"
+                        strokeWidth={1.5}
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
+                    </Svg>
                     <Text style={{ fontSize: 20, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
                       Map Scale
                     </Text>
