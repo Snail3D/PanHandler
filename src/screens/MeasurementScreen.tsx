@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -7,7 +7,6 @@ import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ViewShot from 'react-native-view-shot';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -39,7 +38,7 @@ export default function MeasurementScreen() {
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
   const cameraRef = useRef<CameraView>(null);
-  const measurementViewRef = useRef<ViewShot>(null);
+  const measurementViewRef = useRef<View | null>(null);
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -499,10 +498,14 @@ export default function MeasurementScreen() {
           {mode === 'measurement' && (
             <View style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
-              <ViewShot
-                ref={measurementViewRef}
-                options={{ format: 'jpg', quality: 0.9 }}
+              <View 
+                ref={measurementViewRef} 
+                collapsable={false} 
                 style={{ flex: 1 }}
+                onLayout={() => {
+                  // Debug: Log when view is laid out and ref should be attached
+                  console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
+                }}
               >
                 <ZoomableImage 
                   imageUri={currentImageUri}
@@ -529,7 +532,7 @@ export default function MeasurementScreen() {
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
                 />
-              </ViewShot>
+              </View>
             </View>
           )}
 
