@@ -17,7 +17,6 @@ import { BlurView } from 'expo-blur';
 import useStore from '../state/measurementStore';
 import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
-import VerbalScaleModal from './VerbalScaleModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import { getRandomQuote } from '../utils/makerQuotes';
@@ -213,11 +212,6 @@ export default function DimensionOverlay({
   
   // Hide measurement labels toggle
   const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
-  
-  // Map Mode state
-  const [isMapMode, setIsMapMode] = useState(false);
-  const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
-  const [showMapScaleModal, setShowMapScaleModal] = useState(false);
   
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
@@ -4421,87 +4415,49 @@ export default function DimensionOverlay({
             </Animated.View>
           </GestureDetector>
 
-          {/* Unit System and Map Mode Row */}
-          <View className="flex-row mb-2" style={{ gap: 6 }}>
-            {/* Unit System Toggle: Metric vs Imperial - Compact */}
-            <View className="flex-row" style={{ flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
-              <Pressable
-                onPress={() => {
-                  setUnitSystem('metric');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
-                  backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                }}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Text style={{
-                    fontWeight: '600',
-                    fontSize: 10,
-                    color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                  }}>
-                    Metric
-                  </Text>
-                </View>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setUnitSystem('imperial');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={{
-                  flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
-                  backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                }}
-              >
-                <View className="flex-row items-center justify-center">
-                  <Text style={{
-                    fontWeight: '600',
-                    fontSize: 10,
-                    color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
-                  }}>
-                    Imperial
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
-
-            {/* Map Mode Toggle */}
+          {/* Unit System Toggle: Metric vs Imperial - Moved below measurement types */}
+          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
-                if (!isMapMode) {
-                  // Turning ON map mode - show modal to set scale
-                  setShowMapScaleModal(true);
-                } else {
-                  // Turning OFF map mode - clear scale
-                  setIsMapMode(false);
-                  setMapScale(null);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
+                setUnitSystem('metric');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               style={{
                 flex: 1,
                 paddingVertical: 5,
-                borderRadius: 9,
-                backgroundColor: isMapMode ? 'rgba(100, 150, 255, 0.25)' : 'rgba(120, 120, 128, 0.18)',
-                borderWidth: isMapMode ? 1.5 : 0,
-                borderColor: isMapMode ? 'rgba(100, 150, 255, 0.5)' : 'transparent',
-                paddingHorizontal: 8,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View className="flex-row items-center justify-center">
-                <Text style={{ fontSize: 14, marginRight: 4 }}>🗺️</Text>
                 <Text style={{
                   fontWeight: '600',
                   fontSize: 10,
-                  color: isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'
+                  color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  Map
+                  Metric
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setUnitSystem('imperial');
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              style={{
+                flex: 1,
+                paddingVertical: 5,
+                borderRadius: 7.5,
+                backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+              }}
+            >
+              <View className="flex-row items-center justify-center">
+                <Text style={{
+                  fontWeight: '600',
+                  fontSize: 10,
+                  color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
+                }}>
+                  Imperial
                 </Text>
               </View>
             </Pressable>
@@ -5253,20 +5209,6 @@ export default function DimensionOverlay({
           </Animated.View>
         </Animated.View>
       </Modal>
-
-      {/* Map Scale Modal */}
-      <VerbalScaleModal
-        visible={showMapScaleModal}
-        onComplete={(scale) => {
-          setMapScale(scale);
-          setIsMapMode(true);
-          setShowMapScaleModal(false);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }}
-        onDismiss={() => {
-          setShowMapScaleModal(false);
-        }}
-      />
     </>
   );
 }
