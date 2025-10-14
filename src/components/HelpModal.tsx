@@ -1825,8 +1825,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
           </View>
         </View>
       </BlurView>
-    </Modal>
-  );
+
       {/* Custom Alert Modal */}
       <AlertModal
         visible={alertConfig.visible}
@@ -1835,4 +1834,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
         type={alertConfig.type}
         onClose={closeAlert}
       />
+    </Modal>
+  );
 }
