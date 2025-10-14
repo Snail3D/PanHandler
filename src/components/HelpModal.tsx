@@ -209,7 +209,22 @@ const ComparisonRow = ({
       <Text style={{ fontSize: 14, color: '#1C1C1E' }}>{feature}</Text>
     </View>
     <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-      <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
+      {free === '✗' ? (
+        <View style={{
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+          backgroundColor: 'rgba(0, 0, 0, 0.15)',
+          borderWidth: 1,
+          borderColor: 'rgba(0, 0, 0, 0.25)',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Text style={{ fontSize: 14, color: '#3C3C43', fontWeight: '600' }}>{free}</Text>
+        </View>
+      ) : (
+        <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
+      )}
     </View>
     <View style={{ 
       width: 70, 
