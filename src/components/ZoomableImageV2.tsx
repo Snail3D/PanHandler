@@ -14,6 +14,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 interface ZoomableImageProps {
   imageUri: string;
   onTransformChange?: (scale: number, translateX: number, translateY: number, rotation: number) => void;
+  onDoubleTapWhenLocked?: () => void; // Called when user double-taps while locked (e.g., to switch to Measure mode)
   initialScale?: number;
   initialTranslateX?: number;
   initialTranslateY?: number;
@@ -27,6 +28,7 @@ interface ZoomableImageProps {
 export default function ZoomableImage({ 
   imageUri, 
   onTransformChange,
+  onDoubleTapWhenLocked,
   initialScale = 1,
   initialTranslateX = 0,
   initialTranslateY = 0,
@@ -47,6 +49,13 @@ export default function ZoomableImage({
   const focalX = useSharedValue(0);
   const focalY = useSharedValue(0);
   const isPinching = useSharedValue(false);
+  const fadeOpacity = useSharedValue(1);
+  const gestureWasActive = useSharedValue(false);
+  
+  // Smooth fade when switching between locked/unlocked to prevent flash
+  useEffect(() => {
+    fadeOpacity.value = withTiming(1, { duration: 150 });
+  }, [locked]);
 
   // Notify parent of initial transform values on mount
   useEffect(() => {
@@ -73,12 +82,17 @@ export default function ZoomableImage({
   const pinchGesture = Gesture.Pinch()
     .enabled(!locked)
     .onUpdate((event) => {
+      gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
     })
     .onEnd(() => {
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
+    })
+    .onFinalize(() => {
+      // Ensure gesture is fully complete
+      savedScale.value = scale.value;
     });
   
   const rotationGesture = Gesture.Rotation()
@@ -88,18 +102,28 @@ export default function ZoomableImage({
     })
     .onEnd(() => {
       savedRotation.value = rotation.value;
+    })
+    .onFinalize(() => {
+      // Ensure gesture is fully complete
+      savedRotation.value = rotation.value;
     });
 
   const panGesture = Gesture.Pan()
     .enabled(!locked)
     .minDistance(10) // Require 10px movement before activating - reduces tap interference
-    .minDistance(10) // Require 10px movement before activating - reduces tap interference
+    .minPointers(2) // Require 2 fingers - prevents single tap interference with buttons
     .onUpdate((event) => {
+      gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
       translateY.value = savedTranslateY.value + event.translationY * 0.7;
     })
     .onEnd(() => {
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
+    })
+    .onFinalize(() => {
+      // Ensure gesture is fully complete
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
     });
@@ -126,8 +150,19 @@ export default function ZoomableImage({
       }
     });
 
+  // Double-tap when LOCKED to switch to Measure mode (power-user shortcut)
+  const doubleTapWhenLockedGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .enabled(locked)
+    .onEnd(() => {
+      if (onDoubleTapWhenLocked) {
+        runOnJS(onDoubleTapWhenLocked)();
+      }
+    });
+
   const composedGesture = Gesture.Race(
     doubleTapGesture,
+    doubleTapWhenLockedGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
   );
   
@@ -148,6 +183,7 @@ export default function ZoomableImage({
       { scale: scale.value },
       { rotate: `${rotation.value}rad` },
     ],
+    opacity: fadeOpacity.value,
   }));
 
   return (

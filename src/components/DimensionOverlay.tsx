@@ -1,6 +1,6 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
@@ -92,6 +92,7 @@ interface DimensionOverlayProps {
   zoomRotation?: number;
   viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
+  onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
 }
 
 export default function DimensionOverlay({ 
@@ -101,6 +102,7 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
+  onRegisterDoubleTapCallback,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -223,6 +225,19 @@ export default function DimensionOverlay({
   
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
+  
+  // Register the callback with parent so it can be called on double-tap
+  useEffect(() => {
+    if (onRegisterDoubleTapCallback) {
+      const switchToMeasureMode = () => {
+        setMeasurementMode(true);
+        setShowCursor(true);
+        setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
+        Haptics.impactAsync(Haptics.ImpactFeedbackType.Medium);
+      };
+      onRegisterDoubleTapCallback(switchToMeasureMode);
+    }
+  }, [onRegisterDoubleTapCallback]);
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [isSnapped, setIsSnapped] = useState(false); // Track if cursor is snapped to horizontal/vertical
