@@ -16,7 +16,13 @@ export default function UnitSelector() {
     <View className="flex-row bg-gray-100 rounded-lg p-1">
       {options.map((option) => {
         const isSelected = unitSystem === option.value;
-        const isImperial = option.value === 'imperial';
+        const isMetric = option.value === 'metric';
+        
+        // Determine color based on which system is selected
+        let textColor = '#6B7280'; // Gray when not selected
+        if (isSelected) {
+          textColor = isMetric ? '#3B82F6' : '#EF4444'; // Blue for Metric, Red for Imperial
+        }
         
         return (
           <Pressable
@@ -37,9 +43,7 @@ export default function UnitSelector() {
               style={{
                 textAlign: 'center',
                 fontWeight: '600',
-                color: isSelected 
-                  ? (isImperial ? '#EF4444' : '#3B82F6') // Red for Imperial, Blue for Metric
-                  : '#6B7280', // Gray when not selected
+                color: textColor,
               }}
             >
               {option.label}
