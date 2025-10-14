@@ -294,6 +294,17 @@ export default function DimensionOverlay({
   }));
   
   // Show inspirational quote overlay
+
+  // Clean up freehand state when switching away from freehand mode
+  useEffect(() => {
+    if (mode !== 'freehand') {
+      setIsDrawingFreehand(false);
+      setShowFreehandCursor(false);
+      setFreehandPath([]);
+      setShowCursor(false);
+    }
+  }, [mode]);
+
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
     setCurrentQuote(quote);
