@@ -604,7 +604,31 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Freehand Mode (Free Measure)
                     </Text>
+                    <View style={{ 
+                      backgroundColor: '#5856D6', 
+                      paddingHorizontal: 8, 
+                      paddingVertical: 3, 
+                      borderRadius: 6,
+                      marginLeft: 8,
+                    }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: 'white' }}>PRO</Text>
+                    </View>
                   </View>
+                  
+                  {/* Pro Feature Notice */}
+                  <View style={{ 
+                    backgroundColor: 'rgba(88, 86, 214, 0.08)', 
+                    borderRadius: 10, 
+                    padding: 12, 
+                    marginBottom: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(88, 86, 214, 0.15)',
+                  }}>
+                    <Text style={{ fontSize: 13, color: '#5856D6', fontWeight: '600', textAlign: 'center' }}>
+                      This is a Pro-only feature. See "Free vs Pro" below for more details.
+                    </Text>
+                  </View>
+                  
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                     Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
                   </Text>
