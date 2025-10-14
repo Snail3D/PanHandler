@@ -226,6 +226,9 @@ export default function DimensionOverlay({
   // Legend collapse state
   const [legendCollapsed, setLegendCollapsed] = useState(false);
   
+  // Hide measurement labels toggle
+  const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
+  
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
   const vibrantColors = [
@@ -1544,7 +1547,7 @@ export default function DimensionOverlay({
       console.log('📸 Capturing main measurement photo with label and coin info...');
       
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(externalViewRef || internalViewRef, {
+      const uri = await captureRef((externalViewRef || internalViewRef) as any, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -3527,7 +3530,7 @@ export default function DimensionOverlay({
           )}
 
           {/* Measurement labels for completed measurements with smart positioning */}
-          {!hideMeasurementsForCapture && (() => {
+          {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
             // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
             const labelData = measurements
               .filter(m => m.mode !== 'rectangle')
@@ -3640,7 +3643,7 @@ export default function DimensionOverlay({
           })()}
 
           {/* Side labels for rectangles - Width on left, Height on top */}
-          {measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
+          {!hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
             const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
             
             // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
