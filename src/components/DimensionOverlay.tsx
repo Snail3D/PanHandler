@@ -3146,9 +3146,9 @@ export default function DimensionOverlay({
                 <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
                   {mode === 'distance' && currentPoints.length === 0 && 'Point 1'}
                   {mode === 'distance' && currentPoints.length === 1 && 'Point 2'}
-                  {mode === 'angle' && currentPoints.length === 0 && 'Point 1'}
-                  {mode === 'angle' && currentPoints.length === 1 && 'Point 2 (vertex)'}
-                  {mode === 'angle' && currentPoints.length === 2 && 'Point 3'}
+                  {mode === 'angle' && currentPoints.length === 0 && (isMapMode ? 'Start location' : 'Point 1')}
+                  {mode === 'angle' && currentPoints.length === 1 && (isMapMode ? 'North reference' : 'Point 2 (vertex)')}
+                  {mode === 'angle' && currentPoints.length === 2 && (isMapMode ? 'Destination' : 'Point 3')}
                   {mode === 'circle' && currentPoints.length === 0 && 'Center of circle'}
                   {mode === 'circle' && currentPoints.length === 1 && 'Outside of circle'}
                   {mode === 'rectangle' && currentPoints.length === 0 && 'First corner'}
@@ -4482,7 +4482,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'angle' ? 4 : 0,
                   }}>
-                    Angle
+                    {isMapMode ? 'Azimuth' : 'Angle'}
                   </Text>
                 </View>
               </Pressable>
@@ -4727,7 +4727,9 @@ export default function DimensionOverlay({
                     : mode === 'freehand'
                     ? '✏️ Touch and drag to draw freehand path'
                     : mode === 'angle'
-                    ? '📐 Tap 3 points: start, vertex (center), end'
+                    ? isMapMode
+                      ? '🧭 Tap 3 points: start location, north reference, destination'
+                      : '📐 Tap 3 points: start, vertex (center), end'
                     : '📏 Tap to place 2 points for distance'
                   : selectedMeasurementId
                   ? (() => {
@@ -4739,7 +4741,9 @@ export default function DimensionOverlay({
                       } else if (selected?.mode === 'distance') {
                         return '📏 Selected Line: Drag endpoints to adjust • Tap line to move';
                       } else if (selected?.mode === 'angle') {
-                        return '📐 Selected Angle: Drag any point to adjust angle';
+                        return isMapMode 
+                          ? '🧭 Selected Azimuth: Drag points to adjust bearing'
+                          : '📐 Selected Angle: Drag any point to adjust angle';
                       } else if (selected?.mode === 'freehand') {
                         return '✏️ Selected Path: Drag any point to reshape path';
                       }
