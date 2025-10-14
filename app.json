@@ -1,17 +1,36 @@
 {
   "expo": {
-    "name": "vibecode",
-    "slug": "vibecode",
-    "scheme": "vibecode",
+    "name": "PanHandler",
+    "slug": "panhandler",
+    "scheme": "panhandler",
     "version": "1.2.0",
     "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "icon": "./assets/snail-logo.png",
+    "splash": {
+      "image": "./assets/snail-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "description": "PanHandler - Precise CAD measurements from photos. Use coins for calibration, measure distances, angles, areas, and export to CAD software.",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.snail.panhandler",
+      "infoPlist": {
+        "NSCameraUsageDescription": "PanHandler needs camera access to take reference photos for measurements.",
+        "NSPhotoLibraryUsageDescription": "PanHandler needs photo library access to save measurements and export images.",
+        "NSPhotoLibraryAddUsageDescription": "PanHandler needs permission to save measurement images to your photo library."
+      }
     },
     "android": {
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.snail.panhandler",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "plugins": [
       [
