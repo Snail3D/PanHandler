@@ -1415,20 +1415,16 @@ export default function DimensionOverlay({
       
       console.log('📸 Capturing measurements photo with label and coin info...');
       
-      // Ensure ref is valid before capture with retry
-      let refToUse = viewRef.current;
-      if (!refToUse) {
-        console.log('⏳ Ref not ready for save, waiting 200ms more...');
-        await new Promise(resolve => setTimeout(resolve, 200));
-        refToUse = viewRef.current;
-      }
+      // Use the ref object directly, not ref.current!
+      // captureRef can accept a ref object
+      const refToCapture = externalViewRef || internalViewRef;
       
-      if (!refToUse) {
-        throw new Error('View reference is null before measurements capture');
+      if (!refToCapture) {
+        throw new Error('View reference object is null');
       }
       
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(refToUse, {
+      const measurementsUri = await captureRef(refToCapture as any, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1553,12 +1549,13 @@ export default function DimensionOverlay({
       }
       
       // NOW check the view reference after modal interactions
-      // Add small delay to ensure ref is attached after modal closes
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Add delay to ensure ref is attached after modal closes
+      console.log('⏳ Waiting for ref to attach...');
+      await new Promise(resolve => setTimeout(resolve, 300)); // Increased from 100ms
       
       // Check if external ref is available, otherwise try internal
       if (!externalViewRef?.current && !internalViewRef.current) {
-        console.error('❌ Email failed: No view ref available', {
+        console.error('❌ Email failed: No view ref available after 300ms wait', {
           externalViewRef: !!externalViewRef,
           externalViewRefCurrent: !!externalViewRef?.current,
           internalViewRefCurrent: !!internalViewRef.current,
@@ -1585,28 +1582,19 @@ export default function DimensionOverlay({
         externalRefCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
       });
       
-      // Double-check ref is still valid with another small wait if needed
-      let emailRefToUse = viewRef.current;
-      if (!emailRefToUse) {
-        console.log('⏳ Ref not ready, waiting 200ms more...');
-        await new Promise(resolve => setTimeout(resolve, 200));
-        emailRefToUse = viewRef.current;
+      // Use the ref object directly, not ref.current!
+      // captureRef can accept a ref object
+      const refToCapture = externalViewRef || internalViewRef;
+      
+      if (!refToCapture) {
+        console.error('❌ No ref object available!');
+        throw new Error('View reference object is null');
       }
       
-      // Ensure ref is valid before capture
-      if (!emailRefToUse) {
-        console.error('❌ Ref is STILL null after wait! Full debug:', {
-          viewRef,
-          viewRefCurrent: viewRef?.current,
-          internalViewRef: internalViewRef.current,
-          externalViewRef,
-          externalViewRefCurrent: externalViewRef?.current,
-        });
-        throw new Error('View reference is null before email capture');
-      }
+      console.log('📸 Using ref object:', !!refToCapture, 'current:', !!refToCapture?.current);
       
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(emailRefToUse, {
+      const uri = await captureRef(refToCapture as any, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1686,7 +1674,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
       // Reuse the same ref from first capture
-      const labelOnlyUri = await captureRef(emailRefToUse, {
+      const labelOnlyUri = await captureRef(refToCapture as any, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
