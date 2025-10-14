@@ -1528,6 +1528,40 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
                   </Text>
 
+                  {/* Lightweight & Offline badges */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16, gap: 10 }}>
+                    <View style={{
+                      backgroundColor: 'rgba(52, 199, 89, 0.15)',
+                      borderRadius: 12,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: 'rgba(52, 199, 89, 0.25)',
+                    }}>
+                      <Ionicons name="cloud-offline" size={16} color="#34C759" style={{ marginRight: 6 }} />
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#34C759' }}>
+                        Works Offline
+                      </Text>
+                    </View>
+                    <View style={{
+                      backgroundColor: 'rgba(0, 122, 255, 0.15)',
+                      borderRadius: 12,
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: 'rgba(0, 122, 255, 0.25)',
+                    }}>
+                      <Ionicons name="flash" size={16} color="#007AFF" style={{ marginRight: 6 }} />
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#007AFF' }}>
+                        Lightweight
+                      </Text>
+                    </View>
+                  </View>
+
                   <Pressable
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
                     style={{
