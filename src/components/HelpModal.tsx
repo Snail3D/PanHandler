@@ -275,6 +275,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Pulsing animation for "Upgrade to Pro" button text
   const textPulse = useSharedValue(1);
   
+  // Gentle color morph animation for vibecoding link - slow, elegant cycling
+  const vibecodeLinkHue = useSharedValue(0);
+  const vibecodeLinkOpacity = useSharedValue(0.7);
+  
   useEffect(() => {
     // Gentle, slow pulsing animation - subtle opacity change
     textPulse.value = withRepeat(
@@ -285,11 +289,60 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
       -1, // Infinite repeat
       true // Reverse (fade back up)
     );
+    
+    // Slow, dreamy color morph - full rainbow in 30 seconds
+    vibecodeLinkHue.value = withRepeat(
+      withTiming(360, {
+        duration: 30000, // 30 seconds for full color cycle - slow and inviting
+        easing: Easing.inOut(Easing.sine), // Smooth sine wave for gentle transitions
+      }),
+      -1,
+      false
+    );
+    
+    // Gentle opacity pulse - breathes in and out
+    vibecodeLinkOpacity.value = withRepeat(
+      withTiming(1, {
+        duration: 3000, // 3 seconds to pulse up
+        easing: Easing.inOut(Easing.sine),
+      }),
+      -1,
+      true // Reverse for breathing effect
+    );
   }, []);
   
   const textPulseStyle = useAnimatedStyle(() => ({
     opacity: textPulse.value,
   }));
+  
+  const hslToRgb = (h: number, s: number, l: number) => {
+    'worklet';
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+    
+    if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+    else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+    else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+    else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+    else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+    else if (h >= 300 && h < 360) { r = c; g = 0; b = x; }
+    
+    return {
+      r: Math.round((r + m) * 255),
+      g: Math.round((g + m) * 255),
+      b: Math.round((b + m) * 255)
+    };
+  };
+  
+  const vibecodeLinkStyle = useAnimatedStyle(() => {
+    const rgb = hslToRgb(vibecodeLinkHue.value, 0.7, 0.55);
+    return {
+      color: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+      opacity: vibecodeLinkOpacity.value,
+    };
+  });
   
   useEffect(() => {
     if (visible) {
@@ -1792,8 +1845,35 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                         Leave a Review ⭐
                       </Text>
                     </Pressable>
-                  </AnimatedView>
+                   </AnimatedView>
                 </View>
+              </View>
+
+              {/* Vibecode Attribution - Very bottom of scrollable content */}
+              <View style={{ marginBottom: 40, marginTop: 16, alignItems: 'center' }}>
+                <Text style={{ 
+                  fontSize: 11, 
+                  color: '#A8A8A8', 
+                  textAlign: 'center',
+                  lineHeight: 18,
+                  letterSpacing: 0.2,
+                }}>
+                  Brought to you by a human brain{'\n'}
+                  harnessing the power of{' '}
+                  <AnimatedText 
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      Linking.openURL('https://vibecode.app');
+                    }}
+                    style={[{ 
+                      fontWeight: '500',
+                      textDecorationLine: 'underline',
+                      fontSize: 11,
+                    }, vibecodeLinkStyle]}
+                  >
+                    vibecoding
+                  </AnimatedText>
+                </Text>
               </View>
             </Animated.ScrollView>
                 </GestureDetector>
