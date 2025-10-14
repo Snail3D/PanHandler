@@ -641,16 +641,34 @@ export default function DimensionOverlay({
   };
 
   // Helper to detect if a path self-intersects
+  // Ignores first and last 5% of path to account for natural hand jitter
   const doesPathSelfIntersect = (path: Array<{ x: number; y: number }>): boolean => {
     if (path.length < 4) return false; // Need at least 4 points to self-intersect
     
+    // Calculate exclusion zones (first and last 5% of path)
+    const exclusionZoneSize = Math.ceil(path.length * 0.05); // 5% of path length
+    const startExclusionEnd = exclusionZoneSize;
+    const endExclusionStart = path.length - exclusionZoneSize - 1;
+    
+    console.log(`🔍 Self-intersection check: path length ${path.length}, excluding first ${exclusionZoneSize} and last ${exclusionZoneSize} segments`);
+    
     // Check each line segment against all other non-adjacent line segments
     for (let i = 0; i < path.length - 1; i++) {
+      // Skip segments in the exclusion zones
+      if (i < startExclusionEnd || i >= endExclusionStart) {
+        continue;
+      }
+      
       const seg1Start = path[i];
       const seg1End = path[i + 1];
       
       // Start checking from i+2 to avoid adjacent segments
       for (let j = i + 2; j < path.length - 1; j++) {
+        // Skip segments in the exclusion zones
+        if (j < startExclusionEnd || j >= endExclusionStart) {
+          continue;
+        }
+        
         // Don't check the last segment against the first (they're supposed to connect in a loop)
         if (i === 0 && j === path.length - 2) continue;
         
@@ -659,11 +677,13 @@ export default function DimensionOverlay({
         
         // Check if segments intersect
         if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+          console.log(`❌ Self-intersection detected between segment ${i} and segment ${j}`);
           return true;
         }
       }
     }
     
+    console.log('✅ No self-intersection detected (excluding start/end zones)');
     return false;
   };
   
