@@ -1274,8 +1274,6 @@ export default function DimensionOverlay({
       setCurrentPoints([]);
     }
   };
-    }
-  };
   
   // Long-press handlers for undo button (like holding backspace)
   const startUndoLongPress = () => {
