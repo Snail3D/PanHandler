@@ -1628,6 +1628,7 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
+    .minDistance(20) // Require 20px movement before activating
     .onUpdate((event) => {
       // Only respond to horizontal swipes
       if (Math.abs(event.translationX) > Math.abs(event.translationY)) {
