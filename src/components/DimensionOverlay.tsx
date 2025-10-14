@@ -3448,9 +3448,10 @@ export default function DimensionOverlay({
           {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
             // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
             const labelData = measurements
-              .filter(m => m.mode !== 'rectangle')
-              .map((measurement, idx) => {
-              const color = getMeasurementColor(idx, measurement.mode);
+              .map((measurement, originalIdx) => ({ measurement, originalIdx }))
+              .filter(({ measurement }) => measurement.mode !== 'rectangle')
+              .map(({ measurement, originalIdx }) => {
+              const color = getMeasurementColor(originalIdx, measurement.mode);
               let screenX = 0, screenY = 0;
               if (measurement.mode === 'distance') {
                 const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
@@ -3486,7 +3487,7 @@ export default function DimensionOverlay({
                   screenY = sumY / measurement.points.length;
                 }
               }
-              return { measurement, idx, color, screenX, screenY };
+              return { measurement, idx: originalIdx, color, screenX, screenY };
             });
 
             // Smart label positioning algorithm to prevent overlaps
