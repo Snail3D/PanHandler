@@ -96,9 +96,9 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
-}: DimensionOverlayProps = {}) {
+}: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
-  console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
+  // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
   
   const insets = useSafeAreaInsets();
   
@@ -1393,9 +1393,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        console.error('❌ SAVE ERROR: externalViewRef is', externalViewRef);
-        console.error('❌ SAVE ERROR: externalViewRef.current is', externalViewRef?.current);
-        Alert.alert('View Error', 'The view reference is not available. This is a bug - please contact support.');
+        Alert.alert('View Error', 'View ref not available. Try again.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
