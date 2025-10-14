@@ -399,7 +399,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                           Label This Item
                         </Text>
                         <Text style={{ 
-                          color: '#8E8E93', 
+                          color: '#6E6E73', 
                           fontSize: 12, 
                           fontWeight: '500',
                           marginTop: 1,
@@ -429,7 +429,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                   {/* Input Field */}
                   <View style={{ marginBottom: 6 }}>
                     <Text style={{ 
-                      color: '#3C3C43', 
+                      color: '#48484A', 
                       fontSize: 13, 
                       fontWeight: '600', 
                       marginBottom: 8,
@@ -473,7 +473,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                   </View>
 
                   <Text style={{ 
-                    color: '#8E8E93', 
+                    color: '#6E6E73', 
                     fontSize: 11,
                     fontWeight: '500',
                   }}>
@@ -511,19 +511,19 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                       })}
                     >
                       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Ionicons name="save" size={18} color="#1C1C1E" />
+                        <Ionicons name="save" size={20} color="#1C1C1E" />
                       </View>
                       <Text style={{ 
                         color: '#1C1C1E', 
                         fontWeight: '700', 
-                        fontSize: 16, 
+                        fontSize: 18, 
                         marginLeft: 8,
                       }}>
                         Save
                       </Text>
                     </Pressable>
 
-                    {/* Skip Button - LIGHT text, minimal background */}
+                    {/* Skip Button - Changed to "Leave Blank" */}
                     <Pressable
                       onPress={handleSkip}
                       style={({ pressed }) => ({
@@ -541,7 +541,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                         fontWeight: '600', 
                         fontSize: 14, 
                       }}>
-                        Skip
+                        Leave Blank
                       </Text>
                     </Pressable>
                   </View>
