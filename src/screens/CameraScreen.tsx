@@ -33,6 +33,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [flashEnabled, setFlashEnabled] = useState(false);
   
   // Bubble level animation
   const bubbleX = useSharedValue(0);
@@ -76,6 +77,15 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     try {
       setIsCapturing(true);
       
+      // Enable flash for capture if not already on
+      const wasFlashOn = flashEnabled;
+      if (!flashEnabled) {
+        setFlashEnabled(true);
+      }
+      
+      // Wait a tiny bit for flash to activate
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Camera flash effect - quick bright flash
       flashOpacity.value = 1;
       flashOpacity.value = withSpring(0, {
@@ -91,6 +101,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
       });
+      
+      // Turn flash back off if it wasn't on before
+      if (!wasFlashOn) {
+        setFlashEnabled(false);
+      }
       
       if (!photo?.uri) return;
 
@@ -159,6 +174,8 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const toggleAutoMode = () => {
     const newMode = !autoMode;
     setAutoMode(newMode);
+    // Turn on flash when auto mode is enabled, turn off when disabled
+    setFlashEnabled(newMode);
     if (newMode) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } else {
@@ -169,6 +186,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
 
   const toggleCameraFacing = () => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
+  };
+
+  const toggleFlash = () => {
+    setFlashEnabled(!flashEnabled);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const toggleOrientationMode = () => {
@@ -341,6 +363,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         style={{ flex: 1 }}
         facing={facing}
         zoom={0}
+        enableTorch={flashEnabled}
       >
         {/* TEST BUBBLE - Simple red circle that should ALWAYS be visible */}
         <View
@@ -383,6 +406,16 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                   } 
                   size={24} 
                   color="white" 
+                />
+              </Pressable>
+              <Pressable
+                onPress={toggleFlash}
+                className="w-10 h-10 items-center justify-center ml-2"
+              >
+                <Ionicons 
+                  name={flashEnabled ? 'flash' : 'flash-off'} 
+                  size={24} 
+                  color={flashEnabled ? '#FFD700' : 'white'} 
                 />
               </Pressable>
               <Pressable
