@@ -1565,10 +1565,22 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 150));
       
       console.log('📸 Capturing main measurement photo with label and coin info...');
+      console.log('🔍 Debug refs:', {
+        viewRefExists: !!viewRef,
+        viewRefCurrent: !!viewRef?.current,
+        internalRefCurrent: !!internalViewRef?.current,
+        externalRefExists: !!externalViewRef,
+        externalRefCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
+      });
       
       // Ensure ref is valid before capture
       const emailRefToUse = viewRef.current;
       if (!emailRefToUse) {
+        console.error('❌ Ref is null! Full debug:', {
+          viewRef,
+          viewRefCurrent: viewRef?.current,
+          internalViewRef: internalViewRef.current,
+        });
         throw new Error('View reference is null before email capture');
       }
       
