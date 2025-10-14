@@ -704,6 +704,21 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
                   </View>
 
+                  {/* Hide Labels Toggle */}
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <View style={{ marginRight: 10, marginTop: 2 }}>
+                      <Ionicons name="eye-outline" size={18} color="#007AFF" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
+                        Hide Labels
+                      </Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                        Toggle measurement labels off to view your photo clearly. Legend stays visible for reference
+                      </Text>
+                    </View>
+                  </View>
+
                   {/* Shake to Toggle */}
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 18, marginRight: 10 }}>📳</Text>
