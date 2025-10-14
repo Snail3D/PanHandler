@@ -5011,8 +5011,18 @@ export default function DimensionOverlay({
                         </View>
                       </View>
                       
-                      {/* Table Row */}
-                      <View style={{ flexDirection: 'row', paddingVertical: 12, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' }}>
+                      {/* Table Row - Freehand Tool (last free tool, subtle red shadow to indicate dividing line) */}
+                      <View style={{ 
+                        flexDirection: 'row', 
+                        paddingVertical: 12, 
+                        borderTopWidth: 1, 
+                        borderTopColor: 'rgba(0,0,0,0.06)',
+                        shadowColor: '#FF3B30',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.15,
+                        shadowRadius: 6,
+                        backgroundColor: 'rgba(255, 59, 48, 0.02)',
+                      }}>
                         <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12 }}>
                           <Text style={{ fontSize: 14, color: '#1C1C1E' }}>Freehand Tool</Text>
                         </View>
