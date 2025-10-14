@@ -1523,12 +1523,12 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait for UI to update and ref to be ready
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Final check that ref is valid before capture
       if (!viewRef?.current) {
-        console.error('❌ EMAIL: viewRef.current is null. Debug:', {
+        console.error('❌ EMAIL: viewRef.current is null after 500ms. Debug:', {
           hasExternalViewRef: externalViewRef !== undefined,
           externalViewRefCurrent: externalViewRef?.current,
           externalViewRefType: externalViewRef?.current?.constructor?.name,
