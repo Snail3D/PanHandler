@@ -1149,11 +1149,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 index={9}
               >
                 <View style={{ marginLeft: 4 }}>
-                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginBottom: 10 }}>
-                    Measure Real-World Distances on Maps
-                  </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
-                    Map Mode converts your measurements from screen dimensions to actual geographic distances using a verbal scale. Perfect for planning routes, estimating areas, or measuring features directly from printed or digital maps.
+                    Measure real-world distances on maps and blueprints using verbal scale calibration (e.g., "1 inch = 10 miles").
                   </Text>
                   {/* How It Works */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
@@ -1161,19 +1158,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      1. Take a photo of your map with a coin on it
+                      1. Take photo with a coin for reference
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      2. Trace the coin to calibrate (establishes pixel density)
+                      2. Trace the coin to calibrate
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      3. Tap <Text style={{ fontWeight: '600' }}>🗺️ Map</Text> button and enter the verbal scale
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#6A6A6A', lineHeight: 21, marginLeft: 12, marginBottom: 6 }}>
-                      Example: "1 cm = 5 km" or "1 inch = 10 miles"
+                      3. Tap 🗺️ Map button and enter scale (e.g., "1cm = 5km")
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                      4. All measurements now display in real-world units!
+                      4. Measurements auto-convert to real units
                     </Text>
                   </View>
                   {/* Tools in Map Mode */}
