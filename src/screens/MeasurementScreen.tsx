@@ -31,6 +31,7 @@ export default function MeasurementScreen() {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
+  const [flashEnabled, setFlashEnabled] = useState(true); // Flash ON by default
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
