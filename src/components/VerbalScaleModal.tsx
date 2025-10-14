@@ -412,7 +412,7 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                 </View>
               </ScrollView>
 
-              {/* Continue Button */}
+              {/* LOCK IN Button - matches calibration screen */}
               {isValid && (
                 <View style={{
                   paddingHorizontal: 16,
@@ -431,27 +431,32 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                     style={({ pressed }) => ({
                       backgroundColor: pressed 
                         ? 'rgba(52, 199, 89, 0.9)' 
-                        : 'rgba(52, 199, 89, 0.8)',
-                      borderRadius: 14,
-                      paddingVertical: 15,
-                      flexDirection: 'row',
+                        : 'rgba(52, 199, 89, 0.85)',
+                      borderRadius: 24,
+                      paddingVertical: 22,
                       alignItems: 'center',
                       justifyContent: 'center',
                       shadowColor: '#34C759',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 12,
+                      shadowOffset: { width: 0, height: 8 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 24,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255, 255, 255, 0.4)',
+                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                     })}
                   >
                     <Text style={{ 
-                      color: 'white', 
-                      fontWeight: '700', 
-                      fontSize: 16, 
-                      marginRight: 8 
+                      color: '#FFFFFF', 
+                      fontWeight: '900', 
+                      fontSize: 32,
+                      textAlign: 'center',
+                      letterSpacing: 2,
+                      textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
                     }}>
-                      Continue
+                      LOCK IN
                     </Text>
-                    <Ionicons name="arrow-forward-circle" size={20} color="white" />
                   </Pressable>
                 </View>
               )}
