@@ -295,6 +295,11 @@ export default function DimensionOverlay({
     ],
   }));
   
+  // Animated style for mode swipe
+  const modeSwipeAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
+  }));
+  
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
@@ -4127,10 +4132,7 @@ export default function DimensionOverlay({
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <GestureDetector gesture={modeSwitchGesture}>
-            <Animated.View style={[{ marginBottom: 8 }, useAnimatedStyle(() => ({
-              transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
-            }))]}>
-              <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <Animated.View style={[{ marginBottom: 8 }, modeSwipeAnimatedStyle]}>              <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={() => {
