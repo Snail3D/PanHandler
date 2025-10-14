@@ -1195,7 +1195,10 @@ export default function DimensionOverlay({
     return () => subscription.remove();
   }, []);
 
-  // Recalculate all measurement values when unit system changes
+  // ⚠️ PROTECTED BLOCK - Recalculate measurements when unit system changes
+  // This useEffect updates measurement.value, measurement.width, measurement.height, measurement.radius
+  // IMPORTANT: width, height, radius are stored in BASE UNITS (mm/cm/in from calibration), NOT pixels
+  // DO NOT MODIFY without testing unit conversion (metric ↔ imperial)
   useEffect(() => {
     // Only recalculate if unit system actually changed (not on initial mount or measurement changes)
     if (prevUnitSystemRef.current === unitSystem || measurements.length === 0) {
@@ -1255,14 +1258,15 @@ export default function DimensionOverlay({
         ...m,
         value: newValue,
         ...(newPerimeter !== undefined && { perimeter: newPerimeter }),
-        ...(width !== undefined && { width }),
-        ...(height !== undefined && { height }),
-        ...(radius !== undefined && { radius }),
+        ...(width !== undefined && { width }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
+        ...(height !== undefined && { height }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
+        ...(radius !== undefined && { radius }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
       };
     });
     
     setMeasurements(updatedMeasurements);
   }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
+  // ⚠️ END PROTECTED BLOCK
 
   const handleClear = () => {
     // Check if the last measurement has been edited (has history)
@@ -3876,7 +3880,8 @@ export default function DimensionOverlay({
                     {/* Measurement value with area for circles and rectangles */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
-                        // Recalculate display value based on current unit system
+                        // ⚠️ PROTECTED BLOCK - DO NOT MODIFY WITHOUT TESTING UNIT CONVERSION
+                        // This recalculates display values when unit system changes
                         let displayValue = measurement.value;
                         
                         if (measurement.mode === 'distance') {
@@ -3886,16 +3891,16 @@ export default function DimensionOverlay({
                           // Recalculate angle
                           displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
-                          // Recalculate circle diameter and area
-                          // measurement.radius is stored in PIXELS, convert to real units
-                          const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
-                          const diameter = radiusInUnits * 2;
+                          // ⚠️ PROTECTED: measurement.radius is stored in BASE UNITS (mm/cm/in), not pixels
+                          // The useEffect hook (line 1210) converts from pixels to base units
+                          const diameter = measurement.radius * 2;
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                          const area = Math.PI * radiusInUnits * radiusInUnits;
+                          const area = Math.PI * measurement.radius * measurement.radius;
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
                           return `${displayValue} (A: ${areaStr}²)`;
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
-                          // Recalculate rectangle dimensions and area
+                          // ⚠️ PROTECTED: measurement.width and measurement.height are stored in BASE UNITS (mm/cm/in), not pixels
+                          // The useEffect hook (line 1210) converts from pixels to base units and updates on unit system change
                           const widthStr = formatMeasurement(measurement.width, calibration?.unit || 'mm', unitSystem, 2);
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
@@ -3903,6 +3908,7 @@ export default function DimensionOverlay({
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
                           return `${displayValue} (A: ${areaStr}²)`;
                         }
+                        // ⚠️ END PROTECTED BLOCK
                         
                         return displayValue;
                       })()}
