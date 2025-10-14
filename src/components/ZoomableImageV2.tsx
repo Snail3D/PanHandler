@@ -92,6 +92,8 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .enabled(!locked)
+    .minDistance(10) // Require 10px movement before activating - reduces tap interference
+    .minDistance(10) // Require 10px movement before activating - reduces tap interference
     .onUpdate((event) => {
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
@@ -128,6 +130,16 @@ export default function ZoomableImage({
     doubleTapGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
   );
+  
+  // Manual gesture wrapper that immediately fails when locked
+  const lockCheckGesture = Gesture.Manual()
+    .onTouchesDown((e, manager) => {
+      if (locked) {
+        manager.fail();
+      }
+    });
+  
+  const finalGesture = Gesture.Race(lockCheckGesture, composedGesture);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -140,10 +152,7 @@ export default function ZoomableImage({
 
   return (
     <>
-      <View 
-        style={StyleSheet.absoluteFill}
-        pointerEvents={locked ? 'none' : 'auto'}
-      >
+      {!locked && (
         <GestureDetector gesture={composedGesture}>
           <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
             <Image
@@ -153,7 +162,16 @@ export default function ZoomableImage({
             />
           </Animated.View>
         </GestureDetector>
-      </View>
+      )}
+      {locked && (
+        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          <Image
+            source={{ uri: imageUri }}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      )}
       
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
       {showLevelLine && (
