@@ -1616,7 +1616,6 @@ export default function DimensionOverlay({
       
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setTimeout(() => showQuoteOverlay(), 500);
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
