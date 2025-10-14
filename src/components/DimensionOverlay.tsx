@@ -99,6 +99,15 @@ export default function DimensionOverlay({
 }: DimensionOverlayProps) {
   const insets = useSafeAreaInsets();
   
+  // Debug: Log what we receive
+  useEffect(() => {
+    console.log('🔍 DimensionOverlay mounted with viewRef:', {
+      hasExternalViewRef: externalViewRef !== undefined,
+      externalViewRefCurrent: externalViewRef?.current,
+      externalViewRefType: typeof externalViewRef,
+    });
+  }, []);
+  
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
   const viewRef = externalViewRef !== undefined ? externalViewRef : internalViewRef; // Use external ref if provided
@@ -1389,15 +1398,24 @@ export default function DimensionOverlay({
       
       // Final check that ref is valid before capture
       if (!viewRef?.current) {
-        console.error('❌ viewRef.current is null after waiting. Debug info:', {
+        console.error('❌ SAVE: viewRef.current is null. Debug:', {
           hasExternalViewRef: externalViewRef !== undefined,
+          externalViewRefCurrent: externalViewRef?.current,
+          externalViewRefType: externalViewRef?.current?.constructor?.name,
           hasViewRef: !!viewRef,
-          viewRefType: typeof viewRef,
+          viewRefCurrent: viewRef?.current,
+          viewRefCurrentType: viewRef?.current?.constructor?.name,
         });
-        throw new Error('View reference is not ready. Please try again.');
+        Alert.alert(
+          'Capture Error',
+          'Unable to capture view. The screen may not be fully loaded. Please wait a moment and try again.'
+        );
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        return;
       }
       
-      console.log('✅ Capturing with viewRef.current:', viewRef.current.constructor?.name);
+      console.log('✅ SAVE: Capturing with viewRef.current:', viewRef.current.constructor?.name);
       
       // Capture using viewRef.current like it worked before
       const measurementsUri = await captureRef(viewRef.current, {
@@ -1510,15 +1528,24 @@ export default function DimensionOverlay({
       
       // Final check that ref is valid before capture
       if (!viewRef?.current) {
-        console.error('❌ viewRef.current is null after waiting. Debug info:', {
+        console.error('❌ EMAIL: viewRef.current is null. Debug:', {
           hasExternalViewRef: externalViewRef !== undefined,
+          externalViewRefCurrent: externalViewRef?.current,
+          externalViewRefType: externalViewRef?.current?.constructor?.name,
           hasViewRef: !!viewRef,
-          viewRefType: typeof viewRef,
+          viewRefCurrent: viewRef?.current,
+          viewRefCurrentType: viewRef?.current?.constructor?.name,
         });
-        throw new Error('View reference is not ready. Please try again.');
+        Alert.alert(
+          'Capture Error',
+          'Unable to capture view. The screen may not be fully loaded. Please wait a moment and try again.'
+        );
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        return;
       }
       
-      console.log('✅ Capturing with viewRef.current:', viewRef.current.constructor?.name);
+      console.log('✅ EMAIL: Capturing with viewRef.current:', viewRef.current.constructor?.name);
       
       // Capture using viewRef.current (includes photo + overlay)
       const measurementsUri = await captureRef(viewRef.current, {
