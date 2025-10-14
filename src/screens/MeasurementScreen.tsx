@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -38,8 +38,21 @@ export default function MeasurementScreen() {
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
   const cameraRef = useRef<CameraView>(null);
-  const measurementViewRef = useRef<View | null>(null);
+  const measurementViewRef = useRef<View>(null);
   const insets = useSafeAreaInsets();
+  
+  // Callback ref to ensure it's set
+  const setMeasurementViewRef = useCallback((node: View | null) => {
+    if (node) {
+      (measurementViewRef as any).current = node;
+      console.log('✅ measurementViewRef set via callback:', {
+        type: node.constructor?.name,
+        exists: true,
+      });
+    } else {
+      console.log('⚠️ measurementViewRef node is null');
+    }
+  }, []);
   
   const currentImageUri = useStore((s) => s.currentImageUri);
   const calibration = useStore((s) => s.calibration);
@@ -499,12 +512,9 @@ export default function MeasurementScreen() {
             <View style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
               <View 
-                ref={measurementViewRef} 
+                ref={setMeasurementViewRef}
                 collapsable={false}
                 style={{ flex: 1 }}
-                onLayout={() => {
-                  console.log('📐 View laid out, ref:', !!measurementViewRef.current);
-                }}
               >
                 <ZoomableImage 
                   imageUri={currentImageUri}
