@@ -4587,9 +4587,8 @@ export default function DimensionOverlay({
                   Alert.alert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 } else {
-                  // Switched to Free - RESET ALL COUNTERS
-                  resetExportLimits();
-                  Alert.alert('🔄 Free User Mode', 'Switched to Free User. Export counter has been reset for testing!');
+                  // Switched to Free
+                  Alert.alert('🔄 Free User Mode', 'Switched to Free User for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                 }
               } else {
