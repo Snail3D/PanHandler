@@ -1396,32 +1396,12 @@ export default function DimensionOverlay({
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Final check that ref is valid before capture
+      // Use ViewShot's capture method
       if (!viewRef?.current) {
-        console.error('❌ SAVE: viewRef.current is null. Debug:', {
-          hasExternalViewRef: externalViewRef !== undefined,
-          externalViewRefCurrent: externalViewRef?.current,
-          externalViewRefType: externalViewRef?.current?.constructor?.name,
-          hasViewRef: !!viewRef,
-          viewRefCurrent: viewRef?.current,
-          viewRefCurrentType: viewRef?.current?.constructor?.name,
-        });
-        Alert.alert(
-          'Capture Error',
-          'Unable to capture view. The screen may not be fully loaded. Please wait a moment and try again.'
-        );
-        setIsCapturing(false);
-        setCurrentLabel(null);
-        return;
+        throw new Error('ViewShot ref is not available');
       }
       
-      console.log('✅ SAVE: Capturing with viewRef.current:', viewRef.current.constructor?.name);
-      
-      // Capture using viewRef.current like it worked before
-      const measurementsUri = await captureRef(viewRef.current, {
-        format: 'jpg',
-        quality: 0.9,
-      });
+      const measurementsUri = await (viewRef.current as any).capture();
       
       // Save measurements photo
       await MediaLibrary.createAssetAsync(measurementsUri);
@@ -1431,10 +1411,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5);
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const labelOnlyUri = await captureRef(viewRef.current, {
-        format: 'png',
-        quality: 1.0,
-      });
+      const labelOnlyUri = await (viewRef.current as any).capture();
       
       if (setImageOpacity) setImageOpacity(1);
       await MediaLibrary.createAssetAsync(labelOnlyUri);
@@ -1523,35 +1500,15 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update and ref to be ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for UI to update
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Final check that ref is valid before capture
+      // Use ViewShot's capture method (viewRef is ViewShot component)
       if (!viewRef?.current) {
-        console.error('❌ EMAIL: viewRef.current is null after 500ms. Debug:', {
-          hasExternalViewRef: externalViewRef !== undefined,
-          externalViewRefCurrent: externalViewRef?.current,
-          externalViewRefType: externalViewRef?.current?.constructor?.name,
-          hasViewRef: !!viewRef,
-          viewRefCurrent: viewRef?.current,
-          viewRefCurrentType: viewRef?.current?.constructor?.name,
-        });
-        Alert.alert(
-          'Capture Error',
-          'Unable to capture view. The screen may not be fully loaded. Please wait a moment and try again.'
-        );
-        setIsCapturing(false);
-        setCurrentLabel(null);
-        return;
+        throw new Error('ViewShot ref is not available');
       }
       
-      console.log('✅ EMAIL: Capturing with viewRef.current:', viewRef.current.constructor?.name);
-      
-      // Capture using viewRef.current (includes photo + overlay)
-      const measurementsUri = await captureRef(viewRef.current, {
-        format: 'jpg',
-        quality: 0.9,
-      });
+      const measurementsUri = await (viewRef.current as any).capture();
 
       // Build measurement text with scale information
       let measurementText = '';
@@ -1624,11 +1581,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo using viewRef.current
-      const labelOnlyUri = await captureRef(viewRef.current, {
-        format: 'png',
-        quality: 1.0,
-      });
+      // Capture label-only photo using ViewShot
+      const labelOnlyUri = await (viewRef.current as any).capture();
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       

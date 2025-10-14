@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ViewShot from 'react-native-view-shot';
 import useStore from '../state/measurementStore';
 import CalibrationModal from '../components/CalibrationModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -38,21 +39,8 @@ export default function MeasurementScreen() {
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
   const cameraRef = useRef<CameraView>(null);
-  const measurementViewRef = useRef<View>(null);
+  const measurementViewRef = useRef<ViewShot>(null);
   const insets = useSafeAreaInsets();
-  
-  // Callback ref to ensure it's set
-  const setMeasurementViewRef = useCallback((node: View | null) => {
-    if (node) {
-      (measurementViewRef as any).current = node;
-      console.log('✅ measurementViewRef set via callback:', {
-        type: node.constructor?.name,
-        exists: true,
-      });
-    } else {
-      console.log('⚠️ measurementViewRef node is null');
-    }
-  }, []);
   
   const currentImageUri = useStore((s) => s.currentImageUri);
   const calibration = useStore((s) => s.calibration);
@@ -511,9 +499,9 @@ export default function MeasurementScreen() {
           {mode === 'measurement' && (
             <View style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
-              <View 
-                ref={setMeasurementViewRef}
-                collapsable={false}
+              <ViewShot
+                ref={measurementViewRef}
+                options={{ format: 'jpg', quality: 0.9 }}
                 style={{ flex: 1 }}
               >
                 <ZoomableImage 
@@ -541,7 +529,7 @@ export default function MeasurementScreen() {
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
                 />
-              </View>
+              </ViewShot>
             </View>
           )}
 
