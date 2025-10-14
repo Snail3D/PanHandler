@@ -4151,8 +4151,8 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {/* "Made with PanHandler" banner - bottom center (only when capturing/saving) */}
-          {!isCapturing && !isProUser && (
+          {/* "Made with PanHandler" watermark - only visible during capture for free users */}
+          {isCapturing && !isProUser && (
             <View
               style={{
                 position: 'absolute',
@@ -4169,15 +4169,10 @@ export default function DimensionOverlay({
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 6,
-                  flexDirection: 'row',
-                  alignItems: 'center',
                 }}
               >
                 <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '500' }}>
                   Made with PanHandler
-                </Text>
-                <Text style={{ color: '#A0A0A0', fontSize: 9, fontWeight: '400', marginLeft: 6 }}>
-                  • Remove with Pro
                 </Text>
               </View>
             </View>
