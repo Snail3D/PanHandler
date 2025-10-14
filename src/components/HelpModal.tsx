@@ -86,12 +86,14 @@ const ExpandableSection = ({
           { translateX: shift }
         ],
         opacity: opacity.value,
+        zIndex: 0, // Base z-index for non-expanded sections
       };
     }
     
     return {
       transform: [{ scale: scale.value }],
       opacity: opacity.value,
+      zIndex: 0,
     };
   });
   
@@ -106,7 +108,7 @@ const ExpandableSection = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, { marginBottom: 14 }]}>
+    <Animated.View style={[animatedStyle, { marginBottom: 14, zIndex: expanded ? 999 : 0 }]}>
       <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -119,7 +121,7 @@ const ExpandableSection = ({
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.2,
           shadowRadius: 12,
-          elevation: 6,
+          elevation: expanded ? 999 : 6,
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.35)',
         }}
