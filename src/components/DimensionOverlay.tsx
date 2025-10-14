@@ -1258,12 +1258,6 @@ export default function DimensionOverlay({
       return;
     }
     
-    // Show paywall at exactly 5 saves (halfway point)
-    if (!isProUser && monthlySaveCount === 4) {
-      setShowPaywallModal(true);
-      return;
-    }
-    
     // Show label modal first
     setPendingAction('save');
     setShowLabelModal(true);
@@ -1342,6 +1336,11 @@ export default function DimensionOverlay({
       // Increment save counter for free users
       incrementSaveCount();
       
+      // Show paywall at exactly 5 saves (halfway point) - AFTER successful save
+      if (!isProUser && monthlySaveCount === 4) {
+        setTimeout(() => setShowPaywallModal(true), 1000); // Show after quote
+      }
+      
       // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       
@@ -1366,12 +1365,6 @@ export default function DimensionOverlay({
           { text: 'Upgrade to Pro', onPress: () => setShowProModal(true) }
         ]
       );
-      return;
-    }
-    
-    // Show paywall at exactly 5 emails (halfway point)
-    if (!isProUser && monthlyEmailCount === 4) {
-      setShowPaywallModal(true);
       return;
     }
     
@@ -1569,6 +1562,11 @@ export default function DimensionOverlay({
       
       // Increment email counter for free users (counts when composer opens)
       incrementEmailCount();
+      
+      // Show paywall at exactly 5 emails (halfway point) - AFTER successful email
+      if (!isProUser && monthlyEmailCount === 4) {
+        setTimeout(() => setShowPaywallModal(true), 500);
+      }
       
       // Note: We don't show quote here because composeAsync() returns when composer opens,
       // not when email is sent. We can't distinguish between "sent" and "cancelled".
