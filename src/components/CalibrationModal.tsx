@@ -48,12 +48,10 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center' }}>
         <View style={{
-          position: 'absolute',
-          top: insets.top + 60,
-          left: 20,
-          right: 20,
+          width: '90%',
+          maxWidth: 400,
           maxHeight: selectedCoin ? 520 : 440,
           borderRadius: 20,
           overflow: 'hidden',
@@ -130,45 +128,45 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                     shadowOpacity: 0.15,
                     shadowRadius: 8,
                   }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <View style={{ flex: 1 }}>
-                        <View style={{ 
-                          flexDirection: 'row', 
-                          alignItems: 'center',
-                          marginBottom: 6,
+                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                      <View style={{ 
+                        flexDirection: 'row', 
+                        alignItems: 'center',
+                        marginBottom: 6,
+                      }}>
+                        <View style={{
+                          backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                          paddingHorizontal: 8,
+                          paddingVertical: 3,
+                          borderRadius: 6,
                         }}>
-                          <View style={{
-                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                            paddingHorizontal: 8,
-                            paddingVertical: 3,
-                            borderRadius: 6,
+                          <Text style={{ 
+                            color: '#2E7D32', 
+                            fontSize: 10, 
+                            fontWeight: '700', 
+                            letterSpacing: 0.5 
                           }}>
-                            <Text style={{ 
-                              color: '#2E7D32', 
-                              fontSize: 10, 
-                              fontWeight: '700', 
-                              letterSpacing: 0.5 
-                            }}>
-                              SELECTED
-                            </Text>
-                          </View>
+                            SELECTED
+                          </Text>
                         </View>
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.9)', 
-                          fontWeight: '700', 
-                          fontSize: 17,
-                          marginBottom: 4,
-                        }}>
-                          {selectedCoin.name}
-                        </Text>
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.55)', 
-                          fontSize: 14, 
-                          fontWeight: '500' 
-                        }}>
-                          {selectedCoin.diameter}mm • {selectedCoin.country}
-                        </Text>
                       </View>
+                      <Text style={{ 
+                        color: 'rgba(0, 0, 0, 0.9)', 
+                        fontWeight: '700', 
+                        fontSize: 17,
+                        marginBottom: 4,
+                        textAlign: 'center',
+                      }}>
+                        {selectedCoin.name}
+                      </Text>
+                      <Text style={{ 
+                        color: 'rgba(0, 0, 0, 0.55)', 
+                        fontSize: 14, 
+                        fontWeight: '500',
+                        textAlign: 'center',
+                      }}>
+                        {selectedCoin.diameter}mm • {selectedCoin.country}
+                      </Text>
                       <Pressable
                         onPress={() => {
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -178,6 +176,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                           padding: 8,
                           backgroundColor: 'rgba(0, 0, 0, 0.05)',
                           borderRadius: 20,
+                          marginTop: 8,
                         }}
                       >
                         <Ionicons name="close-circle" size={22} color="rgba(0, 0, 0, 0.4)" />
@@ -245,9 +244,9 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                           setSearchQuery('');
                         }}
                         style={({ pressed }) => ({
-                          paddingVertical: 13,
+                          paddingVertical: 16,
                           paddingHorizontal: 14,
-                          marginBottom: 8,
+                          marginBottom: 12,
                           borderRadius: 12,
                           backgroundColor: pressed 
                             ? 'rgba(255, 255, 255, 0.9)' 
@@ -263,13 +262,15 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                           fontWeight: '600', 
                           fontSize: 15,
                           marginBottom: 3,
+                          textAlign: 'center',
                         }}>
                           {coin.name}
                         </Text>
                         <Text style={{ 
                           color: 'rgba(0, 0, 0, 0.5)', 
                           fontSize: 13, 
-                          fontWeight: '500' 
+                          fontWeight: '500',
+                          textAlign: 'center',
                         }}>
                           {coin.diameter}mm • {coin.country}
                         </Text>
@@ -357,7 +358,7 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                         ? 'rgba(255, 255, 255, 0.9)' 
                         : 'rgba(255, 255, 255, 0.7)',
                       borderRadius: 14,
-                      paddingVertical: 15,
+                      paddingVertical: 18,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -372,12 +373,10 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.8)', 
                       fontWeight: '700', 
-                      fontSize: 16, 
-                      marginRight: 8 
+                      fontSize: 22,
                     }}>
                       Continue
                     </Text>
-                    <Ionicons name="arrow-forward-circle" size={20} color="rgba(0, 0, 0, 0.6)" />
                   </Pressable>
                 </View>
               )}
