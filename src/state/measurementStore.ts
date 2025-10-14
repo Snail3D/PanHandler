@@ -25,6 +25,8 @@ export interface CompletedMeasurement {
   points: Array<{ x: number; y: number }>;
   value: string;
   mode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
+  calibrationMode?: 'coin' | 'map'; // Track which calibration mode was used when creating this measurement
+  mapScaleData?: {screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'}; // Store map scale if created in map mode
   radius?: number; // For circles
   width?: number;  // For rectangles  
   height?: number; // For rectangles
