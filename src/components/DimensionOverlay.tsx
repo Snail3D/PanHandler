@@ -1438,18 +1438,9 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Check if user can export
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-    
-    // Skip label modal, just email directly
-    performEmail(null);
+    // Show label modal first
+    setPendingAction('email');
+    setShowLabelModal(true);
   };
 
   const performEmail = async (label: string | null) => {
@@ -4062,6 +4053,7 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               style={{
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 flex: 1,
                 paddingVertical: 6,
                 borderRadius: 7.5,
@@ -4090,6 +4082,7 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
               style={{
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 flex: 1,
                 paddingVertical: 6,
                 borderRadius: 7.5,
