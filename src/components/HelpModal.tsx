@@ -6,6 +6,7 @@ import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import SnailIcon from './SnailIcon';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -1526,11 +1527,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       Created by{' '}
                     </Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: -2 }}>
-                      <Image 
-                        source={require('../../assets/snail-logo.png')} 
-                        style={{ width: 18, height: 18, marginRight: 4 }}
-                        resizeMode="contain"
-                      />
+                      <View style={{ marginRight: 4 }}>
+                        <SnailIcon size={18} color="#1C1C1E" />
+                      </View>
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', lineHeight: 22 }}>
                         Snail
                       </Text>
