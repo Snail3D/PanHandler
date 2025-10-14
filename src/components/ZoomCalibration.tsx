@@ -303,49 +303,54 @@ export default function ZoomCalibration({
               Current <Text style={{ fontWeight: '700', color: '#F59E0B' }}>Zoom: {zoomScale.toFixed(2)}x</Text>
             </Text>
             
-            {/* GIANT Lock In Button - centered, no icon */}
+            {/* GIANT Lock In Button - obvious, clickable button styling */}
             <Pressable
               onPress={handleLockIn}
               style={({ pressed }) => ({
-                backgroundColor: pressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: pressed ? '#10B981' : '#34C759',
                 borderRadius: 16,
                 paddingVertical: 20,
                 marginBottom: 12,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
+                borderWidth: 2,
+                borderColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.3,
+                shadowRadius: 16,
               })}
             >
               <Text style={{ 
-                color: 'rgba(0, 0, 0, 0.85)', 
+                color: '#FFFFFF', 
                 fontWeight: '800', 
                 fontSize: 26,
                 textAlign: 'center',
+                letterSpacing: 1,
               }}>
                 LOCK IN
               </Text>
             </Pressable>
             
-            {/* Cancel button - smaller, below */}
+            {/* Go Back button - with icon */}
             <Pressable
               onPress={onCancel}
               style={({ pressed }) => ({
                 backgroundColor: 'transparent',
                 paddingVertical: 10,
                 alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                opacity: pressed ? 0.5 : 1,
               })}
             >
+              <Ionicons name="arrow-back" size={18} color="rgba(0, 0, 0, 0.5)" style={{ marginRight: 6 }} />
               <Text style={{ 
                 color: 'rgba(0, 0, 0, 0.5)', 
                 fontWeight: '600', 
                 fontSize: 15,
               }}>
-                Cancel
+                Go Back
               </Text>
             </Pressable>
           </View>
