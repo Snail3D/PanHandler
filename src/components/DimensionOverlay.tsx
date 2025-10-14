@@ -140,13 +140,6 @@ export default function DimensionOverlay({
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
   
-  // 5-tap Pro/Free toggle for testing (REMOVE IN PRODUCTION)
-  const [proToggleTapCount, setProToggleTapCount] = useState(0);
-  const [proToggleLastTapTime, setProToggleLastTapTime] = useState(0);
-  
-  // Label modal for save/email
-  const [showLabelModal, setShowLabelModal] = useState(false);
-  const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
@@ -4954,47 +4947,8 @@ export default function DimensionOverlay({
           {/* Pro status footer */}
           <Pressable
             onPress={() => {
-              // SECRET TEST FEATURE: 5 fast taps to toggle Pro/Free (REMOVE IN PRODUCTION)
-              const now = Date.now();
-              let newCount = proToggleTapCount;
-              
-              // Reset counter if more than 1 second since last tap
-              if (now - proToggleLastTapTime > 1000) {
-                newCount = 1;
-              } else {
-                newCount = proToggleTapCount + 1;
-              }
-              
-              setProToggleTapCount(newCount);
-              setProToggleLastTapTime(now);
-              
-              if (newCount >= 5) {
-                // Toggle Pro/Free status
-                const newProStatus = !isProUser;
-                setIsProUser(newProStatus);
-                setProToggleTapCount(0);
-                
-                if (newProStatus) {
-                  // Switched to Pro
-                  showAlert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!', 'success');
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                } else {
-                  // Switched to Free
-                  showAlert('🔄 Free User Mode', 'Switched to Free User for testing!', 'info');
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                }
-              } else {
-                // Only show modal on 1st tap if Free user (not during rapid tapping)
-                if (newCount === 1 && !isProUser) {
-                  setTimeout(() => {
-                    // Check if user didn't continue tapping (still at 1 tap after 500ms)
-                    if (proToggleTapCount === 1) {
-                      setShowProModal(true);
-                    }
-                  }, 500);
-                }
-                
-                // Haptic feedback for tap counting
+              if (!isProUser) {
+                setShowProModal(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
             }}
@@ -5010,9 +4964,6 @@ export default function DimensionOverlay({
             </Text>
           </Pressable>
         </View>
-        </BlurView>
-          </Animated.View>
-        </GestureDetector>
       )}
       
       {/* Pro Upgrade Modal */}
