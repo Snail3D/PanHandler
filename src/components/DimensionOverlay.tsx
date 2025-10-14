@@ -4750,7 +4750,24 @@ export default function DimensionOverlay({
               }}
             >
               <View className="flex-row items-center justify-center">
-                <Text style={{ fontSize: 14, marginRight: 4 }}>🗺️</Text>
+                {/* Map icon - folded map style */}
+                <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
+                  <Path
+                    d="M15 5l-6 6l6 6M9 5l-6 6l6 6"
+                    stroke={isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <Path
+                    d="M8 3v18M16 3v18"
+                    stroke={isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </Svg>
                 <Text style={{
                   fontWeight: '600',
                   fontSize: 10,
@@ -5018,10 +5035,10 @@ export default function DimensionOverlay({
                         borderTopWidth: 1, 
                         borderTopColor: 'rgba(0,0,0,0.06)',
                         shadowColor: '#FF3B30',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 6,
-                        backgroundColor: 'rgba(255, 59, 48, 0.02)',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 8,
+                        backgroundColor: 'rgba(255, 59, 48, 0.06)',
                       }}>
                         <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12 }}>
                           <Text style={{ fontSize: 14, color: '#1C1C1E' }}>Freehand Tool</Text>
