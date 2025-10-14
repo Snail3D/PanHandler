@@ -1787,7 +1787,6 @@ export default function DimensionOverlay({
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 12,
-            flexDirection: 'row',
             alignItems: 'center',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 2 },
@@ -1796,9 +1795,19 @@ export default function DimensionOverlay({
             elevation: 5,
           }}
         >
-          <Ionicons name="checkmark-circle" size={16} color="white" />
-          <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
-            Calibrated
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="checkmark-circle" size={16} color="white" />
+            <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
+              Calibrated
+            </Text>
+          </View>
+          <Text style={{ 
+            color: 'rgba(255, 255, 255, 0.85)', 
+            fontSize: 9, 
+            fontWeight: '500', 
+            marginTop: 2 
+          }}>
+            {coinCircle.coinName} • {coinCircle.coinDiameter.toFixed(1)}mm
           </Text>
         </Pressable>
       )}
