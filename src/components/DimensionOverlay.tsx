@@ -2533,6 +2533,17 @@ export default function DimensionOverlay({
                     const draggedIdx = resizingPoint.pointIndex;
                     newPoints[draggedIdx] = imageCoords;
                     
+                    // If this is a closed loop and we're moving the first or last point, sync them
+                    if (m.isClosed) {
+                      if (draggedIdx === 0) {
+                        // Moving first point - update last point to match
+                        newPoints[newPoints.length - 1] = imageCoords;
+                      } else if (draggedIdx === newPoints.length - 1) {
+                        // Moving last point - update first point to match
+                        newPoints[0] = imageCoords;
+                      }
+                    }
+                    
                     // Calculate influence radius (how many neighboring points to smooth)
                     const influenceRadius = 2; // Affect 2 points on each side
                     
@@ -2540,7 +2551,7 @@ export default function DimensionOverlay({
                     for (let i = 1; i <= influenceRadius; i++) {
                       // Smooth points BEFORE the dragged point
                       const beforeIdx = draggedIdx - i;
-                      if (beforeIdx >= 0) {
+                      if (beforeIdx >= 0 && !(m.isClosed && beforeIdx === newPoints.length - 1)) {
                         const weight = 1 - (i / (influenceRadius + 1)); // Decreasing influence (0.67, 0.33)
                         const originalPoint = m.points[beforeIdx];
                         newPoints[beforeIdx] = {
@@ -2551,7 +2562,7 @@ export default function DimensionOverlay({
                       
                       // Smooth points AFTER the dragged point
                       const afterIdx = draggedIdx + i;
-                      if (afterIdx < m.points.length) {
+                      if (afterIdx < m.points.length && !(m.isClosed && afterIdx === newPoints.length - 1)) {
                         const weight = 1 - (i / (influenceRadius + 1)); // Decreasing influence
                         const originalPoint = m.points[afterIdx];
                         newPoints[afterIdx] = {
