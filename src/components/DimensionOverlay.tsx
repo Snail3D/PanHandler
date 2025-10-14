@@ -1367,6 +1367,11 @@ export default function DimensionOverlay({
       return;
     }
 
+    if (!viewRef.current) {
+      Alert.alert('Export Error', 'View not ready. Please try again.');
+      return;
+    }
+
     try {
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -1382,8 +1387,8 @@ export default function DimensionOverlay({
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Capture using viewRef like it worked before
-      const measurementsUri = await captureRef(viewRef, {
+      // Capture using viewRef.current like it worked before
+      const measurementsUri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 0.9,
       });
@@ -1396,7 +1401,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5);
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const labelOnlyUri = await captureRef(viewRef, {
+      const labelOnlyUri = await captureRef(viewRef.current, {
         format: 'png',
         quality: 1.0,
       });
@@ -1445,6 +1450,11 @@ export default function DimensionOverlay({
       return;
     }
     
+    if (!viewRef.current) {
+      Alert.alert('Email Error', 'View not ready. Please try again.');
+      return;
+    }
+    
     try {
       // Check if email is available
       const isAvailable = await MailComposer.isAvailableAsync();
@@ -1483,8 +1493,8 @@ export default function DimensionOverlay({
       // Wait for UI to update
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Capture using viewRef (includes photo + overlay)
-      const measurementsUri = await captureRef(viewRef, {
+      // Capture using viewRef.current (includes photo + overlay)
+      const measurementsUri = await captureRef(viewRef.current, {
         format: 'jpg',
         quality: 0.9,
       });
@@ -1560,8 +1570,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo using viewRef
-      const labelOnlyUri = await captureRef(viewRef, {
+      // Capture label-only photo using viewRef.current
+      const labelOnlyUri = await captureRef(viewRef.current, {
         format: 'png',
         quality: 1.0,
       });
