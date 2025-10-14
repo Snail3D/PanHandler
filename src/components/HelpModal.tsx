@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, ScrollView, Pressable, Linking, Alert, Image } from 'react-native';
+import { View, Text, Modal, ScrollView, Pressable, Linking, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
+import AlertModal from './AlertModal';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -241,7 +242,33 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
+  const isProUser = useStore((s) => s.isProUser);
+  const setIsProUser = useStore((s) => s.setIsProUser);
   
+  // Easter egg: 10-tap on right egg to toggle Pro/Free (only for non-paid users)
+  const [eggTapCount, setEggTapCount] = useState(0);
+  const [eggLastTapTime, setEggLastTapTime] = useState(0);
+  
+  // Alert modal state
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    type?: 'info' | 'success' | 'error' | 'warning';
+  }>({
+    visible: false,
+    title: '',
+    message: '',
+  });
+
+  const showAlert = (title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
+    setAlertConfig({ visible: true, title, message, type });
+  };
+
+  const closeAlert = () => {
+    setAlertConfig(prev => ({ ...prev, visible: false }));
+  };
+
   // Scroll position for Rolodex effect
   const scrollY = useSharedValue(0);
   
@@ -1633,7 +1660,56 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 10, letterSpacing: -0.3 }}>
                       Hidden Surprises
                     </Text>
-                    <Text style={{ fontSize: 28 }}>🥚</Text>
+                    <Pressable
+                      onPress={() => {
+                        // Easter egg: 10 taps on right egg toggles Pro/Free
+                        // Only works if not actually a paid Pro member
+                        // TODO: When payment is integrated, check actual payment status here
+                        const actuallyPaidPro = false; // Will be: checkPaymentStatus()
+                        
+                        if (actuallyPaidPro) {
+                          // Disable easter egg for actual paying customers
+                          return;
+                        }
+                        
+                        const now = Date.now();
+                        let newCount = eggTapCount;
+                        
+                        // Reset counter if more than 1 second since last tap
+                        if (now - eggLastTapTime > 1000) {
+                          newCount = 1;
+                        } else {
+                          newCount = eggTapCount + 1;
+                        }
+                        
+                        setEggTapCount(newCount);
+                        setEggLastTapTime(now);
+                        
+                        if (newCount >= 10) {
+                          // Toggle Pro/Free status
+                          const newProStatus = !isProUser;
+                          setIsProUser(newProStatus);
+                          setEggTapCount(0);
+                          
+                          // Haptic feedback
+                          if (newProStatus) {
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            showAlert('🎉 Easter Egg Found!', 'Pro features unlocked for testing!', 'success');
+                          } else {
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                            showAlert('🥚 Back to Free', 'Pro features locked again.', 'info');
+                          }
+                        } else if (newCount >= 5) {
+                          // Halfway feedback - let them know they're on the right track
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        } else {
+                          // Light tap feedback
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
+                      }}
+                    >
+                      <Text style={{ fontSize: 28 }}>🥚</Text>
+                    </Pressable>
                   </View>
                   
                   <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, textAlign: 'center', fontStyle: 'italic' }}>
@@ -1751,4 +1827,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
       </BlurView>
     </Modal>
   );
+      {/* Custom Alert Modal */}
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={closeAlert}
+      />
 }
