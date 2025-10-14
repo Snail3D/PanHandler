@@ -127,7 +127,7 @@ export default function ZoomableImage({
   const composedGesture = Gesture.Race(
     doubleTapGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
-  );
+  ).enabled(!locked); // Disable entire gesture composition when locked
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
