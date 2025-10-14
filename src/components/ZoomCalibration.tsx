@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Svg, Circle } from 'react-native-svg';
@@ -8,6 +8,17 @@ import { CoinReference } from '../utils/coinReferences';
 import ZoomableImage from './ZoomableImageV2';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Vibrant color palette for the circle/text (same as measurement colors)
+const VIBRANT_COLORS = [
+  '#3B82F6', // Blue
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+  '#F59E0B', // Amber
+  '#10B981', // Green
+  '#EF4444', // Red
+  '#06B6D4', // Cyan
+];
 
 interface ZoomCalibrationProps {
   imageUri: string;
@@ -41,6 +52,17 @@ export default function ZoomCalibration({
   const insets = useSafeAreaInsets();
   const [zoomScale, setZoomScale] = useState(1);
   const [zoomTranslate, setZoomTranslate] = useState({ x: 0, y: 0 });
+  const [colorIndex, setColorIndex] = useState(0);
+
+  // Rotate colors every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setColorIndex((prev) => (prev + 1) % VIBRANT_COLORS.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentColor = VIBRANT_COLORS[colorIndex];
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -106,42 +128,42 @@ export default function ZoomCalibration({
         pointerEvents="none"
       >
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-          {/* Filled red circle with low opacity for sexy, subtle look */}
+          {/* Vibrant colored circle with glow */}
           <Circle
             cx={referenceCenterX}
             cy={referenceCenterY}
             r={referenceRadiusPixels}
-            fill="rgba(239, 68, 68, 0.15)"
-            stroke="#EF4444"
-            strokeWidth="3"
+            fill={`${currentColor}15`}
+            stroke={currentColor}
+            strokeWidth="4"
           />
           
-          {/* Crosshair for precision */}
+          {/* Center dot for precision */}
           <Circle
             cx={referenceCenterX}
             cy={referenceCenterY}
-            r="4"
-            fill="#EF4444"
+            r="5"
+            fill={currentColor}
           />
         </Svg>
         
-        {/* Text instruction inside the circle - larger, bolder, red */}
+        {/* Coin text inside the circle - BIGGER and vibrant color */}
         <View
           style={{
             position: 'absolute',
-            left: referenceCenterX - 100,
-            top: referenceCenterY - 40,
-            width: 200,
+            left: referenceCenterX - 120,
+            top: referenceCenterY - 50,
+            width: 240,
           }}
         >
           <Text style={{ 
-            color: '#EF4444', 
-            fontSize: 22, 
-            fontWeight: '800', 
+            color: currentColor, 
+            fontSize: 28, 
+            fontWeight: '900', 
             textAlign: 'center', 
-            textShadowColor: 'rgba(0,0,0,0.8)', 
-            textShadowOffset: { width: 0, height: 2 }, 
-            textShadowRadius: 6,
+            textShadowColor: 'rgba(0,0,0,0.9)', 
+            textShadowOffset: { width: 0, height: 3 }, 
+            textShadowRadius: 8,
             letterSpacing: 0.5,
           }}>
             Cover the{'\n'}{selectedCoin.name}
@@ -179,7 +201,7 @@ export default function ZoomCalibration({
         />
       </View>
 
-      {/* Instructions */}
+      {/* Instructions - watery glassmorphic */}
       <View
         style={{
           position: 'absolute',
@@ -190,15 +212,15 @@ export default function ZoomCalibration({
         pointerEvents="none"
       >
         <BlurView
-          intensity={40}
+          intensity={35}
           tint="light"
           style={{
             borderRadius: 20,
             overflow: 'hidden',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.3,
-            shadowRadius: 16,
+            shadowOpacity: 0.2,
+            shadowRadius: 20,
           }}
         >
           <View style={{
@@ -207,7 +229,7 @@ export default function ZoomCalibration({
             paddingHorizontal: 20,
             paddingVertical: 18,
             borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
             <Text style={{
               color: 'rgba(0, 0, 0, 0.85)',
@@ -225,7 +247,7 @@ export default function ZoomCalibration({
               fontWeight: '500',
               lineHeight: 20,
             }}>
-              Pinch to zoom until the <Text style={{ fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>{selectedCoin.name}</Text> in your photo matches the red circle
+              Pinch to zoom until the <Text style={{ fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>{selectedCoin.name}</Text> in your photo matches the circle
             </Text>
             <View style={{
               marginTop: 12,
@@ -234,7 +256,7 @@ export default function ZoomCalibration({
               paddingHorizontal: 12,
               paddingVertical: 8,
               borderWidth: 1,
-              borderColor: 'rgba(0, 0, 0, 0.06)',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
             }}>
               <Text style={{
                 color: 'rgba(0, 0, 0, 0.6)',
@@ -249,86 +271,93 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Bottom Controls */}
+      {/* Bottom Controls - MOVED WAY UP, closer to circle */}
       <View
         style={{
           position: 'absolute',
-          bottom: insets.bottom + 20,
+          bottom: SCREEN_HEIGHT / 2 - referenceRadiusPixels - 140, // Much closer to circle
           left: 20,
           right: 20,
         }}
       >
         <BlurView
-          intensity={40}
+          intensity={35}
           tint="light"
           style={{
             borderRadius: 20,
             overflow: 'hidden',
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.3,
-            shadowRadius: 16,
+            shadowOpacity: 0.2,
+            shadowRadius: 20,
           }}
         >
           <View style={{
             backgroundColor: 'rgba(255, 255, 255, 0.5)',
             borderRadius: 20,
             paddingHorizontal: 20,
-            paddingVertical: 18,
+            paddingVertical: 20,
             borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.4)',
+            borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
+            {/* Current Zoom Display */}
             <Text style={{
               color: 'rgba(0, 0, 0, 0.6)',
               textAlign: 'center',
-              fontSize: 14,
-              marginBottom: 14,
+              fontSize: 15,
+              marginBottom: 16,
               fontWeight: '600',
             }}>
-              Current Zoom: <Text style={{ fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>{zoomScale.toFixed(2)}x</Text>
+              Current <Text style={{ fontWeight: '700', color: '#F59E0B' }}>Zoom: {zoomScale.toFixed(2)}x</Text>
             </Text>
             
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable
-                onPress={onCancel}
-                style={({ pressed }) => ({
-                  flex: 1,
-                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 14,
-                  paddingVertical: 14,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(0, 0, 0, 0.1)',
-                })}
-              >
-                <Ionicons name="close" size={20} color="rgba(0, 0, 0, 0.6)" />
-                <Text style={{ color: 'rgba(0, 0, 0, 0.75)', fontWeight: '700', marginLeft: 6, fontSize: 15 }}>
-                  Cancel
-                </Text>
-              </Pressable>
-              
-              <Pressable
-                onPress={handleLockIn}
-                style={({ pressed }) => ({
-                  flex: 1,
-                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 14,
-                  paddingVertical: 14,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(0, 0, 0, 0.1)',
-                })}
-              >
-                <Ionicons name="checkmark-circle" size={20} color="rgba(0, 0, 0, 0.6)" />
-                <Text style={{ color: 'rgba(0, 0, 0, 0.75)', fontWeight: '700', marginLeft: 6, fontSize: 15 }}>
-                  Lock In
-                </Text>
-              </Pressable>
-            </View>
+            {/* BIG Lock In Button - centered */}
+            <Pressable
+              onPress={handleLockIn}
+              style={({ pressed }) => ({
+                backgroundColor: pressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+                borderRadius: 16,
+                paddingVertical: 18,
+                marginBottom: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.4)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.15,
+                shadowRadius: 12,
+              })}
+            >
+              <Ionicons name="checkmark-circle" size={26} color="rgba(16, 185, 129, 0.8)" />
+              <Text style={{ 
+                color: 'rgba(0, 0, 0, 0.85)', 
+                fontWeight: '800', 
+                marginLeft: 10, 
+                fontSize: 22,
+              }}>
+                Lock In
+              </Text>
+            </Pressable>
+            
+            {/* Cancel button - smaller, below */}
+            <Pressable
+              onPress={onCancel}
+              style={({ pressed }) => ({
+                backgroundColor: 'transparent',
+                paddingVertical: 10,
+                alignItems: 'center',
+              })}
+            >
+              <Text style={{ 
+                color: 'rgba(0, 0, 0, 0.5)', 
+                fontWeight: '600', 
+                fontSize: 15,
+              }}>
+                Cancel
+              </Text>
+            </Pressable>
           </View>
         </BlurView>
       </View>
