@@ -4052,8 +4052,8 @@ export default function DimensionOverlay({
                 setSelectedMeasurementId(null); // Clear selection when switching to Edit mode
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 flex: 1,
                 paddingVertical: 6,
                 borderRadius: 7.5,
@@ -4081,8 +4081,8 @@ export default function DimensionOverlay({
                 setMeasurementMode(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 flex: 1,
                 paddingVertical: 6,
                 borderRadius: 7.5,
