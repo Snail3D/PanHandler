@@ -1393,6 +1393,68 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   entering={FadeIn.delay(800)}
                   style={{
                     backgroundColor: 'rgba(255,215,0,0.15)',
+              {/* Pro Features Section */}
+              <AnimatedView
+                entering={FadeIn.delay(600)}
+                style={{
+                  marginTop: 24,
+                  marginBottom: 14,
+                  paddingVertical: 14,
+                  paddingHorizontal: 18,
+                  backgroundColor: 'rgba(255,215,0,0.12)',
+                  borderRadius: 16,
+                  shadowColor: '#FFD700',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 14,
+                  elevation: 6,
+                  borderWidth: 2,
+                  borderColor: 'rgba(255,215,0,0.4)',
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 28 }}>✨</Text>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 10, letterSpacing: -0.3 }}>
+                    PanHandler Pro
+                  </Text>
+                  <Text style={{ fontSize: 28 }}>✨</Text>
+                </View>
+                
+                <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, textAlign: 'center', marginBottom: 10 }}>
+                  Unlock the <Text style={{ fontWeight: '700' }}>Freehand Tool</Text> to draw custom measurements and trace complex shapes!
+                </Text>
+                
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    Alert.alert(
+                      '✨ PanHandler Pro',
+                      'Pro features coming soon! Email hello@panhandler.app to join the waitlist.',
+                      [{ text: 'OK' }]
+                    );
+                  }}
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed ? 'rgba(255,215,0,0.35)' : 'rgba(255,215,0,0.25)',
+                    paddingVertical: 10,
+                    paddingHorizontal: 16,
+                    borderRadius: 12,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,215,0,0.6)',
+                    marginTop: 6,
+                  })}
+                >
+                  <Text style={{ 
+                    color: '#B8860B', 
+                    fontSize: 14, 
+                    fontWeight: '700',
+                    textAlign: 'center',
+                    letterSpacing: -0.2,
+                  }}>
+                    Upgrade to Pro ✨
+                  </Text>
+                </Pressable>
+              </AnimatedView>
+
                     borderRadius: 20,
                     padding: 18,
                     shadowColor: '#FFD700',

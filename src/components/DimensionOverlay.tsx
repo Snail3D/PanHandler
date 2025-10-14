@@ -127,14 +127,7 @@ export default function DimensionOverlay({
   const setUserEmail = useStore((s) => s.setUserEmail);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
-  const exportedSessions = useStore((s) => s.exportedSessions);
-  const markSessionExported = useStore((s) => s.markSessionExported);
-  const hasSessionBeenExported = useStore((s) => s.hasSessionBeenExported);
-  const resetExportLimits = useStore((s) => s.resetExportLimits);
   
-  // Compute canExport/getRemainingExports as functions (not store methods)
-  const canExport = () => isProUser || exportedSessions.length < 20;
-  const getRemainingExports = () => isProUser ? Infinity : Math.max(0, 20 - exportedSessions.length);
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
@@ -1365,15 +1358,6 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Check if user can export (20 lifetime limit for free users)
-    if (!canExport()) {
-      Alert.alert(
-        'Export Limit Reached',
-        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
     
     // Show label modal first
     setPendingAction('save');
@@ -4266,9 +4250,27 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {/* Freehand (activated by tapping here OR long-pressing Distance) */}
+              {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
               <Pressable
-                onPress={() => {
+              onPress={() => {
+                  if (!isProUser) {
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
+                  setMode('freehand');
+              onPress={() => {
+                  if (!isProUser) {
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
+                  setMode('freehand');
+                    // Show paywall modal
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
                   setMode('freehand');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
@@ -4313,6 +4315,19 @@ export default function DimensionOverlay({
                     Free
                   </Text>
                 </View>
+                  {!isProUser && (
+                    <View style={{
+                      position: 'absolute',
+                      top: -2,
+                      right: -2,
+                      backgroundColor: '#FFD700',
+                      paddingHorizontal: 3,
+                      paddingVertical: 1,
+                      borderRadius: 4,
+                    }}>
+                      <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
+                    </View>
+                  )}
               </Pressable>
 
               {/* Distance (long-press also activates freehand) */}
@@ -4331,7 +4346,7 @@ export default function DimensionOverlay({
                   }
                   freehandLongPressRef.current = setTimeout(() => {
                     // Activate freehand mode
-                    setMode('freehand');
+                    if (!isProUser) { setShowProModal(true); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); return; } setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
@@ -4486,10 +4501,10 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleExport}
-                disabled={!canExport()}
+                
                 style={{
                   flex: 1,
-                  backgroundColor: canExport() ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: true ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4497,16 +4512,16 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="images-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+                <Ionicons name="images-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
               </Pressable>
               
               <Pressable
                 onPress={handleEmail}
-                disabled={!canExport()}
+                
                 style={{
                   flex: 1,
-                  backgroundColor: canExport() ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: true ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4514,8 +4529,8 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="mail-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+                <Ionicons name="mail-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
               </Pressable>
             </>
 
@@ -4537,21 +4552,6 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
           
-          {/* Export Counter - Only show for free users */}
-          {!isProUser && (
-            <View style={{ 
-              marginTop: 8, 
-              paddingVertical: 6, 
-              paddingHorizontal: 12, 
-              alignItems: 'center',
-              borderTopWidth: 1,
-              borderTopColor: 'rgba(0, 0, 0, 0.08)',
-            }}>
-              <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.5)', fontWeight: '600' }}>
-                {getRemainingExports()} {getRemainingExports() === 1 ? 'export' : 'exports'} remaining
-              </Text>
-            </View>
-          )}
           
           {/* Pro status footer */}
           <Pressable
