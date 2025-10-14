@@ -1319,8 +1319,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                         Upgrade to Pro
                       </AnimatedText>
                       {' '}or{' '}
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6' }}>
-                        Restore your past purchase
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>
+                        Restore Purchase
                       </Text>
                     </Text>
                   </View>
