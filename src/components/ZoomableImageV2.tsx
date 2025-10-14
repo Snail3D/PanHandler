@@ -127,7 +127,7 @@ export default function ZoomableImage({
   const composedGesture = Gesture.Race(
     doubleTapGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
-  ).enabled(!locked); // Disable entire gesture composition when locked
+  );
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -138,17 +138,25 @@ export default function ZoomableImage({
     ],
   }));
 
+  const imageContent = (
+    <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+      <Image
+        source={{ uri: imageUri }}
+        style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
+        resizeMode="contain"
+      />
+    </Animated.View>
+  );
+
   return (
     <>
-      <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-          <Image
-            source={{ uri: imageUri }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
-            resizeMode="contain"
-          />
-        </Animated.View>
-      </GestureDetector>
+      {locked ? (
+        imageContent
+      ) : (
+        <GestureDetector gesture={composedGesture}>
+          {imageContent}
+        </GestureDetector>
+      )}
       
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
       {showLevelLine && (
