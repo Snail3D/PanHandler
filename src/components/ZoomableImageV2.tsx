@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Dimensions, StyleSheet, View, Text } from 'react-native';
+import { Image, Dimensions, StyleSheet, View, Text, InteractionManager } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -52,24 +52,12 @@ export default function ZoomableImage({
   const isPinching = useSharedValue(false);
   const fadeOpacity = useSharedValue(1);
   const gestureWasActive = useSharedValue(false);
-  const [gestureCleanupPending, setGestureCleanupPending] = useState(false);
   
   // Smooth fade when switching between locked/unlocked to prevent flash
   useEffect(() => {
     fadeOpacity.value = withTiming(1, { duration: 150 });
   }, [locked]);
-  
-  // Add cleanup delay when locking to ensure gestures fully release
-  useEffect(() => {
-    if (locked && !gestureCleanupPending) {
-      setGestureCleanupPending(true);
-      // Small delay to ensure gesture handlers release
-      const timer = setTimeout(() => {
-        setGestureCleanupPending(false);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [locked, gestureCleanupPending]);
+
 
   // Notify parent of initial transform values on mount
   useEffect(() => {
@@ -126,6 +114,10 @@ export default function ZoomableImage({
     .enabled(!locked)
     .minDistance(10) // Require 10px movement before activating - reduces tap interference
     .minPointers(2) // Require 2 fingers - prevents single tap interference with buttons
+    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
+    .activeOffsetY([-10, 10]) // Require 10px vertical movement to activate
+    .failOffsetX([-5, 5]) // Fail if finger stays within 5px
+    .failOffsetY([-5, 5]) // Fail if finger stays within 5px
     .onUpdate((event) => {
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
@@ -179,7 +171,7 @@ export default function ZoomableImage({
 
   const composedGesture = Gesture.Race(
     doubleTapGesture,
-    doubleTapWhenLockedGesture,
+    // doubleTapWhenLockedGesture disabled - causes bounce
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
   );
 
@@ -196,7 +188,7 @@ export default function ZoomableImage({
 
   return (
     <>
-      {!locked && !gestureCleanupPending && (
+      {!locked && (
         <GestureDetector gesture={composedGesture}>
           <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
             <Image
@@ -207,7 +199,7 @@ export default function ZoomableImage({
           </Animated.View>
         </GestureDetector>
       )}
-      {(locked || gestureCleanupPending) && (
+      {locked && (
         <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
           <Image
             source={{ uri: imageUri }}
