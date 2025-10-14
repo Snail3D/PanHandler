@@ -948,6 +948,15 @@ export default function DimensionOverlay({
         ...(height !== undefined && { height }),
       };
       
+      console.log('📏 Created measurement:', {
+        mode,
+        hasWidth: width !== undefined,
+        hasHeight: height !== undefined,
+        width,
+        height,
+        value,
+      });
+      
       setMeasurements([...measurements, newMeasurement]);
       setCurrentPoints([]); // Reset for next measurement
     }
