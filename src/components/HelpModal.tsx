@@ -1524,30 +1524,17 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </Text>
                   </View>
                   
-                  <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 16, flexWrap: 'wrap' }}>
-                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
-                      Created by{' '}
-                    </Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: -2 }}>
-                      <View style={{ marginRight: 4 }}>
-                        <SnailIcon size={18} color="#1C1C1E" />
-                      </View>
-                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', lineHeight: 22 }}>
-                        Snail
-                      </Text>
-                    </View>
-                    <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22 }}>
-                      , a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
-                    </Text>
-                  </View>
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
+                    Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
+                  </Text>
 
                   <Pressable
                     onPress={() => Linking.openURL("https://youtube.com/@realsnail3d?si=K4XTUYdou1ZefOlB")}
                     style={{
                       backgroundColor: '#FF0000',
-                      borderRadius: 14,
-                      paddingVertical: 14,
-                      paddingHorizontal: 16,
+                      borderRadius: 12,
+                      paddingVertical: 10,
+                      paddingHorizontal: 14,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1558,8 +1545,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       elevation: 6,
                     }}
                   >
-                    <Ionicons name="logo-youtube" size={24} color="white" />
-                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', marginLeft: 8, letterSpacing: -0.2 }}>
+                    <Ionicons name="logo-youtube" size={20} color="white" />
+                    <Text style={{ color: 'white', fontSize: 15, fontWeight: '600', marginLeft: 6, letterSpacing: -0.2 }}>
                       Follow on YouTube
                     </Text>
                   </Pressable>
