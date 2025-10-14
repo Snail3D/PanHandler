@@ -4750,21 +4750,28 @@ export default function DimensionOverlay({
               }}
             >
               <View className="flex-row items-center justify-center">
-                {/* Map icon - folded map style */}
+                {/* Map icon - folded map with panels */}
                 <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
+                  {/* Three vertical panels of a folded map */}
                   <Path
-                    d="M15 5l-6 6l6 6M9 5l-6 6l6 6"
+                    d="M3 4 L8 2 L8 22 L3 20 Z"
                     stroke={isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'}
-                    strokeWidth={2}
-                    strokeLinecap="round"
+                    strokeWidth={1.5}
                     strokeLinejoin="round"
                     fill="none"
                   />
                   <Path
-                    d="M8 3v18M16 3v18"
+                    d="M8 2 L16 4 L16 22 L8 22"
                     stroke={isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'}
-                    strokeWidth={2}
-                    strokeLinecap="round"
+                    strokeWidth={1.5}
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                  <Path
+                    d="M16 4 L21 2 L21 20 L16 22"
+                    stroke={isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'}
+                    strokeWidth={1.5}
+                    strokeLinejoin="round"
                     fill="none"
                   />
                 </Svg>
