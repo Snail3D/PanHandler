@@ -321,28 +321,42 @@ export default function ZoomCalibration({
           </Pressable>
         </BlurView>
         
-        {/* Go Back button - subtle, bottom */}
-        <Pressable
-          onPress={onCancel}
-          style={({ pressed }) => ({
-            paddingVertical: 12,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            opacity: pressed ? 0.5 : 1,
+        {/* Go Back button - gentle glassmorphic */}
+        <BlurView
+          intensity={30}
+          tint="light"
+          style={{
+            borderRadius: 16,
+            overflow: 'hidden',
             marginTop: 12,
-          })}
+          }}
         >
-          <Ionicons name="arrow-back" size={16} color="rgba(255, 255, 255, 0.6)" style={{ marginRight: 6 }} />
-          <Text style={{ 
-            color: 'rgba(255, 255, 255, 0.6)', 
-            fontWeight: '600', 
-            fontSize: 14,
-            letterSpacing: 0.2,
-          }}>
-            Go Back
-          </Text>
-        </Pressable>
+          <Pressable
+            onPress={onCancel}
+            style={({ pressed }) => ({
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              opacity: pressed ? 0.7 : 1,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: 16,
+            })}
+          >
+            <Ionicons name="arrow-back" size={18} color="rgba(0, 0, 0, 0.7)" style={{ marginRight: 6 }} />
+            <Text style={{ 
+              color: 'rgba(0, 0, 0, 0.7)', 
+              fontWeight: '600', 
+              fontSize: 15,
+              letterSpacing: 0.2,
+            }}>
+              Go Back
+            </Text>
+          </Pressable>
+        </BlurView>
       </View>
     </View>
   );
