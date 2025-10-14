@@ -7,7 +7,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, run
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { captureRef } from 'react-native-view-shot';
+import { captureRef, captureScreen } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
@@ -1360,17 +1360,19 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // TEMPORARILY DISABLED - Show measurements as text instead
-    let measurementText = 'Your Measurements:\n\n';
-    measurements.forEach((m, idx) => {
-      const color = getMeasurementColor(idx, m.mode);
-      measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
-    });
-    measurementText += `\nUnit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}`;
-    if (coinCircle) {
-      measurementText += `\nCalibrated with: ${coinCircle.coinName}`;
+    // Check if user can export (20 lifetime limit for free users)
+    if (!canExport()) {
+      Alert.alert(
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
+      );
+      return;
     }
-    Alert.alert('Measurements', measurementText);
+    
+    // Show label modal first
+    setPendingAction('save');
+    setShowLabelModal(true);
   };
 
   const performSave = async (label: string | null) => {
@@ -1387,103 +1389,73 @@ export default function DimensionOverlay({
         return;
       }
       
-      // Set state to show label + coin info and hide control menu
+      // Show label + coin info
       setIsCapturing(true);
       setCurrentLabel(label);
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef || !externalViewRef.current) {
-        throw new Error('No view ref available for capture');
-      }
-      
-      // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef(externalViewRef.current, {
-        format: 'jpg',
-        quality: 0.9,
-      });
-      
-      // Save measurements photo
+      // Capture with measurements
+      const measurementsUri = await captureScreen({ format: 'jpg', quality: 0.9 });
       await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
-      setHideMeasurementsForCapture(true); // Hide measurements and legend
-      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
-      await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
+      // Hide measurements, show label only
+      setHideMeasurementsForCapture(true);
+      if (setImageOpacity) setImageOpacity(0.5);
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (!externalViewRef || !externalViewRef.current) {
-        throw new Error('View ref lost after hiding measurements');
-      }
-      
-      const labelOnlyUri = await captureRef(externalViewRef.current, {
-        format: 'png',
-        quality: 1.0,
-      });
-      
-      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
+      // Capture label only
+      const labelOnlyUri = await captureScreen({ format: 'png', quality: 1.0 });
       await MediaLibrary.createAssetAsync(labelOnlyUri);
       
-      setHideMeasurementsForCapture(false); // Show measurements again
-      
-      console.log('✅ Saved label-only photo!');
-      
-      // Clear capture state
+      // Restore
+      if (setImageOpacity) setImageOpacity(1);
+      setHideMeasurementsForCapture(false);
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      console.log('✅ Save successful!');
-      // Show toast notification instead of Alert (so it appears behind the quote modal)
       showToastNotification(label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
       
-      // Mark this session as exported (only counts once per image)
       if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
         markSessionExported(currentImageUri);
       }
       
-      // Haptic feedback for success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      
-      // Show inspirational quote overlay
       setTimeout(() => showQuoteOverlay(), 500);
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      console.error('❌ Export error:', error);
-      Alert.alert('Save Error', `Failed to save image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      Alert.alert('Save Error', `Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleEmail = async () => {
-    // TEMPORARILY DISABLED - Show measurements as text instead
-    let measurementText = 'Your Measurements:\n\n';
-    measurements.forEach((m, idx) => {
-      const color = getMeasurementColor(idx, m.mode);
-      measurementText += `${idx + 1}. ${m.value} (${color.name})\n`;
-    });
-    measurementText += `\nUnit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}`;
-    if (coinCircle) {
-      measurementText += `\nCalibrated with: ${coinCircle.coinName}`;
+    // Check if user can export
+    if (!canExport()) {
+      Alert.alert(
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
+      );
+      return;
     }
-    Alert.alert('Measurements', measurementText);
+    
+    // Skip label modal, just email directly
+    performEmail(null);
   };
 
   const performEmail = async (label: string | null) => {
     if (!currentImageUri) {
-      Alert.alert('Email Error', 'No image to export. Please take a photo first.');
+      Alert.alert('Email Error', 'No image to export.');
       return;
     }
     
     try {
-      // Check if email is available
       const isAvailable = await MailComposer.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Email Not Available', 'No email app is configured on this device.');
+        Alert.alert('Email Not Available', 'No email app is configured.');
         return;
       }
 
-      // Prompt for email if not set
       let emailToUse = userEmail;
       if (!emailToUse) {
         await new Promise<void>((resolve) => {
@@ -1506,151 +1478,83 @@ export default function DimensionOverlay({
         });
       }
       
-      // Set state to show label + coin info and hide control menu
+      // Show label + coin info
       setIsCapturing(true);
       setCurrentLabel(label);
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Wait for UI to update before capturing
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Capture with measurements
+      const measurementsUri = await captureScreen({ format: 'jpg', quality: 0.9 });
       
-      // Use external ref (from parent) - it wraps both image and overlay
-      if (!externalViewRef || !externalViewRef.current) {
-        throw new Error('No view ref available for capture');
-      }
-      
-      // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef(externalViewRef.current, {
-        format: 'jpg',
-        quality: 0.9,
-      });
-
-      // Build measurement text with scale information
-      let measurementText = '';
-      
-      // First line with label and PanHandler branding
-      if (label) {
-        measurementText += `${label} - Measurements by PanHandler\n`;
-      } else {
-        measurementText += 'PanHandler Measurements\n';
-      }
+      // Build email body
+      let measurementText = label ? `${label} - Measurements by PanHandler\n` : 'PanHandler Measurements\n';
       measurementText += '========================================\n\n';
       
-      // Add calibration and unit info
       if (coinCircle) {
         const coinDiameterDisplay = unitSystem === 'imperial' 
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        const coinName = coinCircle.coinName || 'the coin you selected';
-        measurementText += `Calibration Reference: ${coinDiameterDisplay} (${coinName})\n`;
+        measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
       }
       
-      measurementText += `Unit System: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\n`;
-      
-      // List measurements with color names in parentheses
-      measurementText += 'Measurements:\n';
+      measurementText += `Unit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\nMeasurements:\n`;
       
       measurements.forEach((m, idx) => {
-        // Get color name for this measurement
         const colorInfo = getMeasurementColor(idx, m.mode);
-        const colorName = colorInfo.name;
-        
-        // Extract just the measurement value without any existing color prefix
         const valueOnly = m.value.replace(/^(Blue|Green|Red|Purple|Orange|Yellow|Pink|Amber|Cyan|Rose|Teal|Violet|Crimson|Magenta|Indigo|Sky|Lime)\s+/i, '');
-        
-        measurementText += `${valueOnly} (${colorName})\n`;
+        measurementText += `${valueOnly} (${colorInfo.name})\n`;
       });
       
-      // Add attachment info
       measurementText += `\n\nAttached: 2 photos\n`;
-      measurementText += `  • Full measurements photo\n`;
-      measurementText += `  • Transparent CAD canvas (50% opacity)\n`;
-      
-      // Add footer (only for non-Pro users)
       if (!isProUser) {
-        measurementText += '\n\n';
-        measurementText += '═══════════════════════════\n';
-        measurementText += 'Made with PanHandler for iOS\n';
-        measurementText += '═══════════════════════════';
+        measurementText += '\n═══════════════════════════\nMade with PanHandler for iOS\n═══════════════════════════';
       }
 
-      console.log('📧 Opening email composer...');
-      
-      // Build recipients array - use saved email for both to/cc if available
-      const recipients = emailToUse ? [emailToUse] : [];
-      const ccRecipients = emailToUse ? [emailToUse] : [];
-      
-      // Prepare attachments with proper filenames
       const attachments: string[] = [];
-      
-      // 1. Full measurements photo (with legend, label, coin, and all measurements)
-      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
+      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'Measurements.jpg';
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
-      await FileSystem.copyAsync({ from: uri, to: measurementsDest });
+      await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      console.log('✅ Added measurements photo to email');
+      // Capture label only
+      setHideMeasurementsForCapture(true);
+      if (setImageOpacity) setImageOpacity(0.5);
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // 2. Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
-      setHideMeasurementsForCapture(true); // Hide measurements and legend
-      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
-      await new Promise(resolve => setTimeout(resolve, 300)); // Wait longer for UI update
+      const labelOnlyUri = await captureScreen({ format: 'png', quality: 1.0 });
       
-      // Check ref is still available
-      if (!externalViewRef || !externalViewRef.current) {
-        throw new Error('ViewShot ref is not available for second capture');
-      }
+      if (setImageOpacity) setImageOpacity(1);
+      setHideMeasurementsForCapture(false);
       
-      // Capture label-only photo with same ref
-      const labelOnlyUri = await captureRef(externalViewRef.current, {
-        format: 'png',
-        quality: 1.0,
-      });
-      
-      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
-      
-      const labelOnlyFilename = label ? `${label}_Label.png` : 'PanHandler_Label.png';
+      const labelOnlyFilename = label ? `${label}_Label.png` : 'Label.png';
       const labelOnlyDest = `${FileSystem.cacheDirectory}${labelOnlyFilename}`;
       await FileSystem.copyAsync({ from: labelOnlyUri, to: labelOnlyDest });
       attachments.push(labelOnlyDest);
       
-      setHideMeasurementsForCapture(false); // Show measurements again
-      
-      console.log('✅ Added label-only photo to email');
-      
-      // Clear capture state
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      // Build subject with label first, then "Measurements"
-      const subject = label 
-        ? `${label} - Measurements` 
-        : 'PanHandler Measurements';
+      const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
+      const recipients = emailToUse ? [emailToUse] : [];
       
-      // Compose email with attachments
       await MailComposer.composeAsync({
         recipients,
-        ccRecipients,
+        ccRecipients: recipients,
         subject,
         body: measurementText,
         attachments,
       });
       
-      console.log('✅ Email composer opened');
-      
-      // Mark this session as exported (only counts once per image)
       if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
         markSessionExported(currentImageUri);
       }
-      
-      // Note: We don't show quote here because composeAsync() returns when composer opens,
-      // not when email is sent. We can't distinguish between "sent" and "cancelled".
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      console.error('❌ Email error:', error);
-      Alert.alert('Email Error', `Failed to prepare email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      Alert.alert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
+
 
   const handleReset = () => {
     // Instant reset without confirmation
