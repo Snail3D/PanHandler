@@ -78,6 +78,7 @@ interface Measurement {
   height?: number; // For rectangles
   area?: number;   // For closed freehand loops (lasso mode)
   isClosed?: boolean; // For freehand paths - indicates if it's a closed loop
+  perimeter?: string; // For closed freehand loops - just the perimeter for inline display
 }
 
 interface DimensionOverlayProps {
@@ -1097,7 +1098,7 @@ export default function DimensionOverlay({
     
     const updatedMeasurements = measurements.map(m => {
       let newValue = m.value;
-      let width, height, radius;
+      let width, height, radius, newPerimeter;
       
       if (m.mode === 'distance') {
         newValue = calculateDistance(m.points[0], m.points[1]);
@@ -1128,20 +1129,23 @@ export default function DimensionOverlay({
           totalLength += Math.sqrt(dx * dx + dy * dy);
         }
         const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
+        const perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
         
-        // If it has area (closed non-intersecting loop), recalculate area too
+        // If it has area (closed non-intersecting loop), recalculate area display
+        let newPerimeter;
         if (m.area !== undefined) {
-          const perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
           const areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
           newValue = `${perimeterStr} ⊞ ${areaStr}`;
+          newPerimeter = perimeterStr; // Store perimeter separately for inline display
         } else {
-          newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+          newValue = perimeterStr;
         }
       }
       
       return {
         ...m,
         value: newValue,
+        ...(newPerimeter !== undefined && { perimeter: newPerimeter }),
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
         ...(radius !== undefined && { radius }),
@@ -2171,7 +2175,8 @@ export default function DimensionOverlay({
                   const newMeasurement: Measurement = {
                     id: Date.now().toString(),
                     points: [...freehandPath],
-                    value: formattedValue,
+                    value: formattedValue, // Full display with area (for legend)
+                    perimeter: perimeterStr, // Just perimeter (for inline label)
                     mode: 'freehand',
                     area: physicalArea, // Store raw area value
                     isClosed: true, // Mark as closed loop
@@ -3668,7 +3673,9 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: 'white', fontSize: 10, fontWeight: '600' }}>
-                    {showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value}
+                    {showCalculatorWords 
+                      ? getCalculatorWord(measurement.perimeter || measurement.value) 
+                      : (measurement.perimeter || measurement.value)}
                   </Text>
                 </View>
               </View>
