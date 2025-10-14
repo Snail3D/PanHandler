@@ -1397,14 +1397,12 @@ export default function DimensionOverlay({
       // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log('🔍 Save ref check:', {
-        hasExternal: !!externalViewRef,
-        hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A',
-        captureMethod: externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'
-      });
+      // Debug on screen
+      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}\nCapture method: ${externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'}`;
       
       // Use external ref (from parent) - it's a ViewShot component
       if (!externalViewRef || !externalViewRef.current) {
+        Alert.alert('Debug: No Ref', `Ref check failed:\n\n${debugInfo}`);
         throw new Error('No view ref available for capture');
       }
       
@@ -1514,14 +1512,12 @@ export default function DimensionOverlay({
       // Wait longer for ViewShot to be ready (ViewShot needs time to attach)
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log('🔍 Email ref check:', {
-        hasExternal: !!externalViewRef,
-        hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A',
-        captureMethod: externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'
-      });
+      // Debug on screen
+      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}\nCapture method: ${externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'}`;
       
       // Use external ref (from parent) - it's a ViewShot component
       if (!externalViewRef || !externalViewRef.current) {
+        Alert.alert('Debug: No Ref', `Email ref check failed:\n\n${debugInfo}`);
         throw new Error('No view ref available for capture');
       }
       
