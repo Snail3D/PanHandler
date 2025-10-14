@@ -29,19 +29,23 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
-// Expandable section component with GLOWING VIBRANT AESTHETIC
+// Expandable section component with GLOWING VIBRANT AESTHETIC + Rolodex effect
 const ExpandableSection = ({ 
   title, 
   icon, 
   color, 
   children, 
-  delay = 0 
+  delay = 0,
+  scrollY,
+  index = 0
 }: { 
   title: string; 
   icon: string; 
   color: string; 
   children: React.ReactNode; 
   delay?: number;
+  scrollY?: Animated.SharedValue<number>;
+  index?: number;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const heightValue = useSharedValue(0);
@@ -64,10 +68,31 @@ const ExpandableSection = ({
     }
   }, [expanded]);
   
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+  // Rolodex effect: slight horizontal shift based on scroll position
+  const animatedStyle = useAnimatedStyle(() => {
+    const offsetPerSection = 150; // How much scroll creates one cycle
+    const maxShift = 8; // Maximum pixels to shift left/right
+    
+    if (scrollY) {
+      // Calculate shift for this specific section based on its index
+      const sectionOffset = index * 80; // Stagger effect between sections
+      const scrollProgress = (scrollY.value + sectionOffset) / offsetPerSection;
+      const shift = Math.sin(scrollProgress) * maxShift;
+      
+      return {
+        transform: [
+          { scale: scale.value },
+          { translateX: shift }
+        ],
+        opacity: opacity.value,
+      };
+    }
+    
+    return {
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    };
+  });
   
   const contentAnimatedStyle = useAnimatedStyle(() => ({
     maxHeight: heightValue.value === 0 ? 0 : 2000,
@@ -198,6 +223,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
+  
+  // Scroll position for Rolodex effect
+  const scrollY = useSharedValue(0);
   
   // Pulsing animation for "Upgrade to Pro" button text
   const textPulse = useSharedValue(1);
@@ -346,10 +374,15 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
             <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
               <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}>
                 <GestureDetector gesture={swipeGesture}>
-                  <ScrollView
+                  <Animated.ScrollView
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: 20 }}
                     showsVerticalScrollIndicator={false}
+                    onScroll={(event) => {
+                      'worklet';
+                      scrollY.value = event.nativeEvent.contentOffset.y;
+                    }}
+                    scrollEventThrottle={16}
                   >
               {/* Camera & Auto Level */}
               <ExpandableSection
@@ -357,6 +390,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="📸 Step 1: Take a Perfect Photo"
                 color="#34C759"
                 delay={0}
+                scrollY={scrollY}
+                index={0}
               >
                 <View style={{ marginLeft: 4 }}>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
@@ -458,6 +493,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="🪙 Step 2: Calibrate with Coin"
                 color="#FF9500"
                 delay={100}
+                scrollY={scrollY}
+                index={1}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After capturing your photo, calibrate using the reference coin to enable precise measurements.
@@ -484,6 +521,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="📏 Step 3: Place Measurements"
                 color="#AF52DE"
                 delay={200}
+                scrollY={scrollY}
+                index={2}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Choose from multiple measurement types to capture all dimensions of your object.
@@ -683,6 +722,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="🎮 Navigation & Controls"
                 color="#FF3B30"
                 delay={300}
+                scrollY={scrollY}
+                index={3}
               >
                 <View style={{ gap: 12 }}>
                   {/* Pan/Zoom */}
@@ -811,6 +852,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="✏️ Move & Edit Measurements"
                 color="#FF2D55"
                 delay={350}
+                scrollY={scrollY}
+                index={4}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After placing measurements, you can move and edit them in Pan/Zoom mode.
@@ -886,6 +929,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="💾 Save & Share"
                 color="#5856D6"
                 delay={400}
+                scrollY={scrollY}
+                index={5}
               >
                 {/* FREE badge */}
                 <View style={{ 
@@ -964,6 +1009,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 icon="mail"
                 color="#34C759"
                 delay={450}
+                scrollY={scrollY}
+                index={6}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 2 photos and a detailed measurement table.
@@ -999,6 +1046,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 icon="construct"
                 color="#FF9500"
                 delay={500}
+                scrollY={scrollY}
+                index={7}
               >
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
                   Import to Any CAD Software
@@ -1189,6 +1238,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="🗺️ Map Mode"
                 color="#0066FF"
                 delay={500}
+                scrollY={scrollY}
+                index={8}
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginBottom: 10 }}>
@@ -1297,6 +1348,8 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 title="💡 Pro Tips"
                 color="#00C7BE"
                 delay={600}
+                scrollY={scrollY}
+                index={9}
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
@@ -1639,7 +1692,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </AnimatedView>
                 </View>
               </View>
-            </ScrollView>
+            </Animated.ScrollView>
                 </GestureDetector>
               </View>
             </BlurView>
