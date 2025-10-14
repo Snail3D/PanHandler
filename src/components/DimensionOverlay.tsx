@@ -248,27 +248,10 @@ export default function DimensionOverlay({
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   
-  // Toast notification state (for save success) - must be before animated styles
+  // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useSharedValue(0);
-  
-  // Animated styles for quote overlay
-  const quoteBackgroundStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
-  }));
-  
-  const quoteContentStyle = useAnimatedStyle(() => ({
-    opacity: quoteOpacity.value,
-  }));
-  
-  // Animated style for toast notification
-  const toastAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: toastOpacity.value,
-    transform: [
-      { translateY: interpolate(toastOpacity.value, [0, 1], [20, 0]) }
-    ],
-  }));
   
   // Easter egg states
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
@@ -294,6 +277,23 @@ export default function DimensionOverlay({
       setMeasurementMode(false); // Keep in pan mode but locked
     }
   }, []); // Only run on mount
+  
+  // Animated styles for quote overlay (must be after all state/ref hooks)
+  const quoteBackgroundStyle = useAnimatedStyle(() => ({
+    backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
+  }));
+  
+  const quoteContentStyle = useAnimatedStyle(() => ({
+    opacity: quoteOpacity.value,
+  }));
+  
+  // Animated style for toast notification
+  const toastAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: toastOpacity.value,
+    transform: [
+      { translateY: interpolate(toastOpacity.value, [0, 1], [20, 0]) }
+    ],
+  }));
   
   // Show inspirational quote overlay
   const showQuoteOverlay = () => {
