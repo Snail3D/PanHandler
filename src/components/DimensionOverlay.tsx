@@ -1382,38 +1382,56 @@ export default function DimensionOverlay({
     }
 
     try {
-      // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant photo library access to save images.');
+        Alert.alert('Permission Required', 'Please grant photo library access.');
         return;
       }
       
-      // Show label + coin info
       setIsCapturing(true);
       setCurrentLabel(label);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      // Capture with measurements
-      const measurementsUri = await captureScreen({ format: 'jpg', quality: 0.9 });
+      if (!externalViewRef?.current) {
+        Alert.alert('Error', 'View not ready. Wait a moment and try again.');
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        return;
+      }
+      
+      const measurementsUri = await captureRef(externalViewRef.current, { 
+        format: 'jpg', 
+        quality: 0.9,
+        result: 'tmpfile',
+      });
       await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Hide measurements, show label only
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      // Capture label only
-      const labelOnlyUri = await captureScreen({ format: 'png', quality: 1.0 });
+      if (!externalViewRef?.current) {
+        Alert.alert('Error', 'View lost during capture.');
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        setHideMeasurementsForCapture(false);
+        if (setImageOpacity) setImageOpacity(1);
+        return;
+      }
+      
+      const labelOnlyUri = await captureRef(externalViewRef.current, { 
+        format: 'png', 
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       await MediaLibrary.createAssetAsync(labelOnlyUri);
       
-      // Restore
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      showToastNotification(label ? `"${label}" saved to Photos!` : 'Measurement saved to Photos!');
+      showToastNotification(label ? `"${label}" saved!` : 'Saved to Photos!');
       
       if (currentImageUri && !hasSessionBeenExported(currentImageUri)) {
         markSessionExported(currentImageUri);
@@ -1424,7 +1442,9 @@ export default function DimensionOverlay({
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      Alert.alert('Save Error', `Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setHideMeasurementsForCapture(false);
+      if (setImageOpacity) setImageOpacity(1);
+      Alert.alert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -1478,13 +1498,22 @@ export default function DimensionOverlay({
         });
       }
       
-      // Show label + coin info
       setIsCapturing(true);
       setCurrentLabel(label);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      // Capture with measurements
-      const measurementsUri = await captureScreen({ format: 'jpg', quality: 0.9 });
+      if (!externalViewRef?.current) {
+        Alert.alert('Error', 'View not ready. Wait and try again.');
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        return;
+      }
+      
+      const measurementsUri = await captureRef(externalViewRef.current, { 
+        format: 'jpg', 
+        quality: 0.9,
+        result: 'tmpfile',
+      });
       
       // Build email body
       let measurementText = label ? `${label} - Measurements by PanHandler\n` : 'PanHandler Measurements\n';
