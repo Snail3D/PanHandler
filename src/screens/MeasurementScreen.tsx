@@ -1,4 +1,3 @@
-import ViewShot from 'react-native-view-shot';
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -499,12 +498,12 @@ export default function MeasurementScreen() {
           {mode === 'measurement' && (
             <View style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
-              <ViewShot 
+              <View 
                 ref={measurementViewRef} 
-                options={{ format: 'jpg', quality: 0.9 }}
+                collapsable={false}
                 style={{ flex: 1 }}
                 onLayout={() => {
-                  console.log('📐 ViewShot laid out, ref:', !!measurementViewRef.current);
+                  console.log('📐 View laid out, ref:', !!measurementViewRef.current);
                 }}
               >
                 <ZoomableImage 
@@ -532,7 +531,7 @@ export default function MeasurementScreen() {
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
                 />
-              </ViewShot>
+              </View>
             </View>
           )}
 

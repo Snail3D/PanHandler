@@ -1398,16 +1398,20 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Debug on screen
-      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}\nCapture method: ${externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'}`;
+      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}`;
       
-      // Use external ref (from parent) - it's a ViewShot component
-      if (!externalViewRef || !externalViewRef.current) {
-        Alert.alert('Debug: No Ref', `Ref check failed:\n\n${debugInfo}`);
+      // Use external ref - pass the REF OBJECT to captureRef, not .current
+      if (!externalViewRef) {
+        Alert.alert('Debug: No Ref', `Save ref check failed:\n\n${debugInfo}`);
         throw new Error('No view ref available for capture');
       }
       
-      // ViewShot components have a .capture() method
-      const measurementsUri = await externalViewRef.current.capture();
+      // captureRef accepts the ref object itself
+      const measurementsUri = await captureRef(externalViewRef, {
+        format: 'jpg',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
       
       // Save measurements photo
       await MediaLibrary.createAssetAsync(measurementsUri);
@@ -1417,7 +1421,11 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await externalViewRef.current.capture();
+      const labelOnlyUri = await captureRef(externalViewRef, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       await MediaLibrary.createAssetAsync(labelOnlyUri);
@@ -1513,16 +1521,20 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Debug on screen
-      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}\nCapture method: ${externalViewRef?.current ? typeof externalViewRef.current.capture : 'N/A'}`;
+      const debugInfo = `Has external: ${!!externalViewRef}\nHas current: ${externalViewRef ? !!externalViewRef.current : 'N/A'}`;
       
-      // Use external ref (from parent) - it's a ViewShot component
-      if (!externalViewRef || !externalViewRef.current) {
+      // Use external ref - pass the REF OBJECT to captureRef, not .current
+      if (!externalViewRef) {
         Alert.alert('Debug: No Ref', `Email ref check failed:\n\n${debugInfo}`);
         throw new Error('No view ref available for capture');
       }
       
-      // ViewShot components have a .capture() method
-      const uri = await externalViewRef.current.capture();
+      // captureRef accepts the ref object itself
+      const uri = await captureRef(externalViewRef, {
+        format: 'jpg',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
 
       // Build measurement text with scale information
       let measurementText = '';
@@ -1596,7 +1608,11 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
       // Capture label-only photo
-      const labelOnlyUri = await externalViewRef.current.capture();
+      const labelOnlyUri = await captureRef(externalViewRef, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       
