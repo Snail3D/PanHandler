@@ -937,31 +937,15 @@ export default function DimensionOverlay({
       const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
       const perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
       
-      // Check if path self-intersects after editing
-      const selfIntersects = doesPathSelfIntersect(points);
-      
-      if (selfIntersects) {
-        // Path now self-intersects - remove area, keep perimeter only
-        console.log('⚠️ Path self-intersects after editing - removing area from legend');
-        return { 
-          ...measurement, 
-          perimeter: perimeterStr, 
-          area: undefined, // Clear area
-          isClosed: true // Still marked as closed, just no area
-        };
-      }
-      
-      // No self-intersection - calculate area using Shoelace formula
-      let areaSum = 0;
-      for (let i = 0; i < points.length; i++) {
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        areaSum += (p1.x * p2.y - p2.x * p1.y);
-      }
-      const areaPx = Math.abs(areaSum) / 2;
-      const areaInUnits = areaPx / Math.pow(calibration?.pixelsPerUnit || 1, 2);
-      
-      return { ...measurement, perimeter: perimeterStr, area: areaInUnits };
+      // ALWAYS clear area when points are moved - area is no longer accurate after manual editing
+      console.log('⚠️ Freehand shape edited - removing area from legend (perimeter still valid)');
+      return { 
+        ...measurement, 
+        perimeter: perimeterStr, 
+        value: perimeterStr, // Update value to show only perimeter
+        area: undefined, // Clear area - no longer accurate after editing
+        isClosed: true // Still marked as closed, just no area
+      };
     }
     
     return measurement;
@@ -2020,8 +2004,11 @@ export default function DimensionOverlay({
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
-                        // Snap threshold: 15 pixels (reduced from 30 for less sensitivity)
-                        if (distToStart < 15) {
+                        // Snap threshold: 2mm in real-world distance (much less sensitive)
+                        const snapThresholdMM = 2;
+                        const snapThresholdPixels = calibration ? snapThresholdMM * calibration.pixelsPerUnit : 10;
+                        
+                        if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
                           const testPath = [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
                           const selfIntersects = doesPathSelfIntersect(testPath);
