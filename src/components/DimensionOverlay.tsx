@@ -166,6 +166,9 @@ export default function DimensionOverlay({
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
   const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
   
+  // Undo history for measurement edits - stores original state before first edit
+  const [measurementHistory, setMeasurementHistory] = useState<Map<string, Measurement>>(new Map());
+  
   // Freehand drawing state
   const [isDrawingFreehand, setIsDrawingFreehand] = useState(false);
   const [freehandPath, setFreehandPath] = useState<Array<{ x: number; y: number }>>([]);
@@ -864,6 +867,18 @@ export default function DimensionOverlay({
     return Math.sqrt(dx * dx + dy * dy);
   };
 
+  // Save original measurement state before editing (for undo)
+  const saveOriginalState = (measurementId: string) => {
+    // Only save if not already saved
+    if (!measurementHistory.has(measurementId)) {
+      const measurement = measurements.find(m => m.id === measurementId);
+      if (measurement) {
+        setMeasurementHistory(new Map(measurementHistory.set(measurementId, { ...measurement })));
+        console.log('💾 Saved original state for measurement:', measurementId);
+      }
+    }
+  };
+
   // Helper function to recalculate measurement values after points are moved
   const recalculateMeasurement = (measurement: Measurement): Measurement => {
     const { mode, points } = measurement;
@@ -1227,12 +1242,35 @@ export default function DimensionOverlay({
   }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
 
   const handleClear = () => {
-    // Remove one measurement at a time (last first)
+    // Check if the last measurement has been edited (has history)
     if (measurements.length > 0) {
-      setMeasurements(measurements.slice(0, -1));
+      const lastMeasurement = measurements[measurements.length - 1];
+      
+      if (measurementHistory.has(lastMeasurement.id)) {
+        // Revert to original state instead of deleting
+        const originalState = measurementHistory.get(lastMeasurement.id)!;
+        const updatedMeasurements = measurements.map(m => 
+          m.id === lastMeasurement.id ? originalState : m
+        );
+        setMeasurements(updatedMeasurements);
+        
+        // Remove from history
+        const newHistory = new Map(measurementHistory);
+        newHistory.delete(lastMeasurement.id);
+        setMeasurementHistory(newHistory);
+        
+        console.log('↩️ Reverted measurement to original state:', lastMeasurement.id);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      } else {
+        // No edits - delete the measurement
+        setMeasurements(measurements.slice(0, -1));
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
     } else if (currentPoints.length > 0) {
       // If no completed measurements, clear current points
       setCurrentPoints([]);
+    }
+  };
     }
   };
   
@@ -2431,6 +2469,7 @@ export default function DimensionOverlay({
                   // This is a circle drag, not point resize - fall through to measurement tap logic
                 } else {
                   // Near center or edge - allow point resize
+                  saveOriginalState(point.measurementId); // Save state before editing
                   setResizingPoint(point);
                   setDidDrag(false);
                   setIsSnapped(false);
@@ -2465,6 +2504,7 @@ export default function DimensionOverlay({
                   
                   if (isClosestCorner) {
                     // Very close to this corner and it's the closest - allow corner resize
+                    saveOriginalState(point.measurementId); // Save state before editing
                     setResizingPoint(point);
                     setDidDrag(false);
                     setIsSnapped(false);
@@ -2477,6 +2517,7 @@ export default function DimensionOverlay({
                 // Otherwise, fall through to treat as rectangle drag/tap
               } else {
                 // Not a circle center or rectangle - normal point resize behavior
+                saveOriginalState(point.measurementId); // Save state before editing
                 setResizingPoint(point);
                 setDidDrag(false);
                 setIsSnapped(false); // Reset snap state when starting to resize
@@ -2690,6 +2731,7 @@ export default function DimensionOverlay({
                 const measurement = measurements.find(m => m.id === tappedId);
                 // Allow dragging for circles and rectangles, but NOT freehand (freehand can only be reshaped by points)
                 if (measurement && (measurement.mode === 'circle' || measurement.mode === 'rectangle')) {
+                  saveOriginalState(tappedId); // Save state before dragging
                   setDraggedMeasurementId(tappedId);
                   setDidDrag(true);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
