@@ -376,8 +376,9 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                       color: 'rgba(0, 0, 0, 0.8)', 
                       fontWeight: '700', 
                       fontSize: 22,
+                      textAlign: 'center',
                     }}>
-                      Continue
+                      CONTINUE
                     </Text>
                   </Pressable>
                 </View>
