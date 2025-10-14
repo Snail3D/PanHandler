@@ -4582,21 +4582,6 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
-
-          
-          {/* Status/Result Display */}
-          {currentPoints.length === 0 && measurements.length === 0 && measurementMode && (
-            <View className="flex-row items-center mb-3">
-              <Ionicons name="finger-print-outline" size={20} color="#6B7280" />
-              <Text className="ml-3 text-gray-700 font-medium flex-1">
-                {mode === 'distance' && 'Tap to place 2 points'}
-                {mode === 'angle' && 'Tap to place 3 points (vertex in center)'}
-                {mode === 'circle' && 'Tap center, then tap edge of circle'}
-                {mode === 'rectangle' && 'Tap first corner, then tap opposite corner'}
-                {mode === 'freehand' && 'Touch and drag to draw freehand path'}
-              </Text>
-            </View>
-          )}
           
           {/* Action Buttons - Always show Save and Email */}
           <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>

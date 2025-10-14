@@ -862,7 +862,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   marginBottom: 12,
                 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: '#34C759' }}>
-                    ✓ FREE - 10 saves & 10 emails per month
+                    ✓ FREE - 20 total exports (save/email)
                   </Text>
                 </View>
 
@@ -1113,8 +1113,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     </View>
 
                     {/* Feature Rows */}
-                    <ComparisonRow feature="Monthly Saves" free="10" pro="∞" />
-                    <ComparisonRow feature="Monthly Emails" free="10" pro="∞" />
+                    <ComparisonRow feature="Total Exports" free="20" pro="∞" />
                     <ComparisonRow feature="Measurements" free="∞" pro="∞" />
                     <ComparisonRow feature="All Measurement Types" free="✓" pro="✓" />
                     <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
