@@ -374,6 +374,7 @@ export default function MeasurementScreen() {
           ref={cameraRef}
           style={{ flex: 1 }}
           facing="back"
+          enableTorch={flashEnabled}
         >
           {/* Top controls */}
           <View 
@@ -381,16 +382,31 @@ export default function MeasurementScreen() {
             style={{ paddingTop: insets.top + 16 }}
           >
             <View className="flex-row justify-between items-center px-6">
-              <Pressable
-                onPress={() => {
-                  console.log('🔵 Help button pressed in camera screen');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setShowHelpModal(true);
-                }}
-                className="w-10 h-10 items-center justify-center"
-              >
-                <Ionicons name="help-circle-outline" size={28} color="white" />
-              </Pressable>
+              <View className="flex-row items-center">
+                <Pressable
+                  onPress={() => {
+                    console.log('🔵 Help button pressed in camera screen');
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowHelpModal(true);
+                  }}
+                  className="w-10 h-10 items-center justify-center"
+                >
+                  <Ionicons name="help-circle-outline" size={28} color="white" />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setFlashEnabled(!flashEnabled);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  className="w-10 h-10 items-center justify-center ml-2"
+                >
+                  <Ionicons 
+                    name={flashEnabled ? "flash" : "flash-off"} 
+                    size={26} 
+                    color={flashEnabled ? "#FFD700" : "white"} 
+                  />
+                </Pressable>
+              </View>
               <Text className="text-white text-lg font-semibold">Take Photo</Text>
               {/* Spacer to keep title centered */}
               <View className="w-10 h-10" />
