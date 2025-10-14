@@ -137,14 +137,16 @@ export default function DimensionOverlay({
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
-  const [proTapCount, setProTapCount] = useState(0);
-  const proTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
   
   // Paywall modal for halfway point (5 saves/emails)
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  
+  // 5-tap Pro/Free toggle for testing (REMOVE IN PRODUCTION)
+  const [proToggleTapCount, setProToggleTapCount] = useState(0);
+  const [proToggleLastTapTime, setProToggleLastTapTime] = useState(0);
   
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
@@ -4685,31 +4687,43 @@ export default function DimensionOverlay({
           {/* Pro status footer */}
           <Pressable
             onPress={() => {
-              // Secret backdoor: 5 fast taps to unlock pro
-              const newCount = proTapCount + 1;
-              setProTapCount(newCount);
+              // SECRET TEST FEATURE: 5 fast taps to toggle Pro/Free (REMOVE IN PRODUCTION)
+              const now = Date.now();
+              let newCount = proToggleTapCount;
               
-              if (proTapTimeoutRef.current) {
-                clearTimeout(proTapTimeoutRef.current);
+              // Reset counter if more than 1 second since last tap
+              if (now - proToggleLastTapTime > 1000) {
+                newCount = 1;
+              } else {
+                newCount = proToggleTapCount + 1;
               }
               
+              setProToggleTapCount(newCount);
+              setProToggleLastTapTime(now);
+              
               if (newCount >= 5) {
-                // Unlock pro!
-                setIsProUser(true);
-                setProTapCount(0);
-                Alert.alert('🎉 Pro Unlocked!', 'All pro features are now available!');
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              } else {
-                // Reset counter after 2 seconds
-                proTapTimeoutRef.current = setTimeout(() => {
-                  setProTapCount(0);
-                }, 2000);
+                // Toggle Pro/Free status
+                const newProStatus = !isProUser;
+                setIsProUser(newProStatus);
+                setProToggleTapCount(0);
                 
-                // Only show modal on 1st tap (not during rapid tapping)
+                if (newProStatus) {
+                  // Switched to Pro
+                  Alert.alert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!');
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                } else {
+                  // Switched to Free - RESET ALL COUNTERS
+                  const resetMonthlyLimits = useStore.getState().resetMonthlyLimits;
+                  resetMonthlyLimits();
+                  Alert.alert('🔄 Free User Mode', 'Switched to Free User. All monthly counters have been reset for testing!');
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                }
+              } else {
+                // Only show modal on 1st tap if Free user (not during rapid tapping)
                 if (newCount === 1 && !isProUser) {
                   setTimeout(() => {
                     // Check if user didn't continue tapping (still at 1 tap after 500ms)
-                    if (proTapCount === 1) {
+                    if (proToggleTapCount === 1) {
                       setShowProModal(true);
                     }
                   }, 500);
@@ -4721,7 +4735,8 @@ export default function DimensionOverlay({
             }}
             style={{
               marginTop: 4,
-              paddingVertical: 1,
+              paddingVertical: 6,
+              paddingHorizontal: 12,
               alignItems: 'center',
             }}
           >
