@@ -582,25 +582,19 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🥾 <Text style={{ fontWeight: '600' }}>Hiking & Trail Planning</Text> - Measure trail distances and elevation routes
+                      📐 <Text style={{ fontWeight: '600' }}>Blueprints & Floor Plans</Text> - Measure room dimensions and layout distances
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🏠 <Text style={{ fontWeight: '600' }}>Real Estate & Property</Text> - Calculate lot sizes and property boundaries
+                      🏗️ <Text style={{ fontWeight: '600' }}>Engineering Drawings</Text> - Calculate component spacing and assembly dimensions
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🚗 <Text style={{ fontWeight: '600' }}>Route Planning</Text> - Estimate travel distances and alternative routes
+                      🗺️ <Text style={{ fontWeight: '600' }}>Topographic Maps</Text> - Measure trail distances and terrain features
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🏛️ <Text style={{ fontWeight: '600' }}>Historical Maps</Text> - Study old city layouts and territorial changes
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      ⛰️ <Text style={{ fontWeight: '600' }}>Topographic Analysis</Text> - Measure contour intervals and terrain features
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🗺️ <Text style={{ fontWeight: '600' }}>Urban Planning</Text> - Calculate district areas and infrastructure spacing
+                      🏠 <Text style={{ fontWeight: '600' }}>Property & Real Estate</Text> - Calculate lot sizes and boundaries
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                      🌍 <Text style={{ fontWeight: '600' }}>Geographic Education</Text> - Teach map skills and spatial reasoning
+                      🏛️ <Text style={{ fontWeight: '600' }}>Historical Analysis</Text> - Study archived plans and territorial maps
                     </Text>
                   </View>
                   {/* Pro Tip */}
