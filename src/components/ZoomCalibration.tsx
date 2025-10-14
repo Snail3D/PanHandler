@@ -60,9 +60,10 @@ export default function ZoomCalibration({
   const referenceCenterX = SCREEN_WIDTH / 2;
   const referenceCenterY = SCREEN_HEIGHT / 2;
   
-  // Start with a reasonable reference size (e.g., 100 pixels for the coin diameter)
+  // BIGGER circle = easier alignment, more accuracy!
   // User will zoom the IMAGE to match this reference circle
-  const referenceRadiusPixels = 100; // This is arbitrary - user zooms image to match
+  // 130px radius = 260px diameter (30% bigger than before for better precision)
+  const referenceRadiusPixels = 130;
 
   const handleLockIn = () => {
     // When user locks in:
