@@ -779,49 +779,81 @@ export default function DimensionOverlay({
     const pixelsPerScreenUnit = imageWidth / screenWidthPhysical;
     const screenUnits = pixelDistance / pixelsPerScreenUnit;
     
-    // Convert to map units
+    // Convert to map units and return directly (not in mm)
     const mapDistance = screenUnits * (mapScale.realDistance / mapScale.screenDistance);
+    return mapDistance;
+  };
+
+  // Helper: Format a value that's already in map units
+  const formatMapValue = (valueInMapUnits: number): string => {
+    if (!mapScale) return '';
     
-    // Convert map units to mm for consistency with formatMeasurement
-    let distanceInMM: number;
+    // Format based on map's real unit and user's preferred unit system
     if (mapScale.realUnit === 'km') {
-      distanceInMM = mapDistance * 1000000; // km to mm
+      return unitSystem === 'imperial' 
+        ? `${(valueInMapUnits * 0.621371).toFixed(2)} mi` // km to mi
+        : `${valueInMapUnits.toFixed(2)} km`;
     } else if (mapScale.realUnit === 'mi') {
-      distanceInMM = mapDistance * 1609344; // mi to mm
+      return unitSystem === 'metric'
+        ? `${(valueInMapUnits * 1.60934).toFixed(2)} km` // mi to km
+        : `${valueInMapUnits.toFixed(2)} mi`;
     } else if (mapScale.realUnit === 'm') {
-      distanceInMM = mapDistance * 1000; // m to mm
+      return unitSystem === 'imperial'
+        ? `${(valueInMapUnits * 3.28084).toFixed(0)} ft` // m to ft
+        : `${valueInMapUnits.toFixed(0)} m`;
     } else { // ft
-      distanceInMM = mapDistance * 304.8; // ft to mm
+      return unitSystem === 'metric'
+        ? `${(valueInMapUnits * 0.3048).toFixed(0)} m` // ft to m
+        : `${valueInMapUnits.toFixed(0)} ft`;
     }
+  };
+
+  // Helper: Format map scale distance (for lines, perimeters)
+  const formatMapScaleDistance = (pixelDistance: number): string => {
+    if (!mapScale) return '';
     
-    return distanceInMM;
+    const mapDistance = convertToMapScale(pixelDistance);
+    
+    // Format based on map's real unit and user's preferred unit system
+    if (mapScale.realUnit === 'km') {
+      return unitSystem === 'imperial' 
+        ? `${(mapDistance * 0.621371).toFixed(2)} mi` // km to mi
+        : `${mapDistance.toFixed(2)} km`;
+    } else if (mapScale.realUnit === 'mi') {
+      return unitSystem === 'metric'
+        ? `${(mapDistance * 1.60934).toFixed(2)} km` // mi to km
+        : `${mapDistance.toFixed(2)} mi`;
+    } else if (mapScale.realUnit === 'm') {
+      return unitSystem === 'imperial'
+        ? `${(mapDistance * 3.28084).toFixed(0)} ft` // m to ft
+        : `${mapDistance.toFixed(0)} m`;
+    } else { // ft
+      return unitSystem === 'metric'
+        ? `${(mapDistance * 0.3048).toFixed(0)} m` // ft to m
+        : `${mapDistance.toFixed(0)} ft`;
+    }
   };
 
   // Helper: Format map scale area (for rectangles, circles, freehand)
-  const formatMapScaleArea = (areaMM2: number): string => {
+  const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
     
-    // Convert from mm² to map units²
-    let areaInMapUnits2: number;
+    // Format based on map's real unit and user's preferred unit system
     if (mapScale.realUnit === 'km') {
-      areaInMapUnits2 = areaMM2 / (1000000 * 1000000); // mm² to km²
       return unitSystem === 'imperial' 
         ? `${(areaInMapUnits2 * 0.386102).toFixed(2)} mi²` // km² to mi²
-        : `${areaInMapUnits2.toFixed(3)} km²`;
+        : `${areaInMapUnits2.toFixed(2)} km²`;
     } else if (mapScale.realUnit === 'mi') {
-      areaInMapUnits2 = areaMM2 / (1609344 * 1609344); // mm² to mi²
       return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 2.58999).toFixed(3)} km²` // mi² to km²
+        ? `${(areaInMapUnits2 * 2.58999).toFixed(2)} km²` // mi² to km²
         : `${areaInMapUnits2.toFixed(2)} mi²`;
     } else if (mapScale.realUnit === 'm') {
-      areaInMapUnits2 = areaMM2 / (1000 * 1000); // mm² to m²
       return unitSystem === 'imperial'
         ? `${(areaInMapUnits2 * 10.7639).toFixed(0)} ft²` // m² to ft²
-        : `${areaInMapUnits2.toFixed(1)} m²`;
+        : `${areaInMapUnits2.toFixed(0)} m²`;
     } else { // ft
-      areaInMapUnits2 = areaMM2 / (304.8 * 304.8); // mm² to ft²
       return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 0.092903).toFixed(1)} m²` // ft² to m²
+        ? `${(areaInMapUnits2 * 0.092903).toFixed(0)} m²` // ft² to m²
         : `${areaInMapUnits2.toFixed(0)} ft²`;
     }
   };
@@ -838,8 +870,7 @@ export default function DimensionOverlay({
     
     // Map Mode: Apply scale conversion and respect Metric/Imperial
     if (isMapMode && mapScale) {
-      const mapDistanceMM = convertToMapScale(pixelDistance);
-      return formatMeasurement(mapDistanceMM, 'mm', unitSystem, 2);
+      return formatMapScaleDistance(pixelDistance);
     }
     
     return formatMeasurement(realDistance, calibration.unit, unitSystem, 2);
@@ -1015,8 +1046,8 @@ export default function DimensionOverlay({
       // Map Mode: Apply scale conversion
       if (isMapMode && mapScale) {
         const diameterPx = radius * 2;
-        const diameterMM = convertToMapScale(diameterPx);
-        const value = `⌀ ${formatMeasurement(diameterMM, 'mm', unitSystem, 2)}`;
+        const diameterDist = convertToMapScale(diameterPx);
+        const value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
         return { ...measurement, value, radius };
       }
       
@@ -1033,12 +1064,12 @@ export default function DimensionOverlay({
       
       // Map Mode: Apply scale conversion
       if (isMapMode && mapScale) {
-        const widthMM = convertToMapScale(widthPx);
-        const heightMM = convertToMapScale(heightPx);
-        const widthStr = formatMeasurement(widthMM, 'mm', unitSystem, 2);
-        const heightStr = formatMeasurement(heightMM, 'mm', unitSystem, 2);
+        const widthDist = convertToMapScale(widthPx);
+        const heightDist = convertToMapScale(heightPx);
+        const widthStr = formatMapScaleDistance(widthPx);
+        const heightStr = formatMapScaleDistance(heightPx);
         const value = `${widthStr} × ${heightStr}`;
-        return { ...measurement, value, width: widthMM, height: heightMM };
+        return { ...measurement, value, width: widthDist, height: heightDist };
       }
       
       const width = widthPx / (calibration?.pixelsPerUnit || 1);
@@ -1062,8 +1093,7 @@ export default function DimensionOverlay({
       // Map Mode: Apply scale conversion
       let perimeterStr: string;
       if (isMapMode && mapScale) {
-        const perimeterMM = convertToMapScale(perimeter);
-        perimeterStr = formatMeasurement(perimeterMM, 'mm', unitSystem, 2);
+        perimeterStr = formatMapScaleDistance(perimeter);
       } else {
         const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
         perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
@@ -1129,8 +1159,7 @@ export default function DimensionOverlay({
         // Map Mode: Apply scale conversion
         if (isMapMode && mapScale) {
           const diameterPx = radius * 2;
-          const diameterMM = convertToMapScale(diameterPx);
-          value = `⌀ ${formatMeasurement(diameterMM, 'mm', unitSystem, 2)}`;
+          value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
         } else {
           // Convert radius in pixels to diameter in mm/inches
           const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
@@ -1146,12 +1175,12 @@ export default function DimensionOverlay({
         
         // Map Mode: Apply scale conversion
         if (isMapMode && mapScale) {
-          const widthMM = convertToMapScale(widthPx);
-          const heightMM = convertToMapScale(heightPx);
-          width = widthMM;
-          height = heightMM;
-          const widthStr = formatMeasurement(widthMM, 'mm', unitSystem, 2);
-          const heightStr = formatMeasurement(heightMM, 'mm', unitSystem, 2);
+          const widthDist = convertToMapScale(widthPx);
+          const heightDist = convertToMapScale(heightPx);
+          width = widthDist;
+          height = heightDist;
+          const widthStr = formatMapScaleDistance(widthPx);
+          const heightStr = formatMapScaleDistance(heightPx);
           value = `${widthStr} × ${heightStr}`;
         } else {
           width = widthPx / (calibration?.pixelsPerUnit || 1);
@@ -1380,8 +1409,7 @@ export default function DimensionOverlay({
         // Map Mode: Apply scale conversion
         let perimeterStr: string;
         if (isMapMode && mapScale) {
-          const perimeterMM = convertToMapScale(totalLength);
-          perimeterStr = formatMeasurement(perimeterMM, 'mm', unitSystem);
+          perimeterStr = formatMapScaleDistance(totalLength);
         } else {
           const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
           perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
@@ -1395,8 +1423,8 @@ export default function DimensionOverlay({
           if (isMapMode && mapScale) {
             // Convert area pixels to map scale area
             const areaPx = m.area * (calibration?.pixelsPerUnit || 1) * (calibration?.pixelsPerUnit || 1);
-            const areaMM2 = convertToMapScale(Math.sqrt(areaPx)) ** 2;
-            areaStr = formatMapScaleArea(areaMM2);
+            const areaDist2 = convertToMapScale(Math.sqrt(areaPx)) ** 2;
+            areaStr = formatMapScaleArea(areaDist2);
           } else {
             areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
           }
@@ -2382,12 +2410,11 @@ export default function DimensionOverlay({
                       const next = freehandPath[i + 1];
                       return sum + Math.sqrt(Math.pow(next.x - point.x, 2) + Math.pow(next.y - point.y, 2));
                     }, 0);
-                    const perimeterMM = convertToMapScale(totalPixelLength);
-                    perimeterStr = formatMeasurement(perimeterMM, 'mm', unitSystem);
+                    perimeterStr = formatMapScaleDistance(totalPixelLength);
                     
                     // Convert area to map scale
-                    const areaMM2 = convertToMapScale(Math.sqrt(area)) ** 2;
-                    areaStr = formatMapScaleArea(areaMM2);
+                    const areaDist2 = convertToMapScale(Math.sqrt(area)) ** 2;
+                    areaStr = formatMapScaleArea(areaDist2);
                   } else {
                     perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                     areaStr = formatAreaMeasurement(physicalArea, calibration?.unit || 'mm', unitSystem);
@@ -2425,8 +2452,7 @@ export default function DimensionOverlay({
                   
                   // Map Mode: Apply scale conversion
                   if (isMapMode && mapScale) {
-                    const perimeterMM = convertToMapScale(totalLength);
-                    formattedValue = formatMeasurement(perimeterMM, 'mm', unitSystem);
+                    formattedValue = formatMapScaleDistance(totalLength);
                   } else {
                     formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   }
@@ -4065,12 +4091,12 @@ export default function DimensionOverlay({
                           // Map Mode: Apply scale conversion
                           if (isMapMode && mapScale) {
                             const diameterPx = measurement.radius * 2;
-                            const diameterMM = convertToMapScale(diameterPx);
-                            displayValue = `⌀ ${formatMeasurement(diameterMM, 'mm', unitSystem, 2)}`;
+                            const diameterDist = convertToMapScale(diameterPx);
+                            displayValue = `⌀ ${formatMapScaleDistance(diameterPx)}`;
                             // Calculate area in map units
-                            const radiusMM = diameterMM / 2;
-                            const areaMM2 = Math.PI * radiusMM * radiusMM;
-                            const areaStr = formatMapScaleArea(areaMM2);
+                            const radiusDist = diameterDist / 2;
+                            const areaDist2 = Math.PI * radiusDist * radiusDist;
+                            const areaStr = formatMapScaleArea(areaDist2);
                             return `${displayValue} (A: ${areaStr})`;
                           }
                           
@@ -4085,11 +4111,12 @@ export default function DimensionOverlay({
                           
                           // Map Mode: Apply scale conversion
                           if (isMapMode && mapScale) {
-                            const widthStr = formatMeasurement(measurement.width, 'mm', unitSystem, 2);
-                            const heightStr = formatMeasurement(measurement.height, 'mm', unitSystem, 2);
+                            // measurement.width and measurement.height are already in map units
+                            const widthStr = formatMapValue(measurement.width);
+                            const heightStr = formatMapValue(measurement.height);
                             displayValue = `${widthStr} × ${heightStr}`;
-                            const areaMM2 = measurement.width * measurement.height;
-                            const areaStr = formatMapScaleArea(areaMM2);
+                            const areaDist2 = measurement.width * measurement.height;
+                            const areaStr = formatMapScaleArea(areaDist2);
                             return `${displayValue} (A: ${areaStr})`;
                           }
                           
