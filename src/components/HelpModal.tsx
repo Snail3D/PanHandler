@@ -195,10 +195,10 @@ const ComparisonRow = ({
       borderTopColor: 'rgba(0,0,0,0.06)',
       ...(isLastFree && {
         shadowColor: '#FF3B30',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        backgroundColor: 'rgba(255, 59, 48, 0.02)',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        backgroundColor: 'rgba(255, 59, 48, 0.06)',
       }),
     }}
   >
