@@ -1410,7 +1410,7 @@ export default function DimensionOverlay({
       console.log('📸 Capturing measurements photo with label and coin info...');
       
       // Ensure ref is valid before capture
-      const refToUse = externalViewRef?.current || internalViewRef.current;
+      const refToUse = viewRef.current;
       if (!refToUse) {
         throw new Error('View reference is null before measurements capture');
       }
@@ -1567,7 +1567,7 @@ export default function DimensionOverlay({
       console.log('📸 Capturing main measurement photo with label and coin info...');
       
       // Ensure ref is valid before capture
-      const emailRefToUse = externalViewRef?.current || internalViewRef.current;
+      const emailRefToUse = viewRef.current;
       if (!emailRefToUse) {
         throw new Error('View reference is null before email capture');
       }
