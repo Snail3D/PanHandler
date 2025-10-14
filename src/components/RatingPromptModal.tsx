@@ -59,26 +59,32 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
       transparent={true}
       onRequestClose={onClose}
     >
-      <BlurView intensity={30} tint="dark" style={{ flex: 1 }}>
+      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
         <View style={{ 
           flex: 1, 
-          backgroundColor: 'rgba(0,0,0,0.5)', 
+          backgroundColor: 'rgba(0,0,0,0.3)', 
           justifyContent: 'center', 
           alignItems: 'center',
           paddingHorizontal: 30
         }}>
-          <Animated.View style={[animatedStyle, {
-            backgroundColor: 'white',
-            borderRadius: 24,
-            padding: 28,
-            maxWidth: 400,
+          <Animated.View style={[{
             width: '100%',
+            maxWidth: 400,
+            borderRadius: 20,
+            overflow: 'hidden',
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.3,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.2,
             shadowRadius: 20,
-            elevation: 20,
-          }]}>
+            elevation: 16,
+          }, animatedStyle]}>
+            <BlurView intensity={35} tint="light" style={{ width: '100%' }}>
+              <View style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.35)',
+                padding: 28,
+              }}>
             {/* Star Icon */}
             <View style={{ 
               alignItems: 'center', 
@@ -170,6 +176,8 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
                 </Text>
               </Pressable>
             </View>
+              </View>
+            </BlurView>
           </Animated.View>
         </View>
       </BlurView>

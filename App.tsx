@@ -5,11 +5,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
-// import * as StoreReview from 'expo-store-review';
+import * as StoreReview from 'expo-store-review';
 import MeasurementScreen from "./src/screens/MeasurementScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
-// import RatingPromptModal from "./src/components/RatingPromptModal";
-// import useStore from "./src/state/measurementStore";
+import RatingPromptModal from "./src/components/RatingPromptModal";
+import useStore from "./src/state/measurementStore";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -129,63 +129,67 @@ export default function App() {
     opacity: appOpacity.value,
   }));
   
-  // RATING PROMPT TEMPORARILY DISABLED - Will work in production build
-  // const [showRatingPrompt, setShowRatingPrompt] = useState(false);
-  // const sessionCount = useStore((s) => s.sessionCount);
-  // const hasRatedApp = useStore((s) => s.hasRatedApp);
-  // const lastRatingPromptDate = useStore((s) => s.lastRatingPromptDate);
-  // const incrementSessionCount = useStore((s) => s.incrementSessionCount);
-  // const setHasRatedApp = useStore((s) => s.setHasRatedApp);
-  // const setLastRatingPromptDate = useStore((s) => s.setLastRatingPromptDate);
+  // Review prompt system - Ask at 20 opens, then at 50 opens (max 2 times)
+  const [showRatingPrompt, setShowRatingPrompt] = useState(false);
+  const sessionCount = useStore((s) => s.sessionCount);
+  const reviewPromptCount = useStore((s) => s.reviewPromptCount);
+  const hasReviewedApp = useStore((s) => s.hasReviewedApp);
+  const incrementSessionCount = useStore((s) => s.incrementSessionCount);
+  const incrementReviewPromptCount = useStore((s) => s.incrementReviewPromptCount);
+  const setHasReviewedApp = useStore((s) => s.setHasReviewedApp);
+  const setLastReviewPromptDate = useStore((s) => s.setLastReviewPromptDate);
 
-  // useEffect(() => {
-  //   // Increment session count on app start
-  //   incrementSessionCount();
+  useEffect(() => {
+    // Increment session count on app start
+    incrementSessionCount();
 
-  //   // Check if we should show rating prompt
-  //   const shouldShowPrompt = async () => {
-  //     // Don't show if user has already rated
-  //     if (hasRatedApp) return;
+    // Check if we should show rating prompt
+    const shouldShowPrompt = async () => {
+      // Don't show if user has already reviewed
+      if (hasReviewedApp) return;
 
-  //     // Show after 3-4 sessions
-  //     if (sessionCount >= 3 && sessionCount <= 4) {
-  //       // Check if we've shown prompt recently (wait 7 days between prompts)
-  //       if (lastRatingPromptDate) {
-  //         const lastPromptTime = new Date(lastRatingPromptDate).getTime();
-  //         const daysSinceLastPrompt = (Date.now() - lastPromptTime) / (1000 * 60 * 60 * 24);
-  //         if (daysSinceLastPrompt < 7) return;
-  //       }
+      // Don't show if we've already asked twice
+      if (reviewPromptCount >= 2) return;
 
-  //       // Check if store review is available
-  //       const isAvailable = await StoreReview.isAvailableAsync();
-  //       if (isAvailable) {
-  //         // Small delay before showing prompt
-  //         setTimeout(() => {
-  //           setShowRatingPrompt(true);
-  //         }, 2000);
-  //       }
-  //     }
-  //   };
+      // First prompt: after 20 opens
+      // Second prompt: after 50 opens
+      const shouldPrompt = 
+        (sessionCount === 20 && reviewPromptCount === 0) ||
+        (sessionCount === 50 && reviewPromptCount === 1);
 
-  //   shouldShowPrompt();
-  // }, []);
+      if (shouldPrompt) {
+        // Check if store review is available
+        const isAvailable = await StoreReview.isAvailableAsync();
+        if (isAvailable) {
+          // Small delay before showing prompt (wait for intro to finish)
+          setTimeout(() => {
+            setShowRatingPrompt(true);
+          }, 3000);
+        }
+      }
+    };
 
-  // const handleRate = async () => {
-  //   setShowRatingPrompt(false);
-  //   setHasRatedApp(true);
-  //   setLastRatingPromptDate(new Date().toISOString());
-  //   
-  //   // Request in-app review (iOS 10.3+, Android 5.0+)
-  //   const isAvailable = await StoreReview.isAvailableAsync();
-  //   if (isAvailable) {
-  //     await StoreReview.requestReview();
-  //   }
-  // };
+    shouldShowPrompt();
+  }, [sessionCount]); // Re-check when session count changes
 
-  // const handleDismiss = () => {
-  //   setShowRatingPrompt(false);
-  //   setLastRatingPromptDate(new Date().toISOString());
-  // };
+  const handleRate = async () => {
+    setShowRatingPrompt(false);
+    setHasReviewedApp(true);
+    setLastReviewPromptDate(new Date().toISOString());
+    incrementReviewPromptCount();
+    
+    // Request in-app review (iOS 10.3+, Android 5.0+)
+    const isAvailable = await StoreReview.isAvailableAsync();
+    if (isAvailable) {
+      await StoreReview.requestReview();
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowRatingPrompt(false);
+    setLastReviewPromptDate(new Date().toISOString());
+    incrementReviewPromptCount();
+  };
 
   // v2.2.2 - Fixed touch responder to allow pinch/pan with single-finger hold
   return (
@@ -245,12 +249,12 @@ export default function App() {
           </NavigationContainer>
         </Animated.View>
         
-        {/* Rating prompt will be enabled in production build */}
-        {/* <RatingPromptModal 
+        {/* Review prompt - Shows after 20 & 50 app opens */}
+        <RatingPromptModal 
           visible={showRatingPrompt}
           onClose={handleDismiss}
           onRate={handleRate}
-        /> */}
+        />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
