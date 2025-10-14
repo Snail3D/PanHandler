@@ -188,7 +188,11 @@ export default function ZoomableImage({
 
   return (
     <>
-      {!locked && (
+      <View 
+        key={locked ? 'locked' : 'unlocked'}
+        style={StyleSheet.absoluteFill} 
+        pointerEvents={locked ? 'none' : 'auto'}
+      >
         <GestureDetector gesture={composedGesture}>
           <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
             <Image
@@ -198,16 +202,7 @@ export default function ZoomableImage({
             />
           </Animated.View>
         </GestureDetector>
-      )}
-      {locked && (
-        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
-          <Image
-            source={{ uri: imageUri }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
-            resizeMode="contain"
-          />
-        </Animated.View>
-      )}
+      </View>
       
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
       {showLevelLine && (
