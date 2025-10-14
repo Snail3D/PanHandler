@@ -8,21 +8,16 @@ interface PaywallModalProps {
   visible: boolean;
   onClose: () => void;
   onUpgrade: () => void;
-  remainingSaves: number;
-  remainingEmails: number;
 }
 
-// Comparison row component (matching HelpModal style)
 const ComparisonRow = ({ 
   feature, 
   free, 
   pro,
-  last = false 
 }: { 
   feature: string; 
-  free: string; 
-  pro: string;
-  last?: boolean;
+  free: string | React.ReactNode; 
+  pro: string | React.ReactNode;
 }) => (
   <View 
     style={{ 
@@ -35,15 +30,19 @@ const ComparisonRow = ({
       <Text style={{ fontSize: 14, color: '#1C1C1E' }}>{feature}</Text>
     </View>
     <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-      <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
+      {typeof free === 'string' ? (
+        <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
+      ) : free}
     </View>
     <View style={{ 
       width: 70, 
       padding: 12, 
       alignItems: 'center',
-      backgroundColor: 'rgba(255,149,0,0.08)',
+      backgroundColor: 'rgba(0,122,255,0.08)',
     }}>
-      <Text style={{ fontSize: 14, fontWeight: '600', color: '#FF9500' }}>{pro}</Text>
+      {typeof pro === 'string' ? (
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#007AFF' }}>{pro}</Text>
+      ) : pro}
     </View>
   </View>
 );
@@ -52,8 +51,6 @@ export default function PaywallModal({
   visible, 
   onClose, 
   onUpgrade,
-  remainingSaves,
-  remainingEmails
 }: PaywallModalProps) {
   const handleUpgrade = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -64,8 +61,6 @@ export default function PaywallModal({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onClose();
   };
-
-  const totalRemaining = remainingSaves + remainingEmails;
 
   return (
     <Modal
@@ -98,42 +93,21 @@ export default function PaywallModal({
               contentContainerStyle={{ padding: 32 }}
               showsVerticalScrollIndicator={false}
             >
-              {/* Close Button */}
-              <Pressable
-                onPress={handleClose}
-                style={{
-                  position: 'absolute',
-                  top: 16,
-                  right: 16,
-                  width: 32,
-                  height: 32,
-                  borderRadius: 16,
-                  backgroundColor: '#F3F4F6',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  zIndex: 10,
-                }}
-              >
-                <Ionicons name="close" size={20} color="#6B7280" />
-              </Pressable>
-
-              {/* Icon */}
               <View 
                 style={{
                   width: 80,
                   height: 80,
                   borderRadius: 40,
-                  backgroundColor: '#FEF3C7',
+                  backgroundColor: '#007AFF',
                   justifyContent: 'center',
                   alignItems: 'center',
                   alignSelf: 'center',
                   marginBottom: 20,
                 }}
               >
-                <Ionicons name="warning" size={40} color="#F59E0B" />
+                <Ionicons name="star" size={40} color="#FFFFFF" />
               </View>
 
-              {/* Title */}
               <Text 
                 style={{
                   fontSize: 24,
@@ -143,10 +117,9 @@ export default function PaywallModal({
                   marginBottom: 12,
                 }}
               >
-                You've Used Half Your Free Saves
+                Upgrade to Pro
               </Text>
 
-              {/* Subtitle */}
               <Text 
                 style={{
                   fontSize: 16,
@@ -156,10 +129,9 @@ export default function PaywallModal({
                   lineHeight: 24,
                 }}
               >
-                {totalRemaining} {totalRemaining === 1 ? 'save' : 'saves'} remaining this month
+                Unlock unlimited precision
               </Text>
 
-              {/* Comparison Table */}
               <View style={{ marginBottom: 24 }}>
                 <View style={{ 
                   borderRadius: 14, 
@@ -167,46 +139,67 @@ export default function PaywallModal({
                   borderColor: 'rgba(0,0,0,0.08)',
                   overflow: 'hidden',
                 }}>
-                  {/* Header Row */}
                   <View style={{ flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.02)' }}>
                     <View style={{ flex: 1, padding: 12 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Feature</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FEATURE</Text>
                     </View>
                     <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Free</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
                     </View>
-                    <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,149,0,0.08)' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF9500' }}>Pro</Text>
+                    <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(0,122,255,0.08)' }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#007AFF' }}>PRO</Text>
                     </View>
                   </View>
 
-                  {/* Feature Rows */}
-                  <ComparisonRow feature="Monthly Saves" free="10" pro="∞" />
-                  <ComparisonRow feature="Monthly Emails" free="10" pro="∞" />
-                  <ComparisonRow feature="Measurements" free="∞" pro="∞" />
-                  <ComparisonRow feature="All Tools" free="✓" pro="✓" />
-                  <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
-                  <ComparisonRow feature="CAD Canvas" free="✓" pro="✓" last />
+                  <ComparisonRow 
+                    feature="Total exports (save/email)" 
+                    free="∞" 
+                    pro="∞" 
+                  />
+                  <ComparisonRow 
+                    feature="Measurements per photo" 
+                    free="∞" 
+                    pro="∞" 
+                  />
+                  <ComparisonRow 
+                    feature="Remove watermarks" 
+                    free={<Ionicons name="close" size={20} color="#EF4444" />}
+                    pro={<Ionicons name="checkmark" size={20} color="#007AFF" />}
+                  />
                 </View>
               </View>
 
-              {/* Features List */}
-              <View style={{ marginBottom: 28 }}>
-                <FeatureRow icon="infinite" text="Unlimited saves & emails" />
-                <FeatureRow icon="time" text="For life - one-time payment" />
-                <FeatureRow icon="flash" text="Support indie development" />
-                <FeatureRow icon="shield-checkmark" text="No subscriptions, no ads" />
-              </View>
+              <Text 
+                style={{
+                  fontSize: 48,
+                  fontWeight: '700',
+                  color: '#007AFF',
+                  textAlign: 'center',
+                  marginBottom: 8,
+                }}
+              >
+                $9.97
+              </Text>
+              
+              <Text 
+                style={{
+                  fontSize: 14,
+                  color: '#6B7280',
+                  textAlign: 'center',
+                  marginBottom: 24,
+                }}
+              >
+                One-time purchase • Lifetime access
+              </Text>
 
-              {/* Go Pro Button */}
               <Pressable
                 onPress={handleUpgrade}
                 style={({ pressed }) => ({
-                  backgroundColor: pressed ? '#D97706' : '#F59E0B',
+                  backgroundColor: pressed ? '#0051D5' : '#007AFF',
                   paddingVertical: 18,
                   borderRadius: 16,
                   marginBottom: 12,
-                  shadowColor: '#F59E0B',
+                  shadowColor: '#007AFF',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 8,
@@ -221,38 +214,32 @@ export default function PaywallModal({
                     textAlign: 'center',
                   }}
                 >
-                  🌟 Go Pro - $9.97
+                  Purchase Pro
                 </Text>
               </Pressable>
 
-              {/* Upgrade Button */}
               <Pressable
-                onPress={handleUpgrade}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
                 style={({ pressed }) => ({
-                  backgroundColor: pressed ? '#1E40AF' : '#2563EB',
-                  paddingVertical: 18,
-                  borderRadius: 16,
-                  marginBottom: 12,
-                  shadowColor: '#2563EB',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 8,
+                  paddingVertical: 14,
+                  opacity: pressed ? 0.6 : 1,
+                  marginBottom: 8,
                 })}
               >
                 <Text 
                   style={{
-                    color: '#FFFFFF',
-                    fontSize: 18,
-                    fontWeight: '700',
+                    color: '#007AFF',
+                    fontSize: 16,
+                    fontWeight: '600',
                     textAlign: 'center',
                   }}
                 >
-                  Unlock Unlimited for $9.97
+                  Restore Purchase
                 </Text>
               </Pressable>
 
-              {/* Continue Free Button */}
               <Pressable
                 onPress={handleClose}
                 style={({ pressed }) => ({
@@ -268,7 +255,7 @@ export default function PaywallModal({
                     textAlign: 'center',
                   }}
                 >
-                  Continue with Free ({totalRemaining} {totalRemaining === 1 ? 'save' : 'saves'} left)
+                  Maybe Later
                 </Text>
               </Pressable>
             </ScrollView>
@@ -276,41 +263,5 @@ export default function PaywallModal({
         </Pressable>
       </BlurView>
     </Modal>
-  );
-}
-
-function FeatureRow({ icon, text }: { icon: keyof typeof Ionicons.glyphMap; text: string }) {
-  return (
-    <View 
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 14,
-      }}
-    >
-      <View 
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 16,
-          backgroundColor: '#DBEAFE',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginRight: 12,
-        }}
-      >
-        <Ionicons name={icon} size={18} color="#2563EB" />
-      </View>
-      <Text 
-        style={{
-          fontSize: 16,
-          color: '#374151',
-          fontWeight: '500',
-          flex: 1,
-        }}
-      >
-        {text}
-      </Text>
-    </View>
   );
 }
