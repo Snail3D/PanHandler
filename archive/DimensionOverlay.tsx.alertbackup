@@ -1,7 +1,7 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -103,7 +103,7 @@ export default function DimensionOverlay({
   setImageOpacity,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
-  // __DEV__ && console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
+  // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
   
   const insets = useSafeAreaInsets();
   
@@ -507,7 +507,7 @@ export default function DimensionOverlay({
   // Tetris animation trigger - EPIC GAME OVER sequence!
   // Static Tetris animation - simple fade in/out (v4.0)
   const triggerTetrisAnimation = () => {
-    __DEV__ && console.log('🎮 STATIC TETRIS v4.0 - Simple fade animation');
+    console.log('🎮 STATIC TETRIS v4.0 - Simple fade animation');
     setShowTetris(true);
     
     // Success haptic
@@ -723,7 +723,7 @@ export default function DimensionOverlay({
     const startExclusionEnd = exclusionZoneSize;
     const endExclusionStart = path.length - exclusionZoneSize - 1;
     
-    __DEV__ && console.log(`🔍 Self-intersection check: path length ${path.length}, excluding first ${exclusionZoneSize} and last ${exclusionZoneSize} segments`);
+    console.log(`🔍 Self-intersection check: path length ${path.length}, excluding first ${exclusionZoneSize} and last ${exclusionZoneSize} segments`);
     
     // Check each line segment against all other non-adjacent line segments
     for (let i = 0; i < path.length - 1; i++) {
@@ -750,13 +750,13 @@ export default function DimensionOverlay({
         
         // Check if segments intersect
         if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
-          __DEV__ && console.log(`❌ Self-intersection detected between segment ${i} and segment ${j}`);
+          console.log(`❌ Self-intersection detected between segment ${i} and segment ${j}`);
           return true;
         }
       }
     }
     
-    __DEV__ && console.log('✅ No self-intersection detected (excluding start/end zones)');
+    console.log('✅ No self-intersection detected (excluding start/end zones)');
     return false;
   };
   
@@ -1072,7 +1072,7 @@ export default function DimensionOverlay({
       const measurement = measurements.find(m => m.id === measurementId);
       if (measurement) {
         setMeasurementHistory(new Map(measurementHistory.set(measurementId, { ...measurement })));
-        __DEV__ && console.log('💾 Saved original state for measurement:', measurementId);
+        console.log('💾 Saved original state for measurement:', measurementId);
       }
     }
   };
@@ -1151,7 +1151,7 @@ export default function DimensionOverlay({
       }
       
       // ALWAYS clear area when points are moved - area is no longer accurate after manual editing
-      __DEV__ && console.log('⚠️ Freehand shape edited - removing area from legend (perimeter still valid)');
+      console.log('⚠️ Freehand shape edited - removing area from legend (perimeter still valid)');
       return { 
         ...measurement, 
         perimeter: perimeterStr, 
@@ -1167,10 +1167,10 @@ export default function DimensionOverlay({
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
-    __DEV__ && console.log('🎯 Placing point:');
-    __DEV__ && console.log('  Screen coords:', x, y);
-    __DEV__ && console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
-    __DEV__ && console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
+    console.log('🎯 Placing point:');
+    console.log('  Screen coords:', x, y);
+    console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
+    console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
     
     const requiredPoints = mode === 'distance' ? 2 
       : mode === 'angle' ? 3 
@@ -1269,7 +1269,7 @@ export default function DimensionOverlay({
         ...(height !== undefined && { height }),
       };
       
-      __DEV__ && console.log('📏 Created measurement:', {
+      console.log('📏 Created measurement:', {
         mode,
         hasWidth: width !== undefined,
         hasHeight: height !== undefined,
@@ -1291,7 +1291,7 @@ export default function DimensionOverlay({
       Math.abs(zoomTranslateY - prevZoomRef.current.y) > 1;
     
     if (zoomChanged && showLockedInAnimation) {
-      __DEV__ && console.log('🚫 Pan/zoom detected - dismissing lock-in animation');
+      console.log('🚫 Pan/zoom detected - dismissing lock-in animation');
       setShowLockedInAnimation(false);
     }
     
@@ -1355,7 +1355,7 @@ export default function DimensionOverlay({
     const triggerHeight = SCREEN_HEIGHT * 0.7;
     
     if (legendHeight >= triggerHeight) {
-      __DEV__ && console.log('🎮 TETRIS EASTER EGG TRIGGERED!', measurements.length, 'measurements');
+      console.log('🎮 TETRIS EASTER EGG TRIGGERED!', measurements.length, 'measurements');
       setHasTriggeredTetris(true);
       triggerTetrisAnimation();
     }
@@ -1519,7 +1519,7 @@ export default function DimensionOverlay({
         newHistory.delete(lastMeasurement.id);
         setMeasurementHistory(newHistory);
         
-        __DEV__ && console.log('↩️ Reverted measurement to original state:', lastMeasurement.id);
+        console.log('↩️ Reverted measurement to original state:', lastMeasurement.id);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       } else {
         // No edits - delete the measurement
@@ -1618,7 +1618,7 @@ export default function DimensionOverlay({
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        showAlert('Permission Required', 'Please grant photo library access.', 'warning');
+        Alert.alert('Permission Required', 'Please grant photo library access.');
         return;
       }
       
@@ -1627,7 +1627,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('View Error', 'View ref not available. Try again.', 'error');
+        Alert.alert('View Error', 'View ref not available. Try again.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1645,7 +1645,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during capture.', 'error');
+        Alert.alert('Error', 'View lost during capture.');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1674,7 +1674,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      showAlert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      Alert.alert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -1686,14 +1686,14 @@ export default function DimensionOverlay({
 
   const performEmail = async (label: string | null) => {
     if (!currentImageUri) {
-      showAlert('Email Error', 'No image to export.', 'error');
+      Alert.alert('Email Error', 'No image to export.');
       return;
     }
     
     try {
       const isAvailable = await MailComposer.isAvailableAsync();
       if (!isAvailable) {
-        showAlert('Email Not Available', 'No email app is configured.', 'warning');
+        Alert.alert('Email Not Available', 'No email app is configured.');
         return;
       }
 
@@ -1724,7 +1724,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View not ready. Wait and try again.', 'error');
+        Alert.alert('Error', 'View not ready. Wait and try again.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1775,7 +1775,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during label capture.', 'error');
+        Alert.alert('Error', 'View lost during label capture.');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1814,7 +1814,7 @@ export default function DimensionOverlay({
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      Alert.alert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -2109,7 +2109,7 @@ export default function DimensionOverlay({
           onMoveShouldSetResponder={() => true}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
-            __DEV__ && console.log('👆 Touch started - activating cursor');
+            console.log('👆 Touch started - activating cursor');
             
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
@@ -2154,7 +2154,7 @@ export default function DimensionOverlay({
                 
                 // Strong haptic feedback to signal drawing has started
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                __DEV__ && console.log('🎨 Freehand drawing activated!');
+                console.log('🎨 Freehand drawing activated!');
               }, 1500); // 1.5 seconds
               
               // Light haptic on initial press
@@ -2271,7 +2271,7 @@ export default function DimensionOverlay({
                           const selfIntersects = doesPathSelfIntersect(testPath);
                           
                           if (!selfIntersects) {
-                            __DEV__ && console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
+                            console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
                             // Strong haptic feedback for successful lasso close
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setFreehandClosedLoop(true);
@@ -2279,7 +2279,7 @@ export default function DimensionOverlay({
                             // Snap to exact start point to close the loop
                             return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
                           } else {
-                            __DEV__ && console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
+                            console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
                             // Continue drawing normally without snapping
                             return [...prevPath, { x: imageX, y: imageY }];
                           }
@@ -2384,7 +2384,7 @@ export default function DimensionOverlay({
             }
           }}
           onResponderRelease={() => {
-            __DEV__ && console.log('✅ Touch released');
+            console.log('✅ Touch released');
             
             // Reset snap state
             setIsSnapped(false);
@@ -2402,14 +2402,14 @@ export default function DimensionOverlay({
                 setFreehandActivating(false);
                 setShowFreehandCursor(false);
                 setFreehandPath([]); // IMPORTANT: Clear any points that might have been captured
-                __DEV__ && console.log('⚠️ Freehand activation cancelled (released too early)');
+                console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
               } else if (isDrawingFreehand && freehandPath.length >= 5) {
                 // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
                 // Use ref instead of state to avoid async state issues
                 const isClosedLoop = freehandClosedLoopRef.current;
-                __DEV__ && console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
+                console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
                 
                 // Calculate total path length (perimeter)
                 let totalLength = 0;
@@ -2425,14 +2425,14 @@ export default function DimensionOverlay({
                 
                 // Check if path self-intersects
                 const selfIntersects = doesPathSelfIntersect(freehandPath);
-                __DEV__ && console.log('🔍 Self-intersection check:', selfIntersects);
-                __DEV__ && console.log('🔍 Closed loop state:', isClosedLoop);
-                __DEV__ && console.log('🔍 Path length:', freehandPath.length);
+                console.log('🔍 Self-intersection check:', selfIntersects);
+                console.log('🔍 Closed loop state:', isClosedLoop);
+                console.log('🔍 Path length:', freehandPath.length);
                 
                 // Calculate area only if loop is closed AND doesn't self-intersect
                 let area = 0;
                 if (isClosedLoop && !selfIntersects && freehandPath.length >= 3) {
-                  __DEV__ && console.log('✅ Conditions met for area calculation!');
+                  console.log('✅ Conditions met for area calculation!');
                   
                   // Shoelace formula for polygon area
                   for (let i = 0; i < freehandPath.length - 1; i++) {
@@ -2441,14 +2441,14 @@ export default function DimensionOverlay({
                   }
                   area = Math.abs(area) / 2;
                   
-                  __DEV__ && console.log('📐 Raw area in pixels²:', area.toFixed(2));
+                  console.log('📐 Raw area in pixels²:', area.toFixed(2));
                   
                   // Convert from pixel² to physical units²
                   const physicalArea = area / (pixelsPerUnit * pixelsPerUnit);
                   
-                  __DEV__ && console.log('📐 Physical area:', physicalArea.toFixed(2), 'square units');
-                  __DEV__ && console.log('📐 Calibration unit:', calibration?.unit);
-                  __DEV__ && console.log('📐 Unit system:', unitSystem);
+                  console.log('📐 Physical area:', physicalArea.toFixed(2), 'square units');
+                  console.log('📐 Calibration unit:', calibration?.unit);
+                  console.log('📐 Unit system:', unitSystem);
                   
                   // Format measurement with both perimeter and area
                   let perimeterStr: string;
@@ -2479,9 +2479,9 @@ export default function DimensionOverlay({
                   
                   const formattedValue = `${perimeterStr} ⊞ ${areaStr}`;
                   
-                  __DEV__ && console.log('📐 Formatted perimeter:', perimeterStr);
-                  __DEV__ && console.log('📐 Formatted area:', areaStr);
-                  __DEV__ && console.log('📐 Final value string:', formattedValue);
+                  console.log('📐 Formatted perimeter:', perimeterStr);
+                  console.log('📐 Formatted area:', areaStr);
+                  console.log('📐 Final value string:', formattedValue);
                   
                   // Create completed measurement with area
                   const newMeasurement: Measurement = {
@@ -2496,11 +2496,11 @@ export default function DimensionOverlay({
                     ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
                   };
                   
-                  __DEV__ && console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
+                  console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
                   
                   setMeasurements([...measurements, newMeasurement]);
                 } else {
-                  __DEV__ && console.log('⚠️ Area calculation skipped - conditions not met:', {
+                  console.log('⚠️ Area calculation skipped - conditions not met:', {
                     isClosedLoop,
                     selfIntersects,
                     pathLength: freehandPath.length,
@@ -2530,11 +2530,11 @@ export default function DimensionOverlay({
                   
                   // Log reason for no area
                   if (isClosedLoop && selfIntersects) {
-                    __DEV__ && console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
+                    console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
                   }
                 }
                 
-                __DEV__ && console.log('🎨 Creating freehand measurement with', freehandPath.length, 'points');
+                console.log('🎨 Creating freehand measurement with', freehandPath.length, 'points');
                 
                 // Reset freehand state
                 setFreehandPath([]);
@@ -2545,10 +2545,10 @@ export default function DimensionOverlay({
                 freehandClosedLoopRef.current = false; // Reset ref too
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                __DEV__ && console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
+                console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
-                __DEV__ && console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');
+                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
@@ -3003,7 +3003,7 @@ export default function DimensionOverlay({
                     setMeasurements(updatedMeasurements);
                     setTapDeleteState(null);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    __DEV__ && console.log('🗑️ Measurement deleted via 4 rapid taps');
+                    console.log('🗑️ Measurement deleted via 4 rapid taps');
                     
                     // Reset all states and return early
                     setDraggedMeasurementId(null);
@@ -3040,7 +3040,7 @@ export default function DimensionOverlay({
                   setMeasurements(updatedMeasurements);
                   setTapDeleteState(null);
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  __DEV__ && console.log('🗑️ Measurement deleted via 4 rapid taps');
+                  console.log('🗑️ Measurement deleted via 4 rapid taps');
                   
                   // Reset all states and return early
                   setDraggedMeasurementId(null);
@@ -4613,7 +4613,7 @@ export default function DimensionOverlay({
                     // Don't show cursor until user touches screen
                     setModeColorIndex((prev) => prev + 1); // Rotate color when long-press activates
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    __DEV__ && console.log('🎨 Freehand mode activated via long-press');
+                    console.log('🎨 Freehand mode activated via long-press');
                   }, 500); // 500ms long-press
                 }}
                 onPressOut={() => {
@@ -4976,11 +4976,11 @@ export default function DimensionOverlay({
                 
                 if (newProStatus) {
                   // Switched to Pro
-                  showAlert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!', 'success');
+                  Alert.alert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 } else {
                   // Switched to Free
-                  showAlert('🔄 Free User Mode', 'Switched to Free User for testing!', 'info');
+                  Alert.alert('🔄 Free User Mode', 'Switched to Free User for testing!');
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                 }
               } else {
@@ -5158,7 +5158,7 @@ export default function DimensionOverlay({
                   <Pressable
                     onPress={() => {
                       setShowProModal(false);
-                      showAlert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!', 'info');
+                      Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
                     }}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
@@ -5177,7 +5177,7 @@ export default function DimensionOverlay({
                   {/* Restore Purchase Button */}
                   <Pressable
                     onPress={() => {
-                      showAlert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)', 'info');
+                      Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
                     }}
                     style={{ paddingVertical: 12, marginBottom: 8 }}
                   >
@@ -5215,7 +5215,7 @@ export default function DimensionOverlay({
               // Secret: Long-press to clear saved email (for testing)
               setUserEmail(null);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
+              Alert.alert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!');
             }}
             style={{
               backgroundColor: 'rgba(0, 122, 255, 0.9)',
@@ -5667,17 +5667,6 @@ export default function DimensionOverlay({
           setIsMapMode(false);
           setShowMapScaleModal(false);
         }}
-      />
-      {/* Custom Alert Modal */}
-      <AlertModal
-        visible={alertConfig.visible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        confirmText={alertConfig.confirmText}
-        cancelText={alertConfig.cancelText}
-        onConfirm={alertConfig.onConfirm}
-        onClose={closeAlert}
       />
     </>
   );

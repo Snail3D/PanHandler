@@ -51,7 +51,7 @@ export async function generateImage(
     }
 
     const result = await response.json();
-    console.log("[AssetGenerationService] Image generated successfully");
+    __DEV__ && console.log("[AssetGenerationService] Image generated successfully");
 
     // Return the image data from the response
     if (result.success && result.data) {

@@ -65,10 +65,10 @@ export default function MeasurementScreen() {
     try {
       await new Promise<void>((resolve) => {
         Image.getSize(uri, (width, height) => {
-          console.log('📐 Image dimensions:', width, 'x', height);
+          __DEV__ && console.log('📐 Image dimensions:', width, 'x', height);
           const isLandscape = width > height;
           const orientation = isLandscape ? 'LANDSCAPE' : 'PORTRAIT';
-          console.log('📱 Image orientation:', orientation);
+          __DEV__ && console.log('📱 Image orientation:', orientation);
           setImageOrientation(orientation);
           resolve();
         }, (error) => {
@@ -220,11 +220,11 @@ export default function MeasurementScreen() {
   // Restore session on mount if there's a persisted image
   useEffect(() => {
     if (currentImageUri && calibration && coinCircle) {
-      console.log('📦 Restoring previous session');
+      __DEV__ && console.log('📦 Restoring previous session');
       setMode('measurement');
       // Restore saved zoom state if available
       if (savedZoomState) {
-        console.log('🔄 Restoring zoom state:', savedZoomState);
+        __DEV__ && console.log('🔄 Restoring zoom state:', savedZoomState);
         setMeasurementZoom({ ...savedZoomState, rotation: savedZoomState.rotation || 0 });
       } else {
         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
@@ -285,7 +285,7 @@ export default function MeasurementScreen() {
           const { granted } = await requestMediaLibraryPermission();
           canSave = granted;
           if (!granted) {
-            console.log('Media library permission not granted');
+            __DEV__ && console.log('Media library permission not granted');
           }
         }
 
@@ -293,7 +293,7 @@ export default function MeasurementScreen() {
         if (canSave) {
           try {
             await MediaLibrary.saveToLibraryAsync(photo.uri);
-            console.log('✅ Photo saved to camera roll');
+            __DEV__ && console.log('✅ Photo saved to camera roll');
           } catch (saveError) {
             console.error('Failed to save to camera roll:', saveError);
           }
@@ -385,7 +385,7 @@ export default function MeasurementScreen() {
               <View className="flex-row items-center">
                 <Pressable
                   onPress={() => {
-                    console.log('🔵 Help button pressed in camera screen');
+                    __DEV__ && console.log('🔵 Help button pressed in camera screen');
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setShowHelpModal(true);
                   }}
@@ -564,7 +564,7 @@ export default function MeasurementScreen() {
                 style={{ flex: 1 }}
                 onLayout={() => {
                   // Debug: Log when view is laid out and ref should be attached
-                  console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
+                  __DEV__ && console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
                 }}
               >
                 <ZoomableImage 

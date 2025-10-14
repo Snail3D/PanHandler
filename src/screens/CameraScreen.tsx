@@ -135,14 +135,14 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       if (!mediaLibraryPermission?.granted) {
         const { granted } = await requestMediaLibraryPermission();
         if (!granted) {
-          console.log('Media library permission not granted');
+          __DEV__ && console.log('Media library permission not granted');
         }
       }
 
       // Save to camera roll
       if (mediaLibraryPermission?.granted) {
         await MediaLibrary.saveToLibraryAsync(finalUri);
-        console.log('✅ Photo saved to camera roll');
+        __DEV__ && console.log('✅ Photo saved to camera roll');
       }
 
       // Pass to next screen
@@ -250,7 +250,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         
         // Debug: Log bubble position occasionally
         if (Math.random() < 0.05) { // Log ~5% of updates
-          console.log('🫧 Bubble position:', finalX.toFixed(1), finalY.toFixed(1), '| Tilt:', absTilt.toFixed(1), '°');
+          __DEV__ && console.log('🫧 Bubble position:', finalX.toFixed(1), finalY.toFixed(1), '| Tilt:', absTilt.toFixed(1), '°');
         }
         
         // Track angles for stability check
