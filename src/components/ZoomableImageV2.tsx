@@ -169,7 +169,6 @@ export default function ZoomableImage({
   const doubleTapWhenLockedGesture = Gesture.Tap()
     .numberOfTaps(2)
     .enabled(locked)
-    .maxDuration(500)
     .maxDeltaX(10)
     .maxDeltaY(10)
     .onEnd(() => {
