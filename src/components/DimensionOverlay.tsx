@@ -775,10 +775,37 @@ export default function DimensionOverlay({
     }
     
     const realDistance = pixelDistance / calibration.pixelsPerUnit;
+    
+    // Map Mode: Apply scale conversion
+    if (isMapMode && mapScale) {
+      // Calculate how many screen units (cm/in) the measurement is
+      const screenWidthCm = 10.8; // Standard phone screen width
+      const screenWidthIn = 4.25;
+      const imageWidth = SCREEN_WIDTH * 2; // Assume 2x pixel density
+      
+      const screenWidthPhysical = mapScale.screenUnit === 'cm' ? screenWidthCm : screenWidthIn;
+      const pixelsPerScreenUnit = imageWidth / screenWidthPhysical;
+      const screenUnits = pixelDistance / pixelsPerScreenUnit;
+      
+      // Convert to map units
+      const mapDistance = screenUnits * (mapScale.realDistance / mapScale.screenDistance);
+      
+      // Format in the map's real units
+      if (mapScale.realUnit === 'km') {
+        return `${mapDistance.toFixed(2)} km`;
+      } else if (mapScale.realUnit === 'mi') {
+        return `${mapDistance.toFixed(2)} mi`;
+      } else if (mapScale.realUnit === 'm') {
+        return `${mapDistance.toFixed(1)} m`;
+      } else if (mapScale.realUnit === 'ft') {
+        return `${mapDistance.toFixed(0)} ft`;
+      }
+    }
+    
     return formatMeasurement(realDistance, calibration.unit, unitSystem, 2);
   };
 
-  // Calculate angle between three points
+  // Calculate angle between three points (or azimuth in Map Mode)
   const calculateAngle = (p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }) => {
     // Safety check
     if (!p1 || !p2 || !p3 || p1.y === undefined || p2.y === undefined || p3.y === undefined) {
@@ -786,6 +813,37 @@ export default function DimensionOverlay({
       return '0°';
     }
     
+    // Map Mode: Calculate azimuth (bearing) - clockwise angle from north
+    if (isMapMode) {
+      // p1 = starting point
+      // p2 = north reference point (defines north direction)
+      // p3 = destination point
+      
+      // Vector from p1 to p2 (north reference)
+      const northX = p2.x - p1.x;
+      const northY = p2.y - p1.y;
+      
+      // Vector from p1 to p3 (destination)
+      const destX = p3.x - p1.x;
+      const destY = p3.y - p1.y;
+      
+      // Calculate angle of north vector from horizontal (in radians)
+      const northAngle = Math.atan2(-northY, northX); // Negative Y because screen coords are inverted
+      
+      // Calculate angle of destination vector from horizontal
+      const destAngle = Math.atan2(-destY, destX);
+      
+      // Calculate clockwise angle from north to destination
+      let azimuth = (destAngle - northAngle) * (180 / Math.PI);
+      
+      // Normalize to 0-360 range
+      if (azimuth < 0) azimuth += 360;
+      if (azimuth >= 360) azimuth -= 360;
+      
+      return `${azimuth.toFixed(1)}° (Azimuth)`;
+    }
+    
+    // Normal Mode: Calculate interior angle
     const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
     const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
     let angle = Math.abs((angle2 - angle1) * (180 / Math.PI));
