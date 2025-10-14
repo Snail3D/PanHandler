@@ -97,13 +97,6 @@ export default function DimensionOverlay({
   viewRef: externalViewRef,
   setImageOpacity,
 }: DimensionOverlayProps) {
-  // CACHE BUST v4.0 - Verify new bundle is loaded
-  console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
-  console.log('🔍 Component mount - viewRef:', {
-    hasViewRef: !!externalViewRef,
-    hasCurrent: externalViewRef ? !!externalViewRef.current : 'N/A'
-  });
-  
   const insets = useSafeAreaInsets();
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
