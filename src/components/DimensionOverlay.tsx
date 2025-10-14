@@ -864,6 +864,68 @@ export default function DimensionOverlay({
     return Math.sqrt(dx * dx + dy * dy);
   };
 
+  // Helper function to recalculate measurement values after points are moved
+  const recalculateMeasurement = (measurement: Measurement): Measurement => {
+    const { mode, points } = measurement;
+    
+    if (mode === 'distance') {
+      const value = calculateDistance(points[0], points[1]);
+      return { ...measurement, value };
+    } else if (mode === 'angle') {
+      const value = calculateAngle(points[0], points[1], points[2]);
+      return { ...measurement, value };
+    } else if (mode === 'circle') {
+      // Recalculate radius and diameter
+      const radius = Math.sqrt(
+        Math.pow(points[1].x - points[0].x, 2) + 
+        Math.pow(points[1].y - points[0].y, 2)
+      );
+      const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
+      const diameter = radiusInUnits * 2;
+      const value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+      return { ...measurement, value, radius };
+    } else if (mode === 'rectangle') {
+      // Recalculate width and height from all 4 corners
+      const p0 = points[0]; // top-left
+      const p2 = points[2]; // bottom-right
+      const widthPx = Math.abs(p2.x - p0.x);
+      const heightPx = Math.abs(p2.y - p0.y);
+      const width = widthPx / (calibration?.pixelsPerUnit || 1);
+      const height = heightPx / (calibration?.pixelsPerUnit || 1);
+      const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
+      const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+      const value = `${widthStr} × ${heightStr}`;
+      return { ...measurement, value, width, height };
+    } else if (mode === 'freehand' && measurement.isClosed) {
+      // Recalculate perimeter and area for closed loops
+      let perimeter = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        const segmentLength = Math.sqrt(
+          Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+        );
+        perimeter += segmentLength;
+      }
+      const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
+      const perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+      
+      // Recalculate area using Shoelace formula
+      let areaSum = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        areaSum += (p1.x * p2.y - p2.x * p1.y);
+      }
+      const areaPx = Math.abs(areaSum) / 2;
+      const areaInUnits = areaPx / Math.pow(calibration?.pixelsPerUnit || 1, 2);
+      
+      return { ...measurement, perimeter: perimeterStr, area: areaInUnits };
+    }
+    
+    return measurement;
+  };
+
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
@@ -2596,7 +2658,9 @@ export default function DimensionOverlay({
                 return m;
               });
               
-              setMeasurements(updatedMeasurements);
+              setMeasurements(updatedMeasurements.map(m => 
+                m.id === resizingPoint.measurementId ? recalculateMeasurement(m) : m
+              ));
               
               // Reduced haptic feedback - only if not snapping and movement is significant
               // This prevents jittery feeling from too many haptics
@@ -2735,54 +2799,10 @@ export default function DimensionOverlay({
             }
             
             if (resizingPoint) {
-              // Recalculate measurement values after point movement completes
+              // Recalculate measurement values after point movement completes using our helper function
               const updatedMeasurements = measurements.map(m => {
                 if (m.id === resizingPoint.measurementId) {
-                  let newValue = m.value;
-                  let width, height, radius;
-                  
-                  if (m.mode === 'distance') {
-                    newValue = calculateDistance(m.points[0], m.points[1]);
-                  } else if (m.mode === 'angle') {
-                    newValue = calculateAngle(m.points[0], m.points[1], m.points[2]);
-                  } else if (m.mode === 'circle') {
-                    const radiusPx = Math.sqrt(
-                      Math.pow(m.points[1].x - m.points[0].x, 2) + 
-                      Math.pow(m.points[1].y - m.points[0].y, 2)
-                    );
-                    radius = radiusPx / (calibration?.pixelsPerUnit || 1);
-                    const diameter = radius * 2;
-                    newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                  } else if (m.mode === 'rectangle') {
-                    // Recalculate width and height from all 4 corners
-                    const xCoords = m.points.map(p => p.x);
-                    const yCoords = m.points.map(p => p.y);
-                    const widthPx = Math.max(...xCoords) - Math.min(...xCoords);
-                    const heightPx = Math.max(...yCoords) - Math.min(...yCoords);
-                    width = widthPx / (calibration?.pixelsPerUnit || 1);
-                    height = heightPx / (calibration?.pixelsPerUnit || 1);
-                    const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
-                    const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
-                    newValue = `${widthStr} × ${heightStr}`;
-                  } else if (m.mode === 'freehand') {
-                    // Recalculate total path length
-                    let totalLength = 0;
-                    for (let i = 1; i < m.points.length; i++) {
-                      const dx = m.points[i].x - m.points[i - 1].x;
-                      const dy = m.points[i].y - m.points[i - 1].y;
-                      totalLength += Math.sqrt(dx * dx + dy * dy);
-                    }
-                    const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
-                    newValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
-                  }
-                  
-                  return {
-                    ...m,
-                    value: newValue,
-                    ...(width !== undefined && { width }),
-                    ...(height !== undefined && { height }),
-                    ...(radius !== undefined && { radius }),
-                  };
+                  return recalculateMeasurement(m);
                 }
                 return m;
               });
