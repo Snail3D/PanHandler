@@ -2421,7 +2421,15 @@ export default function DimensionOverlay({
                   });
                   
                   // Open path OR self-intersecting - just show length
-                  const formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                  let formattedValue: string;
+                  
+                  // Map Mode: Apply scale conversion
+                  if (isMapMode && mapScale) {
+                    const perimeterMM = convertToMapScale(totalLength);
+                    formattedValue = formatMeasurement(perimeterMM, 'mm', unitSystem);
+                  } else {
+                    formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
+                  }
                   
                   const newMeasurement: Measurement = {
                     id: Date.now().toString(),
@@ -5475,6 +5483,8 @@ export default function DimensionOverlay({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }}
         onDismiss={() => {
+          // If dismissing without setting scale, turn off map mode
+          setIsMapMode(false);
           setShowMapScaleModal(false);
         }}
       />
