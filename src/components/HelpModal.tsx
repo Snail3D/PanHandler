@@ -1540,7 +1540,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                   
                   <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
-                    Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a 3D designer on a mission to make CAD designing faster, easier, and more accurate for everyone!
+                    Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a slug on a mission to make CAD designing faster, easier, and more accurate for everyone!
                   </Text>
 
                   {/* Lightweight & Offline badges */}
