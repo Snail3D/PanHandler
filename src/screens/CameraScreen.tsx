@@ -33,7 +33,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
-  const [flashEnabled, setFlashEnabled] = useState(false);
+  const [flashEnabled, setFlashEnabled] = useState(true); // Flash ON by default
   
   // Bubble level animation
   const bubbleX = useSharedValue(0);
@@ -77,16 +77,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     try {
       setIsCapturing(true);
       
-      // Enable flash for capture if not already on
-      const wasFlashOn = flashEnabled;
-      if (!flashEnabled) {
-        setFlashEnabled(true);
-      }
-      
-      // Wait a tiny bit for flash to activate
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Camera flash effect - quick bright flash
+      // Camera flash effect - quick bright flash UI overlay
       flashOpacity.value = 1;
       flashOpacity.value = withSpring(0, {
         damping: 20,
@@ -97,15 +88,10 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       // Haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       
-      // Take the photo
+      // Take the photo (flash/torch is controlled by enableTorch prop on CameraView)
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
       });
-      
-      // Turn flash back off if it wasn't on before
-      if (!wasFlashOn) {
-        setFlashEnabled(false);
-      }
       
       if (!photo?.uri) return;
 
