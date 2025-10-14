@@ -52,17 +52,9 @@ export default function ZoomCalibration({
   const insets = useSafeAreaInsets();
   const [zoomScale, setZoomScale] = useState(1);
   const [zoomTranslate, setZoomTranslate] = useState({ x: 0, y: 0 });
-  const [colorIndex, setColorIndex] = useState(0);
-
-  // Rotate colors every 2 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setColorIndex((prev) => (prev + 1) % VIBRANT_COLORS.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const currentColor = VIBRANT_COLORS[colorIndex];
+  
+  // Pick ONE random color on mount (don't rotate during use)
+  const [currentColor] = useState(() => VIBRANT_COLORS[Math.floor(Math.random() * VIBRANT_COLORS.length)]);
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -271,11 +263,11 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Bottom Controls - MOVED WAY UP, closer to circle */}
+      {/* Bottom Controls - Moved up but not TOO much */}
       <View
         style={{
           position: 'absolute',
-          bottom: SCREEN_HEIGHT / 2 - referenceRadiusPixels - 140, // Much closer to circle
+          bottom: SCREEN_HEIGHT / 2 - referenceRadiusPixels - 210, // Halfway between original and too-high position
           left: 20,
           right: 20,
         }}
@@ -311,15 +303,14 @@ export default function ZoomCalibration({
               Current <Text style={{ fontWeight: '700', color: '#F59E0B' }}>Zoom: {zoomScale.toFixed(2)}x</Text>
             </Text>
             
-            {/* BIG Lock In Button - centered */}
+            {/* GIANT Lock In Button - centered, no icon */}
             <Pressable
               onPress={handleLockIn}
               style={({ pressed }) => ({
                 backgroundColor: pressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
                 borderRadius: 16,
-                paddingVertical: 18,
+                paddingVertical: 20,
                 marginBottom: 12,
-                flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderWidth: 1,
@@ -330,14 +321,13 @@ export default function ZoomCalibration({
                 shadowRadius: 12,
               })}
             >
-              <Ionicons name="checkmark-circle" size={26} color="rgba(16, 185, 129, 0.8)" />
               <Text style={{ 
                 color: 'rgba(0, 0, 0, 0.85)', 
                 fontWeight: '800', 
-                marginLeft: 10, 
-                fontSize: 22,
+                fontSize: 26,
+                textAlign: 'center',
               }}>
-                Lock In
+                LOCK IN
               </Text>
             </Pressable>
             
