@@ -1235,7 +1235,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               {/* Map Mode */}
               <ExpandableSection
                 icon="map"
-                title="🗺️ Map Mode"
+                title="Map Mode"
                 color="#0066FF"
                 delay={500}
                 scrollY={scrollY}
