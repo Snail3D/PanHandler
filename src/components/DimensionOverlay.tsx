@@ -1409,8 +1409,14 @@ export default function DimensionOverlay({
       
       console.log('📸 Capturing measurements photo with label and coin info...');
       
+      // Ensure ref is valid before capture
+      const refToUse = externalViewRef?.current || internalViewRef.current;
+      if (!refToUse) {
+        throw new Error('View reference is null before measurements capture');
+      }
+      
       // Capture measurements photo with label/coin visible, menu hidden
-      const measurementsUri = await captureRef((externalViewRef || internalViewRef) as any, {
+      const measurementsUri = await captureRef(refToUse, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1560,8 +1566,14 @@ export default function DimensionOverlay({
       
       console.log('📸 Capturing main measurement photo with label and coin info...');
       
+      // Ensure ref is valid before capture
+      const emailRefToUse = externalViewRef?.current || internalViewRef.current;
+      if (!emailRefToUse) {
+        throw new Error('View reference is null before email capture');
+      }
+      
       // Capture the image with measurements, label, and coin info visible (menu hidden)
-      const uri = await captureRef((externalViewRef || internalViewRef) as any, {
+      const uri = await captureRef(emailRefToUse, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1640,7 +1652,8 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef((externalViewRef || internalViewRef) as any, {
+      // Reuse the same ref from first capture
+      const labelOnlyUri = await captureRef(emailRefToUse, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
