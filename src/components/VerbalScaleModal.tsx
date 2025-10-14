@@ -139,7 +139,7 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                         color: 'rgba(0, 0, 0, 0.6)', 
                         marginBottom: 8 
                       }}>
-                        On Screen
+                        On Map
                       </Text>
                       <View style={{
                         backgroundColor: 'rgba(255, 255, 255, 0.7)',

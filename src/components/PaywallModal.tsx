@@ -38,10 +38,10 @@ const ComparisonRow = ({
       width: 70, 
       padding: 12, 
       alignItems: 'center',
-      backgroundColor: 'rgba(0,122,255,0.08)',
+      backgroundColor: 'rgba(88, 86, 214, 0.15)',
     }}>
       {typeof pro === 'string' ? (
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#007AFF' }}>{pro}</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#5856D6' }}>{pro}</Text>
       ) : pro}
     </View>
   </View>
@@ -77,188 +77,193 @@ export default function PaywallModal({
           <Pressable
             onPress={(e) => e.stopPropagation()}
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 24,
+              borderRadius: 20,
               width: '100%',
               maxWidth: 400,
               maxHeight: '85%',
+              overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.2,
+              shadowRadius: 20,
               elevation: 16,
             }}
           >
-            <ScrollView 
-              contentContainerStyle={{ padding: 32 }}
-              showsVerticalScrollIndicator={false}
-            >
-              <View 
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
-                  backgroundColor: '#007AFF',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  alignSelf: 'center',
-                  marginBottom: 20,
-                }}
-              >
-                <Ionicons name="star" size={40} color="#FFFFFF" />
-              </View>
+            <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
+              <View style={{
+                flex: 1,
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.35)',
+              }}>
+                <ScrollView 
+                  contentContainerStyle={{ padding: 32 }}
+                  showsVerticalScrollIndicator={false}
+                >
+                  <View 
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 40,
+                      backgroundColor: 'rgba(88, 86, 214, 0.85)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      alignSelf: 'center',
+                      marginBottom: 20,
+                    }}
+                  >
+                    <Ionicons name="star" size={40} color="#FFFFFF" />
+                  </View>
 
-              <Text 
-                style={{
-                  fontSize: 24,
-                  fontWeight: '700',
-                  color: '#111827',
-                  textAlign: 'center',
-                  marginBottom: 12,
-                }}
-              >
-                Upgrade to Pro
-              </Text>
+                  <Text 
+                    style={{
+                      fontSize: 24,
+                      fontWeight: '700',
+                      color: '#1C1C1E',
+                      textAlign: 'center',
+                      marginBottom: 12,
+                    }}
+                  >
+                    Upgrade to Pro
+                  </Text>
 
-              <Text 
-                style={{
-                  fontSize: 16,
-                  color: '#6B7280',
-                  textAlign: 'center',
-                  marginBottom: 24,
-                  lineHeight: 24,
-                }}
-              >
-                Unlock unlimited precision
-              </Text>
+                  <Text 
+                    style={{
+                      fontSize: 16,
+                      color: '#3C3C43',
+                      textAlign: 'center',
+                      marginBottom: 24,
+                      lineHeight: 24,
+                    }}
+                  >
+                    Unlock unlimited precision
+                  </Text>
 
-              <View style={{ marginBottom: 24 }}>
-                <View style={{ 
-                  borderRadius: 14, 
-                  borderWidth: 1, 
-                  borderColor: 'rgba(0,0,0,0.08)',
-                  overflow: 'hidden',
-                }}>
-                  <View style={{ flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.02)' }}>
-                    <View style={{ flex: 1, padding: 12 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FEATURE</Text>
-                    </View>
-                    <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
-                    </View>
-                    <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(0,122,255,0.08)' }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#007AFF' }}>PRO</Text>
+                  <View style={{ marginBottom: 24 }}>
+                    <View style={{ 
+                      borderRadius: 14, 
+                      borderWidth: 1, 
+                      borderColor: 'rgba(0,0,0,0.08)',
+                      overflow: 'hidden',
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                    }}>
+                      <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.12)' }}>
+                        <View style={{ flex: 1, padding: 12 }}>
+                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#3C3C43' }}>FEATURE</Text>
+                        </View>
+                        <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
+                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
+                        </View>
+                        <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(88, 86, 214, 0.15)' }}>
+                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>PRO</Text>
+                        </View>
+                      </View>
+
+                      <ComparisonRow 
+                        feature="Total exports (save/email)" 
+                        free="∞" 
+                        pro="∞" 
+                      />
+                      <ComparisonRow 
+                        feature="Measurements per photo" 
+                        free="∞" 
+                        pro="∞" 
+                      />
                     </View>
                   </View>
 
-                  <ComparisonRow 
-                    feature="Total exports (save/email)" 
-                    free="∞" 
-                    pro="∞" 
-                  />
-                  <ComparisonRow 
-                    feature="Measurements per photo" 
-                    free="∞" 
-                    pro="∞" 
-                  />
-                  <ComparisonRow 
-                    feature="Remove watermarks" 
-                    free={<Ionicons name="close" size={20} color="#EF4444" />}
-                    pro={<Ionicons name="checkmark" size={20} color="#007AFF" />}
-                  />
-                </View>
+                  <Text 
+                    style={{
+                      fontSize: 48,
+                      fontWeight: '700',
+                      color: '#5856D6',
+                      textAlign: 'center',
+                      marginBottom: 8,
+                    }}
+                  >
+                    $9.97
+                  </Text>
+                  
+                  <Text 
+                    style={{
+                      fontSize: 14,
+                      color: '#3C3C43',
+                      textAlign: 'center',
+                      marginBottom: 24,
+                    }}
+                  >
+                    One-time purchase • Lifetime access
+                  </Text>
+
+                  <Pressable
+                    onPress={handleUpgrade}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
+                      paddingVertical: 18,
+                      borderRadius: 16,
+                      marginBottom: 12,
+                      shadowColor: '#5856D6',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 8,
+                    })}
+                  >
+                    <Text 
+                      style={{
+                        color: '#FFFFFF',
+                        fontSize: 18,
+                        fontWeight: '700',
+                        textAlign: 'center',
+                      }}
+                    >
+                      Purchase Pro
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={({ pressed }) => ({
+                      paddingVertical: 14,
+                      opacity: pressed ? 0.6 : 1,
+                      marginBottom: 8,
+                    })}
+                  >
+                    <Text 
+                      style={{
+                        color: '#5856D6',
+                        fontSize: 16,
+                        fontWeight: '600',
+                        textAlign: 'center',
+                      }}
+                    >
+                      Restore Purchase
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleClose}
+                    style={({ pressed }) => ({
+                      paddingVertical: 14,
+                      opacity: pressed ? 0.6 : 1,
+                    })}
+                  >
+                    <Text 
+                      style={{
+                        color: '#8E8E93',
+                        fontSize: 16,
+                        fontWeight: '600',
+                        textAlign: 'center',
+                      }}
+                    >
+                      Maybe Later
+                    </Text>
+                  </Pressable>
+                </ScrollView>
               </View>
-
-              <Text 
-                style={{
-                  fontSize: 48,
-                  fontWeight: '700',
-                  color: '#007AFF',
-                  textAlign: 'center',
-                  marginBottom: 8,
-                }}
-              >
-                $9.97
-              </Text>
-              
-              <Text 
-                style={{
-                  fontSize: 14,
-                  color: '#6B7280',
-                  textAlign: 'center',
-                  marginBottom: 24,
-                }}
-              >
-                One-time purchase • Lifetime access
-              </Text>
-
-              <Pressable
-                onPress={handleUpgrade}
-                style={({ pressed }) => ({
-                  backgroundColor: pressed ? '#0051D5' : '#007AFF',
-                  paddingVertical: 18,
-                  borderRadius: 16,
-                  marginBottom: 12,
-                  shadowColor: '#007AFF',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 8,
-                })}
-              >
-                <Text 
-                  style={{
-                    color: '#FFFFFF',
-                    fontSize: 18,
-                    fontWeight: '700',
-                    textAlign: 'center',
-                  }}
-                >
-                  Purchase Pro
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={({ pressed }) => ({
-                  paddingVertical: 14,
-                  opacity: pressed ? 0.6 : 1,
-                  marginBottom: 8,
-                })}
-              >
-                <Text 
-                  style={{
-                    color: '#007AFF',
-                    fontSize: 16,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                  }}
-                >
-                  Restore Purchase
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={handleClose}
-                style={({ pressed }) => ({
-                  paddingVertical: 14,
-                  opacity: pressed ? 0.6 : 1,
-                })}
-              >
-                <Text 
-                  style={{
-                    color: '#6B7280',
-                    fontSize: 16,
-                    fontWeight: '600',
-                    textAlign: 'center',
-                  }}
-                >
-                  Maybe Later
-                </Text>
-              </Pressable>
-            </ScrollView>
+            </BlurView>
           </Pressable>
         </Pressable>
       </BlurView>
