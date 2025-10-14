@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Dimensions, StyleSheet, View, Text } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -52,11 +52,24 @@ export default function ZoomableImage({
   const isPinching = useSharedValue(false);
   const fadeOpacity = useSharedValue(1);
   const gestureWasActive = useSharedValue(false);
+  const [gestureCleanupPending, setGestureCleanupPending] = useState(false);
   
   // Smooth fade when switching between locked/unlocked to prevent flash
   useEffect(() => {
     fadeOpacity.value = withTiming(1, { duration: 150 });
   }, [locked]);
+  
+  // Add cleanup delay when locking to ensure gestures fully release
+  useEffect(() => {
+    if (locked && !gestureCleanupPending) {
+      setGestureCleanupPending(true);
+      // Small delay to ensure gesture handlers release
+      const timer = setTimeout(() => {
+        setGestureCleanupPending(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [locked, gestureCleanupPending]);
 
   // Notify parent of initial transform values on mount
   useEffect(() => {
@@ -155,6 +168,9 @@ export default function ZoomableImage({
   const doubleTapWhenLockedGesture = Gesture.Tap()
     .numberOfTaps(2)
     .enabled(locked)
+    .maxDuration(500)
+    .maxDeltaX(10)
+    .maxDeltaY(10)
     .onEnd(() => {
       if (onDoubleTapWhenLocked) {
         runOnJS(onDoubleTapWhenLocked)();
@@ -166,16 +182,7 @@ export default function ZoomableImage({
     doubleTapWhenLockedGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
   );
-  
-  // Manual gesture wrapper that immediately fails when locked
-  const lockCheckGesture = Gesture.Manual()
-    .onTouchesDown((e, manager) => {
-      if (locked) {
-        manager.fail();
-      }
-    });
-  
-  const finalGesture = Gesture.Race(lockCheckGesture, composedGesture);
+
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -189,9 +196,9 @@ export default function ZoomableImage({
 
   return (
     <>
-      {!locked && (
+      {!locked && !gestureCleanupPending && (
         <GestureDetector gesture={composedGesture}>
-          <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+          <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
             <Image
               source={{ uri: imageUri }}
               style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
@@ -200,8 +207,8 @@ export default function ZoomableImage({
           </Animated.View>
         </GestureDetector>
       )}
-      {locked && (
-        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+      {(locked || gestureCleanupPending) && (
+        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
           <Image
             source={{ uri: imageUri }}
             style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
