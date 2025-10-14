@@ -1287,12 +1287,18 @@ export default function DimensionOverlay({
         return;
       }
 
-      console.log('📸 Capturing view without state changes...');
+      console.log('📸 Setting capture state to show label/coin info and hide menu...');
       
-      // DON'T use setIsCapturing or setCurrentLabel - they cause re-renders that unmount the view
-      // Just capture AS-IS
+      // Set state to show label + coin info and hide control menu
+      setIsCapturing(true);
+      setCurrentLabel(label);
       
-      // Capture measurements photo directly without state changes
+      // Wait for UI to update before capturing
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      console.log('📸 Capturing measurements photo with label and coin info...');
+      
+      // Capture measurements photo with label/coin visible, menu hidden
       const measurementsUri = await captureRef(externalViewRef || internalViewRef, {
         format: 'jpg',
         quality: 0.9,
@@ -1324,6 +1330,10 @@ export default function DimensionOverlay({
       setHideMeasurementsForCapture(false); // Show measurements again
       
       console.log('✅ Saved label-only photo!');
+      
+      // Clear capture state
+      setIsCapturing(false);
+      setCurrentLabel(null);
       
       console.log('✅ Save successful!');
       // Show toast notification instead of Alert (so it appears behind the quote modal)
@@ -1425,18 +1435,22 @@ export default function DimensionOverlay({
       }
       
       // Capture the view reference NOW, after modal interactions
-      if (!externalViewRef.current) {
+      if (!externalViewRef && !internalViewRef.current) {
         throw new Error('View reference is null before capture');
       }
 
       console.log('📸 Starting capture for email...');
       
-      // DON'T use setIsCapturing or setCurrentLabel - they cause re-renders that unmount the view
-      // Instead, capture multiple times with different states
+      // Set state to show label + coin info and hide control menu
+      setIsCapturing(true);
+      setCurrentLabel(label);
       
-      console.log('📸 Capturing main measurement photo...');
+      // Wait for UI to update before capturing
+      await new Promise(resolve => setTimeout(resolve, 150));
       
-      // Capture the image with measurements AS-IS (without changing any state)
+      console.log('📸 Capturing main measurement photo with label and coin info...');
+      
+      // Capture the image with measurements, label, and coin info visible (menu hidden)
       const uri = await captureRef(externalViewRef || internalViewRef, {
         format: 'jpg',
         quality: 0.9,
@@ -1533,6 +1547,10 @@ export default function DimensionOverlay({
       
       console.log('✅ Added label-only photo to email');
       
+      // Clear capture state
+      setIsCapturing(false);
+      setCurrentLabel(null);
+      
       // Build subject with label first, then "Measurements"
       const subject = label 
         ? `${label} - Measurements` 
@@ -1556,6 +1574,7 @@ export default function DimensionOverlay({
       // not when email is sent. We can't distinguish between "sent" and "cancelled".
     } catch (error) {
       setIsCapturing(false);
+      setCurrentLabel(null);
       console.error('❌ Email error:', error);
       Alert.alert('Email Error', `Failed to prepare email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
