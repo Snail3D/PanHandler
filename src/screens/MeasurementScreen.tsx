@@ -56,15 +56,6 @@ export default function MeasurementScreen() {
   
   // Determine if pan/zoom should be locked
   const isPanZoomLocked = measurements.length > 0 || currentPoints.length > 0;
-  
-  // Debug: Log when measurementViewRef changes
-  useEffect(() => {
-    console.log('🔍 measurementViewRef changed:', {
-      exists: !!measurementViewRef,
-      current: !!measurementViewRef.current,
-      currentType: measurementViewRef.current?.constructor?.name
-    });
-  }, [measurementViewRef.current]);
 
   // Helper to detect orientation based on image (for future use)
   const detectOrientation = async (uri: string) => {

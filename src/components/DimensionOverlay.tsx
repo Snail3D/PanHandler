@@ -1393,7 +1393,9 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View not ready. Wait a moment and try again.');
+        console.error('❌ SAVE ERROR: externalViewRef is', externalViewRef);
+        console.error('❌ SAVE ERROR: externalViewRef.current is', externalViewRef?.current);
+        Alert.alert('View Error', 'The view reference is not available. This is a bug - please contact support.');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1545,12 +1547,25 @@ export default function DimensionOverlay({
       await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
       attachments.push(measurementsDest);
       
-      // Capture label only
+      // Capture label only (transparent overlay with just the label)
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      const labelOnlyUri = await captureScreen({ format: 'png', quality: 1.0 });
+      if (!externalViewRef?.current) {
+        Alert.alert('Error', 'View lost during label capture.');
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        setHideMeasurementsForCapture(false);
+        if (setImageOpacity) setImageOpacity(1);
+        return;
+      }
+      
+      const labelOnlyUri = await captureRef(externalViewRef.current, { 
+        format: 'png', 
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
