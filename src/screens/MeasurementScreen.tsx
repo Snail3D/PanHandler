@@ -31,7 +31,7 @@ export default function MeasurementScreen() {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
-  const [flashEnabled, setFlashEnabled] = useState(true); // Flash ON by default
+  const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF for preview, fires on capture
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -274,9 +274,22 @@ export default function MeasurementScreen() {
       setIsCapturing(true);
       setIsHoldingShutter(false); // Release hold state
       
+      // If flash is enabled, turn torch on briefly for the shot
+      const needsFlash = flashEnabled;
+      if (needsFlash) {
+        setFlashEnabled(true);
+        // Wait for torch to actually turn on (hardware needs time)
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
       });
+      
+      // Turn torch back off after capture if it was temporarily enabled
+      if (needsFlash) {
+        setFlashEnabled(false);
+      }
       
       if (photo?.uri) {
         // Request media library permission if not granted
