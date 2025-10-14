@@ -8,7 +8,6 @@ import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
-import CalibrationModal from '../components/CalibrationModal';
 import VerbalScaleModal from '../components/VerbalScaleModal';
 import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
@@ -19,7 +18,7 @@ import { VerbalScale } from '../state/measurementStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-type ScreenMode = 'camera' | 'selectCoin' | 'zoomCalibrate' | 'measurement';
+type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
 
 export default function MeasurementScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -315,7 +314,7 @@ export default function MeasurementScreen() {
         // Set image URI (auto-captured if it was via hold)
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
-        setMode('selectCoin');
+        setMode('zoomCalibrate'); // Go straight to combined zoom + coin select screen
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -352,7 +351,7 @@ export default function MeasurementScreen() {
   };
 
   const handleCancelCalibration = () => {
-    setMode('selectCoin');
+    setMode('camera'); // Go back to camera
     setSelectedCoin(null);
   };
 
@@ -375,7 +374,7 @@ export default function MeasurementScreen() {
     if (!result.canceled && result.assets[0]) {
       setImageUri(result.assets[0].uri);
       await detectOrientation(result.assets[0].uri);
-      setMode('selectCoin');
+      setMode('zoomCalibrate'); // Go straight to combined screen
     }
   };
 
@@ -558,10 +557,9 @@ export default function MeasurementScreen() {
       {currentImageUri && (
         <>
           {/* Zoom Calibration Mode */}
-          {mode === 'zoomCalibrate' && selectedCoin && (
+          {mode === 'zoomCalibrate' && (
             <ZoomCalibration
               imageUri={currentImageUri}
-              selectedCoin={selectedCoin}
               onComplete={handleCalibrationComplete}
               onCancel={handleCancelCalibration}
             />
@@ -609,33 +607,13 @@ export default function MeasurementScreen() {
             </View>
           )}
 
-          {/* Static Image for Coin Selection */}
-          {mode === 'selectCoin' && (
-            <Image
-              source={{ uri: currentImageUri }}
-              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
-              resizeMode="contain"
-            />
-          )}
-
-          {/* Coin Selection Modal */}
-          <CalibrationModal
-            visible={mode === 'selectCoin'}
-            onComplete={handleCoinSelected}
-            onDismiss={handleRetakePhoto}
-            onMapScale={() => {
-              setMode('camera'); // Close coin modal
-              setShowVerbalScaleModal(true); // Open verbal scale modal
-            }}
-          />
-
           {/* Verbal Scale Modal */}
           <VerbalScaleModal
             visible={showVerbalScaleModal}
             onComplete={handleVerbalScaleComplete}
             onDismiss={() => {
               setShowVerbalScaleModal(false);
-              setMode('selectCoin'); // Go back to coin selection
+              setMode('camera'); // Go back to camera
             }}
           />
         </>
