@@ -1,13 +1,13 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio, findNodeHandle } from 'react-native';
+import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { captureRef, captureScreen } from 'react-native-view-shot';
+import { captureRef } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
 import * as Haptics from 'expo-haptics';
@@ -85,7 +85,7 @@ interface DimensionOverlayProps {
   zoomTranslateX?: number;
   zoomTranslateY?: number;
   zoomRotation?: number;
-  viewRef?: React.RefObject<any>; // Changed to any to support ViewShot component
+  viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
 }
 
@@ -96,17 +96,11 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
-}: DimensionOverlayProps) {
-  const insets = useSafeAreaInsets();
+}: DimensionOverlayProps = {}) {
+  // CACHE BUST v4.0 - Verify new bundle is loaded
+  console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
   
-  // Debug: Log what we receive
-  useEffect(() => {
-    console.log('🔍 DimensionOverlay mounted with viewRef:', {
-      hasExternalViewRef: externalViewRef !== undefined,
-      externalViewRefCurrent: externalViewRef?.current,
-      externalViewRefType: typeof externalViewRef,
-    });
-  }, []);
+  const insets = useSafeAreaInsets();
   
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
@@ -138,9 +132,9 @@ export default function DimensionOverlay({
   const hasSessionBeenExported = useStore((s) => s.hasSessionBeenExported);
   const resetExportLimits = useStore((s) => s.resetExportLimits);
   
-  // Compute canExport as a derived value (don't call store methods during render)
-  const canExport = isProUser || exportedSessions.length < 20;
-  const remainingExports = isProUser ? Infinity : Math.max(0, 20 - exportedSessions.length);
+  // Compute canExport/getRemainingExports as functions (not store methods)
+  const canExport = () => isProUser || exportedSessions.length < 20;
+  const getRemainingExports = () => isProUser ? Infinity : Math.max(0, 20 - exportedSessions.length);
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
@@ -1195,10 +1189,7 @@ export default function DimensionOverlay({
     return () => subscription.remove();
   }, []);
 
-  // ⚠️ PROTECTED BLOCK - Recalculate measurements when unit system changes
-  // This useEffect updates measurement.value, measurement.width, measurement.height, measurement.radius
-  // IMPORTANT: width, height, radius are stored in BASE UNITS (mm/cm/in from calibration), NOT pixels
-  // DO NOT MODIFY without testing unit conversion (metric ↔ imperial)
+  // Recalculate all measurement values when unit system changes
   useEffect(() => {
     // Only recalculate if unit system actually changed (not on initial mount or measurement changes)
     if (prevUnitSystemRef.current === unitSystem || measurements.length === 0) {
@@ -1258,15 +1249,14 @@ export default function DimensionOverlay({
         ...m,
         value: newValue,
         ...(newPerimeter !== undefined && { perimeter: newPerimeter }),
-        ...(width !== undefined && { width }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
-        ...(height !== undefined && { height }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
-        ...(radius !== undefined && { radius }),  // ⚠️ Stored in BASE UNITS (mm/cm/in)
+        ...(width !== undefined && { width }),
+        ...(height !== undefined && { height }),
+        ...(radius !== undefined && { radius }),
       };
     });
     
     setMeasurements(updatedMeasurements);
   }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
-  // ⚠️ END PROTECTED BLOCK
 
   const handleClear = () => {
     // Check if the last measurement has been edited (has history)
@@ -1370,18 +1360,24 @@ export default function DimensionOverlay({
   };
 
   const handleExport = async () => {
-    // Temporarily bypass label modal to debug hooks error
-    performSave(null); // Skip label, just save directly
+    // Check if user can export (20 lifetime limit for free users)
+    if (!canExport()) {
+      Alert.alert(
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    
+    // Show label modal first
+    setPendingAction('save');
+    setShowLabelModal(true);
   };
 
   const performSave = async (label: string | null) => {
     if (!currentImageUri) {
       Alert.alert('Export Error', 'No image to export. Please take a photo first.');
-      return;
-    }
-
-    if (!viewRef.current) {
-      Alert.alert('Export Error', 'View not ready. Please try again.');
       return;
     }
 
@@ -1397,30 +1393,39 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update
+      // Wait for UI to update before capturing
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use ViewShot's capture method
-      if (!viewRef?.current) {
-        throw new Error('ViewShot ref is not available');
+      // Use external ref (from parent) - it wraps both image and overlay
+      if (!externalViewRef) {
+        throw new Error('No view ref available for capture');
       }
       
-      const measurementsUri = await (viewRef.current as any).capture();
+      // Capture measurements photo with label/coin visible, menu hidden
+      const measurementsUri = await captureRef(externalViewRef, {
+        format: 'jpg',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
       
       // Save measurements photo
       await MediaLibrary.createAssetAsync(measurementsUri);
       
-      // Hide measurements for second capture
-      setHideMeasurementsForCapture(true);
-      if (setImageOpacity) setImageOpacity(0.5);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Capture SAME view again but with measurements hidden and 50% opacity (label + coin info only)
+      setHideMeasurementsForCapture(true); // Hide measurements and legend
+      if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await (viewRef.current as any).capture();
+      const labelOnlyUri = await captureRef(externalViewRef, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       
-      if (setImageOpacity) setImageOpacity(1);
+      if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       await MediaLibrary.createAssetAsync(labelOnlyUri);
       
-      setHideMeasurementsForCapture(false);
+      setHideMeasurementsForCapture(false); // Show measurements again
       
       console.log('✅ Saved label-only photo!');
       
@@ -1451,8 +1456,19 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    // Temporarily bypass label modal to debug hooks error
-    performEmail(null); // Skip label, just email directly
+    // Check if user can export (20 lifetime limit for free users)
+    if (!canExport()) {
+      Alert.alert(
+        'Export Limit Reached',
+        'Join Pro (in Help menu) to unlock unlimited saves and emails.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+    
+    // Show label modal first
+    setPendingAction('email');
+    setShowLabelModal(true);
   };
 
   const performEmail = async (label: string | null) => {
@@ -1460,14 +1476,6 @@ export default function DimensionOverlay({
       Alert.alert('Email Error', 'No image to export. Please take a photo first.');
       return;
     }
-    
-    // Debug logging
-    console.log('📸 Email capture attempt:', {
-      hasExternalViewRef: externalViewRef !== undefined,
-      hasViewRef: !!viewRef,
-      hasViewRefCurrent: !!viewRef?.current,
-      viewRefCurrentType: viewRef?.current?.constructor?.name,
-    });
     
     try {
       // Check if email is available
@@ -1504,15 +1512,20 @@ export default function DimensionOverlay({
       setIsCapturing(true);
       setCurrentLabel(label);
       
-      // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Wait for UI to update before capturing
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Use ViewShot's capture method (viewRef is ViewShot component)
-      if (!viewRef?.current) {
-        throw new Error('ViewShot ref is not available');
+      // Use external ref (from parent) - it wraps both image and overlay
+      if (!externalViewRef) {
+        throw new Error('No view ref available for capture');
       }
       
-      const measurementsUri = await (viewRef.current as any).capture();
+      // Capture the image with measurements, label, and coin info visible (menu hidden)
+      const uri = await captureRef(externalViewRef, {
+        format: 'jpg',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
 
       // Build measurement text with scale information
       let measurementText = '';
@@ -1575,7 +1588,7 @@ export default function DimensionOverlay({
       // 1. Full measurements photo (with legend, label, coin, and all measurements)
       const measurementsFilename = label ? `${label}_Measurements.jpg` : 'PanHandler_Measurements.jpg';
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
-      await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
+      await FileSystem.copyAsync({ from: uri, to: measurementsDest });
       attachments.push(measurementsDest);
       
       console.log('✅ Added measurements photo to email');
@@ -1585,8 +1598,12 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      // Capture label-only photo using ViewShot
-      const labelOnlyUri = await (viewRef.current as any).capture();
+      // Capture label-only photo with same ref
+      const labelOnlyUri = await captureRef(externalViewRef, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
       
       if (setImageOpacity) setImageOpacity(1); // Restore full opacity
       
@@ -3150,6 +3167,7 @@ export default function DimensionOverlay({
 
       {/* Visual overlay for measurements */}
       <View
+        ref={viewRef}
         collapsable={false}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         pointerEvents="none"
@@ -3880,8 +3898,7 @@ export default function DimensionOverlay({
                     {/* Measurement value with area for circles and rectangles */}
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
-                        // ⚠️ PROTECTED BLOCK - DO NOT MODIFY WITHOUT TESTING UNIT CONVERSION
-                        // This recalculates display values when unit system changes
+                        // Recalculate display value based on current unit system
                         let displayValue = measurement.value;
                         
                         if (measurement.mode === 'distance') {
@@ -3891,16 +3908,16 @@ export default function DimensionOverlay({
                           // Recalculate angle
                           displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
-                          // ⚠️ PROTECTED: measurement.radius is stored in BASE UNITS (mm/cm/in), not pixels
-                          // The useEffect hook (line 1210) converts from pixels to base units
-                          const diameter = measurement.radius * 2;
+                          // Recalculate circle diameter and area
+                          // measurement.radius is stored in PIXELS, convert to real units
+                          const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
+                          const diameter = radiusInUnits * 2;
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                          const area = Math.PI * measurement.radius * measurement.radius;
+                          const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
                           return `${displayValue} (A: ${areaStr}²)`;
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
-                          // ⚠️ PROTECTED: measurement.width and measurement.height are stored in BASE UNITS (mm/cm/in), not pixels
-                          // The useEffect hook (line 1210) converts from pixels to base units and updates on unit system change
+                          // Recalculate rectangle dimensions and area
                           const widthStr = formatMeasurement(measurement.width, calibration?.unit || 'mm', unitSystem, 2);
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
@@ -3908,7 +3925,6 @@ export default function DimensionOverlay({
                           const areaStr = formatMeasurement(area, calibration?.unit || 'mm', unitSystem, 2);
                           return `${displayValue} (A: ${areaStr}²)`;
                         }
-                        // ⚠️ END PROTECTED BLOCK
                         
                         return displayValue;
                       })()}
@@ -4520,10 +4536,10 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleExport}
-                disabled={!canExport}
+                disabled={!canExport()}
                 style={{
                   flex: 1,
-                  backgroundColor: canExport ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: canExport() ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4531,16 +4547,16 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="images-outline" size={12} color={canExport ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+                <Ionicons name="images-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
               </Pressable>
               
               <Pressable
                 onPress={handleEmail}
-                disabled={!canExport}
+                disabled={!canExport()}
                 style={{
                   flex: 1,
-                  backgroundColor: canExport ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
+                  backgroundColor: canExport() ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
                   borderRadius: 10,
                   paddingVertical: 8,
                   flexDirection: 'row',
@@ -4548,8 +4564,8 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="mail-outline" size={12} color={canExport ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: canExport ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+                <Ionicons name="mail-outline" size={12} color={canExport() ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: canExport() ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
               </Pressable>
             </>
 
@@ -4582,7 +4598,7 @@ export default function DimensionOverlay({
               borderTopColor: 'rgba(0, 0, 0, 0.08)',
             }}>
               <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.5)', fontWeight: '600' }}>
-                {remainingExports} {remainingExports === 1 ? 'export' : 'exports'} remaining
+                {getRemainingExports()} {getRemainingExports() === 1 ? 'export' : 'exports'} remaining
               </Text>
             </View>
           )}
