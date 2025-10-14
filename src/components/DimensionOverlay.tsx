@@ -1290,7 +1290,7 @@ export default function DimensionOverlay({
       console.log(`📸 Label set to: "${label || 'null'}"`);
       
       // Capture measurements photo
-      const measurementsUri = await captureRef(externalViewRef, {
+      const measurementsUri = await captureRef(externalViewRef.current, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1309,7 +1309,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureRef(externalViewRef.current, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
@@ -1438,7 +1438,8 @@ export default function DimensionOverlay({
       console.log('📸 About to capture with ref:', externalViewRef, 'current:', !!externalViewRef.current);
       
       // Capture the image with measurements
-      const uri = await captureRef(externalViewRef, {
+      // Pass .current directly as the view node
+      const uri = await captureRef(externalViewRef.current, {
         format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
@@ -1517,7 +1518,7 @@ export default function DimensionOverlay({
       if (setImageOpacity) setImageOpacity(0.5); // Set 50% opacity
       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI update
       
-      const labelOnlyUri = await captureRef(externalViewRef, {
+      const labelOnlyUri = await captureRef(externalViewRef.current, {
         format: 'png',
         quality: 1.0,
         result: 'tmpfile',
