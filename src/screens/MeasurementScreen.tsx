@@ -367,15 +367,25 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth fade transition to calibration screen
+        // Smooth fade transition to black, then to calibration screen
         cameraOpacity.value = withTiming(0, {
           duration: 400,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
+        blackOverlayOpacity.value = withTiming(1, {
+          duration: 400,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
         
-        // Wait for fade, then switch mode
+        // Wait for fade to black, then switch mode and fade in from black
         setTimeout(() => {
-          setMode('zoomCalibrate'); // Go straight to combined zoom + coin select screen
+          setMode('zoomCalibrate');
+          // Reset screenOpacity to 0, then fade in from black
+          screenOpacity.value = 0;
+          screenOpacity.value = withTiming(1, {
+            duration: 600,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
         }, 400);
       }
     } catch (error) {
