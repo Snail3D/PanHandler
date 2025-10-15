@@ -368,7 +368,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 <Ionicons name="help-circle-outline" size={26} color="white" />
               </Pressable>
             </View>
-            <Text className="text-white text-lg font-semibold">Take Reference Photo</Text>
+            <Text className="text-white text-lg font-semibold">📸 TESTING CACHE 📸</Text>
             <Pressable
               onPress={toggleCameraFacing}
               className="w-10 h-10 items-center justify-center"
