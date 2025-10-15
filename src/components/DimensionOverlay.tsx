@@ -231,6 +231,8 @@ export default function DimensionOverlay({
   const [freehandActivating, setFreehandActivating] = useState(false); // Waiting for activation
   const [freehandClosedLoop, setFreehandClosedLoop] = useState(false); // Track if loop is closed (lasso mode)
   const freehandClosedLoopRef = useRef(false); // Sync ref to avoid async state issues
+  // Lock zoom/pan/rotation when freehand drawing starts to prevent coordinate drift
+  const freehandZoomLockRef = useRef<{ scale: number; translateX: number; translateY: number; rotation: number } | null>(null);
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -2341,6 +2343,15 @@ export default function DimensionOverlay({
                 setIsDrawingFreehand(true);
                 setFreehandActivating(false);
                 
+                // LOCK zoom/pan/rotation state to prevent coordinate drift during drawing
+                freehandZoomLockRef.current = {
+                  scale: zoomScale,
+                  translateX: zoomTranslateX,
+                  translateY: zoomTranslateY,
+                  rotation: zoomRotation,
+                };
+                console.log('🔒 Locked zoom state:', freehandZoomLockRef.current);
+                
                 // Powerful "weapon charged" haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -2423,8 +2434,10 @@ export default function DimensionOverlay({
                 // If already drawing, add points to path
                 // IMPORTANT: Use cursor position (rawCursorX, rawCursorY), not finger position (pageX, pageY)
                 if (isDrawingFreehand) {
-                  const imageX = (rawCursorX - zoomTranslateX) / zoomScale;
-                  const imageY = (rawCursorY - zoomTranslateY) / zoomScale;
+                  // Use locked zoom state to prevent coordinate drift from zoom changes during drawing
+                  const lockedZoom = freehandZoomLockRef.current || { scale: zoomScale, translateX: zoomTranslateX, translateY: zoomTranslateY, rotation: zoomRotation };
+                  const imageX = (rawCursorX - lockedZoom.translateX) / lockedZoom.scale;
+                  const imageY = (rawCursorY - lockedZoom.translateY) / lockedZoom.scale;
                   
                   // Only add point if it's far enough from the last point (smooth path)
                   // Use functional update to ensure we have the latest state
@@ -2730,6 +2743,8 @@ export default function DimensionOverlay({
                 setFreehandActivating(false);
                 setFreehandClosedLoop(false); // Reset closed loop state
                 freehandClosedLoopRef.current = false; // Reset ref too
+                freehandZoomLockRef.current = null; // Clear zoom lock
+                console.log('🔓 Cleared zoom lock');
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
@@ -2740,6 +2755,8 @@ export default function DimensionOverlay({
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
+                freehandZoomLockRef.current = null; // Clear zoom lock
+                console.log('🔓 Cleared zoom lock (path too short)');
               }
               
               // Evaporation effect for freehand mode - organic fade with slight expansion and dissipation
