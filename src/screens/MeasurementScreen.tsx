@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import VerbalScaleModal from '../components/VerbalScaleModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -31,6 +32,9 @@ export default function MeasurementScreen() {
   const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
+  
+  // Cinematic fade-in animation for camera screen
+  const cameraOpacity = useSharedValue(0);
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -240,6 +244,21 @@ export default function MeasurementScreen() {
     }
   }, [currentImageUri, mode]);
 
+  // Cinematic fade-in when entering camera mode
+  useEffect(() => {
+    if (mode === 'camera') {
+      cameraOpacity.value = 0;
+      cameraOpacity.value = withTiming(1, {
+        duration: 800,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+      });
+    }
+  }, [mode]);
+
+  const cameraAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cameraOpacity.value,
+  }));
+
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center bg-black">
@@ -370,7 +389,7 @@ export default function MeasurementScreen() {
   // Camera Mode
   if (mode === 'camera') {
     return (
-      <View className="flex-1 bg-black">
+      <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, cameraAnimatedStyle]}>
         <CameraView 
           ref={cameraRef}
           style={{ flex: 1 }}
@@ -562,7 +581,7 @@ export default function MeasurementScreen() {
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-      </View>
+      </Animated.View>
     );
   }
 
