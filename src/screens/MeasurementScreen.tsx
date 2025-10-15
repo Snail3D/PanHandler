@@ -85,6 +85,8 @@ export default function MeasurementScreen() {
     });
     
     setTimeout(() => {
+      // Force black overlay to 1 before mode switch to prevent any flash
+      transitionBlackOverlay.value = 1;
       setMode(newMode);
       
       // If transitioning TO camera, let camera handle its own fade
@@ -95,7 +97,7 @@ export default function MeasurementScreen() {
         setTimeout(() => setIsTransitioning(false), 1800);
       } else {
         // For non-camera modes, morph in from black (1.5 seconds in)
-        // Wait longer for mode switch and render to prevent snap
+        // Wait LONGER for mode switch and complete render to prevent snap
         setTimeout(() => {
           screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
           screenScale.value = withTiming(1, { // Settle to normal scale
@@ -107,7 +109,7 @@ export default function MeasurementScreen() {
             duration: delay,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
-        }, 200); // Increased to 200ms for full render (was 100ms)
+        }, 350); // Increased to 350ms to ensure full render (was 200ms)
         
         // Unlock AFTER transition fully completes + buffer time + gesture queue clear
         setTimeout(() => {
@@ -478,7 +480,13 @@ export default function MeasurementScreen() {
       rotation: calibrationData.initialZoom.rotation || 0,
     });
     
-    smoothTransitionToMode('measurement');
+    // Double RAF to ensure state updates are flushed AND layout is complete
+    // This prevents the snap by giving React time to render the complex measurement screen
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        smoothTransitionToMode('measurement');
+      });
+    });
   };
 
   const handleCancelCalibration = () => {
