@@ -85,7 +85,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         mass: 0.3,
       });
       
-      // Haptic feedback - Mario Kart countdown sequence for auto mode!
+      // Take the photo first (flash/torch is controlled by enableTorch prop on CameraView)
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 1,
+      });
+      
+      // Haptic feedback AFTER photo capture - Mario Kart countdown sequence for auto mode!
       if (autoMode) {
         // DUN... DUN... DING! 🏎️
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // First heavy beep
@@ -94,11 +99,6 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       } else {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
-      
-      // Take the photo (flash/torch is controlled by enableTorch prop on CameraView)
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 1,
-      });
       
       if (!photo?.uri) return;
 
