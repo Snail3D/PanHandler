@@ -427,7 +427,7 @@ export default function MeasurementScreen() {
             }}
             pointerEvents="none"
           >
-            {/* Horizontal line */}
+            {/* Horizontal line - color reactive */}
             <View
               style={{
                 position: 'absolute',
@@ -435,10 +435,14 @@ export default function MeasurementScreen() {
                 left: 0,
                 right: 0,
                 height: 2,
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: alignmentStatus === 'good' 
+                  ? 'rgba(76, 175, 80, 0.9)' 
+                  : alignmentStatus === 'warning'
+                  ? 'rgba(255, 183, 77, 0.9)'
+                  : 'rgba(239, 83, 80, 0.9)',
               }}
             />
-            {/* Vertical line */}
+            {/* Vertical line - color reactive */}
             <View
               style={{
                 position: 'absolute',
@@ -446,7 +450,11 @@ export default function MeasurementScreen() {
                 top: 0,
                 bottom: 0,
                 width: 2,
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: alignmentStatus === 'good' 
+                  ? 'rgba(76, 175, 80, 0.9)' 
+                  : alignmentStatus === 'warning'
+                  ? 'rgba(255, 183, 77, 0.9)'
+                  : 'rgba(239, 83, 80, 0.9)',
               }}
             />
             {/* Center dot */}
@@ -462,21 +470,38 @@ export default function MeasurementScreen() {
               }}
             />
             
-            {/* "Center object here" text below crosshairs */}
-            <Text
+            {/* "Center object here" text below crosshairs with hint */}
+            <View
               style={{
                 position: 'absolute',
                 top: 110,
-                left: -50,
-                width: 200,
-                textAlign: 'center',
-                color: 'rgba(255, 255, 255, 0.6)',
-                fontSize: 13,
-                fontWeight: '500',
+                left: -75,
+                width: 250,
+                alignItems: 'center',
               }}
             >
-              Center object here
-            </Text>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: 13,
+                  fontWeight: '600',
+                }}
+              >
+                Center object here
+              </Text>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  fontSize: 11,
+                  fontStyle: 'italic',
+                  marginTop: 2,
+                }}
+              >
+                (place coin in the middle)
+              </Text>
+            </View>
           </View>
 
           {/* Bottom controls */}
@@ -510,7 +535,7 @@ export default function MeasurementScreen() {
                   backgroundColor: 'white',
                   borderWidth: 4,
                   borderColor: isHoldingShutter 
-                    ? (alignmentStatus === 'good' ? '#00C800' : alignmentStatus === 'warning' ? '#FFC800' : '#FF3232')
+                    ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.9)' : 'rgba(239, 83, 80, 0.9)')
                     : '#D1D5DB',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -520,7 +545,7 @@ export default function MeasurementScreen() {
                   width: 64, 
                   height: 64, 
                   borderRadius: 32, 
-                  backgroundColor: isHoldingShutter && alignmentStatus === 'good' ? '#00FF00' : 'white',
+                  backgroundColor: isHoldingShutter && alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : 'white',
                 }} />
               </Pressable>
               
