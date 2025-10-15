@@ -390,9 +390,20 @@ export default function DimensionOverlay({
     // }
   }, []); // TESTING: Empty deps so it shows every time
 
-  // Detect panning and fade out tutorial
+  // Detect panning/measuring and fade out tutorial
   useEffect(() => {
     if (showPanTutorial) {
+      // Dismiss if user switches to measure mode
+      if (measurementMode) {
+        panTutorialOpacity.value = withSpring(0, { damping: 20 });
+        setTimeout(() => {
+          setShowPanTutorial(false);
+          // TESTING: Comment out so it shows again
+          // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+        }, 500);
+        return;
+      }
+      
       const deltaX = Math.abs(zoomTranslateX - lastPanPosition.current.x);
       const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
       const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -410,7 +421,7 @@ export default function DimensionOverlay({
       // Update last position
       lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
     }
-  }, [zoomTranslateX, zoomTranslateY, showPanTutorial]);
+  }, [zoomTranslateX, zoomTranslateY, showPanTutorial, measurementMode]);
 
   // Clear map scale when new photo is loaded
   useEffect(() => {
@@ -5831,15 +5842,16 @@ export default function DimensionOverlay({
           {/* Instructional Text */}
           <Text
             style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: 'white',
+              fontSize: 15,
+              fontWeight: '500',
+              color: 'rgba(255, 255, 255, 0.95)',
               textAlign: 'center',
-              marginBottom: 20,
-              textShadowColor: 'rgba(0, 0, 0, 0.9)',
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 6,
-              lineHeight: 24,
+              marginBottom: 18,
+              textShadowColor: 'rgba(0, 0, 0, 0.6)',
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+              lineHeight: 21,
+              letterSpacing: 0.3,
             }}
           >
             {"Pan around and align your photo\nusing the guides, then select\nyour measurement"}
