@@ -124,10 +124,6 @@ export default function ZoomableImage({
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
-    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
-    .activeOffsetY([-10, 10]) // Require 10px vertical movement to activate
-    .failOffsetX([-5, 5]) // Fail if finger stays within 5px
-    .failOffsetY([-5, 5]) // Fail if finger stays within 5px
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       if (__DEV__ && singleFingerPan) {
