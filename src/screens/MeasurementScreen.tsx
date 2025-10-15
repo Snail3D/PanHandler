@@ -37,6 +37,7 @@ export default function MeasurementScreen() {
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(0);
   const blackOverlayOpacity = useSharedValue(1); // Start with black overlay
+  const cameraFlashOpacity = useSharedValue(0); // For camera flash effect
   
   // Universal screen transition opacity for smooth mode changes
   const screenOpacity = useSharedValue(1);
@@ -76,7 +77,7 @@ export default function MeasurementScreen() {
     
     // Bring up BLACK overlay FASTER to cover content before it scales
     transitionBlackOverlay.value = withTiming(1, {
-      duration: delay * 0.7, // 70% of delay = 1050ms (finish earlier!)
+      duration: delay * 0.5, // 50% of delay = 750ms (FASTER fade to black!)
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
     screenScale.value = withTiming(0.90, { // More pronounced scale down (water pulling in)
@@ -96,20 +97,20 @@ export default function MeasurementScreen() {
         // Unlock after camera's fade completes (300ms delay + 1500ms fade)
         setTimeout(() => setIsTransitioning(false), 1800);
       } else {
-        // For non-camera modes, morph in from black (1.5 seconds in)
-        // Wait LONGER for mode switch and complete render to prevent snap
+        // For non-camera modes, keep black overlay longer to hide any render snap
+        // Wait MUCH LONGER before revealing to ensure full render
         setTimeout(() => {
           screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
           screenScale.value = withTiming(1, { // Settle to normal scale
-            duration: delay,
+            duration: delay * 0.8, // Faster morph = 1200ms
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
           // Fade out black overlay as content appears
           transitionBlackOverlay.value = withTiming(0, {
-            duration: delay,
+            duration: delay * 0.8, // Faster fade out = 1200ms
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
-        }, 350); // Increased to 350ms to ensure full render (was 200ms)
+        }, 600); // MUCH longer wait = 600ms for complete render
         
         // Unlock AFTER transition fully completes + buffer time + gesture queue clear
         setTimeout(() => {
@@ -118,7 +119,7 @@ export default function MeasurementScreen() {
           requestAnimationFrame(() => {
             setIsTransitioning(false);
           });
-        }, delay + 400); // Extra buffer (was 300ms)
+        }, delay * 2); // Extra long buffer for complex render
       }
     }, delay);
   };
@@ -344,6 +345,10 @@ export default function MeasurementScreen() {
     opacity: transitionBlackOverlay.value,
   }));
 
+  const cameraFlashStyle = useAnimatedStyle(() => ({
+    opacity: cameraFlashOpacity.value,
+  }));
+
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center bg-black">
@@ -377,6 +382,13 @@ export default function MeasurementScreen() {
     try {
       setIsCapturing(true);
       setIsHoldingShutter(false); // Release hold state
+      
+      // Pleasant camera flash effect
+      cameraFlashOpacity.value = 1;
+      cameraFlashOpacity.value = withTiming(0, {
+        duration: 200, // Quick 200ms flash
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+      });
       
       // Take photo (torch is controlled by enableTorch prop on CameraView)
       const photo = await cameraRef.current.takePictureAsync({
@@ -728,6 +740,23 @@ export default function MeasurementScreen() {
           />
         </Animated.View>
         
+        {/* Camera Flash Effect - Pleasant white flash */}
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'white',
+              zIndex: 999998, // Below black overlay, above camera
+            },
+            cameraFlashStyle,
+          ]}
+        />
+        
         {/* UNIVERSAL BLACK TRANSITION OVERLAY - ABOVE EVERYTHING in camera mode */}
         <Animated.View
           pointerEvents="none"
@@ -812,7 +841,7 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => smoothTransitionToMode('camera')}
+                  onReset={() => smoothTransitionToMode('camera', 750)} // Half duration = 750ms
                 />
               </View>
             </View>
