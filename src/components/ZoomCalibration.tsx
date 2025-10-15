@@ -303,8 +303,9 @@ export default function ZoomCalibration({
             style={{
               position: 'absolute',
               left: referenceCenterX - 120,
-              top: referenceCenterY - 15,
+              top: referenceCenterY - 30, // Moved up to make room for zoom
               width: 240,
+              alignItems: 'center',
             }}
           >
             <Text style={{ 
@@ -318,6 +319,21 @@ export default function ZoomCalibration({
               letterSpacing: 0.3,
             }}>
               {selectedCoin.name}
+            </Text>
+            
+            {/* Zoom indicator below coin name */}
+            <Text style={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: 14,
+              fontWeight: '700',
+              textAlign: 'center',
+              marginTop: 8,
+              textShadowColor: 'rgba(0,0,0,0.6)',
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+              letterSpacing: 0.5,
+            }}>
+              {zoomScale.toFixed(2)}×
             </Text>
           </View>
         </View>
@@ -571,41 +587,6 @@ export default function ZoomCalibration({
             right: 20,
           }}
         >
-          {/* Small zoom indicator on the left */}
-          <View style={{
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            zIndex: 10,
-          }}>
-            <BlurView
-              intensity={30}
-              tint="light"
-              style={{
-                borderRadius: 12,
-                overflow: 'hidden',
-              }}
-            >
-              <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                borderRadius: 12,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.3)',
-              }}>
-                <Text style={{
-                  color: 'rgba(0, 0, 0, 0.7)',
-                  fontSize: 12,
-                  fontWeight: '700',
-                  letterSpacing: 0.3,
-                }}>
-                  {zoomScale.toFixed(2)}×
-                </Text>
-              </View>
-            </BlurView>
-          </View>
-
           {/* LOCK IN Button - centered, dynamic color, HUGE */}
           <BlurView
             intensity={35}
@@ -698,12 +679,12 @@ export default function ZoomCalibration({
             pointerEvents: 'none',
           }}
         >
-          {/* Coin selection prompt - above the coin circle */}
+          {/* Coin selection prompt - above the coin circle (moved up 10%) */}
           <Animated.View
             style={[
               {
                 position: 'absolute',
-                top: SCREEN_HEIGHT / 2 - 220,
+                top: SCREEN_HEIGHT / 2 - 260, // Moved up 10% (~40px more)
                 alignItems: 'center',
                 paddingHorizontal: 40,
               },
@@ -713,8 +694,8 @@ export default function ZoomCalibration({
             <Text
               style={{
                 fontSize: 17,
-                fontWeight: '600',
-                color: 'rgba(255, 255, 255, 0.95)',
+                fontWeight: '700', // Sexy fun font weight!
+                color: 'rgba(255, 255, 255, 0.85)', // Lighter color
                 textAlign: 'center',
                 textShadowColor: 'rgba(0, 0, 0, 0.7)',
                 textShadowOffset: { width: 0, height: 1 },
@@ -725,35 +706,7 @@ export default function ZoomCalibration({
             </Text>
           </Animated.View>
 
-          {/* Arrow pointing to coin selector (top right) */}
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                top: insets.top + 120,
-                right: 80,
-                opacity: arrowOpacity,
-              },
-            ]}
-          >
-            <Svg width={60} height={60} viewBox="0 0 60 60">
-              {/* Curved arrow pointing up-right */}
-              <Path
-                d="M 10 50 Q 30 30, 45 15"
-                stroke="rgba(255, 255, 255, 0.9)"
-                strokeWidth="3"
-                fill="none"
-                strokeLinecap="round"
-              />
-              {/* Arrowhead */}
-              <Path
-                d="M 45 15 L 40 20 M 45 15 L 50 20"
-                stroke="rgba(255, 255, 255, 0.9)"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </Svg>
-          </Animated.View>
+          {/* Arrow removed - text is enough! */}
 
           {/* Pinch tutorial text - moved up a bit */}
           <Animated.View
