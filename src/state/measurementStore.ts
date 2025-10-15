@@ -66,6 +66,7 @@ interface MeasurementStore {
   lastReviewPromptDate: string | null; // Track when user was last prompted
   globalDownloads: number; // Global download count (fetched from backend)
   hasSeenPinchTutorial: boolean; // Track if user has seen pinch-zoom tutorial
+  hasSeenPanTutorial: boolean; // Track if user has seen pan tutorial on measurement screen
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;

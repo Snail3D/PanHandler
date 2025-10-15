@@ -134,10 +134,17 @@ export default function DimensionOverlay({
   const setUserEmail = useStore((s) => s.setUserEmail);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
+  const hasSeenPanTutorial = useStore((s) => s.hasSeenPanTutorial);
+  const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
   
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
+  
+  // Pan tutorial state
+  const [showPanTutorial, setShowPanTutorial] = useState(false);
+  const panTutorialOpacity = useSharedValue(0);
+  const lastPanPosition = useRef({ x: zoomTranslateX, y: zoomTranslateY });
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
@@ -368,6 +375,42 @@ export default function DimensionOverlay({
       setShowCursor(false);
     }
   }, [mode]);
+
+  // Show pan tutorial on first load after calibration (TESTING: Always show)
+  useEffect(() => {
+    // TESTING: Always show tutorial
+    // TODO: Uncomment to only show first time: if (!hasSeenPanTutorial) {
+      // Show tutorial after a brief delay
+      const timer = setTimeout(() => {
+        setShowPanTutorial(true);
+        panTutorialOpacity.value = withSpring(1, { damping: 20, stiffness: 100 });
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    // }
+  }, []); // TESTING: Empty deps so it shows every time
+
+  // Detect panning and fade out tutorial
+  useEffect(() => {
+    if (showPanTutorial) {
+      const deltaX = Math.abs(zoomTranslateX - lastPanPosition.current.x);
+      const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
+      const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      
+      // If user has panned more than 20px, fade out the tutorial
+      if (totalMovement > 20) {
+        panTutorialOpacity.value = withSpring(0, { damping: 20 });
+        setTimeout(() => {
+          setShowPanTutorial(false);
+          // TESTING: Comment out so it shows again
+          // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+        }, 500);
+      }
+      
+      // Update last position
+      lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+    }
+  }, [zoomTranslateX, zoomTranslateY, showPanTutorial]);
 
   // Clear map scale when new photo is loaded
   useEffect(() => {
@@ -5740,6 +5783,87 @@ export default function DimensionOverlay({
           setShowMapScaleModal(false);
         }}
       />
+
+      {/* Pan Tutorial Overlay - Shows on first load after calibration */}
+      {showPanTutorial && (
+        <Animated.View
+          style={[{
+            position: 'absolute',
+            top: SCREEN_HEIGHT / 2 - 120,
+            left: 40,
+            right: 40,
+            alignItems: 'center',
+            pointerEvents: 'none',
+          }, {
+            opacity: panTutorialOpacity,
+          }]}
+        >
+          {/* Instructional Text */}
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '700',
+              color: 'white',
+              textAlign: 'center',
+              marginBottom: 20,
+              textShadowColor: 'rgba(0, 0, 0, 0.9)',
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 6,
+              lineHeight: 24,
+            }}
+          >
+            {"Pan around and align your photo\nusing the guides, then select\nyour measurement"}
+          </Text>
+
+          {/* Measurement Mode Icons */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16 }}>
+            {/* Box */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={28} height={28} viewBox="0 0 24 24">
+                <Rect x="4" y="4" width="16" height="16" stroke="white" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Circle */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={28} height={28} viewBox="0 0 24 24">
+                <Circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Angle */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={28} height={28} viewBox="0 0 24 24">
+                <Line x1="4" y1="20" x2="20" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <Line x1="4" y1="20" x2="20" y2="20" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <Path d="M 10 20 A 8 8 0 0 1 8 12" stroke="white" strokeWidth="1.5" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Line */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={28} height={28} viewBox="0 0 24 24">
+                <Line x1="4" y1="12" x2="20" y2="12" stroke="white" strokeWidth="2" />
+                <Circle cx="4" cy="12" r="3" fill="white" />
+                <Circle cx="20" cy="12" r="3" fill="white" />
+              </Svg>
+            </View>
+
+            {/* Freehand */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={28} height={28} viewBox="0 0 24 24">
+                <Path 
+                  d="M 4 12 Q 7 8, 10 12 T 16 12 Q 18 13, 20 10" 
+                  stroke="white" 
+                  strokeWidth="2.5" 
+                  fill="none"
+                  strokeLinecap="round"
+                />
+              </Svg>
+            </View>
+          </View>
+        </Animated.View>
+      )}
 
       {/* Alert Modal */}
       <AlertModal
