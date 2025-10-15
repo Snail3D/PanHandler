@@ -4556,7 +4556,7 @@ export default function DimensionOverlay({
       {!menuMinimized && !isCapturing && (
         <GestureDetector gesture={Gesture.Tap()}>
           <Animated.View
-            pointerEvents="box-none"
+            pointerEvents="auto"
             style={[
               { 
                 position: 'absolute',
