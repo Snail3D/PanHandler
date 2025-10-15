@@ -3948,14 +3948,13 @@ export default function DimensionOverlay({
 
       {/* Bottom toolbar - Water droplet style with slide gesture */}
       {!menuMinimized && !isCapturing && (
-        <GestureDetector gesture={Gesture.Tap()}>
+        <GestureDetector gesture={menuPanGesture}>
           <Animated.View
-            className="absolute left-0 right-0"
+            className="absolute left-0 right-0 z-20"
             style={[
               { 
                 bottom: insets.bottom + 16,
                 paddingHorizontal: 24,
-                zIndex: 9999, // Super high priority - always on top
               },
               menuAnimatedStyle
             ]}
