@@ -89,16 +89,10 @@ export default function MeasurementScreen() {
       
       // If transitioning TO camera, let camera handle its own fade
       if (newMode === 'camera') {
-        cameraOpacity.value = 0;
-        blackOverlayOpacity.value = 1;
-        screenScale.value = 1; // Reset scale immediately for camera
-        // Fade out transition overlay, let camera's own black overlay handle the fade
-        transitionBlackOverlay.value = withTiming(0, {
-          duration: delay,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-        // Unlock after transition completes
-        setTimeout(() => setIsTransitioning(false), delay);
+        screenScale.value = 1; // Reset scale for camera
+        // Camera's useEffect will clear transitionBlackOverlay and handle fade-in
+        // Unlock after camera's fade completes (300ms delay + 1500ms fade)
+        setTimeout(() => setIsTransitioning(false), 1800);
       } else {
         // For non-camera modes, morph in from black (1.5 seconds in)
         // Wait a tiny bit for mode switch before morphing
@@ -308,6 +302,7 @@ export default function MeasurementScreen() {
     if (mode === 'camera') {
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
+      transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
       
       // Delay slightly to let camera initialize, then 1.5 second fade-in
       setTimeout(() => {
