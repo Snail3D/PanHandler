@@ -2226,21 +2226,23 @@ export default function DimensionOverlay({
                 clearTimeout(freehandActivationTimerRef.current);
               }
               
+              // 🌟 Samus Charge Beam - Progressive power build-up
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
+              
               freehandActivationTimerRef.current = setTimeout(() => {
-                // Activation complete - start drawing!
+                // 1.5s - FULLY CHARGED! Ready to fire! 🔥
                 setIsDrawingFreehand(true);
                 setFreehandActivating(false);
                 
-                // Don't add first point here - let onResponderMove handle it
-                // This ensures the path starts from the current finger position, not where they initially pressed
-                
-                // Strong haptic feedback to signal drawing has started
+                // Powerful "weapon charged" haptic
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 console.log('🎨 Freehand drawing activated!');
-              }, 1500); // 1.5 seconds
-              
-              // Light haptic on initial press
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }, 1500);
               return; // Skip normal cursor logic for freehand
             }
             
