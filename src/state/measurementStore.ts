@@ -65,6 +65,7 @@ interface MeasurementStore {
   hasReviewedApp: boolean; // True if user tapped "Rate" button
   lastReviewPromptDate: string | null; // Track when user was last prompted
   globalDownloads: number; // Global download count (fetched from backend)
+  hasSeenPinchTutorial: boolean; // Track if user has seen pinch-zoom tutorial
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
