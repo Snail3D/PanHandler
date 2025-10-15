@@ -4554,7 +4554,6 @@ export default function DimensionOverlay({
 
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
-        <GestureDetector gesture={Gesture.Tap()}>
           <Animated.View
             pointerEvents="box-none"
             style={[
@@ -4562,7 +4561,7 @@ export default function DimensionOverlay({
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                zIndex: 9999, // Super high priority - gesture firewall
+                zIndex: 9999, // Super high priority
                 bottom: insets.bottom + 16,
                 paddingHorizontal: 24,
               },
@@ -5327,7 +5326,6 @@ export default function DimensionOverlay({
         </View>
         </BlurView>
           </Animated.View>
-        </GestureDetector>
       )}
       
       {/* Pro Upgrade Modal */}
