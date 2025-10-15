@@ -106,6 +106,7 @@ export default function ZoomableImage({
     .enabled(!locked)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
+      gestureWasActive.value = true;
       rotation.value = savedRotation.value + event.rotation;
     })
     .onEnd(() => {
@@ -120,10 +121,15 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .enabled(!locked)
-    .minDistance(singleFingerPan ? 5 : 10) // Lower threshold for single-finger mode
+    .minDistance(5) // Lower threshold for responsiveness
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
-    .maxPointers(singleFingerPan ? 1 : 2) // Limit to 1 finger in single-finger mode
+    .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
+    .onStart(() => {
+      if (__DEV__ && singleFingerPan) {
+        console.log('🖐️ Pan gesture started (single-finger mode enabled)');
+      }
+    })
     .onUpdate((event) => {
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
@@ -131,6 +137,9 @@ export default function ZoomableImage({
       translateY.value = savedTranslateY.value + event.translationY * 0.7;
     })
     .onEnd(() => {
+      if (__DEV__ && singleFingerPan) {
+        console.log('✅ Pan gesture ended');
+      }
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
@@ -176,19 +185,11 @@ export default function ZoomableImage({
       }
     });
 
-  // Compose gestures differently based on single-finger mode
-  const composedGesture = singleFingerPan
-    ? Gesture.Race(
-        doubleTapGesture,
-        Gesture.Exclusive(
-          pinchGesture,  // Pinch takes priority
-          panGesture     // Then pan
-        )
-      )
-    : Gesture.Race(
-        doubleTapGesture,
-        Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
-      );
+  // Use simple simultaneous gestures for both modes
+  const composedGesture = Gesture.Race(
+    doubleTapGesture,
+    Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
+  );
 
 
   const animatedStyle = useAnimatedStyle(() => ({
