@@ -2086,46 +2086,7 @@ export default function DimensionOverlay({
   }));
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
-  const menuPanGesture = Gesture.Pan()
-    .activeOffsetX([-20, 20]) // Activate on 20px horizontal movement
-    .failOffsetY([-40, 40]) // Fail if too much vertical movement
-    .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
-    .onUpdate((event) => {
-      // Only respond to horizontal swipes - stricter detection
-      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
-      if (isHorizontal) {
-        if (event.translationX < -50 && !menuHidden) {
-          // Swipe left to hide (to right side)
-          menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
-        } else if (event.translationX > 50 && menuHidden && tabSide === 'right') {
-          // Swipe right to show (from right side)
-          menuTranslateX.value = Math.min(SCREEN_WIDTH + event.translationX, 0);
-        }
-      }
-    })
-    .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.25; // Reduced from 0.3 for easier activation
-      // Require FAST swipe OR enough distance to collapse menu
-      const minVelocity = 600; // Reduced from 800 for more responsive feel
-      const isFastSwipe = Math.abs(event.velocityX) > minVelocity;
-      
-      if ((Math.abs(event.translationX) > threshold && isFastSwipe) || Math.abs(event.translationX) > SCREEN_WIDTH * 0.5) {
-        // Hide menu to the right - fast swipe detected or dragged far enough
-        menuTranslateX.value = SCREEN_WIDTH;
-        menuOpacity.value = 1;
-        runOnJS(setMenuHidden)(true);
-        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
-      } else {
-        // Show menu - slow swipe or didn't cross threshold
-        menuTranslateX.value = withSpring(0);
-        menuOpacity.value = 1;
-        runOnJS(setMenuHidden)(false);
-        if (Math.abs(event.translationX) > 20) {
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-        }
-      }
-    });
-  
+
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
     .activeOffsetX([-15, 15]) // Activate on 15px horizontal movement in either direction
@@ -4570,22 +4531,6 @@ export default function DimensionOverlay({
                 borderWidth: 1,
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
-                
-                {/* Swipe handle at top - ONLY this area has the pan gesture */}
-                <GestureDetector gesture={menuPanGesture}>
-                  <Animated.View style={{ 
-                    paddingVertical: 8,
-                    alignItems: 'center',
-                    marginBottom: 4
-                  }}>
-                    <View style={{
-                      width: 40,
-                      height: 4,
-                      borderRadius: 2,
-                      backgroundColor: 'rgba(0, 0, 0, 0.15)',
-                    }} />
-                  </Animated.View>
-                </GestureDetector>
                 
                 {/* Header with undo button and hide menu on same line */}
                 <View style={{ 
