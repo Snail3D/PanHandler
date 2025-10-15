@@ -2211,7 +2211,7 @@ export default function DimensionOverlay({
           style={{
             top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
             right: 16,
-            backgroundColor: stepBrothersMode ? 'rgba(59, 130, 246, 0.95)' : 'rgba(52, 199, 89, 0.9)', // Blue in Step Brothers mode
+            backgroundColor: stepBrothersMode ? 'rgba(59, 130, 246, 0.95)' : 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 12,
@@ -4454,7 +4454,7 @@ export default function DimensionOverlay({
             position: 'absolute',
             top: insets.top + 16,
             right: 12,
-            backgroundColor: 'rgba(0, 200, 0, 0.9)',
+            backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 8,
             paddingVertical: 4,
             borderRadius: 6,
@@ -5444,7 +5444,7 @@ export default function DimensionOverlay({
               showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
             }}
             style={{
-              backgroundColor: 'rgba(0, 122, 255, 0.9)',
+              backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
               width: 26,
               height: 26,
               borderRadius: 13,
