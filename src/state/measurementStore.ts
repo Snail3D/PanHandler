@@ -217,7 +217,7 @@ const useStore = create<MeasurementStore>()(
         hasReviewedApp: state.hasReviewedApp, // Persist review status
         lastReviewPromptDate: state.lastReviewPromptDate, // Persist last prompt date
         hasSeenPinchTutorial: state.hasSeenPinchTutorial, // Persist tutorial state
-        hasSeenPanTutorial: state.hasSeenPanTutorial, // Persist tutorial state
+        // hasSeenPanTutorial: DON'T persist - resets each new photo session
         // Persist current work session
         currentImageUri: state.currentImageUri,
         isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
