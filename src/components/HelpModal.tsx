@@ -368,6 +368,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     });
 
   return (
+    <>
     <Modal
       visible={visible}
       animationType="slide"
@@ -1896,15 +1897,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
           </View>
         </View>
       </BlurView>
-
-      {/* Custom Alert Modal */}
-      <AlertModal
-        visible={alertConfig.visible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={closeAlert}
-      />
     </Modal>
+
+    {/* Custom Alert Modal - Outside main modal for proper z-index */}
+    <AlertModal
+      visible={alertConfig.visible}
+      title={alertConfig.title}
+      message={alertConfig.message}
+      type={alertConfig.type}
+      onClose={closeAlert}
+    />
+    </>
   );
 }
