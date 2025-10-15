@@ -2000,14 +2000,8 @@ export default function DimensionOverlay({
 
 
   const handleReset = () => {
-    // Instant reset without confirmation
-    const setImageUri = useStore.getState().setImageUri;
-    const setCoinCircle = useStore.getState().setCoinCircle;
-    const setCalibration = useStore.getState().setCalibration;
-    
-    setImageUri(null);
-    setCoinCircle(null);
-    setCalibration(null);
+    // Don't clear state here - let the parent's transition handle it properly
+    // This prevents the measurement screen from unmounting before the transition starts
     
     // Call parent's reset callback to return to camera mode
     onReset?.();
@@ -5147,7 +5141,13 @@ export default function DimensionOverlay({
 
             {/* New Photo button - always visible in the same row */}
             <Pressable
-              onPress={handleReset}
+              onPress={() => {
+                // Small delay to ensure any active gestures are fully released
+                // This prevents sticky button behavior after panning
+                requestAnimationFrame(() => {
+                  handleReset();
+                });
+              }}
               style={{
                 flex: 1,
                 backgroundColor: 'rgba(255, 59, 48, 0.85)',
