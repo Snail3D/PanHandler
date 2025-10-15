@@ -2165,7 +2165,7 @@ export default function DimensionOverlay({
           runOnJS(setModeColorIndex)(nextIndex);
           runOnJS(setCurrentPoints)([]);
           runOnJS(setMeasurementMode)(true);
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         } else {
           // Swipe right - previous mode
           let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
@@ -2181,7 +2181,7 @@ export default function DimensionOverlay({
           runOnJS(setModeColorIndex)(prevIndex);
           runOnJS(setCurrentPoints)([]);
           runOnJS(setMeasurementMode)(true);
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         }
       }
       
