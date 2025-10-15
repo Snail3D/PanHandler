@@ -5433,7 +5433,7 @@ export default function DimensionOverlay({
             left: SCREEN_WIDTH / 2 - 13,
             zIndex: 50,
           }}
-          pointerEvents="box-none"
+          pointerEvents="auto"
         >
           <Pressable
             onPress={() => setShowHelpModal(true)}
