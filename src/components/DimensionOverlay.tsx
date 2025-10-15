@@ -1598,12 +1598,17 @@ export default function DimensionOverlay({
 
   // Recalculate all measurement values when unit system changes
   useEffect(() => {
-    // Only recalculate if unit system actually changed (not on initial mount or measurement changes)
-    if (prevUnitSystemRef.current === unitSystem || measurements.length === 0) {
-      prevUnitSystemRef.current = unitSystem;
+    // Don't run on mount or if no measurements exist
+    if (measurements.length === 0) {
       return;
     }
     
+    // Only recalculate if unit system actually changed
+    if (prevUnitSystemRef.current === unitSystem) {
+      return;
+    }
+    
+    console.log('🔄 Unit system changed, recalculating all measurements...');
     prevUnitSystemRef.current = unitSystem;
     
     const updatedMeasurements = measurements.map(m => {
@@ -1678,8 +1683,9 @@ export default function DimensionOverlay({
       };
     });
     
+    console.log('✅ Updated', updatedMeasurements.length, 'measurements for', unitSystem, 'system');
     setMeasurements(updatedMeasurements);
-  }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
+  }, [unitSystem, measurements, calibration, isMapMode, mapScale, calculateDistance, calculateAngle, formatMeasurement, formatAreaMeasurement, formatMapScaleDistance, formatMapScaleArea, convertToMapScale]); // Include all dependencies
 
   const handleClear = () => {
     // Check if the last measurement has been edited (has history)
