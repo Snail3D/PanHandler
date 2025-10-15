@@ -1824,7 +1824,21 @@ export default function DimensionOverlay({
         quality: 0.9,
         result: 'tmpfile',
       });
-      await MediaLibrary.createAssetAsync(measurementsUri);
+      const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
+      
+      // Add to "PanHandler Measurements" album
+      try {
+        const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync([measurementsAsset], album, false);
+        } else {
+          await MediaLibrary.createAlbumAsync('PanHandler Measurements', measurementsAsset, false);
+        }
+        __DEV__ && console.log('✅ Measurements saved to Camera Roll + PanHandler Measurements album');
+      } catch (albumError) {
+        console.error('Failed to add to PanHandler Measurements album:', albumError);
+        __DEV__ && console.log('✅ Measurements saved to Camera Roll only');
+      }
       
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
@@ -1844,7 +1858,18 @@ export default function DimensionOverlay({
         quality: 1.0,
         result: 'tmpfile',
       });
-      await MediaLibrary.createAssetAsync(labelOnlyUri);
+      const labelOnlyAsset = await MediaLibrary.createAssetAsync(labelOnlyUri);
+      
+      // Add label-only version to "PanHandler Measurements" album
+      try {
+        const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync([labelOnlyAsset], album, false);
+        }
+        __DEV__ && console.log('✅ Label-only version also saved to PanHandler Measurements album');
+      } catch (albumError) {
+        console.error('Failed to add label-only to album:', albumError);
+      }
       
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);

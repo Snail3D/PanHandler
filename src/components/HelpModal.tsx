@@ -1101,6 +1101,26 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                   </View>
                 </View>
 
+                {/* PanHandler Measurements Album Feature */}
+                <View style={{
+                  marginTop: 16,
+                  backgroundColor: 'rgba(88,86,214,0.08)',
+                  borderRadius: 14,
+                  padding: 14,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(88,86,214,0.2)',
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="folder" size={18} color="#5856D6" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
+                      Organized Measurements
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    All saved measurements are automatically organized into a "PanHandler Measurements" album in your Photos app for easy access and sharing!
+                  </Text>
+                </View>
+
                 {/* CAD Integration */}
                 <View
                   style={{
