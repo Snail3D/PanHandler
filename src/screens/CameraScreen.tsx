@@ -29,11 +29,13 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   const [orientationMode, setOrientationMode] = useState<'horizontal' | 'vertical' | 'auto'>('auto');
   const [detectedOrientation, setDetectedOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
   const [isStable, setIsStable] = useState(false);
-  const [autoMode, setAutoMode] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [readyToCapture, setReadyToCapture] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
-  const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
+  
+  // AUTO MODE ALWAYS ON - This is a precision measurement tool!
+  const autoMode = true; // No toggle
+  const flashEnabled = true; // Flash always on for consistent lighting
   
   // Bubble level animation
   const bubbleX = useSharedValue(0);
@@ -90,15 +92,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         quality: 1,
       });
       
-      // Haptic feedback AFTER photo capture - Mario Kart countdown sequence for auto mode!
-      if (autoMode) {
-        // DUN... DUN... DING! 🏎️
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // First heavy beep
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 150);  // Second heavy beep
-        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);  // DING! GO!
-      } else {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      }
+      // Haptic feedback AFTER photo capture - Mario Kart countdown sequence!
+      // DUN... DUN... DING! 🏎️
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // First heavy beep
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 150);  // Second heavy beep
+      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);  // DING! GO!
       
       if (!photo?.uri) return;
 
@@ -159,31 +157,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       console.error('Error taking picture:', error);
     } finally {
       setIsCapturing(false);
-      setAutoMode(false);
-      setCountdown(null);
-    }
-  };
-
-  const toggleAutoMode = () => {
-    const newMode = !autoMode;
-    setAutoMode(newMode);
-    // Turn on flash when auto mode is enabled, turn off when disabled
-    setFlashEnabled(newMode);
-    if (newMode) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       setCountdown(null);
     }
   };
 
   const toggleCameraFacing = () => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
-  };
-
-  const toggleFlash = () => {
-    setFlashEnabled(!flashEnabled);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const toggleOrientationMode = () => {
@@ -381,16 +360,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                   color="white" 
                 />
               </Pressable>
-              <Pressable
-                onPress={toggleFlash}
-                className="w-10 h-10 items-center justify-center ml-2"
-              >
-                <Ionicons 
-                  name={flashEnabled ? 'flash' : 'flash-off'} 
-                  size={24} 
-                  color={flashEnabled ? '#FFD700' : 'white'} 
-                />
-              </Pressable>
+              {/* Flash always on - removed toggle */}
               <Pressable
                 onPress={() => setShowHelpModal(true)}
                 className="w-10 h-10 items-center justify-center ml-2"
@@ -659,39 +629,37 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           style={{ paddingBottom: insets.bottom + 32 }}
         >
           <View className="items-center">
-            {/* Auto mode toggle */}
-            <Pressable
-              onPress={toggleAutoMode}
+            {/* Auto mode always on - no toggle needed */}
+            <View
               style={{
                 marginBottom: 16,
                 paddingHorizontal: 20,
                 paddingVertical: 10,
                 borderRadius: 20,
-                backgroundColor: autoMode ? 'rgba(0, 200, 0, 0.9)' : 'rgba(255, 255, 255, 0.3)',
+                backgroundColor: 'rgba(0, 200, 0, 0.9)',
                 flexDirection: 'row',
                 alignItems: 'center',
               }}
             >
               <Ionicons 
-                name={autoMode ? 'flash' : 'flash-off'} 
+                name="flash" 
                 size={20} 
                 color="white" 
               />
               <Text className="text-white text-sm font-bold ml-2">
-                {autoMode ? 'AUTO MODE ON' : 'AUTO MODE OFF'}
+                AUTO-LEVEL MODE
               </Text>
-            </Pressable>
+            </View>
 
-            <Pressable
-              onPress={autoMode ? undefined : takePicture}
-              disabled={isCapturing || autoMode}
+            {/* No manual capture - auto-capture only when leveled */}
+            <View
               style={{
                 width: 80,
                 height: 80,
                 borderRadius: 40,
-                backgroundColor: autoMode ? 'rgba(255, 255, 255, 0.3)' : 'white',
+                backgroundColor: 'rgba(0, 200, 0, 0.6)',
                 borderWidth: 4,
-                borderColor: autoMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(200, 200, 200, 1)',
+                borderColor: 'rgba(0, 200, 0, 0.9)',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -700,11 +668,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 width: 64, 
                 height: 64, 
                 borderRadius: 32, 
-                backgroundColor: autoMode ? 'rgba(255, 255, 255, 0.5)' : 'white',
+                backgroundColor: 'rgba(0, 200, 0, 0.5)',
               }} />
-            </Pressable>
+            </View>
             <Text className="text-white text-sm mt-4">
-              {autoMode ? 'Hold steady to auto-capture' : 'Tap to capture'}
+              Hold level to auto-capture
             </Text>
           </View>
         </View>
