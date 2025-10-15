@@ -4404,7 +4404,6 @@ export default function DimensionOverlay({
           <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
-                showToastNotification('Edit button pressed!');
                 setMeasurementMode(false);
                 setShowCursor(false);
                 setSelectedMeasurementId(null);
@@ -4438,8 +4437,6 @@ export default function DimensionOverlay({
             </Pressable>
             <Pressable
               onPress={() => {
-                showToastNotification('Measure pressed!');
-                __DEV__ && console.log('🔥 MEASURE BUTTON PRESSED!');
                 setMeasurementMode(true);
                 setShowCursor(true);
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
