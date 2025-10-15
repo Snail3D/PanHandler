@@ -1,6 +1,6 @@
 # 📐 PanHandler - Professional Measurements from Your Pocket
 
-**Version:** Alpha v1.0  
+**Version:** Alpha v1.65  
 **Status:** Production Ready 🚀  
 **Platform:** iOS (Expo SDK 53, React Native 0.76.7)
 
@@ -18,14 +18,17 @@ PanHandler transforms your iPhone into a precision measurement tool. Using coin-
 
 ### 📐 Measurement Tools
 - **Distance** - Linear measurements between two points
-- **Angle** - Three-point angle measurements  
+- **Angle** - Three-point angle measurements with azimuth bearing mode
 - **Circle** - Radius, diameter, area, circumference
 - **Rectangle** - Dimensions and area (length × width)
-- **Freehand** - Trace irregular shapes for perimeter and area (Pro)
+- **Freehand** - Trace irregular shapes with ultra-precise lasso mode (Pro)
+  - **NEW in v1.65**: Smooth, fluid lines with 0.3mm snap precision
 
 ### 🪙 Smart Calibration
 - **Coin Calibration** - Use any common coin (50+ supported)
 - **Map Scale** - Measure from maps, blueprints, drawings
+- **Auto-Level Capture** - Hold level to auto-capture perfectly straight photos
+- **Auto-Leveled Album** - Auto-captured photos saved to dedicated album
 - **Remembers** - Last coin used for quick setup
 - **Accurate** - Professional-grade precision
 

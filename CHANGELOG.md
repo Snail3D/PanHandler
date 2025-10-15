@@ -4,6 +4,53 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.65] - 2025-10-15
+
+### 🎨 Freehand Tool Refinement & Unit System Fix
+
+#### ✨ Major Improvements
+- **Ultra-Precise Lasso Snap** - Reduced snap threshold from 2mm to 0.3mm (1.5px fallback)
+  - Users can now trace complex shapes like lakes with precision
+  - Snap only triggers when virtually touching the starting point
+- **Smooth Freehand Lines** - Reduced point sampling from 2px to 0.5px
+  - Eliminates chunky, segmented appearance
+  - Creates beautifully fluid, natural-feeling lines
+- **Unit System Label Fix** - Fixed measurement labels not updating when switching units
+  - All labels now update instantly (not just legend)
+  - Fixed useEffect dependencies for proper recalculation
+
+#### 📚 Documentation
+- **NEW: TOOL_DYNAMICS.md** - Comprehensive technical documentation
+  - Complete specifications for all 5 measurement tools
+  - Freehand tool algorithms (lasso snap, point sampling, area calculation)
+  - Gesture system details
+  - Cursor dynamics and offsets
+  - Performance metrics and constants
+  - Developer guide for adding new tools
+- **Help Modal Update** - Added Auto-Leveled album feature documentation
+  - Explains automatic photo organization for auto-captured photos
+
+#### 🐛 Bug Fixes
+- **TypeScript Errors** - Fixed all className/style prop issues in DimensionOverlay
+- **Haptics API** - Corrected ImpactFeedbackType → ImpactFeedbackStyle
+- **AlertModal Props** - Fixed onDismiss → onClose
+- **Camera Screen** - Converted Tailwind classes to inline styles
+
+#### 🔧 Technical Details
+- Freehand snap calculation now properly converts mm/cm/in to pixels
+- Unit system recalculation includes all dependencies
+- Added debug console logs for troubleshooting
+- Improved early return logic in useEffect
+
+### 📁 Files Modified
+- `src/components/DimensionOverlay.tsx` - Freehand refinements, unit system fix
+- `src/components/HelpModal.tsx` - Auto-Leveled album docs
+- `src/screens/MeasurementScreen.tsx` - Style prop fixes
+- `TOOL_DYNAMICS.md` - NEW comprehensive documentation
+- `V1.65_SUMMARY.md` - NEW version summary
+
+---
+
 ## [Alpha v1.6] - 2025-10-15
 
 ### 🎬 Cinematic Polish & Precision Mode Update
