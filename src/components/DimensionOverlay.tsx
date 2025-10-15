@@ -4852,7 +4852,11 @@ export default function DimensionOverlay({
                   if (mapScale) {
                     // Scale already exists for this photo - just activate map mode
                     setIsMapMode(true);
+                    // Dora "We did it!" - Triumphant celebratory sequence! 🗺️
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 80);
+                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+                    setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
                   } else {
                     // No scale yet - show modal to set scale
                     setShowMapScaleModal(true);
@@ -5312,6 +5316,7 @@ export default function DimensionOverlay({
         onComplete={handleLabelComplete}
         onDismiss={handleLabelDismiss}
         initialValue={currentLabel}
+        isMapMode={isMapMode}
       />
       
       {/* Email Prompt Modal */}

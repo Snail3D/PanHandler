@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
 import ZoomableImage from './ZoomableImageV2';
 import * as Haptics from 'expo-haptics';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, Easing } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -52,7 +53,17 @@ export default function ZoomCalibration({
   onHelp,
 }: ZoomCalibrationProps) {
   const insets = useSafeAreaInsets();
+  const hasSeenPinchTutorial = useStore((s) => s.hasSeenPinchTutorial);
+  const setHasSeenPinchTutorial = useStore((s) => s.setHasSeenPinchTutorial);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  
+  // Pinch tutorial animation values
+  const leftFingerX = useSharedValue(SCREEN_WIDTH / 2 - 30);
+  const leftFingerY = useSharedValue(SCREEN_HEIGHT / 2);
+  const rightFingerX = useSharedValue(SCREEN_WIDTH / 2 + 30);
+  const rightFingerY = useSharedValue(SCREEN_HEIGHT / 2);
+  const tutorialOpacity = useSharedValue(0);
   const [zoomTranslate, setZoomTranslate] = useState({ x: 0, y: 0 });
   
   // Coin selection state
@@ -83,6 +94,42 @@ export default function ZoomCalibration({
       setSearchResults([]);
     }
   }, [searchQuery]);
+
+  // Show pinch-zoom tutorial on first use
+  useEffect(() => {
+    if (!hasSeenPinchTutorial) {
+      setTimeout(() => {
+        setShowTutorial(true);
+        tutorialOpacity.value = withSpring(1, { damping: 20 });
+        
+        // Animate fingers pinching outward (zoom in gesture)
+        const animatePinch = () => {
+          leftFingerX.value = withSequence(
+            withSpring(SCREEN_WIDTH / 2 - 30),
+            withSpring(SCREEN_WIDTH / 2 - 80, { damping: 15 }),
+            withSpring(SCREEN_WIDTH / 2 - 30, { damping: 15 })
+          );
+          rightFingerX.value = withSequence(
+            withSpring(SCREEN_WIDTH / 2 + 30),
+            withSpring(SCREEN_WIDTH / 2 + 80, { damping: 15 }),
+            withSpring(SCREEN_WIDTH / 2 + 30, { damping: 15 })
+          );
+        };
+        
+        // Run animation twice, then hide
+        animatePinch();
+        setTimeout(animatePinch, 1500);
+        
+        setTimeout(() => {
+          tutorialOpacity.value = withSpring(0);
+          setTimeout(() => {
+            setShowTutorial(false);
+            setHasSeenPinchTutorial(true);
+          }, 500);
+        }, 3500);
+      }, 800); // Delay so user sees the screen first
+    }
+  }, [hasSeenPinchTutorial]);
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -144,6 +191,27 @@ export default function ZoomCalibration({
       },
     });
   };
+
+  // Animated styles for tutorial
+  const leftFingerStyle = useAnimatedStyle(() => ({
+    opacity: tutorialOpacity.value,
+    transform: [
+      { translateX: leftFingerX.value },
+      { translateY: leftFingerY.value },
+    ],
+  }));
+
+  const rightFingerStyle = useAnimatedStyle(() => ({
+    opacity: tutorialOpacity.value,
+    transform: [
+      { translateX: rightFingerX.value },
+      { translateY: rightFingerY.value },
+    ],
+  }));
+
+  const tutorialTextStyle = useAnimatedStyle(() => ({
+    opacity: tutorialOpacity.value,
+  }));
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
@@ -587,6 +655,92 @@ export default function ZoomCalibration({
           </Pressable>
         </BlurView>
       </View>
+
+      {/* Pinch-Zoom Tutorial Overlay - Only shows on first use */}
+      {showTutorial && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          {/* Tutorial text */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: SCREEN_HEIGHT / 2 - 150,
+                alignItems: 'center',
+                paddingHorizontal: 40,
+              },
+              tutorialTextStyle,
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 22,
+                fontWeight: '700',
+                color: 'white',
+                textAlign: 'center',
+                marginBottom: 8,
+                textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                textShadowOffset: { width: 0, height: 2 },
+                textShadowRadius: 4,
+              }}
+            >
+              Pinch to Zoom
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                color: 'rgba(255, 255, 255, 0.9)',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}
+            >
+              {"Zoom until the coin matches the circle"}
+            </Text>
+          </Animated.View>
+
+          {/* Animated finger indicators */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                borderWidth: 3,
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+              },
+              leftFingerStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                borderWidth: 3,
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+              },
+              rightFingerStyle,
+            ]}
+          />
+        </View>
+      )}
     </View>
   );
 }

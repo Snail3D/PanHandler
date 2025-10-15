@@ -285,27 +285,87 @@ const makerExamples = [
   "iOS Loading Circle",
 ];
 
-const getRandomExample = () => {
-  const idx = Math.floor(Math.random() * makerExamples.length);
-  return makerExamples[idx];
-};
+// Map-themed funny examples for Map Mode
+const mapExamples = [
+  // Fictional/Funny Places
+  "Map to Nowhere",
+  "Middle Earth Overview",
+  "Treasure Island (X marks the spot)",
+  "Atlantis Location",
+  "Narnia Wardrobe Route",
+  "Hogwarts Grounds",
+  "Hundred Acre Wood",
+  "Neverland Flight Path",
+  "Bikini Bottom Layout",
+  "Springfield Town Center",
+  "Gotham City Streets",
+  "Westeros Continent",
+  "The Upside Down",
+  "Silent Hill Roads",
+  "Vice City Map",
+  "Hyrule Kingdom",
+  "Mushroom Kingdom",
+  "DK Island",
+  "Green Hill Zone",
+  "World 1-1",
+  // Absurd Map Titles
+  "Where I Parked",
+  "Bathroom Locations",
+  "Nearest Coffee",
+  "Wi-Fi Dead Zones",
+  "Dog Walking Route",
+  "Pizza Delivery Zone",
+  "Donut Shop Radius",
+  "Escape Routes",
+  "Secret Shortcut",
+  "The Long Way Home",
+  // Adventure/Pirate Themed
+  "Pirate Treasure Map",
+  "Buried Gold Location",
+  "Secret Hideout",
+  "Abandoned Mine Shaft",
+  "Lost Temple Entrance",
+  "Hidden Waterfall",
+  "Ancient Ruins Path",
+  "Forbidden Forest",
+  "Dragon Lair",
+  "Quest Waypoints",
+  // Real-ish But Funny
+  "Dad Shortcut",
+  "Scenic Route (that takes 3x longer)",
+  "Traffic Jam Detour",
+  "Construction Zone Map",
+  "Pothole Locations",
+  "Speed Trap Warnings",
+  "School Drop-off Route",
+  "Grocery Store Circuit",
+  "Mall Parking Spots",
+  "Airport Terminal Maze",
+];
+
+
+const getRandomExample = (isMapMode: boolean = false) => {
+  const examples = isMapMode ? mapExamples : makerExamples;
+  const idx = Math.floor(Math.random() * examples.length);
+  return examples[idx];
 
 interface LabelModalProps {
   visible: boolean;
   onComplete: (label: string | null) => void;
   onDismiss: () => void;
   initialValue?: string | null;
+  isMapMode?: boolean;
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss, initialValue }: LabelModalProps) {
+export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false }: LabelModalProps) {
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
 
   // Generate a new random example whenever modal becomes visible
   useEffect(() => {
     if (visible) {
-      const example1 = getRandomExample();
-      const example2 = getRandomExample();
+      const example1 = getRandomExample(isMapMode);
+      const example2 = getRandomExample(isMapMode);
       setPlaceholder(`e.g., ${example1}, ${example2}...`);
       
       // Pre-fill with initial value if provided
