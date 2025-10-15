@@ -74,16 +74,12 @@ export default function MeasurementScreen() {
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
     setIsTransitioning(true); // Lock out interactions
     
-    // Bring up BLACK overlay while fading content (1.5 seconds out)
+    // Bring up BLACK overlay to cover content (1.5 seconds out) with pronounced scale down
     transitionBlackOverlay.value = withTiming(1, {
       duration: delay,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
-    screenOpacity.value = withTiming(0, {
-      duration: delay,
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-    });
-    screenScale.value = withTiming(0.95, { // Slight scale down (water pulling in)
+    screenScale.value = withTiming(0.90, { // More pronounced scale down (water pulling in)
       duration: delay,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
@@ -91,12 +87,11 @@ export default function MeasurementScreen() {
     setTimeout(() => {
       setMode(newMode);
       
-      // If transitioning TO camera, DON'T fade screenOpacity back in - let camera handle its own fade
+      // If transitioning TO camera, let camera handle its own fade
       if (newMode === 'camera') {
         cameraOpacity.value = 0;
         blackOverlayOpacity.value = 1;
         screenScale.value = 1; // Reset scale immediately for camera
-        screenOpacity.value = 1; // Keep at 1 for camera
         // Fade out transition overlay, let camera's own black overlay handle the fade
         transitionBlackOverlay.value = withTiming(0, {
           duration: delay,
@@ -105,17 +100,13 @@ export default function MeasurementScreen() {
         // Unlock after transition completes
         setTimeout(() => setIsTransitioning(false), delay);
       } else {
-        // For non-camera modes, fade in from black with liquid morph (1.5 seconds in)
-        screenScale.value = 1.05; // Start slightly scaled up
-        screenOpacity.value = withTiming(1, {
-          duration: delay,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
+        // For non-camera modes, morph in from black (1.5 seconds in)
+        screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
         screenScale.value = withTiming(1, { // Settle to normal scale
           duration: delay,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
-        // Fade out black overlay as content fades in
+        // Fade out black overlay as content appears
         transitionBlackOverlay.value = withTiming(0, {
           duration: delay,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -429,7 +420,7 @@ export default function MeasurementScreen() {
           setMode('zoomCalibrate');
           // Reset screenOpacity and scale for liquid morph effect (1.5s in)
           screenOpacity.value = 0;
-          screenScale.value = 1.05; // Start slightly scaled up (water flowing in)
+          screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
           screenOpacity.value = withTiming(1, {
             duration: 1500,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -511,198 +502,217 @@ export default function MeasurementScreen() {
   // Camera Mode
   if (mode === 'camera') {
     return (
-      <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, cameraAnimatedStyle]}>
-        <CameraView 
-          ref={cameraRef}
-          style={{ flex: 1 }}
-          facing="back"
-          enableTorch={flashEnabled}
-        >
-          {/* Top controls */}
-          <View 
-            className="absolute top-0 left-0 right-0 z-10"
-            style={{ paddingTop: insets.top + 16 }}
+      <View style={{ flex: 1, backgroundColor: 'black' }}>
+        <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
+          <CameraView 
+            ref={cameraRef}
+            style={{ flex: 1 }}
+            facing="back"
+            enableTorch={flashEnabled}
           >
-            <View className="flex-row justify-between items-center px-6">
-              <View className="flex-row items-center">
-                <Pressable
-                  onPress={() => {
-                    __DEV__ && console.log('🔵 Help button pressed in camera screen');
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowHelpModal(true);
-                  }}
-                  className="w-10 h-10 items-center justify-center"
-                >
-                  <Ionicons name="help-circle-outline" size={28} color="white" />
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    setFlashEnabled(!flashEnabled);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  className="w-10 h-10 items-center justify-center ml-2"
-                >
-                  <Ionicons 
-                    name={flashEnabled ? "flash" : "flash-off"} 
-                    size={26} 
-                    color={flashEnabled ? "#FFD700" : "white"} 
-                  />
-                </Pressable>
-              </View>
-              <Text className="text-white text-lg font-semibold">Take Photo</Text>
-              {/* Spacer to keep title centered */}
-              <View className="w-10 h-10" />
-            </View>
-          </View>
-
-          {/* Crosshairs overlay - center of screen */}
-          <View 
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: 100,
-              height: 100,
-              marginLeft: -50,
-              marginTop: -50,
-            }}
-            pointerEvents="none"
-          >
-            {/* Horizontal line - color reactive */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 49,
-                left: 0,
-                right: 0,
-                height: 2,
-                backgroundColor: alignmentStatus === 'good' 
-                  ? 'rgba(76, 175, 80, 0.9)' 
-                  : alignmentStatus === 'warning'
-                  ? 'rgba(255, 183, 77, 0.9)'
-                  : 'rgba(239, 83, 80, 0.9)',
-              }}
-            />
-            {/* Vertical line - color reactive */}
-            <View
-              style={{
-                position: 'absolute',
-                left: 49,
-                top: 0,
-                bottom: 0,
-                width: 2,
-                backgroundColor: alignmentStatus === 'good' 
-                  ? 'rgba(76, 175, 80, 0.9)' 
-                  : alignmentStatus === 'warning'
-                  ? 'rgba(255, 183, 77, 0.9)'
-                  : 'rgba(239, 83, 80, 0.9)',
-              }}
-            />
-            {/* Center dot */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 47,
-                left: 47,
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              }}
-            />
-            
-            {/* "Center object here" text below crosshairs with hint */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 110,
-                left: -75,
-                width: 250,
-                alignItems: 'center',
-              }}
+            {/* Top controls */}
+            <View 
+              className="absolute top-0 left-0 right-0 z-10"
+              style={{ paddingTop: insets.top + 16 }}
             >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  fontSize: 13,
-                  fontWeight: '600',
-                }}
-              >
-                Center object here
-              </Text>
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontSize: 11,
-                  fontStyle: 'italic',
-                  marginTop: 2,
-                }}
-              >
-                (place coin in the middle)
-              </Text>
+              <View className="flex-row justify-between items-center px-6">
+                <View className="flex-row items-center">
+                  <Pressable
+                    onPress={() => {
+                      __DEV__ && console.log('🔵 Help button pressed in camera screen');
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setShowHelpModal(true);
+                    }}
+                    className="w-10 h-10 items-center justify-center"
+                  >
+                    <Ionicons name="help-circle-outline" size={28} color="white" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setFlashEnabled(!flashEnabled);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    className="w-10 h-10 items-center justify-center ml-2"
+                  >
+                    <Ionicons 
+                      name={flashEnabled ? "flash" : "flash-off"} 
+                      size={26} 
+                      color={flashEnabled ? "#FFD700" : "white"} 
+                    />
+                  </Pressable>
+                </View>
+                <Text className="text-white text-lg font-semibold">Take Photo</Text>
+                {/* Spacer to keep title centered */}
+                <View className="w-10 h-10" />
+              </View>
             </View>
-          </View>
 
-          {/* Bottom controls */}
-          <View 
-            className="absolute bottom-0 left-0 right-0 z-10"
-            style={{ paddingBottom: insets.bottom + 32 }}
-          >
-            <View className="items-center">
-              {/* Photo Library Button */}
-              <Pressable
-                onPress={pickImage}
-                className="absolute left-8 bottom-0 w-14 h-14 rounded-full bg-gray-800/80 items-center justify-center"
-                style={{ marginBottom: 3 }}
-              >
-                <Ionicons name="images-outline" size={28} color="white" />
-              </Pressable>
-
-              {/* Camera Shutter - HOLD ONLY for auto-level capture */}
-              <Pressable
-                onPressIn={() => {
-                  setIsHoldingShutter(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                }}
-                onPressOut={() => setIsHoldingShutter(false)}
-                disabled={isCapturing}
+            {/* Crosshairs overlay - center of screen */}
+            <View 
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: 100,
+                height: 100,
+                marginLeft: -50,
+                marginTop: -50,
+              }}
+              pointerEvents="none"
+            >
+              {/* Horizontal line - color reactive */}
+              <View
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
-                  backgroundColor: 'white',
-                  borderWidth: 4,
-                  borderColor: isHoldingShutter 
-                    ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.9)' : 'rgba(239, 83, 80, 0.9)')
-                    : '#D1D5DB',
-                  justifyContent: 'center',
+                  position: 'absolute',
+                  top: 49,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  backgroundColor: alignmentStatus === 'good' 
+                    ? 'rgba(76, 175, 80, 0.9)' 
+                    : alignmentStatus === 'warning'
+                    ? 'rgba(255, 183, 77, 0.9)'
+                    : 'rgba(239, 83, 80, 0.9)',
+                }}
+              />
+              {/* Vertical line - color reactive */}
+              <View
+                style={{
+                  position: 'absolute',
+                  left: 49,
+                  top: 0,
+                  bottom: 0,
+                  width: 2,
+                  backgroundColor: alignmentStatus === 'good' 
+                    ? 'rgba(76, 175, 80, 0.9)' 
+                    : alignmentStatus === 'warning'
+                    ? 'rgba(255, 183, 77, 0.9)'
+                    : 'rgba(239, 83, 80, 0.9)',
+                }}
+              />
+              {/* Center dot */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 47,
+                  left: 47,
+                  width: 6,
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                }}
+              />
+              
+              {/* "Center object here" text below crosshairs with hint */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 110,
+                  left: -75,
+                  width: 250,
                   alignItems: 'center',
                 }}
               >
-                <View style={{ 
-                  width: 64, 
-                  height: 64, 
-                  borderRadius: 32, 
-                  backgroundColor: isHoldingShutter 
-                    ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.8)' : 'rgba(239, 83, 80, 0.8)')
-                    : 'white',
-                }} />
-              </Pressable>
-              
-              <Text className="text-white text-sm mt-4">
-                {isHoldingShutter 
-                  ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
-                  : 'Hold level to auto-capture'
-                }
-              </Text>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: 13,
+                    fontWeight: '600',
+                  }}
+                >
+                  Center object here
+                </Text>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontSize: 11,
+                    fontStyle: 'italic',
+                    marginTop: 2,
+                  }}
+                >
+                  (place coin in the middle)
+                </Text>
+              </View>
             </View>
-          </View>
-        </CameraView>
+
+            {/* Bottom controls */}
+            <View 
+              className="absolute bottom-0 left-0 right-0 z-10"
+              style={{ paddingBottom: insets.bottom + 32 }}
+            >
+              <View className="items-center">
+                {/* Photo Library Button */}
+                <Pressable
+                  onPress={pickImage}
+                  className="absolute left-8 bottom-0 w-14 h-14 rounded-full bg-gray-800/80 items-center justify-center"
+                  style={{ marginBottom: 3 }}
+                >
+                  <Ionicons name="images-outline" size={28} color="white" />
+                </Pressable>
+
+                {/* Camera Shutter - HOLD ONLY for auto-level capture */}
+                <Pressable
+                  onPressIn={() => {
+                    setIsHoldingShutter(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }}
+                  onPressOut={() => setIsHoldingShutter(false)}
+                  disabled={isCapturing}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    backgroundColor: 'white',
+                    borderWidth: 4,
+                    borderColor: isHoldingShutter 
+                      ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.9)' : 'rgba(239, 83, 80, 0.9)')
+                      : '#D1D5DB',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <View style={{ 
+                    width: 64, 
+                    height: 64, 
+                    borderRadius: 32, 
+                    backgroundColor: isHoldingShutter 
+                      ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.8)' : 'rgba(239, 83, 80, 0.8)')
+                      : 'white',
+                  }} />
+                </Pressable>
+                
+                <Text className="text-white text-sm mt-4">
+                  {isHoldingShutter 
+                    ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
+                    : 'Hold level to auto-capture'
+                  }
+                </Text>
+              </View>
+            </View>
+          </CameraView>
+          
+          {/* Black overlay that fades out for smooth transition */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'black',
+                pointerEvents: 'none',
+              },
+              blackOverlayStyle,
+            ]}
+          />
+        </Animated.View>
         
-        {/* Black overlay that fades out for smooth transition */}
+        {/* UNIVERSAL BLACK TRANSITION OVERLAY - ABOVE EVERYTHING in camera mode */}
         <Animated.View
+          pointerEvents="none"
           style={[
             {
               position: 'absolute',
@@ -711,15 +721,15 @@ export default function MeasurementScreen() {
               right: 0,
               bottom: 0,
               backgroundColor: 'black',
-              pointerEvents: 'none',
+              zIndex: 999999,
             },
-            blackOverlayStyle,
+            transitionBlackOverlayStyle,
           ]}
         />
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-      </Animated.View>
+      </View>
     );
   }
 
@@ -805,24 +815,22 @@ export default function MeasurementScreen() {
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       
-      {/* FORCE BLACK Transition Overlay - only rendered during transitions */}
-      {isTransitioning && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'black',
-              zIndex: 999999,
-            },
-            transitionBlackOverlayStyle,
-          ]}
-        />
-      )}
+      {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'black',
+            zIndex: 999999,
+          },
+          transitionBlackOverlayStyle,
+        ]}
+      />
     </Animated.View>
   );
 }
