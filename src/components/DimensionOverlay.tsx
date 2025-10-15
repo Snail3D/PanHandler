@@ -2458,6 +2458,16 @@ export default function DimensionOverlay({
                 setCursorSpeed(cursorMoveSpeed);
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
+                // Cancel activation if moving too fast during hold phase
+                if (freehandActivating && cursorMoveSpeed > 1) { // More than 1 pixel per millisecond
+                  if (freehandActivationTimerRef.current) {
+                    clearTimeout(freehandActivationTimerRef.current);
+                    freehandActivationTimerRef.current = null;
+                  }
+                  // Don't cancel activation state yet - just reset the timer
+                  // This allows them to slow down and try again
+                }
+                
                 // If already drawing, add points to path
                 // IMPORTANT: Use cursor position (rawCursorX, rawCursorY), not finger position (pageX, pageY)
                 if (isDrawingFreehand) {
@@ -3358,7 +3368,12 @@ export default function DimensionOverlay({
           // Determine label based on state
           let label = 'Hold to start';
           if (freehandActivating) {
-            label = 'Hold...';
+            // Check if user is moving too fast during activation
+            if (cursorSpeed > 1) { // More than 1 pixel per millisecond
+              label = 'Slow down to draw';
+            } else {
+              label = 'Hold...';
+            }
           } else if (isDrawingFreehand) {
             label = 'Drawing';
           }
