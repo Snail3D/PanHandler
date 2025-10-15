@@ -294,7 +294,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     vibecodeLinkHue.value = withRepeat(
       withTiming(360, {
         duration: 30000, // 30 seconds for full color cycle - slow and inviting
-        easing: Easing.inOut(Easing.sine), // Smooth sine wave for gentle transitions
+        easing: Easing.inOut(Easing.ease), // Smooth transitions
       }),
       -1,
       false
@@ -304,7 +304,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     vibecodeLinkOpacity.value = withRepeat(
       withTiming(1, {
         duration: 3000, // 3 seconds to pulse up
-        easing: Easing.inOut(Easing.sine),
+        easing: Easing.inOut(Easing.ease),
       }),
       -1,
       true // Reverse for breathing effect
