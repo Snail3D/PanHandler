@@ -2272,6 +2272,27 @@ export default function DimensionOverlay({
               : 'Calibrated'
             }
           </Text>
+          {/* Show "Verbal scale" and "Locked in" when in map mode */}
+          {isMapMode && !stepBrothersMode && (
+            <View style={{ marginTop: 4, alignItems: 'center' }}>
+              <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.75)', 
+                fontSize: 8, 
+                fontWeight: '600',
+                letterSpacing: 0.3
+              }}>
+                Verbal scale
+              </Text>
+              <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.75)', 
+                fontSize: 8, 
+                fontWeight: '600',
+                letterSpacing: 0.3
+              }}>
+                Locked in
+              </Text>
+            </View>
+          )}
         </Pressable>
       )}
 
