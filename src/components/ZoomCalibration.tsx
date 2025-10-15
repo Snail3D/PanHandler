@@ -97,7 +97,9 @@ export default function ZoomCalibration({
 
   // Show pinch-zoom tutorial on first use
   useEffect(() => {
-    if (!hasSeenPinchTutorial) {
+    // TESTING: Always show tutorial (comment out first-time check)
+    // TODO: Uncomment the line below to only show on first use
+    // if (!hasSeenPinchTutorial) {
       setTimeout(() => {
         setShowTutorial(true);
         tutorialOpacity.value = withSpring(1, { damping: 20 });
@@ -124,12 +126,14 @@ export default function ZoomCalibration({
           tutorialOpacity.value = withSpring(0);
           setTimeout(() => {
             setShowTutorial(false);
-            setHasSeenPinchTutorial(true);
+            // TESTING: Comment out setHasSeenPinchTutorial so it shows every time
+            // TODO: Uncomment the line below to only show once
+            // setHasSeenPinchTutorial(true);
           }, 500);
         }, 3500);
       }, 800); // Delay so user sees the screen first
-    }
-  }, [hasSeenPinchTutorial]);
+    // }
+  }, []); // TESTING: Empty deps so it runs every time component mounts
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
