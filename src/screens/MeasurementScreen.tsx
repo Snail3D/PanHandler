@@ -21,111 +21,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
 
-// Smoke trail phrases - the chef's kiss entrance to the kingdom! ✨
-const SMOKE_PHRASES = [
-  "Now the fun begins...",
-  "Hold on tight, this is gonna get good",
-  "Enter the kingdom of precision",
-  "Where magic meets mathematics",
-  "Time to measure the unmeasurable",
-  "The universe in your hands",
-  "Every pixel tells a story",
-  "Prepare for pixel perfection",
-  "Your reality, now quantified",
-  "Measure twice, cut once... or just measure perfectly",
-  "The ancient art of knowing exactly",
-  "Science has never looked this good",
-  "Welcome to the measurement multiverse",
-  "Calibrating your superpowers",
-  "Physics, but make it fashion",
-  "This is where the magic happens",
-  "Loading infinite precision...",
-  "Activating measurement mode",
-  "Your pocket dimension meter",
-  "Reality check: initializing",
-  "Quantum measuring in progress",
-  "The numbers don't lie",
-  "Precision is our love language",
-  "Measuring the immeasurable",
-  "Your personal reality scanner",
-  "Welcome to dimension central",
-  "Where accuracy meets artistry",
-  "The measurement awakens",
-  "Initializing pixel sorcery",
-  "Your guide to the measurable world",
-  "Precision: activated",
-  "The art of exact",
-  "Calibrated for excellence",
-  "Your reality ruler awaits",
-  "Measurements loading...",
-  "Prepare for perfection",
-  "The dimension whisperer",
-  "Your precision portal",
-  "Measuring reality itself",
-  "The calibration sensation",
-  "Where math becomes magic",
-  "Your digital measuring tape",
-  "Accuracy unlocked",
-  "The measurement matrix",
-  "Precision mode: engaged",
-  "Your personal meter reader",
-  "Welcome to measure island",
-  "The exactitude experience",
-  "Calculating the calculable",
-  "Your measurement manifesto",
-  "The precision palace",
-  "Where numbers come alive",
-  "Your digital dimension decoder",
-  "Measuring the measurable",
-  "The calibration chronicles",
-  "Your accuracy architect",
-  "The measurement maestro",
-  "Precision at your fingertips",
-  "Your digital distance detector",
-  "The dimension detective",
-  "Where reality gets real",
-  "Your measurement muse",
-  "The precision prophet",
-  "Accuracy awaits",
-  "Your digital divining rod",
-  "The measurement mystic",
-  "Where precision prevails",
-  "Your reality calculator",
-  "The dimension doctor",
-  "Measuring with meaning",
-  "Your precision partner",
-  "The calibration captain",
-  "Where math meets reality",
-  "Your measurement mentor",
-  "The accuracy alchemist",
-  "Precision personified",
-  "Your digital dimension guide",
-  "The measurement magician",
-  "Where numbers tell tales",
-  "Your precision pilot",
-  "The calibration connoisseur",
-  "Reality refined",
-  "Your measurement maestro",
-  "The dimension dynamo",
-  "Where accuracy reigns",
-  "Your precision producer",
-  "The measurement monarch",
-  "Calibrating consciousness",
-  "Your reality renderer",
-  "The dimension dealer",
-  "Where precision meets passion",
-  "Your accuracy advisor",
-  "The measurement master",
-  "Precision perfected",
-  "Your digital dimension diver",
-  "The calibration crusader",
-  "Where reality resonates",
-  "Your measurement mage",
-  "The precision pioneer",
-  "Accuracy amplified",
-  "Your dimension diplomat",
-];
-
 export default function MeasurementScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
@@ -138,7 +33,6 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
-  const [smokeText, setSmokeText] = useState(""); // Current smoke phrase
   
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(0);
@@ -149,10 +43,6 @@ export default function MeasurementScreen() {
   const screenScale = useSharedValue(1); // For liquid morphing effect
   const screenBlur = useSharedValue(0); // For water-like blur during transition
   const transitionBlackOverlay = useSharedValue(0); // FORCE black overlay for ALL transitions
-  
-  // Smoke trail text animation
-  const smokeOpacity = useSharedValue(0);
-  const smokeTranslateY = useSharedValue(0);
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -180,36 +70,6 @@ export default function MeasurementScreen() {
   const setCoinCircle = useStore((s) => s.setCoinCircle);
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
   
-  // Helper to show smoke trail text during transitions
-  const showSmokeText = () => {
-    // Pick a random phrase
-    const randomPhrase = SMOKE_PHRASES[Math.floor(Math.random() * SMOKE_PHRASES.length)];
-    setSmokeText(randomPhrase);
-    
-    // Smoke animation: fade in + float up slowly, then fade out
-    smokeOpacity.value = 0;
-    smokeTranslateY.value = 0;
-    
-    // Fade in slower for dramatic effect
-    smokeOpacity.value = withTiming(1, {
-      duration: 800, // Slower fade in
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-    });
-    // Float up MORE and SLOWER for smoky effect
-    smokeTranslateY.value = withTiming(-30, {
-      duration: 2800, // Longer float
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-    });
-    
-    // Stay visible longer (1.5s at peak), then fade out
-    setTimeout(() => {
-      smokeOpacity.value = withTiming(0, {
-        duration: 1000, // Slower fade out
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-      });
-    }, 1700); // Wait longer before fading
-  };
-  
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
     setIsTransitioning(true); // Lock out interactions
@@ -235,7 +95,7 @@ export default function MeasurementScreen() {
         setTimeout(() => setIsTransitioning(false), 1800);
       } else {
         // For non-camera modes, morph in from black (1.5 seconds in)
-        // Wait a bit longer for mode switch before morphing to prevent snap
+        // Wait longer for mode switch and render to prevent snap
         setTimeout(() => {
           screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
           screenScale.value = withTiming(1, { // Settle to normal scale
@@ -247,7 +107,7 @@ export default function MeasurementScreen() {
             duration: delay,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
-        }, 100); // Longer delay for React render (was 50ms)
+        }, 200); // Increased to 200ms for full render (was 100ms)
         
         // Unlock AFTER transition fully completes + buffer time + gesture queue clear
         setTimeout(() => {
@@ -256,7 +116,7 @@ export default function MeasurementScreen() {
           requestAnimationFrame(() => {
             setIsTransitioning(false);
           });
-        }, delay + 300); // Extra buffer (was 250ms)
+        }, delay + 400); // Extra buffer (was 300ms)
       }
     }, delay);
   };
@@ -482,11 +342,6 @@ export default function MeasurementScreen() {
     opacity: transitionBlackOverlay.value,
   }));
 
-  const smokeTextStyle = useAnimatedStyle(() => ({
-    opacity: smokeOpacity.value,
-    transform: [{ translateY: smokeTranslateY.value }],
-  }));
-
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center bg-black">
@@ -551,57 +406,46 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth 3 SECOND epic fade to black for smoke effect, then to calibration screen
-        setIsTransitioning(true); // Lock out interactions
-        const fadeOutDuration = 1500; // 1.5s fade to black
-        const smokeDisplayTime = 3000; // 3s total before switching modes
-        const fadeInDuration = 1500; // 1.5s fade in from black
-        
-        transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay - fast!
+        // Smooth 1.5s fade to black, then to calibration screen
+        setIsTransitioning(true);
+        transitionBlackOverlay.value = withTiming(1, {
           duration: 1050, // 70% of 1500ms - cover screen quickly
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         cameraOpacity.value = withTiming(0, {
-          duration: fadeOutDuration,
+          duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(1, {
-          duration: fadeOutDuration,
+          duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         
-        // Show smoke text at peak darkness (after 1050ms when black covers screen)
-        setTimeout(() => {
-          showSmokeText();
-        }, 1050);
-        
-        // Wait 3 SECONDS for smoke to display, then switch mode and fade in with morph
+        // Wait 1.5s for fade to black, then switch mode and fade in
         setTimeout(() => {
           setMode('zoomCalibrate');
           
-          // Wait a tiny bit for mode switch to complete before morphing in
+          // Wait for mode switch before morphing in
           setTimeout(() => {
-            // Only morph scale - black overlay handles the fade
-            screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
-            screenScale.value = withTiming(1, { // Settle to normal
-              duration: fadeInDuration,
+            screenScale.value = 1.10; // Start scaled up
+            screenScale.value = withTiming(1, {
+              duration: 1500,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
-            transitionBlackOverlay.value = withTiming(0, { // Fade out black overlay
-              duration: fadeInDuration,
+            transitionBlackOverlay.value = withTiming(0, {
+              duration: 1500,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
-          }, 50); // Small delay to let React render new mode
+          }, 50);
           
-          // Unlock AFTER transition fully completes + buffer + gesture clear
+          // Unlock after transition
           setTimeout(() => {
-            transitionBlackOverlay.value = 0; // Force to 0
-            // Use requestAnimationFrame to ensure gesture queue is cleared
+            transitionBlackOverlay.value = 0;
             requestAnimationFrame(() => {
               setIsTransitioning(false);
             });
-          }, fadeInDuration + 250); // Extra 200ms buffer
-        }, smokeDisplayTime);
+          }, 1750);
+        }, 1500);
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -893,42 +737,6 @@ export default function MeasurementScreen() {
           ]}
         />
         
-        {/* Smoke Trail Text - The Chef's Kiss ✨ */}
-        {smokeText && (
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              {
-                position: 'absolute',
-                top: '45%',
-                left: 0,
-                right: 0,
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 9999999, // Above black overlay
-              },
-              smokeTextStyle,
-            ]}
-          >
-            <Text
-              style={{
-                color: 'rgba(255, 255, 255, 0.9)', // Very bright white
-                fontSize: 22, // BIGGER!
-                fontWeight: '300', // Lighter weight = more ethereal
-                fontStyle: 'italic',
-                textAlign: 'center',
-                paddingHorizontal: 40,
-                letterSpacing: 1, // Spread out for smoky feel
-                textShadowColor: 'rgba(76, 175, 80, 0.8)', // Stronger green glow
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 20, // Bigger bloom = smokier
-              }}
-            >
-              {smokeText}
-            </Text>
-          </Animated.View>
-        )}
-        
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       </View>
@@ -1016,42 +824,6 @@ export default function MeasurementScreen() {
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-      
-      {/* Smoke Trail Text - The Chef's Kiss ✨ */}
-      {smokeText && (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              top: '45%',
-              left: 0,
-              right: 0,
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 9999999, // Above black overlay
-            },
-            smokeTextStyle,
-          ]}
-        >
-          <Text
-            style={{
-              color: 'rgba(255, 255, 255, 0.9)', // Very bright white
-              fontSize: 22, // BIGGER!
-              fontWeight: '300', // Lighter weight = more ethereal
-              fontStyle: 'italic',
-              textAlign: 'center',
-              paddingHorizontal: 40,
-              letterSpacing: 1, // Spread out for smoky feel
-              textShadowColor: 'rgba(76, 175, 80, 0.8)', // Stronger green glow
-              textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 20, // Bigger bloom = smokier
-            }}
-          >
-            {smokeText}
-          </Text>
-        </Animated.View>
-      )}
       
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
