@@ -389,10 +389,10 @@ export default function DimensionOverlay({
     }
   }, [mode]);
 
-  // Show pan tutorial on first load after calibration (TESTING: Always show)
+  // Show pan tutorial on first load after calibration (only once!)
   useEffect(() => {
-    // TESTING: Always show tutorial
-    // TODO: Uncomment to only show first time: if (!hasSeenPanTutorial) {
+    // Only show if user hasn't seen it before
+    if (!hasSeenPanTutorial) {
       // Show tutorial after a brief delay
       const timer = setTimeout(() => {
         // Record starting position when tutorial appears
@@ -406,8 +406,8 @@ export default function DimensionOverlay({
       }, 500);
       
       return () => clearTimeout(timer);
-    // }
-  }, []); // TESTING: Empty deps so it shows every time
+    }
+  }, []); // Only run once on mount
 
   // Detect panning/measuring/zooming/rotating and fade out tutorial - CINEMATIC
   useEffect(() => {
@@ -423,7 +423,7 @@ export default function DimensionOverlay({
       });
       setTimeout(() => {
         isDismissing.current = false; // Reset for next time
-        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+        setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
       return;
     }
@@ -451,7 +451,7 @@ export default function DimensionOverlay({
       
       setTimeout(() => {
         isDismissing.current = false; // Reset for next time
-        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+        setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
     }
   }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
