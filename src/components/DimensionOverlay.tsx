@@ -252,7 +252,7 @@ export default function DimensionOverlay({
         setMeasurementMode(true);
         setShowCursor(true);
         setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
-        Haptics.impactAsync(Haptics.ImpactFeedbackType.Medium);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       };
       onRegisterDoubleTapCallback(switchToMeasureMode);
     }
@@ -2205,8 +2205,9 @@ export default function DimensionOverlay({
       {coinCircle && !showLockedInAnimation && (
         <Pressable
           onPress={handleCalibratedTap}
-          className="absolute z-20"
           style={{
+            position: 'absolute',
+            zIndex: 20,
             top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
             right: 16,
             backgroundColor: stepBrothersMode ? 'rgba(59, 130, 246, 0.95)' : 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
@@ -2457,8 +2458,8 @@ export default function DimensionOverlay({
                       Math.pow(imageY - lastPoint.y, 2)
                     );
                     
-                    // Minimum distance: 2 image pixels (zoom independent)
-                    if (distance > 2) {
+                    // Minimum distance: 0.5 image pixels for smooth, fluid lines
+                    if (distance > 0.5) {
                       // LASSO SNAP: Check if we're close to the starting point (to close the loop)
                       if (prevPath.length >= 10) { // Need at least 10 points to make a meaningful loop
                         const firstPoint = prevPath[0];
@@ -4243,7 +4244,7 @@ export default function DimensionOverlay({
                 }}
                 pointerEvents="none"
               >
-                <Text className="text-white font-bold text-base">
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
                   {value}
                 </Text>
               </View>
@@ -4483,10 +4484,13 @@ export default function DimensionOverlay({
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
           <Animated.View
-            className="absolute left-0 right-0 z-20"
             pointerEvents="box-none"
             style={[
               { 
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                zIndex: 20,
                 bottom: insets.bottom + 16,
                 paddingHorizontal: 24,
               },
@@ -4603,7 +4607,7 @@ export default function DimensionOverlay({
                 </View>
 
           {/* Mode Toggle: Edit/Move vs Measure */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+          <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
                 setMeasurementMode(false);
@@ -4619,7 +4623,7 @@ export default function DimensionOverlay({
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
                   size={14} 
@@ -4650,7 +4654,7 @@ export default function DimensionOverlay({
                 backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name="create-outline" 
                   size={14} 
@@ -4671,7 +4675,7 @@ export default function DimensionOverlay({
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <GestureDetector gesture={modeSwitchGesture}>
             <Animated.View style={[{ marginBottom: 8 }, modeSwipeAnimatedStyle]}>
-              <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={() => {
@@ -4946,9 +4950,9 @@ export default function DimensionOverlay({
           </GestureDetector>
 
           {/* Unit System and Map Mode Row */}
-          <View className="flex-row mb-2" style={{ gap: 6 }}>
+          <View style={{ flexDirection: 'row', marginBottom: 8, gap: 6 }}>
             {/* Unit System Toggle: Metric vs Imperial - Compact */}
-            <View className="flex-row" style={{ flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
               <Pressable
                 onPress={() => {
                   setUnitSystem('metric');
@@ -4961,7 +4965,7 @@ export default function DimensionOverlay({
                   backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
-                <View className="flex-row items-center justify-center">
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
                     fontSize: 10,
@@ -4983,7 +4987,7 @@ export default function DimensionOverlay({
                   backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
-                <View className="flex-row items-center justify-center">
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
                     fontSize: 10,
@@ -5028,7 +5032,7 @@ export default function DimensionOverlay({
                 paddingHorizontal: 8,
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Map icon - folded map with panels */}
                 <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
                   {/* Three vertical panels of a folded map */}
@@ -5068,8 +5072,18 @@ export default function DimensionOverlay({
           {/* Tip */}
           {/* Helper instructions - always show based on mode */}
           {currentPoints.length === 0 && (
-            <View className={`${measurementMode ? 'bg-green-50' : selectedMeasurementId ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
-              <Text className={`${measurementMode ? 'text-green-800' : selectedMeasurementId ? 'text-purple-800' : 'text-blue-800'} text-xs text-center`}>
+            <View style={{ 
+              backgroundColor: measurementMode ? 'rgba(240, 253, 244, 1)' : selectedMeasurementId ? 'rgba(250, 245, 255, 1)' : 'rgba(239, 246, 255, 1)',
+              borderRadius: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              marginBottom: 12
+            }}>
+              <Text style={{ 
+                color: measurementMode ? 'rgba(22, 101, 52, 1)' : selectedMeasurementId ? 'rgba(107, 33, 168, 1)' : 'rgba(30, 64, 175, 1)',
+                fontSize: 12,
+                textAlign: 'center'
+              }}>
                 {measurementMode 
                   ? mode === 'circle' 
                     ? '⭕ Tap center, then tap edge of circle'
@@ -5110,8 +5124,8 @@ export default function DimensionOverlay({
           
           {/* Locked notice */}
           {isPanZoomLocked && (
-            <View className="bg-amber-50 rounded-lg px-3 py-2 mb-3">
-              <Text className="text-amber-800 text-xs text-center">
+            <View style={{ backgroundColor: 'rgba(254, 243, 199, 1)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12 }}>
+              <Text style={{ color: 'rgba(146, 64, 14, 1)', fontSize: 12, textAlign: 'center' }}>
                 🔒 Pan/zoom locked • Remove all measurements to unlock
               </Text>
             </View>
@@ -6075,7 +6089,7 @@ export default function DimensionOverlay({
           if (alertConfig.onConfirm) alertConfig.onConfirm();
           closeAlert();
         }}
-        onDismiss={closeAlert}
+        onClose={closeAlert}
       />
     </>
   );
