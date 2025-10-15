@@ -345,8 +345,8 @@ export default function ZoomCalibration({
         style={{
           position: 'absolute',
           top: insets.top + 20,
-          left: 20,
-          right: 20,
+          left: SCREEN_WIDTH * 0.15, // 30% narrower (15% on each side)
+          right: SCREEN_WIDTH * 0.15,
         }}
         pointerEvents="box-none"
       >
@@ -541,11 +541,11 @@ export default function ZoomCalibration({
       {/* Help button - top-left, moved in 20% from corner */}
       {onHelp && (
         <View
-          style={{
-            position: 'absolute',
-            top: insets.top + 28, // Moved down from 20
-            left: 28, // Moved right from 20
-          }}
+        style={{
+          position: 'absolute',
+          top: insets.top + 28,
+          left: SCREEN_WIDTH * 0.15 + 8, // Align with coin selector + small offset
+        }}
         >
           <BlurView
             intensity={30}
@@ -584,8 +584,8 @@ export default function ZoomCalibration({
           style={{
             position: 'absolute',
             bottom: insets.bottom + 80, // Raised 10% higher (was 40, now 80)
-            left: 20,
-            right: 20,
+            left: SCREEN_WIDTH * 0.15, // Narrower, matches coin selector
+            right: SCREEN_WIDTH * 0.15,
           }}
         >
           {/* LOCK IN Button - centered, dynamic color, HUGE */}
@@ -617,9 +617,9 @@ export default function ZoomCalibration({
               <Text style={{ 
                 color: '#FFFFFF', 
                 fontWeight: '900', 
-                fontSize: 32,
+                fontSize: 38,
                 textAlign: 'center',
-                letterSpacing: 2,
+                letterSpacing: 2.5,
                 textShadowColor: 'rgba(0, 0, 0, 0.3)',
                 textShadowOffset: { width: 0, height: 2 },
                 textShadowRadius: 4,
