@@ -5142,11 +5142,11 @@ export default function DimensionOverlay({
             {/* New Photo button - always visible in the same row */}
             <Pressable
               onPress={() => {
-                // Small delay to ensure any active gestures are fully released
-                // This prevents sticky button behavior after panning
-                requestAnimationFrame(() => {
+                // Longer delay to ensure gestures are fully released
+                // requestAnimationFrame wasn't enough, use 100ms timeout
+                setTimeout(() => {
                   handleReset();
-                });
+                }, 100);
               }}
               style={{
                 flex: 1,

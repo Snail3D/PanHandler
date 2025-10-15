@@ -868,7 +868,33 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => smoothTransitionToMode('camera', 750)} // Half duration = 750ms
+                  onReset={() => {
+                    // Simple transition to camera - no complex animations
+                    setIsTransitioning(true);
+                    
+                    // Fast fade to black
+                    transitionBlackOverlay.value = withTiming(1, {
+                      duration: 300, // Quick fade out
+                      easing: Easing.in(Easing.ease),
+                    });
+                    
+                    // After black screen, switch to camera and clear state
+                    setTimeout(() => {
+                      setMode('camera');
+                      
+                      // Clear image state so camera shows up
+                      setImageUri(null);
+                      setCoinCircle(null);
+                      setCalibration(null);
+                      setImageOrientation(null);
+                      setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                      
+                      // Camera's useEffect will handle the fade in
+                      setTimeout(() => {
+                        setIsTransitioning(false);
+                      }, 1800); // Wait for camera fade in
+                    }, 300); // Wait for black fade to complete
+                  }}
                 />
               </View>
             </View>
