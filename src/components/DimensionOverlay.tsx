@@ -561,7 +561,7 @@ export default function DimensionOverlay({
     }
   };
   
-  // Easter egg: AUTO LEVEL badge tap handler
+  // Easter egg: AUTO LEVEL badge tap handler - WITH HAPTIC RICKROLL! 🎵
   const handleAutoLevelTap = () => {
     // Clear existing timeout
     if (autoLevelTapTimeoutRef.current) {
@@ -572,16 +572,46 @@ export default function DimensionOverlay({
     setAutoLevelTapCount(newCount);
     
     if (newCount >= 7) {
-      // Activate Easter egg!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // HAPTIC RICKROLL SEQUENCE! 🎵
+      // Mimics the iconic rhythm and feel of that famous song
       setAutoLevelTapCount(0);
       
-      // Open YouTube video with autoplay
-      const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
-      Linking.openURL(youtubeUrl).catch(err => {
-        showAlert('Error', 'Could not open video', 'error');
-        console.error('Failed to open URL:', err);
-      });
+      // Intro beats (iconic piano notes)
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 400);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 550);
+      
+      // First phrase rhythm (4 beats)
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 800);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1000);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1200);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 1350);
+      
+      // Second phrase rhythm (4 beats)
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1600);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1800);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 1950);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2100);
+      
+      // Third phrase rhythm (4 beats)
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2400);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2600);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2800);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 2950);
+      
+      // Final beat + SUCCESS!
+      setTimeout(() => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        
+        // NOW open the video! 😂
+        const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
+        Linking.openURL(youtubeUrl).catch(err => {
+          showAlert('Error', 'Could not open video', 'error');
+          console.error('Failed to open URL:', err);
+        });
+      }, 3200);
+      
     } else {
       // Reset counter after 2 seconds of no taps
       autoLevelTapTimeoutRef.current = setTimeout(() => {
