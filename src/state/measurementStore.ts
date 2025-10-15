@@ -90,6 +90,8 @@ interface MeasurementStore {
   setUserEmail: (email: string | null) => void;
   setIsProUser: (isPro: boolean) => void;
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
+  setHasSeenPinchTutorial: (hasSeen: boolean) => void;
+  setHasSeenPanTutorial: (hasSeen: boolean) => void;
 }
 
 const useStore = create<MeasurementStore>()(
@@ -115,6 +117,8 @@ const useStore = create<MeasurementStore>()(
       hasReviewedApp: false,
       lastReviewPromptDate: null,
       globalDownloads: 1247,
+      hasSeenPinchTutorial: false,
+      hasSeenPanTutorial: false,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -195,6 +199,10 @@ const useStore = create<MeasurementStore>()(
       setIsProUser: (isPro: boolean) => set({ isProUser: isPro }),
 
       setSavedZoomState: (zoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => set({ savedZoomState: zoomState }),
+      
+      setHasSeenPinchTutorial: (hasSeen: boolean) => set({ hasSeenPinchTutorial: hasSeen }),
+      
+      setHasSeenPanTutorial: (hasSeen: boolean) => set({ hasSeenPanTutorial: hasSeen }),
     }),
     {
       name: 'measurement-settings',
