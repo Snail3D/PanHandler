@@ -93,6 +93,14 @@ export default function MeasurementScreen() {
       // If transitioning TO camera, let camera handle its own fade
       if (newMode === 'camera') {
         screenScale.value = 1; // Reset scale for camera
+        
+        // Clear image state so camera shows up
+        setImageUri(null);
+        setCoinCircle(null);
+        setCalibration(null);
+        setImageOrientation(null);
+        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+        
         // Camera's useEffect will clear transitionBlackOverlay and handle fade-in
         // Unlock after camera's fade completes (300ms delay + 1500ms fade)
         setTimeout(() => setIsTransitioning(false), 1800);
@@ -421,22 +429,22 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth 1.5s fade to black, then to calibration screen
+        // Fast fade to black, then to calibration screen (half speed = 750ms)
         setIsTransitioning(true);
         transitionBlackOverlay.value = withTiming(1, {
-          duration: 1050, // 70% of 1500ms - cover screen quickly
+          duration: 525, // 70% of 750ms - cover screen quickly
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         cameraOpacity.value = withTiming(0, {
-          duration: 1500,
+          duration: 750,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(1, {
-          duration: 1500,
+          duration: 750,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         
-        // Wait 1.5s for fade to black, then switch mode and fade in
+        // Wait 750ms for fade to black, then switch mode and fade in
         setTimeout(() => {
           setMode('zoomCalibrate');
           
@@ -444,11 +452,11 @@ export default function MeasurementScreen() {
           setTimeout(() => {
             screenScale.value = 1.10; // Start scaled up
             screenScale.value = withTiming(1, {
-              duration: 1500,
+              duration: 750,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
             transitionBlackOverlay.value = withTiming(0, {
-              duration: 1500,
+              duration: 750,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
           }, 50);
@@ -459,8 +467,8 @@ export default function MeasurementScreen() {
             requestAnimationFrame(() => {
               setIsTransitioning(false);
             });
-          }, 1750);
-        }, 1500);
+          }, 875);
+        }, 750);
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -860,15 +868,7 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => {
-                    // Clear all state before transitioning to camera
-                    setImageUri(null);
-                    setCoinCircle(null);
-                    setCalibration(null);
-                    setImageOrientation(null);
-                    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                    smoothTransitionToMode('camera', 750); // Half duration = 750ms
-                  }}
+                  onReset={() => smoothTransitionToMode('camera', 750)} // Half duration = 750ms
                 />
               </View>
             </View>
