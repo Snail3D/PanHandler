@@ -145,8 +145,11 @@ export default function DimensionOverlay({
   const [showPanTutorial, setShowPanTutorial] = useState(false);
   const panTutorialOpacity = useSharedValue(0);
   const panTutorialScale = useSharedValue(1); // For zoom-responsive scaling
+  const panTutorialTranslateX = useSharedValue(0); // Track horizontal movement
+  const panTutorialTranslateY = useSharedValue(0); // Track vertical movement
   const lastPanPosition = useRef({ x: zoomTranslateX, y: zoomTranslateY });
   const lastZoomScale = useRef(zoomScale);
+  const lastRotation = useRef(zoomRotation); // Track rotation too!
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
@@ -370,7 +373,11 @@ export default function DimensionOverlay({
   // Animated style for pan tutorial with zoom-responsive scaling
   const panTutorialAnimatedStyle = useAnimatedStyle(() => ({
     opacity: panTutorialOpacity.value,
-    transform: [{ scale: panTutorialScale.value }],
+    transform: [
+      { translateX: panTutorialTranslateX.value },
+      { translateY: panTutorialTranslateY.value },
+      { scale: panTutorialScale.value },
+    ],
   }));
   
   // Show inspirational quote overlay
@@ -399,74 +406,98 @@ export default function DimensionOverlay({
     // }
   }, []); // TESTING: Empty deps so it shows every time
 
-  // Detect panning/measuring/zooming and fade out tutorial with scaling effect
+  // Detect panning/measuring/zooming/rotating and slide tutorial off-screen
   useEffect(() => {
     if (!showPanTutorial) return;
     
     // Dismiss if user switches to measure mode
     if (measurementMode) {
+      // Slide down and fade
+      panTutorialTranslateY.value = withSpring(200, { damping: 20, stiffness: 100 });
       panTutorialOpacity.value = withSpring(0, { damping: 20 });
-      panTutorialScale.value = withSpring(1, { damping: 20 });
       setTimeout(() => {
         setShowPanTutorial(false);
-        // TESTING: Comment out so it shows again
+        panTutorialTranslateX.value = 0;
+        panTutorialTranslateY.value = 0;
         // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-      }, 500);
+      }, 600);
       return;
     }
     
-    const deltaX = Math.abs(zoomTranslateX - lastPanPosition.current.x);
-    const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
+    // Calculate deltas
+    const deltaX = zoomTranslateX - lastPanPosition.current.x;
+    const deltaY = zoomTranslateY - lastPanPosition.current.y;
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    // Check for zooming - more sensitive and immediate
     const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
+    const rotationDelta = Math.abs(zoomRotation - lastRotation.current);
     
-    // Calculate scale based on zoom (zoom in = scale up, zoom out = scale down)
-    const zoomFactor = zoomScale / lastZoomScale.current;
+    // ANY gesture detected? Make tutorial follow the movement IMMEDIATELY
+    const anyGesture = totalMovement > 5 || zoomDelta > 0.01 || rotationDelta > 0.5;
     
-    // Apply zoom-responsive scaling IMMEDIATELY when zoom changes
-    if (zoomDelta > 0.01) { // More sensitive threshold
-      // Map zoom factor to tutorial scale (1.0 = no change, >1 = bigger, <1 = smaller)
-      const newScale = Math.max(0.6, Math.min(1.4, 0.8 + (zoomFactor * 0.4)));
-      const fadeAmount = Math.abs(zoomFactor - 1) * 2; // Fade based on zoom distance from 1.0
-      const newOpacity = Math.max(0.2, 1 - fadeAmount); // Keep visible longer
+    if (anyGesture) {
+      // Tutorial follows the pan direction (inverted - moves with the gesture)
+      const followX = deltaX * 0.3; // Follow 30% of pan movement
+      const followY = deltaY * 0.3;
       
-      panTutorialScale.value = withSpring(newScale, { damping: 12, stiffness: 150 });
-      panTutorialOpacity.value = withSpring(newOpacity, { damping: 12, stiffness: 100 });
+      panTutorialTranslateX.value = withSpring(followX, { damping: 8, stiffness: 120 });
+      panTutorialTranslateY.value = withSpring(followY, { damping: 8, stiffness: 120 });
+      
+      // Scale based on zoom
+      const zoomFactor = zoomScale / lastZoomScale.current;
+      const newScale = Math.max(0.7, Math.min(1.3, 0.85 + (zoomFactor * 0.3)));
+      panTutorialScale.value = withSpring(newScale, { damping: 10, stiffness: 130 });
+      
+      // Fade as user commits to gesture
+      const fadeAmount = Math.min(1, (totalMovement / 50) + (zoomDelta * 5) + (rotationDelta / 10));
+      const newOpacity = Math.max(0, 1 - fadeAmount);
+      panTutorialOpacity.value = withSpring(newOpacity, { damping: 10, stiffness: 100 });
     }
     
-    // Dismiss on significant zoom (>20% change from baseline)
-    if (zoomDelta > 0.2) {
-      panTutorialOpacity.value = withSpring(0, { damping: 20 });
-      panTutorialScale.value = withSpring(1, { damping: 20 });
+    // DISMISS CONDITIONS: Committed gesture detected
+    const shouldDismiss = 
+      totalMovement > 40 ||        // Panned significantly
+      zoomDelta > 0.15 ||          // Zoomed significantly  
+      rotationDelta > 5;           // Rotated significantly
+    
+    if (shouldDismiss) {
+      // Calculate slide-off direction based on gesture
+      let slideX = 0;
+      let slideY = 0;
+      
+      if (totalMovement > 40) {
+        // Slide in direction of pan
+        slideX = deltaX > 0 ? 400 : -400;
+        slideY = deltaY > 0 ? 400 : -400;
+      } else if (zoomDelta > 0.15) {
+        // Zoom: slide down
+        slideY = 300;
+      } else if (rotationDelta > 5) {
+        // Rotation: spiral out (down-right)
+        slideX = 300;
+        slideY = 300;
+      }
+      
+      // Smooth slide off screen
+      panTutorialTranslateX.value = withSpring(slideX, { damping: 18, stiffness: 90 });
+      panTutorialTranslateY.value = withSpring(slideY, { damping: 18, stiffness: 90 });
+      panTutorialOpacity.value = withSpring(0, { damping: 15, stiffness: 100 });
+      panTutorialScale.value = withSpring(0.6, { damping: 15, stiffness: 100 });
+      
       setTimeout(() => {
         setShowPanTutorial(false);
+        // Reset for next time
+        panTutorialTranslateX.value = 0;
+        panTutorialTranslateY.value = 0;
+        panTutorialScale.value = 1;
         // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-      }, 500);
-      lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
-      lastZoomScale.current = zoomScale;
-      return;
+      }, 700);
     }
     
-    // If user has panned more than 30px, fade out the tutorial
-    if (totalMovement > 30) {
-      panTutorialOpacity.value = withSpring(0, { damping: 20 });
-      panTutorialScale.value = withSpring(1, { damping: 20 });
-      setTimeout(() => {
-        setShowPanTutorial(false);
-        // TESTING: Comment out so it shows again
-        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-      }, 500);
-      lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
-      lastZoomScale.current = zoomScale;
-      return;
-    }
-    
-    // Update last position and zoom at the END
+    // Update last position, zoom, and rotation
     lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
     lastZoomScale.current = zoomScale;
-  }, [zoomTranslateX, zoomTranslateY, zoomScale, showPanTutorial, measurementMode]);
+    lastRotation.current = zoomRotation;
+  }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
 
   // Clear map scale when new photo is loaded
   useEffect(() => {
