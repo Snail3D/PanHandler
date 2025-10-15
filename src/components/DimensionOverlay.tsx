@@ -418,12 +418,13 @@ export default function DimensionOverlay({
     // Dismiss if user switches to measure mode
     if (measurementMode) {
       isDismissing.current = true;
-      setShowPanTutorial(false); // Remove from DOM immediately!
+      // Cinematic fade out
       panTutorialOpacity.value = withTiming(0, { 
         duration: 800,
         easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
       });
       setTimeout(() => {
+        setShowPanTutorial(false); // Remove from DOM after animation completes
         isDismissing.current = false; // Reset for next time
         setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
@@ -442,16 +443,15 @@ export default function DimensionOverlay({
     
     if (anyMovement) {
       isDismissing.current = true; // Lock it so we don't fire multiple times!
-      setShowPanTutorial(false); // Remove from DOM immediately - no blocking!
       
       // Cinematic fade - like entering a movie scene 🎬
-      // (opacity animation will complete even though component is removed)
       panTutorialOpacity.value = withTiming(0, { 
         duration: 800, // Longer, more graceful
         easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
       });
       
       setTimeout(() => {
+        setShowPanTutorial(false); // Remove from DOM after animation completes
         isDismissing.current = false; // Reset for next time
         setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
