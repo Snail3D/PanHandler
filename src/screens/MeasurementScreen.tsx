@@ -32,6 +32,7 @@ export default function MeasurementScreen() {
   const [imageOpacity, setImageOpacity] = useState(1); // For 50% opacity capture
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
+  const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
   
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(0);
@@ -71,6 +72,8 @@ export default function MeasurementScreen() {
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
+    setIsTransitioning(true); // Lock out interactions
+    
     // Bring up BLACK overlay while fading content (1.5 seconds out)
     transitionBlackOverlay.value = withTiming(1, {
       duration: delay,
@@ -99,6 +102,8 @@ export default function MeasurementScreen() {
           duration: delay,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
+        // Unlock after transition completes
+        setTimeout(() => setIsTransitioning(false), delay);
       } else {
         // For non-camera modes, fade in from black with liquid morph (1.5 seconds in)
         screenScale.value = 1.05; // Start slightly scaled up
@@ -115,6 +120,8 @@ export default function MeasurementScreen() {
           duration: delay,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
+        // Unlock after transition completes
+        setTimeout(() => setIsTransitioning(false), delay);
       }
     }, delay);
   };
@@ -403,6 +410,7 @@ export default function MeasurementScreen() {
         await detectOrientation(photo.uri);
         
         // Smooth 1.5s fade to black with liquid morph, then to calibration screen
+        setIsTransitioning(true); // Lock out interactions
         transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay
           duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -434,6 +442,8 @@ export default function MeasurementScreen() {
             duration: 1500,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
+          // Unlock after transition completes
+          setTimeout(() => setIsTransitioning(false), 1500);
         }, 1500);
       }
     } catch (error) {
@@ -795,22 +805,24 @@ export default function MeasurementScreen() {
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       
-      {/* FORCE BLACK Transition Overlay - covers EVERYTHING during mode changes */}
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'black',
-            zIndex: 999999,
-          },
-          transitionBlackOverlayStyle,
-        ]}
-      />
+      {/* FORCE BLACK Transition Overlay - only rendered during transitions */}
+      {isTransitioning && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'black',
+              zIndex: 999999,
+            },
+            transitionBlackOverlayStyle,
+          ]}
+        />
+      )}
     </Animated.View>
   );
 }
