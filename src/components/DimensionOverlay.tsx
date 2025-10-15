@@ -5902,10 +5902,11 @@ export default function DimensionOverlay({
           </Text>
 
           {/* Measurement Mode Icons - 15% BIGGER */}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 18 }}> {/* Was 16, now ~15% bigger (rounded) */}
+          {/* Was gap: 16, now 18 (~15% bigger rounded) */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 18 }}>
             {/* Box */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={32} height={32} viewBox="0 0 24 24"> {/* Was 28, now ~15% bigger (rounded) */}
+              <Svg width={32} height={32} viewBox="0 0 24 24">
                 <Rect x="4" y="4" width="16" height="16" stroke="white" strokeWidth="2" fill="none" />
               </Svg>
             </View>
