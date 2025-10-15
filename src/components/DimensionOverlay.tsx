@@ -1598,17 +1598,21 @@ export default function DimensionOverlay({
 
   // Recalculate all measurement values when unit system changes
   useEffect(() => {
+    console.log('🔍 Unit system effect triggered. unitSystem:', unitSystem, 'prev:', prevUnitSystemRef.current, 'measurements:', measurements.length);
+    
     // Don't run on mount or if no measurements exist
     if (measurements.length === 0) {
+      console.log('⏭️ Skipping: No measurements');
       return;
     }
     
     // Only recalculate if unit system actually changed
     if (prevUnitSystemRef.current === unitSystem) {
+      console.log('⏭️ Skipping: Unit system unchanged');
       return;
     }
     
-    console.log('🔄 Unit system changed, recalculating all measurements...');
+    console.log('🔄 Unit system changed from', prevUnitSystemRef.current, 'to', unitSystem, '- recalculating all measurements...');
     prevUnitSystemRef.current = unitSystem;
     
     const updatedMeasurements = measurements.map(m => {
@@ -4108,11 +4112,24 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                    {/* For closed freehand loops, show only perimeter on label (area is in legend) */}
-                    {measurement.mode === 'freehand' && measurement.perimeter
-                      ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
-                      : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
-                    }
+                    {showCalculatorWords ? getCalculatorWord(
+                      measurement.mode === 'freehand' && measurement.perimeter 
+                        ? measurement.perimeter 
+                        : measurement.value
+                    ) : (() => {
+                      // Recalculate display value based on current unit system - same logic as legend
+                      if (measurement.mode === 'distance') {
+                        return calculateDistance(measurement.points[0], measurement.points[1]);
+                      } else if (measurement.mode === 'angle') {
+                        return calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
+                      } else if (measurement.mode === 'freehand' && measurement.perimeter) {
+                        // For closed freehand, show perimeter on label
+                        return measurement.perimeter;
+                      } else {
+                        // For other modes (including open freehand), use stored value
+                        return measurement.value;
+                      }
+                    })()}
                   </Text>
                 </View>
               </View>
