@@ -39,6 +39,8 @@ export default function MeasurementScreen() {
   
   // Universal screen transition opacity for smooth mode changes
   const screenOpacity = useSharedValue(1);
+  const screenScale = useSharedValue(1); // For liquid morphing effect
+  const screenBlur = useSharedValue(0); // For water-like blur during transition
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -66,9 +68,14 @@ export default function MeasurementScreen() {
   const setCoinCircle = useStore((s) => s.setCoinCircle);
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
   
-  // Smooth mode transition helper - fade out, change mode, fade in
-  const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 300) => {
+  // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
+  const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 400) => {
+    // Fade to black with liquid morph effect
     screenOpacity.value = withTiming(0, {
+      duration: delay,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+    });
+    screenScale.value = withTiming(0.95, { // Slight scale down (water pulling in)
       duration: delay,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
@@ -82,7 +89,13 @@ export default function MeasurementScreen() {
         blackOverlayOpacity.value = 1;
       }
       
+      // Fade in from black with liquid morph (water flowing out)
+      screenScale.value = 1.05; // Start slightly scaled up
       screenOpacity.value = withTiming(1, {
+        duration: delay,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+      });
+      screenScale.value = withTiming(1, { // Settle to normal scale
         duration: delay,
         easing: Easing.bezier(0.4, 0.0, 0.2, 1),
       });
@@ -301,6 +314,7 @@ export default function MeasurementScreen() {
 
   const screenTransitionStyle = useAnimatedStyle(() => ({
     opacity: screenOpacity.value,
+    transform: [{ scale: screenScale.value }],
   }));
 
   if (!permission) {
@@ -367,7 +381,7 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth fade transition to black, then to calibration screen
+        // Smooth fade transition to black with liquid morph, then to calibration screen
         cameraOpacity.value = withTiming(0, {
           duration: 400,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -377,12 +391,17 @@ export default function MeasurementScreen() {
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         
-        // Wait for fade to black, then switch mode and fade in from black
+        // Wait for fade to black, then switch mode and fade in from black with morph
         setTimeout(() => {
           setMode('zoomCalibrate');
-          // Reset screenOpacity to 0, then fade in from black
+          // Reset screenOpacity and scale for liquid morph effect
           screenOpacity.value = 0;
+          screenScale.value = 1.05; // Start slightly scaled up (water flowing in)
           screenOpacity.value = withTiming(1, {
+            duration: 600,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
+          screenScale.value = withTiming(1, { // Settle to normal
             duration: 600,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
