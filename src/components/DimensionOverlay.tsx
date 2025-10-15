@@ -393,10 +393,13 @@ export default function DimensionOverlay({
     }
   }, [mode]);
 
-  // Show pan tutorial on first load after calibration (only once!)
+  // Show pan tutorial on first load for NEW photos (fresh session with no measurements)
   useEffect(() => {
-    // Only show if user hasn't seen it before
-    if (!hasSeenPanTutorial) {
+    // Only show for fresh photos (no measurements yet = new session)
+    // Don't show if user is returning to saved work with existing measurements
+    const isFreshPhoto = measurements.length === 0;
+    
+    if (isFreshPhoto) {
       // Show tutorial after a brief delay
       const timer = setTimeout(() => {
         // Record starting position when tutorial appears
@@ -428,7 +431,6 @@ export default function DimensionOverlay({
       setTimeout(() => {
         setShowPanTutorial(false); // Remove from DOM after animation completes
         isDismissing.current = false; // Reset for next time
-        setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
       return;
     }
@@ -455,7 +457,6 @@ export default function DimensionOverlay({
       setTimeout(() => {
         setShowPanTutorial(false); // Remove from DOM after animation completes
         isDismissing.current = false; // Reset for next time
-        setHasSeenPanTutorial(true); // Mark as seen so it doesn't show again!
       }, 800);
     }
   }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
