@@ -2234,7 +2234,7 @@ export default function DimensionOverlay({
             }
           </Text>
           {/* Show "Verbal scale" and "Locked in" when in map mode */}
-          {isMapMode && !stepBrothersMode && (
+          {isMapMode && !stepBrothersMode && mapScale && (
             <View style={{ marginTop: 4, alignItems: 'center' }}>
               <Text style={{ 
                 color: 'rgba(255, 255, 255, 0.75)', 
@@ -2245,10 +2245,20 @@ export default function DimensionOverlay({
                 Verbal scale
               </Text>
               <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.9)', 
+                fontSize: 9, 
+                fontWeight: '700',
+                letterSpacing: 0.2,
+                marginTop: 1
+              }}>
+                {mapScale.screenDistance}{mapScale.screenUnit} = {mapScale.realDistance}{mapScale.realUnit}
+              </Text>
+              <Text style={{ 
                 color: 'rgba(255, 255, 255, 0.75)', 
                 fontSize: 8, 
                 fontWeight: '600',
-                letterSpacing: 0.3
+                letterSpacing: 0.3,
+                marginTop: 1
               }}>
                 Locked in
               </Text>
