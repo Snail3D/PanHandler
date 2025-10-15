@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Image, Dimensions } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system';
 import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +22,36 @@ import { VerbalScale } from '../state/measurementStore';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
+
+// Helper function to add "AUTO-LEVELED" text to image
+async function addAutoLeveledLabel(imageUri: string): Promise<string> {
+  try {
+    // Get image dimensions
+    const imageInfo = await ImageManipulator.manipulateAsync(
+      imageUri,
+      [],
+      { format: ImageManipulator.SaveFormat.JPEG }
+    );
+    
+    // Create a simple green badge as an SVG data URI
+    const svgBadge = `
+      <svg width="200" height="40" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="40" rx="8" fill="rgba(76, 175, 80, 0.9)"/>
+        <text x="100" y="27" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">AUTO-LEVELED</text>
+      </svg>
+    `;
+    
+    // Note: expo-image-manipulator doesn't support SVG overlay directly
+    // We'll use a simpler approach: just return the original image
+    // and rely on the album organization for now
+    
+    // TODO: Implement proper text overlay using react-native-view-shot or canvas
+    return imageUri;
+  } catch (error) {
+    console.error('Error adding label:', error);
+    return imageUri;
+  }
+}
 
 export default function MeasurementScreen() {
   const [permission, requestPermission] = useCameraPermissions();
