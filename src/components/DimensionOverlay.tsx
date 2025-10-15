@@ -1964,8 +1964,9 @@ export default function DimensionOverlay({
   
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
-    .minDistance(15) // Require 15px swipe before activating - prevents tap interference
+    .minDistance(20) // Increased to 20px to better distinguish from taps - allows buttons to work
     .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
+    .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
@@ -4512,6 +4513,8 @@ export default function DimensionOverlay({
               <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
+                delayPressIn={0}
+                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('rectangle');
                   setMode('rectangle');
@@ -4555,6 +4558,8 @@ export default function DimensionOverlay({
 
               {/* Circle */}
               <Pressable
+                delayPressIn={0}
+                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('circle');
                   setMode('circle');
@@ -4598,6 +4603,8 @@ export default function DimensionOverlay({
 
               {/* Angle */}
               <Pressable
+                delayPressIn={0}
+                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('angle');
                   setMode('angle');
@@ -4644,12 +4651,14 @@ export default function DimensionOverlay({
 
               {/* Distance (long-press also activates freehand) */}
               <Pressable
+                delayPressIn={0}
+                delayPressOut={0}
                 onPress={() => {
+                  playModeHaptic('distance');
                   setMode('distance');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 onPressIn={() => {
                   // Start long-press timer for freehand mode
@@ -4663,12 +4672,12 @@ export default function DimensionOverlay({
                       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                       return;
                     }
+                    playModeHaptic('freehand');
                     setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
-                    // Don't show cursor until user touches screen
-                    setModeColorIndex((prev) => prev + 1); // Rotate color when long-press activates
+                    setModeColorIndex((prev) => prev + 1);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     console.log('🎨 Freehand mode activated via long-press');
                   }, 500); // 500ms long-press
@@ -4716,18 +4725,20 @@ export default function DimensionOverlay({
 
               {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
               <Pressable
+                delayPressIn={0}
+                delayPressOut={0}
                 onPress={() => {
                   if (!isProUser) {
                     setShowProModal(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
+                  playModeHaptic('freehand');
                   setMode('freehand');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
                   setIsDrawingFreehand(false);
                   setModeColorIndex((prev) => prev + 1);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
                   flex: 1,
