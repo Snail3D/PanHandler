@@ -2467,13 +2467,14 @@ export default function DimensionOverlay({
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
-                        // Snap threshold: VERY TIGHT - only snap when extremely close to start
-                        // Use 2mm in real-world units, converted to image pixels
-                        let snapThresholdPixels = 3; // Default: 3 image pixels (very tight)
+                        // Snap threshold: EXTREMELY TIGHT - only snap when virtually touching the start point
+                        // The snap zone should be roughly the size of the starting point circle itself
+                        // Use 0.3mm in real-world units (about the size of a small dot)
+                        let snapThresholdPixels = 1.5; // Default: 1.5 image pixels (extremely tight)
                         
                         if (calibration) {
-                          // Convert 2mm to pixels based on calibration unit
-                          const snapThresholdMM = 2; // 2mm real-world distance
+                          // Convert 0.3mm to pixels based on calibration unit
+                          const snapThresholdMM = 0.3; // 0.3mm real-world distance (size of a small dot)
                           if (calibration.unit === 'mm') {
                             snapThresholdPixels = snapThresholdMM * calibration.pixelsPerUnit;
                           } else if (calibration.unit === 'cm') {
