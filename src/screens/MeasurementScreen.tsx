@@ -101,18 +101,22 @@ export default function MeasurementScreen() {
         setTimeout(() => setIsTransitioning(false), delay);
       } else {
         // For non-camera modes, morph in from black (1.5 seconds in)
-        screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
-        screenScale.value = withTiming(1, { // Settle to normal scale
-          duration: delay,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-        // Fade out black overlay as content appears
-        transitionBlackOverlay.value = withTiming(0, {
-          duration: delay,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
+        // Wait a tiny bit for mode switch before morphing
+        setTimeout(() => {
+          screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
+          screenScale.value = withTiming(1, { // Settle to normal scale
+            duration: delay,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
+          // Fade out black overlay as content appears
+          transitionBlackOverlay.value = withTiming(0, {
+            duration: delay,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
+        }, 50); // Small delay for React render
+        
         // Unlock after transition completes
-        setTimeout(() => setIsTransitioning(false), delay);
+        setTimeout(() => setIsTransitioning(false), delay + 50);
       }
     }, delay);
   };
@@ -328,7 +332,8 @@ export default function MeasurementScreen() {
   }));
 
   const screenTransitionStyle = useAnimatedStyle(() => ({
-    opacity: screenOpacity.value,
+    // Don't fade content opacity - let the black overlay handle all opacity transitions
+    // Only use scale for the liquid morph effect
     transform: [{ scale: screenScale.value }],
   }));
 
@@ -418,23 +423,23 @@ export default function MeasurementScreen() {
         // Wait 1.5s for fade to black, then switch mode and fade in with morph
         setTimeout(() => {
           setMode('zoomCalibrate');
-          // Reset screenOpacity and scale for liquid morph effect (1.5s in)
-          screenOpacity.value = 0;
-          screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
-          screenOpacity.value = withTiming(1, {
-            duration: 1500,
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-          });
-          screenScale.value = withTiming(1, { // Settle to normal
-            duration: 1500,
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-          });
-          transitionBlackOverlay.value = withTiming(0, { // Fade out black overlay
-            duration: 1500,
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-          });
+          
+          // Wait a tiny bit for mode switch to complete before morphing in
+          setTimeout(() => {
+            // Only morph scale - black overlay handles the fade
+            screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
+            screenScale.value = withTiming(1, { // Settle to normal
+              duration: 1500,
+              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+            });
+            transitionBlackOverlay.value = withTiming(0, { // Fade out black overlay
+              duration: 1500,
+              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+            });
+          }, 50); // Small delay to let React render new mode
+          
           // Unlock after transition completes
-          setTimeout(() => setIsTransitioning(false), 1500);
+          setTimeout(() => setIsTransitioning(false), 1550);
         }, 1500);
       }
     } catch (error) {
