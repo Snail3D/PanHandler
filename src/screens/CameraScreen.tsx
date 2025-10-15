@@ -552,23 +552,27 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             />
           </Animated.View>
           
-          {/* Debug: Show bubble position */}
-          <View
-            style={{
-              position: 'absolute',
-              top: -50,
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 6,
-              borderWidth: 2,
-              borderColor: 'white',
-            }}
-          >
-            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-              🫧 BUBBLE LEVEL ACTIVE
-            </Text>
-          </View>
+        {/* Center label with subtle hint */}
+        <View
+          style={{
+            position: 'absolute',
+            top: -60,
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 8,
+            borderWidth: 1.5,
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', marginBottom: 2 }}>
+            CENTER OBJECT HERE
+          </Text>
+          <Text style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 10, fontStyle: 'italic' }}>
+            (place your coin in the middle)
+          </Text>
+        </View>
         </View>
 
         {/* Alignment status indicator */}
@@ -827,23 +831,27 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           />
         </Animated.View>
         
-        {/* Debug label */}
-        <View
-          style={{
-            position: 'absolute',
-            top: -50,
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 6,
-            borderWidth: 2,
-            borderColor: 'white',
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-            🫧 BUBBLE LEVEL
-          </Text>
-        </View>
+          {/* Center label with subtle hint */}
+          <View
+            style={{
+              position: 'absolute',
+              top: -60,
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              borderRadius: 8,
+              borderWidth: 1.5,
+              borderColor: 'rgba(255, 255, 255, 0.6)',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', marginBottom: 2 }}>
+              CENTER OBJECT HERE
+            </Text>
+            <Text style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: 10, fontStyle: 'italic' }}>
+              (place your coin in the middle)
+            </Text>
+          </View>
       </View>
       
       {/* Help Modal */}

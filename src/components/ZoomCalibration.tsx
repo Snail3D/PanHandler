@@ -747,20 +747,6 @@ export default function ZoomCalibration({
             >
               {"Match the coin's edge to the circle"}
             </Text>
-            <Text
-              style={{
-                fontSize: 13,
-                color: 'rgba(255, 255, 255, 0.7)',
-                textAlign: 'center',
-                marginTop: 4,
-                textShadowColor: 'rgba(0, 0, 0, 0.7)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
-                fontStyle: 'italic',
-              }}
-            >
-              {"(place your coin in the middle)"}
-            </Text>
           </Animated.View>
 
           {/* Animated finger indicators - positioned below coin circle */}
