@@ -128,12 +128,13 @@ export default function ZoomCalibration({
           );
         };
         
-        // Run animation twice
+        // Run animation 3 times (was 2)
         animatePinch();
-        setTimeout(animatePinch, 1500);
+        setTimeout(animatePinch, 2000); // Slowed down (was 1500)
+        setTimeout(animatePinch, 4000); // Third animation
       }, 1000);
       
-      // Auto-hide after 4 seconds
+      // Auto-hide after 7 seconds (was 4.5 seconds - much longer now!)
       setTimeout(() => {
         tutorialOpacity.value = withSpring(0);
         coinTextOpacity.value = withSpring(0);
@@ -141,7 +142,7 @@ export default function ZoomCalibration({
         setTimeout(() => {
           setShowTutorial(false);
         }, 500);
-      }, 4500);
+      }, 7000);
     }, 800); // Delay so user sees the screen first
   }, []);
   
@@ -708,12 +709,12 @@ export default function ZoomCalibration({
 
           {/* Arrow removed - text is enough! */}
 
-          {/* Pinch tutorial text - moved up a bit */}
+          {/* Pinch tutorial text - moved up more (off the circle) */}
           <Animated.View
             style={[
               {
                 position: 'absolute',
-                top: SCREEN_HEIGHT / 2 - 180,
+                top: SCREEN_HEIGHT / 2 - 220, // Moved up 10% more (was -180, now -220)
                 alignItems: 'center',
                 paddingHorizontal: 40,
               },
@@ -744,7 +745,7 @@ export default function ZoomCalibration({
                 textShadowRadius: 3,
               }}
             >
-              {"Zoom until the coin matches the circle"}
+              {"Match the coin's edge to the circle"}
             </Text>
           </Animated.View>
 
