@@ -522,11 +522,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             />
           </Animated.View>
           
-        {/* Center label with subtle hint */}
+        {/* Center label with subtle hint - BELOW crosshairs */}
         <View
           style={{
             position: 'absolute',
-            top: -60,
+            top: 110,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             paddingHorizontal: 12,
             paddingVertical: 8,
@@ -554,10 +554,10 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             style={{
               backgroundColor: 
                 alignmentStatus === 'good'
-                  ? 'rgba(0, 200, 0, 0.9)'
+                  ? 'rgba(76, 175, 80, 0.85)'
                   : alignmentStatus === 'warning'
-                  ? 'rgba(255, 200, 0, 0.9)'
-                  : 'rgba(255, 50, 50, 0.9)',
+                  ? 'rgba(255, 183, 77, 0.85)'
+                  : 'rgba(239, 83, 80, 0.85)',
               paddingHorizontal: 16,
               paddingVertical: 10,
               borderRadius: 20,
@@ -611,7 +611,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 width: 150,
                 height: 150,
                 borderRadius: 75,
-                backgroundColor: 'rgba(0, 200, 0, 0.9)',
+                backgroundColor: 'rgba(76, 175, 80, 0.9)',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -630,17 +630,17 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         >
           <View className="items-center">
             {/* Auto mode always on - no toggle needed */}
-            <View
-              style={{
-                marginBottom: 16,
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-                borderRadius: 20,
-                backgroundColor: 'rgba(0, 200, 0, 0.9)',
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
+             <View
+               style={{
+                 marginBottom: 16,
+                 paddingHorizontal: 20,
+                 paddingVertical: 10,
+                 borderRadius: 20,
+                 backgroundColor: 'rgba(76, 175, 80, 0.9)',
+                 flexDirection: 'row',
+                 alignItems: 'center',
+               }}
+             >
               <Ionicons 
                 name="flash" 
                 size={20} 
@@ -657,9 +657,9 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 width: 80,
                 height: 80,
                 borderRadius: 40,
-                backgroundColor: 'rgba(0, 200, 0, 0.6)',
+                backgroundColor: 'rgba(76, 175, 80, 0.6)',
                 borderWidth: 4,
-                borderColor: 'rgba(0, 200, 0, 0.9)',
+                borderColor: 'rgba(76, 175, 80, 0.9)',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -668,7 +668,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
                 width: 64, 
                 height: 64, 
                 borderRadius: 32, 
-                backgroundColor: 'rgba(0, 200, 0, 0.5)',
+                backgroundColor: 'rgba(76, 175, 80, 0.5)',
               }} />
             </View>
             <Text className="text-white text-sm mt-4">
@@ -799,11 +799,11 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           />
         </Animated.View>
         
-          {/* Center label with subtle hint */}
+          {/* Center label with subtle hint - BELOW crosshairs */}
           <View
             style={{
               position: 'absolute',
-              top: -60,
+              top: 110,
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
               paddingHorizontal: 12,
               paddingVertical: 8,
