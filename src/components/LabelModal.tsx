@@ -348,6 +348,7 @@ const getRandomExample = (isMapMode: boolean = false) => {
   const examples = isMapMode ? mapExamples : makerExamples;
   const idx = Math.floor(Math.random() * examples.length);
   return examples[idx];
+};
 
 interface LabelModalProps {
   visible: boolean;
