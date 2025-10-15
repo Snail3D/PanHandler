@@ -1690,45 +1690,40 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
 
-              {/* Easter Egg Hints Section - At the very bottom of scrollable content */}
-              <View style={{ marginBottom: 20, marginTop: 8 }}>
+              {/* Easter Egg Hints Section - Compact */}
+              <View style={{ marginBottom: 12, marginTop: 8 }}>
                 <Animated.View 
                   entering={FadeIn.delay(800)}
                   style={{
                     backgroundColor: 'rgba(255,215,0,0.15)',
-                    borderRadius: 20,
-                    padding: 18,
+                    borderRadius: 16,
+                    padding: 14,
                     shadowColor: '#FFD700',
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 14,
-                    elevation: 6,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,215,0,0.4)',
+                    shadowOpacity: 0.2,
+                    shadowRadius: 10,
+                    elevation: 4,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(255,215,0,0.35)',
                     borderStyle: 'dashed',
                   }}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 28 }}>🥚</Text>
-                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 10, letterSpacing: -0.3 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 22 }}>🥚</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
                       Hidden Surprises
                     </Text>
                     <Pressable
                       onPress={() => {
-                        // Easter egg: 10 taps on right egg toggles Pro/Free
-                        // Only works if not actually a paid Pro member
-                        // TODO: When payment is integrated, check actual payment status here
-                        const actuallyPaidPro = false; // Will be: checkPaymentStatus()
+                        const actuallyPaidPro = false;
                         
                         if (actuallyPaidPro) {
-                          // Disable easter egg for actual paying customers
                           return;
                         }
                         
                         const now = Date.now();
                         let newCount = eggTapCount;
                         
-                        // Reset counter if more than 1 second since last tap
                         if (now - eggLastTapTime > 1000) {
                           newCount = 1;
                         } else {
@@ -1739,12 +1734,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                         setEggLastTapTime(now);
                         
                         if (newCount >= 10) {
-                          // Toggle Pro/Free status
                           const newProStatus = !isProUser;
                           setIsProUser(newProStatus);
                           setEggTapCount(0);
                           
-                          // Haptic feedback
                           if (newProStatus) {
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             showAlert('🎉 Easter Egg Found!', 'Pro features unlocked for testing!', 'success');
@@ -1753,58 +1746,56 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                             showAlert('🥚 Back to Free', 'Pro features locked again.', 'info');
                           }
                         } else if (newCount >= 5) {
-                          // Halfway feedback - let them know they're on the right track
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         } else {
-                          // Light tap feedback
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         }
                       }}
                     >
-                      <Text style={{ fontSize: 28 }}>🥚</Text>
+                      <Text style={{ fontSize: 22 }}>🥚</Text>
                     </Pressable>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, textAlign: 'center', fontStyle: 'italic' }}>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
                     Some badges hide secrets... if you are persistent enough 🤔
                   </Text>
                 </Animated.View>
 
-                {/* Download Counter & Rating - Inside ScrollView at bottom */}
-                <View style={{ marginTop: 24, paddingBottom: 20 }}>
+                {/* Download Counter & Rating - Compact */}
+                <View style={{ marginTop: 16 }}>
                   {/* Heartfelt Message with Download Counter */}
                   <AnimatedView
                     entering={FadeIn.delay(750)}
                     style={{
-                      marginBottom: 14,
-                      paddingVertical: 10,
-                      paddingHorizontal: 16,
+                      marginBottom: 10,
+                      paddingVertical: 8,
+                      paddingHorizontal: 14,
                       backgroundColor: 'rgba(255,105,180,0.12)',
-                      borderRadius: 14,
-                      borderWidth: 2,
+                      borderRadius: 12,
+                      borderWidth: 1.5,
                       borderColor: 'rgba(255,105,180,0.25)',
                     }}
                   >
                     <Text style={{ 
-                      fontSize: 14, 
+                      fontSize: 13, 
                       color: '#1C1C1E', 
                       textAlign: 'center',
-                      lineHeight: 20,
+                      lineHeight: 18,
                       fontWeight: '600'
                     }}>
                       ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
                     </Text>
                   </AnimatedView>
 
-                  {/* Rating Section */}
+                  {/* Rating Section - Compact */}
                   <AnimatedView
                     entering={FadeIn.delay(800)}
                     style={{
-                      paddingVertical: 14,
-                      paddingHorizontal: 18,
+                      paddingVertical: 10,
+                      paddingHorizontal: 14,
                       backgroundColor: 'rgba(255,215,0,0.12)',
-                      borderRadius: 16,
-                      borderWidth: 2,
+                      borderRadius: 12,
+                      borderWidth: 1.5,
                       borderColor: 'rgba(255,215,0,0.25)',
                     }}
                   >
@@ -1850,12 +1841,12 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
               </View>
 
               {/* Vibecode Attribution - Very bottom of scrollable content */}
-              <View style={{ marginBottom: 40, marginTop: 16, alignItems: 'center' }}>
+              <View style={{ marginBottom: 24, marginTop: 12, alignItems: 'center' }}>
                 <Text style={{ 
-                  fontSize: 11, 
+                  fontSize: 12, 
                   color: '#A8A8A8', 
                   textAlign: 'center',
-                  lineHeight: 18,
+                  lineHeight: 19,
                   letterSpacing: 0.2,
                 }}>
                   Brought to you by a human brain{'\n'}
@@ -1868,7 +1859,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     style={[{ 
                       fontWeight: '500',
                       textDecorationLine: 'underline',
-                      fontSize: 11,
+                      fontSize: 12,
                     }, vibecodeLinkStyle]}
                   >
                     vibecoding
