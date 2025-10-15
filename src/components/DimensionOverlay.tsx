@@ -244,7 +244,7 @@ export default function DimensionOverlay({
   
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
-  const [isPanLocked, setIsPanLocked] = useState(true); // Manual lock override - starts locked when measurements exist
+  const [isPanLocked, setIsPanLocked] = useState(false); // Manual lock override - starts UNLOCKED for free panning
   
   // Register the callback with parent so it can be called on double-tap
   useEffect(() => {
@@ -4688,6 +4688,7 @@ export default function DimensionOverlay({
             <Pressable
               onPress={() => {
                 setMeasurementMode(true);
+                setIsPanLocked(true); // Lock pan when entering measurement mode
                 setShowCursor(true);
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -4729,6 +4730,7 @@ export default function DimensionOverlay({
                   setMode('rectangle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setIsPanLocked(true); // Lock pan when entering measurement mode
                   setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
@@ -4772,6 +4774,7 @@ export default function DimensionOverlay({
                   setMode('circle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setIsPanLocked(true); // Lock pan when entering measurement mode
                   setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
@@ -4815,6 +4818,7 @@ export default function DimensionOverlay({
                   setMode('angle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setIsPanLocked(true); // Lock pan when entering measurement mode
                   setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
@@ -4861,6 +4865,7 @@ export default function DimensionOverlay({
                   setMode('distance');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setIsPanLocked(true); // Lock pan when entering measurement mode
                   setModeColorIndex((prev) => prev + 1);
                 }}
                 onPressIn={() => {
@@ -4879,6 +4884,7 @@ export default function DimensionOverlay({
                     setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
+                    setIsPanLocked(true); // Lock pan when entering measurement mode
                     setIsDrawingFreehand(false);
                     setModeColorIndex((prev) => prev + 1);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -4938,6 +4944,7 @@ export default function DimensionOverlay({
                   setMode('freehand');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
+                  setIsPanLocked(true); // Lock pan when entering measurement mode
                   setIsDrawingFreehand(false);
                   setModeColorIndex((prev) => prev + 1);
                 }}
