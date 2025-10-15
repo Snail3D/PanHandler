@@ -60,11 +60,14 @@ export default function ZoomCalibration({
   
   // Pinch tutorial animation values
   const leftFingerX = useSharedValue(SCREEN_WIDTH / 2 - 30);
-  const leftFingerY = useSharedValue(SCREEN_HEIGHT / 2);
+  const leftFingerY = useSharedValue(SCREEN_HEIGHT / 2 + 100); // Below the coin (moved down)
   const rightFingerX = useSharedValue(SCREEN_WIDTH / 2 + 30);
-  const rightFingerY = useSharedValue(SCREEN_HEIGHT / 2);
+  const rightFingerY = useSharedValue(SCREEN_HEIGHT / 2 + 100); // Below the coin (moved down)
   const tutorialOpacity = useSharedValue(0);
+  const coinTextOpacity = useSharedValue(0); // For "select coin" text
+  const arrowOpacity = useSharedValue(0); // For arrow pointing to coin selector
   const [zoomTranslate, setZoomTranslate] = useState({ x: 0, y: 0 });
+  const initialZoomScale = useRef(1);
   
   // Coin selection state
   const lastSelectedCoin = useStore((s) => s.lastSelectedCoin);
@@ -96,12 +99,19 @@ export default function ZoomCalibration({
   }, [searchQuery]);
 
   // Show pinch-zoom tutorial on first use
+  // Show tutorial animation (always, since it's pretty!)
   useEffect(() => {
-    // TESTING: Always show tutorial (comment out first-time check)
-    // TODO: Uncomment the line below to only show on first use
-    // if (!hasSeenPinchTutorial) {
+    initialZoomScale.current = zoomScale;
+    
+    setTimeout(() => {
+      setShowTutorial(true);
+      
+      // Fade in coin selection text + arrow first
+      coinTextOpacity.value = withSpring(1, { damping: 20 });
+      arrowOpacity.value = withSpring(1, { damping: 20 });
+      
+      // Then show pinch animation after 1 second
       setTimeout(() => {
-        setShowTutorial(true);
         tutorialOpacity.value = withSpring(1, { damping: 20 });
         
         // Animate fingers pinching outward (zoom in gesture)
@@ -118,22 +128,35 @@ export default function ZoomCalibration({
           );
         };
         
-        // Run animation twice, then hide
+        // Run animation twice
         animatePinch();
         setTimeout(animatePinch, 1500);
-        
+      }, 1000);
+      
+      // Auto-hide after 4 seconds
+      setTimeout(() => {
+        tutorialOpacity.value = withSpring(0);
+        coinTextOpacity.value = withSpring(0);
+        arrowOpacity.value = withSpring(0);
         setTimeout(() => {
-          tutorialOpacity.value = withSpring(0);
-          setTimeout(() => {
-            setShowTutorial(false);
-            // TESTING: Comment out setHasSeenPinchTutorial so it shows every time
-            // TODO: Uncomment the line below to only show once
-            // setHasSeenPinchTutorial(true);
-          }, 500);
-        }, 3500);
-      }, 800); // Delay so user sees the screen first
-    // }
-  }, []); // TESTING: Empty deps so it runs every time component mounts
+          setShowTutorial(false);
+        }, 500);
+      }, 4500);
+    }, 800); // Delay so user sees the screen first
+  }, []);
+  
+  // Detect zoom and dismiss tutorial gracefully
+  useEffect(() => {
+    if (showTutorial && Math.abs(zoomScale - initialZoomScale.current) > 0.1) {
+      // User started zooming - dismiss tutorial gracefully
+      tutorialOpacity.value = withSpring(0, { damping: 20 });
+      coinTextOpacity.value = withSpring(0, { damping: 20 });
+      arrowOpacity.value = withSpring(0, { damping: 20 });
+      setTimeout(() => {
+        setShowTutorial(false);
+      }, 300);
+    }
+  }, [zoomScale, showTutorial]);
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -660,7 +683,7 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Pinch-Zoom Tutorial Overlay - Only shows on first use */}
+      {/* Pinch-Zoom Tutorial Overlay - Always shows (animations are pretty!) */}
       {showTutorial && (
         <View
           style={{
@@ -674,12 +697,69 @@ export default function ZoomCalibration({
             pointerEvents: 'none',
           }}
         >
-          {/* Tutorial text */}
+          {/* Coin selection prompt - above the coin circle */}
           <Animated.View
             style={[
               {
                 position: 'absolute',
-                top: SCREEN_HEIGHT / 2 - 150,
+                top: SCREEN_HEIGHT / 2 - 220,
+                alignItems: 'center',
+                paddingHorizontal: 40,
+              },
+              { opacity: coinTextOpacity },
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: '600',
+                color: 'rgba(255, 255, 255, 0.95)',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.7)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 4,
+              }}
+            >
+              Make sure the right coin is selected
+            </Text>
+          </Animated.View>
+
+          {/* Arrow pointing to coin selector (top right) */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: insets.top + 120,
+                right: 80,
+                opacity: arrowOpacity,
+              },
+            ]}
+          >
+            <Svg width={60} height={60} viewBox="0 0 60 60">
+              {/* Curved arrow pointing up-right */}
+              <Path
+                d="M 10 50 Q 30 30, 45 15"
+                stroke="rgba(255, 255, 255, 0.9)"
+                strokeWidth="3"
+                fill="none"
+                strokeLinecap="round"
+              />
+              {/* Arrowhead */}
+              <Path
+                d="M 45 15 L 40 20 M 45 15 L 50 20"
+                stroke="rgba(255, 255, 255, 0.9)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </Svg>
+          </Animated.View>
+
+          {/* Pinch tutorial text - moved up a bit */}
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: SCREEN_HEIGHT / 2 - 180,
                 alignItems: 'center',
                 paddingHorizontal: 40,
               },
@@ -714,7 +794,7 @@ export default function ZoomCalibration({
             </Text>
           </Animated.View>
 
-          {/* Animated finger indicators */}
+          {/* Animated finger indicators - positioned below coin circle */}
           <Animated.View
             style={[
               {
