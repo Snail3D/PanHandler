@@ -85,8 +85,15 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         mass: 0.3,
       });
       
-      // Haptic feedback
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      // Haptic feedback - Mario Kart countdown sequence for auto mode!
+      if (autoMode) {
+        // DUN... DUN... DING! 🏎️
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // First heavy beep
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 150);  // Second heavy beep
+        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);  // DING! GO!
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
       
       // Take the photo (flash/torch is controlled by enableTorch prop on CameraView)
       const photo = await cameraRef.current.takePictureAsync({
