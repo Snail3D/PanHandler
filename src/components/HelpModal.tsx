@@ -1866,6 +1866,19 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                     vibecoding
                   </AnimatedText>
                 </Text>
+                
+                {/* Hidden haptic message - subtle and classy */}
+                <Text style={{
+                  fontSize: 10,
+                  color: 'rgba(0, 0, 0, 0.35)',
+                  textAlign: 'center',
+                  marginTop: 16,
+                  fontStyle: 'italic',
+                  letterSpacing: 0.3,
+                }}>
+                  Enjoying the haptic feedback?{'\n'}
+                  Those were tuned just for you.
+                </Text>
               </View>
             </Animated.ScrollView>
                 </GestureDetector>
