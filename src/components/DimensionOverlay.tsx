@@ -2087,7 +2087,8 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
-    .minDistance(40) // Require 40px movement to activate
+    .activeOffsetX([-20, 20]) // Activate on 20px horizontal movement
+    .failOffsetY([-40, 40]) // Fail if too much vertical movement
     .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
     .onUpdate((event) => {
       // Only respond to horizontal swipes - stricter detection
@@ -2103,13 +2104,13 @@ export default function DimensionOverlay({
       }
     })
     .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.3;
-      // Require FAST swipe (high velocity) to collapse menu - prevents accidental collapse when swiping modes
-      const minVelocity = 800; // pixels/second - must be a fast swipe
+      const threshold = SCREEN_WIDTH * 0.25; // Reduced from 0.3 for easier activation
+      // Require FAST swipe OR enough distance to collapse menu
+      const minVelocity = 600; // Reduced from 800 for more responsive feel
       const isFastSwipe = Math.abs(event.velocityX) > minVelocity;
       
-      if (Math.abs(event.translationX) > threshold && isFastSwipe) {
-        // Hide menu to the right - fast swipe detected
+      if ((Math.abs(event.translationX) > threshold && isFastSwipe) || Math.abs(event.translationX) > SCREEN_WIDTH * 0.5) {
+        // Hide menu to the right - fast swipe detected or dragged far enough
         menuTranslateX.value = SCREEN_WIDTH;
         menuOpacity.value = 1;
         runOnJS(setMenuHidden)(true);
@@ -2127,11 +2128,9 @@ export default function DimensionOverlay({
   
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
-    .minDistance(40) // Require 40px movement to activate - allows taps to work
-    .activeOffsetX([-20, 20]) // Activate on 20px horizontal movement
-    .failOffsetX([-10, 10]) // Fail if movement stays within 10px horizontal
-    // NO failOffsetY - allow vertical drift while swiping horizontally
-    .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
+    .activeOffsetX([-15, 15]) // Activate on 15px horizontal movement in either direction
+    .failOffsetY([-30, 30]) // Fail if vertical movement exceeds 30px (prevent accidental trigger on vertical scrolls)
+    .shouldCancelWhenOutside(false) // Don't cancel if finger drifts outside - be forgiving
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
       // Reset offset when gesture starts
