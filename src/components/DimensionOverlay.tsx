@@ -236,6 +236,7 @@ export default function DimensionOverlay({
   const freehandClosedLoopRef = useRef(false); // Sync ref to avoid async state issues
   // Lock zoom/pan/rotation when freehand drawing starts to prevent coordinate drift
   const freehandZoomLockRef = useRef<{ scale: number; translateX: number; translateY: number; rotation: number } | null>(null);
+  const [isShowingSpeedWarning, setIsShowingSpeedWarning] = useState(false); // Track if showing "too fast" message to prevent flicker
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -2458,15 +2459,47 @@ export default function DimensionOverlay({
                 setCursorSpeed(cursorMoveSpeed);
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
-                // Cancel activation if moving too fast during hold phase
-                // Threshold: 0.3 pixels/ms = ~113 pixels/sec (very gentle movement)
-                if (freehandActivating && cursorMoveSpeed > 0.3) {
-                  if (freehandActivationTimerRef.current) {
-                    clearTimeout(freehandActivationTimerRef.current);
-                    freehandActivationTimerRef.current = null;
+                // Handle speed-based activation control with hysteresis
+                if (freehandActivating) {
+                  // Hysteresis: Different thresholds for starting/stopping warning
+                  const speedThresholdHigh = 0.3; // Show warning when speed exceeds this
+                  const speedThresholdLow = 0.15; // Hide warning when speed drops below this
+                  
+                  // Update warning state with hysteresis
+                  if (!isShowingSpeedWarning && cursorMoveSpeed > speedThresholdHigh) {
+                    setIsShowingSpeedWarning(true);
+                  } else if (isShowingSpeedWarning && cursorMoveSpeed < speedThresholdLow) {
+                    setIsShowingSpeedWarning(false);
                   }
-                  // Don't cancel activation state yet - just reset the timer
-                  // This allows them to slow down and try again
+                  
+                  // Cancel timer if moving too fast
+                  if (cursorMoveSpeed > speedThresholdHigh) {
+                    if (freehandActivationTimerRef.current) {
+                      clearTimeout(freehandActivationTimerRef.current);
+                      freehandActivationTimerRef.current = null;
+                    }
+                  } 
+                  // Restart timer if slowed down and timer isn't already running
+                  else if (!freehandActivationTimerRef.current) {
+                    // Restart the 1.5s timer
+                    freehandActivationTimerRef.current = setTimeout(() => {
+                      setIsDrawingFreehand(true);
+                      setFreehandActivating(false);
+                      setIsShowingSpeedWarning(false);
+                      
+                      // LOCK zoom/pan/rotation state
+                      freehandZoomLockRef.current = {
+                        scale: zoomScale,
+                        translateX: zoomTranslateX,
+                        translateY: zoomTranslateY,
+                        rotation: zoomRotation,
+                      };
+                      
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      console.log('🎨 Freehand drawing activated after slowing down!');
+                    }, 1500);
+                  }
                 }
                 
                 // If already drawing, add points to path
@@ -3369,9 +3402,8 @@ export default function DimensionOverlay({
           // Determine label based on state
           let label = 'Hold to start';
           if (freehandActivating) {
-            // Check if user is moving too fast during activation
-            // Threshold: 0.3 pixels/ms = ~113 pixels/sec (very gentle movement)
-            if (cursorSpeed > 0.3) {
+            // Use state to show warning (prevents flickering with hysteresis)
+            if (isShowingSpeedWarning) {
               label = 'Slow down to draw';
             } else {
               label = 'Hold...';
