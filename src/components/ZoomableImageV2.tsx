@@ -197,7 +197,6 @@ export default function ZoomableImage({
   return (
     <>
       <View 
-        key={locked ? 'locked' : 'unlocked'}
         style={StyleSheet.absoluteFill} 
         pointerEvents={locked ? 'none' : 'auto'}
       >
