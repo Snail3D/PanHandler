@@ -120,12 +120,9 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .enabled(!locked)
-    .minDistance(10) // Require 10px movement before activating - reduces tap interference
+    .minDistance(singleFingerPan ? 5 : 10) // Lower threshold for single-finger mode
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
-    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
-    .activeOffsetY([-10, 10]) // Require 10px vertical movement to activate
-    .failOffsetX([-5, 5]) // Fail if finger stays within 5px
-    .failOffsetY([-5, 5]) // Fail if finger stays within 5px
+    .maxPointers(singleFingerPan ? 1 : 2) // Limit to 1 finger in single-finger mode
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -179,11 +176,19 @@ export default function ZoomableImage({
       }
     });
 
-  const composedGesture = Gesture.Race(
-    doubleTapGesture,
-    // doubleTapWhenLockedGesture disabled - causes bounce
-    Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
-  );
+  // Compose gestures differently based on single-finger mode
+  const composedGesture = singleFingerPan
+    ? Gesture.Race(
+        doubleTapGesture,
+        Gesture.Exclusive(
+          pinchGesture,  // Pinch takes priority
+          panGesture     // Then pan
+        )
+      )
+    : Gesture.Race(
+        doubleTapGesture,
+        Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
+      );
 
 
   const animatedStyle = useAnimatedStyle(() => ({
