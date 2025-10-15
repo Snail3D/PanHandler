@@ -312,6 +312,7 @@ export default function MeasurementScreen() {
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
+      cameraFlashOpacity.value = 0; // Reset flash in case it's still visible
       
       // Delay slightly to let camera initialize, then 1.5 second fade-in
       setTimeout(() => {
@@ -383,11 +384,11 @@ export default function MeasurementScreen() {
       setIsCapturing(true);
       setIsHoldingShutter(false); // Release hold state
       
-      // Pleasant camera flash effect
+      // Pleasant camera flash effect - MUST complete before transition
       cameraFlashOpacity.value = 1;
       cameraFlashOpacity.value = withTiming(0, {
-        duration: 200, // Quick 200ms flash
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        duration: 150, // Quick 150ms flash
+        easing: Easing.out(Easing.ease),
       });
       
       // Take photo (torch is controlled by enableTorch prop on CameraView)
@@ -751,7 +752,7 @@ export default function MeasurementScreen() {
               right: 0,
               bottom: 0,
               backgroundColor: 'white',
-              zIndex: 999998, // Below black overlay, above camera
+              zIndex: 1000000, // ABOVE black overlay so flash is visible
             },
             cameraFlashStyle,
           ]}
