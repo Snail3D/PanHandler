@@ -94,6 +94,7 @@ interface DimensionOverlayProps {
   setImageOpacity?: (opacity: number) => void;
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
   onReset?: () => void; // Called when "New Photo" button is pressed
+  onPanLockChange?: (locked: boolean) => void; // Called when pan lock state changes
 }
 
 export default function DimensionOverlay({ 
@@ -105,6 +106,7 @@ export default function DimensionOverlay({
   setImageOpacity,
   onRegisterDoubleTapCallback,
   onReset,
+  onPanLockChange,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -244,6 +246,7 @@ export default function DimensionOverlay({
   
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
+  const [isPanLocked, setIsPanLocked] = useState(true); // Manual lock override - starts locked when measurements exist
   
   // Register the callback with parent so it can be called on double-tap
   useEffect(() => {
@@ -354,6 +357,21 @@ export default function DimensionOverlay({
       setMeasurementMode(false); // Keep in pan mode but locked
     }
   }, []); // Only run on mount
+  
+  // Notify parent when pan lock state changes
+  useEffect(() => {
+    if (onPanLockChange) {
+      onPanLockChange(isPanLocked);
+    }
+  }, [isPanLocked, onPanLockChange]);
+  
+  // Reset lock to true when measurements are added after being cleared
+  useEffect(() => {
+    const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
+    if (hasAnyMeasurements && !isPanLocked) {
+      setIsPanLocked(true); // Auto-lock when first measurement is added
+    }
+  }, [measurements.length, currentPoints.length, isPanLocked]);
   
   // Animated styles for quote overlay (must be after all state/ref hooks)
   const quoteBackgroundStyle = useAnimatedStyle(() => ({
@@ -4648,10 +4666,17 @@ export default function DimensionOverlay({
           <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
-                setMeasurementMode(false);
-                setShowCursor(false);
-                setSelectedMeasurementId(null);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (hasAnyMeasurements) {
+                  // Toggle lock state when measurements exist
+                  setIsPanLocked(!isPanLocked);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                } else {
+                  // Normal pan mode when no measurements
+                  setMeasurementMode(false);
+                  setShowCursor(false);
+                  setSelectedMeasurementId(null);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
@@ -4663,7 +4688,7 @@ export default function DimensionOverlay({
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
-                  name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
+                  name={isPanLocked ? "lock-closed" : "lock-open"}
                   size={14} 
                   color={!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
                 />
@@ -4673,7 +4698,7 @@ export default function DimensionOverlay({
                   fontSize: 12,
                   color: !measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  {isPanZoomLocked ? 'Edit' : 'Pan'}
+                  {isPanLocked ? 'Locked' : 'Unlocked'}
                 </Text>
               </View>
             </Pressable>
