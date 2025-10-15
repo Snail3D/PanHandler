@@ -165,6 +165,7 @@ export default function DimensionOverlay({
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
+  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false); // Success modal for saves
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
@@ -1844,8 +1845,8 @@ export default function DimensionOverlay({
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      showToastNotification(label ? `"${label}" saved!` : 'Saved to Photos!');
-      
+      // Show success modal instead of toast
+      setShowSaveSuccessModal(true);
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
@@ -5974,6 +5975,90 @@ export default function DimensionOverlay({
             </View>
           </View>
         </Animated.View>
+      )}
+
+      {/* Save Success Modal - Glassmorphic & Beautiful */}
+      {showSaveSuccessModal && (
+        <Pressable
+          onPress={() => setShowSaveSuccessModal(false)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10000,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: 'rgba(20, 20, 20, 0.95)',
+              borderRadius: 24,
+              padding: 32,
+              alignItems: 'center',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.5,
+              shadowRadius: 30,
+              minWidth: 280,
+            }}
+          >
+            {/* Success Icon */}
+            <View
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}
+            >
+              <Ionicons name="checkmark-circle" size={48} color="rgba(76, 175, 80, 1)" />
+            </View>
+
+            {/* Success Message */}
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: '700',
+                color: 'white',
+                marginBottom: 8,
+                textAlign: 'center',
+              }}
+            >
+              Saved!
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                color: 'rgba(255, 255, 255, 0.8)',
+                textAlign: 'center',
+                lineHeight: 20,
+              }}
+            >
+              Your measurements have been{'\n'}saved to Photos
+            </Text>
+
+            {/* Tap anywhere hint */}
+            <Text
+              style={{
+                fontSize: 13,
+                color: 'rgba(255, 255, 255, 0.5)',
+                marginTop: 24,
+                fontStyle: 'italic',
+              }}
+            >
+              Tap anywhere to continue
+            </Text>
+          </View>
+        </Pressable>
       )}
 
       {/* Alert Modal */}
