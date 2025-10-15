@@ -493,13 +493,31 @@ export default function MeasurementScreen() {
       rotation: calibrationData.initialZoom.rotation || 0,
     });
     
-    // Double RAF to ensure state updates are flushed AND layout is complete
-    // This prevents the snap by giving React time to render the complex measurement screen
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        smoothTransitionToMode('measurement');
-      });
+    // Simpler approach: Just fade to black, switch instantly, fade in
+    setIsTransitioning(true);
+    
+    // Fade to black quickly
+    transitionBlackOverlay.value = withTiming(1, {
+      duration: 400, // Fast fade to black
+      easing: Easing.in(Easing.ease),
     });
+    
+    // After black screen, switch mode and fade in
+    setTimeout(() => {
+      setMode('measurement');
+      
+      // Small delay to let React render, then fade in
+      setTimeout(() => {
+        transitionBlackOverlay.value = withTiming(0, {
+          duration: 600, // Smooth fade in
+          easing: Easing.out(Easing.ease),
+        });
+        
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 700); // Unlock after fade completes
+      }, 100); // Short delay for render
+    }, 400); // Wait for black fade to complete
   };
 
   const handleCancelCalibration = () => {
@@ -842,7 +860,15 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => smoothTransitionToMode('camera', 750)} // Half duration = 750ms
+                  onReset={() => {
+                    // Clear all state before transitioning to camera
+                    setImageUri(null);
+                    setCoinCircle(null);
+                    setCalibration(null);
+                    setImageOrientation(null);
+                    setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                    smoothTransitionToMode('camera', 750); // Half duration = 750ms
+                  }}
                 />
               </View>
             </View>
