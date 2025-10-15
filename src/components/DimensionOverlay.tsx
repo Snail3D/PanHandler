@@ -4534,7 +4534,6 @@ export default function DimensionOverlay({
 
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
-        <GestureDetector gesture={menuPanGesture}>
           <Animated.View
             pointerEvents="box-none"
             style={[
@@ -4571,6 +4570,22 @@ export default function DimensionOverlay({
                 borderWidth: 1,
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
+                
+                {/* Swipe handle at top - ONLY this area has the pan gesture */}
+                <GestureDetector gesture={menuPanGesture}>
+                  <Animated.View style={{ 
+                    paddingVertical: 8,
+                    alignItems: 'center',
+                    marginBottom: 4
+                  }}>
+                    <View style={{
+                      width: 40,
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: 'rgba(0, 0, 0, 0.15)',
+                    }} />
+                  </Animated.View>
+                </GestureDetector>
                 
                 {/* Header with undo button and hide menu on same line */}
                 <View style={{ 
@@ -5307,7 +5322,6 @@ export default function DimensionOverlay({
         </View>
         </BlurView>
           </Animated.View>
-        </GestureDetector>
       )}
       
       {/* Pro Upgrade Modal */}
