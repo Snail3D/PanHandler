@@ -2056,7 +2056,9 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
-    .minDistance(40) // Increased from 20 to 40px to reduce interference with taps
+    .minDistance(20) // Lower minDistance for smoother swipe-off
+    .failOffsetX([-10, 10]) // Fail quickly if movement < 10px
+    .failOffsetY([-10, 10]) // Fail quickly if movement < 10px
     .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
     .onUpdate((event) => {
       // Only respond to horizontal swipes - stricter detection
@@ -2096,10 +2098,11 @@ export default function DimensionOverlay({
   
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
-    .minDistance(40) // Increased to 40px to reduce interference with taps/buttons
+    .minDistance(40) // Require 40px movement to activate - allows taps to work
+    .failOffsetX([-15, 15]) // Fail immediately if movement < 15px horizontal
+    .failOffsetY([-15, 15]) // Fail immediately if movement < 15px vertical
     .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
-    .activateAfterLongPress(0) // Activate immediately once minDistance is met
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
@@ -4660,14 +4663,11 @@ export default function DimensionOverlay({
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={() => {
-                  // Delay to ensure gestures are fully released
-                  setTimeout(() => {
-                    playModeHaptic('rectangle');
-                    setMode('rectangle');
-                    setCurrentPoints([]);
-                    setMeasurementMode(true);
-                    setModeColorIndex((prev) => prev + 1);
-                  }, 100);
+                  playModeHaptic('rectangle');
+                  setMode('rectangle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4706,14 +4706,11 @@ export default function DimensionOverlay({
               {/* Circle */}
               <Pressable
                 onPress={() => {
-                  // Delay to ensure gestures are fully released
-                  setTimeout(() => {
-                    playModeHaptic('circle');
-                    setMode('circle');
-                    setCurrentPoints([]);
-                    setMeasurementMode(true);
-                    setModeColorIndex((prev) => prev + 1);
-                  }, 100);
+                  playModeHaptic('circle');
+                  setMode('circle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4752,14 +4749,11 @@ export default function DimensionOverlay({
               {/* Angle */}
               <Pressable
                 onPress={() => {
-                  // Delay to ensure gestures are fully released
-                  setTimeout(() => {
-                    playModeHaptic('angle');
-                    setMode('angle');
-                    setCurrentPoints([]);
-                    setMeasurementMode(true);
-                    setModeColorIndex((prev) => prev + 1);
-                  }, 100);
+                  playModeHaptic('angle');
+                  setMode('angle');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4801,14 +4795,11 @@ export default function DimensionOverlay({
               {/* Distance (long-press also activates freehand) */}
               <Pressable
                 onPress={() => {
-                  // Delay to ensure gestures are fully released
-                  setTimeout(() => {
-                    playModeHaptic('distance');
-                    setMode('distance');
-                    setCurrentPoints([]);
-                    setMeasurementMode(true);
-                    setModeColorIndex((prev) => prev + 1);
-                  }, 100);
+                  playModeHaptic('distance');
+                  setMode('distance');
+                  setCurrentPoints([]);
+                  setMeasurementMode(true);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 onPressIn={() => {
                   // Start long-press timer for freehand mode
