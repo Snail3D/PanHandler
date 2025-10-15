@@ -5877,43 +5877,43 @@ export default function DimensionOverlay({
             pointerEvents: 'none',
           }, panTutorialAnimatedStyle]}
         >
-          {/* Instructional Text */}
+          {/* Instructional Text - 15% BIGGER (confident & polished!) */}
           <Text
             style={{
-              fontSize: 15,
+              fontSize: 17.25, // Was 15, now +15%
               fontWeight: '500',
               color: 'rgba(255, 255, 255, 0.95)',
               textAlign: 'center',
-              marginBottom: 18,
+              marginBottom: 20.7, // Was 18, now +15%
               textShadowColor: 'rgba(0, 0, 0, 0.6)',
               textShadowOffset: { width: 0, height: 1 },
               textShadowRadius: 4,
-              lineHeight: 21,
+              lineHeight: 24.15, // Was 21, now +15%
               letterSpacing: 0.3,
             }}
           >
             {"Pan around and align your photo\nusing the guides, then select\nyour measurement"}
           </Text>
 
-          {/* Measurement Mode Icons */}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 16 }}>
+          {/* Measurement Mode Icons - 15% BIGGER */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 18.4 }}> {/* Was 16, now +15% */}
             {/* Box */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={28} height={28} viewBox="0 0 24 24">
+              <Svg width={32.2} height={32.2} viewBox="0 0 24 24"> {/* Was 28, now +15% */}
                 <Rect x="4" y="4" width="16" height="16" stroke="white" strokeWidth="2" fill="none" />
               </Svg>
             </View>
 
             {/* Circle */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={28} height={28} viewBox="0 0 24 24">
+              <Svg width={32.2} height={32.2} viewBox="0 0 24 24">
                 <Circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2" fill="none" />
               </Svg>
             </View>
 
             {/* Angle */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={28} height={28} viewBox="0 0 24 24">
+              <Svg width={32.2} height={32.2} viewBox="0 0 24 24">
                 <Line x1="4" y1="20" x2="20" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round" />
                 <Line x1="4" y1="20" x2="20" y2="20" stroke="white" strokeWidth="2" strokeLinecap="round" />
                 <Path d="M 10 20 A 8 8 0 0 1 8 12" stroke="white" strokeWidth="1.5" fill="none" />
@@ -5922,7 +5922,7 @@ export default function DimensionOverlay({
 
             {/* Line */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={28} height={28} viewBox="0 0 24 24">
+              <Svg width={32.2} height={32.2} viewBox="0 0 24 24">
                 <Line x1="4" y1="12" x2="20" y2="12" stroke="white" strokeWidth="2" />
                 <Circle cx="4" cy="12" r="3" fill="white" />
                 <Circle cx="20" cy="12" r="3" fill="white" />
@@ -5931,7 +5931,7 @@ export default function DimensionOverlay({
 
             {/* Freehand */}
             <View style={{ alignItems: 'center' }}>
-              <Svg width={28} height={28} viewBox="0 0 24 24">
+              <Svg width={32.2} height={32.2} viewBox="0 0 24 24">
                 <Path 
                   d="M 4 12 Q 7 8, 10 12 T 16 12 Q 18 13, 20 10" 
                   stroke="white" 
