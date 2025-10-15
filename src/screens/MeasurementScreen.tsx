@@ -37,6 +37,9 @@ export default function MeasurementScreen() {
   const cameraOpacity = useSharedValue(0);
   const blackOverlayOpacity = useSharedValue(1); // Start with black overlay
   
+  // Universal screen transition opacity for smooth mode changes
+  const screenOpacity = useSharedValue(1);
+  
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
   const [tiltAngle, setTiltAngle] = useState(0);
@@ -62,6 +65,22 @@ export default function MeasurementScreen() {
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
+  
+  // Smooth mode transition helper - fade out, change mode, fade in
+  const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 300) => {
+    screenOpacity.value = withTiming(0, {
+      duration: delay,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+    });
+    
+    setTimeout(() => {
+      setMode(newMode);
+      screenOpacity.value = withTiming(1, {
+        duration: delay,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+      });
+    }, delay);
+  };
   
   // Determine if pan/zoom should be locked
   const isPanZoomLocked = measurements.length > 0 || currentPoints.length > 0;
@@ -273,6 +292,10 @@ export default function MeasurementScreen() {
     opacity: blackOverlayOpacity.value,
   }));
 
+  const screenTransitionStyle = useAnimatedStyle(() => ({
+    opacity: screenOpacity.value,
+  }));
+
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center bg-black">
@@ -336,7 +359,17 @@ export default function MeasurementScreen() {
         // Set image URI (auto-captured if it was via hold)
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
-        setMode('zoomCalibrate'); // Go straight to combined zoom + coin select screen
+        
+        // Smooth fade transition to calibration screen
+        cameraOpacity.value = withTiming(0, {
+          duration: 400,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+        
+        // Wait for fade, then switch mode
+        setTimeout(() => {
+          setMode('zoomCalibrate'); // Go straight to combined zoom + coin select screen
+        }, 400);
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -369,7 +402,7 @@ export default function MeasurementScreen() {
       rotation: calibrationData.initialZoom.rotation || 0,
     });
     
-    setMode('measurement');
+    smoothTransitionToMode('measurement');
   };
 
   const handleCancelCalibration = () => {
@@ -617,7 +650,7 @@ export default function MeasurementScreen() {
 
   // Calibration or Measurement Mode
   return (
-    <View className="flex-1 bg-black">
+    <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, screenTransitionStyle]}>
       {currentImageUri && (
         <>
           {/* Zoom Calibration Mode */}
@@ -676,7 +709,7 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => setMode('camera')}
+                  onReset={() => smoothTransitionToMode('camera')}
                 />
               </View>
             </View>
@@ -696,6 +729,6 @@ export default function MeasurementScreen() {
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-    </View>
+    </Animated.View>
   );
 }
