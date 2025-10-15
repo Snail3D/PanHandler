@@ -4660,11 +4660,14 @@ export default function DimensionOverlay({
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={() => {
-                  playModeHaptic('rectangle');
-                  setMode('rectangle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1);
+                  // Delay to ensure gestures are fully released
+                  setTimeout(() => {
+                    playModeHaptic('rectangle');
+                    setMode('rectangle');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setModeColorIndex((prev) => prev + 1);
+                  }, 100);
                 }}
                 style={{
                   flex: 1,
@@ -4703,11 +4706,14 @@ export default function DimensionOverlay({
               {/* Circle */}
               <Pressable
                 onPress={() => {
-                  playModeHaptic('circle');
-                  setMode('circle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1);
+                  // Delay to ensure gestures are fully released
+                  setTimeout(() => {
+                    playModeHaptic('circle');
+                    setMode('circle');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setModeColorIndex((prev) => prev + 1);
+                  }, 100);
                 }}
                 style={{
                   flex: 1,
@@ -4746,11 +4752,14 @@ export default function DimensionOverlay({
               {/* Angle */}
               <Pressable
                 onPress={() => {
-                  playModeHaptic('angle');
-                  setMode('angle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1);
+                  // Delay to ensure gestures are fully released
+                  setTimeout(() => {
+                    playModeHaptic('angle');
+                    setMode('angle');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setModeColorIndex((prev) => prev + 1);
+                  }, 100);
                 }}
                 style={{
                   flex: 1,
@@ -4792,11 +4801,14 @@ export default function DimensionOverlay({
               {/* Distance (long-press also activates freehand) */}
               <Pressable
                 onPress={() => {
-                  playModeHaptic('distance');
-                  setMode('distance');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1);
+                  // Delay to ensure gestures are fully released
+                  setTimeout(() => {
+                    playModeHaptic('distance');
+                    setMode('distance');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setModeColorIndex((prev) => prev + 1);
+                  }, 100);
                 }}
                 onPressIn={() => {
                   // Start long-press timer for freehand mode
