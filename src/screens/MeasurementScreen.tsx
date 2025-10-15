@@ -186,27 +186,28 @@ export default function MeasurementScreen() {
     const randomPhrase = SMOKE_PHRASES[Math.floor(Math.random() * SMOKE_PHRASES.length)];
     setSmokeText(randomPhrase);
     
-    // Smoke animation: fade in + float up, then fade out
+    // Smoke animation: fade in + float up slowly, then fade out
     smokeOpacity.value = 0;
     smokeTranslateY.value = 0;
     
-    // Fade in + float up
+    // Fade in slower for dramatic effect
     smokeOpacity.value = withTiming(1, {
-      duration: 600,
+      duration: 800, // Slower fade in
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
-    smokeTranslateY.value = withTiming(-20, {
-      duration: 2000,
+    // Float up MORE and SLOWER for smoky effect
+    smokeTranslateY.value = withTiming(-30, {
+      duration: 2800, // Longer float
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
     
-    // After 1 second at peak, fade out
+    // Stay visible longer (1.5s at peak), then fade out
     setTimeout(() => {
       smokeOpacity.value = withTiming(0, {
-        duration: 800,
+        duration: 1000, // Slower fade out
         easing: Easing.bezier(0.4, 0.0, 0.2, 1),
       });
-    }, 1200);
+    }, 1700); // Wait longer before fading
   };
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
@@ -234,7 +235,7 @@ export default function MeasurementScreen() {
         setTimeout(() => setIsTransitioning(false), 1800);
       } else {
         // For non-camera modes, morph in from black (1.5 seconds in)
-        // Wait a tiny bit for mode switch before morphing
+        // Wait a bit longer for mode switch before morphing to prevent snap
         setTimeout(() => {
           screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
           screenScale.value = withTiming(1, { // Settle to normal scale
@@ -246,7 +247,7 @@ export default function MeasurementScreen() {
             duration: delay,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
-        }, 50); // Small delay for React render
+        }, 100); // Longer delay for React render (was 50ms)
         
         // Unlock AFTER transition fully completes + buffer time + gesture queue clear
         setTimeout(() => {
@@ -255,7 +256,7 @@ export default function MeasurementScreen() {
           requestAnimationFrame(() => {
             setIsTransitioning(false);
           });
-        }, delay + 250); // Extra 200ms buffer after fade completes
+        }, delay + 300); // Extra buffer (was 250ms)
       }
     }, delay);
   };
@@ -550,18 +551,22 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth 1.5s fade to black with liquid morph, then to calibration screen
+        // Smooth 3 SECOND epic fade to black for smoke effect, then to calibration screen
         setIsTransitioning(true); // Lock out interactions
+        const fadeOutDuration = 1500; // 1.5s fade to black
+        const smokeDisplayTime = 3000; // 3s total before switching modes
+        const fadeInDuration = 1500; // 1.5s fade in from black
+        
         transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay - fast!
           duration: 1050, // 70% of 1500ms - cover screen quickly
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         cameraOpacity.value = withTiming(0, {
-          duration: 1500,
+          duration: fadeOutDuration,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(1, {
-          duration: 1500,
+          duration: fadeOutDuration,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         
@@ -570,7 +575,7 @@ export default function MeasurementScreen() {
           showSmokeText();
         }, 1050);
         
-        // Wait 1.5s for fade to black, then switch mode and fade in with morph
+        // Wait 3 SECONDS for smoke to display, then switch mode and fade in with morph
         setTimeout(() => {
           setMode('zoomCalibrate');
           
@@ -579,11 +584,11 @@ export default function MeasurementScreen() {
             // Only morph scale - black overlay handles the fade
             screenScale.value = 1.10; // Start MORE scaled up (water flowing in)
             screenScale.value = withTiming(1, { // Settle to normal
-              duration: 1500,
+              duration: fadeInDuration,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
             transitionBlackOverlay.value = withTiming(0, { // Fade out black overlay
-              duration: 1500,
+              duration: fadeInDuration,
               easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             });
           }, 50); // Small delay to let React render new mode
@@ -595,8 +600,8 @@ export default function MeasurementScreen() {
             requestAnimationFrame(() => {
               setIsTransitioning(false);
             });
-          }, 1750); // Extra 200ms buffer
-        }, 1500);
+          }, fadeInDuration + 250); // Extra 200ms buffer
+        }, smokeDisplayTime);
       }
     } catch (error) {
       console.error('Error taking picture:', error);
@@ -907,15 +912,16 @@ export default function MeasurementScreen() {
           >
             <Text
               style={{
-                color: 'rgba(255, 255, 255, 0.85)', // Brighter white
-                fontSize: 16,
-                fontWeight: '400',
+                color: 'rgba(255, 255, 255, 0.9)', // Very bright white
+                fontSize: 22, // BIGGER!
+                fontWeight: '300', // Lighter weight = more ethereal
                 fontStyle: 'italic',
                 textAlign: 'center',
                 paddingHorizontal: 40,
-                textShadowColor: 'rgba(76, 175, 80, 0.6)', // Green glow hint
+                letterSpacing: 1, // Spread out for smoky feel
+                textShadowColor: 'rgba(76, 175, 80, 0.8)', // Stronger green glow
                 textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 12,
+                textShadowRadius: 20, // Bigger bloom = smokier
               }}
             >
               {smokeText}
@@ -1030,15 +1036,16 @@ export default function MeasurementScreen() {
         >
           <Text
             style={{
-              color: 'rgba(255, 255, 255, 0.85)', // Brighter white
-              fontSize: 16,
-              fontWeight: '400',
+              color: 'rgba(255, 255, 255, 0.9)', // Very bright white
+              fontSize: 22, // BIGGER!
+              fontWeight: '300', // Lighter weight = more ethereal
               fontStyle: 'italic',
               textAlign: 'center',
               paddingHorizontal: 40,
-              textShadowColor: 'rgba(76, 175, 80, 0.6)', // Green glow hint
+              letterSpacing: 1, // Spread out for smoky feel
+              textShadowColor: 'rgba(76, 175, 80, 0.8)', // Stronger green glow
               textShadowOffset: { width: 0, height: 0 },
-              textShadowRadius: 12,
+              textShadowRadius: 20, // Bigger bloom = smokier
             }}
           >
             {smokeText}
