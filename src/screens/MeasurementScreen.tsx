@@ -59,7 +59,6 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
-  const [manualPanLock, setManualPanLock] = useState(true); // Manual pan lock state from control menu
   
   // Ref for the hidden composite view (photo + badge) to capture
   const compositeViewRef = useRef<View>(null);
@@ -164,9 +163,8 @@ export default function MeasurementScreen() {
   };
   
   // Determine if pan/zoom should be locked
-  // Use manual lock state when measurements exist, otherwise always allow panning
-  const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
-  const isPanZoomLocked = hasAnyMeasurements ? manualPanLock : false;
+  // When measurements exist, always lock (they use Edit mode)
+  const isPanZoomLocked = measurements.length > 0 || currentPoints.length > 0;
 
 
   // Helper to detect orientation based on image (for future use)
@@ -954,9 +952,6 @@ export default function MeasurementScreen() {
                   setImageOpacity={setImageOpacity}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
-                  }}
-                  onPanLockChange={(locked) => {
-                    setManualPanLock(locked);
                   }}
                   onReset={() => {
                     // Simple transition to camera - no complex animations
