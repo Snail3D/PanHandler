@@ -401,66 +401,71 @@ export default function DimensionOverlay({
 
   // Detect panning/measuring/zooming and fade out tutorial with scaling effect
   useEffect(() => {
-    if (showPanTutorial) {
-      // Dismiss if user switches to measure mode
-      if (measurementMode) {
-        panTutorialOpacity.value = withSpring(0, { damping: 20 });
-        panTutorialScale.value = withSpring(1, { damping: 20 });
-        setTimeout(() => {
-          setShowPanTutorial(false);
-          // TESTING: Comment out so it shows again
-          // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-        }, 500);
-        return;
-      }
+    if (!showPanTutorial) return;
+    
+    // Dismiss if user switches to measure mode
+    if (measurementMode) {
+      panTutorialOpacity.value = withSpring(0, { damping: 20 });
+      panTutorialScale.value = withSpring(1, { damping: 20 });
+      setTimeout(() => {
+        setShowPanTutorial(false);
+        // TESTING: Comment out so it shows again
+        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+      }, 500);
+      return;
+    }
+    
+    const deltaX = Math.abs(zoomTranslateX - lastPanPosition.current.x);
+    const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
+    const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    // Check for zooming - more sensitive and immediate
+    const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
+    
+    // Calculate scale based on zoom (zoom in = scale up, zoom out = scale down)
+    const zoomFactor = zoomScale / lastZoomScale.current;
+    
+    // Apply zoom-responsive scaling IMMEDIATELY when zoom changes
+    if (zoomDelta > 0.01) { // More sensitive threshold
+      // Map zoom factor to tutorial scale (1.0 = no change, >1 = bigger, <1 = smaller)
+      const newScale = Math.max(0.6, Math.min(1.4, 0.8 + (zoomFactor * 0.4)));
+      const fadeAmount = Math.abs(zoomFactor - 1) * 2; // Fade based on zoom distance from 1.0
+      const newOpacity = Math.max(0.2, 1 - fadeAmount); // Keep visible longer
       
-      const deltaX = Math.abs(zoomTranslateX - lastPanPosition.current.x);
-      const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
-      const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      
-      // Check for zooming
-      const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
-      
-      // Calculate scale based on zoom (zoom in = scale up, zoom out = scale down)
-      // When user zooms in (scale > 1), make tutorial bigger and fade
-      // When user zooms out (scale < 1), make tutorial smaller and fade
-      const zoomFactor = zoomScale / lastZoomScale.current;
-      if (zoomDelta > 0.05) {
-        // Zoom detected!
-        const newScale = Math.max(0.5, Math.min(1.5, zoomFactor));
-        const newOpacity = Math.max(0, 1 - (Math.abs(zoomFactor - 1) * 3)); // Fade faster
-        
-        panTutorialScale.value = withSpring(newScale, { damping: 15, stiffness: 120 });
-        panTutorialOpacity.value = withSpring(newOpacity, { damping: 15 });
-        
-        // If zoomed significantly, dismiss
-        if (Math.abs(zoomFactor - 1) > 0.15) {
-          setTimeout(() => {
-            panTutorialOpacity.value = withSpring(0, { damping: 20 });
-            panTutorialScale.value = withSpring(1, { damping: 20 });
-            setTimeout(() => {
-              setShowPanTutorial(false);
-              // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-            }, 500);
-          }, 800);
-        }
-      }
-      
-      // If user has panned more than 20px, fade out the tutorial
-      if (totalMovement > 20) {
-        panTutorialOpacity.value = withSpring(0, { damping: 20 });
-        panTutorialScale.value = withSpring(1, { damping: 20 });
-        setTimeout(() => {
-          setShowPanTutorial(false);
-          // TESTING: Comment out so it shows again
-          // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-        }, 500);
-      }
-      
-      // Update last position and zoom
+      panTutorialScale.value = withSpring(newScale, { damping: 12, stiffness: 150 });
+      panTutorialOpacity.value = withSpring(newOpacity, { damping: 12, stiffness: 100 });
+    }
+    
+    // Dismiss on significant zoom (>20% change from baseline)
+    if (zoomDelta > 0.2) {
+      panTutorialOpacity.value = withSpring(0, { damping: 20 });
+      panTutorialScale.value = withSpring(1, { damping: 20 });
+      setTimeout(() => {
+        setShowPanTutorial(false);
+        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+      }, 500);
       lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
       lastZoomScale.current = zoomScale;
+      return;
     }
+    
+    // If user has panned more than 30px, fade out the tutorial
+    if (totalMovement > 30) {
+      panTutorialOpacity.value = withSpring(0, { damping: 20 });
+      panTutorialScale.value = withSpring(1, { damping: 20 });
+      setTimeout(() => {
+        setShowPanTutorial(false);
+        // TESTING: Comment out so it shows again
+        // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+      }, 500);
+      lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+      lastZoomScale.current = zoomScale;
+      return;
+    }
+    
+    // Update last position and zoom at the END
+    lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+    lastZoomScale.current = zoomScale;
   }, [zoomTranslateX, zoomTranslateY, zoomScale, showPanTutorial, measurementMode]);
 
   // Clear map scale when new photo is loaded
