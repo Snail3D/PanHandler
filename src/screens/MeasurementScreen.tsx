@@ -519,9 +519,8 @@ export default function MeasurementScreen() {
                 <Ionicons name="images-outline" size={28} color="white" />
               </Pressable>
 
-              {/* Camera Shutter - press and hold for auto-capture */}
+              {/* Camera Shutter - HOLD ONLY for auto-level capture */}
               <Pressable
-                onPress={takePicture}
                 onPressIn={() => {
                   setIsHoldingShutter(true);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -545,14 +544,16 @@ export default function MeasurementScreen() {
                   width: 64, 
                   height: 64, 
                   borderRadius: 32, 
-                  backgroundColor: isHoldingShutter && alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : 'white',
+                  backgroundColor: isHoldingShutter 
+                    ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.8)' : 'rgba(239, 83, 80, 0.8)')
+                    : 'white',
                 }} />
               </Pressable>
               
               <Text className="text-white text-sm mt-4">
                 {isHoldingShutter 
                   ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
-                  : 'Tap or hold for auto-capture'
+                  : 'Hold level to auto-capture'
                 }
               </Text>
             </View>
