@@ -96,8 +96,14 @@ export default function ZoomCalibration({
   const handleLockIn = () => {
     if (!selectedCoin) return;
     
-    // Haptic feedback for locking in
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // Zelda "Item Get" haptic sequence - da-na-na-NAAAA! 🎵
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // da
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 100);  // na
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);  // na
+    setTimeout(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // NAAAA!
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }, 300);
     
     // Save coin preference
     setLastSelectedCoin(selectedCoin.name);
