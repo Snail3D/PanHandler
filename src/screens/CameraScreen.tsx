@@ -399,7 +399,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           </View>
         </View>
 
-        {/* Alignment overlay - full screen tint */}
+        {/* Alignment overlay - full screen tint with softer colors */}
         <View 
           style={{
             position: 'absolute',
@@ -409,10 +409,10 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             bottom: 0,
             backgroundColor: 
               alignmentStatus === 'good' 
-                ? 'rgba(0, 255, 0, 0.1)' 
+                ? 'rgba(76, 175, 80, 0.08)' 
                 : alignmentStatus === 'warning'
-                ? 'rgba(255, 255, 0, 0.15)'
-                : 'rgba(255, 0, 0, 0.2)',
+                ? 'rgba(255, 183, 77, 0.12)'
+                : 'rgba(239, 83, 80, 0.15)',
             pointerEvents: 'none',
           }}
         />
@@ -459,12 +459,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           />
           
           {/* Crosshair lines - Horizontal (synced with countdown colors) */}
-          <View style={{ position: 'absolute', left: 25, top: 99, width: 45, height: 3, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 255, 0, 0.9)' : 'rgba(255, 0, 0, 0.9)' }} />
-          <View style={{ position: 'absolute', right: 25, top: 99, width: 45, height: 3, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 255, 0, 0.9)' : 'rgba(255, 0, 0, 0.9)' }} />
+          <View style={{ position: 'absolute', left: 25, top: 99, width: 45, height: 3, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 200, 0, 0.9)' : 'rgba(255, 100, 100, 0.9)' }} />
+          <View style={{ position: 'absolute', right: 25, top: 99, width: 45, height: 3, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 200, 0, 0.9)' : 'rgba(255, 100, 100, 0.9)' }} />
           
           {/* Crosshair lines - Vertical (synced with countdown colors) */}
-          <View style={{ position: 'absolute', left: 99, top: 25, width: 3, height: 45, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 255, 0, 0.9)' : 'rgba(255, 0, 0, 0.9)' }} />
-          <View style={{ position: 'absolute', left: 99, bottom: 25, width: 3, height: 45, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 255, 0, 0.9)' : 'rgba(255, 0, 0, 0.9)' }} />
+          <View style={{ position: 'absolute', left: 99, top: 25, width: 3, height: 45, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 200, 0, 0.9)' : 'rgba(255, 100, 100, 0.9)' }} />
+          <View style={{ position: 'absolute', left: 99, bottom: 25, width: 3, height: 45, backgroundColor: alignmentStatus === 'good' ? 'rgba(0, 255, 0, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 200, 0, 0.9)' : 'rgba(255, 100, 100, 0.9)' }} />
           
           {/* Center dot when level */}
           {alignmentStatus === 'good' && (
