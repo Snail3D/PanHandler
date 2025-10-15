@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
 import ZoomableImage from './ZoomableImageV2';
 import * as Haptics from 'expo-haptics';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, Easing, withTiming } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -110,9 +110,12 @@ export default function ZoomCalibration({
       coinTextOpacity.value = withSpring(1, { damping: 20 });
       arrowOpacity.value = withSpring(1, { damping: 20 });
       
-      // Then show pinch animation after 1 second
+      // Then show pinch animation after 1 second - CINEMATIC FADE IN 🎬
       setTimeout(() => {
-        tutorialOpacity.value = withSpring(1, { damping: 20 });
+        tutorialOpacity.value = withTiming(1, { 
+          duration: 600,
+          easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth
+        });
         
         // Animate fingers pinching outward (zoom in gesture)
         const animatePinch = () => {
@@ -134,28 +137,46 @@ export default function ZoomCalibration({
         setTimeout(animatePinch, 4000); // Third animation
       }, 1000);
       
-      // Auto-hide after 7 seconds (was 4.5 seconds - much longer now!)
+      // Auto-hide after 7 seconds - CINEMATIC FADE OUT 🎬
       setTimeout(() => {
-        tutorialOpacity.value = withSpring(0);
-        coinTextOpacity.value = withSpring(0);
-        arrowOpacity.value = withSpring(0);
+        tutorialOpacity.value = withTiming(0, { 
+          duration: 800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth
+        });
+        coinTextOpacity.value = withTiming(0, { 
+          duration: 800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
+        arrowOpacity.value = withTiming(0, { 
+          duration: 800,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
         setTimeout(() => {
           setShowTutorial(false);
-        }, 500);
+        }, 800);
       }, 7000);
     }, 800); // Delay so user sees the screen first
   }, []);
   
-  // Detect zoom and dismiss tutorial gracefully
+  // Detect zoom and dismiss tutorial gracefully - CINEMATIC 🎬
   useEffect(() => {
     if (showTutorial && Math.abs(zoomScale - initialZoomScale.current) > 0.1) {
-      // User started zooming - dismiss tutorial gracefully
-      tutorialOpacity.value = withSpring(0, { damping: 20 });
-      coinTextOpacity.value = withSpring(0, { damping: 20 });
-      arrowOpacity.value = withSpring(0, { damping: 20 });
+      // User started zooming - dismiss tutorial CINEMATICALLY
+      tutorialOpacity.value = withTiming(0, { 
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
+      coinTextOpacity.value = withTiming(0, { 
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
+      arrowOpacity.value = withTiming(0, { 
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
       setTimeout(() => {
         setShowTutorial(false);
-      }, 300);
+      }, 800);
     }
   }, [zoomScale, showTutorial]);
 
