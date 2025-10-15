@@ -41,6 +41,7 @@ export default function MeasurementScreen() {
   const screenOpacity = useSharedValue(1);
   const screenScale = useSharedValue(1); // For liquid morphing effect
   const screenBlur = useSharedValue(0); // For water-like blur during transition
+  const transitionBlackOverlay = useSharedValue(0); // FORCE black overlay for ALL transitions
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -70,7 +71,11 @@ export default function MeasurementScreen() {
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
-    // Fade to black with liquid morph effect (1.5 seconds out)
+    // Bring up BLACK overlay while fading content (1.5 seconds out)
+    transitionBlackOverlay.value = withTiming(1, {
+      duration: delay,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+    });
     screenOpacity.value = withTiming(0, {
       duration: delay,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -88,7 +93,12 @@ export default function MeasurementScreen() {
         cameraOpacity.value = 0;
         blackOverlayOpacity.value = 1;
         screenScale.value = 1; // Reset scale immediately for camera
-        // screenOpacity stays at 0 - camera's useEffect will handle the fade
+        screenOpacity.value = 1; // Keep at 1 for camera
+        // Fade out transition overlay, let camera's own black overlay handle the fade
+        transitionBlackOverlay.value = withTiming(0, {
+          duration: delay,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
       } else {
         // For non-camera modes, fade in from black with liquid morph (1.5 seconds in)
         screenScale.value = 1.05; // Start slightly scaled up
@@ -97,6 +107,11 @@ export default function MeasurementScreen() {
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         screenScale.value = withTiming(1, { // Settle to normal scale
+          duration: delay,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+        // Fade out black overlay as content fades in
+        transitionBlackOverlay.value = withTiming(0, {
           duration: delay,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
@@ -319,6 +334,10 @@ export default function MeasurementScreen() {
     transform: [{ scale: screenScale.value }],
   }));
 
+  const transitionBlackOverlayStyle = useAnimatedStyle(() => ({
+    opacity: transitionBlackOverlay.value,
+  }));
+
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center bg-black">
@@ -384,6 +403,10 @@ export default function MeasurementScreen() {
         await detectOrientation(photo.uri);
         
         // Smooth 1.5s fade to black with liquid morph, then to calibration screen
+        transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay
+          duration: 1500,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
         cameraOpacity.value = withTiming(0, {
           duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -404,6 +427,10 @@ export default function MeasurementScreen() {
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
           screenScale.value = withTiming(1, { // Settle to normal
+            duration: 1500,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
+          transitionBlackOverlay.value = withTiming(0, { // Fade out black overlay
             duration: 1500,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
@@ -767,6 +794,23 @@ export default function MeasurementScreen() {
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      
+      {/* FORCE BLACK Transition Overlay - covers EVERYTHING during mode changes */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'black',
+            zIndex: 999999,
+          },
+          transitionBlackOverlayStyle,
+        ]}
+      />
     </Animated.View>
   );
 }
