@@ -269,6 +269,7 @@ export default function ZoomCalibration({
       <ZoomableImage
         imageUri={imageUri}
         zoomToCenter={true}
+        singleFingerPan={true}
         onTransformChange={(scale, translateX, translateY) => {
           setZoomScale(scale);
           setZoomTranslate({ x: translateX, y: translateY });

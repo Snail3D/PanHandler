@@ -24,6 +24,7 @@ interface ZoomableImageProps {
   showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
   locked?: boolean; // If true, disable pan/zoom gestures
   opacity?: number; // Opacity of the image (0-1), default 1
+  singleFingerPan?: boolean; // If true, allow one-finger panning (for calibration screen)
 }
 
 export default function ZoomableImage({ 
@@ -38,6 +39,7 @@ export default function ZoomableImage({
   showLevelLine = false,
   locked = false,
   opacity = 1,
+  singleFingerPan = false,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -119,7 +121,7 @@ export default function ZoomableImage({
   const panGesture = Gesture.Pan()
     .enabled(!locked)
     .minDistance(10) // Require 10px movement before activating - reduces tap interference
-    .minPointers(2) // Require 2 fingers - prevents single tap interference with buttons
+    .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
     .activeOffsetY([-10, 10]) // Require 10px vertical movement to activate
     .failOffsetX([-5, 5]) // Fail if finger stays within 5px
