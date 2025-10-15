@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
+import { captureRef } from 'react-native-view-shot';
 import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,33 +24,26 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
 
-// Helper function to add "AUTO-LEVELED" text to image
-async function addAutoLeveledLabel(imageUri: string): Promise<string> {
+// Helper function to add "AUTO LEVEL" badge to image (top right corner)
+// Captures a View containing the image + badge overlay
+async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<string | null> {
   try {
-    // Get image dimensions
-    const imageInfo = await ImageManipulator.manipulateAsync(
-      imageUri,
-      [],
-      { format: ImageManipulator.SaveFormat.JPEG }
-    );
+    if (!compositeRef.current) {
+      console.warn('Composite ref not available');
+      return null;
+    }
     
-    // Create a simple green badge as an SVG data URI
-    const svgBadge = `
-      <svg width="200" height="40" xmlns="http://www.w3.org/2000/svg">
-        <rect width="200" height="40" rx="8" fill="rgba(76, 175, 80, 0.9)"/>
-        <text x="100" y="27" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">AUTO-LEVELED</text>
-      </svg>
-    `;
+    // Capture the entire View (image + badge) as a single image
+    const uri = await captureRef(compositeRef, {
+      format: 'jpg',
+      quality: 1.0,
+      result: 'tmpfile',
+    });
     
-    // Note: expo-image-manipulator doesn't support SVG overlay directly
-    // We'll use a simpler approach: just return the original image
-    // and rely on the album organization for now
-    
-    // TODO: Implement proper text overlay using react-native-view-shot or canvas
-    return imageUri;
+    return uri;
   } catch (error) {
-    console.error('Error adding label:', error);
-    return imageUri;
+    console.error('Error adding AUTO LEVEL badge:', error);
+    return null;
   }
 }
 
@@ -65,6 +59,10 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
+  
+  // Ref for the hidden composite view (photo + badge) to capture
+  const compositeViewRef = useRef<View>(null);
+  const [tempPhotoForBadge, setTempPhotoForBadge] = useState<string | null>(null);
   
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(0);
@@ -392,24 +390,24 @@ export default function MeasurementScreen() {
 
   if (!permission) {
     return (
-      <View className="flex-1 items-center justify-center bg-black">
-        <Text className="text-white">Loading camera...</Text>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black' }}>
+        <Text style={{ color: 'white' }}>Loading camera...</Text>
       </View>
     );
   }
 
   if (!permission.granted) {
     return (
-      <View className="flex-1 items-center justify-center bg-black px-6">
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', paddingHorizontal: 24 }}>
         <Ionicons name="camera-outline" size={64} color="white" />
-        <Text className="text-white text-xl text-center mt-4 mb-6">
+        <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', marginTop: 16, marginBottom: 24 }}>
           Camera access is needed to take measurement photos
         </Text>
         <Pressable
           onPress={requestPermission}
-          className="bg-blue-500 px-6 py-3 rounded-full"
+          style={{ backgroundColor: '#3B82F6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 9999 }}
         >
-          <Text className="text-white font-semibold">Grant Permission</Text>
+          <Text style={{ color: 'white', fontWeight: '600' }}>Grant Permission</Text>
         </Pressable>
       </View>
     );
@@ -450,8 +448,20 @@ export default function MeasurementScreen() {
         // Save to camera roll
         if (canSave) {
           try {
+            let photoToSave = photo.uri;
+            
+            // If auto-captured, add badge to photo before saving
+            if (wasAutoCapture) {
+              // TODO: Add badge overlay here using a pre-made badge image
+              // For now, just save the original photo
+              // We'll need to either:
+              // 1. Create a pre-made badge PNG asset and use a library that supports image compositing
+              // 2. Use expo-gl or canvas to draw the badge
+              // 3. Render a View with photo+badge and capture it with react-native-view-shot
+            }
+            
             // Save photo to library
-            const asset = await MediaLibrary.createAssetAsync(photo.uri);
+            const asset = await MediaLibrary.createAssetAsync(photoToSave);
             
             // If auto-captured, also save to "Auto-Leveled" album
             if (wasAutoCapture) {
@@ -463,7 +473,7 @@ export default function MeasurementScreen() {
                 } else {
                   await MediaLibrary.createAlbumAsync('Auto-Leveled', asset, false);
                 }
-                __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album');
+                __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album (badge overlay pending)');
               } catch (albumError) {
                 console.error('Failed to add to Auto-Leveled album:', albumError);
                 __DEV__ && console.log('✅ Photo saved to camera roll only');
@@ -620,18 +630,24 @@ export default function MeasurementScreen() {
           >
             {/* Top controls */}
             <View 
-              className="absolute top-0 left-0 right-0 z-10"
-              style={{ paddingTop: insets.top + 16 }}
+              style={{ 
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                zIndex: 10,
+                paddingTop: insets.top + 16 
+              }}
             >
-              <View className="flex-row justify-between items-center px-6">
-                <View className="flex-row items-center">
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Pressable
                     onPress={() => {
                       __DEV__ && console.log('🔵 Help button pressed in camera screen');
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       setShowHelpModal(true);
                     }}
-                    className="w-10 h-10 items-center justify-center"
+                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Ionicons name="help-circle-outline" size={28} color="white" />
                   </Pressable>
@@ -640,7 +656,7 @@ export default function MeasurementScreen() {
                       setFlashEnabled(!flashEnabled);
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
-                    className="w-10 h-10 items-center justify-center ml-2"
+                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}
                   >
                     <Ionicons 
                       name={flashEnabled ? "flash" : "flash-off"} 
@@ -649,9 +665,9 @@ export default function MeasurementScreen() {
                     />
                   </Pressable>
                 </View>
-                <Text className="text-white text-lg font-semibold">Take Photo</Text>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>Take Photo</Text>
                 {/* Spacer to keep title centered */}
-                <View className="w-10 h-10" />
+                <View style={{ width: 40, height: 40 }} />
               </View>
             </View>
 
@@ -747,15 +763,31 @@ export default function MeasurementScreen() {
 
             {/* Bottom controls */}
             <View 
-              className="absolute bottom-0 left-0 right-0 z-10"
-              style={{ paddingBottom: insets.bottom + 32 }}
+              style={{ 
+                position: 'absolute', 
+                bottom: 0, 
+                left: 0, 
+                right: 0, 
+                zIndex: 10,
+                paddingBottom: insets.bottom + 32 
+              }}
             >
-              <View className="items-center">
+              <View style={{ alignItems: 'center' }}>
                 {/* Photo Library Button */}
                 <Pressable
                   onPress={pickImage}
-                  className="absolute left-8 bottom-0 w-14 h-14 rounded-full bg-gray-800/80 items-center justify-center"
-                  style={{ marginBottom: 3 }}
+                  style={{ 
+                    position: 'absolute', 
+                    left: 32, 
+                    bottom: 0, 
+                    width: 56, 
+                    height: 56, 
+                    borderRadius: 28, 
+                    backgroundColor: 'rgba(31, 41, 55, 0.8)', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    marginBottom: 3 
+                  }}
                 >
                   <Ionicons name="images-outline" size={28} color="white" />
                 </Pressable>
@@ -791,7 +823,7 @@ export default function MeasurementScreen() {
                   }} />
                 </Pressable>
                 
-                <Text className="text-white text-sm mt-4">
+                <Text style={{ color: 'white', fontSize: 14, marginTop: 16 }}>
                   {isHoldingShutter 
                     ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
                     : 'Hold level to auto-capture'

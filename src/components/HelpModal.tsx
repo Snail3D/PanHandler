@@ -583,6 +583,26 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       💡 Green = Auto countdown starts → Photo captures automatically
                     </Text>
                   </View>
+                  
+                  {/* Auto-Leveled Album Feature */}
+                  <View style={{
+                    marginTop: 12,
+                    backgroundColor: 'rgba(88,86,214,0.08)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(88,86,214,0.2)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Ionicons name="albums" size={18} color="#5856D6" />
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
+                        Smart Photo Organization
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                      Auto-captured photos are automatically saved to both your Camera Roll AND a special "Auto-Leveled" album in Photos for easy access!
+                    </Text>
+                  </View>
                 </View>
               </ExpandableSection>
 
