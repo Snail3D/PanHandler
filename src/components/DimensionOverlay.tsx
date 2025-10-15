@@ -2087,9 +2087,7 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
   const menuPanGesture = Gesture.Pan()
-    .minDistance(20) // Lower minDistance for smoother swipe-off
-    .failOffsetX([-10, 10]) // Fail quickly if movement < 10px
-    .failOffsetY([-10, 10]) // Fail quickly if movement < 10px
+    .minDistance(40) // Require 40px movement to activate
     .enableTrackpadTwoFingerGesture(false) // Disable trackpad to reduce interference
     .onUpdate((event) => {
       // Only respond to horizontal swipes - stricter detection
@@ -2130,8 +2128,9 @@ export default function DimensionOverlay({
   // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
   const modeSwitchGesture = Gesture.Pan()
     .minDistance(40) // Require 40px movement to activate - allows taps to work
-    .failOffsetX([-15, 15]) // Fail immediately if movement < 15px horizontal
-    .failOffsetY([-15, 15]) // Fail immediately if movement < 15px vertical
+    .activeOffsetX([-20, 20]) // Activate on 20px horizontal movement
+    .failOffsetX([-10, 10]) // Fail if movement stays within 10px horizontal
+    // NO failOffsetY - allow vertical drift while swiping horizontally
     .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
