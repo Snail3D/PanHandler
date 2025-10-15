@@ -4601,8 +4601,6 @@ export default function DimensionOverlay({
                 setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }}
-              delayPressIn={0}
-              delayPressOut={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
@@ -4634,8 +4632,6 @@ export default function DimensionOverlay({
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               }}
-              delayPressIn={0}
-              delayPressOut={0}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
@@ -4668,8 +4664,6 @@ export default function DimensionOverlay({
               <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
-                delayPressIn={0}
-                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('rectangle');
                   setMode('rectangle');
@@ -4713,8 +4707,6 @@ export default function DimensionOverlay({
 
               {/* Circle */}
               <Pressable
-                delayPressIn={0}
-                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('circle');
                   setMode('circle');
@@ -4758,8 +4750,6 @@ export default function DimensionOverlay({
 
               {/* Angle */}
               <Pressable
-                delayPressIn={0}
-                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('angle');
                   setMode('angle');
@@ -4806,8 +4796,6 @@ export default function DimensionOverlay({
 
               {/* Distance (long-press also activates freehand) */}
               <Pressable
-                delayPressIn={0}
-                delayPressOut={0}
                 onPress={() => {
                   playModeHaptic('distance');
                   setMode('distance');
@@ -4880,8 +4868,6 @@ export default function DimensionOverlay({
 
               {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
               <Pressable
-                delayPressIn={0}
-                delayPressOut={0}
                 onPress={() => {
                   if (!isProUser) {
                     setShowProModal(true);
