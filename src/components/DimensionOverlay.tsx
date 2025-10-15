@@ -488,35 +488,6 @@ export default function DimensionOverlay({
     }
   };
   
-  const playModeHaptic = (mode: MeasurementMode) => {
-    switch(mode) {
-      case 'distance':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 40);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
-        break;
-      case 'angle':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
-        break;
-      case 'circle':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 60);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
-        break;
-      case 'rectangle':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 50);
-        break;
-      case 'freehand':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 70);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 140);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 210);
-        break;
-    }
-  };
-  
   const CALCULATOR_WORDS = ['HELLO', 'BOOBS', '80085', '5318008', 'SHELL', '07734', 'GOOGLE', '376616', 'BOOBLESS', '553780085'];
   
   // Easter egg: Calibrated badge tap handler
