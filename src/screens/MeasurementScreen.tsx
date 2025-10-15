@@ -75,6 +75,13 @@ export default function MeasurementScreen() {
     
     setTimeout(() => {
       setMode(newMode);
+      
+      // If transitioning TO camera, reset camera fade states for smooth black fade-in
+      if (newMode === 'camera') {
+        cameraOpacity.value = 0;
+        blackOverlayOpacity.value = 1;
+      }
+      
       screenOpacity.value = withTiming(1, {
         duration: delay,
         easing: Easing.bezier(0.4, 0.0, 0.2, 1),
