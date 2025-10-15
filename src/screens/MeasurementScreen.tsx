@@ -248,10 +248,13 @@ export default function MeasurementScreen() {
           });
         }, 50); // Small delay for React render
         
-        // Unlock AFTER transition fully completes + buffer time
+        // Unlock AFTER transition fully completes + buffer time + gesture queue clear
         setTimeout(() => {
           transitionBlackOverlay.value = 0; // Force to 0 to ensure it's gone
-          setIsTransitioning(false);
+          // Use requestAnimationFrame to ensure all queued gestures/renders complete
+          requestAnimationFrame(() => {
+            setIsTransitioning(false);
+          });
         }, delay + 250); // Extra 200ms buffer after fade completes
       }
     }, delay);
@@ -585,10 +588,13 @@ export default function MeasurementScreen() {
             });
           }, 50); // Small delay to let React render new mode
           
-          // Unlock AFTER transition fully completes + buffer
+          // Unlock AFTER transition fully completes + buffer + gesture clear
           setTimeout(() => {
             transitionBlackOverlay.value = 0; // Force to 0
-            setIsTransitioning(false);
+            // Use requestAnimationFrame to ensure gesture queue is cleared
+            requestAnimationFrame(() => {
+              setIsTransitioning(false);
+            });
           }, 1750); // Extra 200ms buffer
         }, 1500);
       }
@@ -901,15 +907,15 @@ export default function MeasurementScreen() {
           >
             <Text
               style={{
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.85)', // Brighter white
                 fontSize: 16,
                 fontWeight: '400',
                 fontStyle: 'italic',
                 textAlign: 'center',
                 paddingHorizontal: 40,
-                textShadowColor: 'rgba(0, 0, 0, 0.5)',
-                textShadowOffset: { width: 0, height: 2 },
-                textShadowRadius: 8,
+                textShadowColor: 'rgba(76, 175, 80, 0.6)', // Green glow hint
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 12,
               }}
             >
               {smokeText}
@@ -1024,15 +1030,15 @@ export default function MeasurementScreen() {
         >
           <Text
             style={{
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'rgba(255, 255, 255, 0.85)', // Brighter white
               fontSize: 16,
               fontWeight: '400',
               fontStyle: 'italic',
               textAlign: 'center',
               paddingHorizontal: 40,
-              textShadowColor: 'rgba(0, 0, 0, 0.5)',
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 8,
+              textShadowColor: 'rgba(76, 175, 80, 0.6)', // Green glow hint
+              textShadowOffset: { width: 0, height: 0 },
+              textShadowRadius: 12,
             }}
           >
             {smokeText}
