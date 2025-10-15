@@ -35,6 +35,7 @@ export default function MeasurementScreen() {
   
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(0);
+  const blackOverlayOpacity = useSharedValue(1); // Start with black overlay
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
@@ -248,15 +249,28 @@ export default function MeasurementScreen() {
   useEffect(() => {
     if (mode === 'camera') {
       cameraOpacity.value = 0;
-      cameraOpacity.value = withTiming(1, {
-        duration: 800,
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-      });
+      blackOverlayOpacity.value = 1;
+      
+      // Delay slightly to let camera initialize, then slow fade-in
+      setTimeout(() => {
+        cameraOpacity.value = withTiming(1, {
+          duration: 2000, // 2 second smooth fade
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+        blackOverlayOpacity.value = withTiming(0, {
+          duration: 2000,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+      }, 300); // 300ms delay to let camera initialize
     }
   }, [mode]);
 
   const cameraAnimatedStyle = useAnimatedStyle(() => ({
     opacity: cameraOpacity.value,
+  }));
+
+  const blackOverlayStyle = useAnimatedStyle(() => ({
+    opacity: blackOverlayOpacity.value,
   }));
 
   if (!permission) {
@@ -578,6 +592,22 @@ export default function MeasurementScreen() {
             </View>
           </View>
         </CameraView>
+        
+        {/* Black overlay that fades out for smooth transition */}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'black',
+              pointerEvents: 'none',
+            },
+            blackOverlayStyle,
+          ]}
+        />
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
