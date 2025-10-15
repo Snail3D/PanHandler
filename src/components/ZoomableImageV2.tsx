@@ -84,7 +84,7 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(!locked)
+    .enabled(true) // Always allow pinch to zoom
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -103,7 +103,7 @@ export default function ZoomableImage({
     });
   
   const rotationGesture = Gesture.Rotation()
-    .enabled(!locked)
+    .enabled(true) // Always allow rotation
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -120,7 +120,7 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
-    .enabled(!locked)
+    .enabled(!locked || !singleFingerPan) // Allow pan when locked UNLESS it's single-finger mode
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
