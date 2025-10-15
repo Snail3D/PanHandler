@@ -74,9 +74,9 @@ export default function MeasurementScreen() {
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
     setIsTransitioning(true); // Lock out interactions
     
-    // Bring up BLACK overlay to cover content (1.5 seconds out) with pronounced scale down
+    // Bring up BLACK overlay FASTER to cover content before it scales
     transitionBlackOverlay.value = withTiming(1, {
-      duration: delay,
+      duration: delay * 0.7, // 70% of delay = 1050ms (finish earlier!)
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
     });
     screenScale.value = withTiming(0.90, { // More pronounced scale down (water pulling in)
@@ -109,8 +109,11 @@ export default function MeasurementScreen() {
           });
         }, 50); // Small delay for React render
         
-        // Unlock after transition completes
-        setTimeout(() => setIsTransitioning(false), delay + 50);
+        // Unlock AFTER transition fully completes + buffer time
+        setTimeout(() => {
+          transitionBlackOverlay.value = 0; // Force to 0 to ensure it's gone
+          setIsTransitioning(false);
+        }, delay + 250); // Extra 200ms buffer after fade completes
       }
     }, delay);
   };
@@ -402,8 +405,8 @@ export default function MeasurementScreen() {
         
         // Smooth 1.5s fade to black with liquid morph, then to calibration screen
         setIsTransitioning(true); // Lock out interactions
-        transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay
-          duration: 1500,
+        transitionBlackOverlay.value = withTiming(1, { // FORCE black overlay - fast!
+          duration: 1050, // 70% of 1500ms - cover screen quickly
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         cameraOpacity.value = withTiming(0, {
@@ -433,8 +436,11 @@ export default function MeasurementScreen() {
             });
           }, 50); // Small delay to let React render new mode
           
-          // Unlock after transition completes
-          setTimeout(() => setIsTransitioning(false), 1550);
+          // Unlock AFTER transition fully completes + buffer
+          setTimeout(() => {
+            transitionBlackOverlay.value = 0; // Force to 0
+            setIsTransitioning(false);
+          }, 1750); // Extra 200ms buffer
         }, 1500);
       }
     } catch (error) {
