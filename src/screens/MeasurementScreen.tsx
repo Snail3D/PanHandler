@@ -69,8 +69,8 @@ export default function MeasurementScreen() {
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
-  const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 400) => {
-    // Fade to black with liquid morph effect
+  const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
+    // Fade to black with liquid morph effect (1.5 seconds out)
     screenOpacity.value = withTiming(0, {
       duration: delay,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -83,22 +83,24 @@ export default function MeasurementScreen() {
     setTimeout(() => {
       setMode(newMode);
       
-      // If transitioning TO camera, reset camera fade states for smooth black fade-in
+      // If transitioning TO camera, DON'T fade screenOpacity back in - let camera handle its own fade
       if (newMode === 'camera') {
         cameraOpacity.value = 0;
         blackOverlayOpacity.value = 1;
+        screenScale.value = 1; // Reset scale immediately for camera
+        // screenOpacity stays at 0 - camera's useEffect will handle the fade
+      } else {
+        // For non-camera modes, fade in from black with liquid morph (1.5 seconds in)
+        screenScale.value = 1.05; // Start slightly scaled up
+        screenOpacity.value = withTiming(1, {
+          duration: delay,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
+        screenScale.value = withTiming(1, { // Settle to normal scale
+          duration: delay,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        });
       }
-      
-      // Fade in from black with liquid morph (water flowing out)
-      screenScale.value = 1.05; // Start slightly scaled up
-      screenOpacity.value = withTiming(1, {
-        duration: delay,
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-      });
-      screenScale.value = withTiming(1, { // Settle to normal scale
-        duration: delay,
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-      });
     }, delay);
   };
   
@@ -290,14 +292,14 @@ export default function MeasurementScreen() {
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
       
-      // Delay slightly to let camera initialize, then slow fade-in
+      // Delay slightly to let camera initialize, then 1.5 second fade-in
       setTimeout(() => {
         cameraOpacity.value = withTiming(1, {
-          duration: 2000, // 2 second smooth fade
+          duration: 1500, // 1.5 second smooth fade
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(0, {
-          duration: 2000,
+          duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
       }, 300); // 300ms delay to let camera initialize
@@ -381,31 +383,31 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Smooth fade transition to black with liquid morph, then to calibration screen
+        // Smooth 1.5s fade to black with liquid morph, then to calibration screen
         cameraOpacity.value = withTiming(0, {
-          duration: 400,
+          duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(1, {
-          duration: 400,
+          duration: 1500,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         
-        // Wait for fade to black, then switch mode and fade in from black with morph
+        // Wait 1.5s for fade to black, then switch mode and fade in with morph
         setTimeout(() => {
           setMode('zoomCalibrate');
-          // Reset screenOpacity and scale for liquid morph effect
+          // Reset screenOpacity and scale for liquid morph effect (1.5s in)
           screenOpacity.value = 0;
           screenScale.value = 1.05; // Start slightly scaled up (water flowing in)
           screenOpacity.value = withTiming(1, {
-            duration: 600,
+            duration: 1500,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
           screenScale.value = withTiming(1, { // Settle to normal
-            duration: 600,
+            duration: 1500,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
-        }, 400);
+        }, 1500);
       }
     } catch (error) {
       console.error('Error taking picture:', error);
