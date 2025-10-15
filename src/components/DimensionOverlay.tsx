@@ -2195,7 +2195,7 @@ export default function DimensionOverlay({
   return (
     <>
       {/* Persistent "Calibration Locked" indicator */}
-      {coinCircle && !showLockedInAnimation && (
+      {(coinCircle || (isMapMode && mapScale)) && !showLockedInAnimation && (
         <Pressable
           onPress={handleCalibratedTap}
           style={{
