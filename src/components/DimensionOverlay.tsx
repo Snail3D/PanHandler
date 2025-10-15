@@ -1971,7 +1971,11 @@ export default function DimensionOverlay({
     setCoinCircle(null);
     setCalibration(null);
     
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // Camera shutter haptic: da-da-da-da! 📸
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 240);
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
