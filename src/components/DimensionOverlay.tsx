@@ -2459,7 +2459,8 @@ export default function DimensionOverlay({
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
                 // Cancel activation if moving too fast during hold phase
-                if (freehandActivating && cursorMoveSpeed > 1) { // More than 1 pixel per millisecond
+                // Threshold: 0.3 pixels/ms = ~113 pixels/sec (very gentle movement)
+                if (freehandActivating && cursorMoveSpeed > 0.3) {
                   if (freehandActivationTimerRef.current) {
                     clearTimeout(freehandActivationTimerRef.current);
                     freehandActivationTimerRef.current = null;
@@ -3369,7 +3370,8 @@ export default function DimensionOverlay({
           let label = 'Hold to start';
           if (freehandActivating) {
             // Check if user is moving too fast during activation
-            if (cursorSpeed > 1) { // More than 1 pixel per millisecond
+            // Threshold: 0.3 pixels/ms = ~113 pixels/sec (very gentle movement)
+            if (cursorSpeed > 0.3) {
               label = 'Slow down to draw';
             } else {
               label = 'Hold...';
