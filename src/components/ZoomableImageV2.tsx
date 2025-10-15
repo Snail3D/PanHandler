@@ -143,27 +143,12 @@ export default function ZoomableImage({
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
-      
-      // AGGRESSIVE CLEANUP: Force interaction manager cycle
-      runOnJS(() => {
-        // Force a microtask to ensure gesture fully releases
-        Promise.resolve().then(() => {
-          // Empty - just forces the event loop to cycle
-        });
-      })();
     })
     .onFinalize(() => {
       // Ensure gesture is fully complete and release control
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
-      
-      // NUCLEAR OPTION: Force complete gesture release
-      runOnJS(() => {
-        setTimeout(() => {
-          // Tiny delay to ensure all touch events are processed
-        }, 0);
-      })();
     });
 
   const doubleTapGesture = Gesture.Tap()
