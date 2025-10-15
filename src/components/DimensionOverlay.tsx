@@ -408,17 +408,20 @@ export default function DimensionOverlay({
     // }
   }, []); // TESTING: Empty deps so it shows every time
 
-  // Detect panning/measuring/zooming/rotating and fade out tutorial quickly
+  // Detect panning/measuring/zooming/rotating and fade out tutorial - CINEMATIC
   useEffect(() => {
     if (!showPanTutorial) return;
     
     // Dismiss if user switches to measure mode
     if (measurementMode) {
-      panTutorialOpacity.value = withTiming(0, { duration: 300 });
+      panTutorialOpacity.value = withTiming(0, { 
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
+      });
       setTimeout(() => {
         setShowPanTutorial(false);
         // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-      }, 300);
+      }, 800);
       return;
     }
     
@@ -429,17 +432,20 @@ export default function DimensionOverlay({
     const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
     const rotationDelta = Math.abs(zoomRotation - lastRotation.current);
     
-    // ANY movement detected? Fade out immediately!
+    // ANY movement detected? Fade out CINEMATICALLY!
     const anyMovement = totalMovement > 10 || zoomDelta > 0.02 || rotationDelta > 1;
     
     if (anyMovement) {
-      // Quick fade out - no bouncing, no following, just disappear
-      panTutorialOpacity.value = withTiming(0, { duration: 400 });
+      // Cinematic fade - like entering a movie scene 🎬
+      panTutorialOpacity.value = withTiming(0, { 
+        duration: 800, // Longer, more graceful
+        easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
+      });
       
       setTimeout(() => {
         setShowPanTutorial(false);
         // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
-      }, 400);
+      }, 800);
     }
   }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
 
