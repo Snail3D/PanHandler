@@ -170,13 +170,14 @@ export default function ZoomCalibration({
   const handleLockIn = () => {
     if (!selectedCoin) return;
     
-    // Zelda "Item Get" haptic sequence - da-na-na-NAAAA! 🎵
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // da
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 100);  // na
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);  // na
+    // Zelda "Item Get" haptic sequence - da-na-na-NAAAA! 🎵 (BEEFED UP!)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);  // da (upgraded from Light)
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 100);  // na (upgraded)
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);  // na (upgraded to Heavy!)
     setTimeout(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // NAAAA!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // Double tap for emphasis!
+      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
     }, 300);
     
     // Save coin preference

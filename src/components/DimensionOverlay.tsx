@@ -321,6 +321,7 @@ export default function DimensionOverlay({
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
   const [showCalculatorWords, setShowCalculatorWords] = useState(false);
+  const [stepBrothersMode, setStepBrothersMode] = useState(false); // Step Brothers Easter egg!
   const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -511,33 +512,35 @@ export default function DimensionOverlay({
   const playModeHaptic = (mode: MeasurementMode) => {
     switch(mode) {
       case 'distance':
-        // Sonic Spin Dash - Quick ascending buzz
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 40);
+        // Sonic Spin Dash - Quick ascending buzz (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 40);
         setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
         break;
       case 'angle':
-        // Street Fighter Hadouken - Charge then release
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        // Street Fighter Hadouken - Charge then release (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
         setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 120); // Extra punch!
         break;
       case 'circle':
-        // Pac-Man wakka - Quick oscillating
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 60);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
+        // Pac-Man wakka - Quick oscillating (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 60); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120); // Upgraded
         break;
       case 'rectangle':
-        // Tetris rotate - Solid mechanical click
+        // Tetris rotate - Solid mechanical click (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 50);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 50); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100); // Extra thump!
         break;
       case 'freehand':
-        // Mario Paint - Creative bounce
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 70);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 140);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 210);
+        // Mario Paint - Creative bounce (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 70); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 140); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 210); // Upgraded
         break;
     }
   };
@@ -555,14 +558,19 @@ export default function DimensionOverlay({
     setCalibrateTapCount(newCount);
     
     if (newCount >= 5) {
-      // Activate Easter egg!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Activate Easter eggs! Step Brothers + Calculator words
+      // Stronger haptic feedback
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
+      
       setShowCalculatorWords(true);
+      setStepBrothersMode(true); // "YEP!" mode
       setCalibrateTapCount(0);
       
       // Auto-dismiss after 5 seconds
       setTimeout(() => {
         setShowCalculatorWords(false);
+        setStepBrothersMode(false);
       }, 5000);
     } else {
       // Reset counter after 2 seconds of no taps
@@ -583,37 +591,38 @@ export default function DimensionOverlay({
     setAutoLevelTapCount(newCount);
     
     if (newCount >= 7) {
-      // HAPTIC RICKROLL SEQUENCE! 🎵
+      // HAPTIC RICKROLL SEQUENCE! 🎵 (BEEFED UP!)
       // Mimics the iconic rhythm and feel of that famous song
       setAutoLevelTapCount(0);
       
-      // Intro beats (iconic piano notes)
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 400);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 550);
+      // Intro beats (iconic piano notes) - BEEFED UP!
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 200); // Upgraded from Light
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 550); // Upgraded
       
-      // First phrase rhythm (4 beats)
+      // First phrase rhythm (4 beats) - MORE PUNCH!
       setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 800);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1000);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1200);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 1350);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1000); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1350); // Upgraded
       
-      // Second phrase rhythm (4 beats)
+      // Second phrase rhythm (4 beats) - KEEP IT STRONG!
       setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1600);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1800);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 1950);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2100);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1800); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1950); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2100); // Upgraded
       
-      // Third phrase rhythm (4 beats)
+      // Third phrase rhythm (4 beats) - CLIMAX!
       setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2400);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2600);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2800);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 2950);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2600); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2800); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2950); // Upgraded
       
-      // Final beat + SUCCESS!
+      // Final beat + SUCCESS! - DOUBLE IMPACT!
       setTimeout(() => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
         
         // NOW open the video! 😂
         const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
@@ -2157,7 +2166,7 @@ export default function DimensionOverlay({
           style={{
             top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
             right: 16,
-            backgroundColor: 'rgba(52, 199, 89, 0.9)',
+            backgroundColor: stepBrothersMode ? 'rgba(59, 130, 246, 0.95)' : 'rgba(52, 199, 89, 0.9)', // Blue in Step Brothers mode
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 12,
@@ -2170,9 +2179,9 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="checkmark-circle" size={16} color="white" />
+            <Ionicons name={stepBrothersMode ? "thumbs-up" : "checkmark-circle"} size={16} color="white" />
             <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
-              Calibrated
+              {stepBrothersMode ? "YEP!" : "Calibrated"}
             </Text>
           </View>
           <Text style={{ 
@@ -2181,7 +2190,9 @@ export default function DimensionOverlay({
             fontWeight: '500', 
             marginTop: 2 
           }}>
-            {calibration?.calibrationType === 'verbal' && calibration.verbalScale
+            {stepBrothersMode 
+              ? "Best friends? 🤝"
+              : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
               : coinCircle
               ? `${coinCircle.coinName} • ${coinCircle.coinDiameter.toFixed(1)}mm`
