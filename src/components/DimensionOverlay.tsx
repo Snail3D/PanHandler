@@ -144,7 +144,9 @@ export default function DimensionOverlay({
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
   const panTutorialOpacity = useSharedValue(0);
+  const panTutorialScale = useSharedValue(1); // For zoom-responsive scaling
   const lastPanPosition = useRef({ x: zoomTranslateX, y: zoomTranslateY });
+  const lastZoomScale = useRef(zoomScale);
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
@@ -365,6 +367,12 @@ export default function DimensionOverlay({
     transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
   }));
   
+  // Animated style for pan tutorial with zoom-responsive scaling
+  const panTutorialAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: panTutorialOpacity.value,
+    transform: [{ scale: panTutorialScale.value }],
+  }));
+  
   // Show inspirational quote overlay
 
   // Clean up freehand state when switching away from freehand mode
@@ -391,12 +399,13 @@ export default function DimensionOverlay({
     // }
   }, []); // TESTING: Empty deps so it shows every time
 
-  // Detect panning/measuring and fade out tutorial
+  // Detect panning/measuring/zooming and fade out tutorial with scaling effect
   useEffect(() => {
     if (showPanTutorial) {
       // Dismiss if user switches to measure mode
       if (measurementMode) {
         panTutorialOpacity.value = withSpring(0, { damping: 20 });
+        panTutorialScale.value = withSpring(1, { damping: 20 });
         setTimeout(() => {
           setShowPanTutorial(false);
           // TESTING: Comment out so it shows again
@@ -409,9 +418,38 @@ export default function DimensionOverlay({
       const deltaY = Math.abs(zoomTranslateY - lastPanPosition.current.y);
       const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
       
+      // Check for zooming
+      const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
+      
+      // Calculate scale based on zoom (zoom in = scale up, zoom out = scale down)
+      // When user zooms in (scale > 1), make tutorial bigger and fade
+      // When user zooms out (scale < 1), make tutorial smaller and fade
+      const zoomFactor = zoomScale / lastZoomScale.current;
+      if (zoomDelta > 0.05) {
+        // Zoom detected!
+        const newScale = Math.max(0.5, Math.min(1.5, zoomFactor));
+        const newOpacity = Math.max(0, 1 - (Math.abs(zoomFactor - 1) * 3)); // Fade faster
+        
+        panTutorialScale.value = withSpring(newScale, { damping: 15, stiffness: 120 });
+        panTutorialOpacity.value = withSpring(newOpacity, { damping: 15 });
+        
+        // If zoomed significantly, dismiss
+        if (Math.abs(zoomFactor - 1) > 0.15) {
+          setTimeout(() => {
+            panTutorialOpacity.value = withSpring(0, { damping: 20 });
+            panTutorialScale.value = withSpring(1, { damping: 20 });
+            setTimeout(() => {
+              setShowPanTutorial(false);
+              // TODO: Uncomment to only show once: setHasSeenPanTutorial(true);
+            }, 500);
+          }, 800);
+        }
+      }
+      
       // If user has panned more than 20px, fade out the tutorial
       if (totalMovement > 20) {
         panTutorialOpacity.value = withSpring(0, { damping: 20 });
+        panTutorialScale.value = withSpring(1, { damping: 20 });
         setTimeout(() => {
           setShowPanTutorial(false);
           // TESTING: Comment out so it shows again
@@ -419,10 +457,11 @@ export default function DimensionOverlay({
         }, 500);
       }
       
-      // Update last position
+      // Update last position and zoom
       lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+      lastZoomScale.current = zoomScale;
     }
-  }, [zoomTranslateX, zoomTranslateY, showPanTutorial, measurementMode]);
+  }, [zoomTranslateX, zoomTranslateY, zoomScale, showPanTutorial, measurementMode]);
 
   // Clear map scale when new photo is loaded
   useEffect(() => {
@@ -5850,9 +5889,7 @@ export default function DimensionOverlay({
             right: 40,
             alignItems: 'center',
             pointerEvents: 'none',
-          }, {
-            opacity: panTutorialOpacity,
-          }]}
+          }, panTutorialAnimatedStyle]}
         >
           {/* Instructional Text */}
           <Text
