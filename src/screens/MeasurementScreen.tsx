@@ -676,6 +676,7 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
+                  onReset={() => setMode('camera')}
                 />
               </View>
             </View>
