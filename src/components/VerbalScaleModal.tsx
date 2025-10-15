@@ -424,7 +424,13 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                 }}>
                   <Pressable
                     onPress={() => {
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      // GoldenEye "Objective Complete" - doo-doo-doot! 🎯
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120);
+                      setTimeout(() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      }, 240);
                       Keyboard.dismiss();
                       handleContinue();
                     }}

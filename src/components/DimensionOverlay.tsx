@@ -453,7 +453,70 @@ export default function DimensionOverlay({
     }, 3000);
   };
   
-  // Calculator words for Easter egg (classic upside-down calculator words)
+  // 🎮 Game-inspired haptic sequences for measurement modes
+  const playModeHaptic = (mode: MeasurementMode) => {
+    switch(mode) {
+      case 'distance':
+        // Sonic Spin Dash - Quick ascending buzz
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 40);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+        break;
+      case 'angle':
+        // Street Fighter Hadouken - Charge then release
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+        break;
+      case 'circle':
+        // Pac-Man wakka - Quick oscillating
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 60);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
+        break;
+      case 'rectangle':
+        // Tetris rotate - Solid mechanical click
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 50);
+        break;
+      case 'freehand':
+        // Mario Paint - Creative bounce
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 70);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 140);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 210);
+        break;
+    }
+  };
+  
+  const playModeHaptic = (mode: MeasurementMode) => {
+    switch(mode) {
+      case 'distance':
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 40);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+        break;
+      case 'angle':
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+        break;
+      case 'circle':
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 60);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
+        break;
+      case 'rectangle':
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 50);
+        break;
+      case 'freehand':
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 70);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 140);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 210);
+        break;
+    }
+  };
+  
   const CALCULATOR_WORDS = ['HELLO', 'BOOBS', '80085', '5318008', 'SHELL', '07734', 'GOOGLE', '376616', 'BOOBLESS', '553780085'];
   
   // Easter egg: Calibrated badge tap handler
@@ -4477,11 +4540,11 @@ export default function DimensionOverlay({
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={() => {
+                  playModeHaptic('rectangle');
                   setMode('rectangle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4520,11 +4583,11 @@ export default function DimensionOverlay({
               {/* Circle */}
               <Pressable
                 onPress={() => {
+                  playModeHaptic('circle');
                   setMode('circle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4563,11 +4626,11 @@ export default function DimensionOverlay({
               {/* Angle */}
               <Pressable
                 onPress={() => {
+                  playModeHaptic('angle');
                   setMode('angle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
