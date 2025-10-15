@@ -3,6 +3,7 @@ import { View, Text, Pressable, Image, Dimensions } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
@@ -418,8 +419,27 @@ export default function MeasurementScreen() {
         // Save to camera roll
         if (canSave) {
           try {
-            await MediaLibrary.saveToLibraryAsync(photo.uri);
-            __DEV__ && console.log('✅ Photo saved to camera roll');
+            // Save photo to library
+            const asset = await MediaLibrary.createAssetAsync(photo.uri);
+            
+            // If auto-captured, also save to "Auto-Leveled" album
+            if (wasAutoCapture) {
+              try {
+                // Get or create "Auto-Leveled" album
+                const album = await MediaLibrary.getAlbumAsync('Auto-Leveled');
+                if (album) {
+                  await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+                } else {
+                  await MediaLibrary.createAlbumAsync('Auto-Leveled', asset, false);
+                }
+                __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album');
+              } catch (albumError) {
+                console.error('Failed to add to Auto-Leveled album:', albumError);
+                __DEV__ && console.log('✅ Photo saved to camera roll only');
+              }
+            } else {
+              __DEV__ && console.log('✅ Photo saved to camera roll');
+            }
           } catch (saveError) {
             console.error('Failed to save to camera roll:', saveError);
           }
