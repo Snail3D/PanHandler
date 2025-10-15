@@ -54,6 +54,15 @@ export default function ZoomableImage({
   const isPinching = useSharedValue(false);
   const fadeOpacity = useSharedValue(1);
   const gestureWasActive = useSharedValue(false);
+  const gestureJustEnded = useSharedValue(false); // Debounce cooldown flag
+  
+  // Helper function to clear gesture cooldown after delay
+  const clearGestureCooldown = () => {
+    setTimeout(() => {
+      gestureJustEnded.value = false;
+      __DEV__ && console.log('🔓 Gesture cooldown cleared - buttons should be responsive now');
+    }, 50);
+  };
   
   // Smooth fade when switching between locked/unlocked to prevent flash
   useEffect(() => {
@@ -112,11 +121,19 @@ export default function ZoomableImage({
     .onEnd(() => {
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Mark gesture as complete
+      
+      // ROTATION DEBOUNCE: 50ms cooldown prevents buttons from sticking after rotation
+      gestureJustEnded.value = true;
+      runOnJS(clearGestureCooldown)();
     })
     .onFinalize(() => {
       // Ensure gesture is fully complete
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
+      
+      // Additional safety: set cooldown here too (in case onEnd didn't fire)
+      gestureJustEnded.value = true;
+      runOnJS(clearGestureCooldown)();
     });
 
   const panGesture = Gesture.Pan()
@@ -143,12 +160,20 @@ export default function ZoomableImage({
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
+      
+      // PAN DEBOUNCE: 50ms cooldown prevents buttons from sticking after pan
+      gestureJustEnded.value = true;
+      runOnJS(clearGestureCooldown)();
     })
     .onFinalize(() => {
       // Ensure gesture is fully complete and release control
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
+      
+      // Additional safety: set cooldown here too (in case onEnd didn't fire)
+      gestureJustEnded.value = true;
+      runOnJS(clearGestureCooldown)();
     });
 
   const doubleTapGesture = Gesture.Tap()
