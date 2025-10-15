@@ -93,6 +93,7 @@ interface DimensionOverlayProps {
   viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
+  onReset?: () => void; // Called when "New Photo" button is pressed
 }
 
 export default function DimensionOverlay({ 
@@ -103,6 +104,7 @@ export default function DimensionOverlay({
   viewRef: externalViewRef,
   setImageOpacity,
   onRegisterDoubleTapCallback,
+  onReset,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -2004,6 +2006,9 @@ export default function DimensionOverlay({
     setImageUri(null);
     setCoinCircle(null);
     setCalibration(null);
+    
+    // Call parent's reset callback to return to camera mode
+    onReset?.();
     
     // Camera shutter haptic: da-da-da-da! 📸
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
