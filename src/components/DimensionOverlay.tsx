@@ -530,11 +530,20 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     let currentIndex = 0;
-    const typingSpeed = 30; // milliseconds per character (normal reading speed)
+    const typingSpeed = 45; // Slower for readability with haptics (was 30)
+    
+    // Light haptic on start
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
+        
+        // Subtle haptic every 4 characters (ChatGPT style)
+        if (currentIndex % 4 === 0 && currentIndex > 0) {
+          Haptics.selectionAsync();
+        }
+        
         currentIndex++;
       } else {
         clearInterval(typeInterval);
