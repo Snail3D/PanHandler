@@ -543,16 +543,20 @@ export default function DimensionOverlay({
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
-    let currentIndex = 0;
     const typingSpeed = 50;
     const timeouts: NodeJS.Timeout[] = [];
     
-    // Schedule each character AND its haptic upfront (like mode haptics do!)
-    for (let i = 0; i < completeText.length; i++) {
+    // Use EXACT pattern from freehand power-up (we KNOW this works!)
+    // Fire first character and haptic IMMEDIATELY (not in setTimeout)
+    setDisplayedText(completeText.substring(0, 1));
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    
+    // Then schedule the rest with setTimeout
+    for (let i = 1; i < completeText.length; i++) {
       const timeout = setTimeout(() => {
         setDisplayedText(completeText.substring(0, i + 1));
         
-        // Fire haptic every 3 characters
+        // Fire haptic every 3 characters (Heavy like button presses)
         if (i % 3 === 0) {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         }
