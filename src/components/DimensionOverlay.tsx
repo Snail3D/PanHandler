@@ -4564,7 +4564,7 @@ export default function DimensionOverlay({
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
           <Animated.View
-            pointerEvents="box-none"
+            pointerEvents="auto"
             style={[
               { 
                 position: 'absolute',
