@@ -34,7 +34,7 @@ export default function ZoomableImage({
 
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
-      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 25));
+      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
     })
     .onEnd(() => {
       savedScale.value = scale.value;
