@@ -970,8 +970,8 @@ export default function MeasurementScreen() {
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
-                  onReset={() => {
-                    // Simple transition to camera - no complex animations
+                  onReset={(recalibrateMode = false) => {
+                    // Simple transition to camera or recalibration
                     setIsTransitioning(true);
                     
                     // Fast fade to black
@@ -980,21 +980,39 @@ export default function MeasurementScreen() {
                       easing: Easing.in(Easing.ease),
                     });
                     
-                    // After black screen, switch to camera and clear state
+                    // After black screen, switch to appropriate mode
                     setTimeout(() => {
-                      setMode('camera');
-                      
-                      // Clear image state so camera shows up
-                      setImageUri(null);
-                      setCoinCircle(null);
-                      setCalibration(null);
-                      setImageOrientation(null);
-                      setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                      
-                      // Camera's useEffect will handle the fade in
-                      setTimeout(() => {
-                        setIsTransitioning(false);
-                      }, 1800); // Wait for camera fade in
+                      if (recalibrateMode) {
+                        // Recalibrate: Keep image, clear calibration, go to zoomCalibrate
+                        setCoinCircle(null);
+                        setCalibration(null);
+                        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                        setMode('zoomCalibrate');
+                        
+                        // Fade in the calibration screen
+                        transitionBlackOverlay.value = withTiming(0, {
+                          duration: 500,
+                          easing: Easing.out(Easing.ease),
+                        });
+                        setTimeout(() => {
+                          setIsTransitioning(false);
+                        }, 500);
+                      } else {
+                        // Full reset: Clear everything and go to camera
+                        setMode('camera');
+                        
+                        // Clear image state so camera shows up
+                        setImageUri(null);
+                        setCoinCircle(null);
+                        setCalibration(null);
+                        setImageOrientation(null);
+                        setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                        
+                        // Camera's useEffect will handle the fade in
+                        setTimeout(() => {
+                          setIsTransitioning(false);
+                        }, 1800); // Wait for camera fade in
+                      }
                     }, 300); // Wait for black fade to complete
                   }}
                 />

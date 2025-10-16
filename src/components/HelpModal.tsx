@@ -1626,6 +1626,76 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
 
+              {/* Privacy & Security Section */}
+              <View style={{ marginBottom: 20, marginTop: 12 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(650)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
+                    padding: 20,
+                    shadowColor: '#34C759',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 12,
+                    elevation: 4,
+                    borderWidth: 1,
+                    borderColor: 'rgba(52, 199, 89, 0.2)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    <View style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(52, 199, 89, 0.15)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                    }}>
+                      <Ionicons name="shield-checkmark" size={24} color="#34C759" />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                      Privacy & Security
+                    </Text>
+                  </View>
+                  
+                  <View style={{ gap: 12 }}>
+                    {/* Photos stay on device */}
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="phone-portrait-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to our servers
+                      </Text>
+                    </View>
+                    
+                    {/* Email privacy */}
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="mail-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email for sending only</Text> — your email address is never shared or sold
+                      </Text>
+                    </View>
+                    
+                    {/* No tracking */}
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="eye-off-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics on your photos, files, or measurements
+                      </Text>
+                    </View>
+                    
+                    {/* Lightweight & offline */}
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="cloud-offline-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Works offline</Text> — lightweight and secure, everything runs locally
+                      </Text>
+                    </View>
+                  </View>
+                </Animated.View>
+              </View>
+
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <Animated.View 
