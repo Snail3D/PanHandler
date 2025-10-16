@@ -2090,11 +2090,10 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
 
-  // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
+  // Swipe gesture for cycling through measurement modes - SIMPLE VERSION that doesn't interfere with buttons
   const modeSwitchGesture = Gesture.Pan()
-    .activeOffsetX([-15, 15]) // Activate on 15px horizontal movement in either direction
-    .failOffsetY([-30, 30]) // Fail if vertical movement exceeds 30px (prevent accidental trigger on vertical scrolls)
-    .shouldCancelWhenOutside(false) // Don't cancel if finger drifts outside - be forgiving
+    .minDistance(20) // Require 20px movement before activating - allows taps to work instantly
+    .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
       // Reset offset when gesture starts
