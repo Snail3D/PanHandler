@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -7,6 +7,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import { captureRef } from 'react-native-view-shot';
 import * as Haptics from 'expo-haptics';
+import * as Device from 'expo-device';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -62,6 +63,10 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
+  
+  // Accessibility & Performance Detection
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
   
   // Ref for the hidden composite view (photo + badge) to capture
   const compositeViewRef = useRef<View>(null);
@@ -359,6 +364,42 @@ export default function MeasurementScreen() {
     }
   }, []); // Only on mount
   
+  // Detect accessibility settings and device performance on mount
+  useEffect(() => {
+    async function detectAccessibilityAndPerformance() {
+      try {
+        // Check for iOS Reduce Motion setting
+        const isReduceMotionEnabled = await AccessibilityInfo.isReduceMotionEnabled();
+        setReduceMotion(isReduceMotionEnabled);
+        
+        // Detect low-end device based on multiple factors
+        const deviceYear = Device.deviceYearClass || 2024; // Default to current year if unknown
+        const isOldDevice = deviceYear < 2018; // Devices older than iPhone X / Pixel 2 era
+        
+        // Check available memory (if available)
+        const totalMemory = Device.totalMemory || 4000000000; // Default to 4GB if unknown
+        const hasLowMemory = totalMemory < 3000000000; // Less than 3GB RAM
+        
+        // Determine if device is low-end
+        const isLowEnd = isOldDevice || hasLowMemory;
+        setIsLowEndDevice(isLowEnd);
+        
+        if (isReduceMotionEnabled || isLowEnd) {
+          __DEV__ && console.log('🎯 Accessibility Mode Enabled:', {
+            reduceMotion: isReduceMotionEnabled,
+            isLowEnd,
+            deviceYear,
+            totalMemory: (totalMemory / 1000000000).toFixed(1) + 'GB'
+          });
+        }
+      } catch (error) {
+        console.error('Error detecting accessibility settings:', error);
+      }
+    }
+    
+    detectAccessibilityAndPerformance();
+  }, []); // Only on mount
+  
   // Animate special offer banner in/out
   useEffect(() => {
     if (showSpecialOffer) {
@@ -383,21 +424,25 @@ export default function MeasurementScreen() {
       return;
     }
     
+    // Animation durations - shorter for reduce motion, instant for extreme cases
+    const fadeDuration = reduceMotion ? 150 : 500;
+    const holdDuration = reduceMotion ? 2000 : 2500;
+    
     // Phase 1: Show initial instructions for 10 seconds
-    instructionalTextOpacity.value = withTiming(1, { duration: 300 });
+    instructionalTextOpacity.value = withTiming(1, { duration: reduceMotion ? 100 : 300 });
     
     const timer1 = setTimeout(() => {
       // Fade out initial text
-      instructionalTextOpacity.value = withTiming(0, { duration: 500 });
+      instructionalTextOpacity.value = withTiming(0, { duration: fadeDuration });
       setTimeout(() => {
         setShowInstructionalText(false);
         
         // Phase 2: Show encouragement for 3 seconds (10-13s mark)
         setShowEncouragementText(true);
         encouragementTextOpacity.value = withSequence(
-          withTiming(1, { duration: 500 }),
-          withTiming(1, { duration: 2500 }),
-          withTiming(0, { duration: 500 })
+          withTiming(1, { duration: fadeDuration }),
+          withTiming(1, { duration: holdDuration }),
+          withTiming(0, { duration: fadeDuration })
         );
         
         setTimeout(() => {
@@ -407,17 +452,17 @@ export default function MeasurementScreen() {
           setTimeout(() => {
             setShowReminderText(true);
             reminderTextOpacity.value = withSequence(
-              withTiming(1, { duration: 500 }),
-              withTiming(1, { duration: 2500 }),
-              withTiming(0, { duration: 500 })
+              withTiming(1, { duration: fadeDuration }),
+              withTiming(1, { duration: holdDuration }),
+              withTiming(0, { duration: fadeDuration })
             );
             
             setTimeout(() => {
               setShowReminderText(false);
-            }, 3500);
+            }, fadeDuration + holdDuration + fadeDuration);
           }, 2000);
-        }, 3500);
-      }, 500);
+        }, fadeDuration + holdDuration + fadeDuration);
+      }, fadeDuration);
     }, 10000);
     
     return () => {
@@ -432,7 +477,11 @@ export default function MeasurementScreen() {
       return;
     }
 
-    DeviceMotion.setUpdateInterval(100);
+    // Adjust update rate based on device capability
+    // Low-end devices: 150ms (6.7fps) - gentler on CPU/battery
+    // Normal devices: 100ms (10fps) - smooth but efficient
+    const updateInterval = isLowEndDevice ? 150 : 100;
+    DeviceMotion.setUpdateInterval(updateInterval);
 
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
