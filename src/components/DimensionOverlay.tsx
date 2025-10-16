@@ -5252,7 +5252,19 @@ export default function DimensionOverlay({
                     : mode === 'rectangle'
                     ? '⬜ Tap first corner, then tap opposite corner'
                     : mode === 'freehand'
-                    ? '✏️ Touch and drag to draw freehand path'
+                    ? (() => {
+                        // Dynamic helper for freehand drawing
+                        if (isDrawingFreehand && freehandPath.length > 5) {
+                          // Check if path self-intersects
+                          const selfIntersects = doesPathSelfIntersect(freehandPath);
+                          if (selfIntersects) {
+                            return '❌ Cannot find surface area - path crossed itself';
+                          } else {
+                            return '💡 Connect end to first point to find surface area';
+                          }
+                        }
+                        return '✏️ Touch and drag to draw freehand path';
+                      })()
                     : mode === 'angle'
                     ? isMapMode
                       ? '🧭 Tap 3 points: start location, north reference, destination'
