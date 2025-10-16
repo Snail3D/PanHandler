@@ -2623,7 +2623,7 @@ export default function DimensionOverlay({
             position: 'absolute',
             zIndex: 20,
             top: isMapMode 
-              ? (isAutoCaptured ? insets.top + 50 + 110 : insets.top + 16 + 110)  // Extra space for map scale info
+              ? (isAutoCaptured ? insets.top + 50 + 95 : insets.top + 16 + 95)  // Extra space for map scale info
               : (isAutoCaptured ? insets.top + 50 + 60 : insets.top + 16 + 60),   // Normal spacing
             right: 16,
             backgroundColor: 'rgba(239, 68, 68, 0.9)', // Red color for reset action
