@@ -58,6 +58,10 @@ export default function ZoomCalibration({
   const [showTutorial, setShowTutorial] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
   
+  // Lock-in button fade-in animation
+  const lockInOpacity = useSharedValue(0);
+  const [hasUserPanned, setHasUserPanned] = useState(false);
+  
   // Pinch tutorial animation values
   const leftFingerX = useSharedValue(SCREEN_WIDTH / 2 - 30);
   const leftFingerY = useSharedValue(SCREEN_HEIGHT / 2 + 100); // Below the coin (moved down)
@@ -324,6 +328,12 @@ export default function ZoomCalibration({
         onTransformChange={(scale, translateX, translateY) => {
           setZoomScale(scale);
           setZoomTranslate({ x: translateX, y: translateY });
+          
+          // Fade in lock-in button on first pan/zoom movement
+          if (!hasUserPanned && (Math.abs(translateX) > 5 || Math.abs(translateY) > 5 || Math.abs(scale - 1) > 0.05)) {
+            setHasUserPanned(true);
+            lockInOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+          }
         }}
       />
 
@@ -692,33 +702,37 @@ export default function ZoomCalibration({
 
       {/* Bottom Controls - only show when coin is selected */}
       {selectedCoin && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: insets.bottom + 80, // Raised 10% higher (was 40, now 80)
-            left: SCREEN_WIDTH * 0.15, // Narrower, matches coin selector
-            right: SCREEN_WIDTH * 0.15,
-          }}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              bottom: insets.bottom + 80, // Raised 10% higher (was 40, now 80)
+              left: SCREEN_WIDTH * 0.13, // Wider for bigger button (was 0.15)
+              right: SCREEN_WIDTH * 0.13,
+            },
+            { opacity: lockInOpacity },
+          ]}
         >
-          {/* LOCK IN Button - centered, dynamic color, HUGE */}
+          {/* LOCK IN Button - centered, dynamic color, HUGE + 20% BIGGER */}
           <BlurView
             intensity={35}
             tint="light"
             style={{
-              borderRadius: 24,
+              borderRadius: 28, // 20% bigger (was 24)
               overflow: 'hidden',
               shadowColor: currentColor,
-              shadowOffset: { width: 0, height: 8 },
+              shadowOffset: { width: 0, height: 10 }, // Bigger shadow
               shadowOpacity: 0.4,
-              shadowRadius: 24,
+              shadowRadius: 28, // Bigger shadow radius
             }}
           >
             <Pressable
               onPress={handleLockIn}
               style={({ pressed }) => ({
                 backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
-                borderRadius: 24,
-                paddingVertical: 22,
+                borderRadius: 28, // 20% bigger (was 24)
+                paddingVertical: 26, // 20% bigger (was 22)
+                paddingHorizontal: 10, // Add horizontal padding
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderWidth: 2,
@@ -729,7 +743,7 @@ export default function ZoomCalibration({
               <Text style={{ 
                 color: '#FFFFFF', 
                 fontWeight: '900', 
-                fontSize: 38,
+                fontSize: 45, // 20% bigger (was 38)
                 textAlign: 'center',
                 letterSpacing: 2.5,
                 textShadowColor: 'rgba(0, 0, 0, 0.3)',
@@ -740,7 +754,7 @@ export default function ZoomCalibration({
               </Text>
             </Pressable>
           </BlurView>
-        </View>
+        </Animated.View>
       )}
 
       {/* Back button - left middle edge, 2× bigger */}
