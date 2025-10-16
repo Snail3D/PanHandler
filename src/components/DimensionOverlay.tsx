@@ -2446,6 +2446,41 @@ export default function DimensionOverlay({
           )}
         </Pressable>
       )}
+      
+      {/* Recalibrate button - appears below calibration badge */}
+      {coinCircle && !showLockedInAnimation && !isCapturing && (
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            if (onReset) onReset();
+          }}
+          style={{
+            position: 'absolute',
+            zIndex: 20,
+            top: isMapMode 
+              ? (isAutoCaptured ? insets.top + 50 + 110 : insets.top + 16 + 110)  // Extra space for map scale info
+              : (isAutoCaptured ? insets.top + 50 + 60 : insets.top + 16 + 60),   // Normal spacing
+            right: 16,
+            backgroundColor: 'rgba(239, 68, 68, 0.9)', // Red color for reset action
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 8,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
+            elevation: 4,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="refresh-outline" size={14} color="white" />
+            <Text style={{ color: 'white', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
+              Recalibrate
+            </Text>
+          </View>
+        </Pressable>
+      )}
 
       {/* Draggable side tab - appears when menu is hidden */}
       {menuHidden && !isCapturing && (
@@ -4418,8 +4453,43 @@ export default function DimensionOverlay({
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
                       {legendCollapsed ? '+' : '−'}
                     </Text>
-                  </Pressable>
-                )}
+        </Pressable>
+      )}
+      
+      {/* Recalibrate button - appears below calibration badge */}
+      {coinCircle && !showLockedInAnimation && !isCapturing && (
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            if (onReset) onReset();
+          }}
+          style={{
+            position: 'absolute',
+            zIndex: 20,
+            top: isMapMode 
+              ? (isAutoCaptured ? insets.top + 50 + 110 : insets.top + 16 + 110)  // Extra space for map scale info
+              : (isAutoCaptured ? insets.top + 50 + 60 : insets.top + 16 + 60),   // Normal spacing
+            right: 16,
+            backgroundColor: 'rgba(239, 68, 68, 0.9)', // Red color for reset action
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 8,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
+            elevation: 4,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="refresh-outline" size={14} color="white" />
+            <Text style={{ color: 'white', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
+              Recalibrate
+            </Text>
+          </View>
+        </Pressable>
+      )}
               </View>
               
               {/* Measurement items - hidden when collapsed (except during capture) */}
