@@ -121,6 +121,14 @@ export default function MeasurementScreen() {
   // Accessibility: Track time since holding shutter for Parkinson's/tremor support
   const holdStartTime = useRef<number>(0);
   
+  // Instructional text state - fades after 10 seconds, shows encouragement message
+  const [showInstructionalText, setShowInstructionalText] = useState(true);
+  const [showEncouragementText, setShowEncouragementText] = useState(false);
+  const [showReminderText, setShowReminderText] = useState(false);
+  const instructionalTextOpacity = useSharedValue(1);
+  const encouragementTextOpacity = useSharedValue(0);
+  const reminderTextOpacity = useSharedValue(0);
+  
   // Trail positions (store last 8 positions for smooth trail)
   const trailPositions = useRef<Array<{x: number, y: number}>>([]);
   
@@ -365,6 +373,61 @@ export default function MeasurementScreen() {
     }
   }, [showSpecialOffer]);
   
+  // Instructional text sequence: Initial → Encouragement → Reminder
+  useEffect(() => {
+    if (mode !== 'camera' || isCapturing) {
+      // Reset all when not in camera mode
+      setShowInstructionalText(true);
+      setShowEncouragementText(false);
+      setShowReminderText(false);
+      instructionalTextOpacity.value = 1;
+      encouragementTextOpacity.value = 0;
+      reminderTextOpacity.value = 0;
+      return;
+    }
+    
+    // Phase 1: Show initial instructions for 10 seconds
+    instructionalTextOpacity.value = withTiming(1, { duration: 300 });
+    
+    const timer1 = setTimeout(() => {
+      // Fade out initial text
+      instructionalTextOpacity.value = withTiming(0, { duration: 500 });
+      setTimeout(() => {
+        setShowInstructionalText(false);
+        
+        // Phase 2: Show encouragement for 3 seconds (10-13s mark)
+        setShowEncouragementText(true);
+        encouragementTextOpacity.value = withSequence(
+          withTiming(1, { duration: 500 }),
+          withTiming(1, { duration: 2500 }),
+          withTiming(0, { duration: 500 })
+        );
+        
+        setTimeout(() => {
+          setShowEncouragementText(false);
+          
+          // Phase 3: Show reminder 2 seconds later (15-18s mark)
+          setTimeout(() => {
+            setShowReminderText(true);
+            reminderTextOpacity.value = withSequence(
+              withTiming(1, { duration: 500 }),
+              withTiming(1, { duration: 2500 }),
+              withTiming(0, { duration: 500 })
+            );
+            
+            setTimeout(() => {
+              setShowReminderText(false);
+            }, 3500);
+          }, 2000);
+        }, 3500);
+      }, 500);
+    }, 10000);
+    
+    return () => {
+      clearTimeout(timer1);
+    };
+  }, [mode, isCapturing]);
+  
   // Monitor device tilt for auto-capture when holding shutter
   useEffect(() => {
     if (mode !== 'camera') {
@@ -417,14 +480,15 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVerticalMode) {
-          // VERTICAL MODE: Only Y movement (up/down tilt)
-          // Phone standing upright (portrait, facing user) = beta ~0° = centered
-          // Tilt top away from you (screen faces up/ceiling) = positive beta = bubble goes DOWN
-          // Tilt top toward you (screen faces down/floor) = negative beta = bubble goes UP
-          const bubbleYOffset = (beta / 15) * maxBubbleOffset;
+          // VERTICAL MODE: Only gamma movement (left/right tilt)
+          // When phone is held vertically (portrait):
+          // - gamma ~0° = phone is upright (centered)
+          // - Positive gamma = phone tilts right = bubble goes LEFT (inverted)
+          // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
+          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Use gamma for left/right when vertical
           
-          bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
-          bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
+          bubbleX.value = withSpring(bubbleXOffset, { damping: 20, stiffness: 180, mass: 0.8 });
+          bubbleY.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock Y to center when vertical
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
@@ -720,6 +784,18 @@ export default function MeasurementScreen() {
   const specialOfferAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: specialOfferTranslateY.value }],
     opacity: specialOfferOpacity.value,
+  }));
+  
+  const instructionalTextAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: instructionalTextOpacity.value,
+  }));
+  
+  const encouragementTextAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: encouragementTextOpacity.value,
+  }));
+  
+  const reminderTextAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: reminderTextOpacity.value,
   }));
 
   if (!permission) {
@@ -1208,32 +1284,102 @@ export default function MeasurementScreen() {
                   <Ionicons name="images-outline" size={28} color="white" />
                 </Pressable>
 
-                {/* Instructional Text - No button needed! */}
-                <View
-                  style={{
-                    paddingHorizontal: 24,
-                    paddingVertical: 16,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    maxWidth: SCREEN_WIDTH - 150, // Leave room for photo library button
-                  }}
-                >
-                  <Text style={{ 
-                    color: 'rgba(255, 255, 255, 0.95)', 
-                    fontSize: 15, 
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    lineHeight: 20,
-                    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-                    textShadowOffset: { width: 0, height: 1 },
-                    textShadowRadius: 3,
-                  }}>
-                    {isCapturing 
-                      ? 'Capturing...' 
-                      : 'Position object + coin in frame, then level phone to auto-capture'
-                    }
-                  </Text>
-                </View>
+                {/* Instructional Text Sequence - Positioned halfway between crosshairs and bottom */}
+                {!isCapturing && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      // Position halfway between crosshairs (center) and bottom
+                      top: SCREEN_HEIGHT / 2 + (SCREEN_HEIGHT / 4),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: 32,
+                    }}
+                    pointerEvents="none"
+                  >
+                    {/* Phase 1: Initial Instructions (0-10s) */}
+                    {showInstructionalText && (
+                      <Animated.Text
+                        style={[
+                          {
+                            color: 'white',
+                            fontSize: 18,
+                            fontWeight: '700',
+                            textAlign: 'center',
+                            lineHeight: 26,
+                            textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                            textShadowOffset: { width: 0, height: 2 },
+                            textShadowRadius: 6,
+                          },
+                          instructionalTextAnimatedStyle,
+                        ]}
+                      >
+                        Place object in crosshairs with coin, keep level
+                      </Animated.Text>
+                    )}
+                    
+                    {/* Phase 2: Encouragement (10-13s) */}
+                    {showEncouragementText && (
+                      <Animated.Text
+                        style={[
+                          {
+                            color: 'white',
+                            fontSize: 18,
+                            fontWeight: '700',
+                            textAlign: 'center',
+                            lineHeight: 26,
+                            textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                            textShadowOffset: { width: 0, height: 2 },
+                            textShadowRadius: 6,
+                          },
+                          encouragementTextAnimatedStyle,
+                        ]}
+                      >
+                        Focus, keep this level, you got this!
+                      </Animated.Text>
+                    )}
+                    
+                    {/* Phase 3: Reminder (15-18s) */}
+                    {showReminderText && (
+                      <Animated.Text
+                        style={[
+                          {
+                            color: 'white',
+                            fontSize: 18,
+                            fontWeight: '700',
+                            textAlign: 'center',
+                            lineHeight: 26,
+                            textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                            textShadowOffset: { width: 0, height: 2 },
+                            textShadowRadius: 6,
+                          },
+                          reminderTextAnimatedStyle,
+                        ]}
+                      >
+                        Remember to hold still and center the ball in the middle
+                      </Animated.Text>
+                    )}
+                    
+                    {/* "Capturing..." always visible during capture */}
+                    {isCapturing && (
+                      <Text
+                        style={{
+                          color: 'white',
+                          fontSize: 18,
+                          fontWeight: '700',
+                          textAlign: 'center',
+                          textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                          textShadowOffset: { width: 0, height: 2 },
+                          textShadowRadius: 6,
+                        }}
+                      >
+                        Capturing...
+                      </Text>
+                    )}
+                  </View>
+                )}
               </View>
             </View>
           </CameraView>
