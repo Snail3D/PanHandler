@@ -176,9 +176,12 @@ export default function BattlingBotsModal({
   
   // Start typing when modal becomes visible
   useEffect(() => {
+    console.log('🤖 Start typing check:', { visible, currentMessageIndex, isTyping });
     if (visible && currentMessageIndex === 0 && !isTyping) {
+      console.log('🤖 Starting typing in 500ms...');
       // Small delay before starting
       setTimeout(() => {
+        console.log('🤖 Setting isTyping=true and showCursor=true');
         setIsTyping(true);
         setShowCursor(true);
       }, 500);
@@ -187,9 +190,11 @@ export default function BattlingBotsModal({
   
   // Typing animation for current message
   useEffect(() => {
+    console.log('🤖 Typing animation check:', { isTyping, currentMessageIndex, scriptLength: script.length });
     if (!isTyping || currentMessageIndex >= script.length) return;
     
     const message = script[currentMessageIndex];
+    console.log('🤖 Current message:', { bot: message.bot, text: message.text, shouldBackspace: message.shouldBackspace });
     
     // Haptic feedback on typing start
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
