@@ -159,9 +159,10 @@ export default function ZoomCalibration({
   }, []);
   
   // Detect zoom and dismiss tutorial gracefully - CINEMATIC 🎬
+  // ALSO dismiss when user opens coin selector
   useEffect(() => {
-    if (showTutorial && Math.abs(zoomScale - initialZoomScale.current) > 0.1) {
-      // User started zooming - dismiss tutorial CINEMATICALLY
+    if (showTutorial && (Math.abs(zoomScale - initialZoomScale.current) > 0.1 || searchQuery.trim().length > 0)) {
+      // User started zooming OR opened coin search - dismiss tutorial CINEMATICALLY
       tutorialOpacity.value = withTiming(0, { 
         duration: 800,
         easing: Easing.bezier(0.4, 0, 0.2, 1),
@@ -178,7 +179,7 @@ export default function ZoomCalibration({
         setShowTutorial(false);
       }, 800);
     }
-  }, [zoomScale, showTutorial]);
+  }, [zoomScale, showTutorial, searchQuery]);
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -362,13 +363,14 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Coin Selector at Top - watery glassmorphic */}
+      {/* Coin Selector at Top - watery glassmorphic - HIGHEST z-index when open */}
       <View
         style={{
           position: 'absolute',
           top: insets.top + 20,
           left: SCREEN_WIDTH * 0.15, // 30% narrower (15% on each side)
           right: SCREEN_WIDTH * 0.15,
+          zIndex: searchQuery.trim().length > 0 ? 1000 : 100, // Higher z-index when search is active
         }}
         pointerEvents="box-none"
       >
@@ -504,48 +506,54 @@ export default function ZoomCalibration({
                   )}
                 </View>
 
-                {/* Search Results */}
+                {/* Search Results - Better spacing and larger tap targets */}
                 {searchResults.length > 0 && (
                   <ScrollView 
-                    style={{ maxHeight: 200 }}
+                    style={{ maxHeight: 240 }}
                     showsVerticalScrollIndicator={false}
                   >
-                    {searchResults.slice(0, 4).map((coin) => (
+                    {searchResults.slice(0, 5).map((coin) => (
                       <Pressable
                         key={`${coin.country}-${coin.name}`}
                         onPress={() => {
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                           Keyboard.dismiss();
                           setSelectedCoin(coin);
+                          setLastSelectedCoin(coin.name);
                           setSearchQuery('');
                         }}
                         style={({ pressed }) => ({
-                          paddingVertical: 12,
-                          paddingHorizontal: 12,
-                          marginBottom: 8,
-                          borderRadius: 10,
+                          paddingVertical: 16, // Increased from 12 for bigger tap target
+                          paddingHorizontal: 16, // Increased from 12
+                          marginBottom: 10, // Increased from 8 for more separation
+                          borderRadius: 12, // Slightly larger radius
                           backgroundColor: pressed 
-                            ? 'rgba(255, 255, 255, 0.9)' 
-                            : 'rgba(255, 255, 255, 0.6)',
-                          borderWidth: 1,
+                            ? 'rgba(255, 255, 255, 0.95)' 
+                            : 'rgba(255, 255, 255, 0.7)',
+                          borderWidth: 1.5, // Thicker border
                           borderColor: pressed 
-                            ? 'rgba(0, 0, 0, 0.12)' 
-                            : 'rgba(0, 0, 0, 0.06)',
+                            ? 'rgba(0, 0, 0, 0.15)' 
+                            : 'rgba(0, 0, 0, 0.08)',
+                          shadowColor: '#000', // Added shadow for depth
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: pressed ? 0.15 : 0.08,
+                          shadowRadius: 4,
+                          elevation: pressed ? 3 : 1,
                         })}
                       >
                         <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.85)', 
-                          fontWeight: '600', 
-                          fontSize: 14,
-                          marginBottom: 2,
+                          color: 'rgba(0, 0, 0, 0.9)', // Darker for better contrast
+                          fontWeight: '700', // Bolder
+                          fontSize: 15, // Slightly larger
+                          marginBottom: 3, // More spacing
                           textAlign: 'center',
                         }}>
                           {coin.name}
                         </Text>
                         <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.5)', 
-                          fontSize: 12, 
-                          fontWeight: '500',
+                          color: 'rgba(0, 0, 0, 0.55)', // Better contrast
+                          fontSize: 13, // Larger
+                          fontWeight: '600', // Bolder
                           textAlign: 'center',
                         }}>
                           {coin.diameter}mm • {coin.country}
@@ -560,13 +568,13 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Help button - top-left, moved in 20% from corner */}
+      {/* Help button - top-right corner, out of the way */}
       {onHelp && (
         <View
         style={{
           position: 'absolute',
           top: insets.top + 28,
-          left: SCREEN_WIDTH * 0.15 + 8, // Align with coin selector + small offset
+          right: SCREEN_WIDTH * 0.15 + 8, // Align with coin selector + small offset
         }}
         >
           <BlurView
