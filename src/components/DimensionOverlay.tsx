@@ -1451,22 +1451,24 @@ export default function DimensionOverlay({
       
       // Map Mode: Apply scale conversion
       let perimeterStr: string;
+      let areaStr: string;
       let area: number;
       if (isMapMode && mapScale) {
         perimeterStr = formatMapScaleDistance(perimeter);
-        const perimeterInMapUnits = convertToMapScale(perimeter);
         area = areaPixels * Math.pow(mapScale.realDistance / mapScale.screenDistance, 2);
+        areaStr = formatMapScaleArea(area);
       } else {
         const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
         perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
         const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
         area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
+        areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
       }
       
       return { 
         ...measurement, 
         perimeter: perimeterStr, 
-        value: perimeterStr, // Show perimeter as the main value
+        value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area in legend
         area: area,
       };
     }
@@ -2060,7 +2062,7 @@ export default function DimensionOverlay({
           } else {
             areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
           }
-          newValue = `${perimeterStr} ⊞ ${areaStr}`;
+          newValue = `${perimeterStr} (A: ${areaStr})`;
           newPerimeter = perimeterStr; // Store perimeter separately for inline display
         } else {
           newValue = perimeterStr;
