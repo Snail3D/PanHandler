@@ -89,9 +89,24 @@ export default function App() {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Add haptic feedback every 3 characters for subtle typing feel
-        if (currentIndex % 3 === 0) {
-          Haptics.selectionAsync();
+        // Natural typing haptics - varied intensity like real keystrokes
+        // Most keystrokes are light, occasional medium for emphasis (vowels, punctuation)
+        const char = completeText[currentIndex];
+        const isVowel = /[aeiouAEIOU]/.test(char);
+        const isPunctuation = /[.,!?;:]/.test(char);
+        const isSpace = char === ' ';
+        
+        if (!isSpace) { // No haptic for spaces (like lifting fingers between words)
+          if (isPunctuation) {
+            // Punctuation gets a stronger tap (finishing a thought)
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } else if (isVowel && Math.random() > 0.5) {
+            // 50% of vowels get subtle emphasis (natural rhythm variation)
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          } else if (currentIndex % 4 === 0) {
+            // Every 4th character gets a light tap (consistent baseline rhythm)
+            Haptics.selectionAsync();
+          }
         }
         
         currentIndex++;
