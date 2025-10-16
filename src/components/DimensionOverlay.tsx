@@ -4694,10 +4694,14 @@ export default function DimensionOverlay({
           <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
               onPress={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(false);
                 setShowCursor(false);
                 setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              onPressIn={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BTN_IN', mode: 'IN' });
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
@@ -4725,10 +4729,14 @@ export default function DimensionOverlay({
             </Pressable>
             <Pressable
               onPress={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'MEASURE_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(true);
                 setShowCursor(true);
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }}
+              onPressIn={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'MEASURE_BTN_IN', mode: 'IN' });
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
