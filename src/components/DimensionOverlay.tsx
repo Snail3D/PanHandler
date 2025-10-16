@@ -364,6 +364,7 @@ export default function DimensionOverlay({
   const [isQuoteTyping, setIsQuoteTyping] = useState(false);
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
+  const [quoteHapticFired, setQuoteHapticFired] = useState(false); // DEBUG: Visual indicator
   
   // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
@@ -548,6 +549,9 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (!isQuoteTyping || !currentQuote) return;
     
+    // IMMEDIATE Heavy haptic at the very start
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    
     const fullText = `"${currentQuote.text}"`;
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
@@ -564,7 +568,7 @@ export default function DimensionOverlay({
         
         // Haptic feedback every 4 characters (not too frequent, noticeable)
         if (i % 4 === 0) {
-          Haptics.selectionAsync();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }
         
         if (i === completeText.length - 1) {
