@@ -568,13 +568,13 @@ export default function ZoomCalibration({
         </BlurView>
       </View>
 
-      {/* Help button - top-right corner, out of the way */}
+      {/* Help button - top-right corner */}
       {onHelp && (
         <View
         style={{
           position: 'absolute',
-          top: insets.top + 28,
-          right: SCREEN_WIDTH * 0.15 + 8, // Align with coin selector + small offset
+          top: insets.top + 16,
+          right: 16,
         }}
         >
           <BlurView
@@ -591,7 +591,7 @@ export default function ZoomCalibration({
                 onHelp();
               }}
               style={({ pressed }) => ({
-                backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 width: 40,
                 height: 40,
                 borderRadius: 20,
@@ -599,7 +599,11 @@ export default function ZoomCalibration({
                 justifyContent: 'center',
                 opacity: pressed ? 0.7 : 1,
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.25)',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
               })}
             >
               <Ionicons name="help-circle-outline" size={24} color="rgba(0, 0, 0, 0.7)" />
