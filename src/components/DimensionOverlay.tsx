@@ -531,35 +531,47 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (!isQuoteTyping || !currentQuote) return;
     
+    console.log('🎵 Quote typing starting...');
+    
     const fullText = `"${currentQuote.text}"`;
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
-    const typingSpeed = 50;
-    let currentIndex = 0; // Local variable, not state!
-    
-    const typeInterval = setInterval(() => {
-      if (currentIndex < completeText.length) {
-        setDisplayedText(completeText.substring(0, currentIndex + 1));
-        
-        // Haptic every 4 characters (same as BattlingBotsModal)
-        if (currentIndex % 4 === 0) {
-          Haptics.selectionAsync();
+    // Add delay before starting (like BattlingBotsModal does with 500ms)
+    const startDelay = setTimeout(() => {
+      console.log('🎵 Starting typeInterval now!');
+      const typingSpeed = 50;
+      let currentIndex = 0;
+      
+      const typeInterval = setInterval(() => {
+        if (currentIndex < completeText.length) {
+          setDisplayedText(completeText.substring(0, currentIndex + 1));
+          
+          // Haptic every 4 characters (same as BattlingBotsModal)
+          if (currentIndex % 4 === 0) {
+            console.log('🎵 HAPTIC at index', currentIndex);
+            Haptics.selectionAsync();
+          }
+          
+          currentIndex++;
+        } else {
+          clearInterval(typeInterval);
+          setIsQuoteTyping(false);
+          // Auto-dismiss after 5 seconds
+          setTimeout(() => {
+            dismissQuote();
+          }, 5000);
         }
-        
-        currentIndex++; // Increment local variable
-      } else {
-        clearInterval(typeInterval);
-        setIsQuoteTyping(false);
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-          dismissQuote();
-        }, 5000);
-      }
-    }, typingSpeed);
+      }, typingSpeed);
+      
+      // Store interval ID for cleanup
+      return typeInterval;
+    }, 500); // 500ms delay before starting typing
     
-    return () => clearInterval(typeInterval);
-  }, [isQuoteTyping, currentQuote]); // Remove quoteCharIndex from dependencies!
+    return () => {
+      clearTimeout(startDelay);
+    };
+  }, [isQuoteTyping, currentQuote]);
   
   const dismissQuote = () => {
     quoteOpacity.value = withTiming(0, { 
