@@ -885,26 +885,35 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             {/* No manual capture - auto-capture only when leveled */}
             <View
               style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
+                width: 96,
+                height: 96,
+                borderRadius: 48,
                 backgroundColor: 'rgba(76, 175, 80, 0.6)',
-                borderWidth: 4,
+                borderWidth: 5,
                 borderColor: 'rgba(76, 175, 80, 0.9)',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
             >
               <View style={{ 
-                width: 64, 
-                height: 64, 
-                borderRadius: 32, 
+                width: 76, 
+                height: 76, 
+                borderRadius: 38, 
                 backgroundColor: 'rgba(76, 175, 80, 0.5)',
-              }} />
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <Text style={{ 
+                  color: 'white', 
+                  fontSize: 11, 
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  lineHeight: 14,
+                }}>
+                  Hold level{'\n'}to auto{'\n'}capture
+                </Text>
+              </View>
             </View>
-            <Text className="text-white text-sm mt-4">
-              Hold level to auto-capture
-            </Text>
           </View>
         </View>
         
