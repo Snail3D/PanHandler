@@ -5755,7 +5755,7 @@ export default function DimensionOverlay({
             zIndex: 30, // Same as AUTO LEVEL badge
             top: insets.top + 16, // Same vertical position as AUTO LEVEL
             right: isAutoCaptured 
-              ? 130  // Position left of AUTO LEVEL badge when it's visible
+              ? 118  // Position right next to AUTO LEVEL badge (with small gap)
               : 16,  // Position in top right when AUTO LEVEL is hidden
             backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
             width: 30,
