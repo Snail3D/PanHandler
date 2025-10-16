@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 // import * as StoreReview from 'expo-store-review'; // Temporarily disabled - native module not loaded
 import MeasurementScreen from "./src/screens/MeasurementScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
@@ -87,6 +88,12 @@ export default function App() {
     const intervalId = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
+        
+        // Add haptic feedback every 3 characters for subtle typing feel
+        if (currentIndex % 3 === 0) {
+          Haptics.selectionAsync();
+        }
+        
         currentIndex++;
       } else {
         clearInterval(intervalId);
