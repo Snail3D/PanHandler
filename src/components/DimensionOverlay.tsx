@@ -543,33 +543,35 @@ export default function DimensionOverlay({
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
-    let typeInterval: NodeJS.Timeout | null = null;
     let currentIndex = 0;
-    
-    // Start immediately, no delay
     const typingSpeed = 50;
+    const timeouts: NodeJS.Timeout[] = [];
     
-    typeInterval = setInterval(() => {
-      if (currentIndex < completeText.length) {
-        // Update text
-        setDisplayedText(completeText.substring(0, currentIndex + 1));
+    // Schedule each character AND its haptic upfront (like mode haptics do!)
+    for (let i = 0; i < completeText.length; i++) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(completeText.substring(0, i + 1));
         
-        // Fire haptic EVERY character for now to debug
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        // Fire haptic every 3 characters
+        if (i % 3 === 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        }
         
-        currentIndex++;
-      } else {
-        if (typeInterval) clearInterval(typeInterval);
-        setIsQuoteTyping(false);
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-          dismissQuote();
-        }, 5000);
-      }
-    }, typingSpeed);
+        // On last character, auto-dismiss after 5 seconds
+        if (i === completeText.length - 1) {
+          setIsQuoteTyping(false);
+          setTimeout(() => {
+            dismissQuote();
+          }, 5000);
+        }
+      }, i * typingSpeed);
+      
+      timeouts.push(timeout);
+    }
     
+    // Cleanup: clear all scheduled timeouts
     return () => {
-      if (typeInterval) clearInterval(typeInterval);
+      timeouts.forEach(timeout => clearTimeout(timeout));
     };
   }, [isQuoteTyping, currentQuote]);
   
