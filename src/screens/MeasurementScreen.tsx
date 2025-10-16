@@ -105,6 +105,8 @@ export default function MeasurementScreen() {
   const setCalibration = useStore((s) => s.setCalibration);
   const setCoinCircle = useStore((s) => s.setCoinCircle);
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
+  const setCompletedMeasurements = useStore((s) => s.setCompletedMeasurements);
+  const setCurrentPoints = useStore((s) => s.setCurrentPoints);
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -971,7 +973,7 @@ export default function MeasurementScreen() {
                     doubleTapToMeasureRef.current = callback;
                   }}
                   onReset={(recalibrateMode = false) => {
-                    // Simple transition to camera or recalibration
+                    // Transition to camera or recalibration
                     setIsTransitioning(true);
                     
                     // Fast fade to black
@@ -983,10 +985,12 @@ export default function MeasurementScreen() {
                     // After black screen, switch to appropriate mode
                     setTimeout(() => {
                       if (recalibrateMode) {
-                        // Recalibrate: Keep image, clear calibration, go to zoomCalibrate
+                        // Recalibrate: Keep image, clear calibration AND measurements, go to zoomCalibrate
                         setCoinCircle(null);
                         setCalibration(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                        setCompletedMeasurements([]); // Clear all measurements
+                        setCurrentPoints([]); // Clear current drawing points
                         setMode('zoomCalibrate');
                         
                         // Fade in the calibration screen
@@ -1007,6 +1011,8 @@ export default function MeasurementScreen() {
                         setCalibration(null);
                         setImageOrientation(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
+                        setCompletedMeasurements([]); // Clear measurements
+                        setCurrentPoints([]); // Clear points
                         
                         // Camera's useEffect will handle the fade in
                         setTimeout(() => {
