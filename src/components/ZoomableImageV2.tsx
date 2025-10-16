@@ -211,9 +211,8 @@ export default function ZoomableImage({
     });
 
   // Use simple simultaneous gestures for both modes
-  // Use Exclusive instead of Race for better performance
-  // Only evaluate gestures when they actually start
-  const composedGesture = Gesture.Exclusive(
+  // Compose gestures - use Race so double-tap and pan/zoom can coexist
+  const composedGesture = Gesture.Race(
     doubleTapGesture,
     doubleTapWhenLockedGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
