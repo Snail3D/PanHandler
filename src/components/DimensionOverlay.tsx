@@ -6183,37 +6183,6 @@ export default function DimensionOverlay({
         }}
         onClose={closeAlert}
       />
-      
-      {/* DEBUG OVERLAY */}
-      <View style={{
-        position: 'absolute',
-        top: 50,
-        left: 10,
-        right: 10,
-        backgroundColor: 'rgba(255, 0, 0, 0.9)',
-        padding: 8,
-        borderRadius: 8,
-        zIndex: 99999,
-      }} pointerEvents="none">
-        <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-          measurementMode: {measurementMode ? 'TRUE' : 'FALSE'}
-        </Text>
-        <Text style={{ color: 'white', fontSize: 12 }}>
-          measurements.length: {measurements.length}
-        </Text>
-        <Text style={{ color: 'white', fontSize: 12 }}>
-          Overlay Rendered: {!measurementMode && measurements.length > 0 ? 'YES' : 'NO'}
-        </Text>
-        <Text style={{ color: 'white', fontSize: 12 }}>
-          menuHidden: {menuHidden ? 'TRUE' : 'FALSE'}
-        </Text>
-        <Text style={{ color: 'white', fontSize: 12, marginTop: 4 }}>
-          Last Touch: {debugInfo.lastTouch ? `${Date.now() - debugInfo.lastTouch}ms ago` : 'none'}
-        </Text>
-        <Text style={{ color: 'white', fontSize: 12 }}>
-          Interceptor: {debugInfo.interceptor || 'none'}
-        </Text>
-      </View>
     </>
   );
 }

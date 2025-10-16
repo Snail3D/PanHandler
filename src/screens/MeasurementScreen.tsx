@@ -86,6 +86,7 @@ export default function MeasurementScreen() {
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
+  const zoomSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce zoom saves
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -934,8 +935,14 @@ export default function MeasurementScreen() {
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
-                    // Save zoom state to store for session restoration
-                    setSavedZoomState(newZoom);
+                    
+                    // Debounce AsyncStorage saves - only save 500ms after gesture ends
+                    if (zoomSaveTimeoutRef.current) {
+                      clearTimeout(zoomSaveTimeoutRef.current);
+                    }
+                    zoomSaveTimeoutRef.current = setTimeout(() => {
+                      setSavedZoomState(newZoom);
+                    }, 500);
                   }}
                   onDoubleTapWhenLocked={() => {
                     // Call the DimensionOverlay's measure mode switcher
