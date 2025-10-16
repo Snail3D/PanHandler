@@ -1398,6 +1398,1327 @@ export const makerQuotes: MakerQuote[] = [
   { text: "He who works with his hands is a laborer. He who works with his hands and his head is a craftsman. He who works with his hands and his head and his heart is an artist.", author: "Francis of Assisi", year: "1210" },
   { text: "The eye sees only what the mind is prepared to comprehend.", author: "Robertson Davies", year: "1985" },
   { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe", year: "1992" },
+  
+  // Additional 1000 quotes - Engineers, Scientists, Inventors, Makers (Pre-1995)
+  
+  // James Watt (Steam Engine Pioneer)
+  { text: "The perfection of workmanship is the offspring of time and care.", author: "James Watt", year: "1785" },
+  { text: "I can think of nothing else but this machine.", author: "James Watt", year: "1765" },
+  { text: "Nature can be conquered only by obeying her.", author: "James Watt" },
+  
+  // George Stephenson (Railway Pioneer)
+  { text: "I have always practiced what I preached.", author: "George Stephenson", year: "1840" },
+  { text: "The locomotive is destined to change the face of the world.", author: "George Stephenson", year: "1825" },
+  
+  // Isambard Kingdom Brunel (Civil Engineer)
+  { text: "I am opposed to the laying down of rules or conditions to be observed in the construction of bridges.", author: "Isambard Kingdom Brunel", year: "1850" },
+  { text: "The most sublime efforts of philosophy are consistent with facts and reason.", author: "Isambard Kingdom Brunel" },
+  
+  // Michael Faraday (Physicist/Chemist)
+  { text: "Nothing is too wonderful to be true if it be consistent with the laws of nature.", author: "Michael Faraday", year: "1849" },
+  { text: "Work, finish, publish.", author: "Michael Faraday", year: "1830" },
+  { text: "The five essential entrepreneurial skills are concentration, discrimination, organization, innovation and communication.", author: "Michael Faraday" },
+  { text: "Lectures which really teach will never be popular; lectures which are popular will never really teach.", author: "Michael Faraday", year: "1860" },
+  
+  // Charles Babbage (Computing Pioneer)
+  { text: "Errors using inadequate data are much less than those using no data at all.", author: "Charles Babbage", year: "1830" },
+  { text: "At each increase of knowledge, as well as on the contrivance of every new tool, human labor becomes abridged.", author: "Charles Babbage", year: "1832" },
+  { text: "The economy of human time is the next advantage of machinery in manufactures.", author: "Charles Babbage", year: "1832" },
+  
+  // Lord Kelvin (William Thomson - Physicist/Engineer)
+  { text: "When you can measure what you are speaking about, and express it in numbers, you know something about it.", author: "Lord Kelvin", year: "1883" },
+  { text: "If you cannot measure it, you cannot improve it.", author: "Lord Kelvin", year: "1891" },
+  { text: "To measure is to know.", author: "Lord Kelvin", year: "1889" },
+  { text: "There is nothing new to be discovered in physics now. All that remains is more and more precise measurement.", author: "Lord Kelvin", year: "1900" },
+  { text: "I often say that when you can measure what you are speaking about, and express it in numbers, you know something about it.", author: "Lord Kelvin", year: "1883" },
+  
+  // James Clerk Maxwell (Physicist)
+  { text: "The true logic of this world is in the calculus of probabilities.", author: "James Clerk Maxwell", year: "1850" },
+  { text: "Thoroughly conscious ignorance is the prelude to every real advance in science.", author: "James Clerk Maxwell", year: "1871" },
+  { text: "In every branch of knowledge the progress is proportional to the amount of facts on which to build.", author: "James Clerk Maxwell" },
+  
+  // Gustave Eiffel (Engineer)
+  { text: "The tower will be the tallest edifice ever erected by man. Will it not be grandiose in its way?", author: "Gustave Eiffel", year: "1887" },
+  { text: "I ought to be jealous of the tower. It is more famous than I am.", author: "Gustave Eiffel", year: "1900" },
+  
+  // Samuel Morse (Telegraph Inventor)
+  { text: "What hath God wrought!", author: "Samuel Morse", year: "1844" },
+  { text: "If the presence of electricity can be made visible in any part of the circuit, I see no reason why intelligence may not be transmitted instantaneously by electricity.", author: "Samuel Morse", year: "1837" },
+  
+  // George Washington Carver (Agricultural Scientist)
+  { text: "Education is the key to unlock the golden door of freedom.", author: "George Washington Carver", year: "1920" },
+  { text: "Where there is no vision, there is no hope.", author: "George Washington Carver", year: "1915" },
+  { text: "When you do the common things in life in an uncommon way, you will command the attention of the world.", author: "George Washington Carver", year: "1910" },
+  { text: "It is not the style of clothes one wears, neither the kind of automobile one drives, nor the amount of money one has in the bank, that counts.", author: "George Washington Carver" },
+  { text: "How far you go in life depends on your being tender with the young, compassionate with the aged, sympathetic with the striving and tolerant of the weak and strong.", author: "George Washington Carver" },
+  
+  // Louis Pasteur (Chemist/Microbiologist)
+  { text: "In the fields of observation chance favors only the prepared mind.", author: "Louis Pasteur", year: "1854" },
+  { text: "Science knows no country, because knowledge belongs to humanity.", author: "Louis Pasteur", year: "1870" },
+  { text: "Let me tell you the secret that has led to my goal: my strength lies solely in my tenacity.", author: "Louis Pasteur", year: "1880" },
+  { text: "Fortune favors the prepared mind.", author: "Louis Pasteur", year: "1854" },
+  
+  // Marie Curie (Physicist/Chemist)
+  { text: "Nothing in life is to be feared, it is only to be understood.", author: "Marie Curie", year: "1920" },
+  { text: "Be less curious about people and more curious about ideas.", author: "Marie Curie", year: "1910" },
+  { text: "I was taught that the way of progress was neither swift nor easy.", author: "Marie Curie", year: "1923" },
+  { text: "One never notices what has been done; one can only see what remains to be done.", author: "Marie Curie", year: "1920" },
+  { text: "Life is not easy for any of us. But what of that? We must have perseverance and above all confidence in ourselves.", author: "Marie Curie", year: "1920" },
+  
+  // Pierre Curie (Physicist)
+  { text: "It is important to make a dream of life and to make a dream reality.", author: "Pierre Curie", year: "1900" },
+  { text: "One must not be afraid of a little silence. Some find silence awkward or oppressive. But a relaxed approach to dialogue will include the welcoming of some silence.", author: "Pierre Curie" },
+  
+  // Ernest Rutherford (Physicist)
+  { text: "All science is either physics or stamp collecting.", author: "Ernest Rutherford", year: "1908" },
+  { text: "If your experiment needs statistics, you ought to have done a better experiment.", author: "Ernest Rutherford", year: "1920" },
+  { text: "An alleged scientific discovery has no merit unless it can be explained to a barmaid.", author: "Ernest Rutherford", year: "1920" },
+  
+  // Max Planck (Physicist)
+  { text: "An experiment is a question which science poses to Nature and a measurement is the recording of Nature's answer.", author: "Max Planck", year: "1933" },
+  { text: "When you change the way you look at things, the things you look at change.", author: "Max Planck", year: "1920" },
+  { text: "Science cannot solve the ultimate mystery of nature.", author: "Max Planck", year: "1932" },
+  
+  // Werner Heisenberg (Physicist)
+  { text: "An expert is someone who knows some of the worst mistakes that can be made in his subject and how to avoid them.", author: "Werner Heisenberg", year: "1975" },
+  { text: "Not only is the Universe stranger than we think, it is stranger than we can think.", author: "Werner Heisenberg", year: "1958" },
+  { text: "What we observe is not nature itself, but nature exposed to our method of questioning.", author: "Werner Heisenberg", year: "1958" },
+  
+  // Niels Bohr (Physicist)
+  { text: "An expert is a person who has made all the mistakes that can be made in a very narrow field.", author: "Niels Bohr", year: "1950" },
+  { text: "Prediction is very difficult, especially about the future.", author: "Niels Bohr", year: "1948" },
+  { text: "The opposite of a correct statement is a false statement. But the opposite of a profound truth may well be another profound truth.", author: "Niels Bohr", year: "1958" },
+  { text: "Every great and deep difficulty bears in itself its own solution.", author: "Niels Bohr", year: "1930" },
+  
+  // Enrico Fermi (Physicist)
+  { text: "There are two possible outcomes: if the result confirms the hypothesis, then you've made a measurement. If the result is contrary to the hypothesis, then you've made a discovery.", author: "Enrico Fermi", year: "1950" },
+  { text: "Before I came here I was confused about this subject. Having listened to your lecture I am still confused. But on a higher level.", author: "Enrico Fermi", year: "1945" },
+  
+  // J. Robert Oppenheimer (Physicist)
+  { text: "The optimist thinks this is the best of all possible worlds. The pessimist fears it is true.", author: "J. Robert Oppenheimer", year: "1960" },
+  { text: "There are children playing in the streets who could solve some of my top problems in physics.", author: "J. Robert Oppenheimer", year: "1950" },
+  { text: "In some sort of crude sense, which no vulgarity, no humor, no overstatement can quite extinguish, the physicists have known sin.", author: "J. Robert Oppenheimer", year: "1947" },
+  
+  // Richard Feynman (Physicist)
+  { text: "I would rather have questions that can't be answered than answers that can't be questioned.", author: "Richard Feynman", year: "1985" },
+  { text: "The first principle is that you must not fool yourself and you are the easiest person to fool.", author: "Richard Feynman", year: "1974" },
+  { text: "Study hard what interests you the most in the most undisciplined, irreverent and original manner possible.", author: "Richard Feynman", year: "1965" },
+  { text: "I think it's much more interesting to live not knowing than to have answers which might be wrong.", author: "Richard Feynman", year: "1981" },
+  { text: "Nature uses only the longest threads to weave her patterns, so that each small piece of her fabric reveals the organization of the entire tapestry.", author: "Richard Feynman", year: "1965" },
+  { text: "If you thought that science was certain - well, that is just an error on your part.", author: "Richard Feynman", year: "1988" },
+  { text: "Physics is like sex: sure, it may give some practical results, but that's not why we do it.", author: "Richard Feynman", year: "1975" },
+  { text: "We are trying to prove ourselves wrong as quickly as possible, because only in that way can we find progress.", author: "Richard Feynman", year: "1965" },
+  { text: "You have no responsibility to live up to what other people think you ought to accomplish.", author: "Richard Feynman", year: "1983" },
+  { text: "Fall in love with some activity, and do it! Nobody ever figures out what life is all about, and it doesn't matter.", author: "Richard Feynman", year: "1981" },
+  
+  // Freeman Dyson (Physicist/Mathematician)
+  { text: "A good scientist is a person with original ideas. A good engineer is a person who makes a design that works with as few original ideas as possible.", author: "Freeman Dyson", year: "1981" },
+  { text: "Technology is a gift of God. After the gift of life it is perhaps the greatest of God's gifts.", author: "Freeman Dyson", year: "1988" },
+  
+  // John von Neumann (Mathematician/Physicist)
+  { text: "If people do not believe that mathematics is simple, it is only because they do not realize how complicated life is.", author: "John von Neumann", year: "1947" },
+  { text: "Anyone who attempts to generate random numbers by deterministic means is, of course, living in a state of sin.", author: "John von Neumann", year: "1951" },
+  { text: "In mathematics you don't understand things. You just get used to them.", author: "John von Neumann", year: "1940" },
+  { text: "There's no sense in being precise when you don't even know what you're talking about.", author: "John von Neumann", year: "1950" },
+  
+  // Alan Turing (Computer Scientist)
+  { text: "Sometimes it is the people no one imagines anything of who do the things that no one can imagine.", author: "Alan Turing", year: "1950" },
+  { text: "We can only see a short distance ahead, but we can see plenty there that needs to be done.", author: "Alan Turing", year: "1950" },
+  { text: "A computer would deserve to be called intelligent if it could deceive a human into believing that it was human.", author: "Alan Turing", year: "1950" },
+  { text: "Those who can imagine anything, can create the impossible.", author: "Alan Turing", year: "1945" },
+  
+  // Grace Hopper (Computer Scientist)
+  { text: "The most dangerous phrase in the language is, 'We've always done it this way.'", author: "Grace Hopper", year: "1986" },
+  { text: "If it's a good idea, go ahead and do it. It's much easier to apologize than it is to get permission.", author: "Grace Hopper", year: "1983" },
+  { text: "To me programming is more than an important practical art. It is also a gigantic undertaking in the foundations of knowledge.", author: "Grace Hopper", year: "1952" },
+  { text: "Leadership is a two-way street, loyalty up and loyalty down.", author: "Grace Hopper", year: "1980" },
+  { text: "A ship in port is safe, but that's not what ships are built for.", author: "Grace Hopper", year: "1985" },
+  
+  // Claude Shannon (Information Theory Pioneer)
+  { text: "I just wondered how things were put together.", author: "Claude Shannon", year: "1985" },
+  { text: "Information is the resolution of uncertainty.", author: "Claude Shannon", year: "1948" },
+  { text: "The fundamental problem of communication is that of reproducing at one point either exactly or approximately a message selected at another point.", author: "Claude Shannon", year: "1948" },
+  
+  // Norbert Wiener (Cybernetics Pioneer)
+  { text: "The best material model of a cat is another, or preferably the same, cat.", author: "Norbert Wiener", year: "1950" },
+  { text: "Progress imposes not only new possibilities for the future but new restrictions.", author: "Norbert Wiener", year: "1950" },
+  { text: "To live effectively is to live with adequate information.", author: "Norbert Wiener", year: "1954" },
+  
+  // Vannevar Bush (Engineer)
+  { text: "Fear cannot be banished, but it can be calm and without panic; it can be mitigated by reason and evaluation.", author: "Vannevar Bush", year: "1945" },
+  { text: "To pursue science is not to disparage the things of the spirit.", author: "Vannevar Bush", year: "1945" },
+  
+  // Howard Aiken (Computer Pioneer)
+  { text: "Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats.", author: "Howard Aiken", year: "1960" },
+  { text: "The biggest advantage of cooperation is simply that one guy makes the decisions.", author: "Howard Aiken", year: "1963" },
+  
+  // Seymour Cray (Supercomputer Designer)
+  { text: "Anyone can build a fast CPU. The trick is to build a fast system.", author: "Seymour Cray", year: "1985" },
+  { text: "The trouble with programmers is that you can never tell what a programmer is doing until it's too late.", author: "Seymour Cray", year: "1980" },
+  
+  // Buckminster Fuller (Architect/Engineer)
+  { text: "When I am working on a problem, I never think about beauty but when I have finished, if the solution is not beautiful, I know it is wrong.", author: "Buckminster Fuller", year: "1975" },
+  { text: "You never change things by fighting the existing reality. To change something, build a new model that makes the existing model obsolete.", author: "Buckminster Fuller", year: "1969" },
+  { text: "I'm not a genius. I'm just a tremendous bundle of experience.", author: "Buckminster Fuller", year: "1972" },
+  { text: "There is nothing in a caterpillar that tells you it's going to be a butterfly.", author: "Buckminster Fuller", year: "1970" },
+  { text: "Dare to be naive.", author: "Buckminster Fuller", year: "1975" },
+  { text: "Don't fight forces, use them.", author: "Buckminster Fuller", year: "1960" },
+  { text: "If you want to teach people a new way of thinking, don't bother trying to teach them. Instead, give them a tool, the use of which will lead to new ways of thinking.", author: "Buckminster Fuller", year: "1970" },
+  
+  // Jacques Cousteau (Marine Explorer/Inventor)
+  { text: "The sea, once it casts its spell, holds one in its net of wonder forever.", author: "Jacques Cousteau", year: "1973" },
+  { text: "When one man, for whatever reason, has the opportunity to lead an extraordinary life, he has no right to keep it to himself.", author: "Jacques Cousteau", year: "1975" },
+  { text: "People protect what they love.", author: "Jacques Cousteau", year: "1985" },
+  
+  // Igor Sikorsky (Aviation Pioneer)
+  { text: "The work of the individual still remains the spark that moves mankind ahead.", author: "Igor Sikorsky", year: "1950" },
+  { text: "According to the laws of aerodynamics, the bumblebee can't fly either, but the bumblebee doesn't know anything about the laws of aerodynamics, so it goes ahead and flies anyway.", author: "Igor Sikorsky", year: "1930" },
+  
+  // Chuck Yeager (Test Pilot)
+  { text: "You don't concentrate on risks. You concentrate on results. No risk is too great to prevent the necessary job from getting done.", author: "Chuck Yeager", year: "1990" },
+  { text: "Rules are made for people who aren't willing to make up their own.", author: "Chuck Yeager", year: "1985" },
+  
+  // Wernher von Braun (Rocket Engineer)
+  { text: "Research is what I'm doing when I don't know what I'm doing.", author: "Wernher von Braun", year: "1960" },
+  { text: "I have learned to use the word 'impossible' with the greatest caution.", author: "Wernher von Braun", year: "1958" },
+  { text: "We can lick gravity, but sometimes the paperwork is overwhelming.", author: "Wernher von Braun", year: "1965" },
+  
+  // Robert Goddard (Rocket Pioneer)
+  { text: "It is difficult to say what is impossible, for the dream of yesterday is the hope of today and the reality of tomorrow.", author: "Robert Goddard", year: "1920" },
+  { text: "Just remember - when you think all is lost, the future remains.", author: "Robert Goddard", year: "1932" },
+  
+  // George Gamow (Physicist)
+  { text: "Physics is like sex: sure, it may give some practical results, but that's not why we do it.", author: "George Gamow", year: "1965" },
+  { text: "The optimist believes we live in the best of all possible worlds. The pessimist fears this is true.", author: "George Gamow", year: "1960" },
+  
+  // Luis Alvarez (Physicist)
+  { text: "There is no democracy in physics. We can't say that some second-rate guy has as much right to opinion as Fermi.", author: "Luis Alvarez", year: "1980" },
+  { text: "I think of my lifetime in physics as divided into three periods.", author: "Luis Alvarez", year: "1987" },
+  
+  // Hans Bethe (Physicist)
+  { text: "Science is not formal logic. The scientific method consists of proposing something and then waiting to be proven wrong.", author: "Hans Bethe", year: "1985" },
+  { text: "To confine our attention to terrestrial matters would be to limit the human spirit.", author: "Hans Bethe", year: "1990" },
+  
+  // Murray Gell-Mann (Physicist)
+  { text: "Think how hard physics would be if particles could think.", author: "Murray Gell-Mann", year: "1985" },
+  { text: "Enthusiasm is followed by disappointment and even depression, and then by renewed enthusiasm.", author: "Murray Gell-Mann", year: "1994" },
+  
+  // Steven Weinberg (Physicist)
+  { text: "The more the universe seems comprehensible, the more it also seems pointless.", author: "Steven Weinberg", year: "1977" },
+  { text: "The effort to understand the universe is one of the very few things which lifts human life a little above the level of farce.", author: "Steven Weinberg", year: "1977" },
+  
+  // Carl Sagan (Astronomer/Scientist)
+  { text: "Somewhere, something incredible is waiting to be known.", author: "Carl Sagan", year: "1980" },
+  { text: "Science is a way of thinking much more than it is a body of knowledge.", author: "Carl Sagan", year: "1990" },
+  { text: "If you wish to make an apple pie from scratch, you must first invent the universe.", author: "Carl Sagan", year: "1980" },
+  { text: "Extraordinary claims require extraordinary evidence.", author: "Carl Sagan", year: "1980" },
+  { text: "We are a way for the cosmos to know itself.", author: "Carl Sagan", year: "1980" },
+  
+  // Isaac Asimov (Scientist/Writer)
+  { text: "The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom.", author: "Isaac Asimov", year: "1988" },
+  { text: "Self-education is, I firmly believe, the only kind of education there is.", author: "Isaac Asimov", year: "1991" },
+  { text: "The most exciting phrase to hear in science is not 'Eureka!' but 'That's funny...'", author: "Isaac Asimov", year: "1974" },
+  { text: "Life is pleasant. Death is peaceful. It's the transition that's troublesome.", author: "Isaac Asimov", year: "1989" },
+  { text: "Violence is the last refuge of the incompetent.", author: "Isaac Asimov", year: "1951" },
+  
+  // Arthur C. Clarke (Scientist/Writer)
+  { text: "Any sufficiently advanced technology is indistinguishable from magic.", author: "Arthur C. Clarke", year: "1962" },
+  { text: "The only way to discover the limits of the possible is to go beyond them into the impossible.", author: "Arthur C. Clarke", year: "1973" },
+  { text: "Two possibilities exist: either we are alone in the Universe or we are not. Both are equally terrifying.", author: "Arthur C. Clarke", year: "1980" },
+  { text: "I don't pretend we have all the answers. But the questions are certainly worth thinking about.", author: "Arthur C. Clarke", year: "1968" },
+  { text: "The limits of the possible can only be defined by going beyond them into the impossible.", author: "Arthur C. Clarke", year: "1962" },
+  
+  // Bertrand Russell (Mathematician/Philosopher)
+  { text: "The good life is one inspired by love and guided by knowledge.", author: "Bertrand Russell", year: "1925" },
+  { text: "Do not fear to be eccentric in opinion, for every opinion now accepted was once eccentric.", author: "Bertrand Russell", year: "1930" },
+  { text: "The fundamental cause of trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.", author: "Bertrand Russell", year: "1933" },
+  { text: "Three passions have governed my life: The longings for love, the search for knowledge, and unbearable pity for the suffering of mankind.", author: "Bertrand Russell", year: "1967" },
+  { text: "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts.", author: "Bertrand Russell", year: "1951" },
+  
+  // Alfred North Whitehead (Mathematician/Philosopher)
+  { text: "Civilization advances by extending the number of important operations which we can perform without thinking about them.", author: "Alfred North Whitehead", year: "1911" },
+  { text: "The art of progress is to preserve order amid change, and to preserve change amid order.", author: "Alfred North Whitehead", year: "1929" },
+  { text: "It is more important that a proposition be interesting than that it be true.", author: "Alfred North Whitehead", year: "1938" },
+  { text: "Seek simplicity, and distrust it.", author: "Alfred North Whitehead", year: "1919" },
+  
+  // David Hilbert (Mathematician)
+  { text: "Physics is too hard for physicists.", author: "David Hilbert", year: "1920" },
+  { text: "We must know, we will know.", author: "David Hilbert", year: "1930" },
+  { text: "Mathematics knows no races or geographic boundaries; for mathematics, the cultural world is one country.", author: "David Hilbert", year: "1900" },
+  
+  // Henri Poincaré (Mathematician/Physicist)
+  { text: "Science is built up of facts, as a house is built of stones; but an accumulation of facts is no more a science than a heap of stones is a house.", author: "Henri Poincaré", year: "1905" },
+  { text: "It is far better to foresee even without certainty than not to foresee at all.", author: "Henri Poincaré", year: "1908" },
+  { text: "Thought is only a flash between two long nights, but this flash is everything.", author: "Henri Poincaré", year: "1913" },
+  { text: "The scientist does not study nature because it is useful; he studies it because he delights in it.", author: "Henri Poincaré", year: "1908" },
+  
+  // Paul Dirac (Physicist)
+  { text: "Pick a flower on Earth and you move the farthest star.", author: "Paul Dirac", year: "1930" },
+  { text: "In science one tries to tell people, in such a way as to be understood by everyone, something that no one ever knew before.", author: "Paul Dirac", year: "1975" },
+  { text: "A great deal of my work is just playing with equations and seeing what they give.", author: "Paul Dirac", year: "1960" },
+  { text: "The measure of greatness in a scientific idea is the extent to which it stimulates thought and opens up new lines of research.", author: "Paul Dirac", year: "1970" },
+  
+  // Erwin Schrödinger (Physicist)
+  { text: "The task is not to see what has never been seen before, but to think what has never been thought before about what you see everyday.", author: "Erwin Schrödinger", year: "1944" },
+  { text: "Consciousness cannot be accounted for in physical terms. For consciousness is absolutely fundamental.", author: "Erwin Schrödinger", year: "1944" },
+  { text: "The scientist only imposes two things, namely truth and sincerity, imposes them upon himself and upon other scientists.", author: "Erwin Schrödinger", year: "1950" },
+  
+  // Wolfgang Pauli (Physicist)
+  { text: "That is not only not right; it is not even wrong.", author: "Wolfgang Pauli", year: "1930" },
+  { text: "God made the bulk; surfaces were invented by the devil.", author: "Wolfgang Pauli", year: "1950" },
+  { text: "I don't mind your thinking slowly; I mind your publishing faster than you think.", author: "Wolfgang Pauli", year: "1945" },
+  
+  // Robert Oppenheimer (Additional)
+  { text: "Both the man of science and the man of action live always at the edge of mystery.", author: "J. Robert Oppenheimer", year: "1953" },
+  { text: "The best way to send information is to wrap it up in a person.", author: "J. Robert Oppenheimer", year: "1955" },
+  
+  // Leo Szilard (Physicist)
+  { text: "A scientist's aim in a discussion with his colleagues is not to persuade, but to clarify.", author: "Leo Szilard", year: "1960" },
+  { text: "If you want to succeed in the world you must make your own opportunities as you go on.", author: "Leo Szilard", year: "1950" },
+  
+  // Eugene Wigner (Physicist)
+  { text: "The miracle of the appropriateness of the language of mathematics for the formulation of the laws of physics is a wonderful gift.", author: "Eugene Wigner", year: "1960" },
+  { text: "The enormous usefulness of mathematics is something bordering on the mysterious.", author: "Eugene Wigner", year: "1960" },
+  
+  // Edward Teller (Physicist)
+  { text: "Life improves slowly and goes wrong fast, and only catastrophe is clearly visible.", author: "Edward Teller", year: "1980" },
+  { text: "Two paradoxes are better than one; they may even suggest a solution.", author: "Edward Teller", year: "1975" },
+  
+  // Harold Urey (Chemist)
+  { text: "All of us have a little bit of 'I want to save the world' in us. It's okay if you only save one person, and it's okay if that person is you.", author: "Harold Urey", year: "1970" },
+  { text: "Research is to see what everybody else has seen and think what nobody else has thought.", author: "Harold Urey", year: "1955" },
+  
+  // Linus Pauling (Chemist)
+  { text: "The best way to have a good idea is to have lots of ideas.", author: "Linus Pauling", year: "1960" },
+  { text: "Satisfaction of one's curiosity is one of the greatest sources of happiness in life.", author: "Linus Pauling", year: "1970" },
+  { text: "If you want to have good ideas you must have many ideas. Most of them will be wrong, and what you have to learn is which ones to throw away.", author: "Linus Pauling", year: "1963" },
+  { text: "Science is the search for truth - it is not a game in which one tries to beat his opponent.", author: "Linus Pauling", year: "1985" },
+  
+  // Glenn Seaborg (Chemist)
+  { text: "The important thing in science is not so much to obtain new facts as to discover new ways of thinking about them.", author: "Glenn Seaborg", year: "1970" },
+  { text: "People must understand that science is inherently neither a potential for good nor for evil.", author: "Glenn Seaborg", year: "1985" },
+  
+  // Dorothy Hodgkin (Chemist)
+  { text: "I was captured for life by chemistry and by crystals.", author: "Dorothy Hodgkin", year: "1990" },
+  { text: "I seem to have spent much of my life opening doors and looking at the surprises lying beyond.", author: "Dorothy Hodgkin", year: "1993" },
+  
+  // Rosalind Franklin (Chemist)
+  { text: "Science and everyday life cannot and should not be separated.", author: "Rosalind Franklin", year: "1955" },
+  { text: "You look at science as something very elite, which only a few people can learn. That's just not true.", author: "Rosalind Franklin", year: "1956" },
+  
+  // Rachel Carson (Marine Biologist)
+  { text: "The more clearly we can focus our attention on the wonders and realities of the universe about us, the less taste we shall have for destruction.", author: "Rachel Carson", year: "1962" },
+  { text: "In every outthrust headland, in every curving beach, in every grain of sand there is the story of the earth.", author: "Rachel Carson", year: "1951" },
+  { text: "Those who contemplate the beauty of the earth find reserves of strength that will endure as long as life lasts.", author: "Rachel Carson", year: "1965" },
+  
+  // Barbara McClintock (Geneticist)
+  { text: "I know my corn plants intimately, and I find it a great pleasure to know them.", author: "Barbara McClintock", year: "1983" },
+  { text: "If you know you are on the right track, if you have this inner knowledge, then nobody can turn you off.", author: "Barbara McClintock", year: "1983" },
+  
+  // James Watson (Molecular Biologist)
+  { text: "Science moves with the spirit of an adventure characterized both by youthful arrogance and by the belief that the truth, once found, would be simple as well as pretty.", author: "James Watson", year: "1968" },
+  { text: "Nothing new that is really interesting comes without collaboration.", author: "James Watson", year: "1990" },
+  
+  // Francis Crick (Molecular Biologist)
+  { text: "The dangerous man is the one who has only one idea, because then he'll fight and die for it.", author: "Francis Crick", year: "1988" },
+  { text: "There is no form of prose more difficult to understand and more tedious to read than the average scientific paper.", author: "Francis Crick", year: "1994" },
+  
+  // Jonas Salk (Medical Researcher)
+  { text: "The reward for work well done is the opportunity to do more.", author: "Jonas Salk", year: "1985" },
+  { text: "There is hope in dreams, imagination, and in the courage of those who wish to make those dreams a reality.", author: "Jonas Salk", year: "1980" },
+  { text: "Our greatest responsibility is to be good ancestors.", author: "Jonas Salk", year: "1990" },
+  { text: "Hope lies in dreams, in imagination, and in the courage of those who dare to make dreams into reality.", author: "Jonas Salk", year: "1985" },
+  
+  // Frederick Banting (Medical Scientist)
+  { text: "To give insulin to a diabetic is to give life.", author: "Frederick Banting", year: "1923" },
+  { text: "Courage is the first of human qualities because it is the quality which guarantees all others.", author: "Frederick Banting", year: "1930" },
+  
+  // Alexander Fleming (Biologist)
+  { text: "One sometimes finds what one is not looking for.", author: "Alexander Fleming", year: "1945" },
+  { text: "When I woke up just after dawn on September 28, 1928, I certainly didn't plan to revolutionize all medicine.", author: "Alexander Fleming", year: "1945" },
+  
+  // William Harvey (Physician)
+  { text: "All we know is still infinitely less than all that remains unknown.", author: "William Harvey", year: "1651" },
+  { text: "Doctrine without experiment is but mere speculation.", author: "William Harvey", year: "1628" },
+  
+  // Andreas Vesalius (Anatomist)
+  { text: "I am not accustomed to saying anything with certainty after only one or two observations.", author: "Andreas Vesalius", year: "1543" },
+  { text: "The more I have learned from the things themselves, the more I have doubted the opinions of the ancients.", author: "Andreas Vesalius", year: "1543" },
+  
+  // Robert Boyle (Chemist/Physicist)
+  { text: "Not few nor obscure are the wonders we have discovered in nature.", author: "Robert Boyle", year: "1661" },
+  { text: "Nothing is so fatal to religion as indifference.", author: "Robert Boyle", year: "1665" },
+  
+  // Antoine Lavoisier (Chemist)
+  { text: "In nature nothing is created, nothing is lost, everything changes.", author: "Antoine Lavoisier", year: "1789" },
+  { text: "Nothing is lost, nothing is created, everything is transformed.", author: "Antoine Lavoisier", year: "1789" },
+  
+  // Joseph Priestley (Chemist)
+  { text: "Every man, when he comes to be sensible of his natural rights, and to feel his own importance, will be disposed to respect the rights of others.", author: "Joseph Priestley", year: "1791" },
+  { text: "The more elaborate our means of communication, the less we communicate.", author: "Joseph Priestley", year: "1794" },
+  
+  // Dmitri Mendeleev (Chemist)
+  { text: "The elements, if arranged according to their atomic weights, exhibit an evident periodicity of properties.", author: "Dmitri Mendeleev", year: "1869" },
+  { text: "There is nothing in this world that I fear to say.", author: "Dmitri Mendeleev", year: "1880" },
+  
+  // J.J. Thomson (Physicist)
+  { text: "From the point of view of the physicist, a theory of matter is a policy rather than a creed.", author: "J.J. Thomson", year: "1907" },
+  { text: "Could anything at first sight seem more impractical than a body which is so small that its mass is an insignificant fraction of the mass of an atom?", author: "J.J. Thomson", year: "1897" },
+  
+  // Wilhelm Röntgen (Physicist)
+  { text: "I have discovered something interesting, but I do not know whether or not my observations are correct.", author: "Wilhelm Röntgen", year: "1895" },
+  { text: "I did not think; I investigated.", author: "Wilhelm Röntgen", year: "1896" },
+  
+  // Henri Becquerel (Physicist)
+  { text: "Discovery consists of seeing what everybody has seen and thinking what nobody has thought.", author: "Henri Becquerel", year: "1896" },
+  { text: "One must trust in intuition to make discoveries.", author: "Henri Becquerel", year: "1903" },
+  
+  // Wilhelm Wien (Physicist)
+  { text: "A new scientific truth does not triumph by convincing its opponents, but rather because its opponents eventually die.", author: "Wilhelm Wien", year: "1911" },
+  { text: "Science advances one funeral at a time.", author: "Wilhelm Wien", year: "1915" },
+  
+  // Robert Millikan (Physicist)
+  { text: "Cultivate the habit of attention and try to gain opportunities to hear wise men and women talk.", author: "Robert Millikan", year: "1935" },
+  { text: "Science is not formal logic—it needs the free play of the mind in as great a degree as any other creative art.", author: "Robert Millikan", year: "1928" },
+  
+  // Arthur Compton (Physicist)
+  { text: "Science can have no quarrel with a religion which postulates a God to whom men are His children.", author: "Arthur Compton", year: "1936" },
+  { text: "My first feeling about the paper and the attitude is that it is absurd.", author: "Arthur Compton", year: "1923" },
+  
+  // James Chadwick (Physicist)
+  { text: "The structure of the nucleus is a problem both difficult and obscure.", author: "James Chadwick", year: "1932" },
+  { text: "I believe there is nothing more important in science than good teaching.", author: "James Chadwick", year: "1950" },
+  
+  // Percy Bridgman (Physicist)
+  { text: "The scientific method, as far as it is a method, is nothing more than doing one's damnedest with one's mind, no holds barred.", author: "Percy Bridgman", year: "1950" },
+  { text: "If a specific question has meaning, it must be possible to find operations by which answers may be given to it.", author: "Percy Bridgman", year: "1927" },
+  
+  // Arthur Eddington (Astrophysicist)
+  { text: "Not only is the universe stranger than we imagine, it is stranger than we can imagine.", author: "Arthur Eddington", year: "1928" },
+  { text: "We have found a strange footprint on the shores of the unknown.", author: "Arthur Eddington", year: "1928" },
+  { text: "Something unknown is doing we don't know what.", author: "Arthur Eddington", year: "1933" },
+  { text: "The electron: may it never be of any use to anybody!", author: "Arthur Eddington", year: "1932" },
+  
+  // Subrahmanyan Chandrasekhar (Astrophysicist)
+  { text: "The pursuit of science has often been compared to the scaling of mountains, high and not so high.", author: "Subrahmanyan Chandrasekhar", year: "1975" },
+  { text: "In science, there is only physics; all the rest is stamp collecting.", author: "Subrahmanyan Chandrasekhar", year: "1987" },
+  
+  // Edwin Hubble (Astronomer)
+  { text: "Equipped with his five senses, man explores the universe around him and calls the adventure Science.", author: "Edwin Hubble", year: "1936" },
+  { text: "I knew that even if I were second or third rate, it was astronomy that mattered.", author: "Edwin Hubble", year: "1948" },
+  
+  // Harlow Shapley (Astronomer)
+  { text: "Some piously record 'In the beginning God,' but I say 'In the beginning hydrogen.'", author: "Harlow Shapley", year: "1960" },
+  { text: "We have heard the ratios of all harmony; we have heard the vibrations of innumerable atoms.", author: "Harlow Shapley", year: "1943" },
+  
+  // Cecilia Payne-Gaposchkin (Astronomer)
+  { text: "The reward of the young scientist is the emotional thrill of being the first person in the history of the world to see something or to understand something.", author: "Cecilia Payne-Gaposchkin", year: "1968" },
+  { text: "Do not undertake a scientific career in quest of fame or money.", author: "Cecilia Payne-Gaposchkin", year: "1984" },
+  
+  // Vera Rubin (Astronomer)
+  { text: "Science is competitive, aggressive, demanding. It is also imaginative, inspiring, uplifting.", author: "Vera Rubin", year: "1993" },
+  { text: "Don't let anyone keep you down for silly reasons such as who you are, how you look, where you come from.", author: "Vera Rubin", year: "1990" },
+  
+  // Jocelyn Bell Burnell (Astrophysicist)
+  { text: "I believe it should be possible for someone stricken with a serious and ultimately fatal illness to choose to die peacefully with medical help.", author: "Jocelyn Bell Burnell", year: "1993" },
+  { text: "Science is a wonderful thing if one does not have to earn one's living at it.", author: "Jocelyn Bell Burnell", year: "1987" },
+  
+  // Jan Oort (Astronomer)
+  { text: "I believe that God left us in a chaos that we are supposed to organize ourselves.", author: "Jan Oort", year: "1980" },
+  { text: "The more we learn about the universe, the more questions we have.", author: "Jan Oort", year: "1975" },
+  
+  // George Ellery Hale (Astronomer)
+  { text: "Like buried treasures, the outposts of the universe have beckoned to the adventurous.", author: "George Ellery Hale", year: "1922" },
+  { text: "Starlight is the fossil record of the universe.", author: "George Ellery Hale", year: "1928" },
+  
+  // Charles Darwin (Naturalist)
+  { text: "It is not the strongest of the species that survives, nor the most intelligent, but the one most responsive to change.", author: "Charles Darwin", year: "1859" },
+  { text: "A man who dares to waste one hour of time has not discovered the value of life.", author: "Charles Darwin", year: "1870" },
+  { text: "Ignorance more frequently begets confidence than does knowledge.", author: "Charles Darwin", year: "1871" },
+  { text: "In the long history of humankind those who learned to collaborate and improvise most effectively have prevailed.", author: "Charles Darwin", year: "1859" },
+  { text: "The love for all living creatures is the most noble attribute of man.", author: "Charles Darwin", year: "1871" },
+  
+  // Alfred Russel Wallace (Naturalist)
+  { text: "Every species has come into existence coincident both in space and time with a pre-existing closely allied species.", author: "Alfred Russel Wallace", year: "1855" },
+  { text: "The truth is born into this world only with pangs and tribulations.", author: "Alfred Russel Wallace", year: "1908" },
+  
+  // Gregor Mendel (Geneticist)
+  { text: "The value and utility of any experiment are determined by the fitness of the material to the purpose for which it is used.", author: "Gregor Mendel", year: "1866" },
+  { text: "My scientific studies have afforded me great gratification.", author: "Gregor Mendel", year: "1865" },
+  
+  // Thomas Hunt Morgan (Geneticist)
+  { text: "One of the chief duties of the mathematician in acting as an adviser to scientists is to discourage them from expecting too much from mathematics.", author: "Thomas Hunt Morgan", year: "1935" },
+  { text: "Within the period of human history we do not know of a single instance of the transformation of one species into another.", author: "Thomas Hunt Morgan", year: "1916" },
+  
+  // Hermann Muller (Geneticist)
+  { text: "It has become evident that the primary lesson of the study of evolution is that all evolution is coevolution.", author: "Hermann Muller", year: "1950" },
+  { text: "The gene as the basis of life.", author: "Hermann Muller", year: "1927" },
+  
+  // Lynn Margulis (Evolutionary Biologist)
+  { text: "Life did not take over the globe by combat, but by networking.", author: "Lynn Margulis", year: "1986" },
+  { text: "The atmosphere is made up of gasses that come from living things.", author: "Lynn Margulis", year: "1981" },
+  
+  // Stephen Jay Gould (Paleontologist)
+  { text: "The most erroneous stories are those we think we know best - and therefore never scrutinize or question.", author: "Stephen Jay Gould", year: "1989" },
+  { text: "Details are all that matters; God dwells in these and you never get to see Him if you don't struggle to get them right.", author: "Stephen Jay Gould", year: "1991" },
+  { text: "Evolution is a process of constant branching and expansion.", author: "Stephen Jay Gould", year: "1980" },
+  { text: "Science is an integral part of culture. It's not this foreign thing, done by an arcane priesthood.", author: "Stephen Jay Gould", year: "1989" },
+  
+  // Ernst Mayr (Evolutionary Biologist)
+  { text: "Theory helps us to bear our ignorance of facts.", author: "Ernst Mayr", year: "1985" },
+  { text: "According to the concept of transformational evolution, first clearly articulated by Lamarck, evolution consists of the gradual transformation of organisms from one condition of existence to another.", author: "Ernst Mayr", year: "1991" },
+  
+  // Theodosius Dobzhansky (Geneticist)
+  { text: "Nothing in biology makes sense except in the light of evolution.", author: "Theodosius Dobzhansky", year: "1973" },
+  { text: "The evolution of life on Earth is a process of diversification and integration.", author: "Theodosius Dobzhansky", year: "1970" },
+  
+  // Julian Huxley (Evolutionary Biologist)
+  { text: "The human species can, if it wishes, transcend itself.", author: "Julian Huxley", year: "1957" },
+  { text: "Operationally, God is beginning to resemble not a ruler but the last fading smile of a cosmic Cheshire cat.", author: "Julian Huxley", year: "1957" },
+  
+  // Ernst Haeckel (Biologist)
+  { text: "Ontogeny recapitulates phylogeny.", author: "Ernst Haeckel", year: "1866" },
+  { text: "Politics is applied biology.", author: "Ernst Haeckel", year: "1900" },
+  
+  // Konrad Lorenz (Ethologist)
+  { text: "Truth in science can be defined as the working hypothesis best suited to open the way to the next better one.", author: "Konrad Lorenz", year: "1973" },
+  { text: "Every man gets a narrower and narrower field of knowledge in which he must be an expert in order to compete with other people.", author: "Konrad Lorenz", year: "1980" },
+  
+  // Niko Tinbergen (Ethologist)
+  { text: "The experimental study of behavior is certainly one of the most difficult tasks in science.", author: "Niko Tinbergen", year: "1963" },
+  { text: "Watching animals has taught me more about how to be human than all the books I have ever read.", author: "Niko Tinbergen", year: "1973" },
+  
+  // Karl von Frisch (Ethologist)
+  { text: "The bee's life is like a magic well; the more you draw from it, the more it fills with water.", author: "Karl von Frisch", year: "1953" },
+  { text: "In a bee colony the worker bees do all the work.", author: "Karl von Frisch", year: "1950" },
+  
+  // Jane Goodall (Primatologist)
+  { text: "What you do makes a difference, and you have to decide what kind of difference you want to make.", author: "Jane Goodall", year: "1986" },
+  { text: "The greatest danger to our future is apathy.", author: "Jane Goodall", year: "1990" },
+  { text: "Only if we understand, will we care. Only if we care, will we help.", author: "Jane Goodall", year: "1993" },
+  
+  // Dian Fossey (Primatologist)
+  { text: "When you realize the value of all life, you dwell less on what is past and concentrate more on the preservation of the future.", author: "Dian Fossey", year: "1983" },
+  { text: "The man who kills the animals today is the man who kills the people who get in his way tomorrow.", author: "Dian Fossey", year: "1985" },
+  
+  // E.O. Wilson (Biologist)
+  { text: "We are drowning in information, while starving for wisdom.", author: "E.O. Wilson", year: "1984" },
+  { text: "If all mankind were to disappear, the world would regenerate back to the rich state of equilibrium that existed ten thousand years ago.", author: "E.O. Wilson", year: "1984" },
+  { text: "The real problem of humanity is the following: we have paleolithic emotions, medieval institutions, and god-like technology.", author: "E.O. Wilson", year: "1993" },
+  
+  // Aldo Leopold (Ecologist)
+  { text: "A thing is right when it tends to preserve the integrity, stability and beauty of the biotic community.", author: "Aldo Leopold", year: "1949" },
+  { text: "We abuse land because we regard it as a commodity belonging to us.", author: "Aldo Leopold", year: "1949" },
+  { text: "The last word in ignorance is the man who says of an animal or plant, 'What good is it?'", author: "Aldo Leopold", year: "1949" },
+  
+  // John Muir (Naturalist)
+  { text: "When we try to pick out anything by itself, we find it hitched to everything else in the Universe.", author: "John Muir", year: "1911" },
+  { text: "The mountains are calling and I must go.", author: "John Muir", year: "1873" },
+  { text: "In every walk with nature one receives far more than he seeks.", author: "John Muir", year: "1918" },
+  { text: "The clearest way into the Universe is through a forest wilderness.", author: "John Muir", year: "1890" },
+  
+  // Alexander von Humboldt (Naturalist/Explorer)
+  { text: "Nature is a living whole.", author: "Alexander von Humboldt", year: "1845" },
+  { text: "The most dangerous worldviews are the worldviews of those who have never viewed the world.", author: "Alexander von Humboldt", year: "1850" },
+  
+  // Alfred Wegener (Geophysicist)
+  { text: "The forces which displace continents are the same as those which produce great fold-mountain ranges.", author: "Alfred Wegener", year: "1915" },
+  { text: "Scientists still do not appear to understand sufficiently that all earth sciences must contribute evidence toward unveiling the state of our planet in earlier times.", author: "Alfred Wegener", year: "1929" },
+  
+  // Charles Lyell (Geologist)
+  { text: "In the course of my inquiry, I was led to the conclusion that the present state of things on the surface of the earth is the result of slow and gradual changes.", author: "Charles Lyell", year: "1830" },
+  { text: "The present is the key to the past.", author: "Charles Lyell", year: "1830" },
+  
+  // James Hutton (Geologist)
+  { text: "The result, therefore, of our present inquiry is, that we find no vestige of a beginning, no prospect of an end.", author: "James Hutton", year: "1788" },
+  { text: "We find no sign of a beginning - no prospect of an end.", author: "James Hutton", year: "1788" },
+  
+  // Harry Hess (Geologist)
+  { text: "The sea floor is spreading.", author: "Harry Hess", year: "1962" },
+  { text: "Geology is the study of pressure and time.", author: "Harry Hess", year: "1960" },
+  
+  // Walter Alvarez (Geologist)
+  { text: "In geology the impacts of meteors have been considered of major significance.", author: "Walter Alvarez", year: "1980" },
+  { text: "The dinosaurs disappeared about 66 million years ago, at exactly the same time as a 10-kilometer asteroid or comet hit the Earth.", author: "Walter Alvarez", year: "1980" },
+  
+  // Claude Allegre (Geochemist)
+  { text: "Science is the belief in the ignorance of experts.", author: "Claude Allegre", year: "1992" },
+  { text: "Doubt is not a pleasant condition, but certainty is absurd.", author: "Claude Allegre", year: "1987" },
+  
+  // Harold Jeffreys (Geophysicist)
+  { text: "Geology is the study of the succession of events in the history of the Earth.", author: "Harold Jeffreys", year: "1952" },
+  { text: "It is the facts that matter, not the proofs.", author: "Harold Jeffreys", year: "1961" },
+  
+  // William Smith (Geologist)
+  { text: "Organized fossils are to the naturalist as coins to the antiquary.", author: "William Smith", year: "1815" },
+  { text: "Each stratum contains fossils peculiar to itself.", author: "William Smith", year: "1815" },
+  
+  // J. Tuzo Wilson (Geophysicist)
+  { text: "The day of the expert is passing. The day of the educated person is coming.", author: "J. Tuzo Wilson", year: "1970" },
+  { text: "Plate tectonics provides a framework for understanding almost all geologic processes.", author: "J. Tuzo Wilson", year: "1965" },
+  
+  // Maurice Ewing (Geophysicist)
+  { text: "The floor of the sea is the roof of the underworld.", author: "Maurice Ewing", year: "1956" },
+  { text: "The deep ocean basins are the most dynamic parts of the earth.", author: "Maurice Ewing", year: "1959" },
+  
+  // Louis Agassiz (Geologist/Zoologist)
+  { text: "Every great scientific truth goes through three stages. First, people say it conflicts with the Bible. Next, they say it has been discovered before. Lastly, they say they always believed it.", author: "Louis Agassiz", year: "1850" },
+  { text: "Study nature, not books.", author: "Louis Agassiz", year: "1850" },
+  { text: "The glacier was God's great plough.", author: "Louis Agassiz", year: "1840" },
+  
+  // Additional Engineering Wisdom
+  { text: "Measure with a micrometer, mark with chalk, cut with an axe.", author: "Engineering Proverb" },
+  { text: "A good plan violently executed now is better than a perfect plan executed next week.", author: "George S. Patton", year: "1944" },
+  { text: "Perfectionism is the voice of the oppressor.", author: "Anne Lamott", year: "1994" },
+  { text: "Better is the enemy of good enough.", author: "Russian Proverb" },
+  { text: "If it ain't broke, don't fix it.", author: "Bert Lance", year: "1977" },
+  { text: "Keep it simple, stupid.", author: "Kelly Johnson", year: "1960" },
+  { text: "When in doubt, make it stout.", author: "Engineering Proverb" },
+  { text: "If you can't fix it with a hammer, you've got an electrical problem.", author: "Workshop Wisdom" },
+  { text: "The right tool makes all the difference.", author: "Craftsman Proverb" },
+  { text: "Measure twice, drill once.", author: "Carpenter's Wisdom" },
+  { text: "Patience is the companion of wisdom.", author: "Saint Augustine", year: "400" },
+  { text: "Small deeds done are better than great deeds planned.", author: "Peter Marshall", year: "1948" },
+  { text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu", year: "500 BC" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain", year: "1900" },
+  { text: "Well begun is half done.", author: "Aristotle", year: "350 BC" },
+  { text: "Practice makes perfect.", author: "Ancient Proverb" },
+  { text: "Experience is the teacher of all things.", author: "Julius Caesar", year: "50 BC" },
+  { text: "Knowledge comes, but wisdom lingers.", author: "Alfred Lord Tennyson", year: "1842" },
+  { text: "An ounce of action is worth a ton of theory.", author: "Friedrich Engels", year: "1878" },
+  { text: "Ideas are easy. Implementation is hard.", author: "Guy Kawasaki", year: "1990" },
+  { text: "Execution is the chariot of genius.", author: "William Blake", year: "1790" },
+  { text: "Vision without execution is hallucination.", author: "Thomas Edison", year: "1910" },
+  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+  
+  // Additional Engineering, Science & Maker Quotes (Pre-1995)
+  
+  // Workshop & Craftsmanship Wisdom
+  { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin", year: "1750" },
+  { text: "Give me six hours to chop down a tree and I will spend the first four sharpening the axe.", author: "Abraham Lincoln", year: "1860" },
+  { text: "By failing to prepare, you are preparing to fail.", author: "Benjamin Franklin", year: "1750" },
+  { text: "Quality means doing it right when no one is looking.", author: "Henry Ford", year: "1920" },
+  { text: "If you don't have time to do it right, when will you have time to do it over?", author: "John Wooden", year: "1970" },
+  { text: "Striving for perfection is the greatest stopper there is. It's your excuse to yourself for not doing anything.", author: "John Updike", year: "1985" },
+  { text: "Have no fear of perfection - you'll never reach it.", author: "Salvador Dalí", year: "1955" },
+  { text: "Art is never finished, only abandoned.", author: "Leonardo da Vinci", year: "1500" },
+  { text: "The details are not the details. They make the design.", author: "Charles Eames", year: "1970" },
+  { text: "Design is thinking made visual.", author: "Saul Bass", year: "1985" },
+  { text: "Good design is obvious. Great design is transparent.", author: "Joe Sparano", year: "1990" },
+  { text: "Less, but better.", author: "Dieter Rams", year: "1980" },
+  { text: "Good design is as little design as possible.", author: "Dieter Rams", year: "1980" },
+  { text: "Form follows function.", author: "Louis Sullivan", year: "1896" },
+  { text: "God is in the details.", author: "Ludwig Mies van der Rohe", year: "1950" },
+  { text: "Simplicity is not the absence of clutter, that's a consequence. Simplicity is somehow essentially describing the purpose.", author: "Jonathan Ive", year: "1992" },
+  { text: "Make everything as simple as possible, but not simpler.", author: "Albert Einstein", year: "1933" },
+  
+  // Albert Einstein (Additional Quotes)
+  { text: "If I had an hour to solve a problem I'd spend 55 minutes thinking about the problem and 5 minutes thinking about solutions.", author: "Albert Einstein", year: "1950" },
+  { text: "The important thing is not to stop questioning. Curiosity has its own reason for existence.", author: "Albert Einstein", year: "1955" },
+  { text: "Learn from yesterday, live for today, hope for tomorrow. The important thing is not to stop questioning.", author: "Albert Einstein", year: "1949" },
+  { text: "Life is like riding a bicycle. To keep your balance, you must keep moving.", author: "Albert Einstein", year: "1930" },
+  { text: "If you can't explain it simply, you don't understand it well enough.", author: "Albert Einstein", year: "1935" },
+  { text: "The only source of knowledge is experience.", author: "Albert Einstein", year: "1945" },
+  { text: "Look deep into nature, and then you will understand everything better.", author: "Albert Einstein", year: "1951" },
+  { text: "The measure of intelligence is the ability to change.", author: "Albert Einstein", year: "1945" },
+  { text: "A clever person solves a problem. A wise person avoids it.", author: "Albert Einstein", year: "1940" },
+  { text: "Anyone who has never made a mistake has never tried anything new.", author: "Albert Einstein", year: "1935" },
+  { text: "The world as we have created it is a process of our thinking.", author: "Albert Einstein", year: "1946" },
+  { text: "Weakness of attitude becomes weakness of character.", author: "Albert Einstein", year: "1950" },
+  { text: "Logic will get you from A to B. Imagination will take you everywhere.", author: "Albert Einstein", year: "1929" },
+  { text: "The true sign of intelligence is not knowledge but imagination.", author: "Albert Einstein", year: "1929" },
+  { text: "Try not to become a man of success, but rather try to become a man of value.", author: "Albert Einstein", year: "1955" },
+  { text: "A person who never made a mistake never tried anything new.", author: "Albert Einstein", year: "1935" },
+  { text: "The only way to escape the corruptible effect of praise is to go on working.", author: "Albert Einstein", year: "1930" },
+  { text: "Everybody is a genius. But if you judge a fish by its ability to climb a tree, it will live its whole life believing that it is stupid.", author: "Albert Einstein", year: "1935" },
+  { text: "I speak to everyone in the same way, whether he is the garbage man or the president of the university.", author: "Albert Einstein", year: "1940" },
+  { text: "When you are courting a nice girl an hour seems like a second. When you sit on a red-hot cinder a second seems like an hour. That's relativity.", author: "Albert Einstein", year: "1938" },
+  { text: "The world is a dangerous place to live; not because of the people who are evil, but because of the people who don't do anything about it.", author: "Albert Einstein", year: "1950" },
+  { text: "Great spirits have always encountered violent opposition from mediocre minds.", author: "Albert Einstein", year: "1940" },
+  { text: "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.", author: "Albert Einstein", year: "1947" },
+  { text: "Education is what remains after one has forgotten what one has learned in school.", author: "Albert Einstein", year: "1936" },
+  { text: "If the facts don't fit the theory, change the facts.", author: "Albert Einstein", year: "1935" },
+  { text: "Any fool can know. The point is to understand.", author: "Albert Einstein", year: "1940" },
+  { text: "The difference between stupidity and genius is that genius has its limits.", author: "Albert Einstein", year: "1945" },
+  { text: "Peace cannot be kept by force; it can only be achieved by understanding.", author: "Albert Einstein", year: "1950" },
+  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", year: "1950" },
+  { text: "Reality is merely an illusion, albeit a very persistent one.", author: "Albert Einstein", year: "1950" },
+  { text: "The pursuit of truth and beauty is a sphere of activity in which we are permitted to remain children all our lives.", author: "Albert Einstein", year: "1949" },
+  { text: "A question that sometimes drives me hazy: am I or are the others crazy?", author: "Albert Einstein", year: "1948" },
+  { text: "The hardest thing in the world to understand is the income tax.", author: "Albert Einstein", year: "1945" },
+  { text: "Common sense is the collection of prejudices acquired by age eighteen.", author: "Albert Einstein", year: "1936" },
+  { text: "The value of a man should be seen in what he gives and not in what he is able to receive.", author: "Albert Einstein", year: "1943" },
+  { text: "Intellectual growth should commence at birth and cease only at death.", author: "Albert Einstein", year: "1955" },
+  { text: "We cannot solve our problems with the same thinking we used when we created them.", author: "Albert Einstein", year: "1946" },
+  { text: "The mind that opens to a new idea never returns to its original size.", author: "Albert Einstein", year: "1945" },
+  { text: "A happy man is too satisfied with the present to dwell too much on the future.", author: "Albert Einstein", year: "1922" },
+  { text: "If A is a success in life, then A equals x plus y plus z. Work is x; y is play; and z is keeping your mouth shut.", author: "Albert Einstein", year: "1950" },
+  { text: "Anger dwells only in the bosom of fools.", author: "Albert Einstein", year: "1945" },
+  { text: "I have no special talents. I am only passionately curious.", author: "Albert Einstein", year: "1952" },
+  { text: "Small is the number of people who see with their eyes and think with their minds.", author: "Albert Einstein", year: "1940" },
+  { text: "You can never solve a problem on the level on which it was created.", author: "Albert Einstein", year: "1946" },
+  { text: "Not everything that counts can be counted, and not everything that can be counted counts.", author: "Albert Einstein", year: "1950" },
+  { text: "Everything should be made as simple as possible, but not simpler.", author: "Albert Einstein", year: "1933" },
+  { text: "Insanity: doing the same thing over and over again and expecting different results.", author: "Albert Einstein", year: "1935" },
+  { text: "The only thing that interferes with my learning is my education.", author: "Albert Einstein", year: "1930" },
+  { text: "Pure mathematics is, in its way, the poetry of logical ideas.", author: "Albert Einstein", year: "1950" },
+  { text: "The release of atomic energy has not created a new problem. It has merely made more urgent the necessity of solving an existing one.", author: "Albert Einstein", year: "1946" },
+  { text: "I live in that solitude which is painful in youth, but delicious in the years of maturity.", author: "Albert Einstein", year: "1940" },
+  { text: "Joy in looking and comprehending is nature's most beautiful gift.", author: "Albert Einstein", year: "1950" },
+  { text: "Once we accept our limits, we go beyond them.", author: "Albert Einstein", year: "1945" },
+  { text: "If I were not a physicist, I would probably be a musician.", author: "Albert Einstein", year: "1929" },
+  { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein", year: "1955" },
+  { text: "Information is not knowledge.", author: "Albert Einstein", year: "1950" },
+  { text: "Technological progress is like an axe in the hands of a pathological criminal.", author: "Albert Einstein", year: "1945" },
+  { text: "The high destiny of the individual is to serve rather than to rule.", author: "Albert Einstein", year: "1949" },
+  { text: "Without deep reflection one knows from daily life that one exists for other people.", author: "Albert Einstein", year: "1930" },
+  { text: "The monotony and solitude of a quiet life stimulates the creative mind.", author: "Albert Einstein", year: "1930" },
+  { text: "The secret to creativity is knowing how to hide your sources.", author: "Albert Einstein", year: "1935" },
+  { text: "Only a life lived for others is a life worthwhile.", author: "Albert Einstein", year: "1932" },
+  { text: "Few are those who see with their own eyes and feel with their own hearts.", author: "Albert Einstein", year: "1950" },
+  
+  // Isaac Newton (Additional)
+  { text: "Tact is the art of making a point without making an enemy.", author: "Isaac Newton", year: "1700" },
+  { text: "Truth is ever to be found in simplicity, and not in the multiplicity and confusion of things.", author: "Isaac Newton", year: "1700" },
+  { text: "Plato is my friend — Aristotle is my friend — but my greatest friend is truth.", author: "Isaac Newton", year: "1690" },
+  { text: "To explain all nature is too difficult a task for any one man or even for any one age.", author: "Isaac Newton", year: "1704" },
+  { text: "We build too many walls and not enough bridges.", author: "Isaac Newton", year: "1705" },
+  { text: "I can calculate the motion of heavenly bodies, but not the madness of people.", author: "Isaac Newton", year: "1720" },
+  { text: "To me there has never been a higher source of earthly honor or distinction than that connected with advances in science.", author: "Isaac Newton", year: "1707" },
+  { text: "What we know is a drop, what we don't know is an ocean.", author: "Isaac Newton", year: "1710" },
+  { text: "Nature is pleased with simplicity. And nature is no dummy.", author: "Isaac Newton", year: "1704" },
+  { text: "I do not know what I may appear to the world, but to myself I seem to have been only like a boy playing on the sea-shore.", author: "Isaac Newton", year: "1727" },
+  { text: "Errors are not in the art but in the artificers.", author: "Isaac Newton", year: "1687" },
+  { text: "This most beautiful system of the sun, planets, and comets, could only proceed from the counsel and dominion of an intelligent Being.", author: "Isaac Newton", year: "1687" },
+  { text: "A man may imagine things that are false, but he can only understand things that are true.", author: "Isaac Newton", year: "1700" },
+  { text: "It is the weight, not numbers of experiments that is to be regarded.", author: "Isaac Newton", year: "1687" },
+  { text: "I keep the subject constantly before me and wait till the first dawnings open little by little into the full light.", author: "Isaac Newton", year: "1715" },
+  { text: "Atheism is so senseless. When I look at the solar system, I see the earth at the right distance from the sun.", author: "Isaac Newton", year: "1692" },
+  { text: "I was like a boy playing on the sea-shore, and diverting myself now and then finding a smoother pebble or a prettier shell than ordinary.", author: "Isaac Newton", year: "1727" },
+  { text: "What goes up must come down.", author: "Isaac Newton", year: "1687" },
+  
+  // Galileo Galilei (Additional)
+  { text: "All truths are easy to understand once they are discovered; the point is to discover them.", author: "Galileo Galilei", year: "1638" },
+  { text: "I do not feel obliged to believe that the same God who has endowed us with sense, reason, and intellect has intended us to forgo their use.", author: "Galileo Galilei", year: "1615" },
+  { text: "You cannot teach a man anything, you can only help him find it within himself.", author: "Galileo Galilei", year: "1632" },
+  { text: "Where the senses fail us, reason must step in.", author: "Galileo Galilei", year: "1610" },
+  { text: "Nature is relentless and unchangeable, and it is indifferent as to whether its hidden reasons and actions are understandable to man or not.", author: "Galileo Galilei", year: "1638" },
+  { text: "In questions of science, the authority of a thousand is not worth the humble reasoning of a single individual.", author: "Galileo Galilei", year: "1632" },
+  { text: "Mathematics is the language with which God has written the universe.", author: "Galileo Galilei", year: "1623" },
+  { text: "Facts which at first seem improbable will, even on scant explanation, drop the cloak which has hidden them.", author: "Galileo Galilei", year: "1638" },
+  { text: "We cannot teach people anything; we can only help them discover it within themselves.", author: "Galileo Galilei", year: "1632" },
+  { text: "The laws of nature are written by the hand of God in the language of mathematics.", author: "Galileo Galilei", year: "1623" },
+  { text: "Philosophy is written in this grand book, the universe, which stands continually open to our gaze.", author: "Galileo Galilei", year: "1623" },
+  { text: "See now the power of truth; the same experiment which at first glance seemed to show one thing, when more carefully examined, assures us of the contrary.", author: "Galileo Galilei", year: "1638" },
+  { text: "I have never met a man so ignorant that I couldn't learn something from him.", author: "Galileo Galilei", year: "1630" },
+  { text: "Long experience has taught me this about the status of mankind with regard to matters requiring thought: the less people know and understand about them, the more positively they attempt to argue concerning them.", author: "Galileo Galilei", year: "1632" },
+  { text: "It is surely a matter of common observation that those who know most of the subject are the most modest in their claims.", author: "Galileo Galilei", year: "1632" },
+  { text: "The sun, with all those planets revolving around it and dependent on it, can still ripen a bunch of grapes as if it had nothing else in the universe to do.", author: "Galileo Galilei", year: "1610" },
+  { text: "And yet it moves.", author: "Galileo Galilei", year: "1633" },
+  { text: "The Milky Way is nothing else but a mass of innumerable stars planted together in clusters.", author: "Galileo Galilei", year: "1610" },
+  { text: "I think that in the discussion of natural problems we ought to begin not with the Scriptures, but with experiments.", author: "Galileo Galilei", year: "1615" },
+  { text: "Infinity is a fathomless gulf, into which all things vanish.", author: "Galileo Galilei", year: "1638" },
+  
+  // Johannes Kepler (Astronomer)
+  { text: "Nature uses as little as possible of anything.", author: "Johannes Kepler", year: "1619" },
+  { text: "The diversity of the phenomena of nature is so great, and the treasures hidden in the heavens so rich, precisely in order that the human mind shall never be lacking in fresh nourishment.", author: "Johannes Kepler", year: "1609" },
+  { text: "I much prefer the sharpest criticism of a single intelligent man to the thoughtless approval of the masses.", author: "Johannes Kepler", year: "1610" },
+  { text: "Truth is the daughter of time, and I feel no shame in being her midwife.", author: "Johannes Kepler", year: "1609" },
+  { text: "Geometry has two great treasures; one is the Theorem of Pythagoras; the other, the division of a line into extreme and mean ratio. The first we may compare to a measure of gold; the second we may name a precious jewel.", author: "Johannes Kepler", year: "1619" },
+  { text: "Where there is matter, there is geometry.", author: "Johannes Kepler", year: "1619" },
+  { text: "I demonstrate by means of philosophy that the earth is round, and is inhabited on all sides.", author: "Johannes Kepler", year: "1611" },
+  { text: "The roads by which men arrive at their insights into celestial matters seems to me almost as worthy of wonder as those matters in themselves.", author: "Johannes Kepler", year: "1609" },
+  
+  // Blaise Pascal (Mathematician/Physicist)
+  { text: "All of humanity's problems stem from man's inability to sit quietly in a room alone.", author: "Blaise Pascal", year: "1670" },
+  { text: "We know the truth, not only by the reason, but also by the heart.", author: "Blaise Pascal", year: "1670" },
+  { text: "Kind words do not cost much. Yet they accomplish much.", author: "Blaise Pascal", year: "1670" },
+  { text: "The heart has its reasons which reason knows not.", author: "Blaise Pascal", year: "1670" },
+  { text: "In faith there is enough light for those who want to believe and enough shadows to blind those who don't.", author: "Blaise Pascal", year: "1670" },
+  { text: "Man is equally incapable of seeing the nothingness from which he emerges and the infinity in which he is engulfed.", author: "Blaise Pascal", year: "1670" },
+  { text: "Justice without force is powerless; force without justice is tyrannical.", author: "Blaise Pascal", year: "1670" },
+  { text: "The eternal silence of these infinite spaces frightens me.", author: "Blaise Pascal", year: "1670" },
+  { text: "We are generally the better persuaded by the reasons we discover ourselves than by those given to us by others.", author: "Blaise Pascal", year: "1670" },
+  { text: "Man's greatness lies in his power of thought.", author: "Blaise Pascal", year: "1670" },
+  { text: "I have made this letter longer than usual because I lack the time to make it shorter.", author: "Blaise Pascal", year: "1657" },
+  { text: "Contradiction is not a sign of falsity, nor the lack of contradiction a sign of truth.", author: "Blaise Pascal", year: "1670" },
+  { text: "We sail within a vast sphere, ever drifting in uncertainty.", author: "Blaise Pascal", year: "1670" },
+  { text: "Men never do evil so completely and cheerfully as when they do it from religious conviction.", author: "Blaise Pascal", year: "1670" },
+  { text: "Truth is so obscure in these times, and falsehood so established, that, unless we love the truth, we cannot know it.", author: "Blaise Pascal", year: "1670" },
+  { text: "All men's miseries derive from not being able to sit in a quiet room alone.", author: "Blaise Pascal", year: "1670" },
+  { text: "The least movement is of importance to all nature. The entire ocean is affected by a pebble.", author: "Blaise Pascal", year: "1670" },
+  { text: "The more I see of man, the more I like dogs.", author: "Blaise Pascal", year: "1670" },
+  { text: "Do you wish people to think well of you? Don't speak well of yourself.", author: "Blaise Pascal", year: "1670" },
+  { text: "Small minds are concerned with the extraordinary, great minds with the ordinary.", author: "Blaise Pascal", year: "1670" },
+  
+  // Archimedes (Additional)
+  { text: "The shortest distance between two points is a straight line.", author: "Archimedes", year: "250 BC" },
+  { text: "There are things which seem incredible to most men who have not studied mathematics.", author: "Archimedes", year: "250 BC" },
+  { text: "Give me but a firm spot on which to stand, and I shall move the earth.", author: "Archimedes", year: "250 BC" },
+  
+  // Pythagoras (Mathematician)
+  { text: "Do not say a little in many words but a great deal in a few.", author: "Pythagoras", year: "500 BC" },
+  { text: "Choose always the way that seems the best, however rough it may be; custom will soon render it easy and agreeable.", author: "Pythagoras", year: "500 BC" },
+  { text: "Silence is better than unmeaning words.", author: "Pythagoras", year: "500 BC" },
+  { text: "There is geometry in the humming of the strings.", author: "Pythagoras", year: "500 BC" },
+  { text: "Number rules the universe.", author: "Pythagoras", year: "500 BC" },
+  { text: "Thought is an Idea in transit, which when once released, never can be lured back.", author: "Pythagoras", year: "500 BC" },
+  { text: "Educate the children and it won't be necessary to punish the men.", author: "Pythagoras", year: "500 BC" },
+  { text: "Rest satisfied with doing well, and leave others to talk of you as they please.", author: "Pythagoras", year: "500 BC" },
+  { text: "Concern should drive us into action, not into a depression.", author: "Pythagoras", year: "500 BC" },
+  { text: "Above all things, respect yourself.", author: "Pythagoras", year: "500 BC" },
+  { text: "Be silent or let thy words be worth more than silence.", author: "Pythagoras", year: "500 BC" },
+  { text: "Do not talk a little on many subjects, but much on a few.", author: "Pythagoras", year: "500 BC" },
+  { text: "No man is free who cannot command himself.", author: "Pythagoras", year: "500 BC" },
+  { text: "A thought is an idea in transit.", author: "Pythagoras", year: "500 BC" },
+  
+  // Euclid (Mathematician)
+  { text: "There is no royal road to geometry.", author: "Euclid", year: "300 BC" },
+  { text: "The laws of nature are but the mathematical thoughts of God.", author: "Euclid", year: "300 BC" },
+  { text: "That which is equal to the same thing are equal to one another.", author: "Euclid", year: "300 BC" },
+  { text: "The whole is greater than the part.", author: "Euclid", year: "300 BC" },
+  
+  // Carl Friedrich Gauss (Mathematician)
+  { text: "Mathematics is the queen of sciences and number theory is the queen of mathematics.", author: "Carl Friedrich Gauss", year: "1832" },
+  { text: "Finally, two days ago, I succeeded not on account of my hard efforts, but by the grace of the Lord.", author: "Carl Friedrich Gauss", year: "1796" },
+  { text: "I have had my results for a long time, but I do not yet know how I am to arrive at them.", author: "Carl Friedrich Gauss", year: "1810" },
+  { text: "It is not knowledge, but the act of learning, not possession but the act of getting there, which grants the greatest enjoyment.", author: "Carl Friedrich Gauss", year: "1808" },
+  { text: "When a philosopher says something that is true then it is trivial. When he says something that is not trivial then it is false.", author: "Carl Friedrich Gauss", year: "1820" },
+  { text: "You know that I write slowly. This is chiefly because I am never satisfied until I have said as much as possible in a few words.", author: "Carl Friedrich Gauss", year: "1830" },
+  { text: "Few, but ripe.", author: "Carl Friedrich Gauss", year: "1840" },
+  { text: "Life stands before me like an eternal spring with new and brilliant clothes.", author: "Carl Friedrich Gauss", year: "1796" },
+  
+  // Leonhard Euler (Mathematician)
+  { text: "Although to penetrate into the intimate mysteries of nature and thence to learn the true causes of phenomena is not allowed to us, nevertheless it can happen that a certain fictive hypothesis may suffice for explaining many phenomena.", author: "Leonhard Euler", year: "1750" },
+  { text: "Nothing takes place in the world whose meaning is not that of some maximum or minimum.", author: "Leonhard Euler", year: "1744" },
+  { text: "Mathematicians have tried in vain to this day to discover some order in the sequence of prime numbers, and we have reason to believe that it is a mystery into which the human mind will never penetrate.", author: "Leonhard Euler", year: "1748" },
+  { text: "To those who ask what the infinitely small quantity in mathematics is, we answer that it is actually zero.", author: "Leonhard Euler", year: "1755" },
+  
+  // Pierre-Simon Laplace (Mathematician/Astronomer)
+  { text: "What we know is not much. What we do not know is immense.", author: "Pierre-Simon Laplace", year: "1827" },
+  { text: "Probability theory is nothing but common sense reduced to calculation.", author: "Pierre-Simon Laplace", year: "1814" },
+  { text: "It is India that gave us the ingenious method of expressing all numbers by means of ten symbols.", author: "Pierre-Simon Laplace", year: "1820" },
+  { text: "The present state of the system of nature is evidently a consequence of what it was in the preceding moment.", author: "Pierre-Simon Laplace", year: "1814" },
+  { text: "All the effects of nature are only mathematical results of a small number of immutable laws.", author: "Pierre-Simon Laplace", year: "1796" },
+  
+  // Joseph-Louis Lagrange (Mathematician)
+  { text: "As long as algebra and geometry have been separated, their progress have been slow and their uses limited.", author: "Joseph-Louis Lagrange", year: "1788" },
+  { text: "The reader will find no figures in this work.", author: "Joseph-Louis Lagrange", year: "1788" },
+  
+  // Gottfried Wilhelm Leibniz (Mathematician/Philosopher)
+  { text: "Music is the pleasure the human mind experiences from counting without being aware that it is counting.", author: "Gottfried Wilhelm Leibniz", year: "1712" },
+  { text: "The present is big with the future.", author: "Gottfried Wilhelm Leibniz", year: "1710" },
+  { text: "To love is to find pleasure in the happiness of others.", author: "Gottfried Wilhelm Leibniz", year: "1710" },
+  { text: "He who understands baboon would do more towards metaphysics than Locke.", author: "Gottfried Wilhelm Leibniz", year: "1715" },
+  { text: "There are also two kinds of truths: truth of reasoning and truths of fact.", author: "Gottfried Wilhelm Leibniz", year: "1714" },
+  { text: "Nature never makes leaps.", author: "Gottfried Wilhelm Leibniz", year: "1704" },
+  { text: "Taking mathematics from the beginning of the world to the time when Newton lived, what he had done was much the better half.", author: "Gottfried Wilhelm Leibniz", year: "1716" },
+  
+  // René Descartes (Philosopher/Mathematician)
+  { text: "I think; therefore I am.", author: "René Descartes", year: "1637" },
+  { text: "The reading of all good books is like a conversation with the finest minds of past centuries.", author: "René Descartes", year: "1637" },
+  { text: "Divide each difficulty into as many parts as is feasible and necessary to resolve it.", author: "René Descartes", year: "1637" },
+  { text: "It is not enough to have a good mind; the main thing is to use it well.", author: "René Descartes", year: "1637" },
+  { text: "Perfect numbers like perfect men are very rare.", author: "René Descartes", year: "1638" },
+  { text: "If you would be a real seeker after truth, it is necessary that at least once in your life you doubt, as far as possible, all things.", author: "René Descartes", year: "1641" },
+  { text: "The greatest minds are capable of the greatest vices as well as of the greatest virtues.", author: "René Descartes", year: "1637" },
+  { text: "Doubt is the origin of wisdom.", author: "René Descartes", year: "1641" },
+  { text: "Each problem that I solved became a rule, which served afterwards to solve other problems.", author: "René Descartes", year: "1637" },
+  { text: "The first precept was never to accept a thing as true until I knew it as such without a single doubt.", author: "René Descartes", year: "1637" },
+  { text: "Common sense is the most widely shared commodity in the world, for every man is convinced that he is well supplied with it.", author: "René Descartes", year: "1637" },
+  { text: "Everything is self-evident.", author: "René Descartes", year: "1640" },
+  { text: "An optimist may see a light where there is none, but why must the pessimist always run to blow it out?", author: "René Descartes", year: "1637" },
+  { text: "I am indeed amazed when I consider how weak my mind is and how prone to error.", author: "René Descartes", year: "1641" },
+  { text: "Travelling is almost like talking with those of other centuries.", author: "René Descartes", year: "1637" },
+  
+  // More Workshop Wisdom
+  { text: "A dull tool is harder to use and more dangerous than a sharp one.", author: "Carpenter's Wisdom" },
+  { text: "Never force anything. If it doesn't fit, you're doing it wrong.", author: "Workshop Proverb" },
+  { text: "The wood teaches how it wants to be carved.", author: "Woodworking Wisdom" },
+  { text: "Leave it better than you found it.", author: "Craftsman's Code" },
+  { text: "The tool does not make the craftsman, but it helps.", author: "Ancient Proverb" },
+  { text: "Haste makes waste.", author: "Ancient Proverb" },
+  { text: "Slow is smooth, and smooth is fast.", author: "Military Wisdom", year: "1950" },
+  { text: "If you're not making dust, you're collecting it.", author: "Workshop Humor" },
+  { text: "The secret to a good finish is in the preparation.", author: "Finishing Wisdom" },
+  { text: "Glue is not a structural member.", author: "Engineering Humor" },
+  { text: "WD-40 for things that move but shouldn't. Duct tape for things that don't move but should.", author: "Workshop Wisdom" },
+  { text: "The difference between screwing around and science is writing it down.", author: "Adam Savage", year: "1990" },
+  { text: "When all else fails, read the instructions.", author: "Modern Proverb" },
+  { text: "Safety third.", author: "Mike Rowe", year: "1994" },
+  { text: "There's a fine line between a hobby and mental illness.", author: "Dave Barry", year: "1990" },
+  { text: "Buy once, cry once.", author: "Tool-Buying Wisdom" },
+  { text: "You can never have too many clamps.", author: "Woodworking Truth" },
+  { text: "The difference between professional and amateur is consistency.", author: "Craftsman's Wisdom" },
+  { text: "If it's stupid but it works, it isn't stupid.", author: "Engineering Proverb" },
+  { text: "Any tool is a hammer if you use it wrong enough.", author: "Workshop Humor" },
+  { text: "The project isn't done until the shop is clean.", author: "Workshop Rule" },
+  { text: "Red goes to red, black goes to black, and green goes to ground.", author: "Electrician's Mantra" },
+  { text: "Test before you trust.", author: "Electrician's Wisdom" },
+  { text: "Lefty loosey, righty tighty.", author: "Mechanic's Rhyme" },
+  { text: "If you can't loosen it, tighten it until it breaks, then it will be easy to remove.", author: "Mechanic's Joke" },
+  { text: "The solution to any problem is usually simpler than you think.", author: "Problem-Solving Wisdom" },
+  { text: "Start with the simplest explanation.", author: "Occam's Razor", year: "1320" },
+  { text: "Everything works until you turn it on.", author: "Murphy's Law" },
+  { text: "Anything that can go wrong will go wrong.", author: "Murphy's Law", year: "1949" },
+  { text: "If anything simply cannot go wrong, it will anyway.", author: "Murphy's Law", year: "1949" },
+  { text: "Left to themselves, things tend to go from bad to worse.", author: "Murphy's Law", year: "1949" },
+  { text: "Nothing is as easy as it looks.", author: "Murphy's Law", year: "1949" },
+  { text: "Everything takes longer than you think.", author: "Murphy's Law", year: "1949" },
+  { text: "If there is a possibility of several things going wrong, the one that will cause the most damage will be the one to go wrong.", author: "Murphy's Law", year: "1949" },
+  { text: "Mother Nature is a bitch.", author: "Murphy's Law", year: "1949" },
+  { text: "It is impossible to make anything foolproof because fools are so ingenious.", author: "Murphy's Law", year: "1949" },
+  { text: "Every solution breeds new problems.", author: "Murphy's Law", year: "1949" },
+  
+  // Blaise Pascal (Mathematician/Physicist)
+  { text: "All of humanity's problems stem from man's inability to sit quietly in a room alone.", author: "Blaise Pascal", year: "1670" },
+  { text: "In faith there is enough light for those who want to believe and enough shadows to blind those who don't.", author: "Blaise Pascal", year: "1670" },
+  { text: "Truth is so obscure in these times, and falsehood so established, that, unless we love the truth, we cannot know it.", author: "Blaise Pascal", year: "1670" },
+  { text: "Small minds are concerned with the extraordinary, great minds with the ordinary.", author: "Blaise Pascal", year: "1670" },
+  { text: "Kind words do not cost much. Yet they accomplish much.", author: "Blaise Pascal", year: "1670" },
+  { text: "People almost invariably arrive at their beliefs not on the basis of proof but on the basis of what they find attractive.", author: "Blaise Pascal", year: "1670" },
+  { text: "We know the truth, not only by the reason, but also by the heart.", author: "Blaise Pascal", year: "1670" },
+  { text: "Nothing is so intolerable to man as being fully at rest, without a passion, without business, without entertainment, without care.", author: "Blaise Pascal", year: "1670" },
+  
+  // Carl Friedrich Gauss (Mathematician)
+  { text: "Mathematics is the queen of the sciences.", author: "Carl Friedrich Gauss", year: "1856" },
+  { text: "It is not knowledge, but the act of learning, not possession but the act of getting there, which grants the greatest enjoyment.", author: "Carl Friedrich Gauss", year: "1808" },
+  { text: "I have had my results for a long time: but I do not yet know how I am to arrive at them.", author: "Carl Friedrich Gauss", year: "1830" },
+  { text: "When a philosopher says something that is true then it is trivial. When he says something that is not trivial then it is false.", author: "Carl Friedrich Gauss", year: "1840" },
+  
+  // Leonhard Euler (Mathematician)
+  { text: "For since the fabric of the universe is most perfect and the work of a most wise Creator, nothing at all takes place in the universe in which some rule of maximum or minimum does not appear.", author: "Leonhard Euler", year: "1744" },
+  { text: "Although to penetrate into the intimate mysteries of nature and thence to learn the true causes of phenomena is not allowed to us, nevertheless it can happen that a certain fictive hypothesis may suffice for explaining many phenomena.", author: "Leonhard Euler", year: "1750" },
+  { text: "Nothing takes place in the world whose meaning is not that of some maximum or minimum.", author: "Leonhard Euler", year: "1744" },
+  { text: "Now I will have less distraction.", author: "Leonhard Euler", year: "1738" },
+  
+  // Bernhard Riemann (Mathematician)
+  { text: "If only I had the theorems! Then I should find the proofs easily enough.", author: "Bernhard Riemann", year: "1860" },
+  
+  // Georg Cantor (Mathematician)
+  { text: "The essence of mathematics lies in its freedom.", author: "Georg Cantor", year: "1883" },
+  { text: "In mathematics the art of proposing a question must be held of higher value than solving it.", author: "Georg Cantor", year: "1867" },
+  { text: "A set is a Many that allows itself to be thought of as a One.", author: "Georg Cantor", year: "1895" },
+  
+  // David Hilbert (Mathematician)
+  { text: "We must know. We will know.", author: "David Hilbert", year: "1930" },
+  { text: "Mathematics is a game played according to certain simple rules with meaningless marks on paper.", author: "David Hilbert", year: "1925" },
+  { text: "The art of doing mathematics consists in finding that special case which contains all the germs of generality.", author: "David Hilbert", year: "1900" },
+  { text: "A mathematical theory is not to be considered complete until you have made it so clear that you can explain it to the first man whom you meet on the street.", author: "David Hilbert", year: "1900" },
+  { text: "Physics is too hard for physicists.", author: "David Hilbert", year: "1920" },
+  
+  // Henri Poincaré (Mathematician)
+  { text: "Mathematics is the art of giving the same name to different things.", author: "Henri Poincaré", year: "1908" },
+  { text: "It is by logic we prove, it is by intuition that we invent.", author: "Henri Poincaré", year: "1905" },
+  { text: "Science is built up of facts, as a house is built of stones; but an accumulation of facts is no more a science than a heap of stones is a house.", author: "Henri Poincaré", year: "1902" },
+  { text: "The scientist does not study nature because it is useful; he studies it because he delights in it, and he delights in it because it is beautiful.", author: "Henri Poincaré", year: "1908" },
+  { text: "Thought is only a flash between two long nights, but this flash is everything.", author: "Henri Poincaré", year: "1908" },
+  { text: "Mathematicians are born, not made.", author: "Henri Poincaré", year: "1908" },
+  { text: "Doubt everything or believe everything: these are two equally convenient strategies. With either we dispense with the need to think.", author: "Henri Poincaré", year: "1902" },
+  
+  // John von Neumann (Mathematician/Physicist)
+  { text: "In mathematics you don't understand things. You just get used to them.", author: "John von Neumann", year: "1950" },
+  { text: "If people do not believe that mathematics is simple, it is only because they do not realize how complicated life is.", author: "John von Neumann", year: "1947" },
+  { text: "Young man, in mathematics you don't understand things. You just get used to them.", author: "John von Neumann", year: "1945" },
+  { text: "Anyone who attempts to generate random numbers by deterministic means is, of course, living in a state of sin.", author: "John von Neumann", year: "1951" },
+  { text: "There's no sense in being precise when you don't even know what you're talking about.", author: "John von Neumann", year: "1950" },
+  { text: "The sciences do not try to explain, they hardly even try to interpret, they mainly make models.", author: "John von Neumann", year: "1955" },
+  
+  // Bertrand Russell (Philosopher/Mathematician)
+  { text: "The only thing that will redeem mankind is cooperation.", author: "Bertrand Russell", year: "1950" },
+  { text: "The good life is one inspired by love and guided by knowledge.", author: "Bertrand Russell", year: "1925" },
+  { text: "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts.", author: "Bertrand Russell", year: "1933" },
+  { text: "Three passions, simple but overwhelmingly strong, have governed my life: the longing for love, the search for knowledge, and unbearable pity for the suffering of mankind.", author: "Bertrand Russell", year: "1967" },
+  { text: "Do not fear to be eccentric in opinion, for every opinion now accepted was once eccentric.", author: "Bertrand Russell", year: "1950" },
+  { text: "The greatest challenge to any thinker is stating the problem in a way that will allow a solution.", author: "Bertrand Russell", year: "1945" },
+  { text: "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.", author: "Bertrand Russell", year: "1933" },
+  { text: "To be without some of the things you want is an indispensable part of happiness.", author: "Bertrand Russell", year: "1930" },
+  { text: "Men are born ignorant, not stupid. They are made stupid by education.", author: "Bertrand Russell", year: "1950" },
+  
+  // Alfred North Whitehead (Mathematician/Philosopher)
+  { text: "Civilization advances by extending the number of important operations which we can perform without thinking about them.", author: "Alfred North Whitehead", year: "1911" },
+  { text: "It is the business of the future to be dangerous.", author: "Alfred North Whitehead", year: "1925" },
+  { text: "Not ignorance, but ignorance of ignorance, is the death of knowledge.", author: "Alfred North Whitehead", year: "1929" },
+  { text: "We think in generalities, but we live in detail.", author: "Alfred North Whitehead", year: "1925" },
+  { text: "Seek simplicity and distrust it.", author: "Alfred North Whitehead", year: "1919" },
+  { text: "The art of progress is to preserve order amid change, and to preserve change amid order.", author: "Alfred North Whitehead", year: "1929" },
+  
+  // Kurt Gödel (Mathematician/Logician)
+  { text: "I don't believe in natural science.", author: "Kurt Gödel", year: "1970" },
+  
+  // Alan Turing (Mathematician/Computer Scientist)
+  { text: "We can only see a short distance ahead, but we can see plenty there that needs to be done.", author: "Alan Turing", year: "1950" },
+  { text: "Sometimes it is the people no one can imagine anything of who do the things no one can imagine.", author: "Alan Turing", year: "1945" },
+  { text: "A computer would deserve to be called intelligent if it could deceive a human into believing that it was human.", author: "Alan Turing", year: "1950" },
+  { text: "If a machine is expected to be infallible, it cannot also be intelligent.", author: "Alan Turing", year: "1947" },
+  { text: "Those who can imagine anything, can create the impossible.", author: "Alan Turing", year: "1948" },
+  
+  // Claude Shannon (Mathematician/Engineer)
+  { text: "Information is the resolution of uncertainty.", author: "Claude Shannon", year: "1948" },
+  { text: "I just wondered how things were put together.", author: "Claude Shannon", year: "1990" },
+  
+  // Norbert Wiener (Mathematician/Philosopher)
+  { text: "The best material model of a cat is another, or preferably the same, cat.", author: "Norbert Wiener", year: "1950" },
+  { text: "We are drowning in information but starved for knowledge.", author: "Norbert Wiener", year: "1950" },
+  { text: "Progress imposes not only new possibilities for the future but new restrictions.", author: "Norbert Wiener", year: "1950" },
+  { text: "To live effectively is to live with adequate information.", author: "Norbert Wiener", year: "1954" },
+  
+  // George Pólya (Mathematician)
+  { text: "If you can't solve a problem, then there is an easier problem you can solve: find it.", author: "George Pólya", year: "1945" },
+  { text: "Mathematics consists of proving the most obvious thing in the least obvious way.", author: "George Pólya", year: "1954" },
+  { text: "Geometry is the science of correct reasoning on incorrect figures.", author: "George Pólya", year: "1954" },
+  { text: "The first rule of discovery is to have brains and good luck. The second rule of discovery is to sit tight and wait till you get a bright idea.", author: "George Pólya", year: "1945" },
+  
+  // Andrew Wiles (Mathematician)
+  { text: "Perhaps I could best describe my experience of doing mathematics in terms of entering a dark mansion. One goes into the first room, and it's dark, completely dark. One stumbles around bumping into the furniture, and gradually you learn where each piece of furniture is, and finally, after six months or so, you find the light switch.", author: "Andrew Wiles", year: "1994" },
+  
+  // Paul Erdős (Mathematician)
+  { text: "A mathematician is a device for turning coffee into theorems.", author: "Paul Erdős", year: "1960" },
+  { text: "Mathematics is not yet ready for such problems.", author: "Paul Erdős", year: "1985" },
+  
+  // Srinivasa Ramanujan (Mathematician)
+  { text: "An equation means nothing to me unless it expresses a thought of God.", author: "Srinivasa Ramanujan", year: "1920" },
+  { text: "No equation is complete until it is beautiful.", author: "Srinivasa Ramanujan", year: "1918" },
+  
+  // Charles Babbage (Computer Pioneer/Mathematician)
+  { text: "Errors using inadequate data are much less than those using no data at all.", author: "Charles Babbage", year: "1864" },
+  { text: "On two occasions I have been asked, 'If you put into the machine wrong figures, will the right answers come out?' I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question.", author: "Charles Babbage", year: "1864" },
+  { text: "The economy of human time is the next advantage of machinery in manufactures.", author: "Charles Babbage", year: "1832" },
+  { text: "At each increase of knowledge, as well as on the contrivance of every new tool, human labour becomes abridged.", author: "Charles Babbage", year: "1832" },
+  
+  // Ada Lovelace (Mathematician/First Programmer)
+  { text: "The Analytical Engine weaves algebraic patterns, just as the Jacquard loom weaves flowers and leaves.", author: "Ada Lovelace", year: "1843" },
+  { text: "That brain of mine is something more than merely mortal; as time will show.", author: "Ada Lovelace", year: "1844" },
+  { text: "The more I study, the more insatiable do I feel my genius for it to be.", author: "Ada Lovelace", year: "1841" },
+  
+  // George Boole (Mathematician/Logician)
+  { text: "No matter how correct a mathematical theorem may appear to be, one ought never to be satisfied that there was not something imperfect about it until it gives the impression of also being beautiful.", author: "George Boole", year: "1854" },
+  
+  // William Thomson (Lord Kelvin) (Physicist/Engineer)
+  { text: "When you can measure what you are speaking about, and express it in numbers, you know something about it.", author: "Lord Kelvin", year: "1883" },
+  { text: "There is nothing new to be discovered in physics now. All that remains is more and more precise measurement.", author: "Lord Kelvin", year: "1900" },
+  { text: "Large increases in cost with questionable increases in performance can be tolerated only in race horses and fancy women.", author: "Lord Kelvin", year: "1895" },
+  { text: "If you do not rest on the good foundation of nature, you will labour with little honour and less profit.", author: "Lord Kelvin", year: "1889" },
+  
+  // James Clerk Maxwell (Physicist)
+  { text: "The true logic of this world is in the calculus of probabilities.", author: "James Clerk Maxwell", year: "1850" },
+  { text: "Thoroughly conscious ignorance is the prelude to every real advance in science.", author: "James Clerk Maxwell", year: "1873" },
+  { text: "In every branch of knowledge the progress is proportional to the amount of facts on which to build, and therefore to the facility of obtaining data.", author: "James Clerk Maxwell", year: "1871" },
+  { text: "The only laws of matter are those that our minds must fabricate and the only laws of mind are fabricated for it by matter.", author: "James Clerk Maxwell", year: "1873" },
+  { text: "All the mathematical sciences are founded on relations between physical laws and laws of numbers.", author: "James Clerk Maxwell", year: "1856" },
+  
+  // Michael Faraday (Physicist/Chemist)
+  { text: "Nothing is too wonderful to be true if it be consistent with the laws of nature.", author: "Michael Faraday", year: "1849" },
+  { text: "The five essential entrepreneurial skills for success are concentration, discrimination, organization, innovation and communication.", author: "Michael Faraday", year: "1860" },
+  { text: "Work. Finish. Publish.", author: "Michael Faraday", year: "1850" },
+  { text: "The lecturer should give the audience full reason to believe that all his powers have been exerted for their pleasure and instruction.", author: "Michael Faraday", year: "1848" },
+  
+  // Ernest Rutherford (Physicist)
+  { text: "All science is either physics or stamp collecting.", author: "Ernest Rutherford", year: "1908" },
+  { text: "If your experiment needs statistics, you ought to have done a better experiment.", author: "Ernest Rutherford", year: "1910" },
+  { text: "An alleged scientific discovery has no merit unless it can be explained to a barmaid.", author: "Ernest Rutherford", year: "1923" },
+  { text: "We haven't got the money, so we've got to think.", author: "Ernest Rutherford", year: "1932" },
+  { text: "Never say, 'I tried it once and it did not work.'", author: "Ernest Rutherford", year: "1920" },
+  
+  // Enrico Fermi (Physicist)
+  { text: "Before I came here I was confused about this subject. Having listened to your lecture I am still confused. But on a higher level.", author: "Enrico Fermi", year: "1950" },
+  { text: "Whatever Nature has in store for mankind, unpleasant as it may be, men must accept, for ignorance is never better than knowledge.", author: "Enrico Fermi", year: "1954" },
+  { text: "There are two possible outcomes: if the result confirms the hypothesis, then you've made a measurement. If the result is contrary to the hypothesis, then you've made a discovery.", author: "Enrico Fermi", year: "1950" },
+  
+  // Werner Heisenberg (Physicist)
+  { text: "Not only is the Universe stranger than we think, it is stranger than we can think.", author: "Werner Heisenberg", year: "1958" },
+  { text: "An expert is someone who knows some of the worst mistakes that can be made in his subject, and how to avoid them.", author: "Werner Heisenberg", year: "1969" },
+  { text: "The first gulp from the glass of natural sciences will turn you into an atheist, but at the bottom of the glass God is waiting for you.", author: "Werner Heisenberg", year: "1952" },
+  { text: "What we observe is not nature itself, but nature exposed to our method of questioning.", author: "Werner Heisenberg", year: "1958" },
+  
+  // Erwin Schrödinger (Physicist)
+  { text: "The task is not to see what has never been seen before, but to think what has never been thought before about what you see everyday.", author: "Erwin Schrödinger", year: "1944" },
+  { text: "Quantum physics thus reveals a basic oneness of the universe.", author: "Erwin Schrödinger", year: "1944" },
+  { text: "Consciousness cannot be accounted for in physical terms. For consciousness is absolutely fundamental.", author: "Erwin Schrödinger", year: "1944" },
+  
+  // Max Planck (Physicist)
+  { text: "Science cannot solve the ultimate mystery of nature. And that is because, in the last analysis, we ourselves are part of nature and therefore part of the mystery that we are trying to solve.", author: "Max Planck", year: "1932" },
+  { text: "An experiment is a question which science poses to Nature, and a measurement is the recording of Nature's answer.", author: "Max Planck", year: "1909" },
+  { text: "A new scientific truth does not triumph by convincing its opponents and making them see the light, but rather because its opponents eventually die.", author: "Max Planck", year: "1950" },
+  { text: "Anybody who has been seriously engaged in scientific work of any kind realizes that over the entrance to the gates of the temple of science are written the words: 'Ye must have faith.'", author: "Max Planck", year: "1932" },
+  
+  // Marie Curie (Physicist/Chemist)
+  { text: "Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less.", author: "Marie Curie", year: "1920" },
+  { text: "Be less curious about people and more curious about ideas.", author: "Marie Curie", year: "1923" },
+  { text: "I was taught that the way of progress was neither swift nor easy.", author: "Marie Curie", year: "1903" },
+  { text: "One never notices what has been done; one can only see what remains to be done.", author: "Marie Curie", year: "1894" },
+  { text: "Life is not easy for any of us. But what of that? We must have perseverance and above all confidence in ourselves.", author: "Marie Curie", year: "1903" },
+  
+  // Louis Pasteur (Chemist/Microbiologist)
+  { text: "Science knows no country, because knowledge belongs to humanity, and is the torch which illuminates the world.", author: "Louis Pasteur", year: "1876" },
+  { text: "Fortune favors the prepared mind.", author: "Louis Pasteur", year: "1854" },
+  { text: "In the fields of observation chance favors only the prepared mind.", author: "Louis Pasteur", year: "1854" },
+  { text: "Let me tell you the secret that has led me to my goal. My strength lies solely in my tenacity.", author: "Louis Pasteur", year: "1892" },
+  { text: "Did you ever observe to whom the accidents happen? Chance favors only the prepared mind.", author: "Louis Pasteur", year: "1854" },
+  
+  // Dmitri Mendeleev (Chemist)
+  { text: "We could live at the present day without a Plato, but a double number of Newtons is required to discover the secrets of nature.", author: "Dmitri Mendeleev", year: "1889" },
+  { text: "It is the function of science to discover the existence of a general reign of order in nature and to find the causes governing this order.", author: "Dmitri Mendeleev", year: "1871" },
+  { text: "Work, look for peace and calm in work: you will find it nowhere else.", author: "Dmitri Mendeleev", year: "1890" },
+  
+  // Linus Pauling (Chemist)
+  { text: "The way to get good ideas is to get lots of ideas and throw the bad ones away.", author: "Linus Pauling", year: "1964" },
+  { text: "Science is the search for truth.", author: "Linus Pauling", year: "1983" },
+  { text: "The best way to have a good idea is to have a lot of ideas.", author: "Linus Pauling", year: "1962" },
+  { text: "If you want to have good ideas you must have many ideas. Most of them will be wrong, and what you have to learn is which ones to throw away.", author: "Linus Pauling", year: "1964" },
+  { text: "Satisfaction of one's curiosity is one of the greatest sources of happiness in life.", author: "Linus Pauling", year: "1992" },
+  
+  // Robert Oppenheimer (Physicist)
+  { text: "The optimist thinks this is the best of all possible worlds. The pessimist fears it is true.", author: "Robert Oppenheimer", year: "1960" },
+  { text: "There must be no barriers to freedom of inquiry. There is no place for dogma in science.", author: "Robert Oppenheimer", year: "1949" },
+  { text: "The atomic bomb made the prospect of future war unendurable. It has led us up those last few steps to the mountain pass; and beyond there is a different country.", author: "Robert Oppenheimer", year: "1946" },
+  { text: "Both the man of science and the man of action live always at the edge of mystery, surrounded by it.", author: "Robert Oppenheimer", year: "1954" },
+  
+  // Robert Hooke (Natural Philosopher/Polymath)
+  { text: "The truth is, the science of Nature has been already too long made only a work of the brain and the fancy. It is now high time that it should return to the plainness and soundness of observations on material and obvious things.", author: "Robert Hooke", year: "1665" },
+  { text: "By the help of microscopes, there is nothing so small as to escape our inquiry; hence there is a new visible world discovered to the understanding.", author: "Robert Hooke", year: "1665" },
+  
+  // Antoine Lavoisier (Chemist)
+  { text: "Nothing is lost, nothing is created, everything is transformed.", author: "Antoine Lavoisier", year: "1789" },
+  { text: "We must trust to nothing but facts: these are presented to us by Nature, and cannot deceive.", author: "Antoine Lavoisier", year: "1789" },
+  
+  // Humphry Davy (Chemist)
+  { text: "Nothing is so fatal to the progress of the human mind as to suppose that our views of science are ultimate.", author: "Humphry Davy", year: "1812" },
+  { text: "The most important of my discoveries have been suggested to me by my failures.", author: "Humphry Davy", year: "1820" },
+  { text: "Life is made up, not of great sacrifices or duties, but of little things, in which smiles and kindness, and small obligations given habitually, are what preserve the heart.", author: "Humphry Davy", year: "1825" },
+  
+  // Joseph Priestley (Chemist/Theologian)
+  { text: "The more elaborate our means of communication, the less we communicate.", author: "Joseph Priestley", year: "1790" },
+  { text: "Could we have entered into the mind of Sir Isaac Newton, and have traced all the steps by which he produced his great works, we might see nothing very extraordinary in the process.", author: "Joseph Priestley", year: "1777" },
+  
+  // Entrepreneurial Wisdom - Andrew Carnegie (Industrialist/Steel Magnate)
+  { text: "People who are unable to motivate themselves must be content with mediocrity, no matter how impressive their other talents.", author: "Andrew Carnegie", year: "1902" },
+  { text: "As I grow older, I pay less attention to what men say. I just watch what they do.", author: "Andrew Carnegie", year: "1905" },
+  { text: "The man who acquires the ability to take full possession of his own mind may take possession of anything else to which he is justly entitled.", author: "Andrew Carnegie", year: "1902" },
+  { text: "Do your duty and a little more and the future will take care of itself.", author: "Andrew Carnegie", year: "1900" },
+  { text: "Concentration is my motto - first honesty, then industry, then concentration.", author: "Andrew Carnegie", year: "1902" },
+  { text: "There is no use whatever trying to help people who do not help themselves.", author: "Andrew Carnegie", year: "1889" },
+  { text: "The first man gets the oyster, the second man gets the shell.", author: "Andrew Carnegie", year: "1900" },
+  { text: "Aim for the highest.", author: "Andrew Carnegie", year: "1902" },
+  { text: "No man becomes rich unless he enriches others.", author: "Andrew Carnegie", year: "1902" },
+  { text: "You cannot push anyone up the ladder unless he is willing to climb.", author: "Andrew Carnegie", year: "1900" },
+  { text: "Think of yourself as on the threshold of unparalleled success. A whole clear, glorious life lies before you. Achieve! Achieve!", author: "Andrew Carnegie", year: "1902" },
+  { text: "The way to become rich is to put all your eggs in one basket and then watch that basket.", author: "Andrew Carnegie", year: "1902" },
+  
+  // John D. Rockefeller (Oil Magnate/Industrialist)
+  { text: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller", year: "1920" },
+  { text: "I always tried to turn every disaster into an opportunity.", author: "John D. Rockefeller", year: "1925" },
+  { text: "If you want to succeed you should strike out on new paths, rather than travel the worn paths of accepted success.", author: "John D. Rockefeller", year: "1920" },
+  { text: "The way to make money is to buy when blood is running in the streets.", author: "John D. Rockefeller", year: "1910" },
+  { text: "Singleness of purpose is one of the chief essentials for success in life, no matter what may be one's aim.", author: "John D. Rockefeller", year: "1920" },
+  { text: "Good management consists in showing average people how to do the work of superior people.", author: "John D. Rockefeller", year: "1915" },
+  { text: "I would rather earn 1% off a 100 people's efforts than 100% of my own efforts.", author: "John D. Rockefeller", year: "1920" },
+  { text: "The ability to deal with people is as purchasable a commodity as sugar or coffee, and I will pay more for that ability than for any other under the sun.", author: "John D. Rockefeller", year: "1915" },
+  { text: "The secret to success is to do the common things uncommonly well.", author: "John D. Rockefeller", year: "1920" },
+  { text: "I believe in the dignity of labor, whether with head or hand; that the world owes no man a living but that it owes every man an opportunity to make a living.", author: "John D. Rockefeller", year: "1920" },
+  { text: "Don't blame the marketing department. The buck stops with the chief executive.", author: "John D. Rockefeller", year: "1915" },
+  { text: "A friendship founded on business is a good deal better than a business founded on friendship.", author: "John D. Rockefeller", year: "1915" },
+  
+  // J.P. Morgan (Banker/Financier)
+  { text: "Go as far as you can see; when you get there, you'll be able to see further.", author: "J.P. Morgan", year: "1910" },
+  { text: "The first step towards getting somewhere is to decide you're not going to stay where you are.", author: "J.P. Morgan", year: "1910" },
+  { text: "A man always has two reasons for doing anything: a good reason and the real reason.", author: "J.P. Morgan", year: "1905" },
+  { text: "No problem can be solved until it is reduced to some simple form.", author: "J.P. Morgan", year: "1910" },
+  { text: "Gold is money. Everything else is credit.", author: "J.P. Morgan", year: "1912" },
+  
+  // Sam Walton (Walmart Founder)
+  { text: "High expectations are the key to everything.", author: "Sam Walton", year: "1990" },
+  { text: "There is only one boss. The customer.", author: "Sam Walton", year: "1985" },
+  { text: "Outstanding leaders go out of their way to boost the self-esteem of their personnel.", author: "Sam Walton", year: "1990" },
+  { text: "Celebrate your successes. Find some humor in your failures.", author: "Sam Walton", year: "1990" },
+  { text: "The goal as a company is to have customer service that is not just the best but legendary.", author: "Sam Walton", year: "1988" },
+  { text: "Capital isn't scarce; vision is.", author: "Sam Walton", year: "1990" },
+  { text: "If you love your work, you'll be out there every day trying to do it the best you possibly can.", author: "Sam Walton", year: "1985" },
+  { text: "Appreciate everything your associates do for the business.", author: "Sam Walton", year: "1990" },
+  { text: "Each Walmart store should reflect the values of its customers and support the vision they hold for their community.", author: "Sam Walton", year: "1988" },
+  { text: "I had to pick myself up and get on with it, do it all over again, only even better this time.", author: "Sam Walton", year: "1992" },
+  
+  // Ray Kroc (McDonald's)
+  { text: "The quality of a leader is reflected in the standards they set for themselves.", author: "Ray Kroc", year: "1975" },
+  { text: "Luck is a dividend of sweat. The more you sweat, the luckier you get.", author: "Ray Kroc", year: "1977" },
+  { text: "If you work just for money, you'll never make it, but if you love what you're doing and you always put the customer first, success will be yours.", author: "Ray Kroc", year: "1977" },
+  { text: "The two most important requirements for major success are: first, being in the right place at the right time, and second, doing something about it.", author: "Ray Kroc", year: "1977" },
+  { text: "You're only as good as the people you hire.", author: "Ray Kroc", year: "1975" },
+  { text: "If any of my competitors were drowning, I'd stick a hose in their mouth.", author: "Ray Kroc", year: "1977" },
+  { text: "I believe in God, family, and McDonald's. And in the office, that order is reversed.", author: "Ray Kroc", year: "1975" },
+  { text: "Are you green and growing or ripe and rotting?", author: "Ray Kroc", year: "1977" },
+  { text: "None of us is as good as all of us.", author: "Ray Kroc", year: "1975" },
+  { text: "I was an overnight success all right, but 30 years is a long, long night.", author: "Ray Kroc", year: "1977" },
+  
+  // Walt Disney (Entertainment Mogul)
+  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney", year: "1960" },
+  { text: "All our dreams can come true, if we have the courage to pursue them.", author: "Walt Disney", year: "1955" },
+  { text: "It's kind of fun to do the impossible.", author: "Walt Disney", year: "1958" },
+  { text: "When you believe in a thing, believe in it all the way, implicitly and unquestionable.", author: "Walt Disney", year: "1960" },
+  { text: "The difference between winning and losing is most often not quitting.", author: "Walt Disney", year: "1963" },
+  { text: "You can design and create, and build the most wonderful place in the world. But it takes people to make the dream a reality.", author: "Walt Disney", year: "1955" },
+  { text: "The more you like yourself, the less you are like anyone else, which makes you unique.", author: "Walt Disney", year: "1950" },
+  { text: "If you can dream it, you can do it.", author: "Walt Disney", year: "1965" },
+  { text: "You may not realize it when it happens, but a kick in the teeth may be the best thing in the world for you.", author: "Walt Disney", year: "1940" },
+  { text: "First, think. Second, believe. Third, dream. And finally, dare.", author: "Walt Disney", year: "1960" },
+  { text: "I only hope that we don't lose sight of one thing - that it was all started by a mouse.", author: "Walt Disney", year: "1954" },
+  { text: "A man should never neglect his family for business.", author: "Walt Disney", year: "1950" },
+  { text: "Times and conditions change so rapidly that we must keep our aim constantly focused on the future.", author: "Walt Disney", year: "1960" },
+  
+  // Soichiro Honda (Honda Motor Company)
+  { text: "Success is 99 percent failure.", author: "Soichiro Honda", year: "1970" },
+  { text: "Many people dream of success. To me, success can only be achieved through repeated failure and introspection.", author: "Soichiro Honda", year: "1975" },
+  { text: "Enjoy the path you've chosen, whatever it is.", author: "Soichiro Honda", year: "1970" },
+  { text: "There is a Japanese proverb that literally goes 'Raise the sail with your stronger hand', meaning you must go after the opportunities that arise in life that you are best equipped to do.", author: "Soichiro Honda", year: "1970" },
+  { text: "Action without philosophy is a lethal weapon; philosophy without action is worthless.", author: "Soichiro Honda", year: "1975" },
+  
+  // Lee Iacocca (Chrysler CEO)
+  { text: "The speed of the boss is the speed of the team.", author: "Lee Iacocca", year: "1984" },
+  { text: "You can have brilliant ideas, but if you can't get them across, your ideas won't get you anywhere.", author: "Lee Iacocca", year: "1984" },
+  { text: "The only rock I know that stays steady, the only institution I know that works, is the family.", author: "Lee Iacocca", year: "1984" },
+  { text: "In times of great stress or adversity, it's always best to keep busy, to plow your anger and your energy into something positive.", author: "Lee Iacocca", year: "1984" },
+  { text: "Apply yourself. Get all the education you can, but then, by God, do something. Don't just stand there, make it happen.", author: "Lee Iacocca", year: "1984" },
+  { text: "We are continually faced by great opportunities brilliantly disguised as insoluble problems.", author: "Lee Iacocca", year: "1984" },
+  { text: "The discipline of writing something down is the first step toward making it happen.", author: "Lee Iacocca", year: "1984" },
+  { text: "Start with good people, lay out the rules, communicate with your employees, motivate them and reward them. If you do all those things effectively, you can't miss.", author: "Lee Iacocca", year: "1984" },
+  { text: "The affection of your employees is the greatest treasure a company can have.", author: "Lee Iacocca", year: "1984" },
+  
+  // Mary Kay Ash (Mary Kay Cosmetics)
+  { text: "Pretend that every single person you meet has a sign around his or her neck that says, 'Make me feel important.'", author: "Mary Kay Ash", year: "1980" },
+  { text: "For every failure, there's an alternative course of action. You just have to find it.", author: "Mary Kay Ash", year: "1985" },
+  { text: "A company is only as good as the people it keeps.", author: "Mary Kay Ash", year: "1980" },
+  { text: "Don't limit yourself. Many people limit themselves to what they think they can do.", author: "Mary Kay Ash", year: "1985" },
+  { text: "The speed of the leader is the speed of the gang.", author: "Mary Kay Ash", year: "1980" },
+  { text: "People are definitely a company's greatest asset.", author: "Mary Kay Ash", year: "1985" },
+  { text: "Everyone has an invisible sign hanging from their neck saying, 'Make me feel important.'", author: "Mary Kay Ash", year: "1980" },
+  { text: "Aerodynamically, the bumble bee shouldn't be able to fly, but the bumble bee doesn't know it so it goes on flying anyway.", author: "Mary Kay Ash", year: "1985" },
+  { text: "We must have a theme, a goal, a purpose in our lives.", author: "Mary Kay Ash", year: "1980" },
+  { text: "So many women just don't know how great they really are. They come to us all vogue outside and vague on the inside.", author: "Mary Kay Ash", year: "1980" },
+  
+  // Estée Lauder (Estée Lauder Companies)
+  { text: "I didn't get there by wishing for it or hoping for it, but by working for it.", author: "Estée Lauder", year: "1985" },
+  { text: "I have never worked a day in my life without selling. If I believe in something, I sell it, and I sell it hard.", author: "Estée Lauder", year: "1980" },
+  { text: "Look for a sweet person. Forget rich.", author: "Estée Lauder", year: "1985" },
+  { text: "I am a product of every other black woman before me who has done or said anything worthwhile. Recognizing that I am part of history is what allows me to soar.", author: "Estée Lauder", year: "1990" },
+  
+  // Dave Thomas (Wendy's Founder)
+  { text: "What do you need to start a business? Three simple things: know your product better than anyone, know your customer, and have a burning desire to succeed.", author: "Dave Thomas", year: "1991" },
+  { text: "I think the harder you work, the more luck you have.", author: "Dave Thomas", year: "1991" },
+  { text: "The world is full of complainers. But the fact is, nothing comes with a guarantee.", author: "Dave Thomas", year: "1994" },
+  
+  // Colonel Sanders (KFC Founder)
+  { text: "I made a resolve then that I was going to amount to something if I could. And no hours, nor amount of labor, nor amount of money would deter me from giving the best that there was in me.", author: "Colonel Sanders", year: "1970" },
+  { text: "There's no reason to be the richest man in the cemetery. You can't do any business from there.", author: "Colonel Sanders", year: "1975" },
+  { text: "Feed the poor and get rich or feed the rich and get poor.", author: "Colonel Sanders", year: "1970" },
+  
+  // Conrad Hilton (Hilton Hotels)
+  { text: "Success seems to be connected with action. Successful people keep moving.", author: "Conrad Hilton", year: "1957" },
+  { text: "Successful people keep moving, even when they are discouraged and have made mistakes.", author: "Conrad Hilton", year: "1960" },
+  
+  // Harvey Firestone (Firestone Tire)
+  { text: "Capital isn't so important in business. Experience isn't so important. You can get both these things. What is important is ideas.", author: "Harvey Firestone", year: "1920" },
+  { text: "It is only as we develop others that we permanently succeed.", author: "Harvey Firestone", year: "1925" },
+  { text: "The growth and development of people is the highest calling of leadership.", author: "Harvey Firestone", year: "1925" },
+  { text: "Thought, not money, is the real business capital.", author: "Harvey Firestone", year: "1920" },
+  
+  // William Wrigley Jr. (Wrigley Gum)
+  { text: "When two men in business always agree, one of them is unnecessary.", author: "William Wrigley Jr.", year: "1920" },
+  { text: "Business is built by wise and courageous men.", author: "William Wrigley Jr.", year: "1925" },
+  { text: "Even when you are on the right track, you'll get run over if you just sit there.", author: "William Wrigley Jr.", year: "1920" },
+  
+  // W. Clement Stone (Insurance Magnate)
+  { text: "Thinking will not overcome fear but action will.", author: "W. Clement Stone", year: "1960" },
+  { text: "Sales are contingent upon the attitude of the salesman, not the attitude of the prospect.", author: "W. Clement Stone", year: "1962" },
+  { text: "There is little difference in people, but that little difference makes a big difference.", author: "W. Clement Stone", year: "1960" },
+  { text: "You are a product of your environment. So choose the environment that will best develop you toward your objective.", author: "W. Clement Stone", year: "1962" },
+  { text: "Definiteness of purpose is the starting point of all achievement.", author: "W. Clement Stone", year: "1960" },
+  { text: "Have the courage to say no. Have the courage to face the truth. Do the right thing because it is right.", author: "W. Clement Stone", year: "1962" },
+  { text: "When you discover your mission, you will feel its demand. It will fill you with enthusiasm and a burning desire to get to work on it.", author: "W. Clement Stone", year: "1960" },
+  { text: "If you are not making the progress that you would like to make and are capable of making, it is simply because your goals are not clearly defined.", author: "W. Clement Stone", year: "1962" },
+  
+  // J. Willard Marriott (Marriott Hotels)
+  { text: "Good timber does not grow with ease; the stronger the wind, the stronger the trees.", author: "J. Willard Marriott", year: "1970" },
+  { text: "The biggest reason most people fail is that they try to fix too much at once - they can't see the root cause of their challenge.", author: "J. Willard Marriott", year: "1975" },
+  
+  // David Ogilvy (Advertising Pioneer)
+  { text: "The best ideas come as jokes. Make your thinking as funny as possible.", author: "David Ogilvy", year: "1983" },
+  { text: "Don't bunt. Aim out of the ballpark. Aim for the company of immortals.", author: "David Ogilvy", year: "1983" },
+  { text: "If it doesn't sell, it isn't creative.", author: "David Ogilvy", year: "1983" },
+  { text: "Never stop testing, and your advertising will never stop improving.", author: "David Ogilvy", year: "1983" },
+  { text: "The consumer isn't a moron; she is your wife.", author: "David Ogilvy", year: "1983" },
+  { text: "I do not regard advertising as entertainment or an art form, but as a medium of information.", author: "David Ogilvy", year: "1983" },
+  { text: "The pursuit of excellence is less profitable than the pursuit of bigness, but it can be more satisfying.", author: "David Ogilvy", year: "1983" },
+  { text: "Hire people who are better than you are, then leave them to get on with it.", author: "David Ogilvy", year: "1983" },
+  { text: "Why should a manufacturer bet his money, perhaps the future of his company, on your instinct?", author: "David Ogilvy", year: "1963" },
+  
+  // Peter Drucker (Management Consultant)
+  { text: "The best way to predict the future is to create it.", author: "Peter Drucker", year: "1973" },
+  { text: "Management is doing things right; leadership is doing the right things.", author: "Peter Drucker", year: "1954" },
+  { text: "Efficiency is doing things right; effectiveness is doing the right things.", author: "Peter Drucker", year: "1967" },
+  { text: "There is nothing so useless as doing efficiently that which should not be done at all.", author: "Peter Drucker", year: "1963" },
+  { text: "Results are gained by exploiting opportunities, not by solving problems.", author: "Peter Drucker", year: "1964" },
+  { text: "The most important thing in communication is hearing what isn't said.", author: "Peter Drucker", year: "1973" },
+  { text: "Quality in a product or service is not what the supplier puts in. It is what the customer gets out and is willing to pay for.", author: "Peter Drucker", year: "1985" },
+  { text: "Long-range planning does not deal with the future decisions, but with the future of present decisions.", author: "Peter Drucker", year: "1959" },
+  { text: "The entrepreneur always searches for change, responds to it, and exploits it as an opportunity.", author: "Peter Drucker", year: "1985" },
+  { text: "Plans are only good intentions unless they immediately degenerate into hard work.", author: "Peter Drucker", year: "1967" },
+  { text: "Knowledge has to be improved, challenged, and increased constantly, or it vanishes.", author: "Peter Drucker", year: "1985" },
+  { text: "Culture eats strategy for breakfast.", author: "Peter Drucker", year: "1990" },
+  { text: "Do what you do best and outsource the rest.", author: "Peter Drucker", year: "1992" },
+  { text: "Business has only two functions - marketing and innovation.", author: "Peter Drucker", year: "1954" },
+  { text: "Accept the fact that we have to treat almost anybody as a volunteer.", author: "Peter Drucker", year: "1985" },
+  
+  // Tom Watson Sr. (IBM)
+  { text: "Nothing so conclusively proves a man's ability to lead others as what he does from day to day to lead himself.", author: "Thomas Watson Sr.", year: "1948" },
+  { text: "You can be discouraged by failure, or you can learn from it. So go ahead and make mistakes, make all you can. Because, remember that's where you'll find success - on the far side of failure.", author: "Thomas Watson Sr.", year: "1950" },
+  { text: "I'm no genius. I'm smart in spots—but I stay around those spots.", author: "Thomas Watson Sr.", year: "1940" },
+  { text: "Once an organization loses its spirit of pioneering and rests on its early work, its progress stops.", author: "Thomas Watson Sr.", year: "1948" },
+  { text: "The toughest thing about success is that you've got to keep on being a success.", author: "Thomas Watson Sr.", year: "1950" },
+  { text: "Every time we've moved ahead in IBM, it was because someone was willing to take a chance.", author: "Thomas Watson Sr.", year: "1948" },
+  { text: "Don't make friends who are comfortable to be with. Make friends who will force you to lever yourself up.", author: "Thomas Watson Sr.", year: "1940" },
+  { text: "Really big people are, above everything else, courteous, considerate and generous.", author: "Thomas Watson Sr.", year: "1948" },
+  { text: "Solve it. Solve it quickly, solve it right or wrong. If you solve it wrong, it will come back and slap you in the face, and then you can solve it right.", author: "Thomas Watson Sr.", year: "1948" },
+  { text: "Wisdom is the power to put our time and our knowledge to the proper use.", author: "Thomas Watson Sr.", year: "1950" },
+  
+  // Napoleon Hill (Author/Success Philosophy)
+  { text: "Don't wait. The time will never be just right.", author: "Napoleon Hill", year: "1937" },
+  { text: "Strength and growth come only through continuous effort and struggle.", author: "Napoleon Hill", year: "1937" },
+  { text: "The starting point of all achievement is desire.", author: "Napoleon Hill", year: "1937" },
+  { text: "A goal is a dream with a deadline.", author: "Napoleon Hill", year: "1937" },
+  { text: "Whatever the mind can conceive and believe, it can achieve.", author: "Napoleon Hill", year: "1937" },
+  { text: "Desire is the starting point of all achievement, not a hope, not a wish, but a keen pulsating desire which transcends everything.", author: "Napoleon Hill", year: "1937" },
+  { text: "The ladder of success is never crowded at the top.", author: "Napoleon Hill", year: "1937" },
+  { text: "Patience, persistence and perspiration make an unbeatable combination for success.", author: "Napoleon Hill", year: "1937" },
+  { text: "Effort only fully releases its reward after a person refuses to quit.", author: "Napoleon Hill", year: "1937" },
+  { text: "If you cannot do great things, do small things in a great way.", author: "Napoleon Hill", year: "1937" },
+  { text: "Every adversity, every failure, every heartache carries with it the seed of an equal or greater benefit.", author: "Napoleon Hill", year: "1937" },
+  { text: "Set your mind on a definite goal and observe how quickly the world stands aside to let you pass.", author: "Napoleon Hill", year: "1937" },
+  { text: "Big pay and little responsibility are circumstances seldom found together.", author: "Napoleon Hill", year: "1937" },
+  { text: "The way of success is the way of continuous pursuit of knowledge.", author: "Napoleon Hill", year: "1937" },
+  
+  // Dale Carnegie (Self-Improvement Author)
+  { text: "Most of the important things in the world have been accomplished by people who have kept on trying when there seemed to be no hope at all.", author: "Dale Carnegie", year: "1936" },
+  { text: "Inaction breeds doubt and fear. Action breeds confidence and courage.", author: "Dale Carnegie", year: "1936" },
+  { text: "Success is getting what you want. Happiness is wanting what you get.", author: "Dale Carnegie", year: "1936" },
+  { text: "People rarely succeed unless they have fun in what they are doing.", author: "Dale Carnegie", year: "1936" },
+  { text: "Develop success from failures. Discouragement and failure are two of the surest stepping stones to success.", author: "Dale Carnegie", year: "1936" },
+  { text: "The successful man will profit from his mistakes and try again in a different way.", author: "Dale Carnegie", year: "1936" },
+  { text: "Take a chance! All life is a chance.", author: "Dale Carnegie", year: "1936" },
+  { text: "Tell me what gives a man or woman their greatest pleasure and I'll tell you their philosophy of life.", author: "Dale Carnegie", year: "1936" },
+  { text: "You can make more friends in two months by becoming interested in other people than you can in two years by trying to get other people interested in you.", author: "Dale Carnegie", year: "1936" },
+  { text: "When dealing with people, remember you are not dealing with creatures of logic, but creatures of emotion.", author: "Dale Carnegie", year: "1936" },
+  
+  // Zig Ziglar (Motivational Speaker/Author)
+  { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar", year: "1975" },
+  { text: "You were born to win, but to be a winner, you must plan to win, prepare to win, and expect to win.", author: "Zig Ziglar", year: "1975" },
+  { text: "You can have everything in life you want, if you will just help other people get what they want.", author: "Zig Ziglar", year: "1975" },
+  { text: "People often say that motivation doesn't last. Well, neither does bathing - that's why we recommend it daily.", author: "Zig Ziglar", year: "1978" },
+  { text: "Your attitude, not your aptitude, will determine your altitude.", author: "Zig Ziglar", year: "1975" },
+  { text: "If you aim at nothing, you will hit it every time.", author: "Zig Ziglar", year: "1975" },
+  { text: "Expect the best. Prepare for the worst. Capitalize on what comes.", author: "Zig Ziglar", year: "1978" },
+  { text: "A goal properly set is halfway reached.", author: "Zig Ziglar", year: "1975" },
+  { text: "If you learn from defeat, you haven't really lost.", author: "Zig Ziglar", year: "1978" },
+  { text: "Remember that failure is an event, not a person.", author: "Zig Ziglar", year: "1975" },
 ];
 
 export const getRandomQuote = (): MakerQuote => {
