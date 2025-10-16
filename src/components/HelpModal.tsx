@@ -256,6 +256,10 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const [eggTapCount, setEggTapCount] = useState(0);
   const [eggLastTapTime, setEggLastTapTime] = useState(0);
   
+  // Left egg: Long-press to open YouTube link
+  const leftEggPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const [leftEggPressing, setLeftEggPressing] = useState(false);
+  
   // Alert modal state
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -2064,10 +2068,58 @@ Thank you for helping us improve PanHandler!
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 22 }}>🥚</Text>
+                    {/* Left egg - Long press to open YouTube (with chicken haptics!) */}
+                    <Pressable
+                      onPressIn={() => {
+                        setLeftEggPressing(true);
+                        // Start haptic pattern: Bawk bawk bagawk!
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Bawk
+                        
+                        leftEggPressTimer.current = setTimeout(() => {
+                          // Bawk (200ms)
+                          setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                          }, 200);
+                          
+                          // Bawk (400ms)
+                          setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                          }, 400);
+                          
+                          // Bagawk! (stronger final one at 600ms)
+                          setTimeout(() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                          }, 600);
+                          
+                          // Open YouTube link after 3 seconds
+                          setTimeout(() => {
+                            Linking.openURL('https://youtube.com/shorts/r93XNgWN4ss?si=FEoWQBI6E_-9fuRW');
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            setLeftEggPressing(false);
+                          }, 3000);
+                        }, 0);
+                      }}
+                      onPressOut={() => {
+                        // Cancel if released early
+                        if (leftEggPressTimer.current) {
+                          clearTimeout(leftEggPressTimer.current);
+                          leftEggPressTimer.current = null;
+                        }
+                        setLeftEggPressing(false);
+                      }}
+                      style={{
+                        opacity: leftEggPressing ? 0.5 : 1,
+                        transform: [{ scale: leftEggPressing ? 0.9 : 1 }],
+                      }}
+                    >
+                      <Text style={{ fontSize: 22 }}>🥚</Text>
+                    </Pressable>
+                    
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
                       Hidden Surprises
                     </Text>
+                    
+                    {/* Right egg - 5 taps to toggle Pro/Free */}
                     <Pressable
                       onPress={() => {
                         const actuallyPaidPro = false;
@@ -2112,7 +2164,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
-                    Some badges hide secrets... if you are persistent enough 🤔
+                    Hold the left egg for a surprise... or tap the right one rapidly 🐔🤔
                   </Text>
                 </Animated.View>
 
