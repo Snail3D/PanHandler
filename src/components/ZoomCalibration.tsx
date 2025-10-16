@@ -78,6 +78,38 @@ export default function ZoomCalibration({
   
   // Pick ONE random color on mount (don't rotate during use)
   const [currentColor] = useState(() => VIBRANT_COLORS[Math.floor(Math.random() * VIBRANT_COLORS.length)]);
+  
+  // Get color name for instructions
+  const getColorName = (color: string): string => {
+    const colorNames: Record<string, string> = {
+      '#3B82F6': 'blue',
+      '#8B5CF6': 'purple',
+      '#EC4899': 'pink',
+      '#F59E0B': 'amber',
+      '#10B981': 'green',
+      '#EF4444': 'red',
+      '#06B6D4': 'cyan',
+    };
+    return colorNames[color] || 'colored';
+  };
+  
+  // Rotating ring animation for circle edge
+  const ringRotation = useSharedValue(0);
+  
+  useEffect(() => {
+    // Start rotating animation when tutorial shows
+    if (showTutorial) {
+      ringRotation.value = withRepeat(
+        withTiming(360, { duration: 2000, easing: Easing.linear }),
+        3, // 3 loops
+        false
+      );
+    }
+  }, [showTutorial]);
+  
+  const animatedRingStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${ringRotation.value}deg` }],
+  }));
 
   // Load last selected coin on mount
   useEffect(() => {
@@ -321,6 +353,34 @@ export default function ZoomCalibration({
               strokeWidth="1.5"
             />
           </Svg>
+          
+          {/* Animated rotating ring overlay - shows during tutorial */}
+          {showTutorial && (
+            <Animated.View
+              style={[
+                {
+                  position: 'absolute',
+                  width: SCREEN_WIDTH,
+                  height: SCREEN_HEIGHT,
+                },
+                animatedRingStyle,
+              ]}
+              pointerEvents="none"
+            >
+              <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
+                <Circle
+                  cx={referenceCenterX}
+                  cy={referenceCenterY}
+                  r={referenceRadiusPixels}
+                  fill="none"
+                  stroke={currentColor}
+                  strokeWidth="6"
+                  strokeDasharray="40 20"
+                  opacity="0.8"
+                />
+              </Svg>
+            </Animated.View>
+          )}
           
           {/* Coin name - floating beautifully inside */}
           <View
@@ -779,7 +839,7 @@ export default function ZoomCalibration({
                 textShadowRadius: 3,
               }}
             >
-              {"Match the coin's edge to the circle"}
+              {`Match coin's OUTER edge to the ${getColorName(currentColor)} circle`}
             </Text>
           </Animated.View>
 
