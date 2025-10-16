@@ -533,7 +533,8 @@ export default function DimensionOverlay({
     const typingSpeed = 60; // 60ms per character
     
     // Strong haptic on start
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    console.log('🎵 Quote typing: START haptic');
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
@@ -541,6 +542,7 @@ export default function DimensionOverlay({
         
         // Heavy haptic every 10 characters (10 chars × 60ms = 600ms gap = very noticeable!)
         if (currentIndex % 10 === 0 && currentIndex > 0) {
+          console.log('🎵 Quote typing: HAPTIC at character', currentIndex);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         }
         
