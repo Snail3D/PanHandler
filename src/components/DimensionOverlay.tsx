@@ -290,6 +290,7 @@ export default function DimensionOverlay({
   const menuTranslateX = useSharedValue(0);
   const menuOpacity = useSharedValue(1); // For shake fade animation
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  const menuHiddenShared = useSharedValue(false); // Shared value for gesture worklets
   
   // Legend collapse state
   const [legendCollapsed, setLegendCollapsed] = useState(false);
@@ -1574,6 +1575,9 @@ export default function DimensionOverlay({
         setMenuHidden(prev => {
           const newState = !prev;
           
+          // Sync shared value for gesture worklets
+          menuHiddenShared.value = newState;
+          
           // Animate menu position AND opacity
           if (newState) {
             // Hide menu - fade out while sliding
@@ -2179,6 +2183,7 @@ export default function DimensionOverlay({
     .minDistance(15) // Require 15px movement before activating
     .maxPointers(1) // Only single finger
     .onEnd((event) => {
+      'worklet';
       // Detect horizontal swipe with velocity threshold
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 1.5;
       const threshold = SCREEN_WIDTH * 0.15; // 15% of screen width
@@ -2187,14 +2192,22 @@ export default function DimensionOverlay({
       // Quick swipe to the right to collapse menu
       if (isHorizontal && 
           (event.translationX > threshold || event.velocityX > velocityThreshold) &&
-          !menuHidden) {
-        runOnJS(collapseMenu)();
+          !menuHiddenShared.value) {
+        menuTranslateX.value = SCREEN_WIDTH;
+        menuOpacity.value = 1;
+        menuHiddenShared.value = true;
+        runOnJS(setMenuHidden)(true);
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       }
       // Quick swipe to the left to open menu (when hidden)
       else if (isHorizontal && 
                (event.translationX < -threshold || event.velocityX < -velocityThreshold) &&
-               menuHidden) {
-        runOnJS(toggleMenuFromTab)();
+               menuHiddenShared.value) {
+        menuTranslateX.value = withSpring(0);
+        menuOpacity.value = 1;
+        menuHiddenShared.value = false;
+        runOnJS(setMenuHidden)(false);
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       }
     });
   
@@ -2202,10 +2215,12 @@ export default function DimensionOverlay({
     if (menuHidden) {
       menuTranslateX.value = withSpring(0);
       menuOpacity.value = 1; // Ensure visible
+      menuHiddenShared.value = false;
       setMenuHidden(false);
     } else {
       menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
       menuOpacity.value = 1; // Reset for next show
+      menuHiddenShared.value = true;
       setMenuHidden(true);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -2214,6 +2229,7 @@ export default function DimensionOverlay({
   const collapseMenu = () => {
     menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
     menuOpacity.value = 1; // Reset for next show
+    menuHiddenShared.value = true;
     setMenuHidden(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };

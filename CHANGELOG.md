@@ -4,6 +4,73 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.8] - 2025-10-16
+
+### 🧠 Smart UX & Motion Refinements
+
+#### ✨ Major Features
+- **Smart Freehand Helper Text** - Dynamic context-aware helper changes based on drawing state
+  - Not drawing: "Touch and drag to draw freehand path"
+  - Drawing cleanly (>5 points): "💡 Connect end to first point to find surface area"
+  - Path crossed: "❌ Cannot find surface area - path crossed itself"
+  - Uses real-time path analysis with `doesPathSelfIntersect()`
+- **Menu Quick Swipe Gesture** - Fast right/left swipe to collapse/expand control menu
+  - Velocity threshold: >500 px/s for instant response
+  - Distance threshold: >15% screen width
+  - Right swipe = collapse, left swipe = expand
+  - No conflicts with button taps or measurements
+- **Elegant Calibration Animations** - Pulsing, colored, cinematic coin matching
+  - Rotating ring: 4-second rotation, 8px stroke, dashed pattern
+  - Pulsing opacity: 0.9 → 0.3 → 0.9 (1.5s cycle)
+  - Colored text: Dynamic color name (red, blue, green, etc.) that pulses
+  - Synchronized: Ring and text animations perfectly timed
+- **Motion Detection for Auto-Capture** - Dual stability check prevents blurry photos
+  - Angle stability: Device ≤2° from level (existing)
+  - Motion stability: Acceleration variance ≤0.1 (NEW)
+  - Tracks last 10 acceleration readings
+  - No capture until BOTH angle AND motion are stable
+
+#### 🔄 Carried Forward from v1.7
+- **Recalibrate Button** - Keep photo, clear measurements, return to calibration
+- **Privacy & Security** - Complete transparency in Help Modal
+- **App Permissions Guide** - Clear settings instructions
+- **Calibration UI Polish** - Better layout, coin selector improvements
+
+#### 📚 Documentation
+- **NEW: V1.8_SUMMARY.md** - Complete version summary with all features
+- **NEW: FREEHAND_SMART_HELPER_TEXT.md** - Dynamic helper implementation
+- **NEW: MENU_SWIPE_AND_PAN_ANALYSIS.md** - Gesture decision analysis
+- **NEW: ELEGANT_CALIBRATION_ANIMATIONS.md** - Animation specifications
+- **NEW: MOTION_DETECTION_AUTO_CAPTURE.md** - Stability detection details
+
+#### 🎨 UI/UX Improvements
+- Context-aware freehand helper (3 dynamic states)
+- Fast menu control gestures for power users
+- Elegant pulsing animations (not flashy)
+- Colored emphasis on calibration instructions
+- Real-time drawing feedback
+
+#### 🔧 Technical Details
+- Smart helper uses `useMemo` for performance
+- Swipe gesture: velocity + distance detection
+- Color mapping for 10 common colors
+- Motion tracking with DeviceMotion API
+- Variance calculation over 10-sample window
+
+#### 🐛 Bug Fixes
+- Recalibrate now properly clears all measurements (from v1.7)
+- Menu swipe doesn't interfere with button taps
+- Motion detection prevents captures during movement
+
+### 📁 Files Modified
+- `src/components/DimensionOverlay.tsx` - Freehand helper, menu swipe
+- `src/components/ZoomCalibration.tsx` - Elegant animations, colored text
+- `src/screens/MeasurementScreen.tsx` - Motion detection
+- `src/components/HelpModal.tsx` - Privacy & permissions (v1.7)
+- `app.json` - Version bump to 1.8.0
+
+---
+
 ## [Alpha v1.65] - 2025-10-15
 
 ### 🎨 Freehand Tool Refinement & Unit System Fix
