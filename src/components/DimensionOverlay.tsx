@@ -213,6 +213,18 @@ export default function DimensionOverlay({
     setAlertConfig(prev => ({ ...prev, visible: false }));
   };
   
+  // Smart calibration hint state
+  interface MeasurementAttempt {
+    type: 'distance' | 'circle' | 'rectangle' | 'angle' | 'freehand';
+    centerX: number;
+    centerY: number;
+    timestamp: number;
+  }
+  
+  const [attemptHistory, setAttemptHistory] = useState<MeasurementAttempt[]>([]);
+  const [hasShownCalibrationHint, setHasShownCalibrationHint] = useState(false);
+  const [showCalibrationHint, setShowCalibrationHint] = useState(false);
+  
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
   const [resizingPoint, setResizingPoint] = useState<{ measurementId: string, pointIndex: number } | null>(null);
@@ -852,6 +864,56 @@ export default function DimensionOverlay({
     return { x: screenX, y: screenY };
   };
 
+  // Smart calibration hint - detect when user struggles with measurements
+  const checkForCalibrationIssues = (newMeasurement: Measurement) => {
+    // Don't show if already shown for this photo
+    if (hasShownCalibrationHint) return;
+    
+    // Calculate center point of new measurement
+    const centerX = newMeasurement.points.reduce((sum, p) => sum + p.x, 0) / newMeasurement.points.length;
+    const centerY = newMeasurement.points.reduce((sum, p) => sum + p.y, 0) / newMeasurement.points.length;
+    
+    // Create new attempt
+    const attempt: MeasurementAttempt = {
+      type: newMeasurement.mode,
+      centerX,
+      centerY,
+      timestamp: Date.now(),
+    };
+    
+    // Filter recent attempts (last 20 seconds)
+    const now = Date.now();
+    const recentAttempts = attemptHistory.filter(a => now - a.timestamp < 20000);
+    
+    // Count attempts in same area (80px radius) and same type
+    const nearbyAttempts = recentAttempts.filter(a => {
+      const distance = Math.sqrt(
+        Math.pow(a.centerX - centerX, 2) + 
+        Math.pow(a.centerY - centerY, 2)
+      );
+      return distance < 80 && a.type === newMeasurement.mode;
+    });
+    
+    // Check threshold (distance = 2, others = 3)
+    const threshold = newMeasurement.mode === 'distance' ? 1 : 2; // -1 because we count the new one
+    
+    if (nearbyAttempts.length >= threshold) {
+      // Trigger hint!
+      console.log('🎯 Calibration hint triggered:', {
+        attempts: nearbyAttempts.length + 1,
+        type: newMeasurement.mode,
+        threshold: threshold + 1,
+      });
+      setShowCalibrationHint(true);
+      setHasShownCalibrationHint(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    
+    // Update history (keep last 10 attempts)
+    const updatedHistory = [...recentAttempts, attempt].slice(-10);
+    setAttemptHistory(updatedHistory);
+  };
+
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
     // Snap when placing second point in distance mode OR second point in angle mode (before vertex)
@@ -1466,6 +1528,7 @@ export default function DimensionOverlay({
       });
       
       setMeasurements([...measurements, newMeasurement]);
+      checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
     }
   };
@@ -1529,6 +1592,14 @@ export default function DimensionOverlay({
       if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
     };
   }, []);
+  
+  // Reset calibration hint for new photos
+  useEffect(() => {
+    // Reset hint state when image changes
+    setAttemptHistory([]);
+    setHasShownCalibrationHint(false);
+    setShowCalibrationHint(false);
+  }, [currentImageUri]);
   
   // Tetris Easter egg trigger - detect when legend fills screen
   useEffect(() => {
@@ -6255,6 +6326,55 @@ export default function DimensionOverlay({
               Tap anywhere to continue
             </Text>
           </View>
+        </Pressable>
+      )}
+
+      {/* Smart Calibration Hint */}
+      {showCalibrationHint && (
+        <Pressable
+          onPress={() => {
+            setShowCalibrationHint(false);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9999,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <BlurView
+            intensity={80}
+            tint="light"
+            style={{
+              padding: 24,
+              borderRadius: 20,
+              backgroundColor: 'rgba(245, 158, 11, 0.95)', // Amber
+              maxWidth: SCREEN_WIDTH * 0.8,
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 10,
+            }}
+          >
+            <Ionicons name="warning-outline" size={32} color="white" style={{ marginBottom: 12 }} />
+            <Text style={{ fontSize: 18, fontWeight: '700', color: 'white', marginBottom: 8, textAlign: 'center' }}>
+              Measurements seem off?
+            </Text>
+            <Text style={{ fontSize: 15, color: 'white', textAlign: 'center', marginBottom: 16, opacity: 0.95 }}>
+              Check your calibration (upper right)
+            </Text>
+            <Text style={{ fontSize: 13, color: 'white', opacity: 0.7, textAlign: 'center', fontStyle: 'italic' }}>
+              Tap anywhere to dismiss
+            </Text>
+          </BlurView>
         </Pressable>
       )}
 
