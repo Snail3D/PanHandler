@@ -161,6 +161,7 @@ export default function BattlingBotsModal({
   // Reset state when modal opens
   useEffect(() => {
     if (visible) {
+      console.log('🤖 BattlingBotsModal opened!', { userStats });
       setStage('negotiation');
       setMessages([]);
       setCurrentMessageIndex(0);
