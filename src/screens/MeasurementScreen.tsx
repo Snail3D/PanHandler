@@ -570,8 +570,14 @@ export default function MeasurementScreen() {
     if (mode !== 'camera' || isCapturing) return;
 
     if (alignmentStatus === 'good' && isStable) {
-      // Perfect conditions - auto snap!
-      takePicture();
+      // Add small delay to ensure camera is fully mounted before taking picture
+      const timer = setTimeout(() => {
+        if (mode === 'camera' && !isCapturing && cameraRef.current) {
+          takePicture();
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [mode, alignmentStatus, isStable, isCapturing]);
   
@@ -781,7 +787,15 @@ export default function MeasurementScreen() {
   }
 
   const takePicture = async () => {
-    if (!cameraRef.current || isCapturing) return;
+    // Prevent capture if camera isn't ready or already capturing
+    if (!cameraRef.current || isCapturing || mode !== 'camera') {
+      __DEV__ && console.log('⚠️ Skipping takePicture - camera not ready:', {
+        hasCameraRef: !!cameraRef.current,
+        isCapturing,
+        mode
+      });
+      return;
+    }
     
     const wasAutoCapture = alignmentStatus === 'good' && isStable;
     
