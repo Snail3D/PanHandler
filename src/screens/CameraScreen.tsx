@@ -459,6 +459,9 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     if (newMessage !== lastGuidanceMessage.current) {
       lastGuidanceMessage.current = newMessage;
       
+      // Debug: Log message changes
+      __DEV__ && console.log('🎯 Guidance message:', newMessage || 'cleared');
+      
       if (newMessage) {
         setGuidanceMessage(newMessage);
         // Fade in with scale animation
@@ -573,7 +576,7 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             style={[
               {
                 position: 'absolute',
-                top: SCREEN_HEIGHT / 2 - 200, // Midway between crosshairs and top
+                top: SCREEN_HEIGHT * 0.25, // Quarter way down screen (above crosshairs)
                 left: 0,
                 right: 0,
                 alignItems: 'center',
@@ -585,12 +588,12 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           >
             <View
               style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
                 paddingHorizontal: 24,
                 paddingVertical: 14,
                 borderRadius: 16,
                 borderWidth: 2,
-                borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderColor: 'rgba(255, 255, 255, 0.5)',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.5,
@@ -600,8 +603,8 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
               <Text
                 style={{
                   color: 'white',
-                  fontSize: 18,
-                  fontWeight: '600',
+                  fontSize: 20,
+                  fontWeight: '700',
                   textAlign: 'center',
                   letterSpacing: 0.5,
                 }}
@@ -785,6 +788,39 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
               }
             </Text>
           </View>
+        </View>
+        
+        {/* DEBUG: Show guidance state */}
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 150,
+            left: 20,
+            right: 20,
+            backgroundColor: 'rgba(255, 0, 0, 0.8)',
+            padding: 10,
+            borderRadius: 8,
+            zIndex: 20000,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+            DEBUG - Guidance State:
+          </Text>
+          <Text style={{ color: 'white', fontSize: 11 }}>
+            Message: {guidanceMessage || 'null'}
+          </Text>
+          <Text style={{ color: 'white', fontSize: 11 }}>
+            Motion Variance: {accelerationVariance.toFixed(4)}
+          </Text>
+          <Text style={{ color: 'white', fontSize: 11 }}>
+            Tilt Angle: {tiltAngle.toFixed(2)}°
+          </Text>
+          <Text style={{ color: 'white', fontSize: 11 }}>
+            Beta: {currentBeta.toFixed(2)}° | Gamma: {currentGamma.toFixed(2)}°
+          </Text>
+          <Text style={{ color: 'white', fontSize: 11 }}>
+            Countdown: {countdown !== null ? countdown : 'null'}
+          </Text>
         </View>
 
         {/* Countdown display - large centered */}
