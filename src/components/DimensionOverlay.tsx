@@ -530,7 +530,7 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     let currentIndex = 0;
-    const typingSpeed = 60; // 60ms per character
+    const typingSpeed = 50; // 50ms per character for good rhythm
     
     // Strong haptic on start
     console.log('🎵 Quote typing: START haptic');
@@ -540,9 +540,10 @@ export default function DimensionOverlay({
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Heavy haptic every 10 characters (10 chars × 60ms = 600ms gap = very noticeable!)
-        if (currentIndex % 10 === 0 && currentIndex > 0) {
-          console.log('🎵 Quote typing: HAPTIC at character', currentIndex);
+        // Heavy haptic on EVERY character (like a real typewriter!)
+        // Skip spaces to make it feel more natural
+        const char = completeText[currentIndex];
+        if (char !== ' ' && char !== '\n') {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         }
         
