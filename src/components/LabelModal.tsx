@@ -285,6 +285,115 @@ const makerExamples = [
   "iOS Loading Circle",
 ];
 
+// Shape-specific funny examples
+const lineExamples = [
+  "The Long Boi",
+  "Straight Line Steve",
+  "Diagonal Danny",
+  "Edge of Tomorrow",
+  "Line in the Sand",
+  "The Ruler's Revenge",
+  "Distance McDistanceface",
+  "Not a Curve",
+  "The Great Divide",
+  "Shortcut Route",
+  "As the Crow Flies",
+  "Point A to Point B",
+  "The Direct Path",
+  "Straightforward",
+  "Unwavering Line",
+];
+
+const circleExamples = [
+  "The Perfect O",
+  "Round Boi",
+  "Circle of Trust",
+  "The Roundabout",
+  "Pizza Base",
+  "Wheel of Fortune",
+  "Ring of Power",
+  "Circular Reasoning",
+  "Zero Corners Found",
+  "Infinite Edge",
+  "The Loop",
+  "Coin Cousin",
+  "Donut Zone",
+  "Hula Hoop",
+  "Portal Entrance",
+];
+
+const rectangleExamples = [
+  "Box Standard",
+  "Rectangle Rick",
+  "The Four Corners",
+  "Boxy McBoxface",
+  "Screen Shape",
+  "Phone Vibes",
+  "Square's Cousin",
+  "Right Angle Gang",
+  "TV Screen",
+  "Picture Frame",
+  "Window Pane",
+  "Door Outline",
+  "Book Cover",
+  "Trading Card",
+  "Business Card",
+];
+
+const angleExamples = [
+  "The Wedge",
+  "Corner Pocket",
+  "Angle McAngleface",
+  "Acute Achievement",
+  "Right or Wrong",
+  "Obtuse Opinion",
+  "The Protractor's Pride",
+  "Degrees of Separation",
+  "Reflex Reaction",
+  "Bent Behavior",
+  "The Elbow",
+  "Sharp Turn",
+  "Corner Case",
+  "Triangulation Point",
+  "V for Victory",
+];
+
+const freehandExamples = [
+  "The Scribble",
+  "Freestyle Frank",
+  "Squiggly Line",
+  "The Wanderer",
+  "Abstract Art",
+  "Path of Chaos",
+  "The Doodle",
+  "Random Walk",
+  "Spaghetti Route",
+  "Creative Curve",
+  "The Journey",
+  "Wibbly Wobbly Line",
+  "Freehand Fred",
+  "The Snake",
+  "Curvy McCurveface",
+];
+
+const polygonExamples = [
+  "The Polygon",
+  "Multi-Corner Zone",
+  "Shape Shifter",
+  "Complex Boi",
+  "Pentagon Pete",
+  "Hexagon Haven",
+  "Many Sides McGee",
+  "The Irregular",
+  "Corner Collector",
+  "Angle Farm",
+  "The Territory",
+  "Perimeter Police",
+  "Area Authority",
+  "Edge City",
+  "Shape of Things",
+];
+
 // Map-themed funny examples for Map Mode
 const mapExamples = [
   // Fictional/Funny Places
@@ -344,10 +453,59 @@ const mapExamples = [
 ];
 
 
-const getRandomExample = (isMapMode: boolean = false) => {
+const getRandomExample = (isMapMode: boolean = false, measurementMode?: string) => {
+  // If we have a measurement mode, use shape-specific examples
+  if (measurementMode && !isMapMode) {
+    let examples: string[] = [];
+    switch (measurementMode) {
+      case 'distance':
+        examples = lineExamples;
+        break;
+      case 'angle':
+        examples = angleExamples;
+        break;
+      case 'circle':
+        examples = circleExamples;
+        break;
+      case 'rectangle':
+        examples = rectangleExamples;
+        break;
+      case 'freehand':
+        examples = freehandExamples;
+        break;
+      case 'polygon':
+        examples = polygonExamples;
+        break;
+      default:
+        examples = makerExamples;
+    }
+    const idx = Math.floor(Math.random() * examples.length);
+    return examples[idx];
+  }
+  
+  // Otherwise use map or maker examples
   const examples = isMapMode ? mapExamples : makerExamples;
   const idx = Math.floor(Math.random() * examples.length);
   return examples[idx];
+};
+
+const getShapeTitle = (measurementMode?: string) => {
+  switch (measurementMode) {
+    case 'distance':
+      return 'Line';
+    case 'angle':
+      return 'Angle';
+    case 'circle':
+      return 'Circle';
+    case 'rectangle':
+      return 'Rectangle';
+    case 'freehand':
+      return 'Freehand Line';
+    case 'polygon':
+      return 'Polygon';
+    default:
+      return 'Item';
+  }
 };
 
 interface LabelModalProps {
@@ -356,17 +514,18 @@ interface LabelModalProps {
   onDismiss: () => void;
   initialValue?: string | null;
   isMapMode?: boolean;
+  measurementMode?: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand' | 'polygon';
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false }: LabelModalProps) {
+export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false, measurementMode }: LabelModalProps) {
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
 
   // Generate a new random example whenever modal becomes visible
   useEffect(() => {
     if (visible) {
-      const example1 = getRandomExample(isMapMode);
-      const example2 = getRandomExample(isMapMode);
+      const example1 = getRandomExample(isMapMode, measurementMode);
+      const example2 = getRandomExample(isMapMode, measurementMode);
       setPlaceholder(`e.g., ${example1}, ${example2}...`);
       
       // Pre-fill with initial value if provided
@@ -374,7 +533,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
         setLabel(initialValue);
       }
     }
-  }, [visible, initialValue]);
+  }, [visible, initialValue, isMapMode, measurementMode]);
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -457,7 +616,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                           color: '#1C1C1E',
                           letterSpacing: -0.3,
                         }}>
-                          Label This Item
+                          {measurementMode ? `Label This ${getShapeTitle(measurementMode)}` : 'Label This Item'}
                         </Text>
                         <Text style={{ 
                           color: '#6E6E73', 
@@ -495,7 +654,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                       fontWeight: '600', 
                       marginBottom: 8,
                     }}>
-                      What is this?
+                      {measurementMode ? `What would you like to name this ${getShapeTitle(measurementMode).toLowerCase()}?` : 'What is this?'}
                     </Text>
                     <View style={{
                       flexDirection: 'row',

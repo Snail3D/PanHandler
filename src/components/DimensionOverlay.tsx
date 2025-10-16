@@ -4630,74 +4630,86 @@ export default function DimensionOverlay({
             }
 
             // Render labels with adjusted positions
-            return labelData.map(({ measurement, idx, color, screenX, screenY }) => (
-              <View
-                key={measurement.id}
-                style={{
-                  position: 'absolute',
-                  left: screenX - 60,
-                  top: screenY,
-                  alignItems: 'center',
-                }}
-                pointerEvents="none"
-              >
-                {/* Small number badge */}
-                <View
+            return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
+              // Handle label tap to open edit modal (only when NOT in measurement mode)
+              const handleLabelPress = () => {
+                if (!measurementMode) {
+                  setLabelEditingMeasurementId(measurement.id);
+                  setShowLabelEditModal(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }
+              };
+
+              return (
+                <Pressable
+                  key={measurement.id}
                   style={{
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    justifyContent: 'center',
+                    position: 'absolute',
+                    left: screenX - 60,
+                    top: screenY,
                     alignItems: 'center',
-                    marginBottom: 4,
                   }}
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleLabelPress}
                 >
-                  <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-                    {idx + 1}
-                  </Text>
-                </View>
-                {/* Measurement value */}
-                <View
-                  style={{
-                    backgroundColor: color.main,
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 6,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 1.5 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3,
-                    elevation: 4,
-                  }}
-                >
-                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                    {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
-                    {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
-                      ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
-                      : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
-                    }
-                  </Text>
-                </View>
-                {/* Custom label text if present */}
-                {measurement.label && (
+                  {/* Small number badge */}
                   <View
                     style={{
-                      backgroundColor: 'rgba(0,0,0,0.8)',
-                      paddingHorizontal: 6,
-                      paddingVertical: 3,
-                      borderRadius: 4,
-                      marginTop: 4,
-                      maxWidth: 120,
+                      backgroundColor: 'rgba(0,0,0,0.7)',
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 4,
                     }}
                   >
-                    <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
-                      {measurement.label}
+                    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                      {idx + 1}
                     </Text>
                   </View>
-                )}
-              </View>
-            ));
+                  {/* Measurement value */}
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1.5 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+                      {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
+                      {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
+                        ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
+                        : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
+                      }
+                    </Text>
+                  </View>
+                  {/* Custom label text if present */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 120,
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              );
+            });
           })()}
 
           {/* Side labels for rectangles - Width on left, Height on top */}
@@ -4724,16 +4736,26 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
+            // Handle label tap to open edit modal (only when NOT in measurement mode)
+            const handleRectLabelPress = () => {
+              if (!measurementMode) {
+                setLabelEditingMeasurementId(measurement.id);
+                setShowLabelEditModal(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }
+            };
+            
             return (
               <React.Fragment key={`${measurement.id}-sides`}>
                 {/* Width label on left side (vertical dimension) */}
-                <View
+                <Pressable
                   style={{
                     position: 'absolute',
                     left: minX - 70,
                     top: centerY - 15,
                   }}
-                  pointerEvents="none"
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleRectLabelPress}
                 >
                   <View
                     style={{
@@ -4752,16 +4774,17 @@ export default function DimensionOverlay({
                       H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
                     </Text>
                   </View>
-                </View>
+                </Pressable>
                 
                 {/* Length label on top side (horizontal dimension) */}
-                <View
+                <Pressable
                   style={{
                     position: 'absolute',
                     left: centerX - 40,
                     top: minY - 35,
                   }}
-                  pointerEvents="none"
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleRectLabelPress}
                 >
                   <View
                     style={{
@@ -4798,7 +4821,7 @@ export default function DimensionOverlay({
                       </Text>
                     </View>
                   )}
-                </View>
+                </Pressable>
               </React.Fragment>
             );
           })}
@@ -6207,6 +6230,7 @@ export default function DimensionOverlay({
         onDismiss={handleLabelEditDismiss}
         initialValue={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.label : null}
         isMapMode={isMapMode}
+        measurementMode={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.mode : undefined}
       />
       
       {/* Email Prompt Modal */}

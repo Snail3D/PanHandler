@@ -1077,6 +1077,31 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
 
+                  {/* Add Labels - One-Click Editing */}
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(88,86,214,0.12)',
+                      borderRadius: 14,
+                      padding: 14,
+                      marginTop: 4,
+                      borderWidth: 2,
+                      borderColor: 'rgba(88,86,214,0.25)',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Text style={{ fontSize: 18, marginRight: 8 }}>🏷️</Text>
+                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6' }}>
+                        Add Custom Labels
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                      <Text style={{ fontWeight: '600' }}>One-click editing:</Text> Simply tap any measurement label (the colored badge or number) in Pan/Zoom mode to add or edit custom names
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#6E6E73', lineHeight: 19, fontStyle: 'italic' }}>
+                      Labels appear on saved photos and in email reports
+                    </Text>
+                  </View>
+
                   {/* 4-Tap Delete */}
                   <View
                     style={{
