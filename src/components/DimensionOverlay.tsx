@@ -516,6 +516,7 @@ export default function DimensionOverlay({
     setDisplayedText('');
     setQuoteTapCount(0);
     setShowQuote(true);
+    setIsQuoteTyping(true);
     
     // Smooth fade in with spring physics for buttery smoothness
     quoteOpacity.value = withSpring(1, {
@@ -523,28 +524,33 @@ export default function DimensionOverlay({
       stiffness: 90,
       mass: 0.5,
     });
+  };
+  
+  // Quote typing effect with haptics (separate useEffect like BattlingBotsModal)
+  useEffect(() => {
+    if (!isQuoteTyping || !currentQuote) return;
     
-    // Type out the quote text
-    const fullText = `"${quote.text}"`;
-    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    const fullText = `"${currentQuote.text}"`;
+    const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
-    let currentIndex = 0;
-    const typingSpeed = 50; // 50ms per character
+    const typingSpeed = 50;
+    let currentIndex = 0; // Local variable, not state!
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Exact same haptic pattern as BattlingBotsModal - every 4 characters
+        // Haptic every 4 characters (same as BattlingBotsModal)
         if (currentIndex % 4 === 0) {
           Haptics.selectionAsync();
         }
         
-        currentIndex++;
+        currentIndex++; // Increment local variable
       } else {
         clearInterval(typeInterval);
-        // Auto-dismiss after 5 seconds of being fully displayed
+        setIsQuoteTyping(false);
+        // Auto-dismiss after 5 seconds
         setTimeout(() => {
           dismissQuote();
         }, 5000);
@@ -552,7 +558,7 @@ export default function DimensionOverlay({
     }, typingSpeed);
     
     return () => clearInterval(typeInterval);
-  };
+  }, [isQuoteTyping, currentQuote]); // Remove quoteCharIndex from dependencies!
   
   const dismissQuote = () => {
     quoteOpacity.value = withTiming(0, { 
