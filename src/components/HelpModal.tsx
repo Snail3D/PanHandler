@@ -1696,6 +1696,74 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                 </Animated.View>
               </View>
 
+              {/* Permissions Section - Quick Guide */}
+              <View style={{ marginBottom: 20, marginTop: 12 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(675)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
+                    padding: 20,
+                    shadowColor: '#FF9500',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 12,
+                    elevation: 4,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 149, 0, 0.2)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                    <View style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(255, 149, 0, 0.15)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                    }}>
+                      <Ionicons name="settings-outline" size={24} color="#FF9500" />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                      App Permissions
+                    </Text>
+                  </View>
+                  
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 12 }}>
+                    PanHandler needs access to:
+                  </Text>
+                  
+                  <View style={{ gap: 10, marginBottom: 12 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="camera" size={16} color="#FF9500" style={{ marginRight: 8 }} />
+                      <Text style={{ fontSize: 14, color: '#3C3C43', flex: 1 }}>
+                        <Text style={{ fontWeight: '600' }}>Camera</Text> — to take photos
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Ionicons name="images" size={16} color="#FF9500" style={{ marginRight: 8 }} />
+                      <Text style={{ fontSize: 14, color: '#3C3C43', flex: 1 }}>
+                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  <View style={{
+                    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                    borderRadius: 12,
+                    padding: 12,
+                    borderLeftWidth: 3,
+                    borderLeftColor: '#FF9500',
+                  }}>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                      <Text style={{ fontWeight: '700' }}>Need to enable permissions?</Text>{'\n'}
+                      Go to Settings → PanHandler → Enable Camera & Photos
+                    </Text>
+                  </View>
+                </Animated.View>
+              </View>
+
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <Animated.View 
