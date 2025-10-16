@@ -82,9 +82,9 @@ export default function AlertModal({
           >
             <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
               <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
+                borderColor: 'rgba(255, 255, 255, 0.35)',
                 padding: 24,
               }}>
                 {/* Icon */}
@@ -134,16 +134,23 @@ export default function AlertModal({
                   <Pressable
                     onPress={handleConfirm}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(0, 122, 255, 0.9)' : '#007AFF',
-                      paddingVertical: 14,
-                      borderRadius: 12,
+                      backgroundColor: pressed ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.5)',
+                      paddingVertical: 16,
+                      borderRadius: 14,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255, 255, 255, 0.35)',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 8,
+                      elevation: 4,
                     })}
                   >
                     <Text 
                       style={{
-                        color: '#FFFFFF',
-                        fontSize: 17,
-                        fontWeight: '600',
+                        color: '#1C1C1E',
+                        fontSize: 18,
+                        fontWeight: '700',
                         textAlign: 'center',
                       }}
                     >
@@ -155,15 +162,15 @@ export default function AlertModal({
                     <Pressable
                       onPress={handleCancel}
                       style={({ pressed }) => ({
-                        backgroundColor: pressed ? 'rgba(142, 142, 147, 0.1)' : 'rgba(142, 142, 147, 0.08)',
-                        paddingVertical: 14,
-                        borderRadius: 12,
+                        backgroundColor: pressed ? 'rgba(120,120,128,0.08)' : 'transparent',
+                        paddingVertical: 12,
+                        borderRadius: 10,
                       })}
                     >
                       <Text 
                         style={{
-                          color: '#007AFF',
-                          fontSize: 17,
+                          color: '#8E8E93',
+                          fontSize: 16,
                           fontWeight: '600',
                           textAlign: 'center',
                         }}

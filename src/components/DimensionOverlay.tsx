@@ -1428,6 +1428,47 @@ export default function DimensionOverlay({
         area: undefined, // Clear area - no longer accurate after editing
         isClosed: true // Still marked as closed, just no area
       };
+    } else if (mode === 'polygon') {
+      // Recalculate perimeter and area for polygons
+      let perimeter = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        const segmentLength = Math.sqrt(
+          Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+        );
+        perimeter += segmentLength;
+      }
+      
+      // Calculate area using Shoelace formula
+      let areaPixels = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        areaPixels += (p1.x * p2.y - p2.x * p1.y);
+      }
+      areaPixels = Math.abs(areaPixels) / 2;
+      
+      // Map Mode: Apply scale conversion
+      let perimeterStr: string;
+      let area: number;
+      if (isMapMode && mapScale) {
+        perimeterStr = formatMapScaleDistance(perimeter);
+        const perimeterInMapUnits = convertToMapScale(perimeter);
+        area = areaPixels * Math.pow(mapScale.realDistance / mapScale.screenDistance, 2);
+      } else {
+        const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
+        perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+        const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+        area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
+      }
+      
+      return { 
+        ...measurement, 
+        perimeter: perimeterStr, 
+        value: perimeterStr, // Show perimeter as the main value
+        area: area,
+      };
     }
     
     return measurement;
