@@ -93,7 +93,7 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(true) // Always allow - use pointerEvents to control touch handling
+    .enabled(!locked) // Disable when locked to allow menu touches through
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -112,7 +112,7 @@ export default function ZoomableImage({
     });
   
   const rotationGesture = Gesture.Rotation()
-    .enabled(true) // Always allow - use pointerEvents to control touch handling
+    .enabled(!locked) // Disable when locked to allow menu touches through
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
