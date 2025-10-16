@@ -2299,30 +2299,36 @@ export default function DimensionOverlay({
   
   // Quick swipe gesture to collapse/expand menu
   const menuSwipeGesture = Gesture.Pan()
-    .minDistance(40) // Require more movement before activating (was 15px)
+    .minDistance(40) // Require more movement before activating
     .maxPointers(1) // Only single finger
     .onEnd((event) => {
       'worklet';
       // Detect horizontal swipe with velocity threshold
-      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2; // More strict horizontal detection (was 1.5)
-      const threshold = SCREEN_WIDTH * 0.25; // 25% of screen width (was 15%)
-      const velocityThreshold = 800; // Faster swipe required = 800 units/sec (was 500)
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
+      const threshold = SCREEN_WIDTH * 0.25; // 25% of screen width
+      const velocityThreshold = 800; // Faster swipe required = 800 units/sec
       
-      // Quick swipe to the right to collapse menu
+      // Swipe right OR left to collapse menu (both directions work!)
       if (isHorizontal && 
-          (event.translationX > threshold || event.velocityX > velocityThreshold) &&
+          (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > velocityThreshold) &&
           !menuHiddenShared.value) {
-        menuTranslateX.value = SCREEN_WIDTH;
+        menuTranslateX.value = withSpring(SCREEN_WIDTH, {
+          damping: 20,
+          stiffness: 300,
+        });
         menuOpacity.value = 1;
         menuHiddenShared.value = true;
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       }
-      // Quick swipe to the left to open menu (when hidden)
+      // Swipe left OR right to open menu (when hidden)
       else if (isHorizontal && 
-               (event.translationX < -threshold || event.velocityX < -velocityThreshold) &&
+               (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > velocityThreshold) &&
                menuHiddenShared.value) {
-        menuTranslateX.value = withSpring(0);
+        menuTranslateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 300,
+        });
         menuOpacity.value = 1;
         menuHiddenShared.value = false;
         runOnJS(setMenuHidden)(false);
