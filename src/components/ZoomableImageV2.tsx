@@ -93,7 +93,7 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(true) // Always allow pinch to zoom
+    .enabled(!locked) // Disable when locked (respect locked state)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -112,7 +112,7 @@ export default function ZoomableImage({
     });
   
   const rotationGesture = Gesture.Rotation()
-    .enabled(true) // Always allow rotation
+    .enabled(!locked) // Disable when locked (respect locked state)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
