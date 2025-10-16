@@ -510,6 +510,14 @@ export default function DimensionOverlay({
     setIsMapMode(false);
     setShowMapScaleModal(false);
   }, [currentImageUri]);
+  
+  // Show quote overlay on app launch (when no image present)
+  useEffect(() => {
+    if (!currentImageUri) {
+      console.log('🎬 App launch - showing opening quote');
+      showQuoteOverlay();
+    }
+  }, []); // Only run once on mount
 
   const showQuoteOverlay = () => {
     const quote = getRandomQuote();
