@@ -97,6 +97,7 @@ interface MeasurementStore {
   setHasSeenPinchTutorial: (hasSeen: boolean) => void;
   setHasSeenPanTutorial: (hasSeen: boolean) => void;
   incrementFreehandTrial: () => void; // Increment freehand trial usage
+  resetFreehandTrial: () => void; // Reset counter (for testing)
   dismissFreehandOffer: () => void; // User permanently dismissed the freehand offer
 }
 
@@ -220,6 +221,8 @@ const useStore = create<MeasurementStore>()(
       incrementFreehandTrial: () => set((state) => ({ 
         freehandTrialUsed: Math.min(state.freehandTrialLimit, state.freehandTrialUsed + 1) 
       })),
+      
+      resetFreehandTrial: () => set({ freehandTrialUsed: 0 }), // Reset counter (for testing)
       
       dismissFreehandOffer: () => set({ freehandOfferDismissed: true }),
     }),
