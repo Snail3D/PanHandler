@@ -253,9 +253,46 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
   
-  // Easter egg: 10-tap on right egg to toggle Pro/Free (only for non-paid users)
-  const [eggTapCount, setEggTapCount] = useState(0);
-  const [eggLastTapTime, setEggLastTapTime] = useState(0);
+  // Easter egg: "Shave and a haircut" rhythm to toggle Pro/Free (only for non-paid users)
+  // User taps: "shave-and-a-hair-cut" (5 taps with correct rhythm)
+  // App responds: "dun-dun" (strong haptic response)
+  const [eggTaps, setEggTaps] = useState<number[]>([]); // Array of tap timestamps
+  const eggTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // "Shave and a haircut" rhythm pattern (in milliseconds between taps)
+  // tap - tap - taptap - tap
+  // The pattern is: short, short, veryshort, short
+  const SHAVE_HAIRCUT_PATTERN = [
+    { min: 100, max: 400 },   // 1st gap: "shave"
+    { min: 100, max: 400 },   // 2nd gap: "and"
+    { min: 50, max: 200 },    // 3rd gap: quick "a-hair" (fast double tap)
+    { min: 100, max: 400 },   // 4th gap: "cut"
+    // 5th tap completes it, then we respond with "dun-dun" haptic!
+  ];
+  
+  const checkShaveAndHaircutPattern = (taps: number[]) => {
+    if (taps.length !== 5) return false;
+    
+    // Check gaps between taps
+    for (let i = 0; i < 4; i++) {
+      const gap = taps[i + 1] - taps[i];
+      const pattern = SHAVE_HAIRCUT_PATTERN[i];
+      
+      if (gap < pattern.min || gap > pattern.max) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+  
+  const playTwoBitsResponse = () => {
+    // Play "dun-dun" haptic response with strong impact
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }, 200); // 200ms gap between the two hits
+  };
   
   // Left egg: Long-press to open YouTube link
   const leftEggPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -2145,7 +2182,7 @@ Thank you for helping us improve PanHandler!
                       Hidden Surprises
                     </Text>
                     
-                    {/* Right egg - 5 taps to toggle Pro/Free */}
+                    {/* Right egg - Shave and a haircut rhythm to toggle Pro/Free */}
                     <Pressable
                       onPress={() => {
                         const actuallyPaidPro = false;
@@ -2155,41 +2192,49 @@ Thank you for helping us improve PanHandler!
                         }
                         
                         const now = Date.now();
-                        let newCount = eggTapCount;
                         
-                        if (now - eggLastTapTime > 2000) {
-                          newCount = 1;
-                        } else {
-                          newCount = eggTapCount + 1;
+                        // Clear timeout if exists
+                        if (eggTapTimeoutRef.current) {
+                          clearTimeout(eggTapTimeoutRef.current);
                         }
                         
-                        setEggTapCount(newCount);
-                        setEggLastTapTime(now);
+                        // Add new tap to array
+                        const newTaps = [...eggTaps, now];
                         
-                        if (newCount >= 5) {
+                        // Keep only last 5 taps
+                        const recentTaps = newTaps.slice(-5);
+                        setEggTaps(recentTaps);
+                        
+                        // Light haptic for each tap
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        
+                        // Check if we have 5 taps and they match the pattern
+                        if (recentTaps.length === 5 && checkShaveAndHaircutPattern(recentTaps)) {
+                          // SUCCESS! Play "dun-dun" response
+                          playTwoBitsResponse();
+                          
+                          // Toggle Pro/Free status
                           const newProStatus = !isProUser;
                           setIsProUser(newProStatus);
-                          setEggTapCount(0);
                           
                           // Reset freehand trial counter when toggling to free mode
                           if (!newProStatus) {
                             resetFreehandTrial();
                           }
                           
-                          // Close help modal immediately
-                          onClose();
+                          // Clear taps
+                          setEggTaps([]);
                           
-                          // Just haptic feedback, no alert modal (prevents stacking issues)
-                          if (newProStatus) {
-                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                          } else {
-                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                          }
-                        } else if (newCount >= 3) {
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        } else {
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          // Close help modal after response completes
+                          setTimeout(() => {
+                            onClose();
+                          }, 500);
                         }
+                        
+                        // Reset after 2 seconds of no taps
+                        eggTapTimeoutRef.current = setTimeout(() => {
+                          setEggTaps([]);
+                        }, 2000);
                       }}
                     >
                       <Text style={{ fontSize: 22 }}>🥚</Text>
