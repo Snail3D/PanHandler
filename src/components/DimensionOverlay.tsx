@@ -93,7 +93,7 @@ interface DimensionOverlayProps {
   viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
-  onReset?: () => void; // Called when "New Photo" button is pressed
+  onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
 }
 
@@ -2452,7 +2452,7 @@ export default function DimensionOverlay({
         <Pressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            if (onReset) onReset();
+            if (onReset) onReset(true); // Pass true to trigger recalibrate mode
           }}
           style={{
             position: 'absolute',
