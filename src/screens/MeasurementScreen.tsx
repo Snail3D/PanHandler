@@ -337,11 +337,11 @@ export default function MeasurementScreen() {
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement (up/down tilt)
-          // When phone is upright facing you (portrait), beta ≈ 0° = level/center
-          // Looking down (tilt top away): beta becomes positive
-          // Looking up (tilt top toward you): beta becomes negative
-          // Bubble should move opposite to tilt (like real bubble level)
-          const bubbleYOffset = (beta / 15) * maxBubbleOffset; // Direct (not inverted) - tilt down = bubble down
+          // Phone standing upright on table = beta ≈ 90° = level/centered
+          // Tilt top away from you (look down) = beta increases (> 90°)
+          // Tilt top toward you (look up) = beta decreases (< 90°)
+          const verticalTilt = beta - 90; // Offset from upright (90°) position
+          const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // Tilt away = positive Y (down)
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
@@ -554,8 +554,8 @@ export default function MeasurementScreen() {
   
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: bubbleX.value + 60 - 14 }, // Center in 120px container with 28px bubble
-      { translateY: bubbleY.value + 60 - 14 },
+      { translateX: bubbleX.value + 60 - 7 }, // Center in 120px container with 14px bubble (50% smaller)
+      { translateY: bubbleY.value + 60 - 7 },
     ],
   }));
   
@@ -957,24 +957,24 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Cosmic smoke trail with flowing wisps and particles - 30% smaller */}
+              {/* Cosmic smoke trail - 30% BIGGER than original */}
               {trailPositions.current.map((pos, index) => {
                 const progress = (index + 1) / trailPositions.current.length;
-                const opacity = progress * progress * progress; // Cubic fade for more dramatic dissipation
-                const scale = 0.21 + (progress * 0.56); // 30% smaller: was 0.3 + 0.8
-                const angle = index * 0.5; // Rotation for variety
+                const opacity = progress * progress * progress; // Cubic fade
+                const scale = 0.39 + (progress * 1.04); // 30% bigger: was 0.3 + 0.8 = 0.39 + 1.04
+                const angle = index * 0.5;
                 
                 return (
                   <React.Fragment key={`trail-${index}`}>
-                    {/* Large wispy smoke cloud - 30% smaller */}
+                    {/* Large wispy smoke cloud - 30% bigger */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 7 * scale, // 30% smaller: was 10
-                        left: 60 + pos.x - 7 * scale,
-                        width: 14 * scale, // 30% smaller: was 20
-                        height: 14 * scale,
-                        borderRadius: 7 * scale,
+                        top: 60 + pos.y - 13 * scale, // 30% bigger: was 10
+                        left: 60 + pos.x - 13 * scale,
+                        width: 26 * scale, // 30% bigger: was 20
+                        height: 26 * scale,
+                        borderRadius: 13 * scale,
                         backgroundColor: bubbleColor.glow,
                         opacity: opacity * 0.2,
                         shadowColor: bubbleColor.glow,
@@ -983,15 +983,15 @@ export default function MeasurementScreen() {
                         transform: [{ rotate: `${angle}rad` }],
                       }}
                     />
-                    {/* Inner glow wisp - 30% smaller */}
+                    {/* Inner glow wisp - 30% bigger */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 4.2 * scale, // 30% smaller: was 6
-                        left: 60 + pos.x - 4.2 * scale,
-                        width: 8.4 * scale, // 30% smaller: was 12
-                        height: 8.4 * scale,
-                        borderRadius: 4.2 * scale,
+                        top: 60 + pos.y - 7.8 * scale, // 30% bigger: was 6
+                        left: 60 + pos.x - 7.8 * scale,
+                        width: 15.6 * scale, // 30% bigger: was 12
+                        height: 15.6 * scale,
+                        borderRadius: 7.8 * scale,
                         backgroundColor: bubbleColor.main,
                         opacity: opacity * 0.35,
                         shadowColor: bubbleColor.glow,
@@ -999,17 +999,17 @@ export default function MeasurementScreen() {
                         shadowRadius: 10,
                       }}
                     />
-                    {/* Scattered sparkle particles - 30% smaller */}
+                    {/* Scattered sparkle particles - 30% bigger */}
                     {index % 2 === 0 && progress > 0.4 && (
                       <>
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y + Math.sin(index * 1.5) * 7, // 30% smaller: was 10
-                            left: 60 + pos.x + Math.cos(index * 1.5) * 7,
-                            width: 1.4, // 30% smaller: was 2
-                            height: 1.4,
-                            borderRadius: 0.7,
+                            top: 60 + pos.y + Math.sin(index * 1.5) * 13, // 30% bigger: was 10
+                            left: 60 + pos.x + Math.cos(index * 1.5) * 13,
+                            width: 2.6, // 30% bigger: was 2
+                            height: 2.6,
+                            borderRadius: 1.3,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.8,
                             shadowColor: bubbleColor.glow,
@@ -1020,11 +1020,11 @@ export default function MeasurementScreen() {
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y - Math.sin(index * 2) * 5.6, // 30% smaller: was 8
-                            left: 60 + pos.x - Math.cos(index * 2) * 5.6,
-                            width: 1.4,
-                            height: 1.4,
-                            borderRadius: 0.7,
+                            top: 60 + pos.y - Math.sin(index * 2) * 10.4, // 30% bigger: was 8
+                            left: 60 + pos.x - Math.cos(index * 2) * 10.4,
+                            width: 2.6,
+                            height: 2.6,
+                            borderRadius: 1.3,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.6,
                             shadowColor: bubbleColor.glow,
@@ -1038,14 +1038,14 @@ export default function MeasurementScreen() {
                 );
               })}
               
-              {/* COSMIC ENERGY BALL - Smooth gradient, no glow (smoke does it) */}
+              {/* COSMIC ENERGY BALL - 50% smaller (14px), smooth gradient */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
+                    width: 14, // 50% smaller: was 28px
+                    height: 14,
+                    borderRadius: 7,
                   },
                   bubbleStyle,
                 ]}
@@ -1058,12 +1058,26 @@ export default function MeasurementScreen() {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    borderRadius: 14,
-                    backgroundColor: '#0a0118', // Deep space black
+                    borderRadius: 7,
+                    backgroundColor: '#0a0118',
                   }}
                 />
                 
-                {/* Gradient layer 1 - Outer nebula (session color) */}
+                {/* Gradient layer 1 - Outer nebula */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 1,
+                    left: 1,
+                    right: 1,
+                    bottom: 1,
+                    borderRadius: 6,
+                    backgroundColor: bubbleColor.main,
+                    opacity: 0.5,
+                  }}
+                />
+                
+                {/* Gradient layer 2 - Mid nebula */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1071,36 +1085,22 @@ export default function MeasurementScreen() {
                     left: 2,
                     right: 2,
                     bottom: 2,
-                    borderRadius: 12,
-                    backgroundColor: bubbleColor.main,
-                    opacity: 0.5,
-                  }}
-                />
-                
-                {/* Gradient layer 2 - Mid nebula (lighter) */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 4,
-                    left: 4,
-                    right: 4,
-                    bottom: 4,
-                    borderRadius: 10,
+                    borderRadius: 5,
                     backgroundColor: bubbleColor.glow,
                     opacity: 0.45,
                   }}
                 />
                 
-                {/* Gradient layer 3 - Inner transition */}
+                {/* Gradient layer 3 - Blue transition */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 6,
-                    left: 6,
-                    right: 6,
-                    bottom: 6,
-                    borderRadius: 8,
-                    backgroundColor: '#3B82F6', // Blue transition
+                    top: 3,
+                    left: 3,
+                    right: 3,
+                    bottom: 3,
+                    borderRadius: 4,
+                    backgroundColor: '#3B82F6',
                     opacity: 0.4,
                   }}
                 />
@@ -1109,11 +1109,11 @@ export default function MeasurementScreen() {
                 <View
                   style={{
                     position: 'absolute',
-                    top: 8,
-                    left: 8,
-                    right: 8,
-                    bottom: 8,
-                    borderRadius: 6,
+                    top: 4,
+                    left: 4,
+                    right: 4,
+                    bottom: 4,
+                    borderRadius: 3,
                     backgroundColor: '#60A5FA',
                     opacity: 0.5,
                   }}
@@ -1123,11 +1123,11 @@ export default function MeasurementScreen() {
                 <View
                   style={{
                     position: 'absolute',
-                    top: 10,
-                    left: 10,
-                    right: 10,
-                    bottom: 10,
-                    borderRadius: 4,
+                    top: 5,
+                    left: 5,
+                    right: 5,
+                    bottom: 5,
+                    borderRadius: 2,
                     backgroundColor: '#93C5FD',
                     opacity: 0.6,
                   }}
@@ -1137,11 +1137,11 @@ export default function MeasurementScreen() {
                 <View
                   style={{
                     position: 'absolute',
-                    top: 12,
-                    left: 12,
-                    width: 4,
-                    height: 4,
-                    borderRadius: 2,
+                    top: 6,
+                    left: 6,
+                    width: 2,
+                    height: 2,
+                    borderRadius: 1,
                     backgroundColor: '#FFFFFF',
                   }}
                 />
