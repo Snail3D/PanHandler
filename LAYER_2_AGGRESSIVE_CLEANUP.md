@@ -1,105 +1,55 @@
-# Layer 2: Aggressive Gesture Cleanup 🔥
+# Layer 2: First Point Freeze Fix
 
-## What We Tried
-1. ❌ **Layer 3 (zIndex + GestureDetector)** - Didn't fully fix it
-2. ❌ **pointerEvents="auto"** - Made it worse (jittery)
+## The Problem
+"When I push to set a point, the cursor sticks there and waits. But subsequent points work fine."
 
-## Current Approach: Layer 2
-Add aggressive cleanup in ZoomableImageV2 to **force** gesture release.
+Only the FIRST point freezes for 10-15 seconds. Subsequent points are instant.
 
-## Changes Made
-
-### File: `src/components/ZoomableImageV2.tsx`
-
-#### Pan Gesture onEnd (Line ~139)
-**ADDED:**
+## Root Cause
+Line 1365-1367 in `placePoint()`:
 ```typescript
-.onEnd(() => {
-  savedTranslateX.value = translateX.value;
-  savedTranslateY.value = translateY.value;
-  gestureWasActive.value = false;
-  
-  // AGGRESSIVE CLEANUP: Force interaction manager cycle
-  runOnJS(() => {
-    Promise.resolve().then(() => {
-      // Empty - forces event loop to cycle
-    });
-  })();
-})
+// Auto-enable measurement mode and lock pan/zoom after first point
+if (currentPoints.length === 0 && measurements.length === 0) {
+  setMeasurementMode(true); // ❌ Synchronous state update blocks
+}
 ```
 
-#### Pan Gesture onFinalize (Line ~147)
-**ADDED:**
+When the first point is placed:
+1. `setMeasurementMode(true)` triggers immediately
+2. This causes TWO full-screen touch responder overlays to swap:
+   - Line 2321: Measurement overlay mounts (`measurementMode && ...`)
+   - Line 2936: Selection overlay unmounts (`!measurementMode && ...`)
+3. React has to unmount one huge component tree and mount another
+4. All this happens synchronously during the tap event handler
+5. Result: 10-15 second freeze while React reconciles the component tree
+
+### Why Subsequent Points Are Fine
+After the first point, `measurementMode` is already `true`, so no state change occurs on subsequent taps!
+
+## The Fix
+Defer the state update to the next tick:
 ```typescript
-.onFinalize(() => {
-  savedTranslateX.value = translateX.value;
-  savedTranslateY.value = translateY.value;
-  gestureWasActive.value = false;
-  
-  // NUCLEAR OPTION: Force complete gesture release
-  runOnJS(() => {
-    setTimeout(() => {
-      // Tiny delay ensures all touch events processed
-    }, 0);
-  })();
-})
+if (currentPoints.length === 0 && measurements.length === 0) {
+  setTimeout(() => setMeasurementMode(true), 0); // ✅ Async, non-blocking
+}
 ```
 
-## How It Works
+This allows:
+1. Point placement to complete immediately
+2. UI to update with the new point
+3. Mode change to happen in the next event loop tick
+4. No blocking during the tap handler
 
-### The Problem
-```
-Pan gesture ends →
-  Gesture handler internal state not fully cleared →
-    Next tap goes to stale gesture handler →
-      Button tap blocked! 😱
-```
-
-### The Solution
-```
-Pan gesture ends →
-  Clear our state ✅ →
-    Force Promise microtask (flushes event queue) ✅ →
-      Force setTimeout(0) (ensures JS cycle completes) ✅ →
-        Gesture handler fully released ✅ →
-          Next tap goes to buttons! 🎉
-```
-
-## Technical Details
-
-### Why Promise.resolve()?
-- Creates a **microtask** that runs after current task
-- Forces JavaScript event loop to cycle
-- Ensures all pending gesture events are processed
-
-### Why setTimeout(0)?
-- Creates a **macrotask** that runs in next event loop tick
-- Gives gesture handler time to fully clean up internal state
-- 0ms delay = "as soon as possible after current work"
-
-### Why Both?
-**Double-tap cleanup strategy:**
-1. **Microtask**: Fast cleanup (same tick)
-2. **Macrotask**: Thorough cleanup (next tick)
-3. Together: Maximum chance of full release
-
-## Current Stack
-
-### Menu Layer (DimensionOverlay)
-- ✅ zIndex: 9999
-- ✅ GestureDetector with Gesture.Tap()
-- ✅ pointerEvents: "box-none" (reverted from "auto")
-
-### Image Layer (ZoomableImageV2)
-- ✅ Standard gesture handling
-- ✅ **NEW**: Aggressive cleanup in onEnd
-- ✅ **NEW**: Nuclear cleanup in onFinalize
+## Summary of All Fixes
+1. ✅ **Progressive Haptics** - Disabled setTimeout spam (lines 2365-2369)
+2. ✅ **Gesture Composition** - Changed Exclusive → Race for smooth pinch/zoom
+3. ✅ **First Point Freeze** - Made setMeasurementMode async to avoid blocking
 
 ## Testing
-1. Pan with 2 fingers
-2. Release
-3. Immediately tap menu button
-4. Should respond without delay
+1. ✅ Place first measurement point - should be instant (no freeze)
+2. ✅ Place subsequent points - still instant
+3. ✅ Pan/zoom/rotate - smooth gestures
+4. ✅ Calibration - works perfectly
 
-If this works → Chef's kiss! 🤌✨
-If not → We have Layer 1 options (Gesture.Race, etc.)
+---
+**The freeze was React synchronously unmounting/mounting huge component trees during the tap handler!** 🎯
