@@ -179,12 +179,20 @@ export default function BattlingBotsModal({
     console.log('🤖 Start typing check:', { visible, currentMessageIndex, isTyping });
     if (visible && currentMessageIndex === 0 && !isTyping) {
       console.log('🤖 Starting typing in 500ms...');
-      // Small delay before starting
+      // TEMPORARILY: Skip animation and go straight to offer screen for debugging
+      console.log('⚠️ DEBUG MODE: Skipping to offer screen immediately');
+      setTimeout(() => {
+        setStage('offer');
+        offerOpacity.value = withSpring(1, { damping: 20, stiffness: 90 });
+      }, 100);
+      
+      /* Original typing animation code - commented for debugging
       setTimeout(() => {
         console.log('🤖 Setting isTyping=true and showCursor=true');
         setIsTyping(true);
         setShowCursor(true);
       }, 500);
+      */
     }
   }, [visible, currentMessageIndex, isTyping]);
   

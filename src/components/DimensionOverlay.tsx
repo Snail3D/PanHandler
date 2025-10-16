@@ -539,9 +539,9 @@ export default function DimensionOverlay({
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Subtle haptic every 4 characters (ChatGPT style)
-        if (currentIndex % 4 === 0 && currentIndex > 0) {
-          Haptics.selectionAsync();
+        // Light haptic every 3 characters (more noticeable than selectionAsync)
+        if (currentIndex % 3 === 0 && currentIndex > 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
         
         currentIndex++;
