@@ -3414,8 +3414,8 @@ export default function DimensionOverlay({
                 console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
-              } else if (isDrawingFreehand && freehandPath.length >= 5) {
-                // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
+              } else if (isDrawingFreehand && freehandPath.length >= 2) {
+                // If they were drawing, complete the measurement (require at least 2 points for a line)
                 // Use ref instead of state to avoid async state issues
                 const isClosedLoop = freehandClosedLoopRef.current;
                 console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
@@ -3569,7 +3569,7 @@ export default function DimensionOverlay({
                 console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
-                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');
+                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 2 - discarding');
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
@@ -5577,9 +5577,12 @@ export default function DimensionOverlay({
                     if (!isProUser) {
                       // Check if trial exhausted
                       if (freehandTrialUsed >= freehandTrialLimit) {
+                        console.log('🤖 Freehand trial exhausted! Opening modal...');
                         if (freehandOfferDismissed) {
+                          console.log('🤖 Offer was dismissed, showing Battling Bots Modal');
                           setShowProModal(true);
                         } else {
+                          console.log('📧 Showing freehand offer modal first');
                           setShowFreehandOfferModal(true);
                         }
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -6062,6 +6065,7 @@ export default function DimensionOverlay({
             onPress={() => {
               // Simple: Show Pro modal for free users
               if (!isProUser) {
+                console.log('🤖 Opening Battling Bots Modal!');
                 setShowProModal(true);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
