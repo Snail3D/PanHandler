@@ -86,7 +86,11 @@ export default function MeasurementScreen() {
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
-  const zoomSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Debounce zoom saves
+  
+  // ⚠️ CRITICAL: Debounce AsyncStorage writes to prevent 10-15s button lockup
+  // See: NEVER_WRITE_TO_ASYNCSTORAGE_DURING_GESTURES.md
+  const zoomSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const insets = useSafeAreaInsets();
   
   const currentImageUri = useStore((s) => s.currentImageUri);
@@ -936,7 +940,11 @@ export default function MeasurementScreen() {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
                     
-                    // Debounce AsyncStorage saves - only save 500ms after gesture ends
+                    // ⚠️ CRITICAL PERFORMANCE FIX (Oct 16, 2025)
+                    // Debounce AsyncStorage writes to prevent 10-15 second button lockup
+                    // Writing to AsyncStorage 60+ times/sec during gestures blocks JS thread
+                    // See: NEVER_WRITE_TO_ASYNCSTORAGE_DURING_GESTURES.md
+                    // DO NOT REMOVE THIS DEBOUNCE OR BUTTONS WILL FREEZE AFTER PANNING
                     if (zoomSaveTimeoutRef.current) {
                       clearTimeout(zoomSaveTimeoutRef.current);
                     }
