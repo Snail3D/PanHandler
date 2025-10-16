@@ -1361,14 +1361,14 @@ export default function DimensionOverlay({
       : 2; // rectangle
     const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
     
-    // Auto-enable measurement mode and lock pan/zoom after first point
-    if (currentPoints.length === 0 && measurements.length === 0) {
-      setMeasurementMode(true);
-    }
-    
     if (currentPoints.length + 1 < requiredPoints) {
       // Still need more points
       setCurrentPoints([...currentPoints, newPoint]);
+      
+      // Auto-enable measurement mode after first point (async to avoid blocking)
+      if (currentPoints.length === 0 && measurements.length === 0) {
+        setTimeout(() => setMeasurementMode(true), 0);
+      }
     } else {
       // This completes a measurement
       let completedPoints = [...currentPoints, newPoint];
