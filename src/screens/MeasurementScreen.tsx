@@ -104,6 +104,7 @@ export default function MeasurementScreen() {
   // Bubble level
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
+  const isVerticalMode = useSharedValue(false); // Track if phone is vertical
   
   // Pick random complementary colors for crosshairs and bubble (per session)
   const [sessionColors] = useState(() => {
@@ -521,11 +522,12 @@ export default function MeasurementScreen() {
         
         // Animate bubble based on device tilt
         // Detect if phone is horizontal or vertical
-        const isVerticalMode = absBeta > 45; // Phone is held vertically (portrait)
+        const isVertical = absBeta > 45; // Phone is held vertically (portrait)
+        isVerticalMode.value = isVertical; // Update shared value for crosshair rotation
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
-        if (isVerticalMode) {
+        if (isVertical) {
           // VERTICAL MODE: Only gamma movement (left/right tilt)
           // When phone is held vertically (portrait):
           // - gamma ~0° = phone is upright (centered)
@@ -740,6 +742,13 @@ export default function MeasurementScreen() {
     shadowColor: '#9CA3AF',
     shadowOpacity: 0.5 + (crosshairGlow.value * 0.3),
     shadowRadius: 6 + (crosshairGlow.value * 6),
+  }));
+  
+  // Rotate entire crosshair 90° when phone is vertical
+  const crosshairContainerStyle = useAnimatedStyle(() => ({
+    transform: [
+      { rotate: isVerticalMode.value ? '90deg' : '0deg' }
+    ],
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
@@ -1118,16 +1127,19 @@ export default function MeasurementScreen() {
             </View>
 
             {/* Crosshairs overlay - center of screen */}
-            <View 
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: 120, // 20% bigger (was 100)
-                height: 120,
-                marginLeft: -60, // Center it
-                marginTop: -60,
-              }}
+            <Animated.View 
+              style={[
+                {
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: 120, // 20% bigger (was 100)
+                  height: 120,
+                  marginLeft: -60, // Center it
+                  marginTop: -60,
+                },
+                crosshairContainerStyle,
+              ]}
               pointerEvents="none"
             >
               
@@ -1212,7 +1224,7 @@ export default function MeasurementScreen() {
                   centerDotStyle,
                 ]}
               />
-            </View>
+            </Animated.View>
 
             {/* Bottom controls */}
             <View 
