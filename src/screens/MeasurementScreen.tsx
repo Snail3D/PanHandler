@@ -84,6 +84,15 @@ export default function MeasurementScreen() {
   const recentAccelerations = useRef<number[]>([]); // Track phone motion
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
+  // Adaptive guidance system
+  const [guidanceMessage, setGuidanceMessage] = useState<string | null>(null);
+  const guidanceOpacity = useSharedValue(0);
+  const guidanceScale = useSharedValue(0.8);
+  const lastGuidanceMessage = useRef<string | null>(null);
+  const [accelerationVariance, setAccelerationVariance] = useState(0);
+  const [currentBeta, setCurrentBeta] = useState(0);
+  const [currentGamma, setCurrentGamma] = useState(0);
+  
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
@@ -256,7 +265,12 @@ export default function MeasurementScreen() {
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
         const beta = data.rotation.beta * (180 / Math.PI);
+        const gamma = data.rotation.gamma * (180 / Math.PI);
         const absBeta = Math.abs(beta);
+        
+        // Store for guidance system
+        setCurrentBeta(beta);
+        setCurrentGamma(gamma);
         
         // Auto-detect horizontal (0°) or vertical (90°)
         const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
@@ -275,6 +289,13 @@ export default function MeasurementScreen() {
           const totalAcceleration = Math.sqrt(x * x + y * y + z * z);
           recentAccelerations.current.push(totalAcceleration);
           if (recentAccelerations.current.length > 10) recentAccelerations.current.shift();
+          
+          // Calculate acceleration variance for guidance
+          if (recentAccelerations.current.length >= 5) {
+            const mean = recentAccelerations.current.reduce((a, b) => a + b, 0) / recentAccelerations.current.length;
+            const variance = recentAccelerations.current.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentAccelerations.current.length;
+            setAccelerationVariance(variance);
+          }
         }
         
         // Check BOTH angle stability AND motion stability
@@ -351,6 +372,77 @@ export default function MeasurementScreen() {
       takePicture();
     }
   }, [isHoldingShutter, alignmentStatus, isStable, isCapturing]);
+  
+  // Adaptive guidance system - determine PRIMARY issue and show appropriate message
+  useEffect(() => {
+    // Only show guidance in camera mode, not holding shutter, not capturing
+    if (mode !== 'camera' || isHoldingShutter || isCapturing) {
+      if (guidanceMessage) {
+        guidanceOpacity.value = withTiming(0, { duration: 300 });
+        setTimeout(() => setGuidanceMessage(null), 300);
+      }
+      return;
+    }
+    
+    // Calculate severity scores (0-1 scale)
+    const motionSeverity = Math.min(accelerationVariance / 0.15, 1);
+    const tiltSeverity = Math.min(tiltAngle / 25, 1);
+    
+    let newMessage: string | null = null;
+    
+    // Priority 1: Too much motion
+    if (motionSeverity > 0.6) {
+      newMessage = "Hold still";
+    }
+    // Priority 2: Significant tilt
+    else if (tiltSeverity > 0.4 && tiltAngle > 5) {
+      const absBeta = Math.abs(currentBeta);
+      const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
+      
+      if (targetOrientation === 'horizontal') {
+        if (currentBeta > 5) newMessage = "Tilt backward";
+        else if (currentBeta < -5) newMessage = "Tilt forward";
+        else if (Math.abs(currentGamma) > 5) {
+          newMessage = currentGamma > 5 ? "Tilt left" : "Tilt right";
+        }
+      } else {
+        const verticalDiff = Math.abs(currentBeta) - 90;
+        if (verticalDiff > 5) {
+          newMessage = currentBeta > 0 ? "Tilt forward" : "Tilt backward";
+        } else if (Math.abs(currentGamma) > 5) {
+          newMessage = currentGamma > 5 ? "Turn left" : "Turn right";
+        }
+      }
+    }
+    // Priority 3: Getting close
+    else if (tiltSeverity < 0.3 && tiltAngle > 2 && tiltAngle <= 5 && motionSeverity < 0.4) {
+      newMessage = "Almost there...";
+    }
+    // Priority 4: Hold position
+    else if (alignmentStatus === 'good' && !isStable && motionSeverity > 0.2) {
+      newMessage = "Hold that";
+    }
+    
+    // Update message if changed
+    if (newMessage !== lastGuidanceMessage.current) {
+      lastGuidanceMessage.current = newMessage;
+      
+      if (newMessage) {
+        setGuidanceMessage(newMessage);
+        guidanceOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
+        guidanceScale.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
+      } else {
+        guidanceOpacity.value = withTiming(0, { duration: 300 });
+        setTimeout(() => setGuidanceMessage(null), 300);
+      }
+    }
+  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isHoldingShutter, isCapturing, currentBeta, currentGamma]);
+  
+  // Animated style for guidance text
+  const guidanceAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: guidanceOpacity.value,
+    transform: [{ scale: guidanceScale.value }],
+  }));
 
   // Restore session on mount if there's a persisted image
   useEffect(() => {
@@ -714,6 +806,44 @@ export default function MeasurementScreen() {
               }}
               pointerEvents="none"
             >
+              {/* Adaptive Guidance Text - Above crosshairs */}
+              {guidanceMessage && (
+                <Animated.View
+                  style={[
+                    {
+                      position: 'absolute',
+                      top: -150,
+                      left: -75,
+                      width: 250,
+                      alignItems: 'center',
+                    },
+                    guidanceAnimatedStyle,
+                  ]}
+                >
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      paddingHorizontal: 24,
+                      paddingVertical: 14,
+                      borderRadius: 16,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontSize: 20,
+                        fontWeight: '700',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {guidanceMessage}
+                    </Text>
+                  </View>
+                </Animated.View>
+              )}
+              
               {/* Horizontal line - color reactive */}
               <View
                 style={{
@@ -831,11 +961,11 @@ export default function MeasurementScreen() {
                   onPressOut={() => setIsHoldingShutter(false)}
                   disabled={isCapturing}
                   style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 40,
+                    width: 96,
+                    height: 96,
+                    borderRadius: 48,
                     backgroundColor: 'white',
-                    borderWidth: 4,
+                    borderWidth: 5,
                     borderColor: isHoldingShutter 
                       ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.9)' : 'rgba(239, 83, 80, 0.9)')
                       : '#D1D5DB',
@@ -844,21 +974,29 @@ export default function MeasurementScreen() {
                   }}
                 >
                   <View style={{ 
-                    width: 64, 
-                    height: 64, 
-                    borderRadius: 32, 
+                    width: 76, 
+                    height: 76, 
+                    borderRadius: 38, 
                     backgroundColor: isHoldingShutter 
                       ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.8)' : 'rgba(239, 83, 80, 0.8)')
                       : 'white',
-                  }} />
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Text style={{ 
+                      color: isHoldingShutter ? 'white' : '#6B7280', 
+                      fontSize: 11, 
+                      fontWeight: '600',
+                      textAlign: 'center',
+                      lineHeight: 14,
+                    }}>
+                      {isHoldingShutter 
+                        ? (alignmentStatus === 'good' && isStable ? 'Perfect!\nCapturing...' : 'Hold\nsteady...') 
+                        : 'Hold level\nto auto\ncapture'
+                      }
+                    </Text>
+                  </View>
                 </Pressable>
-                
-                <Text style={{ color: 'white', fontSize: 14, marginTop: 16 }}>
-                  {isHoldingShutter 
-                    ? (alignmentStatus === 'good' && isStable ? 'Perfect! Capturing...' : 'Hold steady...') 
-                    : 'Hold level to auto-capture'
-                  }
-                </Text>
               </View>
             </View>
           </CameraView>
