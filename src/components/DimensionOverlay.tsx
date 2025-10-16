@@ -530,21 +530,19 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     let currentIndex = 0;
-    const typingSpeed = 50; // 50ms per character for good rhythm
-    
-    // Strong haptic on start
-    console.log('🎵 Quote typing: START haptic');
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    const typingSpeed = 30; // Fast like ChatGPT (was 50)
+    let lastHapticTime = 0;
+    const minHapticInterval = 80; // Minimum 80ms between haptics (ChatGPT style)
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Heavy haptic on EVERY character (like a real typewriter!)
-        // Skip spaces to make it feel more natural
-        const char = completeText[currentIndex];
-        if (char !== ' ' && char !== '\n') {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        // ChatGPT-style: selectionAsync with time-based throttling
+        const now = Date.now();
+        if (now - lastHapticTime >= minHapticInterval) {
+          Haptics.selectionAsync(); // Very subtle tick
+          lastHapticTime = now;
         }
         
         currentIndex++;
