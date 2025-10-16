@@ -503,20 +503,12 @@ export default function DimensionOverlay({
     }
   }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
 
-  // Clear map scale when new photo is loaded AND show quote overlay
+  // Clear map scale when new photo is loaded
   useEffect(() => {
     // Clear map scale state when image URI changes (new photo loaded)
     setMapScale(null);
     setIsMapMode(false);
     setShowMapScaleModal(false);
-    
-    // Show inspirational quote when new photo is loaded
-    if (currentImageUri) {
-      console.log('📸 New photo loaded, showing quote overlay');
-      setTimeout(() => {
-        showQuoteOverlay();
-      }, 500); // Small delay to let photo render first
-    }
   }, [currentImageUri]);
 
   const showQuoteOverlay = () => {
