@@ -537,13 +537,15 @@ export default function DimensionOverlay({
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
+    let typeInterval: NodeJS.Timeout | null = null;
+    
     // Add delay before starting (like BattlingBotsModal does with 500ms)
     const startDelay = setTimeout(() => {
       console.log('🎵 Starting typeInterval now!');
       const typingSpeed = 50;
       let currentIndex = 0;
       
-      const typeInterval = setInterval(() => {
+      typeInterval = setInterval(() => {
         if (currentIndex < completeText.length) {
           setDisplayedText(completeText.substring(0, currentIndex + 1));
           
@@ -555,7 +557,7 @@ export default function DimensionOverlay({
           
           currentIndex++;
         } else {
-          clearInterval(typeInterval);
+          if (typeInterval) clearInterval(typeInterval);
           setIsQuoteTyping(false);
           // Auto-dismiss after 5 seconds
           setTimeout(() => {
@@ -563,13 +565,11 @@ export default function DimensionOverlay({
           }, 5000);
         }
       }, typingSpeed);
-      
-      // Store interval ID for cleanup
-      return typeInterval;
-    }, 500); // 500ms delay before starting typing
+    }, 500);
     
     return () => {
       clearTimeout(startDelay);
+      if (typeInterval) clearInterval(typeInterval);
     };
   }, [isQuoteTyping, currentQuote]);
   
