@@ -547,6 +547,9 @@ export default function DimensionOverlay({
   
   // Quote typing effect with haptics (separate useEffect like BattlingBotsModal)
   useEffect(() => {
+    // FIRE IMMEDIATELY to test if this useEffect EVER runs
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
     if (!isQuoteTyping || !currentQuote) return;
     
     // IMMEDIATE Heavy haptic at the very start
