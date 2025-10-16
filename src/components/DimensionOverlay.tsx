@@ -22,6 +22,7 @@ import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import AlertModal from './AlertModal';
 import TypewriterText from './TypewriterText';
+import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 import SnailIcon from './SnailIcon';
 
@@ -6073,188 +6074,20 @@ export default function DimensionOverlay({
         </GestureDetector>
       )}
       
-      {/* Pro Upgrade Modal */}
-      <Modal
+      {/* Battling Bots Pro Upgrade Modal */}
+      <BattlingBotsModal
         visible={showProModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowProModal(false)}
-      >
-        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-          <Pressable
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
-            onPress={() => setShowProModal(false)}
-          >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={{
-                width: '100%',
-                maxWidth: 400,
-                borderRadius: 20,
-                overflow: 'hidden',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.2,
-                shadowRadius: 20,
-                elevation: 16,
-              }}
-            >
-              <BlurView intensity={35} tint="light">
-                <View style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.35)',
-                  padding: 28,
-                }}>
-                  {/* Header */}
-                  <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                    <View style={{ 
-                      backgroundColor: 'rgba(88, 86, 214, 0.85)', 
-                      width: 64, 
-                      height: 64, 
-                      borderRadius: 32, 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      marginBottom: 12 
-                    }}>
-                      <Ionicons name="star" size={32} color="white" />
-                    </View>
-                    <Text style={{ fontSize: 24, fontWeight: '700', color: '#1C1C1E', marginBottom: 4 }}>
-                      Upgrade to Pro
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', textAlign: 'center' }}>
-                      Unlock the Freehand tool
-                    </Text>
-                  </View>
-                  
-                  {/* Comparison Chart */}
-                  <View style={{ marginBottom: 20 }}>
-                    <View style={{ 
-                      borderRadius: 14, 
-                      borderWidth: 1, 
-                      borderColor: 'rgba(0,0,0,0.08)',
-                      overflow: 'hidden',
-                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                    }}>
-                      {/* Table Header */}
-                      <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.12)', paddingVertical: 12 }}>
-                        <View style={{ flex: 2, paddingHorizontal: 12 }}>
-                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#3C3C43' }}>FEATURE</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>PRO</Text>
-                        </View>
-                      </View>
-                      
-                      {/* Table Row - Freehand Tool (last free tool, subtle red shadow to indicate dividing line) */}
-                      <View style={{ 
-                        flexDirection: 'row', 
-                        paddingVertical: 12, 
-                        borderTopWidth: 1, 
-                        borderTopColor: 'rgba(0,0,0,0.06)',
-                        shadowColor: '#FF3B30',
-                        shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 8,
-                        backgroundColor: 'rgba(255, 59, 48, 0.06)',
-                      }}>
-                        <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center' }}>
-                          <Text style={{ fontSize: 14, color: '#1C1C1E', marginRight: 6 }}>Freehand Tool</Text>
-                          {/* Small illustrative icon */}
-                          <Svg width="20" height="20" viewBox="0 0 20 20">
-                            {/* Curvy freehand line */}
-                            <Path
-                              d="M 3 10 Q 6 6, 10 10 T 17 10"
-                              stroke="#5856D6"
-                              strokeWidth="1.5"
-                              fill="none"
-                              strokeLinecap="round"
-                            />
-                            {/* Measurement markers */}
-                            <Circle cx="3" cy="10" r="1.5" fill="#5856D6" />
-                            <Circle cx="17" cy="10" r="1.5" fill="#5856D6" />
-                          </Svg>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                          {/* X icon with darker background shadow */}
-                          <View style={{
-                            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                            borderRadius: 10,
-                            width: 20,
-                            height: 20,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
-                          </View>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                          <Ionicons name="checkmark-circle" size={20} color="#5856D6" />
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  {/* Price */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(88, 86, 214, 0.12)', 
-                    borderRadius: 12, 
-                    padding: 16, 
-                    marginBottom: 20, 
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: 'rgba(88, 86, 214, 0.2)',
-                  }}>
-                    <Text style={{ fontSize: 36, fontWeight: '700', color: '#5856D6' }}>$9.97</Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43' }}>One-time purchase • Lifetime access</Text>
-                  </View>
-                  
-                  {/* Purchase Button */}
-                  <Pressable
-                    onPress={() => {
-                      setShowProModal(false);
-                      showAlert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!', 'info');
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
-                      borderRadius: 14,
-                      paddingVertical: 16,
-                      marginBottom: 12,
-                      shadowColor: '#5856D6',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                    })}
-                  >
-                    <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Purchase Pro</Text>
-                  </Pressable>
-                  
-                  {/* Restore Purchase Button */}
-                  <Pressable
-                    onPress={() => {
-                      showAlert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)', 'info');
-                    }}
-                    style={{ paddingVertical: 12, marginBottom: 8 }}
-                  >
-                    <Text style={{ color: '#5856D6', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Restore Purchase</Text>
-                  </Pressable>
-                  
-                  {/* Maybe Later Button */}
-                  <Pressable
-                    onPress={() => setShowProModal(false)}
-                    style={{ paddingVertical: 12 }}
-                  >
-                    <Text style={{ color: '#8E8E93', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Maybe Later</Text>
-                  </Pressable>
-                </View>
-              </BlurView>
-            </Pressable>
-          </Pressable>
-        </BlurView>
-      </Modal>
+        onAccept={(price) => {
+          setShowProModal(false);
+          showAlert('Pro Upgrade', `Payment integration would go here for $${price.toFixed(2)}. For now, tap the footer 5 times fast to unlock!`, 'info');
+        }}
+        onDecline={() => setShowProModal(false)}
+        userStats={{
+          measurementCount: measurements.length,
+          freehandAttempts: freehandTrialUsed,
+          hasUsedFreehand: freehandTrialUsed > 0,
+        }}
+      />
 
       {/* Help Button - Positioned next to AUTO LEVEL badge */}
       {coinCircle && !showLockedInAnimation && !isCapturing && (
