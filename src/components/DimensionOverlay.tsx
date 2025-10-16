@@ -511,13 +511,17 @@ export default function DimensionOverlay({
     setShowMapScaleModal(false);
   }, [currentImageUri]);
   
+  // Track if we've shown the initial quote
+  const hasShownInitialQuote = useRef(false);
+  
   // Show quote overlay on app launch (when no image present)
   useEffect(() => {
-    if (!currentImageUri) {
+    if (!hasShownInitialQuote.current && currentImageUri === null) {
       console.log('🎬 App launch - showing opening quote');
+      hasShownInitialQuote.current = true;
       showQuoteOverlay();
     }
-  }, []); // Only run once on mount
+  }, [currentImageUri]); // Watch for currentImageUri to load from AsyncStorage
 
   const showQuoteOverlay = () => {
     // IMMEDIATE haptic to test if this function is even called
