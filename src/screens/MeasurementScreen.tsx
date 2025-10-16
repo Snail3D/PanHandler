@@ -337,11 +337,11 @@ export default function MeasurementScreen() {
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement (up/down tilt)
-          // When holding phone upright (portrait), beta is near 0° when level
-          // Tilting forward (looking down) makes beta positive
-          // Tilting backward (looking up) makes beta negative
-          const verticalTilt = beta; // Use beta directly (0° = level, positive = down, negative = up)
-          const bubbleYOffset = -(verticalTilt / 15) * maxBubbleOffset; // Inverted: tilt down = bubble goes up (negative Y)
+          // When phone is upright facing you (portrait), beta ≈ 0° = level/center
+          // Looking down (tilt top away): beta becomes positive
+          // Looking up (tilt top toward you): beta becomes negative
+          // Bubble should move opposite to tilt (like real bubble level)
+          const bubbleYOffset = (beta / 15) * maxBubbleOffset; // Direct (not inverted) - tilt down = bubble down
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
@@ -957,24 +957,24 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Cosmic smoke trail with flowing wisps and particles */}
+              {/* Cosmic smoke trail with flowing wisps and particles - 30% smaller */}
               {trailPositions.current.map((pos, index) => {
                 const progress = (index + 1) / trailPositions.current.length;
                 const opacity = progress * progress * progress; // Cubic fade for more dramatic dissipation
-                const scale = 0.3 + (progress * 0.8);
+                const scale = 0.21 + (progress * 0.56); // 30% smaller: was 0.3 + 0.8
                 const angle = index * 0.5; // Rotation for variety
                 
                 return (
                   <React.Fragment key={`trail-${index}`}>
-                    {/* Large wispy smoke cloud */}
+                    {/* Large wispy smoke cloud - 30% smaller */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 10 * scale,
-                        left: 60 + pos.x - 10 * scale,
-                        width: 20 * scale,
-                        height: 20 * scale,
-                        borderRadius: 10 * scale,
+                        top: 60 + pos.y - 7 * scale, // 30% smaller: was 10
+                        left: 60 + pos.x - 7 * scale,
+                        width: 14 * scale, // 30% smaller: was 20
+                        height: 14 * scale,
+                        borderRadius: 7 * scale,
                         backgroundColor: bubbleColor.glow,
                         opacity: opacity * 0.2,
                         shadowColor: bubbleColor.glow,
@@ -983,15 +983,15 @@ export default function MeasurementScreen() {
                         transform: [{ rotate: `${angle}rad` }],
                       }}
                     />
-                    {/* Inner glow wisp */}
+                    {/* Inner glow wisp - 30% smaller */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 6 * scale,
-                        left: 60 + pos.x - 6 * scale,
-                        width: 12 * scale,
-                        height: 12 * scale,
-                        borderRadius: 6 * scale,
+                        top: 60 + pos.y - 4.2 * scale, // 30% smaller: was 6
+                        left: 60 + pos.x - 4.2 * scale,
+                        width: 8.4 * scale, // 30% smaller: was 12
+                        height: 8.4 * scale,
+                        borderRadius: 4.2 * scale,
                         backgroundColor: bubbleColor.main,
                         opacity: opacity * 0.35,
                         shadowColor: bubbleColor.glow,
@@ -999,17 +999,17 @@ export default function MeasurementScreen() {
                         shadowRadius: 10,
                       }}
                     />
-                    {/* Scattered sparkle particles */}
+                    {/* Scattered sparkle particles - 30% smaller */}
                     {index % 2 === 0 && progress > 0.4 && (
                       <>
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y + Math.sin(index * 1.5) * 10,
-                            left: 60 + pos.x + Math.cos(index * 1.5) * 10,
-                            width: 2,
-                            height: 2,
-                            borderRadius: 1,
+                            top: 60 + pos.y + Math.sin(index * 1.5) * 7, // 30% smaller: was 10
+                            left: 60 + pos.x + Math.cos(index * 1.5) * 7,
+                            width: 1.4, // 30% smaller: was 2
+                            height: 1.4,
+                            borderRadius: 0.7,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.8,
                             shadowColor: bubbleColor.glow,
@@ -1020,11 +1020,11 @@ export default function MeasurementScreen() {
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y - Math.sin(index * 2) * 8,
-                            left: 60 + pos.x - Math.cos(index * 2) * 8,
-                            width: 2,
-                            height: 2,
-                            borderRadius: 1,
+                            top: 60 + pos.y - Math.sin(index * 2) * 5.6, // 30% smaller: was 8
+                            left: 60 + pos.x - Math.cos(index * 2) * 5.6,
+                            width: 1.4,
+                            height: 1.4,
+                            borderRadius: 0.7,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.6,
                             shadowColor: bubbleColor.glow,
@@ -1038,7 +1038,7 @@ export default function MeasurementScreen() {
                 );
               })}
               
-              {/* COSMIC ENERGY BALL - Multi-layer nebula with electric energy */}
+              {/* COSMIC ENERGY BALL - Smooth gradient, no glow (smoke does it) */}
               <Animated.View
                 style={[
                   {
@@ -1050,38 +1050,7 @@ export default function MeasurementScreen() {
                   bubbleStyle,
                 ]}
               >
-                {/* Outermost diffuse glow aura */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: -12,
-                    left: -12,
-                    right: -12,
-                    bottom: -12,
-                    borderRadius: 26,
-                    backgroundColor: bubbleColor.glow,
-                    opacity: 0.12,
-                  }}
-                />
-                
-                {/* Outer glow ring */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: -8,
-                    left: -8,
-                    right: -8,
-                    bottom: -8,
-                    borderRadius: 22,
-                    backgroundColor: bubbleColor.glow,
-                    opacity: 0.25,
-                    shadowColor: bubbleColor.glow,
-                    shadowOpacity: 0.8,
-                    shadowRadius: 20,
-                  }}
-                />
-                
-                {/* Main dark cosmic shell */}
+                {/* Deep space black base */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1090,14 +1059,11 @@ export default function MeasurementScreen() {
                     right: 0,
                     bottom: 0,
                     borderRadius: 14,
-                    backgroundColor: '#0a0118', // Deeper space black
-                    shadowColor: bubbleColor.glow,
-                    shadowOpacity: 1.0,
-                    shadowRadius: 24,
+                    backgroundColor: '#0a0118', // Deep space black
                   }}
                 />
                 
-                {/* Colored nebula swirl layer 1 */}
+                {/* Gradient layer 1 - Outer nebula (session color) */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1107,95 +1073,67 @@ export default function MeasurementScreen() {
                     bottom: 2,
                     borderRadius: 12,
                     backgroundColor: bubbleColor.main,
+                    opacity: 0.5,
+                  }}
+                />
+                
+                {/* Gradient layer 2 - Mid nebula (lighter) */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 4,
+                    left: 4,
+                    right: 4,
+                    bottom: 4,
+                    borderRadius: 10,
+                    backgroundColor: bubbleColor.glow,
+                    opacity: 0.45,
+                  }}
+                />
+                
+                {/* Gradient layer 3 - Inner transition */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 6,
+                    left: 6,
+                    right: 6,
+                    bottom: 6,
+                    borderRadius: 8,
+                    backgroundColor: '#3B82F6', // Blue transition
                     opacity: 0.4,
                   }}
                 />
                 
-                {/* Colored nebula swirl layer 2 - offset */}
+                {/* Gradient layer 4 - Lighter blue */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 3,
-                    left: 4,
-                    right: 1,
-                    bottom: 3,
-                    borderRadius: 11,
-                    backgroundColor: bubbleColor.glow,
-                    opacity: 0.3,
+                    top: 8,
+                    left: 8,
+                    right: 8,
+                    bottom: 8,
+                    borderRadius: 6,
+                    backgroundColor: '#60A5FA',
+                    opacity: 0.5,
                   }}
                 />
                 
-                {/* Electric energy ring 1 - outer */}
+                {/* Gradient layer 5 - Lightest blue */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 5,
-                    left: 5,
-                    right: 5,
-                    bottom: 5,
-                    borderRadius: 9,
-                    borderWidth: 1.5,
-                    borderColor: '#3B82F6',
-                    shadowColor: '#3B82F6',
-                    shadowOpacity: 1.0,
-                    shadowRadius: 6,
-                    opacity: 0.9,
+                    top: 10,
+                    left: 10,
+                    right: 10,
+                    bottom: 10,
+                    borderRadius: 4,
+                    backgroundColor: '#93C5FD',
+                    opacity: 0.6,
                   }}
                 />
                 
-                {/* Electric energy ring 2 - middle */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 7,
-                    left: 7,
-                    right: 7,
-                    bottom: 7,
-                    borderRadius: 7,
-                    borderWidth: 1.5,
-                    borderColor: '#60A5FA',
-                    shadowColor: '#60A5FA',
-                    shadowOpacity: 0.9,
-                    shadowRadius: 5,
-                    opacity: 0.8,
-                  }}
-                />
-                
-                {/* Electric energy ring 3 - inner */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 9,
-                    left: 9,
-                    right: 9,
-                    bottom: 9,
-                    borderRadius: 5,
-                    borderWidth: 1,
-                    borderColor: '#93C5FD',
-                    shadowColor: '#93C5FD',
-                    shadowOpacity: 0.8,
-                    shadowRadius: 4,
-                    opacity: 0.7,
-                  }}
-                />
-                
-                {/* Bright white core - the star */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 11,
-                    left: 11,
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: '#FFFFFF',
-                    shadowColor: '#FFFFFF',
-                    shadowOpacity: 1.0,
-                    shadowRadius: 10,
-                  }}
-                />
-                
-                {/* Ultra-bright core highlight */}
+                {/* Bright white core */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1205,9 +1143,6 @@ export default function MeasurementScreen() {
                     height: 4,
                     borderRadius: 2,
                     backgroundColor: '#FFFFFF',
-                    shadowColor: '#93C5FD',
-                    shadowOpacity: 1.0,
-                    shadowRadius: 6,
                   }}
                 />
               </Animated.View>
