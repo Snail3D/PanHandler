@@ -2319,7 +2319,8 @@ export default function DimensionOverlay({
       )}
 
       {/* Touch overlay - only active in measurement mode */}
-      {measurementMode && (
+      {/* TEMP DISABLED: Testing if touch responders cause freeze */}
+      {false && measurementMode && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}
@@ -2933,7 +2934,8 @@ export default function DimensionOverlay({
       )}
 
       {/* Tap detection overlay for selecting/deleting measurements - always active when not in measurement mode */}
-      {!measurementMode && measurements.length > 0 && (
+      {/* TEMP DISABLED: Testing if touch responders cause freeze */}
+      {false && !measurementMode && measurements.length > 0 && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}

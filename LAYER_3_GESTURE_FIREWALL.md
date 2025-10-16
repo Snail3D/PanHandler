@@ -1,108 +1,39 @@
-# Layer 3: Gesture Firewall Implementation 🛡️
+# Layer 3: The Nuclear Option - Disable Touch Responders
 
-## What We Did
-Implemented the "gesture firewall" approach to prevent pan gestures from blocking button taps.
+## The Situation
+We've tried everything and buttons still take forever to respond after gestures. Back to square one.
 
-## Changes Made
+## What I Just Did
+**Completely disabled BOTH touch responder overlays:**
+1. Line 2322: Measurement mode overlay (`{false && measurementMode && ...`)
+2. Line 2937: Selection mode overlay (`{false && !measurementMode && ...`)
 
-### File: `src/components/DimensionOverlay.tsx`
+## What This Breaks
+- ❌ Cannot place measurement points (overlay disabled)
+- ❌ Cannot select/drag measurements (overlay disabled)
+- ❌ Freehand drawing won't work
 
-**Line 3951-3961: Menu Container**
+## What This Tests
+- ✅ If buttons respond instantly now, we know the touch responders are the culprit
+- ✅ If buttons still lag, the problem is somewhere else entirely
 
-**BEFORE:**
-```typescript
-<GestureDetector gesture={menuPanGesture}>
-  <Animated.View
-    className="absolute left-0 right-0 z-20"  // Low z-index
-    style={[
-      { 
-        bottom: insets.bottom + 16,
-        paddingHorizontal: 24,
-      },
-      menuAnimatedStyle
-    ]}
-  >
-```
+## Test Now
+1. Take photo, calibrate
+2. Switch to Measure mode
+3. Try to tap the measure button or any UI button
+4. **Does it respond instantly?**
 
-**AFTER:**
-```typescript
-<GestureDetector gesture={Gesture.Tap()}>  // Simple tap detector
-  <Animated.View
-    className="absolute left-0 right-0"
-    style={[
-      { 
-        bottom: insets.bottom + 16,
-        paddingHorizontal: 24,
-        zIndex: 9999, // Super high priority - always on top
-      },
-      menuAnimatedStyle
-    ]}
-  >
-```
+### If Instant:
+The touch responders are the problem. We need to rebuild them with:
+- Proper gesture exclusion
+- No expensive calculations in onResponder handlers
+- Maybe use Pressable instead of touch responders
 
-## Key Changes
+### If Still Slow:
+The problem is elsewhere - maybe:
+- GestureDetector in ZoomableImage
+- React rendering performance
+- Something in the menu/button components themselves
 
-### 1. Removed menuPanGesture
-- **Before**: Used complex pan gesture that could block touches
-- **After**: Simple `Gesture.Tap()` that doesn't interfere
-
-### 2. Cranked Up zIndex
-- **Before**: `z-20` (zIndex: 20) via Tailwind
-- **After**: `zIndex: 9999` - highest priority layer
-
-### 3. Removed Tailwind z-class
-- Moved z-index to inline style for explicit control
-- Ensures React Native properly respects the value
-
-## How It Works
-
-```
-┌─────────────────────────────────┐
-│   Menu (zIndex: 9999)           │  ← Gesture.Tap() firewall
-│   ├─ Pan Button                 │  ← Always captures taps first
-│   ├─ Measure Button             │
-│   └─ Measurement Icons          │
-└─────────────────────────────────┘
-         ↓ (touches pass down if not captured)
-┌─────────────────────────────────┐
-│   Image (zIndex: lower)         │  ← Pan/pinch/rotate gestures
-│   ├─ 2-finger pan               │
-│   ├─ Pinch zoom                 │
-│   └─ Rotation                   │
-└─────────────────────────────────┘
-```
-
-The menu now acts as a "touch shield" - any tap on the menu area goes to buttons FIRST, never to image gestures.
-
-## Expected Result
-
-✅ **After 2-finger pan** → Tap any button → Responds instantly
-✅ **After pinch zoom** → Tap any button → Responds instantly
-✅ **After rotation** → Tap any button → Responds instantly
-✅ **No "sticky" feeling** → Smooth as butter 🧈
-
-## Why This Should Work
-
-1. **High Priority**: zIndex 9999 ensures menu is visually and touch-wise on top
-2. **Gesture Isolation**: `Gesture.Tap()` creates separate gesture context
-3. **No Interference**: Image gestures can't "hold" touches that land on menu
-4. **Clean Separation**: Menu and image gestures are completely independent
-
-## If This Works...
-Chef's kiss achieved! 🤌✨
-
-## If It Doesn't...
-We move to Layer 2: Aggressive gesture cleanup in ZoomableImageV2
-
-## Testing Instructions
-1. Load the app
-2. Pan around with 2 fingers
-3. Release fingers
-4. Immediately tap a button in the menu
-5. Button should respond instantly (no delay, no "stuck" feeling)
-
-Try this with:
-- Pan → tap
-- Zoom → tap
-- Rotate → tap
-- Multiple gestures → tap
+---
+**This is the definitive test to find the real bottleneck.** 🔬
