@@ -4425,6 +4425,23 @@ export default function DimensionOverlay({
                     }
                   </Text>
                 </View>
+                {/* Custom label text if present */}
+                {measurement.label && (
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.8)',
+                      paddingHorizontal: 6,
+                      paddingVertical: 3,
+                      borderRadius: 4,
+                      marginTop: 4,
+                      maxWidth: 120,
+                    }}
+                  >
+                    <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                      {measurement.label}
+                    </Text>
+                  </View>
+                )}
               </View>
             ));
           })()}
@@ -4509,6 +4526,24 @@ export default function DimensionOverlay({
                       L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
                     </Text>
                   </View>
+                  {/* Custom label text for rectangle - appears below width line */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 100,
+                        alignSelf: 'center',
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </React.Fragment>
             );
@@ -4645,7 +4680,7 @@ export default function DimensionOverlay({
               pointerEvents={isCapturing ? 'none' : 'box-none'}
             >
               {/* Header with collapse/expand button */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 4, paddingBottom: legendCollapsed ? 0 : 4, borderBottomWidth: legendCollapsed ? 0 : 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
                 <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', opacity: 0.7 }}>
                   LEGEND
                 </Text>
@@ -4756,7 +4791,7 @@ export default function DimensionOverlay({
                     </Text>
                     {/* Label text if present */}
                     {measurement.label && (
-                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 7, fontWeight: '500', fontStyle: 'italic', marginTop: 2 }}>
+                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 7, fontWeight: '500', fontStyle: 'italic', marginTop: 4 }}>
                         {measurement.label}
                       </Text>
                     )}
