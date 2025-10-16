@@ -4,7 +4,7 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DeviceMotion } from 'expo-sensors';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, Easing } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -48,6 +48,20 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
   // Stability tracking
   const recentAngles = React.useRef<number[]>([]);
   const stabilityCheckInterval = React.useRef<NodeJS.Timeout | null>(null);
+  
+  // Adaptive guidance system
+  const [guidanceMessage, setGuidanceMessage] = useState<string | null>(null);
+  const guidanceOpacity = useSharedValue(0);
+  const guidanceScale = useSharedValue(0.8);
+  const lastGuidanceMessage = React.useRef<string | null>(null);
+  
+  // Motion tracking for "Hold still" detection
+  const recentAcceleration = React.useRef<number[]>([]);
+  const [accelerationVariance, setAccelerationVariance] = useState(0);
+  
+  // Store current rotation for guidance calculations
+  const [currentBeta, setCurrentBeta] = useState(0);
+  const [currentGamma, setCurrentGamma] = useState(0);
 
   if (!permission) {
     return (
@@ -202,9 +216,31 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
     DeviceMotion.setUpdateInterval(100); // Update 10 times per second
 
     const subscription = DeviceMotion.addListener((data) => {
-      if (data.rotation) {
+      if (data.rotation && data.acceleration) {
         const beta = data.rotation.beta * (180 / Math.PI); // Forward/backward tilt in degrees
         const gamma = data.rotation.gamma * (180 / Math.PI); // Left/right tilt in degrees
+        
+        // Store rotation values for guidance system
+        setCurrentBeta(beta);
+        setCurrentGamma(gamma);
+        
+        // Track acceleration for motion detection
+        const accel = Math.sqrt(
+          Math.pow(data.acceleration.x, 2) + 
+          Math.pow(data.acceleration.y, 2) + 
+          Math.pow(data.acceleration.z, 2)
+        );
+        recentAcceleration.current.push(accel);
+        if (recentAcceleration.current.length > 10) {
+          recentAcceleration.current.shift();
+        }
+        
+        // Calculate acceleration variance
+        if (recentAcceleration.current.length >= 5) {
+          const mean = recentAcceleration.current.reduce((a, b) => a + b, 0) / recentAcceleration.current.length;
+          const variance = recentAcceleration.current.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentAcceleration.current.length;
+          setAccelerationVariance(variance);
+        }
         
         // Auto-detect orientation based on device angle
         const absBeta = Math.abs(beta);
@@ -347,6 +383,100 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
 
     return () => clearTimeout(timer);
   }, [countdown]);
+  
+  // Adaptive guidance system - determine PRIMARY issue and show appropriate message
+  useEffect(() => {
+    // Don't show guidance during countdown or when capturing
+    if (countdown !== null || isCapturing) {
+      if (guidanceMessage) {
+        // Fade out existing message
+        guidanceOpacity.value = withTiming(0, { duration: 300 });
+        setTimeout(() => setGuidanceMessage(null), 300);
+      }
+      return;
+    }
+    
+    // Calculate severity scores for each issue (0-1 scale, 1 = worst)
+    const motionSeverity = Math.min(accelerationVariance / 0.15, 1); // 0.15 = high variance threshold
+    const tiltSeverity = Math.min(tiltAngle / 25, 1); // 25° = bad threshold
+    
+    // Determine the worst issue
+    let newMessage: string | null = null;
+    
+    // Priority 1: Too much motion (most disruptive)
+    if (motionSeverity > 0.6) {
+      newMessage = "Hold still";
+    }
+    // Priority 2: Significant tilt (needs correction)
+    else if (tiltSeverity > 0.4 && tiltAngle > 5) {
+      // Determine target orientation
+      const absBeta = Math.abs(currentBeta);
+      const targetOrientation = orientationMode === 'auto' 
+        ? (absBeta < 45 ? 'horizontal' : 'vertical')
+        : orientationMode;
+      
+      // Provide directional guidance based on target orientation and current tilt
+      if (targetOrientation === 'horizontal') {
+        // Horizontal mode: fix forward/backward tilt
+        if (currentBeta > 5) {
+          newMessage = "Tilt backward";
+        } else if (currentBeta < -5) {
+          newMessage = "Tilt forward";
+        } else if (Math.abs(currentGamma) > 5) {
+          // Left/right tilt in horizontal mode
+          if (currentGamma > 5) {
+            newMessage = "Tilt left";
+          } else {
+            newMessage = "Tilt right";
+          }
+        }
+      } else {
+        // Vertical mode: guide to 90° position
+        const verticalDiff = Math.abs(currentBeta) - 90;
+        if (verticalDiff > 5) {
+          // Too horizontal, need to tilt more vertical
+          newMessage = currentBeta > 0 ? "Tilt forward" : "Tilt backward";
+        } else if (Math.abs(currentGamma) > 5) {
+          // Fix rotation in vertical mode
+          if (currentGamma > 5) {
+            newMessage = "Turn left";
+          } else {
+            newMessage = "Turn right";
+          }
+        }
+      }
+    }
+    // Priority 3: Getting close - encourage them
+    else if (tiltSeverity < 0.3 && tiltAngle > 2 && tiltAngle <= 5 && motionSeverity < 0.4) {
+      newMessage = "Almost there...";
+    }
+    // Priority 4: Very close - hold position
+    else if (alignmentStatus === 'good' && !isStable && motionSeverity > 0.2) {
+      newMessage = "Hold that";
+    }
+    
+    // Update message if it changed
+    if (newMessage !== lastGuidanceMessage.current) {
+      lastGuidanceMessage.current = newMessage;
+      
+      if (newMessage) {
+        setGuidanceMessage(newMessage);
+        // Fade in with scale animation
+        guidanceOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
+        guidanceScale.value = withSpring(1, { damping: 12, stiffness: 200 });
+      } else {
+        // Fade out
+        guidanceOpacity.value = withTiming(0, { duration: 300 });
+        setTimeout(() => setGuidanceMessage(null), 300);
+      }
+    }
+  }, [accelerationVariance, tiltAngle, alignmentStatus, isStable, countdown, isCapturing, orientationMode, currentBeta, currentGamma]);
+  
+  // Animated style for guidance text
+  const guidanceAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: guidanceOpacity.value,
+    transform: [{ scale: guidanceScale.value }],
+  }));
 
   return (
     <View className="flex-1 bg-black">
@@ -436,6 +566,51 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
             pointerEvents: 'none',
           }}
         />
+
+        {/* Adaptive Guidance Text - Above crosshairs */}
+        {guidanceMessage && (
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: SCREEN_HEIGHT / 2 - 200, // Midway between crosshairs and top
+                left: 0,
+                right: 0,
+                alignItems: 'center',
+                pointerEvents: 'none',
+                zIndex: 10000,
+              },
+              guidanceAnimatedStyle,
+            ]}
+          >
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                paddingHorizontal: 24,
+                paddingVertical: 14,
+                borderRadius: 16,
+                borderWidth: 2,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.5,
+                shadowRadius: 8,
+              }}
+            >
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 18,
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  letterSpacing: 0.5,
+                }}
+              >
+                {guidanceMessage}
+              </Text>
+            </View>
+          </Animated.View>
+        )}
 
         {/* Center crosshairs with bubble level - ALWAYS VISIBLE */}
         <View

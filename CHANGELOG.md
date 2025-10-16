@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.86] - 2025-10-16
+
+### 🎯 Adaptive Camera Guidance System
+
+#### ✨ Major Feature
+- **Real-Time Contextual Guidance** - Intelligent helpers guide users to take better photos
+  - Analyzes device motion and tilt in real-time
+  - Shows priority-based messages: "Hold still", "Tilt forward", "Almost there...", etc.
+  - Messages appear above crosshairs with graceful fade in/out animations
+  - Adapts to horizontal vs vertical orientation modes
+  - Disappears during countdown to avoid distraction
+
+#### 🧠 Smart Detection System
+- **Motion Detection** - Tracks acceleration variance to detect shaking
+  - Threshold: 0.15 max variance, triggers at 60% (0.09)
+  - Priority 1: Shows "Hold still" when phone is moving too much
+  
+- **Tilt Analysis** - Measures deviation from level in real-time
+  - Threshold: 25° max tilt, triggers at 40% (10°)
+  - Priority 2: Directional guidance ("Tilt forward", "Tilt backward", etc.)
+  - Orientation-aware: Different messages for horizontal vs vertical mode
+  
+- **Encouragement System** - Provides positive feedback when close
+  - Priority 3: "Almost there..." when tilt is 2-5° with low motion
+  - Priority 4: "Hold that" when aligned but not stable yet
+
+#### 🎨 Visual Design
+- **Positioning**: Above crosshairs, midway between center and top
+- **Animation**: 400ms fade in with scale (0.8 → 1.0), 300ms fade out
+- **Style**: Dark semi-transparent background, white text, subtle border
+- **Z-Index**: 10000 (above all UI elements)
+
+#### 🔧 Technical Implementation
+- Added motion tracking with acceleration variance calculation
+- Added rotation tracking (beta/gamma angles) for directional guidance
+- Priority-based message system (only shows worst issue)
+- Reactive to corrections (messages change as user fixes issues)
+- Integration with existing DeviceMotion listener
+- No new dependencies required
+
+#### 📁 Files Modified
+- `src/screens/CameraScreen.tsx` - Guidance state, motion tracking, UI component
+
+#### 📚 Documentation
+- `ADAPTIVE_GUIDANCE_SYSTEM.md` - Comprehensive feature documentation
+
+---
+
 ## [Alpha v1.85] - 2025-10-16
 
 ### 🎯 Polish & UX Refinements
