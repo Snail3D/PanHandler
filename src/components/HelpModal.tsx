@@ -248,6 +248,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const globalDownloads = useStore((s) => s.globalDownloads);
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
+  const resetFreehandTrial = useStore((s) => s.resetFreehandTrial);
   
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
@@ -2169,6 +2170,11 @@ Thank you for helping us improve PanHandler!
                           const newProStatus = !isProUser;
                           setIsProUser(newProStatus);
                           setEggTapCount(0);
+                          
+                          // Reset freehand trial counter when toggling to free mode
+                          if (!newProStatus) {
+                            resetFreehandTrial();
+                          }
                           
                           // Close help modal immediately
                           onClose();
