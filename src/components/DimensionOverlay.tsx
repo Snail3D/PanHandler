@@ -546,22 +546,20 @@ export default function DimensionOverlay({
     const typingSpeed = 50;
     const timeouts: NodeJS.Timeout[] = [];
     
-    // Use EXACT pattern from freehand power-up (we KNOW this works!)
-    // Fire first character and haptic IMMEDIATELY (not in setTimeout)
-    setDisplayedText(completeText.substring(0, 1));
+    // TEST: Fire 5 Heavy haptics in rapid succession to make SURE haptics work
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 300);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400);
     
-    // Then schedule the rest with setTimeout
+    // Now do the typing
+    setDisplayedText(completeText.substring(0, 1));
+    
     for (let i = 1; i < completeText.length; i++) {
       const timeout = setTimeout(() => {
         setDisplayedText(completeText.substring(0, i + 1));
         
-        // Fire haptic every 3 characters (Heavy like button presses)
-        if (i % 3 === 0) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        }
-        
-        // On last character, auto-dismiss after 5 seconds
         if (i === completeText.length - 1) {
           setIsQuoteTyping(false);
           setTimeout(() => {
@@ -573,7 +571,6 @@ export default function DimensionOverlay({
       timeouts.push(timeout);
     }
     
-    // Cleanup: clear all scheduled timeouts
     return () => {
       timeouts.forEach(timeout => clearTimeout(timeout));
     };
