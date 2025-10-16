@@ -21,6 +21,7 @@ import VerbalScaleModal from './VerbalScaleModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import AlertModal from './AlertModal';
+import TypewriterText from './TypewriterText';
 import { getRandomQuote } from '../utils/makerQuotes';
 import SnailIcon from './SnailIcon';
 
@@ -140,10 +141,19 @@ export default function DimensionOverlay({
   const setIsProUser = useStore((s) => s.setIsProUser);
   const hasSeenPanTutorial = useStore((s) => s.hasSeenPanTutorial);
   const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
+  const freehandTrialUsed = useStore((s) => s.freehandTrialUsed);
+  const freehandTrialLimit = useStore((s) => s.freehandTrialLimit);
+  const incrementFreehandTrial = useStore((s) => s.incrementFreehandTrial);
+  const freehandOfferDismissed = useStore((s) => s.freehandOfferDismissed);
+  const dismissFreehandOffer = useStore((s) => s.dismissFreehandOffer);
   
   
   // Pro upgrade modal
   const [showProModal, setShowProModal] = useState(false);
+  
+  // Freehand trial modals
+  const [showFreehandOfferModal, setShowFreehandOfferModal] = useState(false);
+  const [showFreehandConfirmModal, setShowFreehandConfirmModal] = useState(false);
   
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
@@ -2269,8 +2279,8 @@ export default function DimensionOverlay({
           let nextIndex = (currentIndex + 1) % modes.length;
           let nextMode = modes[nextIndex];
           
-          // Skip freehand if not Pro (keep bouncing through modes)
-          if (nextMode === 'freehand' && !isProUser) {
+          // Skip freehand if not available (check trial)
+          if (nextMode === 'freehand' && !isProUser && freehandTrialUsed >= freehandTrialLimit) {
             nextIndex = (nextIndex + 1) % modes.length;
             nextMode = modes[nextIndex];
           }
@@ -2285,8 +2295,8 @@ export default function DimensionOverlay({
           let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           let prevMode = modes[prevIndex];
           
-          // Skip freehand if not Pro (keep bouncing through modes)
-          if (prevMode === 'freehand' && !isProUser) {
+          // Skip freehand if not available (check trial)
+          if (prevMode === 'freehand' && !isProUser && freehandTrialUsed >= freehandTrialLimit) {
             prevIndex = (prevIndex - 1 + modes.length) % modes.length;
             prevMode = modes[prevIndex];
           }
@@ -2763,13 +2773,12 @@ export default function DimensionOverlay({
                 clearTimeout(freehandActivationTimerRef.current);
               }
               
-              // TEMP DISABLED: Progressive haptics might be causing freeze
-              // 🌟 Samus Charge Beam - Progressive power build-up
-              // Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
-              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
-              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
-              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
-              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
+              // 🌟 Samus Charge Beam - Progressive power build-up (RESTORED!)
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
               
               freehandActivationTimerRef.current = setTimeout(() => {
                 // 1.5s - FULLY CHARGED! Ready to fire! 🔥
@@ -3188,6 +3197,11 @@ export default function DimensionOverlay({
                   console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
                   
                   setMeasurements([...measurements, newMeasurement]);
+                  
+                  // Increment freehand trial counter if not Pro
+                  if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
+                    incrementFreehandTrial();
+                  }
                 } else {
                   console.log('⚠️ Area calculation skipped - conditions not met:', {
                     isClosedLoop,
@@ -3216,6 +3230,11 @@ export default function DimensionOverlay({
                   };
                   
                   setMeasurements([...measurements, newMeasurement]);
+                  
+                  // Increment freehand trial counter if not Pro
+                  if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
+                    incrementFreehandTrial();
+                  }
                   
                   // Log reason for no area
                   if (isClosedLoop && selfIntersects) {
@@ -5204,11 +5223,18 @@ export default function DimensionOverlay({
                     clearTimeout(freehandLongPressRef.current);
                   }
                   freehandLongPressRef.current = setTimeout(() => {
-                    // Activate freehand mode
+                    // Activate freehand mode - check trial
                     if (!isProUser) {
-                      setShowProModal(true);
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                      return;
+                      // Check if trial exhausted
+                      if (freehandTrialUsed >= freehandTrialLimit) {
+                        if (freehandOfferDismissed) {
+                          setShowProModal(true);
+                        } else {
+                          setShowFreehandOfferModal(true);
+                        }
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                        return;
+                      }
                     }
                     playModeHaptic('freehand');
                     setMode('freehand');
@@ -5261,14 +5287,37 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
+              {/* Freehand (FREE TRIAL: 10 uses, then PRO) */}
               <Pressable
                 onPress={() => {
-                  if (!isProUser) {
+                  // Check if user is pro
+                  if (isProUser) {
+                    playModeHaptic('freehand');
+                    setMode('freehand');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setIsDrawingFreehand(false);
+                    setModeColorIndex((prev) => prev + 1);
+                    return;
+                  }
+                  
+                  // Check if trial is exhausted and offer dismissed
+                  if (freehandTrialUsed >= freehandTrialLimit && freehandOfferDismissed) {
+                    // Show Pro modal
                     setShowProModal(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
+                  
+                  // Check if trial is exhausted but offer not yet dismissed
+                  if (freehandTrialUsed >= freehandTrialLimit && !freehandOfferDismissed) {
+                    // Show special offer modal
+                    setShowFreehandOfferModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
+                  
+                  // User still has free tries - activate freehand
                   playModeHaptic('freehand');
                   setMode('freehand');
                   setCurrentPoints([]);
@@ -5312,19 +5361,90 @@ export default function DimensionOverlay({
                     Free
                   </Text>
                 </View>
-                  {!isProUser && (
-                    <View style={{
-                      position: 'absolute',
-                      top: -2,
-                      right: -2,
-                      backgroundColor: '#FFD700',
-                      paddingHorizontal: 3,
-                      paddingVertical: 1,
-                      borderRadius: 4,
-                    }}>
-                      <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
-                    </View>
-                  )}
+                  {/* Badge showing trial status or PRO */}
+                  {(() => {
+                    if (isProUser) {
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FFD700',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
+                        </View>
+                      );
+                    }
+                    
+                    const remaining = freehandTrialLimit - freehandTrialUsed;
+                    
+                    if (remaining > 1) {
+                      // Show "10 FREE" → "9 LEFT" → "2 LEFT"
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#34C759',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>
+                            {freehandTrialUsed === 0 ? `${freehandTrialLimit} FREE` : `${remaining} LEFT`}
+                          </Text>
+                        </View>
+                      );
+                    } else if (remaining === 1) {
+                      // Show "1 LEFT" in orange
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FF9500',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>1 LEFT</Text>
+                        </View>
+                      );
+                    } else if (!freehandOfferDismissed) {
+                      // Trial exhausted, offer not dismissed - show special badge
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FF3B30',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>OFFER</Text>
+                        </View>
+                      );
+                    } else {
+                      // Trial exhausted, offer dismissed - show PRO lock
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FFD700',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO 🔒</Text>
+                        </View>
+                      );
+                    }
+                  })()}
               </Pressable>
             </View>
             </Animated.View>
@@ -6531,6 +6651,178 @@ export default function DimensionOverlay({
           </Animated.View>
         </Animated.View>
       )}
+
+      {/* Freehand Trial Offer Modal - First Time */}
+      <Modal
+        visible={showFreehandOfferModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowFreehandOfferModal(false)}
+      >
+        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+          <Pressable
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+            onPress={() => {
+              // Don't dismiss on backdrop tap - force user to make choice
+            }}
+          >
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: 400,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 20,
+                padding: 24,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
+                elevation: 20,
+              }}
+            >
+              {/* Typewriter message */}
+              <TypewriterText
+                text="Hey there! I noticed you're out of free freehand measurements. Would you like to upgrade to Pro for just $6.97 (normally $9.97)?"
+                speed={25}
+                style={{
+                  fontSize: 16,
+                  color: '#1C1C1E',
+                  lineHeight: 24,
+                  marginBottom: 24,
+                }}
+              />
+
+              {/* Buttons */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandOfferModal(false);
+                    setShowFreehandConfirmModal(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
+                    No Thanks
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandOfferModal(false);
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#007AFF',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
+                    Upgrade Now
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </BlurView>
+      </Modal>
+
+      {/* Freehand Trial Confirm Modal - Second Chance */}
+      <Modal
+        visible={showFreehandConfirmModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowFreehandConfirmModal(false)}
+      >
+        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+          <Pressable
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+            onPress={() => {
+              // Don't dismiss on backdrop tap
+            }}
+          >
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: 400,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 20,
+                padding: 24,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
+                elevation: 20,
+              }}
+            >
+              {/* Typewriter message */}
+              <TypewriterText
+                text="Are you sure? This special offer won't be shown again."
+                speed={25}
+                style={{
+                  fontSize: 16,
+                  color: '#1C1C1E',
+                  lineHeight: 24,
+                  marginBottom: 24,
+                }}
+              />
+
+              {/* Buttons */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandConfirmModal(false);
+                    dismissFreehandOffer();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
+                    {"I'm Sure"}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandConfirmModal(false);
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#34C759',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
+                    Yes, Upgrade
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </BlurView>
+      </Modal>
 
       {/* Alert Modal */}
       <AlertModal
