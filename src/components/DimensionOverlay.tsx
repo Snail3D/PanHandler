@@ -5738,42 +5738,38 @@ export default function DimensionOverlay({
         </BlurView>
       </Modal>
 
-      {/* Help Button - Floating centered horizontally */}
-      {!menuHidden && !isCapturing && (
-        <View
+      {/* Help Button - Positioned next to Calibrated badge */}
+      {coinCircle && !showLockedInAnimation && !isCapturing && (
+        <Pressable
+          onPress={() => setShowHelpModal(true)}
+          onLongPress={() => {
+            // Secret: Long-press to clear saved email (for testing)
+            setUserEmail(null);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
+          }}
           style={{
             position: 'absolute',
-            top: insets.top + 20,
-            left: SCREEN_WIDTH / 2 - 13,
-            zIndex: 50,
+            zIndex: 20,
+            top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
+            right: isMapMode 
+              ? 200  // Position left of badge when in map mode (badge is wider)
+              : 130, // Position left of badge in normal mode
+            backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
           }}
-          pointerEvents="auto"
         >
-          <Pressable
-            onPress={() => setShowHelpModal(true)}
-            onLongPress={() => {
-              // Secret: Long-press to clear saved email (for testing)
-              setUserEmail(null);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
-            }}
-            style={{
-              backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
-              width: 26,
-              height: 26,
-              borderRadius: 13,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-              elevation: 5,
-            }}
-          >
-            <Ionicons name="help-circle-outline" size={16} color="white" />
-          </Pressable>
-        </View>
+          <Ionicons name="help-circle-outline" size={18} color="white" />
+        </Pressable>
       )}
 
       {/* Help Modal */}
