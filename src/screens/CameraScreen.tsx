@@ -790,39 +790,6 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
           </View>
         </View>
         
-        {/* DEBUG: Show guidance state */}
-        <View
-          style={{
-            position: 'absolute',
-            top: insets.top + 150,
-            left: 20,
-            right: 20,
-            backgroundColor: 'rgba(255, 0, 0, 0.8)',
-            padding: 10,
-            borderRadius: 8,
-            zIndex: 20000,
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-            DEBUG - Guidance State:
-          </Text>
-          <Text style={{ color: 'white', fontSize: 11 }}>
-            Message: {guidanceMessage || 'null'}
-          </Text>
-          <Text style={{ color: 'white', fontSize: 11 }}>
-            Motion Variance: {accelerationVariance.toFixed(4)}
-          </Text>
-          <Text style={{ color: 'white', fontSize: 11 }}>
-            Tilt Angle: {tiltAngle.toFixed(2)}°
-          </Text>
-          <Text style={{ color: 'white', fontSize: 11 }}>
-            Beta: {currentBeta.toFixed(2)}° | Gamma: {currentGamma.toFixed(2)}°
-          </Text>
-          <Text style={{ color: 'white', fontSize: 11 }}>
-            Countdown: {countdown !== null ? countdown : 'null'}
-          </Text>
-        </View>
-
         {/* Countdown display - large centered */}
         {countdown !== null && countdown > 0 && (
           <View 
@@ -985,31 +952,33 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       <View
         style={{
           position: 'absolute',
-          top: insets.top + 150,
-          left: 20,
-          right: 20,
-          backgroundColor: 'rgba(255, 0, 0, 0.8)',
-          padding: 10,
+          top: insets.top + 10,
+          left: 10,
+          right: 10,
+          backgroundColor: 'yellow',
+          padding: 12,
           borderRadius: 8,
-          zIndex: 20000,
+          borderWidth: 3,
+          borderColor: 'red',
+          zIndex: 99999,
         }}
       >
-        <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-          DEBUG - Guidance State:
+        <Text style={{ color: 'black', fontSize: 13, fontWeight: 'bold' }}>
+          🚨 DEBUG - Guidance State:
         </Text>
-        <Text style={{ color: 'white', fontSize: 11 }}>
+        <Text style={{ color: 'black', fontSize: 12 }}>
           Message: {guidanceMessage || 'null'}
         </Text>
-        <Text style={{ color: 'white', fontSize: 11 }}>
+        <Text style={{ color: 'black', fontSize: 12 }}>
           Motion Variance: {accelerationVariance.toFixed(4)}
         </Text>
-        <Text style={{ color: 'white', fontSize: 11 }}>
+        <Text style={{ color: 'black', fontSize: 12 }}>
           Tilt Angle: {tiltAngle.toFixed(2)}°
         </Text>
-        <Text style={{ color: 'white', fontSize: 11 }}>
+        <Text style={{ color: 'black', fontSize: 12 }}>
           Beta: {currentBeta.toFixed(2)}° | Gamma: {currentGamma.toFixed(2)}°
         </Text>
-        <Text style={{ color: 'white', fontSize: 11 }}>
+        <Text style={{ color: 'black', fontSize: 12 }}>
           Countdown: {countdown !== null ? countdown : 'null'}
         </Text>
       </View>
