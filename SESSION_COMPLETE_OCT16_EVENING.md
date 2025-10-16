@@ -293,3 +293,108 @@ User mentioned:
 3. Camera screen improvements (user has "exciting ideas")
 
 **Status**: Bubble level polished and ready! Waiting for user feedback on mystical glow effect. 🚀✨
+
+---
+
+# Session Continuation - Later Evening (Same Day)
+
+## Additional Features Completed
+
+### 6. Label Modal Action-Specific Buttons ✅
+**File**: `src/components/LabelModal.tsx`
+
+- Changed prompt: **"What are we calling this thing?"**
+- Dynamic button based on action:
+  - Save: "Save" button with disk icon 💾
+  - Email: "Email" button with mail icon ✉️
+- Passes `actionType` prop from DimensionOverlay
+
+### 7. Zoom Increased to 35x ✅
+**Files**: Both ZoomableImage components
+
+- Changed max zoom: 20x → **35x**
+- Ultra-precise coin placement
+- Extreme detail for calibration
+
+### 8. Bubble Level Orientation Fix ✅
+**Problem**: Crosshair didn't rotate in portrait mode
+
+**Solution**:
+- Crosshair now rotates 90° when phone is vertical
+- Smooth Reanimated animation
+- Uses `isVerticalMode` shared value
+
+### 9. Smoothed Vertical Bubble ✅
+**Problem**: Jerky movement in portrait
+
+**Solution**: Much heavier damping
+- Damping: 20 → 35 (75% increase)
+- Stiffness: 180 → 120
+- Mass: 0.8 → 1.2
+
+### 10. Opt-In Auto-Capture ✅
+**Major UX Change**: No more auto-start!
+
+**Features**:
+- Big "Tap to Begin Auto Capture" button
+- Positioned near crosshairs (top: 50%, marginTop: 100px)
+- Glassmorphic design
+- Fades away 2.5 seconds after tap
+- Haptic feedback
+
+### 11. Relaxed Auto-Capture Sensitivity ✅
+Made it MUCH less strict:
+
+| Parameter | Before | After |
+|-----------|--------|-------|
+| Angle tolerance | 2° | 5° |
+| Motion threshold | 0.2 | 0.4 |
+| Samples needed | 5 | 3 |
+| Angle stability | 2° | 5° |
+
+### 12. Tap-to-Focus ✅
+- Tap anywhere on camera to focus
+- Haptic feedback on tap
+- Native autofocus enabled
+- Works with auto-capture
+
+### 13. Help Button Spacing ✅
+- Added `gap: 12` between Help and Flash
+- Cleaner visual separation
+
+---
+
+## Known Issues
+
+### Portrait Mode Auto-Capture
+❌ Not triggering in vertical orientation
+- Works fine in horizontal
+- Needs orientation detection investigation
+
+### Vertical Bubble Feel
+⚠️ User feedback: "still doesn't feel right"
+- May need more tuning
+- "doesn't need to go as far and as fast"
+
+---
+
+## Documentation Added
+- SESSION_LABEL_MODAL_CUSTOMIZATION.md
+- SESSION_ZOOM_INCREASE.md  
+- SESSION_BUBBLE_LEVEL_ORIENTATION_FIX.md
+- SESSION_AUTO_CAPTURE_IMPROVEMENTS.md
+- SESSION_BUBBLE_SMOOTHING_TAP_FOCUS.md
+- SESSION_RELAXED_AUTO_CAPTURE.md
+- reset-to-pro-user.js
+
+---
+
+## Git Status
+All changes auto-committed by Vibecode:
+- 4f122c7 - Auto-capture button moved
+- 104fdbd - 35x zoom
+- 6617607 - Relaxed sensitivity
+- b73530f - Bubble smoothing & tap-focus
+- c81f6e4 - Label modal
+
+**Total Session Work**: 13 major features + bug fixes + extensive documentation
