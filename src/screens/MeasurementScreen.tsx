@@ -994,7 +994,7 @@ export default function MeasurementScreen() {
             style={{ flex: 1 }}
             facing="back"
             enableTorch={flashEnabled}
-            zoom={cameraZoom}
+            zoom={cameraZoom === 1 ? 0 : cameraZoom === 2 ? 0.25 : cameraZoom === 4 ? 0.5 : 1}
           >
             {/* Top controls */}
             <View 
