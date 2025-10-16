@@ -232,7 +232,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "The creation of something new is not accomplished by the intellect but by the play instinct.", author: "Carl Jung", year: "1921" },
   { text: "The greatest danger for most of us is not that our aim is too high and we miss it, but that it is too low and we reach it.", author: "Michelangelo", year: "1560" },
   { text: "I saw the angel in the marble and carved until I set him free.", author: "Michelangelo" },
-  { text: "The sun, with all those planets revolving around it, can still ripen a bunch of grapes as if it had nothing else in the universe to do.", author: "Galileo Galilei" },
+
   { text: "Nature is pleased with simplicity.", author: "Isaac Newton" },
   { text: "Make everything as simple as possible, but not simpler.", author: "Albert Einstein", year: "1933" },
   { text: "The more you know, the more you realize you don't know.", author: "Aristotle", year: "350 BC" },
@@ -357,7 +357,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "What we know is a drop, what we don't know is an ocean.", author: "Isaac Newton" },
   { text: "Plato is my friend, Aristotle is my friend, but my greatest friend is truth.", author: "Isaac Newton" },
   { text: "If I have ever made any valuable discoveries, it has been due more to patient attention, than to any other talent.", author: "Isaac Newton" },
-  { text: "I can calculate the motion of heavenly bodies but not the madness of people.", author: "Isaac Newton" },
+
   { text: "Errors are not in the art but in the artificers.", author: "Isaac Newton" },
   { text: "Build we must, for our future is one that we shall have to build.", author: "Isaac Newton" },
   { text: "No great discovery was ever made without a bold guess.", author: "Isaac Newton" },
@@ -775,7 +775,6 @@ export const makerQuotes: MakerQuote[] = [
   // Nicolaus Copernicus
   { text: "To know that we know what we know, and to know that we do not know what we do not know, that is true knowledge.", author: "Nicolaus Copernicus", year: "1543" },
   { text: "Mathematics is written for mathematicians.", author: "Nicolaus Copernicus" },
-  { text: "Finally we shall place the Sun himself at the center of the Universe.", author: "Nicolaus Copernicus", year: "1543" },
   
   // Tycho Brahe
   { text: "Let me not seem to have lived in vain.", author: "Tycho Brahe", year: "1601" },
@@ -1090,7 +1089,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Science is organized knowledge. Wisdom is organized life.", author: "Immanuel Kant", year: "1790" },
   { text: "We can judge the heart of a man by his treatment of animals.", author: "Immanuel Kant" },
   { text: "All our knowledge begins with the senses, proceeds then to the understanding, and ends with reason.", author: "Immanuel Kant", year: "1781" },
-  { text: "Two things fill the mind with ever-increasing wonder and awe: the starry heavens above me and the moral law within me.", author: "Immanuel Kant", year: "1788" },
   { text: "In law a man is guilty when he violates the rights of others. In ethics he is guilty if he only thinks of doing so.", author: "Immanuel Kant" },
   { text: "Act only according to that maxim whereby you can, at the same time, will that it should become a universal law.", author: "Immanuel Kant", year: "1785" },
   { text: "He who is cruel to animals becomes hard also in his dealings with men.", author: "Immanuel Kant" },
@@ -1153,7 +1151,6 @@ export const makerQuotes: MakerQuote[] = [
   // Pythagoras
   { text: "Do not say a little in many words but a great deal in a few.", author: "Pythagoras", year: "500 BC" },
   { text: "As long as man continues to be the ruthless destroyer of lower living beings he will never know health or peace.", author: "Pythagoras", year: "500 BC" },
-  { text: "There is geometry in the humming of the strings, there is music in the spacing of the spheres.", author: "Pythagoras", year: "500 BC" },
   { text: "Number is the ruler of forms and ideas, and the cause of gods and demons.", author: "Pythagoras", year: "500 BC" },
   { text: "Educate the children and it won't be necessary to punish the men.", author: "Pythagoras", year: "500 BC" },
   { text: "Choose rather to be strong of soul than strong of body.", author: "Pythagoras", year: "500 BC" },
@@ -1272,7 +1269,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "I keep the subject constantly before me and wait until the first dawnings open little by little into the full light.", author: "Isaac Newton" },
   { text: "In the absence of any other proof, the thumb alone would convince me of God's existence.", author: "Isaac Newton" },
   { text: "We build too many walls and not enough bridges.", author: "Isaac Newton" },
-  { text: "This most beautiful system of the sun, planets and comets, could only proceed from the counsel and dominion of an intelligent and powerful Being.", author: "Isaac Newton", year: "1687" },
   { text: "It is the weight, not numbers of experiments that is to be regarded.", author: "Isaac Newton" },
   
   // More ancient wisdom
