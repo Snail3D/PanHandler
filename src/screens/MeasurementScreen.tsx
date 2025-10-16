@@ -323,12 +323,12 @@ export default function MeasurementScreen() {
         // Detect if phone is horizontal or vertical
         const isVerticalMode = absBeta > 45; // Phone is held vertically
         
-        const maxBubbleOffset = 40; // Max pixels the bubble can move from center
+        const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement matters (up/down tilt)
           // X is locked to center
-          const verticalTilt = absBeta - 90; // How far from true vertical (90°)
+          const verticalTilt = beta - 90; // How far from true vertical (90°) - SIGNED for negative values
           const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // ±15° = max offset
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
@@ -537,8 +537,8 @@ export default function MeasurementScreen() {
   
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: bubbleX.value + 50 - 7.5 }, // Center it
-      { translateY: bubbleY.value + 50 - 7.5 },
+      { translateX: bubbleX.value + 60 - 9 }, // Center in 120px container with 18px bubble
+      { translateY: bubbleY.value + 60 - 9 },
     ],
   }));
   
@@ -907,57 +907,20 @@ export default function MeasurementScreen() {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                width: 100,
-                height: 100,
-                marginLeft: -50,
-                marginTop: -50,
+                width: 120, // 20% bigger (was 100)
+                height: 120,
+                marginLeft: -60, // Center it
+                marginTop: -60,
               }}
               pointerEvents="none"
             >
-              {/* Adaptive Guidance Text - Above crosshairs */}
-              {guidanceMessage && (
-                <Animated.View
-                  style={[
-                    {
-                      position: 'absolute',
-                      top: -150,
-                      left: -75,
-                      width: 250,
-                      alignItems: 'center',
-                    },
-                    guidanceAnimatedStyle,
-                  ]}
-                >
-                  <View
-                    style={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                      paddingHorizontal: 24,
-                      paddingVertical: 14,
-                      borderRadius: 16,
-                      borderWidth: 2,
-                      borderColor: 'rgba(255, 255, 255, 0.5)',
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontSize: 20,
-                        fontWeight: '700',
-                        textAlign: 'center',
-                      }}
-                    >
-                      {guidanceMessage}
-                    </Text>
-                  </View>
-                </Animated.View>
-              )}
               
               {/* Horizontal line - glows when bubble is centered */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    top: 49,
+                    top: 59, // Center in 120px container
                     left: 0,
                     right: 0,
                     height: 2,
@@ -970,7 +933,7 @@ export default function MeasurementScreen() {
                 style={[
                   {
                     position: 'absolute',
-                    left: 49,
+                    left: 59, // Center in 120px container
                     top: 0,
                     bottom: 0,
                     width: 2,
@@ -989,50 +952,67 @@ export default function MeasurementScreen() {
                     key={`trail-${index}`}
                     style={{
                       position: 'absolute',
-                      top: 50 + pos.y - 3 * scale,
-                      left: 50 + pos.x - 3 * scale,
+                      top: 60 + pos.y - 3 * scale, // Adjust for 120px container
+                      left: 60 + pos.x - 3 * scale,
                       width: 6 * scale,
                       height: 6 * scale,
                       borderRadius: 3 * scale,
                       backgroundColor: bubbleColor.glow,
-                      opacity: opacity * 0.4,
+                      opacity: opacity * 0.5, // Increased from 0.4 for more visibility
                       shadowColor: bubbleColor.glow,
-                      shadowOpacity: 0.6,
-                      shadowRadius: 4,
+                      shadowOpacity: 0.8, // More glow
+                      shadowRadius: 6,
                     }}
                   />
                 );
               })}
               
-              {/* Animated bubble - 4mm glowing ball */}
+              {/* Animated bubble - 4mm glowing ball with enhanced mysterious glow */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    width: 15, // ~4mm at typical screen DPI
-                    height: 15,
-                    borderRadius: 7.5,
+                    width: 18, // Slightly bigger for more presence
+                    height: 18,
+                    borderRadius: 9,
                     backgroundColor: bubbleColor.main,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    borderWidth: 2.5,
+                    borderColor: 'rgba(255, 255, 255, 0.9)', // Brighter border
                     shadowColor: bubbleColor.glow,
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.9,
-                    shadowRadius: 8,
+                    shadowOpacity: 1.0, // Full glow
+                    shadowRadius: 16, // Much larger glow radius
                   },
                   bubbleStyle,
                 ]}
               >
-                {/* Inner glow */}
+                {/* Inner glow - brighter and more mysterious */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 2,
-                    left: 3,
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    top: 3,
+                    left: 4,
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Almost pure white
+                    shadowColor: '#FFFFFF',
+                    shadowOpacity: 0.9,
+                    shadowRadius: 4,
+                  }}
+                />
+                {/* Outer glow ring for extra mystique */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -4,
+                    left: -4,
+                    right: -4,
+                    bottom: -4,
+                    borderRadius: 13,
+                    borderWidth: 1,
+                    borderColor: bubbleColor.glow,
+                    opacity: 0.4,
                   }}
                 />
               </Animated.View>
@@ -1042,8 +1022,8 @@ export default function MeasurementScreen() {
                 style={[
                   {
                     position: 'absolute',
-                    top: 47,
-                    left: 47,
+                    top: 57, // Center in 120px container
+                    left: 57,
                     width: 6,
                     height: 6,
                     borderRadius: 3,
@@ -1051,39 +1031,6 @@ export default function MeasurementScreen() {
                   centerDotStyle,
                 ]}
               />
-              
-              {/* "Center object here" text below crosshairs with hint */}
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 110,
-                  left: -75,
-                  width: 250,
-                  alignItems: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    fontSize: 13,
-                    fontWeight: '600',
-                  }}
-                >
-                  Center object here
-                </Text>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    color: 'rgba(255, 255, 255, 0.5)',
-                    fontSize: 11,
-                    fontStyle: 'italic',
-                    marginTop: 2,
-                  }}
-                >
-                  (place coin in the middle)
-                </Text>
-              </View>
             </View>
 
             {/* Bottom controls */}
