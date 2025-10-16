@@ -235,6 +235,10 @@ export default function DimensionOverlay({
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
   const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
   
+  // Label editing feature - double tap to add/edit label
+  const [labelEditingMeasurementId, setLabelEditingMeasurementId] = useState<string | null>(null);
+  const [showLabelEditModal, setShowLabelEditModal] = useState(false);
+  
   // Undo history for measurement edits - stores original state before first edit
   const [measurementHistory, setMeasurementHistory] = useState<Map<string, Measurement>>(new Map());
   
@@ -2199,6 +2203,31 @@ export default function DimensionOverlay({
     setPendingAction(null);
   };
   
+  // Handle label editing for existing measurements (double-tap feature)
+  const handleLabelEditComplete = (label: string | null) => {
+    setShowLabelEditModal(false);
+    
+    if (labelEditingMeasurementId) {
+      // Update the measurement with the new label
+      const updatedMeasurements = measurements.map(m => {
+        if (m.id === labelEditingMeasurementId) {
+          return { ...m, label };
+        }
+        return m;
+      });
+      setMeasurements(updatedMeasurements);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      console.log('✅ Label updated for measurement:', labelEditingMeasurementId);
+    }
+    
+    setLabelEditingMeasurementId(null);
+  };
+  
+  const handleLabelEditDismiss = () => {
+    setShowLabelEditModal(false);
+    setLabelEditingMeasurementId(null);
+  };
+  
   // Animated style for menu sliding
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: menuTranslateX.value }],
@@ -3662,7 +3691,18 @@ export default function DimensionOverlay({
                   // Same measurement tapped within timeout
                   const newCount = tapDeleteState.count + 1;
                   
-                  if (newCount >= 4) {
+                  if (newCount === 2) {
+                    // 2nd tap - open label editor!
+                    const measurement = measurements.find(m => m.id === tappedId);
+                    if (measurement) {
+                      setLabelEditingMeasurementId(tappedId);
+                      setShowLabelEditModal(true);
+                      setTapDeleteState(null); // Reset tap counter
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      console.log('✏️ Opening label editor for measurement');
+                      return;
+                    }
+                  } else if (newCount >= 4) {
                     // 4th tap - delete the measurement!
                     const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                     setMeasurements(updatedMeasurements);
@@ -3699,7 +3739,18 @@ export default function DimensionOverlay({
                 // Same measurement tapped within timeout
                 const newCount = tapDeleteState.count + 1;
                 
-                if (newCount >= 4) {
+                if (newCount === 2) {
+                  // 2nd tap - open label editor!
+                  const measurement = measurements.find(m => m.id === tappedId);
+                  if (measurement) {
+                    setLabelEditingMeasurementId(tappedId);
+                    setShowLabelEditModal(true);
+                    setTapDeleteState(null); // Reset tap counter
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    console.log('✏️ Opening label editor for measurement (via point)');
+                    return;
+                  }
+                } else if (newCount >= 4) {
                   // 4th tap - delete the measurement!
                   const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                   setMeasurements(updatedMeasurements);
@@ -4703,6 +4754,12 @@ export default function DimensionOverlay({
                         return displayValue;
                       })()}
                     </Text>
+                    {/* Label text if present */}
+                    {measurement.label && (
+                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 7, fontWeight: '500', fontStyle: 'italic', marginTop: 2 }}>
+                        {measurement.label}
+                      </Text>
+                    )}
                   </View>
                 );
               })}
@@ -5747,6 +5804,15 @@ export default function DimensionOverlay({
         onComplete={handleLabelComplete}
         onDismiss={handleLabelDismiss}
         initialValue={currentLabel}
+        isMapMode={isMapMode}
+      />
+      
+      {/* Label Edit Modal - for editing existing measurement labels via double-tap */}
+      <LabelModal 
+        visible={showLabelEditModal} 
+        onComplete={handleLabelEditComplete}
+        onDismiss={handleLabelEditDismiss}
+        initialValue={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.label : null}
         isMapMode={isMapMode}
       />
       
