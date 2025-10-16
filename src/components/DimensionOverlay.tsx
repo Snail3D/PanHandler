@@ -224,6 +224,9 @@ export default function DimensionOverlay({
   const [attemptHistory, setAttemptHistory] = useState<MeasurementAttempt[]>([]);
   const [hasShownCalibrationHint, setHasShownCalibrationHint] = useState(false);
   const [showCalibrationHint, setShowCalibrationHint] = useState(false);
+  const hintOpacity = useSharedValue(0);
+  const hintScale = useSharedValue(0.8);
+  const hintColorShift = useSharedValue(0); // 0-1 for color animation
   
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
@@ -1599,7 +1602,33 @@ export default function DimensionOverlay({
     setAttemptHistory([]);
     setHasShownCalibrationHint(false);
     setShowCalibrationHint(false);
+    hintOpacity.value = 0;
+    hintScale.value = 0.8;
   }, [currentImageUri]);
+  
+  // Animate hint appearance
+  useEffect(() => {
+    if (showCalibrationHint) {
+      // Graceful fade in + scale up
+      hintOpacity.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+      hintScale.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.34, 1.56, 0.64, 1) }); // Spring-like ease
+      
+      // Color shift animation (loops forever)
+      hintColorShift.value = withTiming(1, { 
+        duration: 3000, 
+        easing: Easing.inOut(Easing.ease) 
+      }, (finished) => {
+        if (finished) {
+          hintColorShift.value = 0;
+          hintColorShift.value = withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) });
+        }
+      });
+    } else {
+      // Fade out
+      hintOpacity.value = withTiming(0, { duration: 300 });
+      hintScale.value = withTiming(0.9, { duration: 300 });
+    }
+  }, [showCalibrationHint]);
   
   // Tetris Easter egg trigger - detect when legend fills screen
   useEffect(() => {
@@ -6331,11 +6360,7 @@ export default function DimensionOverlay({
 
       {/* Smart Calibration Hint */}
       {showCalibrationHint && (
-        <Pressable
-          onPress={() => {
-            setShowCalibrationHint(false);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
+        <Animated.View
           style={{
             position: 'absolute',
             top: 0,
@@ -6345,37 +6370,107 @@ export default function DimensionOverlay({
             zIndex: 9999,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            opacity: hintOpacity,
           }}
         >
-          <BlurView
-            intensity={80}
-            tint="light"
-            style={{
-              padding: 24,
-              borderRadius: 20,
-              backgroundColor: 'rgba(245, 158, 11, 0.95)', // Amber
-              maxWidth: SCREEN_WIDTH * 0.8,
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 10,
+          <Pressable
+            onPress={() => {
+              setShowCalibrationHint(false);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+          <Animated.View
+            style={useAnimatedStyle(() => {
+              // Color shift between amber, orange, and rose
+              const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
+              const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
+              const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
+              
+              return {
+                transform: [{ scale: hintScale.value }],
+                backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
+              };
+            })}
           >
-            <Ionicons name="warning-outline" size={32} color="white" style={{ marginBottom: 12 }} />
-            <Text style={{ fontSize: 18, fontWeight: '700', color: 'white', marginBottom: 8, textAlign: 'center' }}>
-              Measurements seem off?
-            </Text>
-            <Text style={{ fontSize: 15, color: 'white', textAlign: 'center', marginBottom: 16, opacity: 0.95 }}>
-              Check your calibration (upper right)
-            </Text>
-            <Text style={{ fontSize: 13, color: 'white', opacity: 0.7, textAlign: 'center', fontStyle: 'italic' }}>
-              Tap anywhere to dismiss
-            </Text>
-          </BlurView>
-        </Pressable>
+            <BlurView
+              intensity={100}
+              tint="light"
+              style={{
+                padding: 28,
+                borderRadius: 28,
+                maxWidth: SCREEN_WIDTH * 0.85,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 12,
+                overflow: 'hidden',
+              }}
+            >
+              <Animated.View
+                style={useAnimatedStyle(() => {
+                  // Animate icon color too
+                  const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
+                  const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
+                  const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
+                  
+                  return {
+                    marginBottom: 16,
+                  };
+                })}
+              >
+                <Ionicons name="warning-outline" size={40} color="rgba(255, 255, 255, 0.95)" />
+              </Animated.View>
+              
+              <Text style={{ 
+                fontSize: 20, 
+                fontWeight: '800', 
+                color: 'white', 
+                marginBottom: 10, 
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 4,
+              }}>
+                Measurements seem off?
+              </Text>
+              
+              <Text style={{ 
+                fontSize: 16, 
+                color: 'rgba(255, 255, 255, 0.95)', 
+                textAlign: 'center', 
+                marginBottom: 20,
+                fontWeight: '600',
+                textShadowColor: 'rgba(0, 0, 0, 0.2)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}>
+                Check your calibration (upper right)
+              </Text>
+              
+              <Text style={{ 
+                fontSize: 13, 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textAlign: 'center', 
+                fontStyle: 'italic',
+                fontWeight: '500',
+              }}>
+                Tap anywhere to dismiss
+              </Text>
+            </BlurView>
+          </Animated.View>
+        </Animated.View>
       )}
 
       {/* Alert Modal */}
