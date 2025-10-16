@@ -67,6 +67,8 @@ interface MeasurementStore {
   globalDownloads: number; // Global download count (fetched from backend)
   hasSeenPinchTutorial: boolean; // Track if user has seen pinch-zoom tutorial
   hasSeenPanTutorial: boolean; // Track if user has seen pan tutorial on measurement screen
+  specialOfferTriggered: boolean; // True when user hits 50 sessions as free user
+  specialOfferSessionsLeft: number; // 3 sessions to decide on the offer (countdown)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
@@ -92,6 +94,8 @@ interface MeasurementStore {
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
   setHasSeenPinchTutorial: (hasSeen: boolean) => void;
   setHasSeenPanTutorial: (hasSeen: boolean) => void;
+  decrementSpecialOfferSessions: () => void; // Countdown for special offer
+  dismissSpecialOffer: () => void; // User accepted or permanently dismissed offer
 }
 
 const useStore = create<MeasurementStore>()(
@@ -119,6 +123,8 @@ const useStore = create<MeasurementStore>()(
       globalDownloads: 1247,
       hasSeenPinchTutorial: false,
       hasSeenPanTutorial: false,
+      specialOfferTriggered: false,
+      specialOfferSessionsLeft: 3,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -207,6 +213,15 @@ const useStore = create<MeasurementStore>()(
       setHasSeenPinchTutorial: (hasSeen: boolean) => set({ hasSeenPinchTutorial: hasSeen }),
       
       setHasSeenPanTutorial: (hasSeen: boolean) => set({ hasSeenPanTutorial: hasSeen }),
+      
+      decrementSpecialOfferSessions: () => set((state) => ({ 
+        specialOfferSessionsLeft: Math.max(0, state.specialOfferSessionsLeft - 1) 
+      })),
+      
+      dismissSpecialOffer: () => set({ 
+        specialOfferTriggered: false,
+        specialOfferSessionsLeft: 0 
+      }),
     }),
     {
       name: 'measurement-settings',
@@ -221,6 +236,8 @@ const useStore = create<MeasurementStore>()(
         hasReviewedApp: state.hasReviewedApp, // Persist review status
         lastReviewPromptDate: state.lastReviewPromptDate, // Persist last prompt date
         hasSeenPinchTutorial: state.hasSeenPinchTutorial, // Persist tutorial state
+        specialOfferTriggered: state.specialOfferTriggered, // Persist special offer state
+        specialOfferSessionsLeft: state.specialOfferSessionsLeft, // Persist offer countdown
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
         // Persist current work session
         currentImageUri: state.currentImageUri,
