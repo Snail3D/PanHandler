@@ -97,7 +97,7 @@ export default function ZoomableImage({
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
-      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 20));
+      scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 25));
     })
     .onEnd(() => {
       savedScale.value = scale.value;
