@@ -507,6 +507,50 @@ export default function MeasurementScreen() {
     opacity: guidanceOpacity.value,
     transform: [{ scale: guidanceScale.value }],
   }));
+  
+  // Animated styles for bubble level crosshairs
+  const crosshairHorizontalStyle = useAnimatedStyle(() => ({
+    backgroundColor: crosshairGlow.value > 0.5
+      ? bubbleColor.main
+      : alignmentStatus === 'good' 
+      ? 'rgba(76, 175, 80, 0.9)' 
+      : alignmentStatus === 'warning'
+      ? 'rgba(255, 183, 77, 0.9)'
+      : 'rgba(239, 83, 80, 0.9)',
+    shadowColor: bubbleColor.glow,
+    shadowOpacity: crosshairGlow.value * 0.8,
+    shadowRadius: crosshairGlow.value * 12,
+  }));
+  
+  const crosshairVerticalStyle = useAnimatedStyle(() => ({
+    backgroundColor: crosshairGlow.value > 0.5
+      ? bubbleColor.main
+      : alignmentStatus === 'good' 
+      ? 'rgba(76, 175, 80, 0.9)' 
+      : alignmentStatus === 'warning'
+      ? 'rgba(255, 183, 77, 0.9)'
+      : 'rgba(239, 83, 80, 0.9)',
+    shadowColor: bubbleColor.glow,
+    shadowOpacity: crosshairGlow.value * 0.8,
+    shadowRadius: crosshairGlow.value * 12,
+  }));
+  
+  const bubbleStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: bubbleX.value + 50 - 7.5 }, // Center it
+      { translateY: bubbleY.value + 50 - 7.5 },
+    ],
+  }));
+  
+  const centerDotStyle = useAnimatedStyle(() => ({
+    backgroundColor: crosshairGlow.value > 0.5
+      ? bubbleColor.main
+      : 'rgba(255, 255, 255, 0.7)',
+    transform: [{ scale: 1 + (crosshairGlow.value * 0.5) }],
+    shadowColor: bubbleColor.glow,
+    shadowOpacity: crosshairGlow.value * 0.9,
+    shadowRadius: crosshairGlow.value * 8,
+  }));
 
   // Restore session on mount if there's a persisted image
   useEffect(() => {
@@ -918,18 +962,7 @@ export default function MeasurementScreen() {
                     right: 0,
                     height: 2,
                   },
-                  useAnimatedStyle(() => ({
-                    backgroundColor: crosshairGlow.value > 0.5
-                      ? bubbleColor.main
-                      : alignmentStatus === 'good' 
-                      ? 'rgba(76, 175, 80, 0.9)' 
-                      : alignmentStatus === 'warning'
-                      ? 'rgba(255, 183, 77, 0.9)'
-                      : 'rgba(239, 83, 80, 0.9)',
-                    shadowColor: bubbleColor.glow,
-                    shadowOpacity: crosshairGlow.value * 0.8,
-                    shadowRadius: crosshairGlow.value * 12,
-                  })),
+                  crosshairHorizontalStyle,
                 ]}
               />
               {/* Vertical line - glows when bubble is centered */}
@@ -942,18 +975,7 @@ export default function MeasurementScreen() {
                     bottom: 0,
                     width: 2,
                   },
-                  useAnimatedStyle(() => ({
-                    backgroundColor: crosshairGlow.value > 0.5
-                      ? bubbleColor.main
-                      : alignmentStatus === 'good' 
-                      ? 'rgba(76, 175, 80, 0.9)' 
-                      : alignmentStatus === 'warning'
-                      ? 'rgba(255, 183, 77, 0.9)'
-                      : 'rgba(239, 83, 80, 0.9)',
-                    shadowColor: bubbleColor.glow,
-                    shadowOpacity: crosshairGlow.value * 0.8,
-                    shadowRadius: crosshairGlow.value * 12,
-                  })),
+                  crosshairVerticalStyle,
                 ]}
               />
               
@@ -998,12 +1020,7 @@ export default function MeasurementScreen() {
                     shadowOpacity: 0.9,
                     shadowRadius: 8,
                   },
-                  useAnimatedStyle(() => ({
-                    transform: [
-                      { translateX: bubbleX.value + 50 - 7.5 }, // Center it
-                      { translateY: bubbleY.value + 50 - 7.5 },
-                    ],
-                  })),
+                  bubbleStyle,
                 ]}
               >
                 {/* Inner glow */}
@@ -1031,15 +1048,7 @@ export default function MeasurementScreen() {
                     height: 6,
                     borderRadius: 3,
                   },
-                  useAnimatedStyle(() => ({
-                    backgroundColor: crosshairGlow.value > 0.5
-                      ? bubbleColor.main
-                      : 'rgba(255, 255, 255, 0.7)',
-                    transform: [{ scale: 1 + (crosshairGlow.value * 0.5) }],
-                    shadowColor: bubbleColor.glow,
-                    shadowOpacity: crosshairGlow.value * 0.9,
-                    shadowRadius: crosshairGlow.value * 8,
-                  })),
+                  centerDotStyle,
                 ]}
               />
               
