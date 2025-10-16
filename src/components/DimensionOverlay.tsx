@@ -516,7 +516,7 @@ export default function DimensionOverlay({
   
   // Show quote overlay on app launch (when no image present)
   useEffect(() => {
-    if (!hasShownInitialQuote.current && currentImageUri === null) {
+    if (!hasShownInitialQuote.current && !currentImageUri) {
       console.log('🎬 App launch - showing opening quote');
       hasShownInitialQuote.current = true;
       showQuoteOverlay();
@@ -555,19 +555,17 @@ export default function DimensionOverlay({
     const typingSpeed = 50;
     const timeouts: NodeJS.Timeout[] = [];
     
-    // TEST: Fire 5 Heavy haptics in rapid succession to make SURE haptics work
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 300);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400);
-    
-    // Now do the typing
+    // Add haptics during typing - every 4th character
     setDisplayedText(completeText.substring(0, 1));
     
     for (let i = 1; i < completeText.length; i++) {
       const timeout = setTimeout(() => {
         setDisplayedText(completeText.substring(0, i + 1));
+        
+        // Haptic feedback every 4 characters (not too frequent, noticeable)
+        if (i % 4 === 0) {
+          Haptics.selectionAsync();
+        }
         
         if (i === completeText.length - 1) {
           setIsQuoteTyping(false);
