@@ -6300,6 +6300,7 @@ export default function DimensionOverlay({
         onDismiss={handleLabelDismiss}
         initialValue={currentLabel}
         isMapMode={isMapMode}
+        actionType={pendingAction || 'save'}
       />
       
       {/* Label Edit Modal - for editing existing measurement labels via double-tap */}
