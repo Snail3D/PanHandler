@@ -539,44 +539,36 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (!isQuoteTyping || !currentQuote) return;
     
-    console.log('🎵 Quote typing starting...');
-    
     const fullText = `"${currentQuote.text}"`;
     const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
     let typeInterval: NodeJS.Timeout | null = null;
+    let currentIndex = 0;
     
-    // Add delay before starting (like BattlingBotsModal does with 500ms)
-    const startDelay = setTimeout(() => {
-      console.log('🎵 Starting typeInterval now!');
-      const typingSpeed = 50;
-      let currentIndex = 0;
-      
-      typeInterval = setInterval(() => {
-        if (currentIndex < completeText.length) {
-          setDisplayedText(completeText.substring(0, currentIndex + 1));
-          
-          // Heavy haptic every 3 characters (like shave and haircut - we KNOW this works!)
-          if (currentIndex % 3 === 0) {
-            console.log('🎵 HAPTIC at index', currentIndex);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-          }
-          
-          currentIndex++;
-        } else {
-          if (typeInterval) clearInterval(typeInterval);
-          setIsQuoteTyping(false);
-          // Auto-dismiss after 5 seconds
-          setTimeout(() => {
-            dismissQuote();
-          }, 5000);
-        }
-      }, typingSpeed);
-    }, 500);
+    // Start immediately, no delay
+    const typingSpeed = 50;
+    
+    typeInterval = setInterval(() => {
+      if (currentIndex < completeText.length) {
+        // Update text
+        setDisplayedText(completeText.substring(0, currentIndex + 1));
+        
+        // Fire haptic EVERY character for now to debug
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        
+        currentIndex++;
+      } else {
+        if (typeInterval) clearInterval(typeInterval);
+        setIsQuoteTyping(false);
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          dismissQuote();
+        }, 5000);
+      }
+    }, typingSpeed);
     
     return () => {
-      clearTimeout(startDelay);
       if (typeInterval) clearInterval(typeInterval);
     };
   }, [isQuoteTyping, currentQuote]);
