@@ -90,9 +90,7 @@ export default function App() {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
         // Natural typing haptics - varied intensity like real keystrokes
-        // Most keystrokes are light, occasional medium for emphasis (vowels, punctuation)
         const char = completeText[currentIndex];
-        const isVowel = /[aeiouAEIOU]/.test(char);
         const isPunctuation = /[.,!?;:]/.test(char);
         const isSpace = char === ' ';
         
@@ -100,12 +98,9 @@ export default function App() {
           if (isPunctuation) {
             // Punctuation gets a stronger tap (finishing a thought)
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          } else if (isVowel && Math.random() > 0.5) {
-            // 50% of vowels get subtle emphasis (natural rhythm variation)
+          } else if (currentIndex % 3 === 0) {
+            // Every 3rd character gets a light tap (balanced rhythm)
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          } else if (currentIndex % 4 === 0) {
-            // Every 4th character gets a light tap (consistent baseline rhythm)
-            Haptics.selectionAsync();
           }
         }
         

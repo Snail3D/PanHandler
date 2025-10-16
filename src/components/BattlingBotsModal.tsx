@@ -215,13 +215,21 @@ export default function BattlingBotsModal({
       
       const typeInterval = setInterval(() => {
         if (!isBackspacing) {
-          // Type mean text with periodic haptics
+          // Type mean text with natural typing haptics
           if (charIndex < message.meanText!.length) {
             setCurrentText(message.meanText!.substring(0, charIndex + 1));
             
-            // Subtle haptic every 3-4 characters while typing
-            if (charIndex % 4 === 0) {
-              Haptics.selectionAsync();
+            // Natural typing haptics - varied intensity
+            const char = message.meanText![charIndex];
+            const isPunctuation = /[.,!?;:]/.test(char);
+            const isSpace = char === ' ';
+            
+            if (!isSpace) {
+              if (isPunctuation) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              } else if (charIndex % 3 === 0) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
             }
             
             charIndex++;
@@ -235,17 +243,17 @@ export default function BattlingBotsModal({
               // Stronger haptic when starting to backspace (panic!)
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               
-              // Backspace animation
-              const backspaceInterval = setInterval(() => {
-                if (backspaceIndex > 0) {
-                  setCurrentText(message.meanText!.substring(0, backspaceIndex - 1));
-                  
-                  // Rapid light haptics while backspacing
-                  if (backspaceIndex % 2 === 0) {
-                    Haptics.selectionAsync();
-                  }
-                  
-                  backspaceIndex--;
+                // Backspace animation with natural haptics
+                const backspaceInterval = setInterval(() => {
+                  if (backspaceIndex > 0) {
+                    setCurrentText(message.meanText!.substring(0, backspaceIndex - 1));
+                    
+                    // Haptics while backspacing (every 3rd for balance)
+                    if (backspaceIndex % 3 === 0) {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }
+                    
+                    backspaceIndex--;
                 } else {
                   // Start typing nice text
                   clearInterval(backspaceInterval);
@@ -258,9 +266,17 @@ export default function BattlingBotsModal({
                     if (niceCharIndex < message.niceText!.length) {
                       setCurrentText(message.niceText!.substring(0, niceCharIndex + 1));
                       
-                      // Subtle haptic every 3-4 characters
-                      if (niceCharIndex % 4 === 0) {
-                        Haptics.selectionAsync();
+                      // Natural typing haptics for nice text
+                      const char = message.niceText![niceCharIndex];
+                      const isPunctuation = /[.,!?;:]/.test(char);
+                      const isSpace = char === ' ';
+                      
+                      if (!isSpace) {
+                        if (isPunctuation) {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        } else if (niceCharIndex % 3 === 0) {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
                       }
                       
                       niceCharIndex++;
@@ -302,9 +318,17 @@ export default function BattlingBotsModal({
         if (charIndex < textToType.length) {
           setCurrentText(textToType.substring(0, charIndex + 1));
           
-          // Subtle haptic every 3-4 characters while typing
-          if (charIndex % 4 === 0) {
-            Haptics.selectionAsync();
+          // Natural typing haptics - varied intensity
+          const char = textToType[charIndex];
+          const isPunctuation = /[.,!?;:]/.test(char);
+          const isSpace = char === ' ';
+          
+          if (!isSpace) {
+            if (isPunctuation) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            } else if (charIndex % 3 === 0) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
           }
           
           charIndex++;
