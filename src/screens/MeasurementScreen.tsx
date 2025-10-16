@@ -85,6 +85,9 @@ export default function MeasurementScreen() {
   
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
+  const [autoCaptureEnabled, setAutoCaptureEnabled] = useState(false); // User must tap to enable
+  const [showAutoCaptureButton, setShowAutoCaptureButton] = useState(true); // Show button initially
+  const autoCaptureButtonOpacity = useSharedValue(1); // For fade animation
   const [tiltAngle, setTiltAngle] = useState(0);
   const [isStable, setIsStable] = useState(false);
   const [alignmentStatus, setAlignmentStatus] = useState<'good' | 'warning' | 'bad'>('bad');
@@ -574,8 +577,9 @@ export default function MeasurementScreen() {
           const minAngle = Math.min(...recentAngles.current);
           const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // Motion stability: Relax from 0.1 to 0.25 after 10 seconds
-          const motionThreshold = isAccessibilityMode ? 0.25 : 0.1;
+          // Motion stability: More relaxed thresholds - allow small natural hand movements
+          // 0.2 = normal baseline, 0.35 = accessibility mode (was 0.1 and 0.25 - too strict)
+          const motionThreshold = isAccessibilityMode ? 0.35 : 0.2;
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
           const motionStable = (maxAccel - minAccel) <= motionThreshold;
@@ -644,19 +648,19 @@ export default function MeasurementScreen() {
 
   // Auto-capture when conditions are met (no button needed!)
   useEffect(() => {
-    if (mode !== 'camera' || isCapturing) return;
+    if (mode !== 'camera' || isCapturing || !autoCaptureEnabled) return;
 
     if (alignmentStatus === 'good' && isStable) {
       // Add small delay to ensure camera is fully mounted before taking picture
       const timer = setTimeout(() => {
-        if (mode === 'camera' && !isCapturing && cameraRef.current) {
+        if (mode === 'camera' && !isCapturing && cameraRef.current && autoCaptureEnabled) {
           takePicture();
         }
       }, 100);
       
       return () => clearTimeout(timer);
     }
-  }, [mode, alignmentStatus, isStable, isCapturing]);
+  }, [mode, alignmentStatus, isStable, isCapturing, autoCaptureEnabled]);
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
@@ -764,6 +768,10 @@ export default function MeasurementScreen() {
     shadowColor: '#9CA3AF',
     shadowOpacity: 0.5 + (crosshairGlow.value * 0.4),
     shadowRadius: 4 + (crosshairGlow.value * 6),
+  }));
+  
+  const autoCaptureButtonStyle = useAnimatedStyle(() => ({
+    opacity: autoCaptureButtonOpacity.value,
   }));
 
   // Restore session on mount if there's a persisted image
@@ -1095,7 +1103,7 @@ export default function MeasurementScreen() {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                   <Pressable
                     onPress={() => {
                       __DEV__ && console.log('🔵 Help button pressed in camera screen');
@@ -1111,7 +1119,7 @@ export default function MeasurementScreen() {
                       setFlashEnabled(!flashEnabled);
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center', marginLeft: 8 }}
+                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Ionicons 
                       name={flashEnabled ? "flash" : "flash-off"} 
@@ -1237,6 +1245,65 @@ export default function MeasurementScreen() {
                 paddingBottom: insets.bottom + 32 
               }}
             >
+              {/* Auto-Capture Button - Big and transparent */}
+              {showAutoCaptureButton && !autoCaptureEnabled && (
+                <Animated.View
+                  style={[
+                    {
+                      position: 'absolute',
+                      left: 24,
+                      right: 24,
+                      bottom: 80,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    },
+                    autoCaptureButtonStyle,
+                  ]}
+                >
+                  <Pressable
+                    onPress={() => {
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      setAutoCaptureEnabled(true);
+                      
+                      // Fade out button after 2.5 seconds
+                      setTimeout(() => {
+                        autoCaptureButtonOpacity.value = withTiming(0, { duration: 800 });
+                        setTimeout(() => setShowAutoCaptureButton(false), 800);
+                      }, 2500);
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed 
+                        ? 'rgba(255, 255, 255, 0.25)' 
+                        : 'rgba(255, 255, 255, 0.15)',
+                      paddingVertical: 20,
+                      paddingHorizontal: 32,
+                      borderRadius: 16,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255, 255, 255, 0.4)',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 12,
+                    })}
+                  >
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontSize: 20,
+                        fontWeight: '700',
+                        textAlign: 'center',
+                        letterSpacing: 0.5,
+                        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                        textShadowOffset: { width: 0, height: 2 },
+                        textShadowRadius: 4,
+                      }}
+                    >
+                      Tap to Begin Auto Capture
+                    </Text>
+                  </Pressable>
+                </Animated.View>
+              )}
+              
               <View style={{ alignItems: 'center' }}>
                 {/* Photo Library Button */}
                 <Pressable
