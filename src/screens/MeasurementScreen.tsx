@@ -741,6 +741,19 @@ export default function MeasurementScreen() {
   const cameraFlashStyle = useAnimatedStyle(() => ({
     opacity: cameraFlashOpacity.value,
   }));
+  
+  const zoomSelectorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: zoomSelectorOpacity.value,
+  }));
+  
+  const zoomTextAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: zoomTextOpacity.value,
+  }));
+  
+  const specialOfferAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: specialOfferTranslateY.value }],
+    opacity: specialOfferOpacity.value,
+  }));
 
   if (!permission) {
     return (
@@ -1234,9 +1247,7 @@ export default function MeasurementScreen() {
                           gap: 12,
                           alignItems: 'center',
                         },
-                        useAnimatedStyle(() => ({
-                          opacity: zoomSelectorOpacity.value,
-                        })),
+                        zoomSelectorAnimatedStyle,
                       ]}
                     >
                       {availableZoomLevels.map((zoom) => (
@@ -1328,9 +1339,7 @@ export default function MeasurementScreen() {
                         borderRadius: 12,
                         maxWidth: SCREEN_WIDTH - 180,
                       },
-                      useAnimatedStyle(() => ({
-                        opacity: zoomTextOpacity.value,
-                      })),
+                      zoomTextAnimatedStyle,
                     ]}
                     pointerEvents="none"
                   >
@@ -1574,13 +1583,8 @@ export default function MeasurementScreen() {
               left: 20,
               right: 20,
               zIndex: 100000,
-              transform: [{ translateY: specialOfferTranslateY.value }],
-              opacity: specialOfferOpacity.value,
             },
-            useAnimatedStyle(() => ({
-              transform: [{ translateY: specialOfferTranslateY.value }],
-              opacity: specialOfferOpacity.value,
-            })),
+            specialOfferAnimatedStyle,
           ]}
         >
           <Pressable
