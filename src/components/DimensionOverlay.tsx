@@ -530,18 +530,18 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     let currentIndex = 0;
-    const typingSpeed = 45; // Slower for readability with haptics (was 30)
+    const typingSpeed = 60; // Even slower for haptics to register (was 45, originally 30)
     
-    // Light haptic on start
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Medium haptic on start (more noticeable)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // Light haptic every 3 characters (more noticeable than selectionAsync)
-        if (currentIndex % 3 === 0 && currentIndex > 0) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        // Medium haptic every 5 characters (stronger and less frequent)
+        if (currentIndex % 5 === 0 && currentIndex > 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }
         
         currentIndex++;
