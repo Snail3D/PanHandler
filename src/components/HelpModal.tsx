@@ -2170,19 +2170,15 @@ Thank you for helping us improve PanHandler!
                           setIsProUser(newProStatus);
                           setEggTapCount(0);
                           
-                          // Close help modal first to avoid modal stacking issues
+                          // Close help modal immediately
                           onClose();
                           
-                          // Show alert after a brief delay
-                          setTimeout(() => {
-                            if (newProStatus) {
-                              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                              showAlert('🎉 Easter Egg Found!', 'Pro features unlocked for testing!', 'success');
-                            } else {
-                              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                              showAlert('🥚 Back to Free', 'Pro features locked again.', 'info');
-                            }
-                          }, 300);
+                          // Just haptic feedback, no alert modal (prevents stacking issues)
+                          if (newProStatus) {
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                          } else {
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                          }
                         } else if (newCount >= 3) {
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         } else {
