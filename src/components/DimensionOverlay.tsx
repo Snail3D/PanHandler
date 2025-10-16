@@ -1644,6 +1644,8 @@ export default function DimensionOverlay({
     return {
       transform: [{ scale: hintScale.value }],
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
+      borderRadius: 28, // Match the BlurView radius for smooth corners
+      overflow: 'hidden', // Ensure children respect the rounded corners
     };
   });
   
@@ -5738,7 +5740,7 @@ export default function DimensionOverlay({
         </BlurView>
       </Modal>
 
-      {/* Help Button - Positioned next to Calibrated badge */}
+      {/* Help Button - Positioned next to AUTO LEVEL badge */}
       {coinCircle && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => setShowHelpModal(true)}
@@ -5750,11 +5752,11 @@ export default function DimensionOverlay({
           }}
           style={{
             position: 'absolute',
-            zIndex: 20,
-            top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
-            right: isMapMode 
-              ? 200  // Position left of badge when in map mode (badge is wider)
-              : 130, // Position left of badge in normal mode
+            zIndex: 30, // Same as AUTO LEVEL badge
+            top: insets.top + 16, // Same vertical position as AUTO LEVEL
+            right: isAutoCaptured 
+              ? 130  // Position left of AUTO LEVEL badge when it's visible
+              : 16,  // Position in top right when AUTO LEVEL is hidden
             backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
             width: 30,
             height: 30,
