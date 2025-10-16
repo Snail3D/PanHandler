@@ -1,6 +1,6 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
@@ -2192,6 +2192,181 @@ export default function DimensionOverlay({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
+  // Memoize measurement rendering to prevent re-calculating SVG on every state change
+  const renderedMeasurements = useMemo(() => {
+    if (hideMeasurementsForCapture) return null;
+    
+    return measurements.map((measurement, idx) => {
+      const color = getMeasurementColor(idx, measurement.mode);
+      
+      if (measurement.mode === 'distance') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Outer glow layers */}
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            {/* Main line */}
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            {/* End caps */}
+            <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
+            <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
+            {/* Point markers with reduced glow (50%) */}
+            {/* P0 glow layers */}
+            <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P1 glow layers */}
+            <Circle cx={p1.x} cy={p1.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'angle') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+        
+        // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
+        // In normal mode, draw from p1 (vertex) to p0 and p2
+        const vertex = isMapMode ? p0 : p1;
+        const arm1 = isMapMode ? p1 : p0;
+        const arm2 = isMapMode ? p2 : p2;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            {/* Main lines */}
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
+            {/* Point markers with reduced glow (50%) */}
+            {/* P0 glow layers */}
+            <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P1 (vertex in normal mode, north ref in map mode) */}
+            <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
+            <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P2 glow layers */}
+            <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p2.x} cy={p2.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'circle') {
+        const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const screenRadius = Math.sqrt(
+          Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+        );
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+            {/* Main circle */}
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
+            {/* Center marker with reduced glow (50%) */}
+            <Circle cx={center.x} cy={center.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={center.x} cy={center.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={center.x} cy={center.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={center.x} cy={center.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'rectangle') {
+        // Get all 4 corners
+        const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Calculate bounding box for rectangle rendering
+        const xCoords = corners.map(c => c.x);
+        const yCoords = corners.map(c => c.y);
+        const minX = Math.min(...xCoords);
+        const maxX = Math.max(...xCoords);
+        const minY = Math.min(...yCoords);
+        const maxY = Math.max(...yCoords);
+        const width = maxX - minX;
+        const height = maxY - minY;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+            {/* Main rectangle */}
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
+            {/* Corner markers - all 4 corners with reduced glow (50%) */}
+            {corners.map((corner, cornerIdx) => (
+              <React.Fragment key={`corner-${cornerIdx}`}>
+                <Circle cx={corner.x} cy={corner.y} r="6" fill={color.glow} opacity="0.05" />
+                <Circle cx={corner.x} cy={corner.y} r="5" fill={color.glow} opacity="0.075" />
+                <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} opacity="0.05" />
+                <Circle cx={corner.x} cy={corner.y} r="3" fill={color.main} opacity="0.1" />
+                <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+              </React.Fragment>
+            ))}
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'freehand') {
+        // Render freehand path
+        if (measurement.points.length < 2) return null;
+        
+        // Convert all points to screen coordinates
+        const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Generate simple polyline that exactly follows the drawn path
+        // This prevents morphing issues from Bezier curve interpolation
+        let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+        for (let i = 1; i < screenPoints.length; i++) {
+          pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
+        }
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers for freehand path */}
+            <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Main freehand path */}
+            <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Start and end point markers with reduced glow (50%) */}
+            {/* Start point */}
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+            {/* End point */}
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      }
+      return null;
+    });
+  }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isMapMode]);
+
   return (
     <>
       {/* Persistent "Calibration Locked" indicator */}
@@ -2319,8 +2494,7 @@ export default function DimensionOverlay({
       )}
 
       {/* Touch overlay - only active in measurement mode */}
-      {/* TEMP DISABLED: Testing if touch responders cause freeze */}
-      {false && measurementMode && (
+      {measurementMode && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}
@@ -2934,8 +3108,7 @@ export default function DimensionOverlay({
       )}
 
       {/* Tap detection overlay for selecting/deleting measurements - always active when not in measurement mode */}
-      {/* TEMP DISABLED: Testing if touch responders cause freeze */}
-      {false && !measurementMode && measurements.length > 0 && (
+      {!measurementMode && measurements.length > 0 && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}
@@ -3736,175 +3909,7 @@ export default function DimensionOverlay({
             })()}
 
             {/* Draw completed measurements */}
-            {!hideMeasurementsForCapture && measurements.map((measurement, idx) => {
-              const color = getMeasurementColor(idx, measurement.mode);
-              
-              if (measurement.mode === 'distance') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Outer glow layers */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    {/* Main line */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    {/* End caps */}
-                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
-                    {/* Point markers with reduced glow (50%) */}
-                    {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P1 glow layers */}
-                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'angle') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
-                
-                // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
-                // In normal mode, draw from p1 (vertex) to p0 and p2
-                const vertex = isMapMode ? p0 : p1;
-                const arm1 = isMapMode ? p1 : p0;
-                const arm2 = isMapMode ? p2 : p2;
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    {/* Main lines */}
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
-                    {/* Point markers with reduced glow (50%) */}
-                    {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P1 (vertex in normal mode, north ref in map mode) */}
-                    <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P2 glow layers */}
-                    <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p2.x} cy={p2.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'circle') {
-                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                const screenRadius = Math.sqrt(
-                  Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
-                );
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
-                    {/* Main circle */}
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Center marker with reduced glow (50%) */}
-                    <Circle cx={center.x} cy={center.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={center.x} cy={center.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={center.x} cy={center.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'rectangle') {
-                // Get all 4 corners
-                const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
-                
-                // Calculate bounding box for rectangle rendering
-                const xCoords = corners.map(c => c.x);
-                const yCoords = corners.map(c => c.y);
-                const minX = Math.min(...xCoords);
-                const maxX = Math.max(...xCoords);
-                const minY = Math.min(...yCoords);
-                const maxY = Math.max(...yCoords);
-                const width = maxX - minX;
-                const height = maxY - minY;
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
-                    {/* Main rectangle */}
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Corner markers - all 4 corners with reduced glow (50%) */}
-                    {corners.map((corner, cornerIdx) => (
-                      <React.Fragment key={`corner-${cornerIdx}`}>
-                        <Circle cx={corner.x} cy={corner.y} r="6" fill={color.glow} opacity="0.05" />
-                        <Circle cx={corner.x} cy={corner.y} r="5" fill={color.glow} opacity="0.075" />
-                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} opacity="0.05" />
-                        <Circle cx={corner.x} cy={corner.y} r="3" fill={color.main} opacity="0.1" />
-                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'freehand') {
-                // Render freehand path
-                if (measurement.points.length < 2) return null;
-                
-                // Convert all points to screen coordinates
-                const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
-                
-                // Generate simple polyline that exactly follows the drawn path
-                // This prevents morphing issues from Bezier curve interpolation
-                let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
-                for (let i = 1; i < screenPoints.length; i++) {
-                  pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
-                }
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers for freehand path */}
-                    <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    {/* Main freehand path */}
-                    <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    {/* Start and end point markers with reduced glow (50%) */}
-                    {/* Start point */}
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* End point */}
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              }
-              return null;
-            })}
+            {renderedMeasurements}
 
             {/* Draw live freehand path preview while drawing */}
             {mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1 && (() => {
