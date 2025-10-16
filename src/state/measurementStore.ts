@@ -34,6 +34,7 @@ export interface CompletedMeasurement {
   area?: number; // For closed non-intersecting freehand loops (lasso mode)
   isClosed?: boolean; // For freehand - indicates if it's a closed loop
   perimeter?: string; // For closed freehand loops - just the perimeter for inline display
+  label?: string | null; // Optional text label for the measurement
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
