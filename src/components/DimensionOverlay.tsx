@@ -2174,6 +2174,30 @@ export default function DimensionOverlay({
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
     });
   
+  // Quick swipe gesture to collapse/expand menu
+  const menuSwipeGesture = Gesture.Pan()
+    .minDistance(15) // Require 15px movement before activating
+    .maxPointers(1) // Only single finger
+    .onEnd((event) => {
+      // Detect horizontal swipe with velocity threshold
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 1.5;
+      const threshold = SCREEN_WIDTH * 0.15; // 15% of screen width
+      const velocityThreshold = 500; // Fast swipe = 500 units/sec
+      
+      // Quick swipe to the right to collapse menu
+      if (isHorizontal && 
+          (event.translationX > threshold || event.velocityX > velocityThreshold) &&
+          !menuHidden) {
+        runOnJS(collapseMenu)();
+      }
+      // Quick swipe to the left to open menu (when hidden)
+      else if (isHorizontal && 
+               (event.translationX < -threshold || event.velocityX < -velocityThreshold) &&
+               menuHidden) {
+        runOnJS(toggleMenuFromTab)();
+      }
+    });
+  
   const toggleMenuFromTab = () => {
     if (menuHidden) {
       menuTranslateX.value = withSpring(0);
@@ -4637,6 +4661,7 @@ export default function DimensionOverlay({
 
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
+        <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
             pointerEvents="auto"
             style={[
@@ -5429,6 +5454,7 @@ export default function DimensionOverlay({
         </View>
         </BlurView>
           </Animated.View>
+        </GestureDetector>
       )}
       
       {/* Pro Upgrade Modal */}
