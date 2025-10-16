@@ -5,6 +5,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import * as MailComposer from 'expo-mail-composer';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { captureRef } from 'react-native-view-shot';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
@@ -291,6 +292,24 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
         osVersion: Device.osVersion || 'Unknown',
       };
       
+      // Get app info
+      const appVersion = Constants.expoConfig?.version || 'Unknown';
+      const appName = Constants.expoConfig?.name || 'PanHandler';
+      
+      // Get session info from store
+      const currentImageUri = useStore.getState().currentImageUri;
+      const calibration = useStore.getState().calibration;
+      const measurements = useStore.getState().completedMeasurements;
+      const isProUser = useStore.getState().isProUser;
+      
+      // Build session activity log
+      const sessionLog = [
+        currentImageUri ? '✓ Photo captured' : '✗ No photo',
+        calibration ? `✓ Calibrated (${calibration.calibrationType || 'unknown'} method)` : '✗ Not calibrated',
+        measurements?.length > 0 ? `✓ ${measurements.length} measurement(s) made` : '✗ No measurements',
+        `User type: ${isProUser ? 'Pro' : 'Free'}`,
+      ].join(' → ');
+      
       // Capture screenshot of modal (optional - try but don't block on failure)
       let screenshotUri: string | undefined;
       try {
@@ -316,9 +335,16 @@ ISSUE DESCRIPTION:
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DEVICE INFORMATION:
-Phone Type: ${deviceInfo.brand} ${deviceInfo.model}
-Operating System: ${deviceInfo.osName} ${deviceInfo.osVersion}
+DEVICE & APP INFORMATION:
+App: ${appName} v${appVersion}
+Phone: ${deviceInfo.brand} ${deviceInfo.model}
+OS: ${deviceInfo.osName} ${deviceInfo.osVersion}
+Platform: ${Platform.OS} ${Platform.Version}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SESSION ACTIVITY:
+Last Screen: Help Modal
+Session Flow: ${sessionLog}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Please attach any relevant screenshots if helpful.
@@ -341,7 +367,7 @@ Thank you for helping us improve PanHandler!
       // Compose email with pre-populated fields
       const options: MailComposer.MailComposerOptions = {
         recipients: ['mount3d.llc@gmail.com'],
-        subject: '[PanHandler Support] Help Request',
+        subject: `[PanHandler ${appVersion}] Support Request`,
         body: emailBody,
         isHtml: false,
       };
