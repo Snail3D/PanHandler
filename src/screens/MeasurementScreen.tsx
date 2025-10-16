@@ -1255,6 +1255,67 @@ export default function MeasurementScreen() {
               />
             </Animated.View>
 
+            {/* Auto-Capture Button - Positioned close to crosshairs for visibility */}
+            {showAutoCaptureButton && !autoCaptureEnabled && (
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    left: 24,
+                    right: 24,
+                    top: '50%',
+                    marginTop: 100, // Just below the crosshairs
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 15,
+                  },
+                  autoCaptureButtonStyle,
+                ]}
+              >
+                <Pressable
+                  onPress={() => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    setAutoCaptureEnabled(true);
+                    
+                    // Fade out button after 2.5 seconds
+                    setTimeout(() => {
+                      autoCaptureButtonOpacity.value = withTiming(0, { duration: 800 });
+                      setTimeout(() => setShowAutoCaptureButton(false), 800);
+                    }, 2500);
+                  }}
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed 
+                      ? 'rgba(255, 255, 255, 0.25)' 
+                      : 'rgba(255, 255, 255, 0.15)',
+                    paddingVertical: 20,
+                    paddingHorizontal: 32,
+                    borderRadius: 16,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 12,
+                  })}
+                >
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 20,
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      letterSpacing: 0.5,
+                      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 4,
+                    }}
+                  >
+                    Tap to Begin Auto Capture
+                  </Text>
+                </Pressable>
+              </Animated.View>
+            )}
+
             {/* Bottom controls */}
             <View 
               style={{ 
@@ -1266,65 +1327,6 @@ export default function MeasurementScreen() {
                 paddingBottom: insets.bottom + 32 
               }}
             >
-              {/* Auto-Capture Button - Big and transparent */}
-              {showAutoCaptureButton && !autoCaptureEnabled && (
-                <Animated.View
-                  style={[
-                    {
-                      position: 'absolute',
-                      left: 24,
-                      right: 24,
-                      bottom: 80,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    },
-                    autoCaptureButtonStyle,
-                  ]}
-                >
-                  <Pressable
-                    onPress={() => {
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      setAutoCaptureEnabled(true);
-                      
-                      // Fade out button after 2.5 seconds
-                      setTimeout(() => {
-                        autoCaptureButtonOpacity.value = withTiming(0, { duration: 800 });
-                        setTimeout(() => setShowAutoCaptureButton(false), 800);
-                      }, 2500);
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed 
-                        ? 'rgba(255, 255, 255, 0.25)' 
-                        : 'rgba(255, 255, 255, 0.15)',
-                      paddingVertical: 20,
-                      paddingHorizontal: 32,
-                      borderRadius: 16,
-                      borderWidth: 2,
-                      borderColor: 'rgba(255, 255, 255, 0.4)',
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 12,
-                    })}
-                  >
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontSize: 20,
-                        fontWeight: '700',
-                        textAlign: 'center',
-                        letterSpacing: 0.5,
-                        textShadowColor: 'rgba(0, 0, 0, 0.5)',
-                        textShadowOffset: { width: 0, height: 2 },
-                        textShadowRadius: 4,
-                      }}
-                    >
-                      Tap to Begin Auto Capture
-                    </Text>
-                  </Pressable>
-                </Animated.View>
-              )}
-              
               <View style={{ alignItems: 'center' }}>
                 {/* Photo Library Button */}
                 <Pressable
