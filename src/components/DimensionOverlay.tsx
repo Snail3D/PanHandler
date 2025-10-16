@@ -897,8 +897,8 @@ export default function DimensionOverlay({
       return distance < 80 && a.type === newMeasurement.mode;
     });
     
-    // Check threshold (distance = 2, others = 3)
-    const threshold = newMeasurement.mode === 'distance' ? 1 : 2; // -1 because we count the new one
+    // Check threshold (distance = 4, others = 5) - less sensitive to avoid false positives
+    const threshold = newMeasurement.mode === 'distance' ? 3 : 4; // -1 because we count the new one
     
     if (nearbyAttempts.length >= threshold) {
       // Trigger hint!
@@ -6410,7 +6410,7 @@ export default function DimensionOverlay({
               bottom: 0,
             }}
           />
-          <Animated.View style={hintCardStyle}>
+          <Animated.View style={hintCardStyle} pointerEvents="none">
             <BlurView
               intensity={100}
               tint="light"
