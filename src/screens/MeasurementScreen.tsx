@@ -573,19 +573,18 @@ export default function MeasurementScreen() {
         
         // Check BOTH angle stability AND motion stability
         // Accessibility: After 10 seconds of holding, loosen requirements for Parkinson's/tremor support
-        if (recentAngles.current.length >= 5 && recentAccelerations.current.length >= 5) {
+        if (recentAngles.current.length >= 3 && recentAccelerations.current.length >= 3) {
           const holdDuration = holdStartTime.current > 0 ? (Date.now() - holdStartTime.current) / 1000 : 0;
           const isAccessibilityMode = holdDuration > 10; // After 10 seconds, be more forgiving
           
-          // Angle stability: Relax from 2° to 5° after 10 seconds
-          const angleThreshold = isAccessibilityMode ? 5 : 2;
+          // Angle stability: Much more relaxed - 5° is plenty good enough
+          const angleThreshold = isAccessibilityMode ? 8 : 5;
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
           const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // Motion stability: More relaxed thresholds - allow small natural hand movements
-          // 0.2 = normal baseline, 0.35 = accessibility mode (was 0.1 and 0.25 - too strict)
-          const motionThreshold = isAccessibilityMode ? 0.35 : 0.2;
+          // Motion stability: Much more forgiving - allow natural hand movements
+          const motionThreshold = isAccessibilityMode ? 0.6 : 0.4;
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
           const motionStable = (maxAccel - minAccel) <= motionThreshold;
@@ -601,13 +600,13 @@ export default function MeasurementScreen() {
         let status: 'good' | 'warning' | 'bad';
         if (isAccessibilityMode) {
           // More forgiving thresholds for accessibility
-          if (absTilt <= 5) status = 'good';      // Relaxed from 2°
-          else if (absTilt <= 15) status = 'warning';  // Relaxed from 10°
+          if (absTilt <= 8) status = 'good';      // Very relaxed
+          else if (absTilt <= 20) status = 'warning';
           else status = 'bad';
         } else {
-          // Standard strict tolerance
-          if (absTilt <= 2) status = 'good';
-          else if (absTilt <= 10) status = 'warning';
+          // Much more relaxed standard tolerance - captures sooner
+          if (absTilt <= 5) status = 'good';      // Was 2° - now 5°
+          else if (absTilt <= 15) status = 'warning';  // Was 10° - now 15°
           else status = 'bad';
         }
 
