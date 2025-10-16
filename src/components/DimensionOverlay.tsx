@@ -371,12 +371,10 @@ export default function DimensionOverlay({
   // Easter egg states
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
-  const [rightCornerTapCount, setRightCornerTapCount] = useState(0);
   const [showCalculatorWords, setShowCalculatorWords] = useState(false);
   const [stepBrothersMode, setStepBrothersMode] = useState(false); // Step Brothers Easter egg!
   const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const rightCornerTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Undo long-press state
   const undoIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -757,38 +755,6 @@ export default function DimensionOverlay({
         }
       });
     }, 3000);
-  };
-  
-  // Easter egg: Right corner tap handler - TOGGLE PRO/FREE FOR TESTING
-  const handleRightCornerTap = () => {
-    // Clear existing timeout
-    if (rightCornerTapTimeoutRef.current) {
-      clearTimeout(rightCornerTapTimeoutRef.current);
-    }
-    
-    const newCount = rightCornerTapCount + 1;
-    setRightCornerTapCount(newCount);
-    
-    if (newCount >= 5) {
-      // Toggle Pro/Free status
-      const newProStatus = !isProUser;
-      setIsProUser(newProStatus);
-      
-      // Haptic feedback
-      Haptics.notificationAsync(
-        newProStatus 
-          ? Haptics.NotificationFeedbackType.Success 
-          : Haptics.NotificationFeedbackType.Warning
-      );
-      
-      console.log(`🔧 TEST MODE: Toggled to ${newProStatus ? 'PRO' : 'FREE'} user`);
-      setRightCornerTapCount(0);
-    } else {
-      // Reset counter after 2 seconds of no taps
-      rightCornerTapTimeoutRef.current = setTimeout(() => {
-        setRightCornerTapCount(0);
-      }, 2000);
-    }
   };
   
   // Get color for measurement based on index
@@ -5127,20 +5093,6 @@ export default function DimensionOverlay({
           </Text>
         </Pressable>
       )}
-
-      {/* SECRET: Right corner tap area for testing Pro/Free toggle (5 taps) */}
-      <Pressable
-        onPress={handleRightCornerTap}
-        style={{
-          position: 'absolute',
-          top: insets.top,
-          right: 0,
-          width: 60,
-          height: 60,
-          backgroundColor: 'transparent', // Invisible
-          zIndex: 9999,
-        }}
-      />
 
       {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
