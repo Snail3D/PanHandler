@@ -336,13 +336,12 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVerticalMode) {
-          // VERTICAL MODE: Both X and Y movement based on gamma (left/right) and tilt from vertical
-          // When phone is vertical, gamma controls left-right, beta controls forward-back
-          const gammaOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt
+          // VERTICAL MODE: Only Y movement (up/down tilt)
+          // X is locked to center
           const verticalTilt = beta - 90; // How far from true vertical (90°) - SIGNED for negative values
           const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // ±15° = max offset
           
-          bubbleX.value = withSpring(gammaOffset, { damping: 20, stiffness: 180, mass: 0.8 }); // Allow X movement via gamma
+          bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
         } else {
           // HORIZONTAL MODE: Both X and Y movement
@@ -536,34 +535,34 @@ export default function MeasurementScreen() {
     transform: [{ scale: guidanceScale.value }],
   }));
   
-  // Animated styles for bubble level crosshairs - solid session color with glow
+  // Animated styles for bubble level crosshairs - simple gray with subtle glow
   const crosshairHorizontalStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairColor.main,
-    shadowColor: crosshairColor.glow,
-    shadowOpacity: 0.6 + (crosshairGlow.value * 0.4), // Base glow + extra when centered
-    shadowRadius: 8 + (crosshairGlow.value * 8), // 8-16px glow radius
+    backgroundColor: 'rgba(156, 163, 175, 0.9)', // Gray-400
+    shadowColor: '#9CA3AF',
+    shadowOpacity: 0.5 + (crosshairGlow.value * 0.3),
+    shadowRadius: 6 + (crosshairGlow.value * 6),
   }));
   
   const crosshairVerticalStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairColor.main,
-    shadowColor: crosshairColor.glow,
-    shadowOpacity: 0.6 + (crosshairGlow.value * 0.4),
-    shadowRadius: 8 + (crosshairGlow.value * 8),
+    backgroundColor: 'rgba(156, 163, 175, 0.9)', // Gray-400
+    shadowColor: '#9CA3AF',
+    shadowOpacity: 0.5 + (crosshairGlow.value * 0.3),
+    shadowRadius: 6 + (crosshairGlow.value * 6),
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: bubbleX.value + 60 - 10 }, // Center in 120px container with 20px bubble
-      { translateY: bubbleY.value + 60 - 10 },
+      { translateX: bubbleX.value + 60 - 12 }, // Center in 120px container with 24px bubble
+      { translateY: bubbleY.value + 60 - 12 },
     ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairColor.main,
+    backgroundColor: 'rgba(156, 163, 175, 0.9)', // Gray-400
     transform: [{ scale: 1 + (crosshairGlow.value * 0.5) }],
-    shadowColor: crosshairColor.glow,
-    shadowOpacity: 0.5 + (crosshairGlow.value * 0.5),
-    shadowRadius: 4 + (crosshairGlow.value * 8),
+    shadowColor: '#9CA3AF',
+    shadowOpacity: 0.5 + (crosshairGlow.value * 0.4),
+    shadowRadius: 4 + (crosshairGlow.value * 6),
   }));
 
   // Restore session on mount if there's a persisted image
@@ -956,79 +955,148 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Smoke trail particles - more ethereal and smoky */}
+              {/* Cosmic smoke trail with particles */}
               {trailPositions.current.map((pos, index) => {
-                const progress = (index + 1) / trailPositions.current.length; // 0 (oldest) to 1 (newest)
-                const opacity = progress * progress; // Quadratic fade for smoother dissipation
-                const scale = 0.3 + (progress * 0.7); // Start tiny, grow as it gets newer
-                const blur = (1 - progress) * 8; // Older particles are blurrier (more diffuse)
+                const progress = (index + 1) / trailPositions.current.length;
+                const opacity = progress * progress; // Quadratic fade
+                const scale = 0.4 + (progress * 0.6);
                 
                 return (
-                  <View
-                    key={`trail-${index}`}
-                    style={{
-                      position: 'absolute',
-                      top: 60 + pos.y - 4 * scale, // Adjust for 120px container
-                      left: 60 + pos.x - 4 * scale,
-                      width: 8 * scale, // Slightly larger base size
-                      height: 8 * scale,
-                      borderRadius: 4 * scale,
-                      backgroundColor: bubbleColor.glow,
-                      opacity: opacity * 0.4, // More subtle base opacity
-                      shadowColor: bubbleColor.glow,
-                      shadowOpacity: opacity * 0.6, // Fade shadow with opacity
-                      shadowRadius: 8 + blur, // Dynamic blur effect
-                    }}
-                  />
+                  <React.Fragment key={`trail-${index}`}>
+                    {/* Main smoke wisp */}
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: 60 + pos.y - 6 * scale,
+                        left: 60 + pos.x - 6 * scale,
+                        width: 12 * scale,
+                        height: 12 * scale,
+                        borderRadius: 6 * scale,
+                        backgroundColor: bubbleColor.glow,
+                        opacity: opacity * 0.3,
+                        shadowColor: bubbleColor.glow,
+                        shadowOpacity: opacity * 0.6,
+                        shadowRadius: 12,
+                      }}
+                    />
+                    {/* Sparkle particles around trail */}
+                    {index % 2 === 0 && (
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: 60 + pos.y + Math.sin(index) * 8,
+                          left: 60 + pos.x + Math.cos(index) * 8,
+                          width: 3,
+                          height: 3,
+                          borderRadius: 1.5,
+                          backgroundColor: '#FFFFFF',
+                          opacity: opacity * 0.6,
+                          shadowColor: bubbleColor.glow,
+                          shadowOpacity: 0.8,
+                          shadowRadius: 4,
+                        }}
+                      />
+                    )}
+                  </React.Fragment>
                 );
               })}
               
-              {/* Animated bubble - ethereal glowing orb (not pool ball) */}
+              {/* Cosmic energy bubble with nebula interior */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    width: 20, // Slightly bigger for more mystique
-                    height: 20,
-                    borderRadius: 10,
-                    // Semi-transparent base for ethereal look
-                    backgroundColor: bubbleColor.main,
-                    opacity: 0.85, // Slightly transparent to enhance glow effect
-                    // No solid border - makes it look less like a pool ball
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    // Dark cosmic base
+                    backgroundColor: '#1a0a2e',
+                    // Multiple shadow layers for cosmic glow
                     shadowColor: bubbleColor.glow,
                     shadowOffset: { width: 0, height: 0 },
                     shadowOpacity: 1.0,
-                    shadowRadius: 24, // Even larger glow for mystique (was 16)
+                    shadowRadius: 28,
                   },
                   bubbleStyle,
                 ]}
               >
-                {/* Bright core - the "light source" */}
+                {/* Dark nebula interior */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    left: 2,
+                    right: 2,
+                    bottom: 2,
+                    borderRadius: 10,
+                    backgroundColor: bubbleColor.main,
+                    opacity: 0.5,
+                  }}
+                />
+                
+                {/* Electric energy ring 1 */}
                 <View
                   style={{
                     position: 'absolute',
                     top: 4,
-                    left: 5,
-                    width: 10,
-                    height: 10,
-                    borderRadius: 5,
-                    backgroundColor: 'rgba(255, 255, 255, 1.0)', // Pure white center
-                    shadowColor: '#FFFFFF',
+                    left: 4,
+                    right: 4,
+                    bottom: 4,
+                    borderRadius: 8,
+                    borderWidth: 1.5,
+                    borderColor: '#60A5FA',
+                    opacity: 0.8,
+                    shadowColor: '#60A5FA',
                     shadowOpacity: 1.0,
                     shadowRadius: 6,
                   }}
                 />
-                {/* Soft outer aura ring */}
+                
+                {/* Electric energy ring 2 */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: -6,
-                    left: -6,
-                    right: -6,
-                    bottom: -6,
-                    borderRadius: 16,
+                    top: 6,
+                    left: 6,
+                    right: 6,
+                    bottom: 6,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: '#93C5FD',
+                    opacity: 0.6,
+                    shadowColor: '#93C5FD',
+                    shadowOpacity: 0.8,
+                    shadowRadius: 4,
+                  }}
+                />
+                
+                {/* Bright cosmic core */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    left: 8,
+                    width: 8,
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: '#FFFFFF',
+                    shadowColor: '#FFFFFF',
+                    shadowOpacity: 1.0,
+                    shadowRadius: 8,
+                  }}
+                />
+                
+                {/* Outer cosmic aura */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    left: -8,
+                    right: -8,
+                    bottom: -8,
+                    borderRadius: 20,
                     backgroundColor: bubbleColor.glow,
-                    opacity: 0.2, // Very subtle outer glow
+                    opacity: 0.15,
                   }}
                 />
               </Animated.View>
