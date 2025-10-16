@@ -520,6 +520,11 @@ export default function DimensionOverlay({
   }, []); // Only run once on mount
 
   const showQuoteOverlay = () => {
+    // IMMEDIATE haptic to test if this function is even called
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400);
+    
     const quote = getRandomQuote();
     setCurrentQuote(quote);
     setDisplayedText('');
