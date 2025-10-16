@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, ScrollView, Pressable, Linking, Image } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Modal, ScrollView, Pressable, Linking, Image, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import * as MailComposer from 'expo-mail-composer';
+import * as Device from 'expo-device';
+import { captureRef } from 'react-native-view-shot';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -245,6 +248,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const isProUser = useStore((s) => s.isProUser);
   const setIsProUser = useStore((s) => s.setIsProUser);
   
+  // Ref for capturing modal content as screenshot
+  const modalContentRef = useRef<ScrollView>(null);
+  
   // Easter egg: 10-tap on right egg to toggle Pro/Free (only for non-paid users)
   const [eggTapCount, setEggTapCount] = useState(0);
   const [eggLastTapTime, setEggLastTapTime] = useState(0);
@@ -267,6 +273,94 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
   const closeAlert = () => {
     setAlertConfig(prev => ({ ...prev, visible: false }));
+  };
+  
+  // Ref for capturing the modal container as screenshot (wrap ScrollView)
+  const modalContainerRef = useRef<View>(null);
+  
+  // Handle support email with pre-populated template and screenshot
+  const handleSupportEmail = async () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      
+      // Get device info
+      const deviceInfo = {
+        brand: Device.brand || 'Unknown',
+        model: Device.modelName || 'Unknown',
+        osName: Device.osName || 'Unknown',
+        osVersion: Device.osVersion || 'Unknown',
+      };
+      
+      // Capture screenshot of modal (optional - try but don't block on failure)
+      let screenshotUri: string | undefined;
+      try {
+        if (modalContainerRef.current) {
+          screenshotUri = await captureRef(modalContainerRef, {
+            format: 'png',
+            quality: 0.8,
+            result: 'tmpfile',
+          });
+        }
+      } catch (captureError) {
+        console.log('Screenshot capture failed (non-blocking):', captureError);
+        // Continue without screenshot
+      }
+      
+      // Pre-populated email body with template
+      const emailBody = `
+Please describe your issue below:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ISSUE DESCRIPTION:
+[Example: App freezes when I try to measure after calibrating]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DEVICE INFORMATION:
+Phone Type: ${deviceInfo.brand} ${deviceInfo.model}
+Operating System: ${deviceInfo.osName} ${deviceInfo.osVersion}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Please attach any relevant screenshots if helpful.
+
+Thank you for helping us improve PanHandler!
+      `.trim();
+      
+      // Check if mail composer is available
+      const isAvailable = await MailComposer.isAvailableAsync();
+      
+      if (!isAvailable) {
+        showAlert(
+          'Email Not Available',
+          'Please email us directly at mount3d.llc@gmail.com',
+          'info'
+        );
+        return;
+      }
+      
+      // Compose email with pre-populated fields
+      const options: MailComposer.MailComposerOptions = {
+        recipients: ['mount3d.llc@gmail.com'],
+        subject: '[PanHandler Support] Help Request',
+        body: emailBody,
+        isHtml: false,
+      };
+      
+      // Add screenshot as attachment if available
+      if (screenshotUri) {
+        options.attachments = [screenshotUri];
+      }
+      
+      await MailComposer.composeAsync(options);
+      
+    } catch (error) {
+      console.error('Error composing support email:', error);
+      showAlert(
+        'Error',
+        'Could not open email. Please email us at mount3d.llc@gmail.com',
+        'error'
+      );
+    }
   };
 
   // Scroll position for Rolodex effect
@@ -471,7 +565,11 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
 
             {/* Content with glassmorphism background */}
             <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
-              <View style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}>
+              <View 
+                ref={modalContainerRef}
+                collapsable={false}
+                style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}
+              >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
                     style={{ flex: 1 }}
@@ -1761,6 +1859,116 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                       Go to Settings → PanHandler → Enable Camera & Photos
                     </Text>
                   </View>
+                </Animated.View>
+              </View>
+
+              {/* Need Help? Support Section */}
+              <View style={{ marginBottom: 20, marginTop: 12 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(675)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
+                    padding: 20,
+                    shadowColor: '#FF3B30',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 12,
+                    elevation: 4,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 59, 48, 0.2)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                    <View style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(255, 59, 48, 0.15)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: 12,
+                    }}>
+                      <Ionicons name="help-circle" size={24} color="#FF3B30" />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                      Need Help?
+                    </Text>
+                  </View>
+                  
+                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
+                    Having trouble? Our support team is here to help!
+                  </Text>
+                  
+                  <Pressable
+                    onPress={handleSupportEmail}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? '#FF2D1F' : '#FF3B30',
+                      borderRadius: 14,
+                      padding: 16,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowColor: '#FF3B30',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 4,
+                    })}
+                  >
+                    <Ionicons name="mail" size={20} color="white" style={{ marginRight: 8 }} />
+                    <Text style={{ 
+                      fontSize: 16, 
+                      fontWeight: '700', 
+                      color: 'white',
+                      letterSpacing: 0.3,
+                    }}>
+                      Contact Support
+                    </Text>
+                  </Pressable>
+                  
+                  <View style={{
+                    marginTop: 16,
+                    padding: 12,
+                    backgroundColor: 'rgba(255, 59, 48, 0.08)',
+                    borderRadius: 12,
+                    borderLeftWidth: 3,
+                    borderLeftColor: '#FF3B30',
+                  }}>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 8 }}>
+                      <Text style={{ fontWeight: '700' }}>What to include:</Text>
+                    </Text>
+                    <View style={{ gap: 6 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
+                          Description of the issue (e.g., "App freezes after calibration")
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
+                          Your device info (automatically included)
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
+                          Screenshots if helpful (we'll capture one for you!)
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  
+                  <Text style={{ 
+                    fontSize: 12, 
+                    color: 'rgba(0, 0, 0, 0.4)', 
+                    textAlign: 'center',
+                    marginTop: 12,
+                    fontStyle: 'italic',
+                  }}>
+                    We typically respond within 24 hours
+                  </Text>
                 </Animated.View>
               </View>
 
