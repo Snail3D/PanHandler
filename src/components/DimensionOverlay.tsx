@@ -4581,6 +4581,19 @@ export default function DimensionOverlay({
                   screenX = sumX / measurement.points.length;
                   screenY = sumY / measurement.points.length;
                 }
+              } else if (measurement.mode === 'polygon') {
+                // Label at centroid of polygon
+                if (measurement.points && measurement.points.length > 0) {
+                  // Calculate centroid
+                  let sumX = 0, sumY = 0;
+                  measurement.points.forEach(p => {
+                    const screenPoint = imageToScreen(p.x, p.y);
+                    sumX += screenPoint.x;
+                    sumY += screenPoint.y;
+                  });
+                  screenX = sumX / measurement.points.length;
+                  screenY = sumY / measurement.points.length;
+                }
               }
               return { measurement, idx: originalIdx, color, screenX, screenY };
             });
@@ -4659,8 +4672,8 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                    {/* For closed freehand loops, show only perimeter on label (area is in legend) */}
-                    {measurement.mode === 'freehand' && measurement.perimeter
+                    {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
+                    {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
                       ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
                       : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
                     }
@@ -5025,6 +5038,9 @@ export default function DimensionOverlay({
                           const area = measurement.width * measurement.height;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
                           return `${displayValue} (A: ${areaStr})`;
+                        } else if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter && measurement.area !== undefined) {
+                          // Show perimeter and area for closed freehand loops and polygons
+                          return measurement.value; // Already formatted as "perimeter (A: area)"
                         }
                         
                         return displayValue;
