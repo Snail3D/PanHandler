@@ -93,7 +93,7 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(!locked) // Disable when locked (respect locked state)
+    .enabled(true) // Always allow - use pointerEvents to control touch handling
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -112,7 +112,7 @@ export default function ZoomableImage({
     });
   
   const rotationGesture = Gesture.Rotation()
-    .enabled(!locked) // Disable when locked (respect locked state)
+    .enabled(true) // Always allow - use pointerEvents to control touch handling
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       gestureWasActive.value = true;
@@ -231,7 +231,7 @@ export default function ZoomableImage({
     <>
       <View 
         style={StyleSheet.absoluteFill} 
-        pointerEvents={locked ? 'none' : 'auto'}
+        pointerEvents="box-none"
       >
         <GestureDetector gesture={composedGesture}>
           <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
