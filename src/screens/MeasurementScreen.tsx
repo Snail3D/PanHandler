@@ -81,6 +81,7 @@ export default function MeasurementScreen() {
   const [isStable, setIsStable] = useState(false);
   const [alignmentStatus, setAlignmentStatus] = useState<'good' | 'warning' | 'bad'>('bad');
   const recentAngles = useRef<number[]>([]);
+  const recentAccelerations = useRef<number[]>([]); // Track phone motion
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
   const cameraRef = useRef<CameraView>(null);
@@ -263,15 +264,33 @@ export default function MeasurementScreen() {
         
         setTiltAngle(absTilt);
         
-        // Track stability
+        // Track angle stability
         recentAngles.current.push(absTilt);
         if (recentAngles.current.length > 10) recentAngles.current.shift();
         
-        if (recentAngles.current.length >= 5) {
+        // Track motion/acceleration stability
+        if (data.acceleration) {
+          const { x, y, z } = data.acceleration;
+          // Calculate total acceleration magnitude (movement intensity)
+          const totalAcceleration = Math.sqrt(x * x + y * y + z * z);
+          recentAccelerations.current.push(totalAcceleration);
+          if (recentAccelerations.current.length > 10) recentAccelerations.current.shift();
+        }
+        
+        // Check BOTH angle stability AND motion stability
+        if (recentAngles.current.length >= 5 && recentAccelerations.current.length >= 5) {
+          // Angle stability: max 2° variance
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
-          const stable = (maxAngle - minAngle) <= 2;
-          setIsStable(stable);
+          const angleStable = (maxAngle - minAngle) <= 2;
+          
+          // Motion stability: max 0.1 acceleration variance (phone not moving much)
+          const maxAccel = Math.max(...recentAccelerations.current);
+          const minAccel = Math.min(...recentAccelerations.current);
+          const motionStable = (maxAccel - minAccel) <= 0.1;
+          
+          // BOTH must be stable
+          setIsStable(angleStable && motionStable);
         }
 
         // Alignment status (strict 2° tolerance when holding)
