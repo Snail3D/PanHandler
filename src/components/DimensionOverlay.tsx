@@ -361,6 +361,7 @@ export default function DimensionOverlay({
   const [showQuote, setShowQuote] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
   const [displayedText, setDisplayedText] = useState('');
+  const [isQuoteTyping, setIsQuoteTyping] = useState(false);
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   
