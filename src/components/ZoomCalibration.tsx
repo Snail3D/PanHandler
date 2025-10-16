@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Pressable, Dimensions, TextInput, Keyboard, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Svg, Circle, Defs, RadialGradient, Stop, Path } from 'react-native-svg';
+import { Svg, Circle, Defs, RadialGradient, Stop, Path, Rect, Mask } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
@@ -375,15 +375,15 @@ export default function ZoomCalibration({
               </RadialGradient>
               
               {/* Mask to create the clear circle "window" */}
-              <mask id="circleMask">
+              <Mask id="circleMask">
                 {/* White = visible, Black = hidden */}
-                <rect x="0" y="0" width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
-                <circle cx={referenceCenterX} cy={referenceCenterY} r={referenceRadiusPixels} fill="black" />
-              </mask>
+                <Rect x="0" y="0" width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
+                <Circle cx={referenceCenterX} cy={referenceCenterY} r={referenceRadiusPixels} fill="black" />
+              </Mask>
             </Defs>
             
             {/* Glassmorphic overlay OUTSIDE the circle - creates focus */}
-            <rect 
+            <Rect 
               x="0" 
               y="0" 
               width={SCREEN_WIDTH} 
