@@ -1792,7 +1792,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="mail-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email for sending only</Text> — your email address is never shared or sold
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email for sending only</Text> — your email address is never shared with us
                       </Text>
                     </View>
                     
