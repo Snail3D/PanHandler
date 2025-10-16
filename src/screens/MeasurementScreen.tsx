@@ -96,7 +96,7 @@ export default function MeasurementScreen() {
   const [currentBeta, setCurrentBeta] = useState(0);
   const [currentGamma, setCurrentGamma] = useState(0);
   
-  // Bubble level with smoke trail
+  // Bubble level
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
   
@@ -128,9 +128,6 @@ export default function MeasurementScreen() {
   const instructionalTextOpacity = useSharedValue(1);
   const encouragementTextOpacity = useSharedValue(0);
   const reminderTextOpacity = useSharedValue(0);
-  
-  // Trail positions (store last 8 positions for smooth trail)
-  const trailPositions = useRef<Array<{x: number, y: number}>>([]);
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
@@ -508,10 +505,6 @@ export default function MeasurementScreen() {
           bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 180, mass: 0.8 });
           bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 180, mass: 0.8 });
         }
-        
-        // Track bubble trail positions (store current position)
-        trailPositions.current.push({ x: bubbleX.value, y: bubbleY.value });
-        if (trailPositions.current.length > 8) trailPositions.current.shift(); // Keep last 8 positions
         
         // Calculate crosshair glow (0-1) based on how centered the bubble is
         const distanceFromCenter = Math.sqrt(bubbleX.value * bubbleX.value + bubbleY.value * bubbleY.value);
@@ -1115,87 +1108,6 @@ export default function MeasurementScreen() {
                   crosshairVerticalStyle,
                 ]}
               />
-              
-              {/* Cosmic smoke trail - GRAY (professional), 20% smaller */}
-              {trailPositions.current.map((pos, index) => {
-                const progress = (index + 1) / trailPositions.current.length;
-                const opacity = progress * progress * progress;
-                const scale = 0.312 + (progress * 0.832); // 20% smaller
-                const angle = index * 0.5;
-                
-                return (
-                  <React.Fragment key={`trail-${index}`}>
-                    {/* Large wispy smoke cloud - GRAY */}
-                    <View
-                      style={{
-                        position: 'absolute',
-                        top: 60 + pos.y - 10.4 * scale,
-                        left: 60 + pos.x - 10.4 * scale,
-                        width: 20.8 * scale,
-                        height: 20.8 * scale,
-                        borderRadius: 10.4 * scale,
-                        backgroundColor: '#9CA3AF', // Gray-400 (professional)
-                        opacity: opacity * 0.2,
-                        shadowColor: '#6B7280', // Gray-500 shadow
-                        shadowOpacity: opacity * 0.5,
-                        shadowRadius: 16,
-                        transform: [{ rotate: `${angle}rad` }],
-                      }}
-                    />
-                    {/* Inner glow wisp - GRAY */}
-                    <View
-                      style={{
-                        position: 'absolute',
-                        top: 60 + pos.y - 6.24 * scale,
-                        left: 60 + pos.x - 6.24 * scale,
-                        width: 12.48 * scale,
-                        height: 12.48 * scale,
-                        borderRadius: 6.24 * scale,
-                        backgroundColor: '#D1D5DB', // Gray-300 (lighter)
-                        opacity: opacity * 0.35,
-                        shadowColor: '#9CA3AF',
-                        shadowOpacity: opacity * 0.7,
-                        shadowRadius: 10,
-                      }}
-                    />
-                    {/* Scattered sparkle particles - WHITE */}
-                    {index % 2 === 0 && progress > 0.4 && (
-                      <>
-                        <View
-                          style={{
-                            position: 'absolute',
-                            top: 60 + pos.y + Math.sin(index * 1.5) * 10.4,
-                            left: 60 + pos.x + Math.cos(index * 1.5) * 10.4,
-                            width: 2.08,
-                            height: 2.08,
-                            borderRadius: 1.04,
-                            backgroundColor: '#FFFFFF',
-                            opacity: opacity * 0.8,
-                            shadowColor: '#E5E7EB', // Gray-200 glow
-                            shadowOpacity: 1.0,
-                            shadowRadius: 3,
-                          }}
-                        />
-                        <View
-                          style={{
-                            position: 'absolute',
-                            top: 60 + pos.y - Math.sin(index * 2) * 8.32,
-                            left: 60 + pos.x - Math.cos(index * 2) * 8.32,
-                            width: 2.08,
-                            height: 2.08,
-                            borderRadius: 1.04,
-                            backgroundColor: '#FFFFFF',
-                            opacity: opacity * 0.6,
-                            shadowColor: '#E5E7EB',
-                            shadowOpacity: 0.8,
-                            shadowRadius: 2,
-                          }}
-                        />
-                      </>
-                    )}
-                  </React.Fragment>
-                );
-              })}
               
               {/* COSMIC ENERGY BALL - Professional solid design */}
               <Animated.View
