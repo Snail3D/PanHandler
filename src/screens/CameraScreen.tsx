@@ -936,6 +936,84 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
         />
       </CameraView>
       
+      {/* Adaptive Guidance Text - Above crosshairs (OUTSIDE CameraView) */}
+      {guidanceMessage && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.25, // Quarter way down screen
+              left: 0,
+              right: 0,
+              alignItems: 'center',
+              pointerEvents: 'none',
+              zIndex: 10000,
+            },
+            guidanceAnimatedStyle,
+          ]}
+        >
+          <View
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              paddingHorizontal: 24,
+              paddingVertical: 14,
+              borderRadius: 16,
+              borderWidth: 2,
+              borderColor: 'rgba(255, 255, 255, 0.5)',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.5,
+              shadowRadius: 8,
+            }}
+          >
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 20,
+                fontWeight: '700',
+                textAlign: 'center',
+                letterSpacing: 0.5,
+              }}
+            >
+              {guidanceMessage}
+            </Text>
+          </View>
+        </Animated.View>
+      )}
+      
+      {/* DEBUG: Show guidance state (OUTSIDE CameraView) */}
+      <View
+        style={{
+          position: 'absolute',
+          top: insets.top + 150,
+          left: 20,
+          right: 20,
+          backgroundColor: 'rgba(255, 0, 0, 0.8)',
+          padding: 10,
+          borderRadius: 8,
+          zIndex: 20000,
+        }}
+      >
+        <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+          DEBUG - Guidance State:
+        </Text>
+        <Text style={{ color: 'white', fontSize: 11 }}>
+          Message: {guidanceMessage || 'null'}
+        </Text>
+        <Text style={{ color: 'white', fontSize: 11 }}>
+          Motion Variance: {accelerationVariance.toFixed(4)}
+        </Text>
+        <Text style={{ color: 'white', fontSize: 11 }}>
+          Tilt Angle: {tiltAngle.toFixed(2)}°
+        </Text>
+        <Text style={{ color: 'white', fontSize: 11 }}>
+          Beta: {currentBeta.toFixed(2)}° | Gamma: {currentGamma.toFixed(2)}°
+        </Text>
+        <Text style={{ color: 'white', fontSize: 11 }}>
+          Countdown: {countdown !== null ? countdown : 'null'}
+        </Text>
+      </View>
+      
       {/* BUBBLE LEVEL OVERLAY - Outside CameraView for guaranteed visibility */}
       <View
         style={{
