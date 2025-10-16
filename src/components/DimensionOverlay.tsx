@@ -2297,14 +2297,14 @@ export default function DimensionOverlay({
   
   // Quick swipe gesture to collapse/expand menu
   const menuSwipeGesture = Gesture.Pan()
-    .minDistance(15) // Require 15px movement before activating
+    .minDistance(40) // Require more movement before activating (was 15px)
     .maxPointers(1) // Only single finger
     .onEnd((event) => {
       'worklet';
       // Detect horizontal swipe with velocity threshold
-      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 1.5;
-      const threshold = SCREEN_WIDTH * 0.15; // 15% of screen width
-      const velocityThreshold = 500; // Fast swipe = 500 units/sec
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2; // More strict horizontal detection (was 1.5)
+      const threshold = SCREEN_WIDTH * 0.25; // 25% of screen width (was 15%)
+      const velocityThreshold = 800; // Faster swipe required = 800 units/sec (was 500)
       
       // Quick swipe to the right to collapse menu
       if (isHorizontal && 
