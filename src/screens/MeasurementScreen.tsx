@@ -19,6 +19,7 @@ import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
+import TypewriterText from '../components/TypewriterText';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 
@@ -1483,16 +1484,18 @@ export default function MeasurementScreen() {
                   {getSpecialOfferCopy(specialOfferSessionsLeft).title}
                 </Text>
 
-                {/* Message */}
-                <Text style={{
-                  fontSize: 14,
-                  color: '#3C3C43',
-                  textAlign: 'center',
-                  lineHeight: 20,
-                  marginBottom: 16,
-                }}>
-                  {getSpecialOfferCopy(specialOfferSessionsLeft).message}
-                </Text>
+                {/* Message - Typewriter Effect */}
+                <TypewriterText
+                  text={getSpecialOfferCopy(specialOfferSessionsLeft).message}
+                  speed={25}
+                  style={{
+                    fontSize: 14,
+                    color: '#3C3C43',
+                    textAlign: 'center',
+                    lineHeight: 20,
+                    marginBottom: 16,
+                  }}
+                />
 
                 {/* Price Badge */}
                 <View style={{
