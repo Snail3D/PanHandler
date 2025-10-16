@@ -93,6 +93,27 @@ export default function MeasurementScreen() {
   const [currentBeta, setCurrentBeta] = useState(0);
   const [currentGamma, setCurrentGamma] = useState(0);
   
+  // Bubble level with smoke trail
+  const bubbleX = useSharedValue(0);
+  const bubbleY = useSharedValue(0);
+  const [bubbleColor] = useState(() => {
+    // Pick a random vibrant color when component mounts (per session)
+    const colors = [
+      { main: '#3B82F6', glow: '#60A5FA' },    // Blue
+      { main: '#8B5CF6', glow: '#A78BFA' },    // Purple  
+      { main: '#EC4899', glow: '#F472B6' },    // Pink
+      { main: '#06B6D4', glow: '#22D3EE' },    // Cyan
+      { main: '#10B981', glow: '#34D399' },    // Green
+      { main: '#F59E0B', glow: '#FBBF24' },    // Amber
+      { main: '#EF4444', glow: '#F87171' },    // Red
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  });
+  const crosshairGlow = useSharedValue(0); // 0-1, lights up when bubble is centered
+  
+  // Trail positions (store last 8 positions for smooth trail)
+  const trailPositions = useRef<Array<{x: number, y: number}>>([]);
+  
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
