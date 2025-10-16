@@ -2029,6 +2029,42 @@ export default function DimensionOverlay({
         } else {
           newValue = perimeterStr;
         }
+      } else if (m.mode === 'polygon') {
+        // Recalculate polygon perimeter
+        let perimeter = 0;
+        for (let i = 0; i < m.points.length; i++) {
+          const p1 = m.points[i];
+          const p2 = m.points[(i + 1) % m.points.length];
+          const segmentLength = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          perimeter += segmentLength;
+        }
+        
+        // Map Mode: Apply scale conversion
+        let perimeterStr: string;
+        if (isMapMode && mapScale) {
+          perimeterStr = formatMapScaleDistance(perimeter);
+        } else {
+          const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
+          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+        }
+        
+        // Recalculate area if it exists
+        if (m.area !== undefined) {
+          let areaStr: string;
+          if (isMapMode && mapScale) {
+            // Area is already stored in real units, just need to format it
+            const areaDisplay = m.area;
+            areaStr = formatMapScaleArea(areaDisplay);
+          } else {
+            areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
+          }
+          newValue = `${perimeterStr} ⊞ ${areaStr}`;
+          newPerimeter = perimeterStr; // Store perimeter separately for inline display
+        } else {
+          newValue = perimeterStr;
+        }
       }
       
       return {
