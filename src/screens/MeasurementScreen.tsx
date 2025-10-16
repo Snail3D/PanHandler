@@ -96,20 +96,27 @@ export default function MeasurementScreen() {
   // Bubble level with smoke trail
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
-  const [bubbleColor] = useState(() => {
-    // Pick a random vibrant color when component mounts (per session)
-    const colors = [
-      { main: '#3B82F6', glow: '#60A5FA' },    // Blue
-      { main: '#8B5CF6', glow: '#A78BFA' },    // Purple  
-      { main: '#EC4899', glow: '#F472B6' },    // Pink
-      { main: '#06B6D4', glow: '#22D3EE' },    // Cyan
-      { main: '#10B981', glow: '#34D399' },    // Green
-      { main: '#F59E0B', glow: '#FBBF24' },    // Amber
-      { main: '#EF4444', glow: '#F87171' },    // Red
+  
+  // Pick random complementary colors for crosshairs and bubble (per session)
+  const [sessionColors] = useState(() => {
+    const colorPairs = [
+      { crosshair: { main: '#3B82F6', glow: '#60A5FA' }, bubble: { main: '#F59E0B', glow: '#FBBF24' } },    // Blue vs Amber
+      { crosshair: { main: '#8B5CF6', glow: '#A78BFA' }, bubble: { main: '#10B981', glow: '#34D399' } },    // Purple vs Green
+      { crosshair: { main: '#EC4899', glow: '#F472B6' }, bubble: { main: '#06B6D4', glow: '#22D3EE' } },    // Pink vs Cyan
+      { crosshair: { main: '#EF4444', glow: '#F87171' }, bubble: { main: '#3B82F6', glow: '#60A5FA' } },    // Red vs Blue
+      { crosshair: { main: '#10B981', glow: '#34D399' }, bubble: { main: '#8B5CF6', glow: '#A78BFA' } },    // Green vs Purple
+      { crosshair: { main: '#F59E0B', glow: '#FBBF24' }, bubble: { main: '#EC4899', glow: '#F472B6' } },    // Amber vs Pink
+      { crosshair: { main: '#06B6D4', glow: '#22D3EE' }, bubble: { main: '#EF4444', glow: '#F87171' } },    // Cyan vs Red
     ];
-    return colors[Math.floor(Math.random() * colors.length)];
+    return colorPairs[Math.floor(Math.random() * colorPairs.length)];
   });
+  const crosshairColor = sessionColors.crosshair;
+  const bubbleColor = sessionColors.bubble;
+  
   const crosshairGlow = useSharedValue(0); // 0-1, lights up when bubble is centered
+  
+  // Accessibility: Track time since holding shutter for Parkinson's/tremor support
+  const holdStartTime = useRef<number>(0);
   
   // Trail positions (store last 8 positions for smooth trail)
   const trailPositions = useRef<Array<{x: number, y: number}>>([]);
@@ -279,7 +286,10 @@ export default function MeasurementScreen() {
 
   // Monitor device tilt for auto-capture when holding shutter
   useEffect(() => {
-    if (mode !== 'camera') return;
+    if (mode !== 'camera') {
+      holdStartTime.current = 0; // Reset when leaving camera
+      return;
+    }
 
     DeviceMotion.setUpdateInterval(100);
 
@@ -326,12 +336,13 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVerticalMode) {
-          // VERTICAL MODE: Only Y movement matters (up/down tilt)
-          // X is locked to center
+          // VERTICAL MODE: Both X and Y movement based on gamma (left/right) and tilt from vertical
+          // When phone is vertical, gamma controls left-right, beta controls forward-back
+          const gammaOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt
           const verticalTilt = beta - 90; // How far from true vertical (90°) - SIGNED for negative values
           const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // ±15° = max offset
           
-          bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
+          bubbleX.value = withSpring(gammaOffset, { damping: 20, stiffness: 180, mass: 0.8 }); // Allow X movement via gamma
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
         } else {
           // HORIZONTAL MODE: Both X and Y movement
@@ -363,26 +374,43 @@ export default function MeasurementScreen() {
         crosshairGlow.value = withSpring(glowAmount, { damping: 15, stiffness: 200 });
         
         // Check BOTH angle stability AND motion stability
+        // Accessibility: After 10 seconds of holding, loosen requirements for Parkinson's/tremor support
         if (recentAngles.current.length >= 5 && recentAccelerations.current.length >= 5) {
-          // Angle stability: max 2° variance
+          const holdDuration = holdStartTime.current > 0 ? (Date.now() - holdStartTime.current) / 1000 : 0;
+          const isAccessibilityMode = holdDuration > 10; // After 10 seconds, be more forgiving
+          
+          // Angle stability: Relax from 2° to 5° after 10 seconds
+          const angleThreshold = isAccessibilityMode ? 5 : 2;
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
-          const angleStable = (maxAngle - minAngle) <= 2;
+          const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // Motion stability: max 0.1 acceleration variance (phone not moving much)
+          // Motion stability: Relax from 0.1 to 0.25 after 10 seconds
+          const motionThreshold = isAccessibilityMode ? 0.25 : 0.1;
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
-          const motionStable = (maxAccel - minAccel) <= 0.1;
+          const motionStable = (maxAccel - minAccel) <= motionThreshold;
           
           // BOTH must be stable
           setIsStable(angleStable && motionStable);
         }
 
-        // Alignment status (strict 2° tolerance when holding)
+        // Alignment status - also relax tolerance after 10 seconds
+        const holdDuration = holdStartTime.current > 0 ? (Date.now() - holdStartTime.current) / 1000 : 0;
+        const isAccessibilityMode = holdDuration > 10;
+        
         let status: 'good' | 'warning' | 'bad';
-        if (absTilt <= 2) status = 'good';
-        else if (absTilt <= 10) status = 'warning';
-        else status = 'bad';
+        if (isAccessibilityMode) {
+          // More forgiving thresholds for accessibility
+          if (absTilt <= 5) status = 'good';      // Relaxed from 2°
+          else if (absTilt <= 15) status = 'warning';  // Relaxed from 10°
+          else status = 'bad';
+        } else {
+          // Standard strict tolerance
+          if (absTilt <= 2) status = 'good';
+          else if (absTilt <= 10) status = 'warning';
+          else status = 'bad';
+        }
 
         setAlignmentStatus(status);
 
@@ -508,48 +536,34 @@ export default function MeasurementScreen() {
     transform: [{ scale: guidanceScale.value }],
   }));
   
-  // Animated styles for bubble level crosshairs
+  // Animated styles for bubble level crosshairs - solid session color with glow
   const crosshairHorizontalStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairGlow.value > 0.5
-      ? bubbleColor.main
-      : alignmentStatus === 'good' 
-      ? 'rgba(76, 175, 80, 0.9)' 
-      : alignmentStatus === 'warning'
-      ? 'rgba(255, 183, 77, 0.9)'
-      : 'rgba(239, 83, 80, 0.9)',
-    shadowColor: bubbleColor.glow,
-    shadowOpacity: crosshairGlow.value * 0.8,
-    shadowRadius: crosshairGlow.value * 12,
+    backgroundColor: crosshairColor.main,
+    shadowColor: crosshairColor.glow,
+    shadowOpacity: 0.6 + (crosshairGlow.value * 0.4), // Base glow + extra when centered
+    shadowRadius: 8 + (crosshairGlow.value * 8), // 8-16px glow radius
   }));
   
   const crosshairVerticalStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairGlow.value > 0.5
-      ? bubbleColor.main
-      : alignmentStatus === 'good' 
-      ? 'rgba(76, 175, 80, 0.9)' 
-      : alignmentStatus === 'warning'
-      ? 'rgba(255, 183, 77, 0.9)'
-      : 'rgba(239, 83, 80, 0.9)',
-    shadowColor: bubbleColor.glow,
-    shadowOpacity: crosshairGlow.value * 0.8,
-    shadowRadius: crosshairGlow.value * 12,
+    backgroundColor: crosshairColor.main,
+    shadowColor: crosshairColor.glow,
+    shadowOpacity: 0.6 + (crosshairGlow.value * 0.4),
+    shadowRadius: 8 + (crosshairGlow.value * 8),
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: bubbleX.value + 60 - 9 }, // Center in 120px container with 18px bubble
-      { translateY: bubbleY.value + 60 - 9 },
+      { translateX: bubbleX.value + 60 - 10 }, // Center in 120px container with 20px bubble
+      { translateY: bubbleY.value + 60 - 10 },
     ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
-    backgroundColor: crosshairGlow.value > 0.5
-      ? bubbleColor.main
-      : 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: crosshairColor.main,
     transform: [{ scale: 1 + (crosshairGlow.value * 0.5) }],
-    shadowColor: bubbleColor.glow,
-    shadowOpacity: crosshairGlow.value * 0.9,
-    shadowRadius: crosshairGlow.value * 8,
+    shadowColor: crosshairColor.glow,
+    shadowOpacity: 0.5 + (crosshairGlow.value * 0.5),
+    shadowRadius: 4 + (crosshairGlow.value * 8),
   }));
 
   // Restore session on mount if there's a persisted image
@@ -942,77 +956,79 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Smoke trail particles */}
+              {/* Smoke trail particles - more ethereal and smoky */}
               {trailPositions.current.map((pos, index) => {
-                const opacity = (index + 1) / trailPositions.current.length; // Fade out older positions
-                const scale = 0.5 + (opacity * 0.5); // Smaller particles for older positions
+                const progress = (index + 1) / trailPositions.current.length; // 0 (oldest) to 1 (newest)
+                const opacity = progress * progress; // Quadratic fade for smoother dissipation
+                const scale = 0.3 + (progress * 0.7); // Start tiny, grow as it gets newer
+                const blur = (1 - progress) * 8; // Older particles are blurrier (more diffuse)
                 
                 return (
                   <View
                     key={`trail-${index}`}
                     style={{
                       position: 'absolute',
-                      top: 60 + pos.y - 3 * scale, // Adjust for 120px container
-                      left: 60 + pos.x - 3 * scale,
-                      width: 6 * scale,
-                      height: 6 * scale,
-                      borderRadius: 3 * scale,
+                      top: 60 + pos.y - 4 * scale, // Adjust for 120px container
+                      left: 60 + pos.x - 4 * scale,
+                      width: 8 * scale, // Slightly larger base size
+                      height: 8 * scale,
+                      borderRadius: 4 * scale,
                       backgroundColor: bubbleColor.glow,
-                      opacity: opacity * 0.5, // Increased from 0.4 for more visibility
+                      opacity: opacity * 0.4, // More subtle base opacity
                       shadowColor: bubbleColor.glow,
-                      shadowOpacity: 0.8, // More glow
-                      shadowRadius: 6,
+                      shadowOpacity: opacity * 0.6, // Fade shadow with opacity
+                      shadowRadius: 8 + blur, // Dynamic blur effect
                     }}
                   />
                 );
               })}
               
-              {/* Animated bubble - 4mm glowing ball with enhanced mysterious glow */}
+              {/* Animated bubble - ethereal glowing orb (not pool ball) */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    width: 18, // Slightly bigger for more presence
-                    height: 18,
-                    borderRadius: 9,
+                    width: 20, // Slightly bigger for more mystique
+                    height: 20,
+                    borderRadius: 10,
+                    // Semi-transparent base for ethereal look
                     backgroundColor: bubbleColor.main,
-                    borderWidth: 2.5,
-                    borderColor: 'rgba(255, 255, 255, 0.9)', // Brighter border
+                    opacity: 0.85, // Slightly transparent to enhance glow effect
+                    // No solid border - makes it look less like a pool ball
                     shadowColor: bubbleColor.glow,
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 1.0, // Full glow
-                    shadowRadius: 16, // Much larger glow radius
+                    shadowOpacity: 1.0,
+                    shadowRadius: 24, // Even larger glow for mystique (was 16)
                   },
                   bubbleStyle,
                 ]}
               >
-                {/* Inner glow - brighter and more mysterious */}
+                {/* Bright core - the "light source" */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 3,
-                    left: 4,
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Almost pure white
+                    top: 4,
+                    left: 5,
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: 'rgba(255, 255, 255, 1.0)', // Pure white center
                     shadowColor: '#FFFFFF',
-                    shadowOpacity: 0.9,
-                    shadowRadius: 4,
+                    shadowOpacity: 1.0,
+                    shadowRadius: 6,
                   }}
                 />
-                {/* Outer glow ring for extra mystique */}
+                {/* Soft outer aura ring */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: -4,
-                    left: -4,
-                    right: -4,
-                    bottom: -4,
-                    borderRadius: 13,
-                    borderWidth: 1,
-                    borderColor: bubbleColor.glow,
-                    opacity: 0.4,
+                    top: -6,
+                    left: -6,
+                    right: -6,
+                    bottom: -6,
+                    borderRadius: 16,
+                    backgroundColor: bubbleColor.glow,
+                    opacity: 0.2, // Very subtle outer glow
                   }}
                 />
               </Animated.View>
@@ -1068,9 +1084,13 @@ export default function MeasurementScreen() {
                 <Pressable
                   onPressIn={() => {
                     setIsHoldingShutter(true);
+                    holdStartTime.current = Date.now(); // Track when user starts holding
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   }}
-                  onPressOut={() => setIsHoldingShutter(false)}
+                  onPressOut={() => {
+                    setIsHoldingShutter(false);
+                    holdStartTime.current = 0; // Reset timer
+                  }}
                   disabled={isCapturing}
                   style={{
                     width: 96,
