@@ -655,14 +655,14 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                     <Ionicons name="flash" size={22} color="#34C759" />
                     <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
-                      AUTO LEVEL Mode
+                      AUTO LEVEL - Hands-Free Capture
                     </Text>
                   </View>
                   
-                  {/* Visual: Finger holding button */}
+                  {/* Visual: Bubble Level */}
                   <View style={{ alignItems: 'center', marginBottom: 12 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <Text style={{ fontSize: 36 }}>👆</Text>
+                      <Text style={{ fontSize: 36 }}>🎯</Text>
                       <View style={{
                         backgroundColor: 'rgba(52,199,89,0.2)',
                         paddingHorizontal: 18,
@@ -675,36 +675,31 @@ Thank you for helping us improve PanHandler!
                         shadowOpacity: 0.4,
                         shadowRadius: 8,
                       }}>
-                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#2E7D32' }}>HOLD SHUTTER</Text>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#2E7D32' }}>BUBBLE LEVEL</Text>
                       </View>
                     </View>
                   </View>
                   
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 10, textAlign: 'center' }}>
-                    Press and hold the shutter button for hands-free capture
+                    Position your object + coin in frame, then level phone to auto-capture
                   </Text>
                   
-                  {/* Color indicator flow */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                    <View style={{ alignItems: 'center' }}>
-                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#FF3B30' }} />
-                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Too tilted</Text>
-                    </View>
-                    <Text style={{ fontSize: 18, marginHorizontal: 8, color: '#8E8E93' }}>→</Text>
-                    <View style={{ alignItems: 'center' }}>
-                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#FFCC00' }} />
-                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Close</Text>
-                    </View>
-                    <Text style={{ fontSize: 18, marginHorizontal: 8, color: '#8E8E93' }}>→</Text>
-                    <View style={{ alignItems: 'center' }}>
-                      <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#34C759' }} />
-                      <Text style={{ fontSize: 11, color: '#8E8E93', marginTop: 4 }}>Perfect!</Text>
-                    </View>
+                  {/* How it works */}
+                  <View style={{ marginBottom: 12, paddingHorizontal: 8 }}>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                      <Text style={{ fontWeight: '700' }}>How it works:</Text>
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      1. Frame your object with the coin{'\n'}
+                      2. Watch the bubble level crosshairs{'\n'}
+                      3. Level your phone to center the bubble{'\n'}
+                      4. Hold steady - photo captures automatically!
+                    </Text>
                   </View>
                   
                   <View style={{ marginTop: 8, backgroundColor: 'rgba(52,199,89,0.15)', borderRadius: 10, padding: 10 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic', textAlign: 'center' }}>
-                      💡 Green = Auto countdown starts → Photo captures automatically
+                      💡 No button press needed! Just level your phone and the camera captures when perfectly aligned
                     </Text>
                   </View>
                   

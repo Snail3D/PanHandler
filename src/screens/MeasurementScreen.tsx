@@ -337,11 +337,10 @@ export default function MeasurementScreen() {
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement (up/down tilt)
-          // Phone standing upright = beta ~90° = centered
-          // Tilt top toward you (look down at screen) = beta < 90 = bubble goes UP
-          // Tilt top away (screen faces ceiling) = beta > 90 = bubble goes DOWN
-          const verticalDiff = beta - 90; // How far from perfect vertical (90°)
-          const bubbleYOffset = (verticalDiff / 15) * maxBubbleOffset;
+          // Phone standing upright (portrait, facing user) = beta ~0° = centered
+          // Tilt top away from you (screen faces up/ceiling) = positive beta = bubble goes DOWN
+          // Tilt top toward you (screen faces down/floor) = negative beta = bubble goes UP
+          const bubbleYOffset = (beta / 15) * maxBubbleOffset;
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
@@ -415,61 +414,59 @@ export default function MeasurementScreen() {
 
         setAlignmentStatus(status);
 
-        // Progressive haptic feedback "hot and cold" style (only when holding)
-        if (isHoldingShutter) {
-          if (status === 'bad') {
-            // Far away / RED = Slow, light tapping (tap...tap...tap)
-            if (status !== lastHapticRef.current) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              lastHapticRef.current = status;
-            }
-          } else if (status === 'warning') {
-            // Getting warmer / YELLOW = Medium speed tapping (tap.tap.tap.tap.tap)
-            if (status !== lastHapticRef.current) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              // Create burst pattern for warning
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
-              lastHapticRef.current = status;
-            }
-          } else if (status === 'good') {
-            // HOT! / GREEN = Fast rapid tapping then SNAP! (taptaptaptaptap...SNAP!)
-            if (status !== lastHapticRef.current) {
-              // Rapid fire taps
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 40);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 240);
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 280);
-              // Success notification will come when photo is taken
-              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 320);
-              lastHapticRef.current = status;
-            }
+        // Progressive haptic feedback "hot and cold" style
+        if (status === 'bad') {
+          // Far away / RED = Slow, light tapping (tap...tap...tap)
+          if (status !== lastHapticRef.current) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            lastHapticRef.current = status;
+          }
+        } else if (status === 'warning') {
+          // Getting warmer / YELLOW = Medium speed tapping (tap.tap.tap.tap.tap)
+          if (status !== lastHapticRef.current) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            // Create burst pattern for warning
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
+            lastHapticRef.current = status;
+          }
+        } else if (status === 'good') {
+          // HOT! / GREEN = Fast rapid tapping then SNAP! (taptaptaptaptap...SNAP!)
+          if (status !== lastHapticRef.current) {
+            // Rapid fire taps
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 40);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 240);
+            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 280);
+            // Success notification will come when photo is taken
+            setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 320);
+            lastHapticRef.current = status;
           }
         }
       }
     });
 
     return () => subscription.remove();
-  }, [mode, isHoldingShutter]);
+  }, [mode]);
 
-  // Auto-capture when holding and conditions are met
+  // Auto-capture when conditions are met (no button needed!)
   useEffect(() => {
-    if (!isHoldingShutter || isCapturing) return;
+    if (mode !== 'camera' || isCapturing) return;
 
     if (alignmentStatus === 'good' && isStable) {
       // Perfect conditions - auto snap!
       takePicture();
     }
-  }, [isHoldingShutter, alignmentStatus, isStable, isCapturing]);
+  }, [mode, alignmentStatus, isStable, isCapturing]);
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
-    // Only show guidance in camera mode, not holding shutter, not capturing
-    if (mode !== 'camera' || isHoldingShutter || isCapturing) {
+    // Only show guidance in camera mode, not capturing
+    if (mode !== 'camera' || isCapturing) {
       if (guidanceMessage) {
         guidanceOpacity.value = withTiming(0, { duration: 300 });
         setTimeout(() => setGuidanceMessage(null), 300);
@@ -529,7 +526,7 @@ export default function MeasurementScreen() {
         setTimeout(() => setGuidanceMessage(null), 300);
       }
     }
-  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isHoldingShutter, isCapturing, currentBeta, currentGamma]);
+  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma]);
   
   // Animated style for guidance text
   const guidanceAnimatedStyle = useAnimatedStyle(() => ({
@@ -1125,42 +1122,32 @@ export default function MeasurementScreen() {
                   <Ionicons name="images-outline" size={28} color="white" />
                 </Pressable>
 
-                {/* Camera Shutter - Elegant minimal design */}
-                <Pressable
-                  onPressIn={() => {
-                    setIsHoldingShutter(true);
-                    holdStartTime.current = Date.now(); // Track when user starts holding
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }}
-                  onPressOut={() => {
-                    setIsHoldingShutter(false);
-                    holdStartTime.current = 0; // Reset timer
-                  }}
-                  disabled={isCapturing}
+                {/* Instructional Text - No button needed! */}
+                <View
                   style={{
-                    width: 96,
-                    height: 96,
-                    borderRadius: 48,
-                    backgroundColor: 'transparent', // Clear background
-                    borderWidth: 2, // Thin elegant outline (same as crosshairs)
-                    borderColor: 'rgba(156, 163, 175, 0.9)', // Gray like crosshairs
-                    justifyContent: 'center',
+                    paddingHorizontal: 24,
+                    paddingVertical: 16,
                     alignItems: 'center',
+                    justifyContent: 'center',
+                    maxWidth: SCREEN_WIDTH - 150, // Leave room for photo library button
                   }}
                 >
                   <Text style={{ 
-                    color: 'rgba(255, 255, 255, 0.9)', 
-                    fontSize: 11, 
+                    color: 'rgba(255, 255, 255, 0.95)', 
+                    fontSize: 15, 
                     fontWeight: '600',
                     textAlign: 'center',
-                    lineHeight: 14,
+                    lineHeight: 20,
+                    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+                    textShadowOffset: { width: 0, height: 1 },
+                    textShadowRadius: 3,
                   }}>
-                    {isHoldingShutter 
-                      ? (alignmentStatus === 'good' && isStable ? 'Perfect!\nCapturing...' : 'Hold\nsteady...') 
-                      : 'Hold level\nto auto\ncapture'
+                    {isCapturing 
+                      ? 'Capturing...' 
+                      : 'Position object + coin in frame, then level phone to auto-capture'
                     }
                   </Text>
-                </Pressable>
+                </View>
               </View>
             </View>
           </CameraView>
