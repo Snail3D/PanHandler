@@ -70,6 +70,7 @@ export default function ZoomCalibration({
   const tutorialOpacity = useSharedValue(0);
   const coinTextOpacity = useSharedValue(0); // For "select coin" text
   const arrowOpacity = useSharedValue(0); // For arrow pointing to coin selector
+  const instructionTextOpacity = useSharedValue(0); // For zoom-responsive instruction text (fades in when zoomed out)
   const [zoomTranslate, setZoomTranslate] = useState({ x: 0, y: 0 });
   const initialZoomScale = useRef(1);
   
@@ -164,6 +165,9 @@ export default function ZoomCalibration({
       coinTextOpacity.value = withSpring(1, { damping: 20 });
       arrowOpacity.value = withSpring(1, { damping: 20 });
       
+      // Fade in instruction text (will stay responsive to zoom)
+      instructionTextOpacity.value = withTiming(1, { duration: 800, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+      
       // Then show pinch animation after 1 second - CINEMATIC FADE IN 🎬
       setTimeout(() => {
         tutorialOpacity.value = withTiming(1, { 
@@ -191,7 +195,7 @@ export default function ZoomCalibration({
         setTimeout(animatePinch, 4000); // Third animation
       }, 1000);
       
-      // Auto-hide after 7 seconds - CINEMATIC FADE OUT 🎬
+      // Auto-hide tutorial overlays after 7 seconds - but keep instruction text responsive to zoom
       setTimeout(() => {
         tutorialOpacity.value = withTiming(0, { 
           duration: 800,
@@ -234,6 +238,25 @@ export default function ZoomCalibration({
       }, 800);
     }
   }, [zoomScale, showTutorial, searchQuery]);
+  
+  // Chef's kiss: Fade instruction text back in when user zooms out (but keep it translucent)
+  useEffect(() => {
+    if (!showTutorial && selectedCoin) {
+      // If zoom is close to 1.0 (within 0.15), fade text in at 50% opacity
+      // If zoom is > 1.15, fade text out
+      if (zoomScale < 1.15) {
+        instructionTextOpacity.value = withTiming(0.5, { 
+          duration: 600, 
+          easing: Easing.bezier(0.4, 0, 0.2, 1) 
+        });
+      } else {
+        instructionTextOpacity.value = withTiming(0, { 
+          duration: 400, 
+          easing: Easing.bezier(0.4, 0, 0.2, 1) 
+        });
+      }
+    }
+  }, [zoomScale, showTutorial, selectedCoin]);
 
   // Reference circle in center of screen - represents the coin's actual diameter
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -350,7 +373,24 @@ export default function ZoomCalibration({
                 <Stop offset="70%" stopColor={currentColor} stopOpacity="0.03" />
                 <Stop offset="100%" stopColor={currentColor} stopOpacity="0" />
               </RadialGradient>
+              
+              {/* Mask to create the clear circle "window" */}
+              <mask id="circleMask">
+                {/* White = visible, Black = hidden */}
+                <rect x="0" y="0" width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
+                <circle cx={referenceCenterX} cy={referenceCenterY} r={referenceRadiusPixels} fill="black" />
+              </mask>
             </Defs>
+            
+            {/* Glassmorphic overlay OUTSIDE the circle - creates focus */}
+            <rect 
+              x="0" 
+              y="0" 
+              width={SCREEN_WIDTH} 
+              height={SCREEN_HEIGHT} 
+              fill="rgba(255, 255, 255, 0.15)" 
+              mask="url(#circleMask)"
+            />
             
             {/* Outer glow */}
             <Circle
