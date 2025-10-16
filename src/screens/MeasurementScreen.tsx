@@ -10,7 +10,7 @@ import * as Haptics from 'expo-haptics';
 import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, withSequence } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, withSequence, withSpring } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import VerbalScaleModal from '../components/VerbalScaleModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -318,6 +318,49 @@ export default function MeasurementScreen() {
             setAccelerationVariance(variance);
           }
         }
+        
+        // Animate bubble based on device tilt
+        // Detect if phone is horizontal or vertical
+        const isVerticalMode = absBeta > 45; // Phone is held vertically
+        
+        const maxBubbleOffset = 40; // Max pixels the bubble can move from center
+        
+        if (isVerticalMode) {
+          // VERTICAL MODE: Only Y movement matters (up/down tilt)
+          // X is locked to center
+          const verticalTilt = absBeta - 90; // How far from true vertical (90°)
+          const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // ±15° = max offset
+          
+          bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
+          bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
+        } else {
+          // HORIZONTAL MODE: Both X and Y movement
+          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
+          const bubbleYOffset = (beta / 15) * maxBubbleOffset; // Forward/back tilt
+          
+          // Clamp to circular boundary
+          const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
+          let finalX = bubbleXOffset;
+          let finalY = bubbleYOffset;
+          
+          if (distance > maxBubbleOffset) {
+            const scale = maxBubbleOffset / distance;
+            finalX = bubbleXOffset * scale;
+            finalY = bubbleYOffset * scale;
+          }
+          
+          bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 180, mass: 0.8 });
+          bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 180, mass: 0.8 });
+        }
+        
+        // Track bubble trail positions (store current position)
+        trailPositions.current.push({ x: bubbleX.value, y: bubbleY.value });
+        if (trailPositions.current.length > 8) trailPositions.current.shift(); // Keep last 8 positions
+        
+        // Calculate crosshair glow (0-1) based on how centered the bubble is
+        const distanceFromCenter = Math.sqrt(bubbleX.value * bubbleX.value + bubbleY.value * bubbleY.value);
+        const glowAmount = Math.max(0, 1 - (distanceFromCenter / 15)); // Glow when within 15px of center
+        crosshairGlow.value = withSpring(glowAmount, { damping: 15, stiffness: 200 });
         
         // Check BOTH angle stability AND motion stability
         if (recentAngles.current.length >= 5 && recentAccelerations.current.length >= 5) {
@@ -865,47 +908,139 @@ export default function MeasurementScreen() {
                 </Animated.View>
               )}
               
-              {/* Horizontal line - color reactive */}
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 49,
-                  left: 0,
-                  right: 0,
-                  height: 2,
-                  backgroundColor: alignmentStatus === 'good' 
-                    ? 'rgba(76, 175, 80, 0.9)' 
-                    : alignmentStatus === 'warning'
-                    ? 'rgba(255, 183, 77, 0.9)'
-                    : 'rgba(239, 83, 80, 0.9)',
-                }}
+              {/* Horizontal line - glows when bubble is centered */}
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    top: 49,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                  },
+                  useAnimatedStyle(() => ({
+                    backgroundColor: crosshairGlow.value > 0.5
+                      ? bubbleColor.main
+                      : alignmentStatus === 'good' 
+                      ? 'rgba(76, 175, 80, 0.9)' 
+                      : alignmentStatus === 'warning'
+                      ? 'rgba(255, 183, 77, 0.9)'
+                      : 'rgba(239, 83, 80, 0.9)',
+                    shadowColor: bubbleColor.glow,
+                    shadowOpacity: crosshairGlow.value * 0.8,
+                    shadowRadius: crosshairGlow.value * 12,
+                  })),
+                ]}
               />
-              {/* Vertical line - color reactive */}
-              <View
-                style={{
-                  position: 'absolute',
-                  left: 49,
-                  top: 0,
-                  bottom: 0,
-                  width: 2,
-                  backgroundColor: alignmentStatus === 'good' 
-                    ? 'rgba(76, 175, 80, 0.9)' 
-                    : alignmentStatus === 'warning'
-                    ? 'rgba(255, 183, 77, 0.9)'
-                    : 'rgba(239, 83, 80, 0.9)',
-                }}
+              {/* Vertical line - glows when bubble is centered */}
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    left: 49,
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                  },
+                  useAnimatedStyle(() => ({
+                    backgroundColor: crosshairGlow.value > 0.5
+                      ? bubbleColor.main
+                      : alignmentStatus === 'good' 
+                      ? 'rgba(76, 175, 80, 0.9)' 
+                      : alignmentStatus === 'warning'
+                      ? 'rgba(255, 183, 77, 0.9)'
+                      : 'rgba(239, 83, 80, 0.9)',
+                    shadowColor: bubbleColor.glow,
+                    shadowOpacity: crosshairGlow.value * 0.8,
+                    shadowRadius: crosshairGlow.value * 12,
+                  })),
+                ]}
               />
-              {/* Center dot */}
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 47,
-                  left: 47,
-                  width: 6,
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                }}
+              
+              {/* Smoke trail particles */}
+              {trailPositions.current.map((pos, index) => {
+                const opacity = (index + 1) / trailPositions.current.length; // Fade out older positions
+                const scale = 0.5 + (opacity * 0.5); // Smaller particles for older positions
+                
+                return (
+                  <View
+                    key={`trail-${index}`}
+                    style={{
+                      position: 'absolute',
+                      top: 50 + pos.y - 3 * scale,
+                      left: 50 + pos.x - 3 * scale,
+                      width: 6 * scale,
+                      height: 6 * scale,
+                      borderRadius: 3 * scale,
+                      backgroundColor: bubbleColor.glow,
+                      opacity: opacity * 0.4,
+                      shadowColor: bubbleColor.glow,
+                      shadowOpacity: 0.6,
+                      shadowRadius: 4,
+                    }}
+                  />
+                );
+              })}
+              
+              {/* Animated bubble - 4mm glowing ball */}
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    width: 15, // ~4mm at typical screen DPI
+                    height: 15,
+                    borderRadius: 7.5,
+                    backgroundColor: bubbleColor.main,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255, 255, 255, 0.8)',
+                    shadowColor: bubbleColor.glow,
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.9,
+                    shadowRadius: 8,
+                  },
+                  useAnimatedStyle(() => ({
+                    transform: [
+                      { translateX: bubbleX.value + 50 - 7.5 }, // Center it
+                      { translateY: bubbleY.value + 50 - 7.5 },
+                    ],
+                  })),
+                ]}
+              >
+                {/* Inner glow */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    left: 3,
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  }}
+                />
+              </Animated.View>
+              
+              {/* Center dot - morphs when bubble crosses */}
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    top: 47,
+                    left: 47,
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                  },
+                  useAnimatedStyle(() => ({
+                    backgroundColor: crosshairGlow.value > 0.5
+                      ? bubbleColor.main
+                      : 'rgba(255, 255, 255, 0.7)',
+                    transform: [{ scale: 1 + (crosshairGlow.value * 0.5) }],
+                    shadowColor: bubbleColor.glow,
+                    shadowOpacity: crosshairGlow.value * 0.9,
+                    shadowRadius: crosshairGlow.value * 8,
+                  })),
+                ]}
               />
               
               {/* "Center object here" text below crosshairs with hint */}
