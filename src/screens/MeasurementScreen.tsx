@@ -662,7 +662,6 @@ export default function MeasurementScreen() {
     
     try {
       setIsCapturing(true);
-      setIsHoldingShutter(false); // Release hold state
       
       // Pleasant camera flash effect - MUST complete before transition
       cameraFlashOpacity.value = 1;
@@ -732,46 +731,33 @@ export default function MeasurementScreen() {
         setImageUri(photo.uri, wasAutoCapture);
         await detectOrientation(photo.uri);
         
-        // Fast fade to black, then to calibration screen (half speed = 750ms)
+        // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
-        transitionBlackOverlay.value = withTiming(1, {
-          duration: 525, // 70% of 750ms - cover screen quickly
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-        cameraOpacity.value = withTiming(0, {
-          duration: 750,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-        blackOverlayOpacity.value = withTiming(1, {
-          duration: 750,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
         
-        // Wait 750ms for fade to black, then switch mode and fade in
+        // Immediately start the morph after flash (200ms after capture)
         setTimeout(() => {
-          setMode('zoomCalibrate');
+          // Fade out camera opacity to reveal the photo underneath
+          cameraOpacity.value = withTiming(0, {
+            duration: 600, // Smooth fade
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          });
           
-          // Wait for mode switch before morphing in
-          setTimeout(() => {
-            screenScale.value = 1.10; // Start scaled up
-            screenScale.value = withTiming(1, {
-              duration: 750,
-              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-            });
-            transitionBlackOverlay.value = withTiming(0, {
-              duration: 750,
-              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-            });
-          }, 50);
+          // Slight zoom morph for drama
+          screenScale.value = withSequence(
+            withTiming(1.05, { duration: 300, easing: Easing.out(Easing.cubic) }), // Slight zoom in
+            withTiming(1, { duration: 300, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
+          );
           
-          // Unlock after transition
+          // Switch mode mid-transition so photo appears
           setTimeout(() => {
-            transitionBlackOverlay.value = 0;
-            requestAnimationFrame(() => {
-              setIsTransitioning(false);
-            });
-          }, 875);
-        }, 750);
+            setMode('zoomCalibrate');
+          }, 300); // Switch halfway through the morph
+          
+          // Unlock after full transition
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 600);
+        }, 200); // Wait for flash to complete
       }
     } catch (error) {
       console.error('Error taking picture:', error);
