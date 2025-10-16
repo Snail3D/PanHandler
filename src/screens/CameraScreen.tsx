@@ -483,6 +483,29 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
 
   return (
     <View className="flex-1 bg-black">
+      {/* SUPER OBVIOUS TEST BOX - Should ALWAYS be visible */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 100,
+          left: 20,
+          right: 20,
+          backgroundColor: 'yellow',
+          padding: 20,
+          borderRadius: 12,
+          borderWidth: 5,
+          borderColor: 'red',
+          zIndex: 999999,
+        }}
+      >
+        <Text style={{ color: 'black', fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>
+          🚨 TEST BOX 🚨
+        </Text>
+        <Text style={{ color: 'black', fontSize: 16, textAlign: 'center' }}>
+          If you see this, rendering works!
+        </Text>
+      </View>
+      
       <CameraView 
         ref={cameraRef}
         style={{ flex: 1 }}
