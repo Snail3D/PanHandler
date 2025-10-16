@@ -574,7 +574,7 @@ export default function ZoomCalibration({
         style={{
           position: 'absolute',
           top: insets.top + 16,
-          right: 16,
+          right: 70,
         }}
         >
           <BlurView

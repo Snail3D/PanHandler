@@ -23,7 +23,7 @@ Fixed calibration screen UI issues and added permissions guide to Help Modal.
 
 ### Files Modified
 **`src/components/ZoomCalibration.tsx`** (lines 571-610)
-- Changed position from `right: SCREEN_WIDTH * 0.15 + 8` to `right: 16`
+- Changed position from `right: SCREEN_WIDTH * 0.15 + 8` to `right: 70`
 - Changed top from `insets.top + 28` to `insets.top + 16`
 - Improved background opacity: `rgba(255, 255, 255, 0.5)` (was 0.35)
 - Added shadow for better visibility
@@ -35,8 +35,9 @@ Fixed calibration screen UI issues and added permissions guide to Help Modal.
 
 **After**:
 - Help button: Top-right corner, clearly visible
-- Proper spacing from edge (16px)
+- Proper spacing from edge (70px) - enough room to breathe
 - Enhanced contrast and shadow
+- Fully visible, not cut off by screen edge
 
 ---
 
