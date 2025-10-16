@@ -123,6 +123,11 @@ export default function ZoomCalibration({
     transform: [{ rotate: `${ringRotation.value}deg` }],
     opacity: ringOpacity.value,
   }));
+  
+  // Pulsing opacity without rotation (for text)
+  const animatedTextPulseStyle = useAnimatedStyle(() => ({
+    opacity: ringOpacity.value,
+  }));
 
   // Load last selected coin on mount
   useEffect(() => {
@@ -866,7 +871,7 @@ export default function ZoomCalibration({
                     textShadowOffset: { width: 0, height: 2 },
                     textShadowRadius: 4,
                   },
-                  animatedRingStyle, // Same pulsing as ring!
+                  animatedTextPulseStyle, // Only pulsing, no rotation!
                 ]}
               >
                 {getColorName(currentColor)}
