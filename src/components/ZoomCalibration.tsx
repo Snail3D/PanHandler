@@ -95,13 +95,25 @@ export default function ZoomCalibration({
   
   // Rotating ring animation for circle edge
   const ringRotation = useSharedValue(0);
+  const ringOpacity = useSharedValue(0);
   
   useEffect(() => {
-    // Start rotating animation when tutorial shows
+    // Start elegant pulsing animation when tutorial shows
     if (showTutorial) {
+      // Slower rotation - 4 seconds per loop (was 2)
       ringRotation.value = withRepeat(
-        withTiming(360, { duration: 2000, easing: Easing.linear }),
-        3, // 3 loops
+        withTiming(360, { duration: 4000, easing: Easing.linear }),
+        -1, // Infinite loop
+        false
+      );
+      
+      // Sexy pulsing opacity - breathes in and out
+      ringOpacity.value = withRepeat(
+        withSequence(
+          withTiming(0.9, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
+          withTiming(0.3, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) })
+        ),
+        -1, // Infinite pulse
         false
       );
     }
@@ -109,6 +121,7 @@ export default function ZoomCalibration({
   
   const animatedRingStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${ringRotation.value}deg` }],
+    opacity: ringOpacity.value,
   }));
 
   // Load last selected coin on mount
@@ -374,9 +387,9 @@ export default function ZoomCalibration({
                   r={referenceRadiusPixels}
                   fill="none"
                   stroke={currentColor}
-                  strokeWidth="6"
-                  strokeDasharray="40 20"
-                  opacity="0.8"
+                  strokeWidth="8"
+                  strokeDasharray="50 30"
+                  strokeLinecap="round"
                 />
               </Svg>
             </Animated.View>
@@ -829,18 +842,48 @@ export default function ZoomCalibration({
             >
               Pinch to Zoom
             </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                color: 'rgba(255, 255, 255, 0.9)',
-                textAlign: 'center',
-                textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
-              }}
-            >
-              {`Match coin's OUTER edge to the ${getColorName(currentColor)} circle`}
-            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textAlign: 'center',
+                  textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 3,
+                }}
+              >
+                {"Match coin's OUTER edge to the "}
+              </Text>
+              <Animated.Text
+                style={[
+                  {
+                    fontSize: 16,
+                    fontWeight: '700',
+                    color: currentColor,
+                    textAlign: 'center',
+                    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  },
+                  animatedRingStyle, // Same pulsing as ring!
+                ]}
+              >
+                {getColorName(currentColor)}
+              </Animated.Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textAlign: 'center',
+                  textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 3,
+                }}
+              >
+                {" circle"}
+              </Text>
+            </View>
           </Animated.View>
 
           {/* Animated finger indicators - positioned below coin circle */}
