@@ -198,6 +198,10 @@ const useStore = create<MeasurementStore>()(
 
       setIsProUser: (isPro: boolean) => set({ isProUser: isPro }),
 
+      // ⚠️ WARNING: This writes to AsyncStorage via persist middleware
+      // NEVER call this in high-frequency callbacks (onUpdate, onTransformChange, etc.)
+      // ALWAYS debounce this with 500ms+ delay to prevent JS thread blocking
+      // See: NEVER_WRITE_TO_ASYNCSTORAGE_DURING_GESTURES.md
       setSavedZoomState: (zoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => set({ savedZoomState: zoomState }),
       
       setHasSeenPinchTutorial: (hasSeen: boolean) => set({ hasSeenPinchTutorial: hasSeen }),
