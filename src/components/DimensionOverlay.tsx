@@ -248,6 +248,9 @@ export default function DimensionOverlay({
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
   
+  // DEBUG: Track touch interceptions
+  const [debugInfo, setDebugInfo] = useState({ lastTouch: 0, interceptor: '', mode: '' });
+  
   // Register the callback with parent so it can be called on double-tap
   useEffect(() => {
     if (onRegisterDoubleTapCallback) {
@@ -3117,6 +3120,7 @@ export default function DimensionOverlay({
           }}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
+            setDebugInfo({ lastTouch: Date.now(), interceptor: 'TAP_OVERLAY', mode: measurementMode ? 'MEASURE' : 'PAN' });
             
             // Check if tapping any measurement point first (distance, angle, circle, rectangle)
             const point = getTappedMeasurementPoint(pageX, pageY);
@@ -6171,6 +6175,31 @@ export default function DimensionOverlay({
         }}
         onClose={closeAlert}
       />
+      
+      {/* DEBUG OVERLAY */}
+      <View style={{
+        position: 'absolute',
+        top: 50,
+        left: 10,
+        right: 10,
+        backgroundColor: 'rgba(255, 0, 0, 0.9)',
+        padding: 12,
+        borderRadius: 8,
+        zIndex: 99999,
+      }} pointerEvents="none">
+        <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>
+          MODE: {measurementMode ? 'MEASURE' : 'PAN'}
+        </Text>
+        <Text style={{ color: 'white', fontSize: 12, marginTop: 4 }}>
+          Last Touch: {debugInfo.lastTouch ? `${Date.now() - debugInfo.lastTouch}ms ago` : 'none'}
+        </Text>
+        <Text style={{ color: 'white', fontSize: 12 }}>
+          Interceptor: {debugInfo.interceptor || 'none'}
+        </Text>
+        <Text style={{ color: 'white', fontSize: 12 }}>
+          Overlay Active: {!measurementMode && measurements.length > 0 ? 'YES' : 'NO'}
+        </Text>
+      </View>
     </>
   );
 }
