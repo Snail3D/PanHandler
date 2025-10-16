@@ -515,9 +515,10 @@ interface LabelModalProps {
   initialValue?: string | null;
   isMapMode?: boolean;
   measurementMode?: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand' | 'polygon';
+  actionType?: 'save' | 'email'; // To show different button text/icon
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false, measurementMode }: LabelModalProps) {
+export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false, measurementMode, actionType = 'save' }: LabelModalProps) {
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
 
@@ -654,7 +655,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                       fontWeight: '600', 
                       marginBottom: 8,
                     }}>
-                      {measurementMode ? `What would you like to name this ${getShapeTitle(measurementMode).toLowerCase()}?` : 'What is this?'}
+                      What are we calling this thing?
                     </Text>
                     <View style={{
                       flexDirection: 'row',
@@ -709,7 +710,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                   alignItems: 'center',
                 }}>
                   <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
-                    {/* Save Button - Larger, glassmorphic background */}
+                    {/* Save/Email Button - Larger, glassmorphic background */}
                     <Pressable
                       onPress={handleContinue}
                       style={({ pressed }) => ({
@@ -731,7 +732,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                       })}
                     >
                       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Ionicons name="save" size={20} color="#1C1C1E" />
+                        <Ionicons name={actionType === 'email' ? 'mail' : 'save'} size={20} color="#1C1C1E" />
                       </View>
                       <Text style={{ 
                         color: '#1C1C1E', 
@@ -739,7 +740,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                         fontSize: 18, 
                         marginLeft: 8,
                       }}>
-                        Save
+                        {actionType === 'email' ? 'Email' : 'Save'}
                       </Text>
                     </Pressable>
 
