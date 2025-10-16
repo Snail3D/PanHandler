@@ -1,7 +1,7 @@
 # 🎯 PanHandler - Message for Ken (and Future Bots)
 
 **App Name:** PanHandler  
-**Current Version:** 1.85  
+**Current Version:** 1.86  
 **Type:** iOS Measurement & CAD Tool  
 **Status:** Alpha - Active Development  
 
@@ -407,10 +407,11 @@ You'll see warnings like:
 
 ---
 
-## 🎯 CURRENT STATE (v1.85)
+## 🎯 CURRENT STATE (v1.86)
 
 ### What's Working
 ✅ Camera with bubble level + auto-capture  
+✅ **Adaptive guidance system** (new!) - "Hold still", "Tilt forward", etc.
 ✅ Coin calibration with animated rings  
 ✅ Map/verbal scale calibration  
 ✅ 5 measurement tools (Distance, Circle, Rectangle, Angle, Freehand)  
@@ -428,10 +429,11 @@ You'll see warnings like:
 - Some unused state variables (cleanup opportunity)
 
 ### Next Potential Features
+- Haptic feedback for guidance messages
+- Color-coded guidance (red/yellow/green)
+- Voice guidance option
 - Scale history (show which scale was used per measurement)
 - Multiple locked scales
-- Audio feedback option
-- Voice commands
 
 ---
 
@@ -567,6 +569,7 @@ PanHandler is a precision tool with complex gesture handling and measurement log
 
 ## 📝 VERSION HISTORY QUICK REF
 
+- **v1.86** - Adaptive camera guidance system (contextual helpers)
 - **v1.85** - Map scale persistence, background audio, button spacing polish
 - **v1.8** - Smart calibration hint, menu swipe gestures, elegant animations
 - **v1.7** - Recalibrate button, privacy docs
