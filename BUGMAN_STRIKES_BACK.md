@@ -1,104 +1,43 @@
-# Bugman Returns: The White Flash Strikes Back! 🦸‍♂️⚡
+# BUGMAN STRIKES BACK: The Progressive Haptics Bottleneck
 
-## The Problem (Round 2)
-1. **Fade IN from black** was showing **white flash** before content appeared
-2. **"New Photo" button** was locking screen on black (transition stuck)
+## The Symptoms
+1. "Freezes for 10-15 seconds when placing points"
+2. "Cursor stays there, then it all stacks in"
+3. Calibration screen was broken (couldn't pan)
 
-## Root Causes
+## Root Causes Found
 
-### Issue 1: White Flash on Fade In
-**The Culprit:** `screenOpacity` in the animated style!
+### Issue 1: Broken Gestures
+My edits to conditionally disable GestureDetector broke calibration.
+**Fixed**: Restored simple `<GestureDetector>` wrapper (always enabled)
 
-When fading IN:
-- Black overlay fades from 1→0 (revealing content)
-- Content was ALSO fading from 0→1 via `screenOpacity`
-- Result: Both animations race, causing white to show through briefly
-
-**The Fix:** Removed `screenOpacity` from `screenTransitionStyle`
-```tsx
-// BEFORE (BROKEN):
-const screenTransitionStyle = useAnimatedStyle(() => ({
-  opacity: screenOpacity.value,  // ❌ This causes white flash!
-  transform: [{ scale: screenScale.value }],
-}));
-
-// AFTER (FIXED):
-const screenTransitionStyle = useAnimatedStyle(() => ({
-  // Only scale morph - let black overlay handle ALL opacity
-  transform: [{ scale: screenScale.value }],  // ✅
-}));
+### Issue 2: Progressive Haptics Creating Callback Hell
+Lines 2363-2369 in DimensionOverlay create **5 setTimeout callbacks** on EVERY touch in freehand mode:
+```typescript
+Haptics.impactAsync(...);  // Immediate
+setTimeout(() => Haptics.impactAsync(...), 300);
+setTimeout(() => Haptics.impactAsync(...), 600);
+setTimeout(() => Haptics.impactAsync(...), 900);
+setTimeout(() => Haptics.impactAsync(...), 1200);
 ```
 
-### Issue 2: Timing Race Condition
-**The Problem:** When switching modes, React needed time to render the new content, but we were starting the fade-in animation immediately. This caused:
-- Content not ready → black screen shows nothing
-- Black overlay starts fading out → reveals white background underneath
+When user moves finger (onResponderMove fires 60+ times/second), this creates HUNDREDS of pending setTimeout callbacks, all trying to fire haptics. The JS event loop gets clogged with these callbacks, blocking touch event processing → 10-15 second freeze.
 
-**The Fix:** Added 50ms delay after `setMode()` before starting fade-in animation
-```tsx
-setMode('zoomCalibrate');
+## The Fix
+**Temporarily disabled progressive haptics** (lines 2365-2369 commented out)
 
-// Wait for React to render new mode
-setTimeout(() => {
-  screenScale.value = 1.10;
-  screenScale.value = withTiming(1, ...);
-  transitionBlackOverlay.value = withTiming(0, ...);
-}, 50); // Give React time to render
-```
+This removes the setTimeout spam and should make touch response instant.
 
-## Changes Made
+## Testing Now
+1. ✅ Calibration should work (pan/zoom/rotate)
+2. ✅ Placing measurement points should be instant (no freeze)
+3. ⚠️ Freehand mode won't have progressive haptics (acceptable trade-off for now)
 
-### File: `src/screens/MeasurementScreen.tsx`
+## Future Fix
+If we want progressive haptics back:
+- Store setTimeout IDs in refs
+- Clear all pending haptic timeouts before creating new ones
+- Or use a single timer that checks elapsed time instead of multiple timeouts
 
-1. **Removed opacity fade from content** (line ~330)
-   - Only use scale for morph effect
-   - Black overlay handles all opacity transitions
-
-2. **Added render delay in `takePicture()`** (line ~419)
-   - 50ms delay after `setMode()` before fade-in starts
-   - Ensures calibration screen is rendered before revealing
-
-3. **Added render delay in `smoothTransitionToMode()`** (line ~103)
-   - Same 50ms delay for measurement→camera transitions
-   - Prevents revealing content before it's ready
-
-## How It Works Now
-
-### Fade OUT (Content → Black)
-```
-1. Content scales down (1 → 0.90)           [1.5s]
-2. Black overlay fades up (0 → 1)           [1.5s]
-3. Both happen simultaneously
-```
-
-### Mode Switch
-```
-4. setMode(newMode)
-5. Wait 50ms for React to render new content
-```
-
-### Fade IN (Black → Content)
-```
-6. Content scales up (1.10 → 1)             [1.5s]
-7. Black overlay fades down (1 → 0)         [1.5s]
-8. Both happen simultaneously
-9. Content was ALREADY at full opacity!
-```
-
-## Result
-✅ No more white flashes on fade in
-✅ "New Photo" button transitions smoothly
-✅ All mode transitions go through pure black
-✅ Liquid morph effect is visible (10% scale change)
-✅ Smooth 3-second total transitions (1.5s out + 1.5s in)
-
-## Testing Checklist
-1. ✅ Take photo → Should fade through black with zoom-out
-2. ✅ Calibration appears → Should morph from black with zoom-in (NO WHITE)
-3. ✅ Complete calibration → Should transition through black
-4. ✅ Press "New Photo" → Should transition through black back to camera (NO LOCK-UP)
-5. ✅ All transitions should be smooth with visible scale morph
-
-**BUGMAN HAS VANQUISHED THE WHITE FLASH ONCE AND FOR ALL!** 🎉🦸‍♂️
-
-(Job security remains intact 😄)
+---
+**The real bug was setTimeout callback spam from progressive haptics!** 🐛
