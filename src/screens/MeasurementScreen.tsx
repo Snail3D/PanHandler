@@ -166,7 +166,7 @@ export default function MeasurementScreen() {
   // Determine if pan/zoom should be locked
   // Never lock - users should be able to pan/zoom/rotate at any time
   // This allows adjusting view while placing measurements
-  const isPanZoomLocked = true; // TEMP: Force lock to disable GestureDetector
+  const isPanZoomLocked = false; // Never lock - allow gestures always
 
 
   // Helper to detect orientation based on image (for future use)

@@ -94,6 +94,7 @@ interface DimensionOverlayProps {
   setImageOpacity?: (opacity: number) => void;
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
   onReset?: () => void; // Called when "New Photo" button is pressed
+  onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
 }
 
 export default function DimensionOverlay({ 
@@ -105,6 +106,7 @@ export default function DimensionOverlay({
   setImageOpacity,
   onRegisterDoubleTapCallback,
   onReset,
+  onMeasurementModeChange,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
