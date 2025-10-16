@@ -530,19 +530,15 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     let currentIndex = 0;
-    const typingSpeed = 30; // Fast like ChatGPT (was 50)
-    let lastHapticTime = 0;
-    const minHapticInterval = 80; // Minimum 80ms between haptics (ChatGPT style)
+    const typingSpeed = 50; // 50ms per character
     
     const typeInterval = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
-        // ChatGPT-style: selectionAsync with time-based throttling
-        const now = Date.now();
-        if (now - lastHapticTime >= minHapticInterval) {
-          Haptics.selectionAsync(); // Very subtle tick
-          lastHapticTime = now;
+        // Exact same haptic pattern as BattlingBotsModal - every 4 characters
+        if (currentIndex % 4 === 0) {
+          Haptics.selectionAsync();
         }
         
         currentIndex++;
