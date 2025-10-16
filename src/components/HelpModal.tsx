@@ -287,11 +287,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   };
   
   const playTwoBitsResponse = () => {
-    // Play "dun-dun" haptic response with strong impact
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    // Wait a beat before responding (classic "shave and a haircut" pause)
     setTimeout(() => {
+      // Play "dun-dun" haptic response with strong impact
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }, 200); // 200ms gap between the two hits
+      setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      }, 350); // Longer gap between the two hits for dramatic effect
+    }, 1000); // 1 second pause before responding - the classic wait!
   };
   
   // Left egg: Long-press to open YouTube link
@@ -2210,7 +2213,7 @@ Thank you for helping us improve PanHandler!
                         
                         // Check if we have 5 taps and they match the pattern
                         if (recentTaps.length === 5 && checkShaveAndHaircutPattern(recentTaps)) {
-                          // SUCCESS! Play "dun-dun" response
+                          // SUCCESS! Play "dun-dun" response (with dramatic pause)
                           playTwoBitsResponse();
                           
                           // Toggle Pro/Free status
@@ -2225,10 +2228,10 @@ Thank you for helping us improve PanHandler!
                           // Clear taps
                           setEggTaps([]);
                           
-                          // Close help modal after response completes
+                          // Close help modal after response completes (1000ms pause + 350ms gap + buffer)
                           setTimeout(() => {
                             onClose();
-                          }, 500);
+                          }, 1600);
                         }
                         
                         // Reset after 2 seconds of no taps
