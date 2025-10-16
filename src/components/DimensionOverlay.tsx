@@ -557,10 +557,10 @@ export default function DimensionOverlay({
         if (currentIndex < completeText.length) {
           setDisplayedText(completeText.substring(0, currentIndex + 1));
           
-          // Haptic every 4 characters (same as BattlingBotsModal)
-          if (currentIndex % 4 === 0) {
+          // Heavy haptic every 3 characters (like shave and haircut - we KNOW this works!)
+          if (currentIndex % 3 === 0) {
             console.log('🎵 HAPTIC at index', currentIndex);
-            Haptics.selectionAsync();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
           }
           
           currentIndex++;
