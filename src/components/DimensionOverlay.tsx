@@ -2361,12 +2361,13 @@ export default function DimensionOverlay({
                 clearTimeout(freehandActivationTimerRef.current);
               }
               
+              // TEMP DISABLED: Progressive haptics might be causing freeze
               // 🌟 Samus Charge Beam - Progressive power build-up
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
+              // Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
+              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
+              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
+              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
+              // setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
               
               freehandActivationTimerRef.current = setTimeout(() => {
                 // 1.5s - FULLY CHARGED! Ready to fire! 🔥

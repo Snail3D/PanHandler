@@ -210,8 +210,14 @@ export default function ZoomableImage({
       }
     });
 
-  // TEMP: Simplify gesture composition - remove double-tap to test if it's causing freeze
-  const composedGesture = Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture);
+  // Use simple simultaneous gestures for both modes
+  // Use Exclusive instead of Race for better performance
+  // Only evaluate gestures when they actually start
+  const composedGesture = Gesture.Exclusive(
+    doubleTapGesture,
+    doubleTapWhenLockedGesture,
+    Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
+  );
 
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -230,14 +236,15 @@ export default function ZoomableImage({
         style={StyleSheet.absoluteFill} 
         pointerEvents="box-none"
       >
-        {/* TEMP TEST: Always show image without GestureDetector to test if it causes freeze */}
-        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
-          <Image
-            source={{ uri: imageUri }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
-            resizeMode="contain"
-          />
-        </Animated.View>
+        <GestureDetector gesture={composedGesture}>
+          <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]} collapsable={false}>
+            <Image
+              source={{ uri: imageUri }}
+              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        </GestureDetector>
       </View>
       
       {/* Level reference line - 3/4 up the screen (only during zoom/pan) */}
