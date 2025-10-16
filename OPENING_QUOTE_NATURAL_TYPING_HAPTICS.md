@@ -13,22 +13,27 @@ User wanted haptic feedback during the opening quote typing animation, but we in
 
 ## The Solution
 
-### Natural Typing Haptics Pattern
+### Natural Typing Haptics Pattern (v3 - Balanced)
 
-Implemented character-aware haptic feedback that mimics real typing:
+Implemented character-aware haptic feedback with a balanced frequency:
 
 1. **Punctuation (.,!?;:)** → `Medium` impact (stronger tap, like finishing a thought)
-2. **Vowels (aeiouAEIOU)** → `Light` impact, 50% random chance (natural rhythm variation)
-3. **Every 4th character** → `selectionAsync()` (subtle baseline rhythm)
-4. **Spaces** → No haptic (like lifting fingers between words)
+2. **Every 3rd non-space character** → `Light` impact (consistent, noticeable rhythm)
+3. **Spaces** → No haptic (like lifting fingers between words)
 
-This creates an organic, humanlike typing feel with varied intensity and rhythm.
+This creates engaging tactile feedback that feels natural without being overwhelming - the perfect middle ground between too sparse and too frequent.
 
 ## Files Modified
 
 - `/home/user/workspace/App.tsx` 
   - Added `import * as Haptics from "expo-haptics";` (line 8)
-  - Implemented natural typing haptics in typing loop (lines 92-109)
+  - Implemented natural typing haptics in typing loop (lines 91-107)
+  - Pattern: Every other character gets Light impact, remaining get selectionAsync, punctuation gets Medium
+
+- `/home/user/workspace/src/components/BattlingBotsModal.tsx`
+  - Updated all typing sections to use same natural typing haptics pattern
+  - Applied to: mean text typing (lines 223-237), backspace animation (lines 253-259), nice text typing (lines 274-288), normal message typing (lines 328-342)
+  - Ensures consistent feel across opening quote and bot negotiation screens
 
 ## Code Location
 
@@ -51,9 +56,10 @@ When the app launches:
 ## Technical Notes
 
 - Uses character regex matching to determine haptic type
-- `Math.random()` provides organic variation (50% vowel emphasis)
+- Every 3rd character (modulo 3) gets a haptic - balanced between too sparse (every 4) and too frequent (every 2)
 - No haptics on spaces prevents over-stimulation
-- Baseline every-4th-character rhythm ensures consistent feel even for consonant-heavy text
+- Punctuation always gets stronger Medium impact regardless of position
+- Final iteration after user feedback to find the "just right" frequency
 
 ## Testing
 
