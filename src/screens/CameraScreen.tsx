@@ -8,6 +8,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-na
 import * as Haptics from 'expo-haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { Audio } from 'expo-av';
 import HelpModal from '../components/HelpModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -176,7 +177,26 @@ export default function CameraScreen({ onPhotoTaken }: CameraScreenProps) {
       return newMode;
     });
   };
-
+  
+  // Configure audio session to allow background audio (YouTube, music, etc.) to keep playing
+  useEffect(() => {
+    const configureAudioSession = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: false,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: false,
+          playThroughEarpieceAndroid: false,
+        });
+      } catch (error) {
+        console.log("Audio session configuration error:", error);
+      }
+    };
+    
+    configureAudioSession();
+  }, []);
+  
   // Monitor device tilt for horizontal/vertical alignment and stability
   useEffect(() => {
     DeviceMotion.setUpdateInterval(100); // Update 10 times per second
