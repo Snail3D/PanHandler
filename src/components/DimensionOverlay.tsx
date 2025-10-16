@@ -28,7 +28,7 @@ import SnailIcon from './SnailIcon';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Define type first before using it
-type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
+type MeasurementMode = 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand' | 'polygon';
 
 // Vibrant color palette for measurements (professional but fun)
 const MEASUREMENT_COLORS: Record<MeasurementMode, Array<{ main: string; glow: string; name: string }>> = {
@@ -66,6 +66,13 @@ const MEASUREMENT_COLORS: Record<MeasurementMode, Array<{ main: string; glow: st
     { main: '#F59E0B', glow: '#F59E0B', name: 'Amber' },     
     { main: '#EC4899', glow: '#EC4899', name: 'Pink' },      
     { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    
+  ],
+  polygon: [
+    { main: '#F97316', glow: '#F97316', name: 'Orange' },    // Polygons get orange (unified look)
+    { main: '#EAB308', glow: '#EAB308', name: 'Yellow' },
+    { main: '#84CC16', glow: '#84CC16', name: 'Lime' },
+    { main: '#14B8A6', glow: '#14B8A6', name: 'Teal' },
+    { main: '#A855F7', glow: '#A855F7', name: 'Purple' },
   ],
 };
 
@@ -221,7 +228,7 @@ export default function DimensionOverlay({
   
   // Smart calibration hint state
   interface MeasurementAttempt {
-    type: 'distance' | 'circle' | 'rectangle' | 'angle' | 'freehand';
+    type: 'distance' | 'circle' | 'rectangle' | 'angle' | 'freehand' | 'polygon';
     centerX: number;
     centerY: number;
     timestamp: number;
@@ -1460,6 +1467,171 @@ export default function DimensionOverlay({
     return measurement;
   };
 
+  // 🔷 POLYGON AUTO-DETECTION: Detect closed polygons from connected distance lines
+  const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
+    const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
+    
+    // Only check distance measurements
+    const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
+    
+    if (distanceLines.length < 3) return; // Need at least 3 lines to form a polygon
+    
+    // Find all connected chains of lines
+    const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
+      const chain: Measurement[] = [startLine];
+      usedIds.add(startLine.id);
+      
+      let currentEndpoint = startLine.points[1]; // End of current line
+      let foundConnection = true;
+      
+      while (foundConnection) {
+        foundConnection = false;
+        
+        // Find a line that starts where current line ends
+        for (const line of distanceLines) {
+          if (usedIds.has(line.id)) continue;
+          
+          const lineStart = line.points[0];
+          const lineEnd = line.points[1];
+          
+          // Check if line starts at current endpoint
+          const distToStart = Math.sqrt(
+            Math.pow(lineStart.x - currentEndpoint.x, 2) + 
+            Math.pow(lineStart.y - currentEndpoint.y, 2)
+          );
+          
+          // Check if line ends at current endpoint (reverse direction)
+          const distToEnd = Math.sqrt(
+            Math.pow(lineEnd.x - currentEndpoint.x, 2) + 
+            Math.pow(lineEnd.y - currentEndpoint.y, 2)
+          );
+          
+          if (distToStart < SNAP_TOLERANCE) {
+            // Line connects forward
+            chain.push(line);
+            usedIds.add(line.id);
+            currentEndpoint = lineEnd;
+            foundConnection = true;
+            break;
+          } else if (distToEnd < SNAP_TOLERANCE) {
+            // Line connects backward - reverse it
+            const reversedLine = {
+              ...line,
+              points: [lineEnd, lineStart]
+            };
+            chain.push(reversedLine);
+            usedIds.add(line.id);
+            currentEndpoint = lineStart;
+            foundConnection = true;
+            break;
+          }
+        }
+      }
+      
+      return chain;
+    };
+    
+    // Try to find closed polygons
+    for (const startLine of distanceLines) {
+      const usedIds = new Set<string>();
+      const chain = findConnectedChain(startLine, usedIds);
+      
+      if (chain.length < 3) continue; // Need at least 3 lines
+      
+      // Check if chain forms a closed loop
+      const firstPoint = chain[0].points[0];
+      const lastPoint = chain[chain.length - 1].points[1];
+      
+      const closingDistance = Math.sqrt(
+        Math.pow(lastPoint.x - firstPoint.x, 2) + 
+        Math.pow(lastPoint.y - firstPoint.y, 2)
+      );
+      
+      if (closingDistance < SNAP_TOLERANCE) {
+        // 🎉 FOUND A CLOSED POLYGON!
+        console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
+        
+        // Extract all points in order (excluding duplicates at connections)
+        const polygonPoints: Array<{x: number, y: number}> = [];
+        for (let i = 0; i < chain.length; i++) {
+          polygonPoints.push(chain[i].points[0]);
+        }
+        
+        // Calculate perimeter (sum of all line lengths)
+        let perimeterPx = 0;
+        for (const line of chain) {
+          const p1 = line.points[0];
+          const p2 = line.points[1];
+          const length = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          perimeterPx += length;
+        }
+        
+        // Calculate area using shoelace formula
+        let areaPx2 = 0;
+        for (let i = 0; i < polygonPoints.length; i++) {
+          const p1 = polygonPoints[i];
+          const p2 = polygonPoints[(i + 1) % polygonPoints.length];
+          areaPx2 += (p1.x * p2.y - p2.x * p1.y);
+        }
+        areaPx2 = Math.abs(areaPx2) / 2;
+        
+        // Convert to physical units
+        let perimeterStr: string;
+        let areaStr: string;
+        let physicalArea: number;
+        
+        if (isMapMode && mapScale) {
+          // Map mode
+          const perimeterDist = convertToMapScale(perimeterPx);
+          perimeterStr = formatMapValue(perimeterDist);
+          
+          // For area, we need to square the scale factor
+          const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
+          const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
+          physicalArea = areaDist2;
+          areaStr = formatMapScaleArea(areaDist2);
+        } else {
+          // Coin calibration mode
+          const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
+          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+          
+          const areaInUnits2 = areaPx2 / Math.pow(calibration?.pixelsPerUnit || 1, 2);
+          physicalArea = areaInUnits2;
+          areaStr = formatAreaMeasurement(areaInUnits2, calibration?.unit || 'mm', unitSystem);
+        }
+        
+        // Create new polygon measurement
+        const polygonMeasurement: Measurement = {
+          id: Date.now().toString(),
+          points: polygonPoints,
+          value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area
+          perimeter: perimeterStr, // For inline label
+          mode: 'polygon' as any, // New mode type
+          area: physicalArea,
+          isClosed: true,
+          calibrationMode: isMapMode ? 'map' : 'coin',
+          ...(isMapMode && mapScale && { mapScaleData: mapScale }),
+        };
+        
+        // Remove the individual lines and add the polygon
+        const remainingMeasurements = allMeasurements.filter(m => !usedIds.has(m.id));
+        setMeasurements([...remainingMeasurements, polygonMeasurement]);
+        
+        // Success haptic!
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        console.log('🔷 Polygon created:', {
+          sides: chain.length,
+          perimeter: perimeterStr,
+          area: areaStr
+        });
+        
+        return; // Only merge one polygon at a time
+      }
+    }
+  };
+
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
@@ -1575,6 +1747,12 @@ export default function DimensionOverlay({
       });
       
       setMeasurements([...measurements, newMeasurement]);
+      
+      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
+      if (mode === 'distance') {
+        detectAndMergePolygon([...measurements, newMeasurement]);
+      }
+      
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
     }
@@ -2596,6 +2774,50 @@ export default function DimensionOverlay({
             <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
             <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
             <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'polygon') {
+        // Render auto-detected polygon with filled area
+        if (measurement.points.length < 3) return null;
+        
+        // Convert all points to screen coordinates
+        const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Generate polygon path (closed)
+        let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+        for (let i = 1; i < screenPoints.length; i++) {
+          pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
+        }
+        pathData += ' Z'; // Close the path
+        
+        // Calculate centroid for label placement
+        let centroidX = 0, centroidY = 0;
+        for (const p of screenPoints) {
+          centroidX += p.x;
+          centroidY += p.y;
+        }
+        centroidX /= screenPoints.length;
+        centroidY /= screenPoints.length;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Filled area with transparency */}
+            <Path d={pathData} fill={color.main} opacity="0.15" />
+            {/* Glow layers for outline */}
+            <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Main outline */}
+            <Path d={pathData} stroke={color.main} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Corner markers */}
+            {screenPoints.map((point, i) => (
+              <React.Fragment key={`corner-${i}`}>
+                <Circle cx={point.x} cy={point.y} r="6" fill={color.glow} opacity="0.05" />
+                <Circle cx={point.x} cy={point.y} r="5" fill={color.glow} opacity="0.075" />
+                <Circle cx={point.x} cy={point.y} r="4" fill={color.main} opacity="0.05" />
+                <Circle cx={point.x} cy={point.y} r="3" fill={color.main} opacity="0.1" />
+                <Circle cx={point.x} cy={point.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+              </React.Fragment>
+            ))}
           </React.Fragment>
         );
       }
