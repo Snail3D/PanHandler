@@ -11,6 +11,8 @@ import { DeviceMotion } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, withSequence, withSpring } from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
+import { Svg, Path } from 'react-native-svg';
 import useStore from '../state/measurementStore';
 import VerbalScaleModal from '../components/VerbalScaleModal';
 import ZoomCalibration from '../components/ZoomCalibration';
@@ -145,6 +147,45 @@ export default function MeasurementScreen() {
   const setSavedZoomState = useStore((s) => s.setSavedZoomState);
   const setCompletedMeasurements = useStore((s) => s.setCompletedMeasurements);
   const setCurrentPoints = useStore((s) => s.setCurrentPoints);
+  const sessionCount = useStore((s) => s.sessionCount);
+  const incrementSessionCount = useStore((s) => s.incrementSessionCount);
+  const isProUser = useStore((s) => s.isProUser);
+  const setIsProUser = useStore((s) => s.setIsProUser);
+  const specialOfferTriggered = useStore((s) => s.specialOfferTriggered);
+  const specialOfferSessionsLeft = useStore((s) => s.specialOfferSessionsLeft);
+  const decrementSpecialOfferSessions = useStore((s) => s.decrementSpecialOfferSessions);
+  const dismissSpecialOffer = useStore((s) => s.dismissSpecialOffer);
+  
+  // Special offer modal state
+  const [showSpecialOffer, setShowSpecialOffer] = useState(false);
+  const specialOfferOpacity = useSharedValue(0);
+  const specialOfferTranslateY = useSharedValue(-100);
+  
+  // Get funny copy based on sessions left
+  const getSpecialOfferCopy = (sessionsLeft: number) => {
+    if (sessionsLeft === 3) {
+      return {
+        title: "⚠️ ERROR: Squiggly Line Not Found",
+        message: "We noticed you haven't tried our fancy freehand tool yet. You know... for when straight lines are just too mainstream.",
+        price: "$6.97",
+        sessionsText: "3 sessions to decide",
+      };
+    } else if (sessionsLeft === 2) {
+      return {
+        title: "💪 You're Twisting Our Arm",
+        message: "Alright tough guy, we'll drop it even MORE. But seriously, this squiggly line is pretty cool...",
+        price: "$5.97",
+        sessionsText: "Only 2 sessions left!",
+      };
+    } else {
+      return {
+        title: "🚨 LAST CHANCE ALERT",
+        message: "This is it. Final price. We're basically giving it away. After this? Full price forever.",
+        price: "$4.97",
+        sessionsText: "LAST SESSION",
+      };
+    }
+  };
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -283,6 +324,45 @@ export default function MeasurementScreen() {
     setShowVerbalScaleModal(false);
     setMode('measurement'); // Skip ZoomCalibration, go straight to measurement
   };
+
+  // Track sessions and trigger special offer (on mount only)
+  useEffect(() => {
+    // Increment session count
+    incrementSessionCount();
+    
+    // Check if we should trigger special offer (sessions 50, 51, 52 for free users)
+    const newSessionCount = sessionCount + 1; // Account for the increment we just did
+    
+    if (!isProUser && newSessionCount >= 50 && newSessionCount <= 52) {
+      // Update store to mark offer as triggered if first time
+      if (!specialOfferTriggered && newSessionCount === 50) {
+        // First time hitting 50 - trigger the offer system
+        useStore.setState({ specialOfferTriggered: true, specialOfferSessionsLeft: 3 });
+      } else if (specialOfferTriggered && specialOfferSessionsLeft > 0) {
+        // Already triggered, decrement counter
+        decrementSpecialOfferSessions();
+      }
+      
+      // Show modal if sessions left > 0
+      if (specialOfferSessionsLeft > 0 || newSessionCount === 50) {
+        setTimeout(() => {
+          setShowSpecialOffer(true);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        }, 2000); // Show 2s after app opens
+      }
+    }
+  }, []); // Only on mount
+  
+  // Animate special offer banner in/out
+  useEffect(() => {
+    if (showSpecialOffer) {
+      specialOfferOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) });
+      specialOfferTranslateY.value = withSpring(0, { damping: 20, stiffness: 150 });
+    } else {
+      specialOfferOpacity.value = withTiming(0, { duration: 300 });
+      specialOfferTranslateY.value = withTiming(-100, { duration: 300 });
+    }
+  }, [showSpecialOffer]);
 
   // Monitor device tilt for auto-capture when holding shutter
   useEffect(() => {
@@ -1330,6 +1410,135 @@ export default function MeasurementScreen() {
             }}
           />
         </>
+      )}
+
+      {/* Special Offer Banner - Only show in measurement mode */}
+      {mode === 'measurement' && !isProUser && showSpecialOffer && specialOfferSessionsLeft > 0 && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: insets.top + 20,
+              left: 20,
+              right: 20,
+              zIndex: 100000,
+              transform: [{ translateY: specialOfferTranslateY.value }],
+              opacity: specialOfferOpacity.value,
+            },
+            useAnimatedStyle(() => ({
+              transform: [{ translateY: specialOfferTranslateY.value }],
+              opacity: specialOfferOpacity.value,
+            })),
+          ]}
+        >
+          <Pressable
+            onPress={() => {
+              setShowSpecialOffer(false);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            style={{ flex: 1 }}
+          >
+            <BlurView
+              intensity={100}
+              tint="light"
+              style={{
+                borderRadius: 24,
+                overflow: 'hidden',
+                shadowColor: '#5856D6',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 12,
+                borderWidth: 2,
+                borderColor: 'rgba(88, 86, 214, 0.4)',
+              }}
+            >
+              <View style={{ padding: 24, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}>
+                {/* Squiggly Line Icon */}
+                <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                  <Svg width="50" height="50" viewBox="0 0 60 60">
+                    <Path
+                      d="M 10 30 Q 20 15, 30 30 T 50 30"
+                      stroke="#5856D6"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                    <Path d="M 10 30 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="#5856D6" />
+                    <Path d="M 50 30 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="#5856D6" />
+                  </Svg>
+                </View>
+
+                {/* Title */}
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '800',
+                  color: '#1C1C1E',
+                  textAlign: 'center',
+                  marginBottom: 10,
+                  textShadowColor: 'rgba(0, 0, 0, 0.1)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 2,
+                }}>
+                  {getSpecialOfferCopy(specialOfferSessionsLeft).title}
+                </Text>
+
+                {/* Message */}
+                <Text style={{
+                  fontSize: 14,
+                  color: '#3C3C43',
+                  textAlign: 'center',
+                  lineHeight: 20,
+                  marginBottom: 16,
+                }}>
+                  {getSpecialOfferCopy(specialOfferSessionsLeft).message}
+                </Text>
+
+                {/* Price Badge */}
+                <View style={{
+                  backgroundColor: 'rgba(88, 86, 214, 0.2)',
+                  borderRadius: 12,
+                  paddingVertical: 8,
+                  paddingHorizontal: 16,
+                  alignSelf: 'center',
+                  marginBottom: 12,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(88, 86, 214, 0.4)',
+                }}>
+                  <Text style={{ fontSize: 32, fontWeight: '900', color: '#5856D6', textAlign: 'center' }}>
+                    {getSpecialOfferCopy(specialOfferSessionsLeft).price}
+                  </Text>
+                </View>
+
+                {/* Countdown */}
+                <View style={{
+                  backgroundColor: 'rgba(255, 149, 0, 0.15)',
+                  borderRadius: 10,
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  alignSelf: 'center',
+                  marginBottom: 14,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(255, 149, 0, 0.3)',
+                }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1C1C1E', textAlign: 'center' }}>
+                    ⏰ {getSpecialOfferCopy(specialOfferSessionsLeft).sessionsText}
+                  </Text>
+                </View>
+
+                {/* Tap to dismiss hint */}
+                <Text style={{
+                  fontSize: 12,
+                  color: 'rgba(0, 0, 0, 0.5)',
+                  textAlign: 'center',
+                  fontStyle: 'italic',
+                }}>
+                  Tap to dismiss
+                </Text>
+              </View>
+            </BlurView>
+          </Pressable>
+        </Animated.View>
       )}
 
       {/* Help Modal */}

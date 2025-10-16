@@ -219,7 +219,7 @@ const useStore = create<MeasurementStore>()(
       })),
       
       dismissSpecialOffer: () => set({ 
-        specialOfferTriggered: false,
+        specialOfferTriggered: true, // Keep triggered true so we don't reset
         specialOfferSessionsLeft: 0 
       }),
     }),
