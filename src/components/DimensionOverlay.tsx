@@ -1630,6 +1630,23 @@ export default function DimensionOverlay({
     }
   }, [showCalibrationHint]);
   
+  // Animated styles for hint (must be at top level, not inside conditional)
+  const hintBackgroundStyle = useAnimatedStyle(() => ({
+    opacity: hintOpacity.value,
+  }));
+  
+  const hintCardStyle = useAnimatedStyle(() => {
+    // Color shift between amber, orange, and rose
+    const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
+    const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
+    const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
+    
+    return {
+      transform: [{ scale: hintScale.value }],
+      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
+    };
+  });
+  
   // Tetris Easter egg trigger - detect when legend fills screen
   useEffect(() => {
     if (hasTriggeredTetris || measurements.length === 0) return;
@@ -6361,18 +6378,20 @@ export default function DimensionOverlay({
       {/* Smart Calibration Hint */}
       {showCalibrationHint && (
         <Animated.View
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 9999,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            opacity: hintOpacity,
-          }}
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 9999,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            },
+            hintBackgroundStyle,
+          ]}
         >
           <Pressable
             onPress={() => {
@@ -6387,19 +6406,7 @@ export default function DimensionOverlay({
               bottom: 0,
             }}
           />
-          <Animated.View
-            style={useAnimatedStyle(() => {
-              // Color shift between amber, orange, and rose
-              const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
-              const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
-              const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
-              
-              return {
-                transform: [{ scale: hintScale.value }],
-                backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
-              };
-            })}
-          >
+          <Animated.View style={hintCardStyle}>
             <BlurView
               intensity={100}
               tint="light"
@@ -6418,20 +6425,9 @@ export default function DimensionOverlay({
                 overflow: 'hidden',
               }}
             >
-              <Animated.View
-                style={useAnimatedStyle(() => {
-                  // Animate icon color too
-                  const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
-                  const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
-                  const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
-                  
-                  return {
-                    marginBottom: 16,
-                  };
-                })}
-              >
+              <View style={{ marginBottom: 16 }}>
                 <Ionicons name="warning-outline" size={40} color="rgba(255, 255, 255, 0.95)" />
-              </Animated.View>
+              </View>
               
               <Text style={{ 
                 fontSize: 20, 
