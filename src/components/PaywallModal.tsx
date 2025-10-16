@@ -132,12 +132,41 @@ export default function PaywallModal({
                       fontSize: 16,
                       color: '#3C3C43',
                       textAlign: 'center',
-                      marginBottom: 24,
+                      marginBottom: 8,
                       lineHeight: 24,
                     }}
                   >
-                    Unlock unlimited precision
+                    Unlock the Freehand tool
                   </Text>
+
+                  {/* Freehand tool description */}
+                  <View style={{
+                    backgroundColor: 'rgba(88, 86, 214, 0.08)',
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 24,
+                    borderWidth: 1,
+                    borderColor: 'rgba(88, 86, 214, 0.15)',
+                  }}>
+                    <Text style={{
+                      fontSize: 15,
+                      color: '#1C1C1E',
+                      textAlign: 'center',
+                      lineHeight: 22,
+                      marginBottom: 10,
+                      fontWeight: '600',
+                    }}>
+                      ✨ Draw & measure anything
+                    </Text>
+                    <Text style={{
+                      fontSize: 14,
+                      color: '#3C3C43',
+                      textAlign: 'center',
+                      lineHeight: 20,
+                    }}>
+                      Trace rivers on maps, measure winding cables, calculate areas of irregular shapes, or outline any curved path
+                    </Text>
+                  </View>
 
                   <View style={{ marginBottom: 24 }}>
                     <View style={{ 
