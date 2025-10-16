@@ -2079,7 +2079,7 @@ Thank you for helping us improve PanHandler!
                         const now = Date.now();
                         let newCount = eggTapCount;
                         
-                        if (now - eggLastTapTime > 1000) {
+                        if (now - eggLastTapTime > 2000) {
                           newCount = 1;
                         } else {
                           newCount = eggTapCount + 1;
@@ -2088,7 +2088,7 @@ Thank you for helping us improve PanHandler!
                         setEggTapCount(newCount);
                         setEggLastTapTime(now);
                         
-                        if (newCount >= 10) {
+                        if (newCount >= 5) {
                           const newProStatus = !isProUser;
                           setIsProUser(newProStatus);
                           setEggTapCount(0);
@@ -2100,7 +2100,7 @@ Thank you for helping us improve PanHandler!
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                             showAlert('🥚 Back to Free', 'Pro features locked again.', 'info');
                           }
-                        } else if (newCount >= 5) {
+                        } else if (newCount >= 3) {
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         } else {
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
