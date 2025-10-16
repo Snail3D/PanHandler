@@ -331,15 +331,17 @@ export default function MeasurementScreen() {
         
         // Animate bubble based on device tilt
         // Detect if phone is horizontal or vertical
-        const isVerticalMode = absBeta > 45; // Phone is held vertically
+        const isVerticalMode = absBeta > 45; // Phone is held vertically (portrait)
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement (up/down tilt)
-          // X is locked to center
-          const verticalTilt = beta - 90; // How far from true vertical (90°) - SIGNED for negative values
-          const bubbleYOffset = (verticalTilt / 15) * maxBubbleOffset; // ±15° = max offset
+          // When holding phone upright (portrait), beta is near 0° when level
+          // Tilting forward (looking down) makes beta positive
+          // Tilting backward (looking up) makes beta negative
+          const verticalTilt = beta; // Use beta directly (0° = level, positive = down, negative = up)
+          const bubbleYOffset = -(verticalTilt / 15) * maxBubbleOffset; // Inverted: tilt down = bubble goes up (negative Y)
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
@@ -552,8 +554,8 @@ export default function MeasurementScreen() {
   
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [
-      { translateX: bubbleX.value + 60 - 12 }, // Center in 120px container with 24px bubble
-      { translateY: bubbleY.value + 60 - 12 },
+      { translateX: bubbleX.value + 60 - 14 }, // Center in 120px container with 28px bubble
+      { translateY: bubbleY.value + 60 - 14 },
     ],
   }));
   
@@ -955,15 +957,33 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Cosmic smoke trail with particles */}
+              {/* Cosmic smoke trail with flowing wisps and particles */}
               {trailPositions.current.map((pos, index) => {
                 const progress = (index + 1) / trailPositions.current.length;
-                const opacity = progress * progress; // Quadratic fade
-                const scale = 0.4 + (progress * 0.6);
+                const opacity = progress * progress * progress; // Cubic fade for more dramatic dissipation
+                const scale = 0.3 + (progress * 0.8);
+                const angle = index * 0.5; // Rotation for variety
                 
                 return (
                   <React.Fragment key={`trail-${index}`}>
-                    {/* Main smoke wisp */}
+                    {/* Large wispy smoke cloud */}
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: 60 + pos.y - 10 * scale,
+                        left: 60 + pos.x - 10 * scale,
+                        width: 20 * scale,
+                        height: 20 * scale,
+                        borderRadius: 10 * scale,
+                        backgroundColor: bubbleColor.glow,
+                        opacity: opacity * 0.2,
+                        shadowColor: bubbleColor.glow,
+                        shadowOpacity: opacity * 0.5,
+                        shadowRadius: 16,
+                        transform: [{ rotate: `${angle}rad` }],
+                      }}
+                    />
+                    {/* Inner glow wisp */}
                     <View
                       style={{
                         position: 'absolute',
@@ -972,121 +992,79 @@ export default function MeasurementScreen() {
                         width: 12 * scale,
                         height: 12 * scale,
                         borderRadius: 6 * scale,
-                        backgroundColor: bubbleColor.glow,
-                        opacity: opacity * 0.3,
+                        backgroundColor: bubbleColor.main,
+                        opacity: opacity * 0.35,
                         shadowColor: bubbleColor.glow,
-                        shadowOpacity: opacity * 0.6,
-                        shadowRadius: 12,
+                        shadowOpacity: opacity * 0.7,
+                        shadowRadius: 10,
                       }}
                     />
-                    {/* Sparkle particles around trail */}
-                    {index % 2 === 0 && (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          top: 60 + pos.y + Math.sin(index) * 8,
-                          left: 60 + pos.x + Math.cos(index) * 8,
-                          width: 3,
-                          height: 3,
-                          borderRadius: 1.5,
-                          backgroundColor: '#FFFFFF',
-                          opacity: opacity * 0.6,
-                          shadowColor: bubbleColor.glow,
-                          shadowOpacity: 0.8,
-                          shadowRadius: 4,
-                        }}
-                      />
+                    {/* Scattered sparkle particles */}
+                    {index % 2 === 0 && progress > 0.4 && (
+                      <>
+                        <View
+                          style={{
+                            position: 'absolute',
+                            top: 60 + pos.y + Math.sin(index * 1.5) * 10,
+                            left: 60 + pos.x + Math.cos(index * 1.5) * 10,
+                            width: 2,
+                            height: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#FFFFFF',
+                            opacity: opacity * 0.8,
+                            shadowColor: bubbleColor.glow,
+                            shadowOpacity: 1.0,
+                            shadowRadius: 3,
+                          }}
+                        />
+                        <View
+                          style={{
+                            position: 'absolute',
+                            top: 60 + pos.y - Math.sin(index * 2) * 8,
+                            left: 60 + pos.x - Math.cos(index * 2) * 8,
+                            width: 2,
+                            height: 2,
+                            borderRadius: 1,
+                            backgroundColor: '#FFFFFF',
+                            opacity: opacity * 0.6,
+                            shadowColor: bubbleColor.glow,
+                            shadowOpacity: 0.8,
+                            shadowRadius: 2,
+                          }}
+                        />
+                      </>
                     )}
                   </React.Fragment>
                 );
               })}
               
-              {/* Cosmic energy bubble with nebula interior */}
+              {/* COSMIC ENERGY BALL - Multi-layer nebula with electric energy */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    // Dark cosmic base
-                    backgroundColor: '#1a0a2e',
-                    // Multiple shadow layers for cosmic glow
-                    shadowColor: bubbleColor.glow,
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 1.0,
-                    shadowRadius: 28,
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
                   },
                   bubbleStyle,
                 ]}
               >
-                {/* Dark nebula interior */}
+                {/* Outermost diffuse glow aura */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 2,
-                    left: 2,
-                    right: 2,
-                    bottom: 2,
-                    borderRadius: 10,
-                    backgroundColor: bubbleColor.main,
-                    opacity: 0.5,
+                    top: -12,
+                    left: -12,
+                    right: -12,
+                    bottom: -12,
+                    borderRadius: 26,
+                    backgroundColor: bubbleColor.glow,
+                    opacity: 0.12,
                   }}
                 />
                 
-                {/* Electric energy ring 1 */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 4,
-                    left: 4,
-                    right: 4,
-                    bottom: 4,
-                    borderRadius: 8,
-                    borderWidth: 1.5,
-                    borderColor: '#60A5FA',
-                    opacity: 0.8,
-                    shadowColor: '#60A5FA',
-                    shadowOpacity: 1.0,
-                    shadowRadius: 6,
-                  }}
-                />
-                
-                {/* Electric energy ring 2 */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 6,
-                    left: 6,
-                    right: 6,
-                    bottom: 6,
-                    borderRadius: 6,
-                    borderWidth: 1,
-                    borderColor: '#93C5FD',
-                    opacity: 0.6,
-                    shadowColor: '#93C5FD',
-                    shadowOpacity: 0.8,
-                    shadowRadius: 4,
-                  }}
-                />
-                
-                {/* Bright cosmic core */}
-                <View
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    left: 8,
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: '#FFFFFF',
-                    shadowColor: '#FFFFFF',
-                    shadowOpacity: 1.0,
-                    shadowRadius: 8,
-                  }}
-                />
-                
-                {/* Outer cosmic aura */}
+                {/* Outer glow ring */}
                 <View
                   style={{
                     position: 'absolute',
@@ -1094,9 +1072,142 @@ export default function MeasurementScreen() {
                     left: -8,
                     right: -8,
                     bottom: -8,
-                    borderRadius: 20,
+                    borderRadius: 22,
                     backgroundColor: bubbleColor.glow,
-                    opacity: 0.15,
+                    opacity: 0.25,
+                    shadowColor: bubbleColor.glow,
+                    shadowOpacity: 0.8,
+                    shadowRadius: 20,
+                  }}
+                />
+                
+                {/* Main dark cosmic shell */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: 14,
+                    backgroundColor: '#0a0118', // Deeper space black
+                    shadowColor: bubbleColor.glow,
+                    shadowOpacity: 1.0,
+                    shadowRadius: 24,
+                  }}
+                />
+                
+                {/* Colored nebula swirl layer 1 */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    left: 2,
+                    right: 2,
+                    bottom: 2,
+                    borderRadius: 12,
+                    backgroundColor: bubbleColor.main,
+                    opacity: 0.4,
+                  }}
+                />
+                
+                {/* Colored nebula swirl layer 2 - offset */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 3,
+                    left: 4,
+                    right: 1,
+                    bottom: 3,
+                    borderRadius: 11,
+                    backgroundColor: bubbleColor.glow,
+                    opacity: 0.3,
+                  }}
+                />
+                
+                {/* Electric energy ring 1 - outer */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 5,
+                    left: 5,
+                    right: 5,
+                    bottom: 5,
+                    borderRadius: 9,
+                    borderWidth: 1.5,
+                    borderColor: '#3B82F6',
+                    shadowColor: '#3B82F6',
+                    shadowOpacity: 1.0,
+                    shadowRadius: 6,
+                    opacity: 0.9,
+                  }}
+                />
+                
+                {/* Electric energy ring 2 - middle */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 7,
+                    left: 7,
+                    right: 7,
+                    bottom: 7,
+                    borderRadius: 7,
+                    borderWidth: 1.5,
+                    borderColor: '#60A5FA',
+                    shadowColor: '#60A5FA',
+                    shadowOpacity: 0.9,
+                    shadowRadius: 5,
+                    opacity: 0.8,
+                  }}
+                />
+                
+                {/* Electric energy ring 3 - inner */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 9,
+                    left: 9,
+                    right: 9,
+                    bottom: 9,
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: '#93C5FD',
+                    shadowColor: '#93C5FD',
+                    shadowOpacity: 0.8,
+                    shadowRadius: 4,
+                    opacity: 0.7,
+                  }}
+                />
+                
+                {/* Bright white core - the star */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 11,
+                    left: 11,
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: '#FFFFFF',
+                    shadowColor: '#FFFFFF',
+                    shadowOpacity: 1.0,
+                    shadowRadius: 10,
+                  }}
+                />
+                
+                {/* Ultra-bright core highlight */}
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 12,
+                    width: 4,
+                    height: 4,
+                    borderRadius: 2,
+                    backgroundColor: '#FFFFFF',
+                    shadowColor: '#93C5FD',
+                    shadowOpacity: 1.0,
+                    shadowRadius: 6,
                   }}
                 />
               </Animated.View>
@@ -1148,7 +1259,7 @@ export default function MeasurementScreen() {
                   <Ionicons name="images-outline" size={28} color="white" />
                 </Pressable>
 
-                {/* Camera Shutter - HOLD ONLY for auto-level capture */}
+                {/* Camera Shutter - Elegant minimal design */}
                 <Pressable
                   onPressIn={() => {
                     setIsHoldingShutter(true);
@@ -1164,38 +1275,25 @@ export default function MeasurementScreen() {
                     width: 96,
                     height: 96,
                     borderRadius: 48,
-                    backgroundColor: 'white',
-                    borderWidth: 5,
-                    borderColor: isHoldingShutter 
-                      ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.9)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.9)' : 'rgba(239, 83, 80, 0.9)')
-                      : '#D1D5DB',
+                    backgroundColor: 'transparent', // Clear background
+                    borderWidth: 2, // Thin elegant outline (same as crosshairs)
+                    borderColor: 'rgba(156, 163, 175, 0.9)', // Gray like crosshairs
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                 >
-                  <View style={{ 
-                    width: 76, 
-                    height: 76, 
-                    borderRadius: 38, 
-                    backgroundColor: isHoldingShutter 
-                      ? (alignmentStatus === 'good' ? 'rgba(76, 175, 80, 0.8)' : alignmentStatus === 'warning' ? 'rgba(255, 183, 77, 0.8)' : 'rgba(239, 83, 80, 0.8)')
-                      : 'white',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                  <Text style={{ 
+                    color: 'rgba(255, 255, 255, 0.9)', 
+                    fontSize: 11, 
+                    fontWeight: '600',
+                    textAlign: 'center',
+                    lineHeight: 14,
                   }}>
-                    <Text style={{ 
-                      color: isHoldingShutter ? 'white' : '#6B7280', 
-                      fontSize: 11, 
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      lineHeight: 14,
-                    }}>
-                      {isHoldingShutter 
-                        ? (alignmentStatus === 'good' && isStable ? 'Perfect!\nCapturing...' : 'Hold\nsteady...') 
-                        : 'Hold level\nto auto\ncapture'
-                      }
-                    </Text>
-                  </View>
+                    {isHoldingShutter 
+                      ? (alignmentStatus === 'good' && isStable ? 'Perfect!\nCapturing...' : 'Hold\nsteady...') 
+                      : 'Hold level\nto auto\ncapture'
+                    }
+                  </Text>
                 </Pressable>
               </View>
             </View>
