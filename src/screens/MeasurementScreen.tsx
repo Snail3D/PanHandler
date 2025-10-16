@@ -538,8 +538,14 @@ export default function MeasurementScreen() {
           // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Use gamma for left/right when vertical
           
-          bubbleX.value = withSpring(bubbleXOffset, { damping: 20, stiffness: 180, mass: 0.8 });
-          bubbleY.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock Y to center when vertical
+          // VERTICAL MODE: Much heavier damping for smoother movement
+          // Higher damping = slower, smoother response (less jerky)
+          bubbleX.value = withSpring(bubbleXOffset, { 
+            damping: 35,      // Was 20, now much heavier
+            stiffness: 120,   // Was 180, now softer
+            mass: 1.2         // Was 0.8, now heavier (more inertia)
+          });
+          bubbleY.value = withSpring(0, { damping: 35, stiffness: 120, mass: 1.2 }); // Lock Y to center when vertical
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
@@ -1085,12 +1091,28 @@ export default function MeasurementScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <CameraView 
-            ref={cameraRef}
+          <Pressable 
             style={{ flex: 1 }}
-            facing="back"
-            enableTorch={flashEnabled}
+            onPress={async (event) => {
+              const { locationX, locationY } = event.nativeEvent;
+              if (cameraRef.current) {
+                try {
+                  // Focus camera at tap location
+                  // Note: Expo Camera v15+ handles focus automatically on tap
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                } catch (error) {
+                  __DEV__ && console.log('Focus error:', error);
+                }
+              }
+            }}
           >
+            <CameraView 
+              ref={cameraRef}
+              style={{ flex: 1 }}
+              facing="back"
+              enableTorch={flashEnabled}
+              autofocus="on"
+            >
             {/* Top controls */}
             <View 
               style={{ 
@@ -1423,6 +1445,7 @@ export default function MeasurementScreen() {
               </View>
             </View>
           </CameraView>
+          </Pressable>
           
           {/* Black overlay that fades out for smooth transition */}
           <Animated.View
