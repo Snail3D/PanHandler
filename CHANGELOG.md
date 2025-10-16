@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.85] - 2025-10-16
+
+### 🎯 Polish & UX Refinements
+
+#### ✨ Features
+- **Persistent Map Scale Display** - Verbal scale info stays visible when switching modes
+  - Once you lock in a map scale (e.g., "1in = 10ft"), it stays in the calibration badge
+  - Visible even when switching back to Distance/Circle/Rectangle modes
+  - Users can see their scale reference at all times
+  - Badge shows: "Verbal scale • 1in = 10ft • Locked in"
+
+- **Background Audio Support** - Camera no longer interrupts YouTube, music, podcasts
+  - Configured iOS audio session to be non-intrusive
+  - Background audio continues playing while using camera
+  - Perfect for taking reference photos without disrupting media
+  - Uses `expo-av` Audio.setAudioModeAsync() with ambient settings
+
+#### 🎨 UI Polish
+- **Recalibrate Button Spacing Fix** - Consistent padding below calibration badge
+  - Adjusted spacing from 110px to 95px when map scale is locked
+  - Maintains same visual distance whether in map mode or regular mode
+  - Proper spacing compensation for taller badge with verbal scale info
+
+#### 🔧 Technical Details
+- Audio session configuration in CameraScreen useEffect
+- Changed map scale visibility from `isMapMode` check to `mapScale` existence check
+- Recalibrate button positioning uses `mapScale` instead of `isMapMode`
+- Non-recording, non-exclusive audio mode for camera
+
+#### 📁 Files Modified
+- `src/screens/CameraScreen.tsx` - Audio session configuration
+- `src/components/DimensionOverlay.tsx` - Map scale persistence & button spacing
+
+---
+
 ## [Alpha v1.8] - 2025-10-16
 
 ### 🧠 Smart UX & Motion Refinements
