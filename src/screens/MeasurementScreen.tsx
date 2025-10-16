@@ -337,11 +337,11 @@ export default function MeasurementScreen() {
         
         if (isVerticalMode) {
           // VERTICAL MODE: Only Y movement (up/down tilt)
-          // Phone standing upright on table = beta ≈ 90° = level/centered
-          // Tilt top away from you (look down) = beta increases (> 90°) → bubble should go DOWN (negative Y)
-          // Tilt top toward you (look up) = beta decreases (< 90°) → bubble should go UP (positive Y)
-          const verticalTilt = beta - 90; // Offset from upright (90°) position
-          const bubbleYOffset = -(verticalTilt / 15) * maxBubbleOffset; // INVERTED: tilt down = bubble down (negative Y)
+          // Phone standing upright = beta ~90° = centered
+          // Tilt top toward you (look down at screen) = beta < 90 = bubble goes UP
+          // Tilt top away (screen faces ceiling) = beta > 90 = bubble goes DOWN
+          const verticalDiff = beta - 90; // How far from perfect vertical (90°)
+          const bubbleYOffset = (verticalDiff / 15) * maxBubbleOffset;
           
           bubbleX.value = withSpring(0, { damping: 20, stiffness: 180, mass: 0.8 }); // Lock X to center
           bubbleY.value = withSpring(bubbleYOffset, { damping: 20, stiffness: 180, mass: 0.8 });
@@ -957,62 +957,62 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* Cosmic smoke trail - 20% smaller */}
+              {/* Cosmic smoke trail - GRAY (professional), 20% smaller */}
               {trailPositions.current.map((pos, index) => {
                 const progress = (index + 1) / trailPositions.current.length;
                 const opacity = progress * progress * progress;
-                const scale = 0.312 + (progress * 0.832); // 20% smaller: was 0.39 + 1.04
+                const scale = 0.312 + (progress * 0.832); // 20% smaller
                 const angle = index * 0.5;
                 
                 return (
                   <React.Fragment key={`trail-${index}`}>
-                    {/* Large wispy smoke cloud - 20% smaller */}
+                    {/* Large wispy smoke cloud - GRAY */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 10.4 * scale, // 20% smaller: was 13
+                        top: 60 + pos.y - 10.4 * scale,
                         left: 60 + pos.x - 10.4 * scale,
-                        width: 20.8 * scale, // 20% smaller: was 26
+                        width: 20.8 * scale,
                         height: 20.8 * scale,
                         borderRadius: 10.4 * scale,
-                        backgroundColor: bubbleColor.glow,
+                        backgroundColor: '#9CA3AF', // Gray-400 (professional)
                         opacity: opacity * 0.2,
-                        shadowColor: bubbleColor.glow,
+                        shadowColor: '#6B7280', // Gray-500 shadow
                         shadowOpacity: opacity * 0.5,
                         shadowRadius: 16,
                         transform: [{ rotate: `${angle}rad` }],
                       }}
                     />
-                    {/* Inner glow wisp - 20% smaller */}
+                    {/* Inner glow wisp - GRAY */}
                     <View
                       style={{
                         position: 'absolute',
-                        top: 60 + pos.y - 6.24 * scale, // 20% smaller: was 7.8
+                        top: 60 + pos.y - 6.24 * scale,
                         left: 60 + pos.x - 6.24 * scale,
-                        width: 12.48 * scale, // 20% smaller: was 15.6
+                        width: 12.48 * scale,
                         height: 12.48 * scale,
                         borderRadius: 6.24 * scale,
-                        backgroundColor: bubbleColor.main,
+                        backgroundColor: '#D1D5DB', // Gray-300 (lighter)
                         opacity: opacity * 0.35,
-                        shadowColor: bubbleColor.glow,
+                        shadowColor: '#9CA3AF',
                         shadowOpacity: opacity * 0.7,
                         shadowRadius: 10,
                       }}
                     />
-                    {/* Scattered sparkle particles - 20% smaller */}
+                    {/* Scattered sparkle particles - WHITE */}
                     {index % 2 === 0 && progress > 0.4 && (
                       <>
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y + Math.sin(index * 1.5) * 10.4, // 20% smaller: was 13
+                            top: 60 + pos.y + Math.sin(index * 1.5) * 10.4,
                             left: 60 + pos.x + Math.cos(index * 1.5) * 10.4,
-                            width: 2.08, // 20% smaller: was 2.6
+                            width: 2.08,
                             height: 2.08,
                             borderRadius: 1.04,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.8,
-                            shadowColor: bubbleColor.glow,
+                            shadowColor: '#E5E7EB', // Gray-200 glow
                             shadowOpacity: 1.0,
                             shadowRadius: 3,
                           }}
@@ -1020,14 +1020,14 @@ export default function MeasurementScreen() {
                         <View
                           style={{
                             position: 'absolute',
-                            top: 60 + pos.y - Math.sin(index * 2) * 8.32, // 20% smaller: was 10.4
+                            top: 60 + pos.y - Math.sin(index * 2) * 8.32,
                             left: 60 + pos.x - Math.cos(index * 2) * 8.32,
                             width: 2.08,
                             height: 2.08,
                             borderRadius: 1.04,
                             backgroundColor: '#FFFFFF',
                             opacity: opacity * 0.6,
-                            shadowColor: bubbleColor.glow,
+                            shadowColor: '#E5E7EB',
                             shadowOpacity: 0.8,
                             shadowRadius: 2,
                           }}
