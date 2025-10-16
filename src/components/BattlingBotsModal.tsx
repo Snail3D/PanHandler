@@ -190,6 +190,9 @@ export default function BattlingBotsModal({
     
     const message = script[currentMessageIndex];
     
+    // Haptic feedback on typing start
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
     // Handle backspace scenario
     if (message.shouldBackspace && message.meanText && message.niceText) {
       let charIndex = 0;
@@ -198,9 +201,15 @@ export default function BattlingBotsModal({
       
       const typeInterval = setInterval(() => {
         if (!isBackspacing) {
-          // Type mean text
+          // Type mean text with periodic haptics
           if (charIndex < message.meanText!.length) {
             setCurrentText(message.meanText!.substring(0, charIndex + 1));
+            
+            // Subtle haptic every 3-4 characters while typing
+            if (charIndex % 4 === 0) {
+              Haptics.selectionAsync();
+            }
+            
             charIndex++;
           } else {
             // Pause before backspacing
@@ -209,19 +218,37 @@ export default function BattlingBotsModal({
               isBackspacing = true;
               backspaceIndex = message.meanText!.length;
               
+              // Stronger haptic when starting to backspace (panic!)
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              
               // Backspace animation
               const backspaceInterval = setInterval(() => {
                 if (backspaceIndex > 0) {
                   setCurrentText(message.meanText!.substring(0, backspaceIndex - 1));
+                  
+                  // Rapid light haptics while backspacing
+                  if (backspaceIndex % 2 === 0) {
+                    Haptics.selectionAsync();
+                  }
+                  
                   backspaceIndex--;
                 } else {
                   // Start typing nice text
                   clearInterval(backspaceInterval);
                   let niceCharIndex = 0;
                   
+                  // Light haptic when starting nice text
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  
                   const niceInterval = setInterval(() => {
                     if (niceCharIndex < message.niceText!.length) {
                       setCurrentText(message.niceText!.substring(0, niceCharIndex + 1));
+                      
+                      // Subtle haptic every 3-4 characters
+                      if (niceCharIndex % 4 === 0) {
+                        Haptics.selectionAsync();
+                      }
+                      
                       niceCharIndex++;
                     } else {
                       clearInterval(niceInterval);
@@ -260,6 +287,12 @@ export default function BattlingBotsModal({
       const typeInterval = setInterval(() => {
         if (charIndex < textToType.length) {
           setCurrentText(textToType.substring(0, charIndex + 1));
+          
+          // Subtle haptic every 3-4 characters while typing
+          if (charIndex % 4 === 0) {
+            Haptics.selectionAsync();
+          }
+          
           charIndex++;
         } else {
           clearInterval(typeInterval);
