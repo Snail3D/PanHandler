@@ -2578,8 +2578,8 @@ export default function DimensionOverlay({
               : 'Calibrated'
             }
           </Text>
-          {/* Show "Verbal scale" and "Locked in" when in map mode */}
-          {isMapMode && !stepBrothersMode && mapScale && (
+          {/* Show "Verbal scale" and "Locked in" when map scale is locked in (regardless of current mode) */}
+          {!stepBrothersMode && mapScale && (
             <View style={{ marginTop: 4, alignItems: 'center' }}>
               <Text style={{ 
                 color: 'rgba(255, 255, 255, 0.75)', 
@@ -2622,8 +2622,8 @@ export default function DimensionOverlay({
           style={{
             position: 'absolute',
             zIndex: 20,
-            top: isMapMode 
-              ? (isAutoCaptured ? insets.top + 50 + 95 : insets.top + 16 + 95)  // Extra space for map scale info
+            top: mapScale 
+              ? (isAutoCaptured ? insets.top + 50 + 95 : insets.top + 16 + 95)  // Extra space for map scale info (shown even when not in map mode)
               : (isAutoCaptured ? insets.top + 50 + 60 : insets.top + 16 + 60),   // Normal spacing
             right: 16,
             backgroundColor: 'rgba(239, 68, 68, 0.9)', // Red color for reset action
