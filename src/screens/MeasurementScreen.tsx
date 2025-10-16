@@ -63,14 +63,6 @@ export default function MeasurementScreen() {
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
   
-  // Camera zoom control - hardware lens switching
-  const [cameraZoom, setCameraZoom] = useState(1); // 1×, 2×, 4×, 8× etc
-  const [availableZoomLevels, setAvailableZoomLevels] = useState<number[]>([1]); // Detected zoom levels (≥1× only)
-  const [showZoomSelector, setShowZoomSelector] = useState(false); // Show expanded zoom options
-  const [zoomPersonalityText, setZoomPersonalityText] = useState<string | null>(null); // Personality message
-  const zoomSelectorOpacity = useSharedValue(0);
-  const zoomTextOpacity = useSharedValue(0);
-  
   // Ref for the hidden composite view (photo + badge) to capture
   const compositeViewRef = useRef<View>(null);
   const [tempPhotoForBadge, setTempPhotoForBadge] = useState<string | null>(null);
@@ -372,29 +364,6 @@ export default function MeasurementScreen() {
       specialOfferTranslateY.value = withTiming(-100, { duration: 300 });
     }
   }, [showSpecialOffer]);
-  
-  // Detect available zoom levels on camera mount
-  useEffect(() => {
-    if (mode === 'camera') {
-      // Common zoom levels: Most phones have 1×, many have 2×, some have 3×, 5×, or 10×
-      // We'll provide sensible defaults and filter to ≥1× (no wide-angle)
-      // iOS: typically 1×, 2×, 3× (Pro models), 5× (Pro Max)
-      // Android: varies widely, but typically 1×, 2×, sometimes 5× or 10×
-      
-      // For now, offer standard zoom levels that work via digital zoom
-      // CameraView's zoom prop accepts any value ≥ 0
-      // Typical hardware lenses: 1× (wide), 2×-3× (telephoto), 5×-10× (super telephoto)
-      
-      const commonZoomLevels = [1, 2, 4, 8];
-      
-      // Filter to only show zoom ≥ 1× (no wide-angle 0.5×)
-      const validZoomLevels = commonZoomLevels.filter(z => z >= 1);
-      
-      setAvailableZoomLevels(validZoomLevels);
-      
-      __DEV__ && console.log('📸 Available zoom levels:', validZoomLevels);
-    }
-  }, [mode]);
   
   // Monitor device tilt for auto-capture when holding shutter
   useEffect(() => {
@@ -748,14 +717,6 @@ export default function MeasurementScreen() {
     opacity: cameraFlashOpacity.value,
   }));
   
-  const zoomSelectorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: zoomSelectorOpacity.value,
-  }));
-  
-  const zoomTextAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: zoomTextOpacity.value,
-  }));
-  
   const specialOfferAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: specialOfferTranslateY.value }],
     opacity: specialOfferOpacity.value,
@@ -994,7 +955,6 @@ export default function MeasurementScreen() {
             style={{ flex: 1 }}
             facing="back"
             enableTorch={flashEnabled}
-            zoom={cameraZoom === 1 ? 0 : cameraZoom === 2 ? 0.25 : cameraZoom === 4 ? 0.5 : 1}
           >
             {/* Top controls */}
             <View 
@@ -1247,121 +1207,6 @@ export default function MeasurementScreen() {
                 >
                   <Ionicons name="images-outline" size={28} color="white" />
                 </Pressable>
-
-                {/* Camera Zoom Selector - Bottom Right */}
-                <View style={{ position: 'absolute', right: 32, bottom: 0 }}>
-                  {/* Expanded Zoom Options */}
-                  {showZoomSelector && (
-                    <Animated.View
-                      style={[
-                        {
-                          position: 'absolute',
-                          bottom: 60,
-                          right: 0,
-                          gap: 12,
-                          alignItems: 'center',
-                        },
-                        zoomSelectorAnimatedStyle,
-                      ]}
-                    >
-                      {availableZoomLevels.map((zoom) => (
-                        <Pressable
-                          key={zoom}
-                          onPress={() => {
-                            setCameraZoom(zoom);
-                            setShowZoomSelector(false);
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                            
-                            // Show personality text
-                            const messages: Record<number, string> = {
-                              1: "", // No message for 1×
-                              2: "You know what you're doing 🎯",
-                              4: "Are you sure? 🤔",
-                              8: "You're a wild man! 🤠",
-                            };
-                            const message = messages[zoom] || (zoom > 4 ? "You're a wild man! 🤠" : "");
-                            if (message) {
-                              setZoomPersonalityText(message);
-                              zoomTextOpacity.value = 0;
-                              zoomTextOpacity.value = withSequence(
-                                withTiming(1, { duration: 300 }),
-                                withTiming(1, { duration: 1500 }),
-                                withTiming(0, { duration: 300 })
-                              );
-                              setTimeout(() => setZoomPersonalityText(null), 2100);
-                            }
-                            
-                            zoomSelectorOpacity.value = withTiming(0, { duration: 200 });
-                          }}
-                          style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 24,
-                            backgroundColor: zoom === cameraZoom ? 'rgba(255, 255, 255, 0.3)' : 'rgba(31, 41, 55, 0.8)',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderWidth: zoom === cameraZoom ? 2 : 0,
-                            borderColor: 'white',
-                          }}
-                        >
-                          <Text style={{ color: 'white', fontSize: 14, fontWeight: '700' }}>
-                            {zoom}×
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </Animated.View>
-                  )}
-                  
-                  {/* Current Zoom Badge - Always Visible */}
-                  <Pressable
-                    onPress={() => {
-                      if (availableZoomLevels.length > 1) {
-                        setShowZoomSelector(!showZoomSelector);
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        zoomSelectorOpacity.value = showZoomSelector ? 0 : withSpring(1);
-                      }
-                    }}
-                    style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: 28,
-                      backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: 3,
-                      borderWidth: showZoomSelector ? 2 : 0,
-                      borderColor: 'rgba(255, 255, 255, 0.6)',
-                    }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 15, fontWeight: '700' }}>
-                      {cameraZoom}×
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Personality Text - Floats above zoom selector */}
-                {zoomPersonalityText && (
-                  <Animated.View
-                    style={[
-                      {
-                        position: 'absolute',
-                        right: 100,
-                        bottom: 15,
-                        backgroundColor: 'rgba(31, 41, 55, 0.95)',
-                        paddingHorizontal: 16,
-                        paddingVertical: 10,
-                        borderRadius: 12,
-                        maxWidth: SCREEN_WIDTH - 180,
-                      },
-                      zoomTextAnimatedStyle,
-                    ]}
-                    pointerEvents="none"
-                  >
-                    <Text style={{ color: 'white', fontSize: 13, fontWeight: '600', textAlign: 'center' }}>
-                      {zoomPersonalityText}
-                    </Text>
-                  </Animated.View>
-                )}
 
                 {/* Instructional Text - No button needed! */}
                 <View
