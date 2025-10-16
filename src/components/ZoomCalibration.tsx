@@ -506,13 +506,13 @@ export default function ZoomCalibration({
                   )}
                 </View>
 
-                {/* Search Results - Better spacing and larger tap targets */}
+                {/* Search Results - Alternating colors, larger tap targets */}
                 {searchResults.length > 0 && (
                   <ScrollView 
-                    style={{ maxHeight: 240 }}
+                    style={{ maxHeight: 280 }}
                     showsVerticalScrollIndicator={false}
                   >
-                    {searchResults.slice(0, 5).map((coin) => (
+                    {searchResults.slice(0, 5).map((coin, index) => (
                       <Pressable
                         key={`${coin.country}-${coin.name}`}
                         onPress={() => {
@@ -523,37 +523,37 @@ export default function ZoomCalibration({
                           setSearchQuery('');
                         }}
                         style={({ pressed }) => ({
-                          paddingVertical: 16, // Increased from 12 for bigger tap target
-                          paddingHorizontal: 16, // Increased from 12
-                          marginBottom: 10, // Increased from 8 for more separation
-                          borderRadius: 12, // Slightly larger radius
+                          paddingVertical: 18,
+                          paddingHorizontal: 16,
+                          marginBottom: 6,
+                          borderRadius: 10,
                           backgroundColor: pressed 
-                            ? 'rgba(255, 255, 255, 0.95)' 
-                            : 'rgba(255, 255, 255, 0.7)',
-                          borderWidth: 1.5, // Thicker border
-                          borderColor: pressed 
-                            ? 'rgba(0, 0, 0, 0.15)' 
-                            : 'rgba(0, 0, 0, 0.08)',
-                          shadowColor: '#000', // Added shadow for depth
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: pressed ? 0.15 : 0.08,
-                          shadowRadius: 4,
-                          elevation: pressed ? 3 : 1,
+                            ? 'rgba(0, 0, 0, 0.12)' 
+                            : index % 2 === 0 
+                              ? 'rgba(255, 255, 255, 0.85)'  // Light (even rows)
+                              : 'rgba(240, 240, 245, 0.85)', // Slightly darker (odd rows)
+                          borderWidth: 1,
+                          borderColor: 'rgba(0, 0, 0, 0.06)',
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 1 },
+                          shadowOpacity: 0.05,
+                          shadowRadius: 2,
+                          elevation: 1,
                         })}
                       >
                         <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.9)', // Darker for better contrast
-                          fontWeight: '700', // Bolder
-                          fontSize: 15, // Slightly larger
-                          marginBottom: 3, // More spacing
+                          color: 'rgba(0, 0, 0, 0.95)',
+                          fontWeight: '700',
+                          fontSize: 16,
+                          marginBottom: 4,
                           textAlign: 'center',
                         }}>
                           {coin.name}
                         </Text>
                         <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.55)', // Better contrast
-                          fontSize: 13, // Larger
-                          fontWeight: '600', // Bolder
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          fontSize: 13,
+                          fontWeight: '600',
                           textAlign: 'center',
                         }}>
                           {coin.diameter}mm • {coin.country}
