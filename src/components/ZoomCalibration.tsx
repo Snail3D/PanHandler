@@ -84,6 +84,7 @@ export default function ZoomCalibration({
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
+  const [showCoinSelector, setShowCoinSelector] = useState(false);
   
   // Use session color if provided (from camera screen), otherwise fallback to random for backwards compatibility
   const [currentColor] = useState(() => {
@@ -510,201 +511,6 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Coin Selector at Top - compact and always visible */}
-      <View
-        style={{
-          position: 'absolute',
-          top: insets.top + 12,
-          left: 20,
-          right: 20,
-          zIndex: searchQuery.trim().length > 0 ? 1000 : 100,
-        }}
-        pointerEvents="box-none"
-      >
-        <BlurView
-          intensity={35}
-          tint="light"
-          style={{
-            borderRadius: 16,
-            overflow: 'hidden',
-            shadowColor: selectedCoin ? '#4CAF50' : currentColor,
-            shadowOffset: { width: 0, height: 3 },
-            shadowOpacity: 0.2,
-            shadowRadius: 12,
-          }}
-        >
-          <View style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderRadius: 16,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.35)',
-          }}>
-            {selectedCoin ? (
-              // Selected coin display - COMPACT single line
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setSelectedCoin(null);
-                }}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                  <View style={{
-                    backgroundColor: 'rgba(76, 175, 80, 0.25)',
-                    paddingHorizontal: 6,
-                    paddingVertical: 2,
-                    borderRadius: 4,
-                    marginRight: 8,
-                  }}>
-                    <Text style={{ 
-                      color: '#2E7D32', 
-                      fontSize: 9, 
-                      fontWeight: '700', 
-                      letterSpacing: 0.5 
-                    }}>
-                      SELECTED
-                    </Text>
-                  </View>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.9)', 
-                    fontWeight: '700', 
-                    fontSize: 15,
-                  }}>
-                    {selectedCoin.name}
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.55)', 
-                    fontSize: 13, 
-                    fontWeight: '500',
-                    marginLeft: 6,
-                  }}>
-                    • {selectedCoin.diameter}mm
-                  </Text>
-                </View>
-                <Ionicons name="swap-horizontal" size={18} color="rgba(0, 0, 0, 0.5)" />
-              </Pressable>
-            ) : (
-              // Coin search UI
-              <View>
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 12,
-                }}>
-                  <Text style={{ fontSize: 20, marginRight: 8 }}>🪙</Text>
-                  <Text style={{
-                    color: 'rgba(0, 0, 0, 0.85)',
-                    fontWeight: '700',
-                    fontSize: 16,
-                  }}>
-                    Select Reference Coin
-                  </Text>
-                </View>
-                
-                {/* Search Bar */}
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 12,
-                  paddingHorizontal: 14,
-                  paddingVertical: 10,
-                  borderWidth: 1,
-                  borderColor: 'rgba(0, 0, 0, 0.06)',
-                  marginBottom: searchResults.length > 0 ? 12 : 0,
-                }}>
-                  <Ionicons name="search" size={16} color="rgba(0, 0, 0, 0.35)" />
-                  <TextInput
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    placeholder="Search coins..."
-                    placeholderTextColor="rgba(0, 0, 0, 0.3)"
-                    style={{
-                      flex: 1,
-                      marginLeft: 10,
-                      fontSize: 14,
-                      color: 'rgba(0, 0, 0, 0.85)',
-                      fontWeight: '500',
-                    }}
-                    autoFocus={false}
-                  />
-                  {searchQuery.length > 0 && (
-                    <Pressable 
-                      onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setSearchQuery('');
-                      }}
-                      style={{ padding: 4 }}
-                    >
-                      <Ionicons name="close-circle" size={16} color="rgba(0, 0, 0, 0.35)" />
-                    </Pressable>
-                  )}
-                </View>
-
-                {/* Search Results - Alternating colors, larger tap targets */}
-                {searchResults.length > 0 && (
-                  <ScrollView 
-                    style={{ maxHeight: 280 }}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {searchResults.slice(0, 5).map((coin, index) => (
-                      <Pressable
-                        key={`${coin.country}-${coin.name}`}
-                        onPress={() => {
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                          Keyboard.dismiss();
-                          setSelectedCoin(coin);
-                          setLastSelectedCoin(coin.name);
-                          setSearchQuery('');
-                        }}
-                        style={({ pressed }) => ({
-                          paddingVertical: 18,
-                          paddingHorizontal: 16,
-                          marginBottom: 6,
-                          borderRadius: 10,
-                          backgroundColor: pressed 
-                            ? 'rgba(0, 0, 0, 0.12)' 
-                            : index % 2 === 0 
-                              ? 'rgba(255, 255, 255, 0.85)'  // Light (even rows)
-                              : 'rgba(240, 240, 245, 0.85)', // Slightly darker (odd rows)
-                          borderWidth: 1,
-                          borderColor: 'rgba(0, 0, 0, 0.06)',
-                          shadowColor: '#000',
-                          shadowOffset: { width: 0, height: 1 },
-                          shadowOpacity: 0.05,
-                          shadowRadius: 2,
-                          elevation: 1,
-                        })}
-                      >
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.95)',
-                          fontWeight: '700',
-                          fontSize: 16,
-                          marginBottom: 4,
-                          textAlign: 'center',
-                        }}>
-                          {coin.name}
-                        </Text>
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.6)',
-                          fontSize: 13,
-                          fontWeight: '600',
-                          textAlign: 'center',
-                        }}>
-                          {coin.diameter}mm • {coin.country}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </ScrollView>
-                )}
-              </View>
-            )}
-          </View>
-        </BlurView>
-      </View>
-
       {/* Help button - top-right corner */}
       {onHelp && (
         <View
@@ -812,10 +618,11 @@ export default function ZoomCalibration({
 
               {/* Bottom Row: Coin Selector + Map Button */}
               <View style={{ flexDirection: 'row', gap: 12 }}>
-                {/* Coin Selector (Quarter) */}
+                {/* Coin Selector Button - Opens search when tapped */}
                 <Pressable
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setSearchQuery(''); // Open search mode
                     setSelectedCoin(null);
                   }}
                   style={({ pressed }) => ({
@@ -882,6 +689,153 @@ export default function ZoomCalibration({
             </View>
           </BlurView>
         </Animated.View>
+      )}
+
+      {/* Coin Search Modal - Shows when no coin selected or when opening selector */}
+      {!selectedCoin && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: insets.bottom + 40,
+            left: SCREEN_WIDTH * 0.10,
+            right: SCREEN_WIDTH * 0.10,
+            zIndex: 1000,
+          }}
+        >
+          <BlurView
+            intensity={35}
+            tint="light"
+            style={{
+              borderRadius: 24,
+              overflow: 'hidden',
+              shadowColor: currentColor,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.3,
+              shadowRadius: 20,
+            }}
+          >
+            <View style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.5)',
+              borderRadius: 24,
+              padding: 20,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.35)',
+            }}>
+              {/* Title */}
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: 12,
+              }}>
+                <Text style={{ fontSize: 20, marginRight: 8 }}>🪙</Text>
+                <Text style={{
+                  color: 'rgba(0, 0, 0, 0.85)',
+                  fontWeight: '700',
+                  fontSize: 16,
+                }}>
+                  Select Reference Coin
+                </Text>
+              </View>
+              
+              {/* Search Bar */}
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                borderRadius: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 10,
+                borderWidth: 1,
+                borderColor: 'rgba(0, 0, 0, 0.06)',
+                marginBottom: searchResults.length > 0 ? 12 : 0,
+              }}>
+                <Ionicons name="search" size={16} color="rgba(0, 0, 0, 0.35)" />
+                <TextInput
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder="Search coins..."
+                  placeholderTextColor="rgba(0, 0, 0, 0.3)"
+                  style={{
+                    flex: 1,
+                    marginLeft: 10,
+                    fontSize: 14,
+                    color: 'rgba(0, 0, 0, 0.85)',
+                    fontWeight: '500',
+                  }}
+                  autoFocus={false}
+                />
+                {searchQuery.length > 0 && (
+                  <Pressable 
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setSearchQuery('');
+                    }}
+                    style={{ padding: 4 }}
+                  >
+                    <Ionicons name="close-circle" size={16} color="rgba(0, 0, 0, 0.35)" />
+                  </Pressable>
+                )}
+              </View>
+
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <ScrollView 
+                  style={{ maxHeight: 280 }}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {searchResults.slice(0, 5).map((coin, index) => (
+                    <Pressable
+                      key={`${coin.country}-${coin.name}`}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        Keyboard.dismiss();
+                        setSelectedCoin(coin);
+                        setLastSelectedCoin(coin.name);
+                        setSearchQuery('');
+                      }}
+                      style={({ pressed }) => ({
+                        paddingVertical: 18,
+                        paddingHorizontal: 16,
+                        marginBottom: 6,
+                        borderRadius: 10,
+                        backgroundColor: pressed 
+                          ? 'rgba(0, 0, 0, 0.12)' 
+                          : index % 2 === 0 
+                            ? 'rgba(255, 255, 255, 0.85)'
+                            : 'rgba(240, 240, 245, 0.85)',
+                        borderWidth: 1,
+                        borderColor: 'rgba(0, 0, 0, 0.06)',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 2,
+                        elevation: 1,
+                      })}
+                    >
+                      <Text style={{ 
+                        color: 'rgba(0, 0, 0, 0.95)',
+                        fontWeight: '700',
+                        fontSize: 16,
+                        marginBottom: 4,
+                        textAlign: 'center',
+                      }}>
+                        {coin.name}
+                      </Text>
+                      <Text style={{ 
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        fontSize: 13,
+                        fontWeight: '600',
+                        textAlign: 'center',
+                      }}>
+                        {coin.diameter}mm • {coin.country}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          </BlurView>
+        </View>
       )}
 
       {/* Back button - left middle edge, 2× bigger */}
