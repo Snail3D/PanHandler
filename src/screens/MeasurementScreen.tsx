@@ -828,11 +828,10 @@ export default function MeasurementScreen() {
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: isVerticalMode.value
       ? [
-          // When crosshair rotates 90°, swap coordinates
-          // bubbleX (from gamma/rotation) → visual X (left/right on screen)
-          // bubbleY (from beta/tilt) → visual Y (up/down on screen)
-          { translateX: bubbleX.value + 60 - 7 }, // gamma controls visual left/right
-          { translateY: bubbleY.value + 60 - 7 }, // beta controls visual up/down
+          // Crosshair rotates 90° clockwise in vertical mode
+          // After 90° CW rotation: Physical Y becomes Visual X, Physical X becomes Visual -Y
+          { translateX: bubbleY.value + 60 - 7 },  // beta/tilt → visual left/right
+          { translateY: -bubbleX.value + 60 - 7 }, // gamma/rotation → visual up/down (negated)
         ]
       : [
           // Normal mapping in horizontal mode
