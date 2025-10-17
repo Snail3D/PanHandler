@@ -238,7 +238,6 @@ export default function App() {
               },
               introAnimatedStyle
             ]}
-            pointerEvents={introOpacity.value > 0.5 ? 'auto' : 'none'}
           >
             <Pressable
               onPress={skipIntro}
