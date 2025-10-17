@@ -732,21 +732,38 @@ export default function MeasurementScreen() {
 
   // Auto-capture when holding shutter button and lines align
   useEffect(() => {
-    // Strict guards: must have camera ref, correct mode, holding, not already capturing
-    if (!cameraRef.current || mode !== 'camera' || isCapturing || !isHoldingShutter) return;
+    // Strict guards: must have camera ref, correct mode, camera ready, holding, not already capturing
+    if (!cameraRef.current || mode !== 'camera' || !isCameraReady || isCapturing || !isHoldingShutter) {
+      return;
+    }
+
+    // Debug: Log when user is holding but conditions aren't perfect
+    if (isHoldingShutter && __DEV__) {
+      console.log('⏳ Holding shutter, waiting for alignment:', {
+        alignmentStatus,
+        isStable,
+        needsGood: alignmentStatus !== 'good',
+        needsStable: !isStable,
+      });
+    }
 
     if (alignmentStatus === 'good' && isStable) {
-      // Add small delay to ensure camera is fully mounted before taking picture
+      // Add small delay to ensure conditions are truly stable
       const timer = setTimeout(() => {
-        // Double-check conditions before capture
-        if (cameraRef.current && mode === 'camera' && !isCapturing && isHoldingShutter) {
+        // Double-check all conditions before capture
+        if (cameraRef.current && mode === 'camera' && isCameraReady && !isCapturing && isHoldingShutter) {
+          __DEV__ && console.log('🎯 Auto-capture triggered!', {
+            alignmentStatus,
+            isStable,
+            isHoldingShutter,
+          });
           takePicture();
         }
       }, 100);
       
       return () => clearTimeout(timer);
     }
-  }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter]);
+  }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter, isCameraReady]);
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
