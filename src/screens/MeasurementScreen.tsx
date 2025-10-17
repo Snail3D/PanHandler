@@ -1348,9 +1348,9 @@ export default function MeasurementScreen() {
                   top: '50%',
                   left: 0,
                   right: 0,
-                  height: 3,
+                  height: 2, // Thinner (was 3)
                   backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
-                  marginTop: -1.5,
+                  marginTop: -1,
                 }}
               />
             </Animated.View>
@@ -1517,39 +1517,62 @@ export default function MeasurementScreen() {
               </View>
             </Animated.View>
 
-            {/* Coin Placement Circle - Shows when horizontal */}
+            {/* Coin Placement Circles - Multiple sizes to choose from */}
             <Animated.View
               style={(() => {
                 'worklet';
                 const horizontal = isHorizontal.value;
                 return {
                   position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  width: 60, // Penny-sized
-                  height: 60,
-                  marginLeft: -30,
-                  marginTop: -30,
-                  opacity: horizontal ? 0.8 : 0,
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  opacity: horizontal ? 0.6 : 0,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              {/* Outer ring */}
-              <View style={{ 
-                width: 60, 
-                height: 60, 
-                borderRadius: 30,
-                borderWidth: 2,
-                borderColor: 'rgba(59, 130, 246, 0.8)',
-                backgroundColor: 'transparent',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                <Text style={{ color: 'rgba(59, 130, 246, 0.9)', fontSize: 8, fontWeight: '600', textAlign: 'center' }}>
-                  COIN{'\n'}HERE
-                </Text>
-              </View>
+              {/* Size options: 30, 35, 40, 45, 50, 55, 60, 65, 70, 75px */}
+              {[30, 35, 40, 45, 50, 55, 60, 65, 70, 75].map((size, index) => {
+                const row = Math.floor(index / 5);
+                const col = index % 5;
+                const offsetX = 50 + (col * 70); // Spacing horizontally
+                const offsetY = 100 + (row * 100); // Spacing vertically
+                
+                return (
+                  <View
+                    key={size}
+                    style={{
+                      position: 'absolute',
+                      left: offsetX,
+                      top: offsetY,
+                      width: size,
+                      height: size,
+                    }}
+                  >
+                    <View style={{ 
+                      width: size, 
+                      height: size, 
+                      borderRadius: size / 2,
+                      borderWidth: 2,
+                      borderColor: 'rgba(59, 130, 246, 0.9)',
+                      backgroundColor: 'transparent',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <Text style={{ 
+                        color: 'rgba(59, 130, 246, 1)', 
+                        fontSize: 9, 
+                        fontWeight: '700',
+                        textAlign: 'center',
+                      }}>
+                        {size}px
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
             </Animated.View>
 
             {/* Auto-Capture Button - Positioned close to crosshairs for visibility */}
