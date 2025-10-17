@@ -102,6 +102,7 @@ interface DimensionOverlayProps {
   zoomRotation?: number;
   viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
+  sessionColor?: { main: string; glow: string }; // Session color from camera for visual continuity
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
   onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
@@ -114,6 +115,7 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
+  sessionColor,
   onRegisterDoubleTapCallback,
   onReset,
   onMeasurementModeChange,
@@ -3053,20 +3055,20 @@ export default function DimensionOverlay({
               style={{
                 width: 44,
                 height: 80,
-                backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                backgroundColor: sessionColor ? sessionColor.main : 'rgba(128, 128, 128, 0.5)',
                 borderTopLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderBottomLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderTopRightRadius: tabSide === 'left' ? 16 : 0,
                 borderBottomRightRadius: tabSide === 'left' ? 16 : 0,
                 justifyContent: 'center',
                 alignItems: 'center',
-                shadowColor: '#000',
+                shadowColor: sessionColor ? sessionColor.main : '#000',
                 shadowOffset: { width: tabSide === 'right' ? -2 : 2, height: 0 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
+                shadowOpacity: sessionColor ? 0.4 : 0.1,
+                shadowRadius: sessionColor ? 8 : 4,
                 elevation: 4,
                 borderWidth: 1,
-                borderColor: 'rgba(128, 128, 128, 0.3)',
+                borderColor: sessionColor ? 'rgba(255, 255, 255, 0.3)' : 'rgba(128, 128, 128, 0.3)',
                 [tabSide === 'right' ? 'borderRightWidth' : 'borderLeftWidth']: 0,
               }}
             >
