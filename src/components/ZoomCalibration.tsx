@@ -173,10 +173,13 @@ export default function ZoomCalibration({
       const coin = getCoinByName(lastSelectedCoin);
       if (coin) {
         setSelectedCoin(coin);
+      } else {
+        // Last coin name exists but coin not found - open selector
+        setTimeout(() => setShowCoinSelector(true), 500);
       }
     } else {
-      // No last selected coin - open selector automatically
-      setShowCoinSelector(true);
+      // No last selected coin - open selector after a brief delay
+      setTimeout(() => setShowCoinSelector(true), 500);
     }
   }, [lastSelectedCoin]);
 
