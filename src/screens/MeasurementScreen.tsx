@@ -561,8 +561,15 @@ export default function MeasurementScreen() {
           // Calculate deviation from 90° (perfect vertical)
           const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
           
+          // IMPORTANT: In vertical mode, gamma can be offset by ~180°
+          // Normalize gamma to -180 to +180 range centered around vertical orientation
+          let normalizedGamma = gamma;
+          if (gamma > 90) {
+            normalizedGamma = gamma - 180; // Convert 179° to -1°, 90° to -90°, etc.
+          }
+          
           // Use same formula as horizontal mode (which works well!)
-          const bubbleXOffset = (gamma / 15) * maxBubbleOffset; // Left/right tilt → X movement (removed negative)
+          const bubbleXOffset = (normalizedGamma / 15) * maxBubbleOffset; // Left/right tilt → X movement
           const bubbleYOffset = (forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
           
           // Clamp to circular boundary (stay within crosshairs)
