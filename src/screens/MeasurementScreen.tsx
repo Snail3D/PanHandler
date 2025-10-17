@@ -108,6 +108,7 @@ export default function MeasurementScreen() {
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
   const [showDiagnostic, setShowDiagnostic] = useState(false); // Diagnostic screen
+  const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -868,6 +869,7 @@ export default function MeasurementScreen() {
       setIsCapturing(false);
       setIsTransitioning(false);
       setIsHoldingShutter(false); // Reset hold state so user must press again
+      setIsCameraReady(false); // Camera not ready yet
       
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
@@ -884,7 +886,16 @@ export default function MeasurementScreen() {
           duration: 600,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
+        
+        // Camera is ready after fade-in completes
+        setTimeout(() => {
+          setIsCameraReady(true);
+          __DEV__ && console.log('📷 Camera is ready for capture');
+        }, 700); // Wait for fade + a bit extra for camera to fully initialize
       }, 150); // Reduced delay from 300ms to 150ms
+    } else {
+      // Not in camera mode, camera not ready
+      setIsCameraReady(false);
     }
   }, [mode]);
 
@@ -954,11 +965,12 @@ export default function MeasurementScreen() {
 
   const takePicture = async () => {
     // Prevent capture if camera isn't ready or already capturing
-    if (!cameraRef.current || isCapturing || mode !== 'camera') {
+    if (!cameraRef.current || isCapturing || mode !== 'camera' || !isCameraReady) {
       __DEV__ && console.log('⚠️ Skipping takePicture - camera not ready:', {
         hasCameraRef: !!cameraRef.current,
         isCapturing,
-        mode
+        mode,
+        isCameraReady,
       });
       return;
     }
@@ -1133,8 +1145,15 @@ export default function MeasurementScreen() {
     // Reset capturing states
     setIsCapturing(false);
     setIsTransitioning(false);
+    setIsHoldingShutter(false); // Reset hold state
+    // Clear the image so camera can take new photos
+    setImageUri(null);
+    setCoinCircle(null);
+    setCalibration(null);
     setMode('camera'); // Go back to camera
     setSelectedCoin(null);
+    
+    __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
   };
 
   const handleRetakePhoto = () => {
@@ -1766,10 +1785,19 @@ export default function MeasurementScreen() {
                   setIsHoldingShutter(false);
                   holdStartTimeRef.current = 0;
                   
+                  __DEV__ && console.log('📸 Shutter released:', {
+                    holdDuration,
+                    isCapturing,
+                    mode,
+                    hasCameraRef: !!cameraRef.current,
+                  });
+                  
                   // If quick tap (< 200ms), take picture immediately
                   if (holdDuration < 200 && !isCapturing) {
                     takePicture();
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  } else if (isCapturing) {
+                    __DEV__ && console.log('⚠️ Already capturing, skipping takePicture');
                   }
                 }}
                 style={({ pressed }) => ({
