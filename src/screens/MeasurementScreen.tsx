@@ -980,7 +980,7 @@ export default function MeasurementScreen() {
       // Pleasant camera flash effect - MUST complete before transition
       cameraFlashOpacity.value = 1;
       cameraFlashOpacity.value = withTiming(0, {
-        duration: 150, // Quick 150ms flash
+        duration: 100, // Quick 100ms flash
         easing: Easing.out(Easing.ease),
       });
       
@@ -1005,30 +1005,30 @@ export default function MeasurementScreen() {
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
         
-        // Immediately start the morph after flash (200ms after capture)
+        // Immediately start the morph after flash (100ms after capture)
         setTimeout(() => {
           // Fade out camera opacity to reveal the photo underneath
           cameraOpacity.value = withTiming(0, {
-            duration: 600, // Smooth fade
+            duration: 300, // Faster fade
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
           
           // Slight zoom morph for drama
           screenScale.value = withSequence(
-            withTiming(1.05, { duration: 300, easing: Easing.out(Easing.cubic) }), // Slight zoom in
-            withTiming(1, { duration: 300, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
+            withTiming(1.05, { duration: 150, easing: Easing.out(Easing.cubic) }), // Slight zoom in
+            withTiming(1, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
           );
           
           // Switch mode mid-transition so photo appears
           setTimeout(() => {
             setMode('zoomCalibrate');
-          }, 300); // Switch halfway through the morph
+          }, 150); // Switch halfway through the morph
           
           // Unlock after full transition
           setTimeout(() => {
             setIsTransitioning(false);
-          }, 600);
-        }, 200); // Wait for flash to complete
+          }, 300);
+        }, 100); // Wait for flash to complete
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {
@@ -1166,7 +1166,7 @@ export default function MeasurementScreen() {
         
         // Quick fade to black
         transitionBlackOverlay.value = withTiming(1, {
-          duration: 300,
+          duration: 150,
           easing: Easing.in(Easing.ease),
         });
         
@@ -1175,14 +1175,14 @@ export default function MeasurementScreen() {
           
           // Fade in calibration screen
           transitionBlackOverlay.value = withTiming(0, {
-            duration: 500,
+            duration: 250,
             easing: Easing.out(Easing.ease),
           });
           
           setTimeout(() => {
             setIsTransitioning(false);
-          }, 500);
-        }, 300);
+          }, 250);
+        }, 150);
       }
     } catch (error) {
       console.error('Error picking image:', error);
