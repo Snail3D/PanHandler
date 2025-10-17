@@ -537,35 +537,36 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Track both forward/backward tilt AND left/right tilt
+          // VERTICAL MODE: Real physics - ball rolls in direction of tilt
           // When phone is held vertically (portrait):
-          // X-axis (horizontal): Forward/backward tilt (beta deviation from 90°)
-          //   - beta ~90° = perfectly upright (centered)
-          //   - beta > 90° = tilts forward = bubble goes RIGHT
-          //   - beta < 90° = tilts backward = bubble goes LEFT
-          // Y-axis (vertical): Left/right tilt (gamma)
-          //   - gamma ~0° = no rotation (centered)
-          //   - gamma > 0 = rotates right = bubble goes UP
-          //   - gamma < 0 = rotates left = bubble goes DOWN
+          // 
+          // FORWARD/BACKWARD TILT (beta):
+          //   - beta ~90° = perfectly upright (ball centered)
+          //   - beta > 90° = tilts forward (top toward you) → ball rolls DOWN (positive Y)
+          //   - beta < 90° = tilts backward (top away) → ball rolls UP (negative Y)
+          //
+          // LEFT/RIGHT TILT (gamma): 
+          //   - gamma ~0° = no tilt (ball centered)
+          //   - gamma > 0 = tilts right → ball rolls RIGHT (positive X)
+          //   - gamma < 0 = tilts left → ball rolls LEFT (negative X)
           
           // Calculate deviation from 90° (perfect vertical)
-          const verticalDeviation = beta - 90;
+          const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
           
-          // Add deadzone for centering forward/backward
-          let adjustedBetaDeviation = verticalDeviation;
-          if (Math.abs(verticalDeviation) < 2) {
-            adjustedBetaDeviation = 0;
+          // Add deadzone for centering
+          let adjustedForwardBackward = forwardBackwardTilt;
+          if (Math.abs(forwardBackwardTilt) < 2) {
+            adjustedForwardBackward = 0;
           }
           
-          // Add deadzone for centering rotation (reduced for testing)
-          let adjustedGamma = gamma;
-          if (Math.abs(gamma) < 1) { // Reduced from 2 to 1 degree
-            adjustedGamma = 0;
+          let adjustedLeftRight = gamma;
+          if (Math.abs(gamma) < 2) {
+            adjustedLeftRight = 0;
           }
           
-          // Use gentler sensitivity for both axes (increased Y sensitivity)
-          const bubbleXOffset = (adjustedBetaDeviation / 20) * maxBubbleOffset; // Forward/back
-          const bubbleYOffset = (adjustedGamma / 10) * maxBubbleOffset; // Left/right rotation - increased sensitivity from /20 to /10
+          // Map to bubble movement (real physics)
+          const bubbleXOffset = (adjustedLeftRight / 15) * maxBubbleOffset; // Left/right tilt → X movement
+          const bubbleYOffset = (adjustedForwardBackward / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
@@ -811,17 +812,10 @@ export default function MeasurementScreen() {
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: isVerticalMode.value 
-      ? [
-          // In vertical mode, swap X and Y because container is rotated 90°
-          { translateX: bubbleY.value + 60 - 7 },
-          { translateY: -bubbleX.value + 60 - 7 }, // Negate X for correct direction
-        ]
-      : [
-          // In horizontal mode, use normal X and Y
-          { translateX: bubbleX.value + 60 - 7 },
-          { translateY: bubbleY.value + 60 - 7 },
-        ],
+    transform: [
+      { translateX: bubbleX.value + 60 - 7 }, // Center in 120px container with 14px bubble
+      { translateY: bubbleY.value + 60 - 7 },
+    ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
