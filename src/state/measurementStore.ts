@@ -50,10 +50,11 @@ interface MeasurementStore {
   measurementMode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
   calibration: {
     pixelsPerUnit: number;
-    unit: 'mm' | 'cm' | 'in' | 'm' | 'ft';
+    unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi';
     referenceDistance: number;
     calibrationType?: 'coin' | 'verbal' | 'blueprint';
     verbalScale?: VerbalScale;
+    blueprintScale?: { distance: number; unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }; // Store for display
   } | null;
   coinCircle: CoinCircle | null;
   unitSystem: UnitSystem;
