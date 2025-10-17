@@ -256,6 +256,7 @@ export default function DimensionOverlay({
   // Label editing feature - double tap to add/edit label
   const [labelEditingMeasurementId, setLabelEditingMeasurementId] = useState<string | null>(null);
   const [showLabelEditModal, setShowLabelEditModal] = useState(false);
+  const [labelTapState, setLabelTapState] = useState<{ measurementId: string, lastTapTime: number } | null>(null);
   
   // Undo history for measurement edits - stores original state before first edit
   const [measurementHistory, setMeasurementHistory] = useState<Map<string, Measurement>>(new Map());
@@ -4116,18 +4117,7 @@ export default function DimensionOverlay({
                   // Same measurement tapped within timeout
                   const newCount = tapDeleteState.count + 1;
                   
-                  if (newCount === 2) {
-                    // 2nd tap - open label editor!
-                    const measurement = measurements.find(m => m.id === tappedId);
-                    if (measurement) {
-                      setLabelEditingMeasurementId(tappedId);
-                      setShowLabelEditModal(true);
-                      setTapDeleteState(null); // Reset tap counter
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      console.log('✏️ Opening label editor for measurement');
-                      return;
-                    }
-                  } else if (newCount >= 4) {
+                  if (newCount >= 4) {
                     // 4th tap - delete the measurement!
                     const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                     setMeasurements(updatedMeasurements);
@@ -4142,7 +4132,7 @@ export default function DimensionOverlay({
                     setIsSnapped(false);
                     return;
                   } else {
-                    // Increment tap count
+                    // Increment tap count (1, 2, 3...)
                     setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }
@@ -4164,18 +4154,7 @@ export default function DimensionOverlay({
                 // Same measurement tapped within timeout
                 const newCount = tapDeleteState.count + 1;
                 
-                if (newCount === 2) {
-                  // 2nd tap - open label editor!
-                  const measurement = measurements.find(m => m.id === tappedId);
-                  if (measurement) {
-                    setLabelEditingMeasurementId(tappedId);
-                    setShowLabelEditModal(true);
-                    setTapDeleteState(null); // Reset tap counter
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    console.log('✏️ Opening label editor for measurement (via point)');
-                    return;
-                  }
-                } else if (newCount >= 4) {
+                if (newCount >= 4) {
                   // 4th tap - delete the measurement!
                   const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                   setMeasurements(updatedMeasurements);
@@ -4190,7 +4169,7 @@ export default function DimensionOverlay({
                   setIsSnapped(false);
                   return;
                 } else {
-                  // Increment tap count
+                  // Increment tap count (1, 2, 3...)
                   setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
@@ -4815,12 +4794,23 @@ export default function DimensionOverlay({
 
             // Render labels with adjusted positions
             return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle label tap to open edit modal (only when NOT in measurement mode)
+              // Handle double-tap on label to open edit modal (only when NOT in measurement mode)
               const handleLabelPress = () => {
                 if (!measurementMode) {
-                  setLabelEditingMeasurementId(measurement.id);
-                  setShowLabelEditModal(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  const now = Date.now();
+                  const TAP_TIMEOUT = 300; // 300ms for double-tap detection
+                  
+                  if (labelTapState?.measurementId === measurement.id && (now - labelTapState.lastTapTime) < TAP_TIMEOUT) {
+                    // Second tap - open editor
+                    setLabelEditingMeasurementId(measurement.id);
+                    setShowLabelEditModal(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setLabelTapState(null);
+                  } else {
+                    // First tap - record time
+                    setLabelTapState({ measurementId: measurement.id, lastTapTime: now });
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
                 }
               };
 
