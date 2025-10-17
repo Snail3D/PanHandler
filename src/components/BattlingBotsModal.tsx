@@ -234,12 +234,25 @@ export default function BattlingBotsModal({
                       setIsTyping(false);
                       setShowCursor(false);
                       
-                      // Move to next message after pause
-                      setTimeout(() => {
-                        setCurrentMessageIndex(prev => prev + 1);
-                        setIsTyping(true);
-                        setShowCursor(true);
-                      }, 600);
+                      // Check if this was the last message
+                      if (currentMessageIndex === script.length - 1) {
+                        // Transition to offer screen
+                        setTimeout(() => {
+                          setStage('offer');
+                          setTimeRemaining(60);
+                          offerOpacity.value = withSpring(1, {
+                            damping: 20,
+                            stiffness: 90,
+                          });
+                        }, 800);
+                      } else {
+                        // Move to next message after pause
+                        setTimeout(() => {
+                          setCurrentMessageIndex(prev => prev + 1);
+                          setIsTyping(true);
+                          setShowCursor(true);
+                        }, 600);
+                      }
                     }
                   }, 40);
                 }
