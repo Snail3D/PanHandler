@@ -1252,7 +1252,7 @@ export default function MeasurementScreen() {
                   left: 0,
                   right: 0,
                   height: 2, // Thinner (was 3)
-                  backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
+                  backgroundColor: `${crosshairColor.main}CC`, // Use session color with 80% opacity
                   marginTop: -1,
                 }}
               />
@@ -1285,7 +1285,7 @@ export default function MeasurementScreen() {
                   top: 0,
                   bottom: 0,
                   width: 3,
-                  backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
+                  backgroundColor: `${crosshairColor.main}CC`, // Use session color with 80% opacity
                   marginLeft: -1.5,
                 }}
               />
@@ -1687,12 +1687,14 @@ export default function MeasurementScreen() {
                   width: 80,
                   height: 80,
                   borderRadius: 40,
-                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                  backgroundColor: pressed 
+                    ? `${crosshairColor.main}CC`  // 80% opacity when pressed
+                    : `${crosshairColor.main}E6`, // 90% opacity normally
                   borderWidth: 5,
-                  borderColor: 'white',
+                  borderColor: crosshairColor.glow,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  shadowColor: '#000',
+                  shadowColor: crosshairColor.main,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.6,
                   shadowRadius: 12,
@@ -1703,7 +1705,7 @@ export default function MeasurementScreen() {
                   width: 60,
                   height: 60,
                   borderRadius: 30,
-                  backgroundColor: 'white',
+                  backgroundColor: crosshairColor.glow,
                   borderWidth: 3,
                   borderColor: '#333',
                 }} />
