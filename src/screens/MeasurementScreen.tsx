@@ -1532,15 +1532,18 @@ export default function MeasurementScreen() {
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 20, paddingVertical: 16, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
                   1. Place coin in center
                 </Text>
-                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
                   2. Line up the lines
                 </Text>
-                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
-                  3. Tap to capture (hold for auto capture)
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
+                  3. Tap to capture
+                </Text>
+                <Text style={{ color: 'white', fontSize: 10, fontWeight: '500', textAlign: 'center', lineHeight: 16, opacity: 0.8 }}>
+                  (hold for auto capture)
                 </Text>
               </View>
             </Animated.View>
