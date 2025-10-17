@@ -2006,9 +2006,9 @@ export default function MeasurementScreen() {
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
               onSkipToMap={() => {
-                // Skip coin calibration, go straight to measurement screen
-                // WITHOUT coin calibration data (no coin badge info)
+                // Skip coin calibration, open verbal scale modal for map/blueprint measurements
                 setMode('measurement');
+                setShowVerbalScaleModal(true);
               }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}

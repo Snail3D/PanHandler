@@ -1190,23 +1190,16 @@ export default function DimensionOverlay({
     
     const mapDistance = convertToMapScale(pixelDistance);
     
-    // Format based on map's real unit and user's preferred unit system
+    // ALWAYS use map scale's real unit (don't convert based on user preference)
+    // If user set map scale to miles, output should be in miles
     if (mapScale.realUnit === 'km') {
-      return unitSystem === 'imperial' 
-        ? `${(mapDistance * 0.621371).toFixed(2)} mi` // km to mi
-        : `${mapDistance.toFixed(2)} km`;
+      return `${mapDistance.toFixed(2)} km`;
     } else if (mapScale.realUnit === 'mi') {
-      return unitSystem === 'metric'
-        ? `${(mapDistance * 1.60934).toFixed(2)} km` // mi to km
-        : `${mapDistance.toFixed(2)} mi`;
+      return `${mapDistance.toFixed(2)} mi`;
     } else if (mapScale.realUnit === 'm') {
-      return unitSystem === 'imperial'
-        ? `${(mapDistance * 3.28084).toFixed(0)} ft` // m to ft
-        : `${mapDistance.toFixed(0)} m`;
+      return `${mapDistance.toFixed(0)} m`;
     } else { // ft
-      return unitSystem === 'metric'
-        ? `${(mapDistance * 0.3048).toFixed(0)} m` // ft to m
-        : `${mapDistance.toFixed(0)} ft`;
+      return `${mapDistance.toFixed(0)} ft`;
     }
   };
 
@@ -1214,23 +1207,16 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
     
-    // Format based on map's real unit and user's preferred unit system
+    // ALWAYS use map scale's real unit (don't convert based on user preference)
+    // If user set map scale to miles, output should be in square miles
     if (mapScale.realUnit === 'km') {
-      return unitSystem === 'imperial' 
-        ? `${(areaInMapUnits2 * 0.386102).toFixed(2)} mi²` // km² to mi²
-        : `${areaInMapUnits2.toFixed(2)} km²`;
+      return `${areaInMapUnits2.toFixed(2)} km²`;
     } else if (mapScale.realUnit === 'mi') {
-      return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 2.58999).toFixed(2)} km²` // mi² to km²
-        : `${areaInMapUnits2.toFixed(2)} mi²`;
+      return `${areaInMapUnits2.toFixed(2)} mi²`;
     } else if (mapScale.realUnit === 'm') {
-      return unitSystem === 'imperial'
-        ? `${(areaInMapUnits2 * 10.7639).toFixed(0)} ft²` // m² to ft²
-        : `${areaInMapUnits2.toFixed(0)} m²`;
+      return `${areaInMapUnits2.toFixed(0)} m²`;
     } else { // ft
-      return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 0.092903).toFixed(0)} m²` // ft² to m²
-        : `${areaInMapUnits2.toFixed(0)} ft²`;
+      return `${areaInMapUnits2.toFixed(0)} ft²`;
     }
   };
 
@@ -2929,7 +2915,7 @@ export default function DimensionOverlay({
   return (
     <>
       {/* Persistent "Calibration Locked" indicator */}
-      {coinCircle && !showLockedInAnimation && (
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && (
         <Pressable
           onPress={handleCalibratedTap}
           style={{
@@ -2967,13 +2953,15 @@ export default function DimensionOverlay({
               ? `${calibration.blueprintScale.distance}${calibration.blueprintScale.unit} between points`
               : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
+              : mapScale && !coinCircle
+              ? `${mapScale.screenDistance}${mapScale.screenUnit} = ${mapScale.realDistance}${mapScale.realUnit}`
               : coinCircle
               ? `${coinCircle.coinName} • ${coinCircle.coinDiameter.toFixed(1)}mm`
               : 'Calibrated'
             }
           </Text>
           {/* Show "Verbal scale" and "Locked in" when map scale is locked in (regardless of current mode) */}
-          {!stepBrothersMode && mapScale && (
+          {!stepBrothersMode && mapScale && coinCircle && (
             <View style={{ marginTop: 4, alignItems: 'center' }}>
               <Text style={{ 
                 color: 'rgba(255, 255, 255, 0.75)', 
