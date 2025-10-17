@@ -570,48 +570,50 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Simplified - only forward/backward tilt matters
-          // User is looking straight at the coin, so left/right tilt (gamma) is ignored
+          // VERTICAL MODE: Track forward/backward tilt with rotation compensation
+          // User is looking straight at the coin, so left/right tilt is ignored
           // 
           // ROTATION HANDLING:
-          // Phone can be rotated (alpha) while held vertically - we need to track
-          // forward/backward tilt consistently regardless of rotation
-          // 
-          // Alpha (rotation around vertical axis):
-          //   - 0° = normal portrait
-          //   - 90° = rotated 90° clockwise
-          //   - 180° = upside down
-          //   - 270° = rotated 90° counter-clockwise
-          
-          // Normalize alpha to 0-360 range
+          // Use alpha to determine which axis represents forward/backward
           const normalizedAlpha = ((alpha % 360) + 360) % 360;
           
           // Calculate effective forward/backward tilt accounting for rotation
-          // When rotated, beta and gamma swap and invert
           let forwardBackwardTilt: number;
           
           if (normalizedAlpha < 45 || normalizedAlpha >= 315) {
-            // Normal orientation: use beta as-is
+            // Normal portrait orientation
             forwardBackwardTilt = beta - 90;
           } else if (normalizedAlpha >= 45 && normalizedAlpha < 135) {
-            // Rotated 90° clockwise: gamma becomes forward/backward
+            // Rotated 90° clockwise (landscape right)
             forwardBackwardTilt = -gamma;
           } else if (normalizedAlpha >= 135 && normalizedAlpha < 225) {
-            // Upside down: beta is inverted
+            // Upside down portrait
             forwardBackwardTilt = -(beta - 90);
           } else {
-            // Rotated 90° counter-clockwise: gamma becomes forward/backward (inverted)
+            // Rotated 90° counter-clockwise (landscape left)
             forwardBackwardTilt = gamma;
           }
           
-          // Only Y movement in vertical mode (horizon line moves up/down)
-          // Increased range: /8 instead of /15 for more dramatic movement
-          // Allow full screen movement - no artificial clamping
-          const bubbleYOffset = (forwardBackwardTilt / 8) * maxBubbleOffset;
+          // NON-LINEAR RESPONSE with dead zone for natural feel
+          // Dead zone: ±2° = barely any movement (sticky at center)
+          // Progressive: Beyond dead zone, sensitivity increases exponentially
+          const deadZone = 2;
+          const absTilt = Math.abs(forwardBackwardTilt);
+          let bubbleYOffset: number;
           
-          // Don't clamp - let it move across full screen with 3x amplification
-          // This allows horizon to reach all quadrants
-          let finalY = bubbleYOffset;
+          if (absTilt < deadZone) {
+            // Inside dead zone - minimal movement (sticky center)
+            bubbleYOffset = forwardBackwardTilt * 0.5;
+          } else {
+            // Outside dead zone - progressive sensitivity
+            // Remove dead zone, then apply exponential curve
+            const beyondDeadZone = absTilt - deadZone;
+            const sign = forwardBackwardTilt >= 0 ? 1 : -1;
+            // Exponential: starts gentle, gets more dramatic
+            bubbleYOffset = sign * (deadZone * 0.5 + Math.pow(beyondDeadZone, 1.3) * 2);
+          }
+          
+          const finalY = bubbleYOffset;
           
           // No X movement in vertical mode
           bubbleX.value = withSpring(0, { 
