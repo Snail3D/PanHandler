@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -139,6 +139,7 @@ export default function MeasurementScreen() {
   const recentAngles = useRef<number[]>([]);
   const recentAccelerations = useRef<number[]>([]); // Track phone motion
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
+  const holdStartTimeRef = useRef<number>(0); // Track when user started holding
   
   // Low-pass filter for smooth sensor readings (reduce jitter)
   const smoothedBeta = useRef<number>(0);
@@ -712,28 +713,21 @@ export default function MeasurementScreen() {
     return () => subscription.remove();
   }, [mode]);
 
-  // Auto-capture when conditions are met (no button needed!)
+  // Auto-capture when holding shutter button and lines align
   useEffect(() => {
-    if (mode !== 'camera' || isCapturing || !autoCaptureEnabled) return;
+    if (mode !== 'camera' || isCapturing || !isHoldingShutter) return;
 
     if (alignmentStatus === 'good' && isStable) {
       // Add small delay to ensure camera is fully mounted before taking picture
       const timer = setTimeout(() => {
-        if (mode === 'camera' && !isCapturing && cameraRef.current && autoCaptureEnabled) {
+        if (mode === 'camera' && !isCapturing && cameraRef.current && isHoldingShutter) {
           takePicture();
         }
       }, 100);
       
       return () => clearTimeout(timer);
     }
-  }, [mode, alignmentStatus, isStable, isCapturing, autoCaptureEnabled]);
-  
-  // Reset auto-capture when entering camera mode (user must tap button again)
-  useEffect(() => {
-    if (mode === 'camera') {
-      setAutoCaptureEnabled(false);
-    }
-  }, [mode]);
+  }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter]);
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
@@ -1055,23 +1049,33 @@ export default function MeasurementScreen() {
               // Save photo to library
               const asset = await MediaLibrary.createAssetAsync(photoToSave);
               
-              // If auto-captured, also save to "Auto-Leveled" album
-              if (wasAutoCapture) {
-                try {
-                  // Get or create "Auto-Leveled" album
-                  const album = await MediaLibrary.getAlbumAsync('Auto-Leveled');
-                  if (album) {
-                    await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-                  } else {
-                    await MediaLibrary.createAlbumAsync('Auto-Leveled', asset, false);
-                  }
-                  __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album');
-                } catch (albumError) {
-                  console.error('Failed to add to Auto-Leveled album:', albumError);
-                  __DEV__ && console.log('✅ Photo saved to camera roll only');
+              // Always save to "PanHandler" album
+              try {
+                // Get or create "PanHandler" album
+                let album = await MediaLibrary.getAlbumAsync('PanHandler');
+                if (album) {
+                  await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+                } else {
+                  album = await MediaLibrary.createAlbumAsync('PanHandler', asset, false);
                 }
-              } else {
-                __DEV__ && console.log('✅ Photo saved to camera roll');
+                
+                __DEV__ && console.log('✅ Photo saved to PanHandler album');
+                
+                // Open the album on iOS using Photos app URL scheme
+                // On Android, this will gracefully fail and just save the photo
+                if (Platform.OS === 'ios') {
+                  try {
+                    // Try to open the album - iOS will handle this automatically
+                    // The album will be accessible in Photos app under "Albums" section
+                    await Linking.openURL('photos-redirect://');
+                  } catch (linkError) {
+                    // Silently fail - photo still saved successfully
+                    __DEV__ && console.log('Could not open Photos app, but photo saved');
+                  }
+                }
+              } catch (albumError) {
+                console.error('Failed to add to PanHandler album:', albumError);
+                __DEV__ && console.log('✅ Photo saved to camera roll only');
               }
             }
           } catch (saveError) {
@@ -1158,16 +1162,42 @@ export default function MeasurementScreen() {
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: false,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 1,
+      });
 
-    if (!result.canceled && result.assets[0]) {
-      setImageUri(result.assets[0].uri);
-      await detectOrientation(result.assets[0].uri);
-      setMode('zoomCalibrate'); // Go straight to combined screen
+      if (!result.canceled && result.assets[0]) {
+        setImageUri(result.assets[0].uri, false); // false = not auto-captured
+        await detectOrientation(result.assets[0].uri);
+        
+        // Smooth transition to calibration (same as taking photo)
+        setIsTransitioning(true);
+        
+        // Quick fade to black
+        transitionBlackOverlay.value = withTiming(1, {
+          duration: 300,
+          easing: Easing.in(Easing.ease),
+        });
+        
+        setTimeout(() => {
+          setMode('zoomCalibrate'); // Go straight to calibration screen
+          
+          // Fade in calibration screen
+          transitionBlackOverlay.value = withTiming(0, {
+            duration: 500,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 500);
+        }, 300);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
     }
   };
 
@@ -1736,10 +1766,23 @@ export default function MeasurementScreen() {
               }}
             >
               <Pressable
-                onPress={() => {
-                  // Take picture
-                  takePicture();
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onPressIn={() => {
+                  // Start holding - enable auto-capture mode
+                  setIsHoldingShutter(true);
+                  holdStartTimeRef.current = Date.now();
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                onPressOut={() => {
+                  // Release - check if it was a quick tap or hold
+                  const holdDuration = Date.now() - holdStartTimeRef.current;
+                  setIsHoldingShutter(false);
+                  holdStartTimeRef.current = 0;
+                  
+                  // If quick tap (< 200ms), take picture immediately
+                  if (holdDuration < 200 && !isCapturing) {
+                    takePicture();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }
                 }}
                 style={({ pressed }) => ({
                   width: 80,
@@ -1749,7 +1792,7 @@ export default function MeasurementScreen() {
                     ? `${shutterColor.main}CC`  // 80% opacity when pressed
                     : `${shutterColor.main}E6`, // 90% opacity normally
                   borderWidth: 5,
-                  borderColor: shutterColor.glow,
+                  borderColor: isHoldingShutter ? crosshairColor.main : shutterColor.glow, // Show crosshair color when holding (visual feedback)
                   alignItems: 'center',
                   justifyContent: 'center',
                   shadowColor: shutterColor.main,
@@ -1763,7 +1806,7 @@ export default function MeasurementScreen() {
                   width: 60,
                   height: 60,
                   borderRadius: 30,
-                  backgroundColor: shutterColor.glow,
+                  backgroundColor: isHoldingShutter ? crosshairColor.glow : shutterColor.glow, // Show crosshair color when holding
                   borderWidth: 3,
                   borderColor: '#333',
                 }} />

@@ -4,6 +4,51 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.91] - 2025-10-17
+
+### 🎯 Press-and-Hold Auto-Capture & Photo UX Improvements
+
+#### ✨ Major Features
+- **Press-and-Hold Auto-Capture** - New intuitive capture mode
+  - Quick tap (< 200ms): Takes photo immediately (same as before)
+  - Press & hold: Enables auto-capture mode
+  - Photo automatically captures when bubble level aligns and phone is stable
+  - Visual feedback: Button changes to crosshair color when holding
+  - Release button to cancel auto-capture
+  
+- **Fixed Photo Library Workflow** - Smooth transition to calibration
+  - Photo picker now transitions directly to calibration screen
+  - Same cinematic fade as taking photo (300ms black → 500ms fade-in)
+  - No more ambiguous state after selecting photo
+  
+- **Automatic Album Opening** - Better organization
+  - All photos save to dedicated "PanHandler" album
+  - Album created automatically on first photo
+  - iOS: Photos app opens after save showing album
+  - Android: Graceful fallback (photo saves, album in gallery)
+
+#### 🎨 Visual & Haptic Feedback
+- **Holding State**: Shutter button border/inner circle change to crosshair color
+- **Haptics**: Light haptic on press-in, medium on quick-tap capture
+- **Visual Continuity**: Uses color system from v1.90
+
+#### 🔧 Technical Implementation
+- Added `onPressIn`/`onPressOut` handlers to shutter button
+- `holdStartTimeRef` tracks hold duration for quick-tap detection
+- Updated auto-capture useEffect to monitor `isHoldingShutter`
+- Enhanced `pickImage` function with smooth transition
+- Updated MediaLibrary save to use "PanHandler" album + auto-open
+- Added `Linking` import for opening Photos app
+
+#### 📁 Files Modified
+- `src/screens/MeasurementScreen.tsx` - Press-and-hold, photo picker, album
+- `app.json` - Version bump to 1.91
+
+#### 📚 Documentation
+- `V1.91_PRESS_AND_HOLD_AUTO_CAPTURE.md` - Full implementation details
+
+---
+
 ## [Alpha v1.90] - 2025-10-17
 
 ### 🎨 Contrasting Shutter Button & Enhanced Color System
