@@ -1018,7 +1018,7 @@ export default function MeasurementScreen() {
 
   const takePicture = async () => {
     // Prevent capture if camera isn't ready or already capturing
-    if (!cameraRef.current || isCapturing || mode !== 'camera' || !isCameraReady) {
+    if (!cameraRef.current || isCapturing || mode !== 'camera') {
       __DEV__ && console.log('⚠️ Skipping takePicture - camera not ready:', {
         hasCameraRef: !!cameraRef.current,
         isCapturing,
@@ -1026,6 +1026,11 @@ export default function MeasurementScreen() {
         isCameraReady,
       });
       return;
+    }
+    
+    // Warn if camera might not be fully ready but allow capture anyway
+    if (!isCameraReady) {
+      __DEV__ && console.log('⚠️ Camera not marked ready but attempting capture anyway');
     }
     
     // Disable holding state to prevent double-capture
