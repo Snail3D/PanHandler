@@ -7,11 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BlueprintPlacementModalProps {
   visible: boolean;
-  pointsPlaced: number; // 0, 1, or 2
+  onStartPlacement: () => void; // Called when user taps "Place Pins Now"
   onDismiss: () => void;
 }
 
-export default function BlueprintPlacementModal({ visible, pointsPlaced, onDismiss }: BlueprintPlacementModalProps) {
+export default function BlueprintPlacementModal({ visible, onStartPlacement, onDismiss }: BlueprintPlacementModalProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -71,22 +71,21 @@ export default function BlueprintPlacementModal({ visible, pointsPlaced, onDismi
 
             {/* Instructions */}
             <View style={{
-              backgroundColor: 'rgba(52, 199, 89, 0.15)',
+              backgroundColor: 'rgba(100, 100, 100, 0.15)',
               borderRadius: 12,
               padding: 16,
+              marginBottom: 20,
               borderWidth: 1,
-              borderColor: 'rgba(52, 199, 89, 0.3)',
+              borderColor: 'rgba(100, 100, 100, 0.3)',
             }}>
               <Text style={{
                 fontSize: 16,
                 fontWeight: '600',
-                color: '#2E7D32',
+                color: 'rgba(0, 0, 0, 0.8)',
                 textAlign: 'center',
                 marginBottom: 8,
               }}>
-                {pointsPlaced === 0 && "Tap to place first point"}
-                {pointsPlaced === 1 && "Tap to place second point"}
-                {pointsPlaced === 2 && "Points placed!"}
+                Place Two Reference Points
               </Text>
               <Text style={{
                 fontSize: 13,
@@ -94,60 +93,42 @@ export default function BlueprintPlacementModal({ visible, pointsPlaced, onDismi
                 textAlign: 'center',
                 lineHeight: 18,
               }}>
-                {pointsPlaced < 2 
-                  ? "Place two points on a known distance in your blueprint or drawing"
-                  : "Next, enter the real-world distance between these points"}
+                You'll tap two points on a known distance in your blueprint or drawing. Then enter the real-world distance.
               </Text>
             </View>
 
-            {/* Points Progress */}
-            <View style={{ 
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 16,
-              gap: 12,
-            }}>
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: pointsPlaced >= 1 ? 'rgba(52, 199, 89, 0.3)' : 'rgba(0, 0, 0, 0.1)',
-                borderWidth: 2,
-                borderColor: pointsPlaced >= 1 ? '#34C759' : 'rgba(0, 0, 0, 0.2)',
-                justifyContent: 'center',
+            {/* Place Pins Now Button */}
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onStartPlacement();
+              }}
+              style={({ pressed }) => ({
+                backgroundColor: pressed 
+                  ? 'rgba(100, 100, 100, 0.9)' 
+                  : 'rgba(100, 100, 100, 0.85)',
+                borderRadius: 16,
+                paddingVertical: 18,
                 alignItems: 'center',
-              }}>
-                {pointsPlaced >= 1 ? (
-                  <Ionicons name="checkmark" size={24} color="#34C759" />
-                ) : (
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: 'rgba(0, 0, 0, 0.3)' }}>1</Text>
-                )}
-              </View>
-
-              <View style={{
-                width: 24,
-                height: 2,
-                backgroundColor: pointsPlaced === 2 ? '#34C759' : 'rgba(0, 0, 0, 0.2)',
-              }} />
-
-              <View style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: pointsPlaced === 2 ? 'rgba(52, 199, 89, 0.3)' : 'rgba(0, 0, 0, 0.1)',
-                borderWidth: 2,
-                borderColor: pointsPlaced === 2 ? '#34C759' : 'rgba(0, 0, 0, 0.2)',
                 justifyContent: 'center',
-                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+                borderWidth: 2,
+                borderColor: 'rgba(255, 255, 255, 0.4)',
+                transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+              })}
+            >
+              <Text style={{ 
+                color: '#FFFFFF', 
+                fontWeight: '800', 
+                fontSize: 18,
+                letterSpacing: 0.5,
               }}>
-                {pointsPlaced === 2 ? (
-                  <Ionicons name="checkmark" size={24} color="#34C759" />
-                ) : (
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: 'rgba(0, 0, 0, 0.3)' }}>2</Text>
-                )}
-              </View>
-            </View>
+                PLACE PINS NOW
+              </Text>
+            </Pressable>
           </View>
         </BlurView>
       </View>
