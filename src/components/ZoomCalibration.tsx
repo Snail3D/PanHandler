@@ -389,13 +389,15 @@ export default function ZoomCalibration({
               </Mask>
             </Defs>
             
-            {/* Glassmorphic overlay OUTSIDE the circle - creates focus */}
+            {/* Dynamic blur overlay OUTSIDE the circle - intensity increases with zoom */}
+            {/* Starts at 5% at 1x zoom, reaches 50% at 3.5x zoom */}
+            {/* Inside the coin circle stays crystal clear as focal point */}
             <Rect 
               x="0" 
               y="0" 
               width={SCREEN_WIDTH} 
               height={SCREEN_HEIGHT} 
-              fill="rgba(255, 255, 255, 0.15)" 
+              fill={`rgba(255, 255, 255, ${Math.min(0.05 + (zoomScale - 1) * 0.18, 0.50)})`}
               mask="url(#circleMask)"
             />
             
