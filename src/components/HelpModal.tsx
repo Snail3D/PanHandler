@@ -75,9 +75,26 @@ const ExpandableSection = ({
   }, [expanded]);
   
   // Rolodex effect: slight horizontal shift based on scroll position
-  // DISABLED: Too CPU-intensive with 11 sections at 60fps
-  // Removed to improve scroll performance (was causing jerkiness)
   const animatedStyle = useAnimatedStyle(() => {
+    const offsetPerSection = 150; // How much scroll creates one cycle
+    const maxShift = 8; // Maximum pixels to shift left/right
+    
+    if (scrollY) {
+      // Calculate shift for this specific section based on its index
+      const sectionOffset = index * 80; // Stagger effect between sections
+      const scrollProgress = (scrollY.value + sectionOffset) / offsetPerSection;
+      const shift = Math.sin(scrollProgress) * maxShift;
+      
+      return {
+        transform: [
+          { scale: scale.value },
+          { translateX: shift }
+        ],
+        opacity: opacity.value,
+        zIndex: 0, // Base z-index for non-expanded sections
+      };
+    }
+    
     return {
       transform: [{ scale: scale.value }],
       opacity: opacity.value,
