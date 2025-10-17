@@ -155,6 +155,9 @@ export default function MeasurementScreen() {
   const [currentBeta, setCurrentBeta] = useState(0);
   const [currentGamma, setCurrentGamma] = useState(0);
   
+  // Instructions fade animation
+  const instructionsOpacity = useSharedValue(1);
+  
   // Bubble level
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
@@ -875,6 +878,7 @@ export default function MeasurementScreen() {
       blackOverlayOpacity.value = 1;
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
       cameraFlashOpacity.value = 0; // Reset flash in case it's still visible
+      instructionsOpacity.value = 1; // Reset instructions to visible
       
       // Faster fade-in (reduced from 1.5s to 0.6s)
       setTimeout(() => {
@@ -1511,18 +1515,19 @@ export default function MeasurementScreen() {
               </View>
             </Animated.View>
 
-            {/* Instructions Message - Shows when horizontal, positioned center */}
+            {/* Instructions Message - Shows when horizontal, positioned above shutter button */}
             <Animated.View
               style={(() => {
                 'worklet';
                 const horizontal = isHorizontal.value;
+                const opacity = instructionsOpacity.value;
                 return {
                   position: 'absolute',
-                  top: '30%',
+                  bottom: insets.bottom + 150, // Above shutter button
                   left: 24,
                   right: 24,
                   alignItems: 'center',
-                  opacity: horizontal ? 1 : 0,
+                  opacity: horizontal ? opacity : 0,
                   pointerEvents: 'none',
                 };
               })()}
@@ -1535,7 +1540,7 @@ export default function MeasurementScreen() {
                   2. Line up the lines
                 </Text>
                 <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
-                  3. Press capture
+                  3. Tap to capture (hold for auto capture)
                 </Text>
               </View>
             </Animated.View>
@@ -1778,12 +1783,24 @@ export default function MeasurementScreen() {
                   setIsHoldingShutter(true);
                   holdStartTimeRef.current = Date.now();
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  
+                  // Fade out instructions when user starts holding
+                  instructionsOpacity.value = withTiming(0, {
+                    duration: 400,
+                    easing: Easing.out(Easing.ease),
+                  });
                 }}
                 onPressOut={() => {
                   // Release - check if it was a quick tap or hold
                   const holdDuration = Date.now() - holdStartTimeRef.current;
                   setIsHoldingShutter(false);
                   holdStartTimeRef.current = 0;
+                  
+                  // Fade instructions back in when user releases
+                  instructionsOpacity.value = withTiming(1, {
+                    duration: 400,
+                    easing: Easing.in(Easing.ease),
+                  });
                   
                   __DEV__ && console.log('📸 Shutter released:', {
                     holdDuration,
