@@ -38,15 +38,12 @@ export default function BattlingBotsModal({
   const [showCursor, setShowCursor] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
   const [showDeclineResponse, setShowDeclineResponse] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(60); // 60 second timer
   
   const offerOpacity = useSharedValue(0);
   
-  // Three price tiers
-  const offers = [
-    { price: 8.97, label: 'Premium', color: '#3B82F6', description: 'Best value' },
-    { price: 8.49, label: 'Popular', color: '#10B981', description: 'Most chosen' },
-    { price: 6.97, label: 'Final Offer', color: '#F59E0B', description: 'Last chance!' },
-  ];
+  // Single final offer
+  const finalOffer = { price: 4.97, label: 'Final Offer', color: '#F59E0B' };
   
   // Generate dynamic behind-the-scenes conversation based on user stats
   const getBehindTheScenesScript = (): BotMessage[] => {
@@ -69,13 +66,25 @@ export default function BattlingBotsModal({
       },
       {
         bot: 'right',
-        text: "Yeah. Wait... can they see this conversation?",
+        text: "Yeah. Perfect for wires, cables, irregular shapes...",
       },
       {
         bot: 'left',
+        text: "Maps too! Coastlines, borders, property lines.",
+      },
+      {
+        bot: 'right',
+        text: "Exactly. It's like having a digital measuring string.",
+      },
+      {
+        bot: 'left',
+        text: "Wait... can they see this conversation?",
+      },
+      {
+        bot: 'right',
         shouldBackspace: true,
-        meanText: "Oh no. Oh no no no—",
-        niceText: "Act cool! Start the pitch NOW!",
+        meanText: "Are you KIDDING me right—",
+        niceText: "Just act cool. Start pricing NOW!",
       },
     ];
   };
@@ -84,21 +93,17 @@ export default function BattlingBotsModal({
   const getNegotiationScript = (): BotMessage[] => [
     {
       bot: 'left',
-      text: "So... $8.97?",
+      text: "Okay so... $8.97?",
     },
     {
       bot: 'right',
-      text: "Sure. Or $8.49 as the popular choice.",
+      text: "Too high. Try $6.97.",
     },
     {
       bot: 'left',
-      text: "What about a final offer at $6.97?",
-    },
-    {
-      bot: 'right',
       shouldBackspace: true,
-      meanText: "That's way too—",
-      niceText: "...fine. But THE LAST DRAW!",
+      meanText: "That's basically giving it aw—",
+      niceText: "How about we meet at $4.97?",
     },
   ];
   
@@ -286,6 +291,7 @@ export default function BattlingBotsModal({
             // Transition to offer screen
             setTimeout(() => {
               setStage('offer');
+              setTimeRemaining(60); // Reset timer to 60 seconds
               offerOpacity.value = withSpring(1, {
                 damping: 20,
                 stiffness: 90,
@@ -317,10 +323,28 @@ export default function BattlingBotsModal({
     return () => clearInterval(cursorInterval);
   }, [showCursor, isTyping]);
   
-  const handleAccept = (offerIndex: number) => {
+  // Countdown timer for offer stage
+  useEffect(() => {
+    if (stage !== 'offer' || timeRemaining <= 0) return;
+    
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Time's up - auto decline
+          clearInterval(timer);
+          handleDecline();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [stage, timeRemaining]);
+  
+  const handleAccept = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const selectedPrice = offers[offerIndex].price;
-    onAccept(selectedPrice);
+    onAccept(finalOffer.price);
   };
   
   const handleDecline = () => {
@@ -546,84 +570,99 @@ export default function BattlingBotsModal({
                     </View>
                   </ScrollView>
                 ) : (
-                  // Offer Stage - Three Options
+                  // Offer Stage - Single $4.97 Offer with Timer
                   <Animated.View style={[{ padding: 24 }, offerStyle]}>
                     {!showDeclineResponse ? (
                       <>
+                        {/* Timer */}
+                        <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                          <View style={{
+                            backgroundColor: timeRemaining <= 10 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(249, 115, 22, 0.1)',
+                            paddingHorizontal: 20,
+                            paddingVertical: 10,
+                            borderRadius: 20,
+                            borderWidth: 2,
+                            borderColor: timeRemaining <= 10 ? '#EF4444' : '#F97316',
+                          }}>
+                            <Text style={{
+                              fontSize: 28,
+                              fontWeight: '900',
+                              color: timeRemaining <= 10 ? '#EF4444' : '#F97316',
+                            }}>
+                              {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+                            </Text>
+                          </View>
+                          <Text style={{
+                            fontSize: 12,
+                            color: '#8E8E93',
+                            marginTop: 8,
+                            fontWeight: '600',
+                          }}>
+                            Offer expires soon!
+                          </Text>
+                        </View>
+
                         {/* Title */}
                         <View style={{ alignItems: 'center', marginBottom: 20 }}>
                           <Text style={{
-                            fontSize: 22,
+                            fontSize: 26,
                             fontWeight: '800',
                             color: '#1C1C1E',
                             marginBottom: 4,
                           }}>
-                            Choose Your Offer
+                            Final Offer
                           </Text>
                           <Text style={{
                             fontSize: 14,
                             color: '#8E8E93',
                             textAlign: 'center',
                           }}>
-                            Pick one - this is THE LAST DRAW 🎯
+                            This is THE LAST DRAW 🎯
                           </Text>
                         </View>
 
-                        {/* Three Offer Cards */}
-                        <View style={{ gap: 12, marginBottom: 20 }}>
-                          {offers.map((offer, index) => (
-                            <Pressable
-                              key={index}
-                              onPress={() => handleAccept(index)}
-                              style={({ pressed }) => ({
-                                backgroundColor: pressed ? `${offer.color}20` : `${offer.color}15`,
-                                borderRadius: 16,
-                                padding: 18,
-                                borderWidth: 2,
-                                borderColor: offer.color,
-                                shadowColor: offer.color,
-                                shadowOffset: { width: 0, height: 4 },
-                                shadowOpacity: 0.3,
-                                shadowRadius: 8,
-                                elevation: 6,
-                              })}
-                            >
-                              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <View style={{ flex: 1 }}>
-                                  <Text style={{
-                                    fontSize: 14,
-                                    fontWeight: '700',
-                                    color: offer.color,
-                                    marginBottom: 4,
-                                  }}>
-                                    {offer.label}
-                                  </Text>
-                                  <Text style={{
-                                    fontSize: 12,
-                                    color: '#8E8E93',
-                                  }}>
-                                    {offer.description}
-                                  </Text>
-                                </View>
-                                <View style={{ alignItems: 'flex-end' }}>
-                                  <Text style={{
-                                    fontSize: 32,
-                                    fontWeight: '900',
-                                    color: offer.color,
-                                  }}>
-                                    ${offer.price.toFixed(2)}
-                                  </Text>
-                                  <Text style={{
-                                    fontSize: 11,
-                                    color: '#8E8E93',
-                                  }}>
-                                    one-time
-                                  </Text>
-                                </View>
-                              </View>
-                            </Pressable>
-                          ))}
-                        </View>
+                        {/* Single Big Offer Card */}
+                        <Pressable
+                          onPress={handleAccept}
+                          style={({ pressed }) => ({
+                            backgroundColor: pressed ? `${finalOffer.color}30` : `${finalOffer.color}20`,
+                            borderRadius: 20,
+                            padding: 32,
+                            borderWidth: 3,
+                            borderColor: finalOffer.color,
+                            shadowColor: finalOffer.color,
+                            shadowOffset: { width: 0, height: 8 },
+                            shadowOpacity: 0.4,
+                            shadowRadius: 16,
+                            elevation: 10,
+                            marginBottom: 20,
+                            alignItems: 'center',
+                          })}
+                        >
+                          <Text style={{
+                            fontSize: 16,
+                            fontWeight: '700',
+                            color: finalOffer.color,
+                            marginBottom: 12,
+                          }}>
+                            {finalOffer.label}
+                          </Text>
+                          <Text style={{
+                            fontSize: 64,
+                            fontWeight: '900',
+                            color: finalOffer.color,
+                            marginBottom: 8,
+                          }}>
+                            ${finalOffer.price}
+                          </Text>
+                          <Text style={{
+                            fontSize: 14,
+                            color: '#8E8E93',
+                            fontWeight: '600',
+                          }}>
+                            one-time payment
+                          </Text>
+                        </Pressable>
 
                         {/* Feature List */}
                         <View style={{ 
@@ -639,13 +678,13 @@ export default function BattlingBotsModal({
                             color: '#3C3C43',
                             marginBottom: 4,
                           }}>
-                            ✨ All offers include:
+                            ✨ What you get:
                           </Text>
                           {[
                             'Perfect for measuring wires and cables',
                             'Ideal for maps, borders, and coastlines',
                             'Measure irregular shapes nothing else can',
-                            'Works great when you need a "digital string"',
+                            'Works great as a "digital measuring string"',
                           ].map((feature, i) => (
                             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                               <Ionicons name="checkmark-circle" size={18} color="#10B981" />
