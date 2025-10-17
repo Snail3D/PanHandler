@@ -1186,20 +1186,31 @@ export default function DimensionOverlay({
 
   // Helper: Format map scale distance (for lines, perimeters)
   const formatMapScaleDistance = (pixelDistance: number): string => {
-    if (!mapScale) return '';
+    if (!mapScale) return "";
     
     const mapDistance = convertToMapScale(pixelDistance);
     
     // ALWAYS use map scale's real unit (don't convert based on user preference)
     // If user set map scale to miles, output should be in miles
-    if (mapScale.realUnit === 'km') {
+    if (mapScale.realUnit === "km") {
       return `${mapDistance.toFixed(2)} km`;
-    } else if (mapScale.realUnit === 'mi') {
+    } else if (mapScale.realUnit === "mi") {
       return `${mapDistance.toFixed(2)} mi`;
-    } else if (mapScale.realUnit === 'm') {
+    } else if (mapScale.realUnit === "m") {
       return `${mapDistance.toFixed(0)} m`;
     } else { // ft
-      return `${mapDistance.toFixed(0)} ft`;
+      // Format as feet'inches"
+      const totalInches = Math.round(mapDistance * 12); // Convert to total inches first
+      const feet = Math.floor(totalInches / 12);
+      const inches = totalInches % 12;
+      
+      // If no inches, just show feet
+      if (inches === 0) {
+        return `${feet}'`;
+      }
+      
+      // Show feet and inches
+      return `${feet}'${inches}"`;
     }
   };
 
@@ -2126,7 +2137,16 @@ export default function DimensionOverlay({
   }, [unitSystem, measurements, calibration, isMapMode, mapScale, calculateDistance, calculateAngle, formatMeasurement, formatAreaMeasurement, formatMapScaleDistance, formatMapScaleArea, convertToMapScale]); // Include all dependencies
 
   const handleClear = () => {
-    // Check if the last measurement has been edited (has history)
+    // Priority 1: If user is placing points, undo last point
+    if (currentPoints.length > 0) {
+      // Remove just the last point, not all points
+      setCurrentPoints(currentPoints.slice(0, -1));
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      console.log('↩️ Removed last point, remaining:', currentPoints.length - 1);
+      return;
+    }
+    
+    // Priority 2: Check if the last measurement has been edited (has history)
     if (measurements.length > 0) {
       const lastMeasurement = measurements[measurements.length - 1];
       
@@ -2150,9 +2170,6 @@ export default function DimensionOverlay({
         setMeasurements(measurements.slice(0, -1));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-    } else if (currentPoints.length > 0) {
-      // If no completed measurements, clear current points
-      setCurrentPoints([]);
     }
   };
   

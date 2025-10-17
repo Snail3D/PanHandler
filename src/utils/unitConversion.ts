@@ -81,9 +81,24 @@ export function formatMeasurement(
     }
   }
   
-  // For imperial (inches and feet), use 2 decimal places
-  if (unit === 'in' || unit === 'ft') {
+  // For imperial inches, use 2 decimal places
+  if (unit === 'in') {
     return `${value.toFixed(2)} ${unit}`;
+  }
+  
+  // For imperial feet, format as feet'inches"
+  if (unit === 'ft') {
+    const totalInches = Math.round(value * 12); // Convert to total inches first
+    const feet = Math.floor(totalInches / 12);
+    const inches = totalInches % 12;
+    
+    // If no inches, just show feet
+    if (inches === 0) {
+      return `${feet}'`;
+    }
+    
+    // Show feet and inches
+    return `${feet}'${inches}"`;
   }
   
   // For cm (if used), keep original decimals
