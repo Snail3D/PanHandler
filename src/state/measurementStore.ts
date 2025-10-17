@@ -71,6 +71,8 @@ interface MeasurementStore {
   freehandTrialUsed: number; // Number of freehand measurements used (max 10)
   freehandTrialLimit: number; // Maximum free freehand uses (10)
   freehandOfferDismissed: boolean; // User permanently dismissed the freehand upgrade offer
+  specialOfferTriggered: boolean; // Track if special $6.97 offer has been triggered
+  specialOfferSessionsLeft: number; // Sessions left to accept special offer (3, 2, 1)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
@@ -99,6 +101,8 @@ interface MeasurementStore {
   incrementFreehandTrial: () => void; // Increment freehand trial usage
   resetFreehandTrial: () => void; // Reset counter (for testing)
   dismissFreehandOffer: () => void; // User permanently dismissed the freehand offer
+  decrementSpecialOfferSessions: () => void; // Decrement special offer sessions counter
+  dismissSpecialOffer: () => void; // Permanently dismiss special offer
 }
 
 const useStore = create<MeasurementStore>()(
@@ -129,6 +133,8 @@ const useStore = create<MeasurementStore>()(
       freehandTrialUsed: 0,
       freehandTrialLimit: 10,
       freehandOfferDismissed: false,
+      specialOfferTriggered: false,
+      specialOfferSessionsLeft: 3,
 
       setImageUri: (uri, isAutoCaptured = false) => set({ 
         currentImageUri: uri,
@@ -225,6 +231,12 @@ const useStore = create<MeasurementStore>()(
       resetFreehandTrial: () => set({ freehandTrialUsed: 0 }), // Reset counter (for testing)
       
       dismissFreehandOffer: () => set({ freehandOfferDismissed: true }),
+      
+      decrementSpecialOfferSessions: () => set((state) => ({ 
+        specialOfferSessionsLeft: Math.max(0, state.specialOfferSessionsLeft - 1) 
+      })),
+      
+      dismissSpecialOffer: () => set({ specialOfferTriggered: false, specialOfferSessionsLeft: 0 }),
     }),
     {
       name: 'measurement-settings',
@@ -241,6 +253,8 @@ const useStore = create<MeasurementStore>()(
         hasSeenPinchTutorial: state.hasSeenPinchTutorial, // Persist tutorial state
         freehandTrialUsed: state.freehandTrialUsed, // Persist freehand trial usage
         freehandOfferDismissed: state.freehandOfferDismissed, // Persist freehand offer dismissal
+        specialOfferTriggered: state.specialOfferTriggered, // Persist special offer trigger status
+        specialOfferSessionsLeft: state.specialOfferSessionsLeft, // Persist special offer sessions
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
         // Persist current work session
         currentImageUri: state.currentImageUri,
