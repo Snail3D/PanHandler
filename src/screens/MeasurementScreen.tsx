@@ -1058,7 +1058,13 @@ export default function MeasurementScreen() {
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
         
-        // Immediately start the morph after flash (100ms after capture)
+        // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
+        // The camera view stays rendered but will fade out
+        setTimeout(() => {
+          setMode('zoomCalibrate');
+        }, 50); // Very small delay just for the flash to start
+        
+        // Start the visual transition AFTER mode switch
         setTimeout(() => {
           // Fade out camera opacity to reveal the photo underneath
           cameraOpacity.value = withTiming(0, {
@@ -1072,16 +1078,11 @@ export default function MeasurementScreen() {
             withTiming(1, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
           );
           
-          // Switch mode mid-transition so photo appears
-          setTimeout(() => {
-            setMode('zoomCalibrate');
-          }, 150); // Switch halfway through the morph
-          
           // Unlock after full transition
           setTimeout(() => {
             setIsTransitioning(false);
           }, 300);
-        }, 100); // Wait for flash to complete
+        }, 100); // Start animations after flash
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {
