@@ -511,8 +511,8 @@ export default function MeasurementScreen() {
         const alpha = data.rotation.alpha * (180 / Math.PI); // Rotation/roll
         
         // Apply low-pass filter (exponential moving average) to reduce jitter
-        // Alpha = 0.3 gives smooth motion without too much lag
-        const filterAlpha = 0.3;
+        // Alpha = 0.5 gives good balance between smoothness and responsiveness
+        const filterAlpha = 0.5;
         smoothedBeta.current = smoothedBeta.current * (1 - filterAlpha) + betaRaw * filterAlpha;
         smoothedGamma.current = smoothedGamma.current * (1 - filterAlpha) + gammaRaw * filterAlpha;
         
@@ -595,36 +595,37 @@ export default function MeasurementScreen() {
           }
           
           // NON-LINEAR RESPONSE with dead zone for natural feel
-          // Dead zone: ±2° = barely any movement (sticky at center)
-          // Progressive: Beyond dead zone, sensitivity increases exponentially
-          const deadZone = 2;
+          // Larger dead zone: ±3° = virtually no movement (very sticky at center)
+          // Gentle progressive increase beyond dead zone
+          const deadZone = 3;
           const absTilt = Math.abs(forwardBackwardTilt);
           let bubbleYOffset: number;
           
           if (absTilt < deadZone) {
-            // Inside dead zone - minimal movement (sticky center)
-            bubbleYOffset = forwardBackwardTilt * 0.5;
+            // Inside dead zone - almost no movement (sticky center)
+            bubbleYOffset = forwardBackwardTilt * 0.2;
           } else {
-            // Outside dead zone - progressive sensitivity
-            // Remove dead zone, then apply exponential curve
+            // Outside dead zone - gentle linear increase
+            // Start from dead zone boundary with smooth transition
             const beyondDeadZone = absTilt - deadZone;
             const sign = forwardBackwardTilt >= 0 ? 1 : -1;
-            // Exponential: starts gentle, gets more dramatic
-            bubbleYOffset = sign * (deadZone * 0.5 + Math.pow(beyondDeadZone, 1.3) * 2);
+            // More gentle: linear with moderate multiplier
+            // 5° past dead zone (8° total) = ~20px, 15° past (18° total) = ~60px
+            bubbleYOffset = sign * (deadZone * 0.2 + beyondDeadZone * 4);
           }
           
           const finalY = bubbleYOffset;
           
           // No X movement in vertical mode
           bubbleX.value = withSpring(0, { 
-            damping: 20,
-            stiffness: 400,
-            mass: 0.3
+            damping: 25,  // Higher damping = less overshoot
+            stiffness: 300,  // Lower stiffness = gentler
+            mass: 0.4
           });
           bubbleY.value = withSpring(finalY, { 
-            damping: 20,
-            stiffness: 400,
-            mass: 0.3
+            damping: 25,  // Higher damping = less overshoot
+            stiffness: 300,  // Lower stiffness = gentler
+            mass: 0.4
           });
           
           // Update debug display (occasionally to avoid performance hit)
