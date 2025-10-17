@@ -3730,8 +3730,32 @@ export default function DimensionOverlay({
               fingerRotation.value = 0;
             }, 500);
             
+            // Blueprint placement mode
+            if (isPlacingBlueprint) {
+              // Convert screen position to image coordinates for blueprint points
+              const imageCoords = screenToImage(cursorPosition.x, cursorPosition.y);
+              const newPoint = { x: imageCoords.x, y: imageCoords.y };
+              const updatedPoints = [...blueprintPoints, newPoint];
+              setBlueprintPoints(updatedPoints);
+              
+              // Haptic feedback
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              
+              // If we've placed 2 points, show distance input modal
+              if (updatedPoints.length === 2) {
+                setIsPlacingBlueprint(false);
+                setMeasurementMode(false);
+                setShowCursor(false);
+                setTimeout(() => {
+                  setShowBlueprintDistanceModal(true);
+                }, 100);
+              } else {
+                // Keep cursor visible for second point
+                setShowCursor(false);
+              }
+            }
             // For circle mode
-            if (mode === 'circle') {
+            else if (mode === 'circle') {
               if (currentPoints.length === 0) {
                 // First tap: place center point
                 placePoint(cursorPosition.x, cursorPosition.y);
@@ -4319,8 +4343,66 @@ export default function DimensionOverlay({
           );
         })()}
         
+        {/* Blueprint cursor (gray) */}
+        {showCursor && isPlacingBlueprint && (() => {
+          // Gray colors for blueprint mode
+          const cursorColor = 'rgba(100, 100, 100, 0.8)';
+          const glowColor = 'rgba(150, 150, 150, 0.6)';
+          
+          // Calculate dynamic glow opacity based on cursor speed
+          const minGlowOpacity = 0.07;
+          const maxGlowOpacity = 0.14;
+          const speedFactor = Math.min(cursorSpeed / 2, 1);
+          const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
+          
+          return (
+            <View
+              style={{
+                position: 'absolute',
+                left: cursorPosition.x - 50,
+                top: cursorPosition.y - 50,
+                width: 100,
+                height: 100,
+              }}
+              pointerEvents="none"
+            >
+              <Svg width={100} height={100}>
+                {/* Outer ring glow layers - gray */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={dynamicGlowOpacity * 0.7} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                {/* Outer ring - gray */}
+                <Circle cx={50} cy={50} r={30} fill="none" stroke={cursorColor} strokeWidth="3" opacity={0.8} />
+                {/* Inner circle - gray */}
+                <Circle cx={50} cy={50} r={15} fill="rgba(100, 100, 100, 0.2)" stroke={cursorColor} strokeWidth="2" />
+                {/* Crosshair lines - gray */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
+                
+                {/* Yellow center dot */}
+                <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
+                <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
+                <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
+                <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
+                <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
+              </Svg>
+              <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                  {blueprintPoints.length === 0 && 'Place first point'}
+                  {blueprintPoints.length === 1 && 'Place second point'}
+                </Text>
+              </View>
+            </View>
+          );
+        })()}
+        
         {/* Regular cursor (for other modes) */}
-        {showCursor && mode !== 'freehand' && (() => {
+        {showCursor && mode !== 'freehand' && !isPlacingBlueprint && (() => {
           // Determine which measurement this will be (if completing current or starting new)
           const nextMeasurementIndex = currentPoints.length === requiredPoints 
             ? measurements.length + 1  // Current measurement will be saved, this is the next one
@@ -6703,65 +6785,7 @@ export default function DimensionOverlay({
         }}
       />
 
-      {/* Blueprint Placement Touch Overlay - Active when placing blueprint points */}
-      {isPlacingBlueprint && blueprintPoints.length < 2 && (
-        <View
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
-          onStartShouldSetResponder={() => true}
-          onResponderGrant={(event) => {
-            const { pageX, pageY } = event.nativeEvent;
-            
-            // Add point to blueprint points array
-            const newPoint = { x: pageX, y: pageY };
-            const updatedPoints = [...blueprintPoints, newPoint];
-            setBlueprintPoints(updatedPoints);
-            
-            // Haptic feedback
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            
-            // If we've placed 2 points, show distance input modal
-            if (updatedPoints.length === 2) {
-              setTimeout(() => {
-                setIsPlacingBlueprint(false);
-                setShowBlueprintDistanceModal(true);
-              }, 300); // Small delay for visual feedback
-            }
-          }}
-        />
-      )}
 
-      {/* Instructional Text During Placement */}
-      {isPlacingBlueprint && (
-        <View style={{
-          position: 'absolute',
-          top: insets.top + 60,
-          left: 20,
-          right: 20,
-          zIndex: 35,
-          alignItems: 'center',
-        }}>
-          <View style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            borderRadius: 16,
-            paddingHorizontal: 24,
-            paddingVertical: 16,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-          }}>
-            <Text style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: 'white',
-              textAlign: 'center',
-            }}>
-              {blueprintPoints.length === 0 && "Tap to place first point"}
-              {blueprintPoints.length === 1 && "Tap to place second point"}
-            </Text>
-          </View>
-        </View>
-      )}
 
       {/* Blueprint Points Visualization */}
       {isPlacingBlueprint && blueprintPoints.length > 0 && (
@@ -6776,46 +6800,53 @@ export default function DimensionOverlay({
         }} pointerEvents="none">
           <Svg style={{ width: '100%', height: '100%' }}>
             {/* Draw line between points if we have 2 */}
-            {blueprintPoints.length === 2 && (
-              <Line
-                x1={blueprintPoints[0].x}
-                y1={blueprintPoints[0].y}
-                x2={blueprintPoints[1].x}
-                y2={blueprintPoints[1].y}
-                stroke="rgba(100, 100, 100, 0.8)"
-                strokeWidth={3}
-                strokeDasharray="8,4"
-              />
-            )}
+            {blueprintPoints.length === 2 && (() => {
+              const p0 = imageToScreen(blueprintPoints[0].x, blueprintPoints[0].y);
+              const p1 = imageToScreen(blueprintPoints[1].x, blueprintPoints[1].y);
+              return (
+                <Line
+                  x1={p0.x}
+                  y1={p0.y}
+                  x2={p1.x}
+                  y2={p1.y}
+                  stroke="rgba(100, 100, 100, 0.8)"
+                  strokeWidth={3}
+                  strokeDasharray="8,4"
+                />
+              );
+            })()}
             
             {/* Draw circles for each point */}
-            {blueprintPoints.map((point, idx) => (
-              <React.Fragment key={idx}>
-                {/* Outer glow */}
-                <Circle
-                  cx={point.x}
-                  cy={point.y}
-                  r={20}
-                  fill="rgba(100, 100, 100, 0.3)"
-                />
-                {/* Main circle */}
-                <Circle
-                  cx={point.x}
-                  cy={point.y}
-                  r={12}
-                  fill="rgba(100, 100, 100, 0.8)"
-                  stroke="white"
-                  strokeWidth={3}
-                />
-                {/* Center dot */}
-                <Circle
-                  cx={point.x}
-                  cy={point.y}
-                  r={3}
-                  fill="white"
-                />
-              </React.Fragment>
-            ))}
+            {blueprintPoints.map((point, idx) => {
+              const screenPoint = imageToScreen(point.x, point.y);
+              return (
+                <React.Fragment key={idx}>
+                  {/* Outer glow */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={20}
+                    fill="rgba(100, 100, 100, 0.3)"
+                  />
+                  {/* Main circle */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={12}
+                    fill="rgba(100, 100, 100, 0.8)"
+                    stroke="white"
+                    strokeWidth={3}
+                  />
+                  {/* Center dot */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={3}
+                    fill="white"
+                  />
+                </React.Fragment>
+              );
+            })}
           </Svg>
         </Animated.View>
       )}
