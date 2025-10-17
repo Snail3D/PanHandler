@@ -559,22 +559,9 @@ export default function MeasurementScreen() {
           // Calculate deviation from 90° (perfect vertical)
           const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
           
-          // Add deadzone for centering (reduced for testing)
-          let adjustedForwardBackward = forwardBackwardTilt;
-          if (Math.abs(forwardBackwardTilt) < 0.5) { // Tiny deadzone
-            adjustedForwardBackward = 0;
-          }
-          
-          let adjustedLeftRight = gamma;
-          if (Math.abs(gamma) < 0.5) { // Tiny deadzone
-            adjustedLeftRight = 0;
-          }
-          
-          // Map to bubble movement (real physics with more aggressive response)
-          const signX = adjustedLeftRight >= 0 ? 1 : -1;
-          const signY = adjustedForwardBackward >= 0 ? 1 : -1;
-          const bubbleXOffset = -signX * Math.pow(Math.abs(adjustedLeftRight) / 3, 0.7) * maxBubbleOffset; // Left/right tilt → X movement (inverted, power curve)
-          const bubbleYOffset = signY * Math.pow(Math.abs(adjustedForwardBackward) / 3, 0.7) * maxBubbleOffset; // Forward/back tilt → Y movement (power curve)
+          // Use same formula as horizontal mode (which works well!)
+          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt → X movement
+          const bubbleYOffset = (forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
@@ -587,16 +574,16 @@ export default function MeasurementScreen() {
             finalY = bubbleYOffset * scale;
           }
           
-          // VERTICAL MODE: Both axes move smoothly
+          // VERTICAL MODE: Use same spring as horizontal (fast and responsive)
           bubbleX.value = withSpring(finalX, { 
-            damping: 40,
-            stiffness: 100,
-            mass: 1.5
+            damping: 20,
+            stiffness: 180,
+            mass: 0.8
           });
           bubbleY.value = withSpring(finalY, { 
-            damping: 40,
-            stiffness: 100,
-            mass: 1.5
+            damping: 20,
+            stiffness: 180,
+            mass: 0.8
           });
           
           // Update debug display (occasionally to avoid performance hit)
