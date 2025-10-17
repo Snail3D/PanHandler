@@ -563,19 +563,9 @@ export default function MeasurementScreen() {
             adjustedGamma = 0;
           }
           
-          // Debug logging
-          if (Math.random() < 0.05) { // Log 5% of the time to avoid spam
-            console.log(`[VERTICAL] beta: ${beta.toFixed(1)}°, gamma: ${gamma.toFixed(1)}°, adjustedGamma: ${adjustedGamma.toFixed(1)}°`);
-          }
-          
-          // Use gentler sensitivity for both axes (increased Y sensitivity for testing)
+          // Use gentler sensitivity for both axes (increased Y sensitivity)
           const bubbleXOffset = (adjustedBetaDeviation / 20) * maxBubbleOffset; // Forward/back
           const bubbleYOffset = (adjustedGamma / 10) * maxBubbleOffset; // Left/right rotation - increased sensitivity from /20 to /10
-          
-          // Debug logging offsets
-          if (Math.random() < 0.05) {
-            console.log(`[VERTICAL] bubbleXOffset: ${bubbleXOffset.toFixed(1)}, bubbleYOffset: ${bubbleYOffset.toFixed(1)}`);
-          }
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
@@ -821,10 +811,17 @@ export default function MeasurementScreen() {
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: bubbleX.value + 60 - 7 }, // Center in 120px container with 14px bubble (50% smaller)
-      { translateY: bubbleY.value + 60 - 7 },
-    ],
+    transform: isVerticalMode.value 
+      ? [
+          // In vertical mode, swap X and Y because container is rotated 90°
+          { translateX: bubbleY.value + 60 - 7 },
+          { translateY: -bubbleX.value + 60 - 7 }, // Negate X for correct direction
+        ]
+      : [
+          // In horizontal mode, use normal X and Y
+          { translateX: bubbleX.value + 60 - 7 },
+          { translateY: bubbleY.value + 60 - 7 },
+        ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
