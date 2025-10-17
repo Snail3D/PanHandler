@@ -570,7 +570,7 @@ export default function MeasurementScreen() {
           
           // Use EXACT same formula as horizontal mode (which works perfectly!)
           const bubbleXOffset = -(normalizedGamma / 15) * maxBubbleOffset; // Same as horizontal
-          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset; // Use beta deviation instead of raw beta
+          const bubbleYOffset = -(betaDeviation / 15) * maxBubbleOffset; // INVERTED - above level = negative Y (top), below level = positive Y (bottom)
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
