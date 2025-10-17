@@ -815,10 +815,19 @@ export default function MeasurementScreen() {
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: bubbleX.value + 60 - 7 }, // Center in 120px container with 14px bubble
-      { translateY: bubbleY.value + 60 - 7 },
-    ],
+    transform: isVerticalMode.value
+      ? [
+          // When crosshair rotates 90°, we need to swap and adjust coordinates
+          // Physical gamma (left/right tilt) → Visual Y-axis (up/down on screen)
+          // Physical beta (forward/back) → Visual X-axis (left/right on screen)
+          { translateX: -bubbleY.value + 60 - 7 }, // Use Y for X, negate for correct direction
+          { translateY: bubbleX.value + 60 - 7 },  // Use X for Y
+        ]
+      : [
+          // Normal mapping in horizontal mode
+          { translateX: bubbleX.value + 60 - 7 },
+          { translateY: bubbleY.value + 60 - 7 },
+        ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
