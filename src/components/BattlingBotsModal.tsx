@@ -411,7 +411,9 @@ export default function BattlingBotsModal({
               borderRadius: 24,
               width: '100%',
               maxWidth: 380,
-              overflow: 'hidden',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.4)',
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 10 },
               shadowOpacity: 0.4,
@@ -419,12 +421,6 @@ export default function BattlingBotsModal({
               elevation: 20,
             }}
           >
-            <BlurView intensity={40} tint="light" style={{ flex: 1 }}>
-              <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
-              }}>
                 {stage === 'negotiation' ? (
                   // Negotiation Stage
                   <View style={{ padding: 24 }}>
@@ -746,14 +742,14 @@ export default function BattlingBotsModal({
                           - {getBotName('right')}
                         </Text>
                       </View>
-                    )}
+                     )}
                   </Animated.View>
                 )}
               </View>
-            </BlurView>
+            </View>
           </View>
-        </View>
-      </BlurView>
-    </Modal>
-  );
-}
+        </BlurView>
+      </Modal>
+    );
+  }
+  
