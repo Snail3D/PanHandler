@@ -560,7 +560,7 @@ export default function MeasurementScreen() {
           const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
           
           // Use same formula as horizontal mode (which works well!)
-          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt → X movement
+          const bubbleXOffset = (gamma / 15) * maxBubbleOffset; // Left/right tilt → X movement (removed negative)
           const bubbleYOffset = (forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
           
           // Clamp to circular boundary (stay within crosshairs)
