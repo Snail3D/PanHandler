@@ -2012,9 +2012,10 @@ export default function MeasurementScreen() {
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
               onSkipToMap={() => {
-                // Skip coin calibration, open verbal scale modal for map/blueprint measurements
+                // Skip coin calibration, go to measurement screen
+                // Modal will NOT open automatically - user can pan/zoom first
                 setMode('measurement');
-                setShowVerbalScaleModal(true);
+                // Don't open modal immediately - let user position image first
               }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}
