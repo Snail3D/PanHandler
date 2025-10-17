@@ -390,14 +390,18 @@ export default function ZoomCalibration({
             </Defs>
             
             {/* Dynamic blur overlay OUTSIDE the circle - intensity increases with zoom */}
-            {/* Starts at 5% at 1x zoom, reaches 50% at 3.5x zoom */}
+            {/* Two-phase blur: Fast ramp 1x→6x (5%→40%), slow ramp 6x→35x (40%→50%) */}
             {/* Inside the coin circle stays crystal clear as focal point */}
             <Rect 
               x="0" 
               y="0" 
               width={SCREEN_WIDTH} 
               height={SCREEN_HEIGHT} 
-              fill={`rgba(255, 255, 255, ${Math.min(0.05 + (zoomScale - 1) * 0.18, 0.50)})`}
+              fill={`rgba(255, 255, 255, ${
+                zoomScale <= 6
+                  ? Math.min(0.05 + (zoomScale - 1) * 0.07, 0.40)  // Fast: 1x→6x = 5%→40% (7% per zoom unit)
+                  : Math.min(0.40 + (zoomScale - 6) * 0.0034, 0.50) // Slow: 6x→35x = 40%→50% (0.34% per zoom unit)
+              })`}
               mask="url(#circleMask)"
             />
             
