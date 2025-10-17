@@ -1260,7 +1260,7 @@ export default function MeasurementScreen() {
                 paddingTop: insets.top + 16 
               }}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                   <Pressable
                     onPress={() => {
@@ -1286,9 +1286,6 @@ export default function MeasurementScreen() {
                     />
                   </Pressable>
                 </View>
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>Take Photo</Text>
-                {/* Spacer to keep title centered */}
-                <View style={{ width: 40, height: 40 }} />
               </View>
             </View>
 
