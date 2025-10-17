@@ -570,18 +570,38 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Simple approach - ignore rotation for now
-          // Just track beta deviation from 90° (vertical upright)
+          // VERTICAL MODE: Track forward/backward tilt (beta only)
+          // Rotation (alpha) is ignored - only affects gamma, not our beta reading
           
           // Beta: 90° = upright, >90° = tilt forward, <90° = tilt backward
           const tiltDeviation = beta - 90;
           
-          // SIMPLE: No dead zone for now, just test if direction is correct
-          // Multiplier: 3px per degree
-          let bubbleYOffset = tiltDeviation * 3;
+          // Dead zone: ±2° for sticky center feel
+          const deadZone = 2;
+          let movement: number;
           
-          // Hard clamp to ±150px for testing
-          bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
+          if (Math.abs(tiltDeviation) < deadZone) {
+            // Inside dead zone - minimal movement (sticky)
+            movement = tiltDeviation * 1;
+          } else {
+            // Outside dead zone - linear response
+            const beyondDeadZone = Math.abs(tiltDeviation) - deadZone;
+            const sign = tiltDeviation >= 0 ? 1 : -1;
+            // 10° tilt (8° beyond dead zone) = 2 + 24 = 26px → 78px on screen
+            movement = sign * (deadZone + beyondDeadZone * 3);
+          }
+          
+          // INVERT: Looking down (positive) → line UP (negative Y)
+          //         Looking up (negative) → line DOWN (positive Y)
+          let bubbleYOffset = -movement;
+          
+          // Soft limits at ±150px (becomes ±450px with 3x amp, ~2/3 of 800px screen)
+          if (Math.abs(bubbleYOffset) > 120) {
+            // Apply resistance near limits for smooth feel
+            const excess = Math.abs(bubbleYOffset) - 120;
+            const damped = 120 + excess * 0.25; // 75% resistance
+            bubbleYOffset = (bubbleYOffset >= 0 ? 1 : -1) * Math.min(damped, 150);
+          }
           
           const finalY = bubbleYOffset;
           
