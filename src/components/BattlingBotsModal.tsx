@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, Pressable } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -53,65 +53,29 @@ export default function BattlingBotsModal({
     const { measurementCount, freehandAttempts, hasUsedFreehand } = userStats;
     
     // Detect user behavior patterns
-    let behaviorDescription = "clicking around randomly";
+    let behaviorDescription = "clicking around";
     if (freehandAttempts > 5) {
-      behaviorDescription = "trying to draw all kinds of squiggly lines";
+      behaviorDescription = "drawing squiggly lines everywhere";
     } else if (measurementCount > 10) {
-      behaviorDescription = "measuring everything in sight";
+      behaviorDescription = "measuring everything";
     } else if (hasUsedFreehand) {
-      behaviorDescription = "experimenting with the freehand tool";
+      behaviorDescription = "testing the freehand tool";
     }
     
     return [
       {
         bot: 'left',
-        text: `Yo, check out this user - they've been ${behaviorDescription}.`,
+        text: `User's been ${behaviorDescription}. Time to pitch?`,
       },
       {
         bot: 'right',
-        text: "Yeah, I'm seeing the data. Now's probably a good time to hit them with the offer. What do you think, Jim?",
+        text: "Yeah. Wait... can they see this conversation?",
       },
       {
         bot: 'left',
-        text: "Solid idea. How should we sell them on it?",
-      },
-      {
-        bot: 'right',
-        text: "Well, you can probably sell them on it by telling them it's really good for measuring wires and cables...",
-      },
-      {
-        bot: 'left',
-        text: "Oh yeah! And maps too - perfect for irregular borders and coastlines.",
-      },
-      {
-        bot: 'right',
-        text: "Exactly! Plus projects with irregular shapes that nothing else can measure. Like when you need to use a string.",
-      },
-      {
-        bot: 'left',
-        text: "It can do all sorts of things. Maybe we should tell him that kind of thing?",
-      },
-      {
-        bot: 'right',
-        text: "Yeah, work that into the pitch. You ready?",
-      },
-      {
-        bot: 'left',
-        text: "Born ready. Let's do this!",
-      },
-      {
-        bot: 'right',
-        text: "Wait... hold up. Do you think they can see this conversation?",
-      },
-      {
-        bot: 'left',
-        text: "...oh god. Oh gosh. I think they can.",
-      },
-      {
-        bot: 'right',
         shouldBackspace: true,
-        meanText: "Are you SERIOUS right now?! This is",
-        niceText: "Just act cool, man. Start the pitch NOW!",
+        meanText: "Oh no. Oh no no no—",
+        niceText: "Act cool! Start the pitch NOW!",
       },
     ];
   };
@@ -120,35 +84,21 @@ export default function BattlingBotsModal({
   const getNegotiationScript = (): BotMessage[] => [
     {
       bot: 'left',
-      text: "Alright, so here's what I'm thinking - let's offer them $15!",
+      text: "So... $8.97?",
+    },
+    {
+      bot: 'right',
+      text: "Sure. Or $8.49 as the popular choice.",
+    },
+    {
+      bot: 'left',
+      text: "What about a final offer at $6.97?",
     },
     {
       bot: 'right',
       shouldBackspace: true,
-      meanText: "Dude, you can't do that. The regular offer is already at $9.97, you",
-      niceText: "Wait, let me handle this. How about $8.97?",
-    },
-    {
-      bot: 'left',
-      text: "Fine, fine. So $8.97 then?",
-    },
-    {
-      bot: 'right',
-      text: "Yeah, but let's give them options. $8.49 popular choice too.",
-    },
-    {
-      bot: 'left',
-      text: "And what about a final offer? Like $6.97?",
-    },
-    {
-      bot: 'right',
-      shouldBackspace: true,
-      meanText: "That's way too low, we'll lose",
-      niceText: "...fine. But this is THE LAST DRAW. Seriously.",
-    },
-    {
-      bot: 'left',
-      text: "Deal! Three offers, they pick one.",
+      meanText: "That's way too—",
+      niceText: "...fine. But THE LAST DRAW!",
     },
   ];
   
@@ -424,7 +374,11 @@ export default function BattlingBotsModal({
             <View>
               {stage === 'negotiation' ? (
                   // Negotiation Stage
-                  <View style={{ padding: 24 }}>
+                  <ScrollView 
+                    style={{ maxHeight: 600 }}
+                    contentContainerStyle={{ padding: 24 }}
+                    showsVerticalScrollIndicator={false}
+                  >
                     {/* Title */}
                     <View style={{ alignItems: 'center', marginBottom: 24 }}>
                       <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
@@ -590,7 +544,7 @@ export default function BattlingBotsModal({
                         </View>
                       </View>
                     </View>
-                  </View>
+                  </ScrollView>
                 ) : (
                   // Offer Stage - Three Options
                   <Animated.View style={[{ padding: 24 }, offerStyle]}>
