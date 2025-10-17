@@ -571,48 +571,29 @@ export default function MeasurementScreen() {
         
         if (isVertical) {
           // VERTICAL MODE: Only track forward/backward tilt (beta)
-          // Ignore left/right tilt (gamma) and rotation (alpha)
-          // User is looking straight at the coin
+          // Ignore left/right tilt (gamma) and rotation (alpha) completely
           
-          // Simple: just use beta deviation from 90° (upright)
-          const forwardBackwardTilt = beta - 90;
+          // Beta when vertical upright is around 90°
+          // But let's be more flexible - calculate deviation from vertical
+          const verticalReference = 90;
+          const tiltFromVertical = beta - verticalReference;
           
-          // CORRECT DIRECTION:
-          // - Tilt FORWARD (look down at table) = positive tilt → line goes UP (negative Y)
-          // - Tilt BACKWARD (look up at ceiling) = negative tilt → line goes DOWN (positive Y)
-          // This is INVERTED from what we had before
+          // Simple linear mapping with dead zone
+          const deadZone = 3;
+          let bubbleYOffset: number;
           
-          // Dead zone: ±2° = sticky at center
-          const deadZone = 2;
-          const absTilt = Math.abs(forwardBackwardTilt);
-          let movement: number;
-          
-          if (absTilt < deadZone) {
-            // Inside dead zone - minimal movement (sticky center)
-            movement = forwardBackwardTilt * 0.5;
+          if (Math.abs(tiltFromVertical) < deadZone) {
+            // Dead zone - very sticky at center
+            bubbleYOffset = tiltFromVertical * 1; // Minimal movement
           } else {
-            // Outside dead zone - smooth linear response
-            const beyondDeadZone = absTilt - deadZone;
-            const sign = forwardBackwardTilt >= 0 ? 1 : -1;
-            // Gentle multiplier: 10° tilt = ~50px movement
-            movement = sign * (deadZone * 0.5 + beyondDeadZone * 5);
+            // Beyond dead zone - linear response
+            const beyondDeadZone = Math.abs(tiltFromVertical) - deadZone;
+            const sign = tiltFromVertical >= 0 ? 1 : -1;
+            bubbleYOffset = sign * (deadZone + beyondDeadZone * 3);
           }
           
-          // INVERT: Looking down (positive tilt) = line goes UP (negative Y)
-          let bubbleYOffset = -movement;
-          
-          // SOFT LIMITS: Constrain to ~2/3 of screen (with 3x amplification = 2/3 * screen)
-          // Assuming screen height ~800px, limit to ±200px (becomes ±600px after 3x)
-          const maxOffset = 200; // Will be 600px after 3x amplification
-          
-          // Smooth asymptotic clamping - approaches limit but never quite reaches
-          // This creates a smooth "ease into limit" feel
-          if (Math.abs(bubbleYOffset) > maxOffset * 0.5) {
-            // Beyond halfway to limit - start applying resistance
-            const excess = Math.abs(bubbleYOffset) - maxOffset * 0.5;
-            const resistance = maxOffset * 0.5 + excess * 0.3; // Dampen further movement
-            bubbleYOffset = (bubbleYOffset >= 0 ? 1 : -1) * Math.min(resistance, maxOffset);
-          }
+          // Clamp to reasonable range: ±150px (becomes ±450px with 3x amplification)
+          bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
           
           const finalY = bubbleYOffset;
           
@@ -633,7 +614,7 @@ export default function MeasurementScreen() {
             setDebugGamma(gamma);
             setDebugBeta(beta);
             setDebugBubbleXRaw(0); // No X movement in vertical mode
-            setDebugBubbleYRaw(forwardBackwardTilt); // Show rotation-compensated tilt
+            setDebugBubbleYRaw(tiltFromVertical); // Show tilt from vertical
             setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
