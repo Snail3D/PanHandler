@@ -946,6 +946,9 @@ export default function MeasurementScreen() {
     } else {
       // Not in camera mode, camera not ready
       setIsCameraReady(false);
+      // PERFORMANCE FIX: Stop DeviceMotion sensors immediately when leaving camera
+      // This prevents 60fps sensor updates during transitions, reducing CPU load
+      DeviceMotion.removeAllListeners();
     }
   }, [mode]);
 
