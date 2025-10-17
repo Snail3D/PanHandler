@@ -536,22 +536,27 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Only left-right tilt (horizontal bubble movement)
+          // VERTICAL MODE: Only forward/backward tilt (shows as horizontal bubble movement)
           // When phone is held vertically (portrait):
-          // - gamma ~0° = phone is upright (centered)
-          // - Positive gamma = phone tilts right = bubble goes LEFT (inverted)
-          // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
+          // - beta ~90° = phone is perfectly upright and level (centered)
+          // - beta > 90° = phone tilts forward/down = bubble goes RIGHT
+          // - beta < 90° = phone tilts backward/up = bubble goes LEFT
+          // - Left/right tilt (gamma) and rotation are IGNORED
           
-          // Add deadzone for centering - when gamma is between -2° and 2°, snap to center
-          let adjustedGamma = gamma;
-          if (Math.abs(gamma) < 2) {
-            adjustedGamma = 0; // Snap to center for better "locked in" feel
+          // Calculate deviation from 90° (perfect vertical)
+          const verticalDeviation = beta - 90;
+          
+          // Add deadzone for centering - when deviation is between -2° and 2°, snap to center
+          let adjustedDeviation = verticalDeviation;
+          if (Math.abs(verticalDeviation) < 2) {
+            adjustedDeviation = 0; // Snap to center for better "locked in" feel
           }
           
           // Use much gentler sensitivity (divide by 20 instead of 15) for easier alignment
-          const bubbleXOffset = -(adjustedGamma / 20) * maxBubbleOffset; // Left-right movement
+          // Map forward/backward tilt to horizontal (X-axis) bubble movement
+          const bubbleXOffset = (adjustedDeviation / 20) * maxBubbleOffset;
           
-          // VERTICAL MODE: Only X-axis moves, Y-axis locked to center
+          // VERTICAL MODE: Only X-axis moves based on forward/backward tilt, Y-axis locked
           bubbleX.value = withSpring(bubbleXOffset, { 
             damping: 40,      // Heavy damping for smooth
             stiffness: 100,   // Soft spring
