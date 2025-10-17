@@ -137,12 +137,33 @@ const useStore = create<MeasurementStore>()(
       specialOfferTriggered: false,
       specialOfferSessionsLeft: 3,
 
-      setImageUri: (uri, isAutoCaptured = false) => set({ 
-        currentImageUri: uri,
-        isAutoCaptured,
-        // Don't clear measurements here - let UI handle it to avoid AsyncStorage blocking
-        // Only clear if explicitly setting to null AND no measurements exist
-        ...(uri === null ? { coinCircle: null, calibration: null, imageOrientation: null, savedZoomState: null, isAutoCaptured: false } : {})
+      setImageUri: (uri, isAutoCaptured = false) => set((state) => { 
+        // If setting a NEW image (not null), clear all measurements/calibration
+        if (uri !== null) {
+          return {
+            currentImageUri: uri,
+            isAutoCaptured,
+            // Clear everything for new photo
+            measurements: [],
+            completedMeasurements: [],
+            currentPoints: [],
+            tempPoints: [],
+            coinCircle: null,
+            calibration: null,
+            savedZoomState: null,
+            imageOrientation: null,
+          };
+        }
+        
+        // If setting to null (going back to camera), just clear calibration
+        return {
+          currentImageUri: null,
+          isAutoCaptured: false,
+          coinCircle: null,
+          calibration: null,
+          imageOrientation: null,
+          savedZoomState: null,
+        };
       }),
 
       incrementSessionCount: () => set((state) => ({ sessionCount: state.sessionCount + 1 })),
