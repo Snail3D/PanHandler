@@ -570,53 +570,18 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Track forward/backward tilt accounting for rotation
-          // The trick: use alpha to figure out WHICH axis to read from,
-          // but DON'T let rotation itself move the bubble
+          // VERTICAL MODE: Simple approach - ignore rotation for now
+          // Just track beta deviation from 90° (vertical upright)
           
-          // When phone rotates, beta and gamma swap/invert
-          // We need to extract the TRUE forward/backward tilt regardless of rotation
-          const normalizedAlpha = ((alpha % 360) + 360) % 360;
+          // Beta: 90° = upright, >90° = tilt forward, <90° = tilt backward
+          const tiltDeviation = beta - 90;
           
-          // Calculate TRUE forward/backward tilt (ignoring rotation)
-          let trueTilt: number;
+          // SIMPLE: No dead zone for now, just test if direction is correct
+          // Multiplier: 3px per degree
+          let bubbleYOffset = tiltDeviation * 3;
           
-          if (normalizedAlpha < 45 || normalizedAlpha >= 315) {
-            // Normal portrait: forward/back is beta
-            trueTilt = beta - 90;
-          } else if (normalizedAlpha >= 45 && normalizedAlpha < 135) {
-            // Rotated 90° CW: forward/back becomes gamma
-            trueTilt = gamma;
-          } else if (normalizedAlpha >= 135 && normalizedAlpha < 225) {
-            // Upside down: forward/back is inverted beta
-            trueTilt = 90 - beta;
-          } else {
-            // Rotated 90° CCW: forward/back is inverted gamma
-            trueTilt = -gamma;
-          }
-          
-          // Now trueTilt represents PURE forward/backward, no rotation contamination
-          // Simple linear mapping with dead zone
-          const deadZone = 3;
-          let bubbleYOffset: number;
-          
-          if (Math.abs(trueTilt) < deadZone) {
-            // Dead zone - very sticky at center
-            bubbleYOffset = trueTilt * 0.8;
-          } else {
-            // Beyond dead zone - linear response
-            const beyondDeadZone = Math.abs(trueTilt) - deadZone;
-            const sign = trueTilt >= 0 ? 1 : -1;
-            // 10° tilt = 3 + (7 * 3) = 24px → 72px on screen
-            bubbleYOffset = sign * (deadZone * 0.8 + beyondDeadZone * 3);
-          }
-          
-          // Soft clamp to ±150px (±450px with 3x amplification = ~2/3 screen)
-          if (Math.abs(bubbleYOffset) > 120) {
-            const excess = Math.abs(bubbleYOffset) - 120;
-            const damped = 120 + excess * 0.2; // Resistance near limits
-            bubbleYOffset = (bubbleYOffset >= 0 ? 1 : -1) * Math.min(damped, 150);
-          }
+          // Hard clamp to ±150px for testing
+          bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
           
           const finalY = bubbleYOffset;
           
@@ -636,8 +601,8 @@ export default function MeasurementScreen() {
           if (Math.random() < 0.1) {
             setDebugGamma(gamma);
             setDebugBeta(beta);
-            setDebugBubbleXRaw(0); // No X movement in vertical mode
-            setDebugBubbleYRaw(trueTilt); // Show rotation-compensated tilt
+            setDebugBubbleXRaw(0);
+            setDebugBubbleYRaw(tiltDeviation);
             setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
