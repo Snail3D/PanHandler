@@ -4,6 +4,61 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.2] - 2025-10-17
+
+### 🎨 Two-Phase Dynamic Blur System
+
+#### ✨ Enhancement
+- **Improved Blur Ramping** - Matches typical user zoom behavior (1x → 6x → 35x)
+  - **Phase 1 (1x → 6x)**: Fast ramp - 5% → 40% blur (7% per zoom unit)
+  - **Phase 2 (6x → 35x)**: Slow ramp - 40% → 50% blur (0.34% per zoom unit)
+  - Users see dramatic blur effect in typical zoom range
+  - Subtle refinement at extreme zoom levels
+  
+#### 🎯 Why This Change?
+- Previous formula was linear (capped at 3.5x zoom)
+- Most users zoom to 4x-6x for calibration
+- Old formula wasted blur progression on unused range
+- New formula concentrates effect where users actually zoom
+
+#### 🔧 Technical Implementation
+- Conditional formula: Fast rate below 6x, slow rate above 6x
+- Smooth transition at 6x (no visual jump)
+- Full 1x-35x range utilized (no early cap)
+- Coin circle stays crystal clear via SVG mask
+
+#### 📁 Files Modified
+- `src/components/ZoomCalibration.tsx` - Two-phase blur formula (lines 400-404)
+- `app.json` - Version bump to 2.1.2
+
+#### 📚 Documentation
+- `V2.1.2_TWO_PHASE_BLUR.md` - Full implementation details
+- `V2.1.2_QUICK_REFERENCE.md` - Quick reference guide
+
+---
+
+## [Alpha v2.1.1] - 2025-10-17
+
+### 🎨 Dynamic Blur Effect in Calibration
+
+#### ✨ Feature
+- **Zoom-Responsive Blur Overlay** - Blur intensifies as user zooms in
+  - 1.0x zoom: 5% blur (subtle)
+  - 3.5x zoom: 50% blur (maximum)
+  - Coin circle stays crystal clear (focal point)
+  - Creates natural depth-of-field effect
+
+#### 🔧 Technical Implementation
+- Dynamic opacity formula: `Math.min(0.05 + (zoomScale - 1) * 0.18, 0.50)`
+- SVG mask keeps coin area clear
+- Linear progression for smooth transitions
+
+#### 📁 Files Modified
+- `src/components/ZoomCalibration.tsx` - Dynamic blur formula (line 400)
+- `app.json` - Version bump to 2.1.1
+
+---
+
 ## [Alpha v1.92] - 2025-10-17
 
 ### 🎯 Auto-Capture Precision & Critical Bug Fixes
