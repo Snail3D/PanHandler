@@ -947,60 +947,13 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Request media library permission if not granted
-        let canSave = mediaLibraryPermission?.granted || false;
-        if (!canSave) {
-          const { granted } = await requestMediaLibraryPermission();
-          canSave = granted;
-          if (!granted) {
-            __DEV__ && console.log('Media library permission not granted');
-          }
-        }
-
-        // Save to camera roll
-        if (canSave) {
-          try {
-            let photoToSave = photo.uri;
-            
-            // If auto-captured, add badge to photo before saving
-            if (wasAutoCapture) {
-              // TODO: Add badge overlay here using a pre-made badge image
-              // For now, just save the original photo
-              // We'll need to either:
-              // 1. Create a pre-made badge PNG asset and use a library that supports image compositing
-              // 2. Use expo-gl or canvas to draw the badge
-              // 3. Render a View with photo+badge and capture it with react-native-view-shot
-            }
-            
-            // Save photo to library
-            const asset = await MediaLibrary.createAssetAsync(photoToSave);
-            
-            // If auto-captured, also save to "Auto-Leveled" album
-            if (wasAutoCapture) {
-              try {
-                // Get or create "Auto-Leveled" album
-                const album = await MediaLibrary.getAlbumAsync('Auto-Leveled');
-                if (album) {
-                  await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-                } else {
-                  await MediaLibrary.createAlbumAsync('Auto-Leveled', asset, false);
-                }
-                __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album (badge overlay pending)');
-              } catch (albumError) {
-                console.error('Failed to add to Auto-Leveled album:', albumError);
-                __DEV__ && console.log('✅ Photo saved to camera roll only');
-              }
-            } else {
-              __DEV__ && console.log('✅ Photo saved to camera roll');
-            }
-          } catch (saveError) {
-            console.error('Failed to save to camera roll:', saveError);
-          }
-        }
-
-        // Set image URI (auto-captured if it was via hold)
+        // Set image URI immediately and start transition
         setImageUri(photo.uri, wasAutoCapture);
-        await detectOrientation(photo.uri);
+        
+        // Start orientation detection in background (non-blocking)
+        detectOrientation(photo.uri).catch(err => {
+          console.error('Orientation detection failed:', err);
+        });
         
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
@@ -1029,6 +982,50 @@ export default function MeasurementScreen() {
             setIsTransitioning(false);
           }, 600);
         }, 200); // Wait for flash to complete
+        
+        // Save to camera roll in background (non-blocking for UI)
+        (async () => {
+          try {
+            // Request media library permission if not granted
+            let canSave = mediaLibraryPermission?.granted || false;
+            if (!canSave) {
+              const { granted } = await requestMediaLibraryPermission();
+              canSave = granted;
+              if (!granted) {
+                __DEV__ && console.log('Media library permission not granted');
+                return;
+              }
+            }
+
+            if (canSave) {
+              let photoToSave = photo.uri;
+              
+              // Save photo to library
+              const asset = await MediaLibrary.createAssetAsync(photoToSave);
+              
+              // If auto-captured, also save to "Auto-Leveled" album
+              if (wasAutoCapture) {
+                try {
+                  // Get or create "Auto-Leveled" album
+                  const album = await MediaLibrary.getAlbumAsync('Auto-Leveled');
+                  if (album) {
+                    await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+                  } else {
+                    await MediaLibrary.createAlbumAsync('Auto-Leveled', asset, false);
+                  }
+                  __DEV__ && console.log('✅ Photo saved to camera roll + Auto-Leveled album');
+                } catch (albumError) {
+                  console.error('Failed to add to Auto-Leveled album:', albumError);
+                  __DEV__ && console.log('✅ Photo saved to camera roll only');
+                }
+              } else {
+                __DEV__ && console.log('✅ Photo saved to camera roll');
+              }
+            }
+          } catch (saveError) {
+            console.error('Failed to save to camera roll:', saveError);
+          }
+        })();
       }
     } catch (error) {
       console.error('Error taking picture:', error);
