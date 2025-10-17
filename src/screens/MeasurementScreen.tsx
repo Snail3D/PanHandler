@@ -535,7 +535,8 @@ export default function MeasurementScreen() {
           // Calculate total deviation from level using both axes
           absTilt = Math.sqrt(beta * beta + gamma * gamma);
         } else {
-          // Vertical mode: device should be upright (beta ~90°)
+          // Vertical mode: only forward/backward tilt matters (beta ~90°)
+          // Left/right tilt is ignored since user is looking straight at coin
           absTilt = Math.abs(absBeta - 90);
         }
         
@@ -569,46 +570,25 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Real physics - ball rolls in direction of tilt
-          // When phone is held vertically (portrait):
+          // VERTICAL MODE: Simplified - only forward/backward tilt matters
+          // User is looking straight at the coin, so left/right tilt (gamma) is ignored
           // 
           // FORWARD/BACKWARD TILT (beta):
-          //   - beta ~90° = perfectly upright (ball centered)
-          //   - beta > 90° = tilts forward (top toward you) → ball rolls DOWN (positive Y)
-          //   - beta < 90° = tilts backward (top away) → ball rolls UP (negative Y)
-          //
-          // LEFT/RIGHT TILT (gamma): 
-          //   - gamma ~0° = no tilt (ball centered)
-          //   - gamma > 0 = tilts right → ball rolls LEFT (negative X, inverted for real physics)
-          //   - gamma < 0 = tilts left → ball rolls RIGHT (positive X, inverted for real physics)
+          //   - beta ~90° = perfectly upright (horizon line centered)
+          //   - beta > 90° = tilts forward (top toward you) → horizon moves DOWN (positive Y)
+          //   - beta < 90° = tilts backward (top away) → horizon moves UP (negative Y)
           
           // Calculate deviation from 90° (perfect vertical)
           const betaDeviation = beta - 90; // Positive = forward, negative = backward
           
-          // IMPORTANT: In vertical mode, gamma can be offset by ~180°
-          // Normalize gamma to -180 to +180 range centered around vertical orientation
-          let normalizedGamma = gamma;
-          if (gamma > 90) {
-            normalizedGamma = gamma - 180; // Convert 179° to -1°, 90° to -90°, etc.
-          }
+          // Only Y movement in vertical mode (horizon line moves up/down)
+          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset;
           
-          // Use EXACT same formula as horizontal mode (which works perfectly!)
-          const bubbleXOffset = -(normalizedGamma / 15) * maxBubbleOffset; // Same as horizontal
-          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset; // NO inversion - let the physics work naturally
+          // Clamp Y to max offset
+          let finalY = Math.max(-maxBubbleOffset, Math.min(maxBubbleOffset, bubbleYOffset));
           
-          // Clamp to circular boundary (stay within crosshairs)
-          const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
-          let finalX = bubbleXOffset;
-          let finalY = bubbleYOffset;
-          
-          if (distance > maxBubbleOffset) {
-            const scale = maxBubbleOffset / distance;
-            finalX = bubbleXOffset * scale;
-            finalY = bubbleYOffset * scale;
-          }
-          
-          // VERTICAL MODE: Higher stiffness for snappier, less jittery response
-          bubbleX.value = withSpring(finalX, { 
+          // No X movement in vertical mode
+          bubbleX.value = withSpring(0, { 
             damping: 20,
             stiffness: 400,
             mass: 0.3
@@ -623,9 +603,9 @@ export default function MeasurementScreen() {
           if (Math.random() < 0.1) {
             setDebugGamma(gamma);
             setDebugBeta(beta);
-            setDebugBubbleXRaw(bubbleXOffset);
+            setDebugBubbleXRaw(0); // No X movement in vertical mode
             setDebugBubbleYRaw(bubbleYOffset);
-            setDebugBubbleX(finalX);
+            setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
         } else {
@@ -1319,7 +1299,7 @@ export default function MeasurementScreen() {
               }}
               pointerEvents="none"
             >
-              {/* Horizontal gray line */}
+              {/* Horizontal gray line - always visible */}
               <View
                 style={{
                   position: 'absolute',
@@ -1331,36 +1311,55 @@ export default function MeasurementScreen() {
                   marginTop: -1,
                 }}
               />
-              {/* Vertical gray line */}
-              <View
-                style={{
+            </View>
+            
+            {/* Vertical gray line - ONLY in horizontal mode */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const isVertical = isVerticalMode.value;
+                return {
                   position: 'absolute',
                   left: '50%',
                   top: 0,
                   bottom: 0,
+                  opacity: isVertical ? 0 : 1, // Hide in vertical mode
+                };
+              })()}
+              pointerEvents="none"
+            >
+              <View
+                style={{
                   width: 2,
+                  height: '100%',
                   backgroundColor: 'rgba(156, 163, 175, 0.5)', // Gray
                   marginLeft: -1,
                 }}
               />
-            </View>
+            </Animated.View>
 
             {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
+            {/* Horizontal mode: Both lines move (X and Y) */}
+            {/* Vertical mode: Only horizontal line moves (Y only, based on forward/backward tilt) */}
             <Animated.View
-              style={{
-                position: 'absolute',
-                top: -SCREEN_HEIGHT, // Extend far beyond screen
-                left: -SCREEN_WIDTH,
-                right: -SCREEN_WIDTH,
-                bottom: -SCREEN_HEIGHT,
-                transform: [
-                  { translateX: bubbleX.value * 3 }, // Reduced amplification for smoother feel
-                  { translateY: bubbleY.value * 3 }, // Reduced amplification for smoother feel
-                ],
-              }}
+              style={(() => {
+                'worklet';
+                const isVertical = isVerticalMode.value;
+                return {
+                  position: 'absolute',
+                  top: -SCREEN_HEIGHT,
+                  left: -SCREEN_WIDTH,
+                  right: -SCREEN_WIDTH,
+                  bottom: -SCREEN_HEIGHT,
+                  transform: [
+                    { translateX: isVertical ? 0 : bubbleX.value * 3 }, // X only moves in horizontal mode
+                    { translateY: bubbleY.value * 3 }, // Y always moves
+                  ],
+                };
+              })()}
               pointerEvents="none"
             >
-              {/* Horizontal red line */}
+              {/* Horizontal red line (horizon) - always visible */}
               <View
                 style={{
                   position: 'absolute',
@@ -1372,7 +1371,28 @@ export default function MeasurementScreen() {
                   marginTop: -1.5,
                 }}
               />
-              {/* Vertical red line */}
+            </Animated.View>
+            
+            {/* Vertical red line - ONLY in horizontal mode */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const isVertical = isVerticalMode.value;
+                return {
+                  position: 'absolute',
+                  top: -SCREEN_HEIGHT,
+                  left: -SCREEN_WIDTH,
+                  right: -SCREEN_WIDTH,
+                  bottom: -SCREEN_HEIGHT,
+                  opacity: isVertical ? 0 : 1, // Hide in vertical mode
+                  transform: [
+                    { translateX: bubbleX.value * 3 },
+                    { translateY: bubbleY.value * 3 },
+                  ],
+                };
+              })()}
+              pointerEvents="none"
+            >
               <View
                 style={{
                   position: 'absolute',
