@@ -86,6 +86,26 @@ export default function ZoomCalibration({
   const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
   const [showCoinSelector, setShowCoinSelector] = useState(false);
   
+  // Coin selector fade animation
+  const coinSelectorOpacity = useSharedValue(0);
+  const coinSelectorTranslateY = useSharedValue(-20);
+  
+  // Animate coin selector in/out
+  useEffect(() => {
+    if (showCoinSelector) {
+      coinSelectorOpacity.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.ease) });
+      coinSelectorTranslateY.value = withSpring(0, { damping: 20, stiffness: 200 });
+    } else {
+      coinSelectorOpacity.value = withTiming(0, { duration: 200 });
+      coinSelectorTranslateY.value = withTiming(-20, { duration: 200 });
+    }
+  }, [showCoinSelector]);
+  
+  const coinSelectorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: coinSelectorOpacity.value,
+    transform: [{ translateY: coinSelectorTranslateY.value }],
+  }));
+  
   // Use session color if provided (from camera screen), otherwise fallback to random for backwards compatibility
   const [currentColor] = useState(() => {
     if (sessionColor) {
@@ -580,8 +600,8 @@ export default function ZoomCalibration({
                 <Pressable
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setSearchQuery(''); // Open search mode
-                    setSelectedCoin(null);
+                    setShowCoinSelector(true);
+                    setSearchQuery('');
                   }}
                   style={({ pressed }) => ({
                     flex: 1,
@@ -680,16 +700,19 @@ export default function ZoomCalibration({
         </Animated.View>
       )}
 
-      {/* Coin Search Modal - Shows when no coin selected or when opening selector */}
-      {!selectedCoin && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: insets.bottom + 40,
-            left: SCREEN_WIDTH * 0.10,
-            right: SCREEN_WIDTH * 0.10,
-            zIndex: 1000,
-          }}
+      {/* Coin Search Modal - Shows at TOP when selector button is tapped */}
+      {showCoinSelector && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: insets.top + 16,
+              left: SCREEN_WIDTH * 0.10,
+              right: SCREEN_WIDTH * 0.10,
+              zIndex: 1000,
+            },
+            coinSelectorAnimatedStyle,
+          ]}
         >
           <BlurView
             intensity={35}
@@ -751,7 +774,7 @@ export default function ZoomCalibration({
                     color: 'rgba(0, 0, 0, 0.85)',
                     fontWeight: '500',
                   }}
-                  autoFocus={false}
+                  autoFocus={true}
                 />
                 {searchQuery.length > 0 && (
                   <Pressable 
@@ -781,6 +804,7 @@ export default function ZoomCalibration({
                         setSelectedCoin(coin);
                         setLastSelectedCoin(coin.name);
                         setSearchQuery('');
+                        setShowCoinSelector(false); // Close selector
                       }}
                       style={({ pressed }) => ({
                         paddingVertical: 18,
@@ -824,7 +848,7 @@ export default function ZoomCalibration({
               )}
             </View>
           </BlurView>
-        </View>
+        </Animated.View>
       )}
 
       {/* Back button - left middle edge, 2× bigger */}
