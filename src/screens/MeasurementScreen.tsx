@@ -138,6 +138,11 @@ export default function MeasurementScreen() {
   const encouragementTextOpacity = useSharedValue(0);
   const reminderTextOpacity = useSharedValue(0);
   
+  // Tap-to-focus indicator
+  const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(null);
+  const focusIndicatorOpacity = useSharedValue(0);
+  const focusIndicatorScale = useSharedValue(1);
+  
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
@@ -531,34 +536,28 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Only forward/backward tilt (up/down movement)
+          // VERTICAL MODE: Only left-right tilt (horizontal bubble movement)
           // When phone is held vertically (portrait):
-          // - beta ~90° = phone is perfectly upright (centered)
-          // - beta > 90° = phone tilts forward = bubble goes DOWN
-          // - beta < 90° = phone tilts backward = bubble goes UP
+          // - gamma ~0° = phone is upright (centered)
+          // - Positive gamma = phone tilts right = bubble goes LEFT (inverted)
+          // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
           
-          // Calculate deviation from 90° (perfect vertical)
-          const verticalDeviation = beta - 90;
-          
-          // Add deadzone for centering - when deviation is between -2° and 2°, snap to center
-          let adjustedDeviation = verticalDeviation;
-          if (Math.abs(verticalDeviation) < 2) {
-            adjustedDeviation = 0; // Snap to center for better "locked in" feel
+          // Add deadzone for centering - when gamma is between -2° and 2°, snap to center
+          let adjustedGamma = gamma;
+          if (Math.abs(gamma) < 2) {
+            adjustedGamma = 0; // Snap to center for better "locked in" feel
           }
           
           // Use much gentler sensitivity (divide by 20 instead of 15) for easier alignment
-          const bubbleYOffset = (adjustedDeviation / 20) * maxBubbleOffset; // Forward/back = up/down
+          const bubbleXOffset = -(adjustedGamma / 20) * maxBubbleOffset; // Left-right movement
           
-          // Lock X to center (no left-right movement in vertical mode!)
-          bubbleX.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 });
-          
-          // VERTICAL MODE: Much heavier damping for smoother movement
-          // Higher damping = slower, smoother response (less jerky)
-          bubbleY.value = withSpring(bubbleYOffset, { 
+          // VERTICAL MODE: Only X-axis moves, Y-axis locked to center
+          bubbleX.value = withSpring(bubbleXOffset, { 
             damping: 40,      // Heavy damping for smooth
             stiffness: 100,   // Soft spring
             mass: 1.5         // Heavy mass for inertia
           });
+          bubbleY.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 }); // Lock Y to center
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
@@ -881,6 +880,11 @@ export default function MeasurementScreen() {
   const reminderTextAnimatedStyle = useAnimatedStyle(() => ({
     opacity: reminderTextOpacity.value,
   }));
+  
+  const focusIndicatorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: focusIndicatorOpacity.value,
+    transform: [{ scale: focusIndicatorScale.value }],
+  }));
 
   if (!permission) {
     return (
@@ -1126,6 +1130,19 @@ export default function MeasurementScreen() {
               const { locationX, locationY } = event.nativeEvent;
               if (cameraRef.current) {
                 try {
+                  // Show focus indicator at tap location
+                  setFocusPoint({ x: locationX, y: locationY });
+                  
+                  // Animate focus indicator
+                  focusIndicatorOpacity.value = 1;
+                  focusIndicatorScale.value = 1.5;
+                  focusIndicatorScale.value = withSpring(1, { damping: 15, stiffness: 200 });
+                  
+                  // Fade out after animation
+                  setTimeout(() => {
+                    focusIndicatorOpacity.value = withTiming(0, { duration: 500 });
+                  }, 800);
+                  
                   // Focus camera at tap location
                   // Note: Expo Camera v15+ handles focus automatically on tap
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1513,6 +1530,30 @@ export default function MeasurementScreen() {
               </View>
             </View>
           </CameraView>
+          
+          {/* Tap-to-Focus Indicator */}
+          {focusPoint && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                {
+                  position: 'absolute',
+                  left: focusPoint.x - 40,
+                  top: focusPoint.y - 40,
+                  width: 80,
+                  height: 80,
+                  borderWidth: 2,
+                  borderColor: '#FFD700',
+                  borderRadius: 40,
+                  shadowColor: '#FFD700',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.8,
+                  shadowRadius: 10,
+                },
+                focusIndicatorAnimatedStyle,
+              ]}
+            />
+          )}
           </Pressable>
           
           {/* Black overlay that fades out for smooth transition */}
