@@ -4,6 +4,53 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.90] - 2025-10-17
+
+### 🎨 Contrasting Shutter Button & Enhanced Color System
+
+#### ✨ Major Visual Improvements
+- **Contrasting Shutter Button** - Camera shutter button now uses high-contrast color that pops
+  - Always distinct from crosshairs and bubble level
+  - Helps users quickly locate primary action button
+  - Uses triadic color theory for professional aesthetic
+  
+- **Session Color System** - Fresh colors regenerate every camera session
+  - 7 carefully designed triadic color sets (3 colors each)
+  - Colors: Crosshair (camera/calibration) + Bubble (level) + Shutter (button)
+  - New random color palette on every "New Photo" action
+  - Maintains visual continuity within single session (camera → calibration → measurement)
+
+#### 🎯 Color Sets (7 Triads)
+1. Blue + Amber + Pink
+2. Purple + Green + Orange
+3. Pink + Cyan + Lime
+4. Red + Blue + Green
+5. Green + Purple + Amber
+6. Amber + Pink + Cyan
+7. Cyan + Red + Lime
+
+#### 🔄 Color Regeneration Flow
+- **Regenerates**: Entering camera mode, "New Photo" button, app restart
+- **Persists**: Camera → calibration → measurement (same session)
+- **Visual Continuity**: Calibration screen uses crosshair color from camera
+
+#### 🔧 Technical Implementation
+- Moved color pairs to module-level `COLOR_PAIRS` constant
+- Added `shutterColor` to session color state (3 colors per set)
+- Added `sessionColor` prop to ZoomCalibration for visual continuity
+- Color regeneration via useEffect on mode change
+
+#### 📁 Files Modified
+- `src/screens/MeasurementScreen.tsx` - COLOR_PAIRS, shutter color, regeneration logic
+- `src/components/ZoomCalibration.tsx` - sessionColor prop support
+- `app.json` - Version bump to 1.90
+
+#### 📚 Documentation
+- `V1.90_COLOR_SYSTEM_UPDATE.md` - Full implementation details
+- `V1.90_QUICK_REFERENCE.md` - Quick reference guide
+
+---
+
 ## [Alpha v1.86] - 2025-10-16
 
 ### 🎯 Adaptive Camera Guidance System
