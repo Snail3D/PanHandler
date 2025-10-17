@@ -145,15 +145,6 @@ export default function MeasurementScreen() {
   const encouragementTextOpacity = useSharedValue(0);
   const reminderTextOpacity = useSharedValue(0);
   
-  // Debug: Display sensor values on screen
-  const [debugGamma, setDebugGamma] = useState(0);
-  const [debugBeta, setDebugBeta] = useState(0);
-  const [debugAlpha, setDebugAlpha] = useState(0);
-  const [debugBubbleX, setDebugBubbleX] = useState(0);
-  const [debugBubbleY, setDebugBubbleY] = useState(0);
-  const [debugBubbleXRaw, setDebugBubbleXRaw] = useState(0);
-  const [debugBubbleYRaw, setDebugBubbleYRaw] = useState(0);
-  
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
@@ -1194,44 +1185,6 @@ export default function MeasurementScreen() {
               </View>
             </View>
 
-            {/* Debug Display - Top Left */}
-            {mode === 'camera' && (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: insets.top + 60,
-                  left: 20,
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  padding: 12,
-                  borderRadius: 8,
-                  zIndex: 100,
-                }}
-                pointerEvents="none"
-              >
-                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
-                  alpha: {debugAlpha.toFixed(1)}°
-                </Text>
-                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
-                  gamma: {debugGamma.toFixed(1)}°
-                </Text>
-                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
-                  beta: {debugBeta.toFixed(1)}°
-                </Text>
-                <Text style={{ color: 'yellow', fontSize: 11, fontFamily: 'monospace' }}>
-                  raw X: {debugBubbleXRaw.toFixed(1)}
-                </Text>
-                <Text style={{ color: 'yellow', fontSize: 11, fontFamily: 'monospace' }}>
-                  raw Y: {debugBubbleYRaw.toFixed(1)}
-                </Text>
-                <Text style={{ color: 'lime', fontSize: 11, fontFamily: 'monospace' }}>
-                  final X: {debugBubbleX.toFixed(1)}
-                </Text>
-                <Text style={{ color: 'lime', fontSize: 11, fontFamily: 'monospace' }}>
-                  final Y: {debugBubbleY.toFixed(1)}
-                </Text>
-              </View>
-            )}
-
             {/* Fixed gray crosshairs - REFERENCE (always centered) */}
             <View
               style={{
@@ -1452,7 +1405,53 @@ export default function MeasurementScreen() {
               />
             </Animated.View>
 
-            {/* "Look Straight Down" Message - Shows when NOT horizontal */}
+            {/* "Look Straight Down" Message - Shows when NOT horizontal, positioned upper right */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const horizontal = isHorizontal.value;
+                return {
+                  position: 'absolute',
+                  top: insets.top + 80,
+                  right: 24,
+                  opacity: horizontal ? 0 : 1,
+                  pointerEvents: 'none',
+                };
+              })()}
+            >
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8 }}>
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'right' }}>
+                  Look Straight Down
+                </Text>
+                <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 12, marginTop: 2, textAlign: 'right' }}>
+                  Point camera at table
+                </Text>
+              </View>
+            </Animated.View>
+
+            {/* "Place Coin in the Middle" Message - Shows when horizontal but auto-capture not active, positioned upper right */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const horizontal = isHorizontal.value;
+                const autoCaptureActive = autoCaptureEnabled;
+                return {
+                  position: 'absolute',
+                  top: insets.top + 80,
+                  right: 24,
+                  opacity: horizontal && !autoCaptureActive ? 1 : 0,
+                  pointerEvents: 'none',
+                };
+              })()}
+            >
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8 }}>
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'right' }}>
+                  Place Coin in the Middle
+                </Text>
+              </View>
+            </Animated.View>
+
+            {/* Coin Placement Circle - Single 25px circle in center */}
             <Animated.View
               style={(() => {
                 'worklet';
@@ -1460,86 +1459,24 @@ export default function MeasurementScreen() {
                 return {
                   position: 'absolute',
                   top: '50%',
-                  left: 0,
-                  right: 0,
-                  alignItems: 'center',
-                  marginTop: -40,
-                  opacity: horizontal ? 0 : 1,
+                  left: '50%',
+                  width: 25,
+                  height: 25,
+                  marginLeft: -12.5,
+                  marginTop: -12.5,
+                  opacity: horizontal ? 0.8 : 0,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 24, paddingVertical: 16, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 20, fontWeight: '600', textAlign: 'center' }}>
-                  Look Straight Down
-                </Text>
-                <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 14, marginTop: 4, textAlign: 'center' }}>
-                  Point camera at table
-                </Text>
-              </View>
-            </Animated.View>
-
-            {/* Coin Placement Circles - Multiple sizes to choose from */}
-            <Animated.View
-              style={(() => {
-                'worklet';
-                const horizontal = isHorizontal.value;
-                return {
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  opacity: horizontal ? 0.6 : 0,
-                  pointerEvents: 'none',
-                };
-              })()}
-            >
-              {/* Size options: 30, 35, 40, 45, 50, 55, 60, 65, 70, 75px */}
-              {[30, 35, 40, 45, 50, 55, 60, 65, 70, 75].map((size, index) => {
-                const row = Math.floor(index / 5);
-                const col = index % 5;
-                // Center the grid on screen
-                const gridWidth = 5 * 80; // 5 columns with 80px spacing
-                const gridHeight = 2 * 110; // 2 rows with 110px spacing
-                const startX = (SCREEN_WIDTH - gridWidth) / 2;
-                const startY = (SCREEN_HEIGHT - gridHeight) / 2;
-                const offsetX = startX + (col * 80);
-                const offsetY = startY + (row * 110);
-                
-                return (
-                  <View
-                    key={size}
-                    style={{
-                      position: 'absolute',
-                      left: offsetX,
-                      top: offsetY,
-                      width: size,
-                      height: size,
-                    }}
-                  >
-                    <View style={{ 
-                      width: size, 
-                      height: size, 
-                      borderRadius: size / 2,
-                      borderWidth: 2,
-                      borderColor: 'rgba(59, 130, 246, 0.9)',
-                      backgroundColor: 'transparent',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                      <Text style={{ 
-                        color: 'rgba(59, 130, 246, 1)', 
-                        fontSize: 9, 
-                        fontWeight: '700',
-                        textAlign: 'center',
-                      }}>
-                        {size}px
-                      </Text>
-                    </View>
-                  </View>
-                );
-              })}
+              <View style={{ 
+                width: 25, 
+                height: 25, 
+                borderRadius: 12.5,
+                borderWidth: 2,
+                borderColor: 'rgba(59, 130, 246, 0.9)',
+                backgroundColor: 'transparent',
+              }} />
             </Animated.View>
 
             {/* Auto-Capture Button - Positioned close to crosshairs for visibility */}
@@ -1801,7 +1738,6 @@ export default function MeasurementScreen() {
               </Text>
             </View>
           )}
-          </CameraView>
           
           {/* Black overlay that fades out for smooth transition */}
           <Animated.View
