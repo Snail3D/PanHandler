@@ -18,6 +18,7 @@ import useStore, { CompletedMeasurement } from '../state/measurementStore';
 import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
+import BlueprintPlacementModal from './BlueprintPlacementModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import AlertModal from './AlertModal';
@@ -336,6 +337,11 @@ export default function DimensionOverlay({
   const [isMapMode, setIsMapMode] = useState(false);
   const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
   const [showMapScaleModal, setShowMapScaleModal] = useState(false);
+  
+  // Blueprint scale placement
+  const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
+  const [blueprintPoints, setBlueprintPoints] = useState<Array<{ x: number; y: number }>>([]);
+  const [showBlueprintDistanceModal, setShowBlueprintDistanceModal] = useState(false);
   
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
@@ -6659,10 +6665,26 @@ export default function DimensionOverlay({
           setShowMapScaleModal(false);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }}
+        onBlueprintMode={() => {
+          // User wants to place points for blueprint scale
+          setShowMapScaleModal(false);
+          setShowBlueprintPlacementModal(true);
+        }}
         onDismiss={() => {
           // If dismissing without setting scale, turn off map mode
           setIsMapMode(false);
           setShowMapScaleModal(false);
+        }}
+      />
+
+      {/* Blueprint Placement Modal */}
+      <BlueprintPlacementModal
+        visible={showBlueprintPlacementModal}
+        pointsPlaced={blueprintPoints.length}
+        onDismiss={() => {
+          setShowBlueprintPlacementModal(false);
+          setBlueprintPoints([]);
+          setIsMapMode(false);
         }}
       />
 
