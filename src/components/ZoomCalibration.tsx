@@ -108,15 +108,18 @@ export default function ZoomCalibration({
   };
   
   // Rotating ring animation for circle edge
-  const ringRotation = useSharedValue(0);
+  const ringDashOffset = useSharedValue(0);
   const ringOpacity = useSharedValue(0);
   
   useEffect(() => {
     // Start elegant pulsing animation when tutorial shows
     if (showTutorial) {
-      // Slower rotation - 4 seconds per loop (was 2)
-      ringRotation.value = withRepeat(
-        withTiming(360, { duration: 4000, easing: Easing.linear }),
+      // Calculate circumference for dash offset animation
+      const circumference = 2 * Math.PI * referenceRadiusPixels;
+      
+      // Animate dash offset to create spinning effect
+      ringDashOffset.value = withRepeat(
+        withTiming(circumference, { duration: 4000, easing: Easing.linear }),
         -1, // Infinite loop
         false
       );
@@ -133,8 +136,8 @@ export default function ZoomCalibration({
     }
   }, [showTutorial]);
   
-  const animatedRingStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${ringRotation.value}deg` }],
+  // Animated style for ring opacity only
+  const animatedRingOpacityStyle = useAnimatedStyle(() => ({
     opacity: ringOpacity.value,
   }));
   
@@ -447,7 +450,7 @@ export default function ZoomCalibration({
                   width: SCREEN_WIDTH,
                   height: SCREEN_HEIGHT,
                 },
-                animatedRingStyle,
+                animatedRingOpacityStyle,
               ]}
               pointerEvents="none"
             >
@@ -507,14 +510,14 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Coin Selector at Top - watery glassmorphic - HIGHEST z-index when open */}
+      {/* Coin Selector at Top - compact and always visible */}
       <View
         style={{
           position: 'absolute',
-          top: insets.top + 20,
-          left: SCREEN_WIDTH * 0.15, // 30% narrower (15% on each side)
-          right: SCREEN_WIDTH * 0.15,
-          zIndex: searchQuery.trim().length > 0 ? 1000 : 100, // Higher z-index when search is active
+          top: insets.top + 12,
+          left: 20,
+          right: 20,
+          zIndex: searchQuery.trim().length > 0 ? 1000 : 100,
         }}
         pointerEvents="box-none"
       >
@@ -522,76 +525,66 @@ export default function ZoomCalibration({
           intensity={35}
           tint="light"
           style={{
-            borderRadius: 20,
+            borderRadius: 16,
             overflow: 'hidden',
             shadowColor: selectedCoin ? '#4CAF50' : currentColor,
-            shadowOffset: { width: 0, height: 4 },
+            shadowOffset: { width: 0, height: 3 },
             shadowOpacity: 0.2,
-            shadowRadius: 16,
+            shadowRadius: 12,
           }}
         >
           <View style={{
             backgroundColor: 'rgba(255, 255, 255, 0.5)',
-            borderRadius: 20,
-            paddingHorizontal: 20,
-            paddingVertical: 16,
+            borderRadius: 16,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
             {selectedCoin ? (
-              // Selected coin display
-              <View style={{ alignItems: 'center' }}>
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 6,
-                }}>
+              // Selected coin display - COMPACT single line
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setSelectedCoin(null);
+                }}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <View style={{
                     backgroundColor: 'rgba(76, 175, 80, 0.25)',
-                    paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 6,
+                    paddingHorizontal: 6,
+                    paddingVertical: 2,
+                    borderRadius: 4,
                     marginRight: 8,
                   }}>
                     <Text style={{ 
                       color: '#2E7D32', 
-                      fontSize: 10, 
+                      fontSize: 9, 
                       fontWeight: '700', 
                       letterSpacing: 0.5 
                     }}>
                       SELECTED
                     </Text>
                   </View>
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setSelectedCoin(null);
-                    }}
-                    style={{
-                      padding: 5,
-                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                      borderRadius: 14,
-                    }}
-                  >
-                    <Ionicons name="swap-horizontal" size={18} color="rgba(0, 0, 0, 0.5)" />
-                  </Pressable>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.9)', 
+                    fontWeight: '700', 
+                    fontSize: 15,
+                  }}>
+                    {selectedCoin.name}
+                  </Text>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.55)', 
+                    fontSize: 13, 
+                    fontWeight: '500',
+                    marginLeft: 6,
+                  }}>
+                    • {selectedCoin.diameter}mm
+                  </Text>
                 </View>
-                <Text style={{ 
-                  color: 'rgba(0, 0, 0, 0.9)', 
-                  fontWeight: '700', 
-                  fontSize: 17,
-                  marginBottom: 2,
-                }}>
-                  {selectedCoin.name}
-                </Text>
-                <Text style={{ 
-                  color: 'rgba(0, 0, 0, 0.55)', 
-                  fontSize: 13, 
-                  fontWeight: '500',
-                }}>
-                  {selectedCoin.diameter}mm • {selectedCoin.country}
-                </Text>
-              </View>
+                <Ionicons name="swap-horizontal" size={18} color="rgba(0, 0, 0, 0.5)" />
+              </Pressable>
             ) : (
               // Coin search UI
               <View>
