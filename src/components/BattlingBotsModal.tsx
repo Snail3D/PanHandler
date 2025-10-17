@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, View, Text, Pressable, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,11 +39,12 @@ export default function BattlingBotsModal({
   const [selectedOffer, setSelectedOffer] = useState<number | null>(null);
   const [showDeclineResponse, setShowDeclineResponse] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(60); // 60 second timer
+  const scrollViewRef = useRef<ScrollView>(null);
   
   const offerOpacity = useSharedValue(0);
   
   // Single final offer
-  const finalOffer = { price: 4.97, label: 'Final Offer', color: '#F59E0B' };
+  const finalOffer = { price: 6.97, label: 'Final Offer', color: '#F59E0B' };
   
   // Generate dynamic behind-the-scenes conversation based on user stats
   const getBehindTheScenesScript = (): BotMessage[] => {
@@ -105,7 +106,7 @@ export default function BattlingBotsModal({
       bot: 'left',
       shouldBackspace: true,
       meanText: "Are you CRAZY? We'll barely make anyth—",
-      niceText: "Deal! Actually, $4.97. Final offer.",
+      niceText: "Deal! Actually, $6.97. Final offer.",
     },
   ];
   
@@ -338,6 +339,15 @@ export default function BattlingBotsModal({
     return () => clearInterval(cursorInterval);
   }, [showCursor, isTyping]);
   
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollViewRef.current && messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages, currentText]);
+  
   // Countdown timer for offer stage
   useEffect(() => {
     if (stage !== 'offer' || timeRemaining <= 0) return;
@@ -414,8 +424,9 @@ export default function BattlingBotsModal({
               {stage === 'negotiation' ? (
                   // Negotiation Stage
                   <ScrollView 
-                    style={{ maxHeight: 600 }}
-                    contentContainerStyle={{ padding: 24 }}
+                    ref={scrollViewRef}
+                    style={{ maxHeight: 500 }}
+                    contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
                     showsVerticalScrollIndicator={false}
                   >
                     {/* Title */}
