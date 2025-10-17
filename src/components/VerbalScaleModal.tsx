@@ -296,6 +296,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                           <Pressable
                             onPress={() => {
                               setScreenUnit('cm');
+                              // Smart unit switching: cm → metric units
+                              if (realUnit === 'ft') setRealUnit('m');
+                              if (realUnit === 'mi') setRealUnit('km');
                               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}
                             style={{
@@ -317,6 +320,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                           <Pressable
                             onPress={() => {
                               setScreenUnit('in');
+                              // Smart unit switching: in → imperial units
+                              if (realUnit === 'm') setRealUnit('ft');
+                              if (realUnit === 'km') setRealUnit('mi');
                               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }}
                             style={{
