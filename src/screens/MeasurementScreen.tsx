@@ -573,32 +573,40 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: SIMPLE - just use beta
-          // From diagnostic: Beta ~85° when level
-          // Tilt forward → beta decreases (85 → 54)
-          // Tilt backward → beta increases (85 → 90+)
+          // VERTICAL MODE: Rotation-compensated forward/backward tilt
+          // Problem: Rotation (alpha) affects beta reading significantly
+          // Solution: Use trigonometry to extract true forward/backward tilt
           
           const levelReference = 85;
-          const tiltFromLevel = betaRaw - levelReference;
           
-          // tiltFromLevel: negative = tilted forward, positive = tilted backward
-          // We want: tilt forward → line goes UP (negative Y)
-          //          tilt backward → line goes DOWN (positive Y)
-          // So we use tiltFromLevel AS IS (already has correct sign)
+          // Normalize alpha to 0-360
+          const normalizedAlpha = ((alpha % 360) + 360) % 360;
+          const alphaRad = (normalizedAlpha * Math.PI) / 180;
           
+          // Calculate true forward/backward tilt accounting for rotation
+          // When phone rotates, beta and gamma mix
+          // True tilt = weighted combination based on rotation angle
+          const betaTilt = betaRaw - levelReference;
+          const gammaTilt = gammaRaw;
+          
+          // Use rotation angle to unmix the axes
+          // cos(alpha) weights beta, sin(alpha) weights gamma
+          const trueTilt = betaTilt * Math.cos(alphaRad) - gammaTilt * Math.sin(alphaRad);
+          
+          // trueTilt: negative = forward, positive = backward
           // Dead zone ±3°
           const deadZone = 3;
           let movement: number;
           
-          if (Math.abs(tiltFromLevel) < deadZone) {
-            movement = tiltFromLevel * 1;
+          if (Math.abs(trueTilt) < deadZone) {
+            movement = trueTilt * 1;
           } else {
-            const beyond = Math.abs(tiltFromLevel) - deadZone;
-            const sign = tiltFromLevel >= 0 ? 1 : -1;
+            const beyond = Math.abs(trueTilt) - deadZone;
+            const sign = trueTilt >= 0 ? 1 : -1;
             movement = sign * (deadZone + beyond * 3);
           }
           
-          // Movement is already correct: negative forward, positive backward
+          // Movement: negative forward → line UP, positive backward → line DOWN
           let bubbleYOffset = movement;
           
           // Clamp ±150px
@@ -620,10 +628,10 @@ export default function MeasurementScreen() {
           
           // Update debug display (occasionally to avoid performance hit)
           if (Math.random() < 0.1) {
-            setDebugGamma(gamma);
+            setDebugGamma(gammaRaw);
             setDebugBeta(betaRaw);
-            setDebugBubbleXRaw(0);
-            setDebugBubbleYRaw(tiltFromLevel);
+            setDebugBubbleXRaw(alpha);
+            setDebugBubbleYRaw(trueTilt);
             setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
