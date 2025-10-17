@@ -1552,7 +1552,9 @@ export default function DimensionOverlay({
     // Only check distance measurements
     const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
     
-    if (distanceLines.length < 3) return; // Need at least 3 lines to form a polygon
+    // Require at least 4 lines to form a polygon (squares/rectangles)
+    // This prevents premature triangle detection that users complained about
+    if (distanceLines.length < 4) return;
     
     // Find all connected chains of lines
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
@@ -1826,11 +1828,11 @@ export default function DimensionOverlay({
       
       setMeasurements([...measurements, newMeasurement]);
       
-      // 🔷 POLYGON AUTO-DETECTION: DISABLED - User can manually merge lines if desired
-      // Automatic detection was too aggressive and would snap to triangles prematurely
-      // if (mode === 'distance') {
-      //   detectAndMergePolygon([...measurements, newMeasurement]);
-      // }
+      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
+      // Require at least 4 lines (squares/rectangles) to prevent premature triangle snapping
+      if (mode === 'distance') {
+        detectAndMergePolygon([...measurements, newMeasurement]);
+      }
       
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
