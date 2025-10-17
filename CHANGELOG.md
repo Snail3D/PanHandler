@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.3] - 2025-10-17
+
+### 🐛 Camera Button Alignment & Touch Area Fix
+
+#### ✨ Bug Fixes
+- **Photo Library Button Size** - Increased from 56x56 to 80x80 (matches shutter button)
+  - Larger touch target for easier tapping
+  - Visual consistency with shutter button
+  - Icon size increased from 28 to 36 (proportional scaling)
+  
+- **Button Alignment** - Fixed vertical alignment between photo library and shutter buttons
+  - Container padding updated: `insets.bottom + 32` → `insets.bottom + 40`
+  - Removed 3px margin offset causing misalignment
+  - Both buttons now perfectly horizontally aligned
+  
+- **Touch Area** - Touch area now matches full button size (80x80)
+  - Was only 56x56 before (30% smaller)
+  - No more missed taps due to small touch area
+
+#### 🔧 Technical Changes
+- Button dimensions: 56x56 → 80x80
+- Border radius: 28 → 40
+- Container padding: 32 → 40
+- Icon size: 28 → 36
+- Removed marginBottom: 3
+
+#### 📁 Files Modified
+- `src/screens/MeasurementScreen.tsx` - Button sizing and alignment (lines 1714, 1725-1733)
+- `app.json` - Version bump to 2.1.3
+
+#### 📚 Documentation
+- `V2.1.3_BUTTON_ALIGNMENT_FIX.md` - Full implementation details
+
+---
+
 ## [Alpha v2.1.2] - 2025-10-17
 
 ### 🎨 Two-Phase Dynamic Blur System
