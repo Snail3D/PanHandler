@@ -19,6 +19,7 @@ import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversio
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
 import BlueprintPlacementModal from './BlueprintPlacementModal';
+import BlueprintDistanceModal from './BlueprintDistanceModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import AlertModal from './AlertModal';
@@ -6685,6 +6686,126 @@ export default function DimensionOverlay({
         pointsPlaced={blueprintPoints.length}
         onDismiss={() => {
           setShowBlueprintPlacementModal(false);
+          setBlueprintPoints([]);
+          setIsMapMode(false);
+        }}
+      />
+
+      {/* Blueprint Placement Touch Overlay - Active when placing blueprint points */}
+      {showBlueprintPlacementModal && blueprintPoints.length < 2 && (
+        <View
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
+          onStartShouldSetResponder={() => true}
+          onResponderGrant={(event) => {
+            const { pageX, pageY } = event.nativeEvent;
+            
+            // Add point to blueprint points array
+            const newPoint = { x: pageX, y: pageY };
+            const updatedPoints = [...blueprintPoints, newPoint];
+            setBlueprintPoints(updatedPoints);
+            
+            // Haptic feedback
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            
+            // If we've placed 2 points, show distance input modal
+            if (updatedPoints.length === 2) {
+              setTimeout(() => {
+                setShowBlueprintPlacementModal(false);
+                setShowBlueprintDistanceModal(true);
+              }, 500); // Small delay to show checkmark animation
+            }
+          }}
+        />
+      )}
+
+      {/* Blueprint Points Visualization */}
+      {showBlueprintPlacementModal && blueprintPoints.length > 0 && (
+        <Svg style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 25 }} pointerEvents="none">
+          {/* Draw line between points if we have 2 */}
+          {blueprintPoints.length === 2 && (
+            <Line
+              x1={blueprintPoints[0].x}
+              y1={blueprintPoints[0].y}
+              x2={blueprintPoints[1].x}
+              y2={blueprintPoints[1].y}
+              stroke={sessionColor ? sessionColor.main : '#34C759'}
+              strokeWidth={3}
+              strokeDasharray="8,4"
+            />
+          )}
+          
+          {/* Draw circles for each point */}
+          {blueprintPoints.map((point, idx) => (
+            <React.Fragment key={idx}>
+              {/* Outer glow */}
+              <Circle
+                cx={point.x}
+                cy={point.y}
+                r={20}
+                fill={sessionColor ? sessionColor.main : '#34C759'}
+                opacity={0.2}
+              />
+              {/* Main circle */}
+              <Circle
+                cx={point.x}
+                cy={point.y}
+                r={12}
+                fill={sessionColor ? sessionColor.main : '#34C759'}
+                stroke="white"
+                strokeWidth={3}
+              />
+              {/* Center dot */}
+              <Circle
+                cx={point.x}
+                cy={point.y}
+                r={3}
+                fill="white"
+              />
+            </React.Fragment>
+          ))}
+        </Svg>
+      )}
+
+      {/* Blueprint Distance Input Modal */}
+      <BlueprintDistanceModal
+        visible={showBlueprintDistanceModal}
+        onComplete={(distance, unit) => {
+          // Calculate pixel distance between the two points
+          const dx = blueprintPoints[1].x - blueprintPoints[0].x;
+          const dy = blueprintPoints[1].y - blueprintPoints[0].y;
+          const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Calculate pixels per unit
+          const pixelsPerUnit = pixelDistance / distance;
+          
+          // Create calibration object
+          const newCalibration = {
+            pixelsPerUnit,
+            unit,
+            referenceDistance: distance,
+            calibrationType: 'blueprint' as const,
+          };
+          
+          // Store calibration
+          useStore.getState().setCalibration(newCalibration);
+          
+          // Clean up
+          setShowBlueprintDistanceModal(false);
+          setBlueprintPoints([]);
+          setIsMapMode(false);
+          
+          // Success haptic
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          
+          console.log('🎯 Blueprint calibration complete:', {
+            pixelDistance,
+            realDistance: distance,
+            unit,
+            pixelsPerUnit,
+          });
+        }}
+        onDismiss={() => {
+          setShowBlueprintDistanceModal(false);
           setBlueprintPoints([]);
           setIsMapMode(false);
         }}
