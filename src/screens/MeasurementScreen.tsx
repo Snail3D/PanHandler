@@ -496,6 +496,7 @@ export default function MeasurementScreen() {
       if (data.rotation) {
         const beta = data.rotation.beta * (180 / Math.PI);
         const gamma = data.rotation.gamma * (180 / Math.PI);
+        const alpha = data.rotation.alpha * (180 / Math.PI); // Rotation/roll
         const absBeta = Math.abs(beta);
         
         // Store for guidance system
@@ -536,33 +537,47 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Only forward/backward tilt (shows as horizontal bubble movement)
+          // VERTICAL MODE: Track both forward/backward tilt AND left/right tilt
           // When phone is held vertically (portrait):
-          // - beta ~90° = phone is perfectly upright and level (centered)
-          // - beta > 90° = phone tilts forward/down = bubble goes RIGHT
-          // - beta < 90° = phone tilts backward/up = bubble goes LEFT
-          // - Left/right tilt (gamma) and rotation are IGNORED
+          // X-axis (horizontal): Forward/backward tilt (beta deviation from 90°)
+          //   - beta ~90° = perfectly upright (centered)
+          //   - beta > 90° = tilts forward = bubble goes RIGHT
+          //   - beta < 90° = tilts backward = bubble goes LEFT
+          // Y-axis (vertical): Left/right tilt (gamma)
+          //   - gamma ~0° = no rotation (centered)
+          //   - gamma > 0 = rotates right = bubble goes UP
+          //   - gamma < 0 = rotates left = bubble goes DOWN
           
           // Calculate deviation from 90° (perfect vertical)
           const verticalDeviation = beta - 90;
           
-          // Add deadzone for centering - when deviation is between -2° and 2°, snap to center
-          let adjustedDeviation = verticalDeviation;
+          // Add deadzone for centering forward/backward
+          let adjustedBetaDeviation = verticalDeviation;
           if (Math.abs(verticalDeviation) < 2) {
-            adjustedDeviation = 0; // Snap to center for better "locked in" feel
+            adjustedBetaDeviation = 0;
           }
           
-          // Use much gentler sensitivity (divide by 20 instead of 15) for easier alignment
-          // Map forward/backward tilt to horizontal (X-axis) bubble movement
-          const bubbleXOffset = (adjustedDeviation / 20) * maxBubbleOffset;
+          // Add deadzone for centering rotation
+          let adjustedGamma = gamma;
+          if (Math.abs(gamma) < 2) {
+            adjustedGamma = 0;
+          }
           
-          // VERTICAL MODE: Only X-axis moves based on forward/backward tilt, Y-axis locked
+          // Use gentler sensitivity for both axes
+          const bubbleXOffset = (adjustedBetaDeviation / 20) * maxBubbleOffset; // Forward/back
+          const bubbleYOffset = -(adjustedGamma / 20) * maxBubbleOffset; // Left/right rotation (inverted)
+          
+          // VERTICAL MODE: Both axes move smoothly
           bubbleX.value = withSpring(bubbleXOffset, { 
-            damping: 40,      // Heavy damping for smooth
-            stiffness: 100,   // Soft spring
-            mass: 1.5         // Heavy mass for inertia
+            damping: 40,
+            stiffness: 100,
+            mass: 1.5
           });
-          bubbleY.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 }); // Lock Y to center
+          bubbleY.value = withSpring(bubbleYOffset, { 
+            damping: 40,
+            stiffness: 100,
+            mass: 1.5
+          });
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
