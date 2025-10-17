@@ -31,9 +31,12 @@ This creates engaging tactile feedback that feels natural without being overwhel
   - Pattern: Every other character gets Light impact, remaining get selectionAsync, punctuation gets Medium
 
 - `/home/user/workspace/src/components/BattlingBotsModal.tsx`
-  - Updated all typing sections to use same natural typing haptics pattern
-  - Applied to: mean text typing (lines 223-237), backspace animation (lines 253-259), nice text typing (lines 274-288), normal message typing (lines 328-342)
+  - Updated all typing sections to use same natural typing haptics pattern (every 3rd character)
+  - Applied to: mean text typing, backspace animation, nice text typing, normal message typing
   - Ensures consistent feel across opening quote and bot negotiation screens
+  - **Fixed rendering issue:** Removed nested BlurView that caused blank/invisible modal
+  - **Added ScrollView** for negotiation stage (maxHeight: 600) to prevent content overflow
+  - **Shortened conversation** from 12 messages to 7 for snappier, tighter experience
 
 ## Code Location
 
