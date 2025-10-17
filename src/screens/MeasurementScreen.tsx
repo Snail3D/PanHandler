@@ -1284,6 +1284,84 @@ export default function MeasurementScreen() {
               </View>
             )}
 
+            {/* Fixed gray crosshairs - REFERENCE (always centered) */}
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+              }}
+              pointerEvents="none"
+            >
+              {/* Horizontal gray line */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  backgroundColor: 'rgba(156, 163, 175, 0.5)', // Gray
+                  marginTop: -1,
+                }}
+              />
+              {/* Vertical gray line */}
+              <View
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: 0,
+                  bottom: 0,
+                  width: 2,
+                  backgroundColor: 'rgba(156, 163, 175, 0.5)', // Gray
+                  marginLeft: -1,
+                }}
+              />
+            </View>
+
+            {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                transform: [
+                  { translateX: bubbleX.value * 5 }, // Amplify movement so it's visible
+                  { translateY: bubbleY.value * 5 },
+                ],
+              }}
+              pointerEvents="none"
+            >
+              {/* Horizontal red line */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
+                  marginTop: -1.5,
+                }}
+              />
+              {/* Vertical red line */}
+              <View
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  top: 0,
+                  bottom: 0,
+                  width: 3,
+                  backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
+                  marginLeft: -1.5,
+                }}
+              />
+            </Animated.View>
+
             {/* Crosshairs overlay - center of screen */}
             <Animated.View 
               style={[
