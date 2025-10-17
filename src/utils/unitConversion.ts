@@ -1,6 +1,6 @@
 import { UnitSystem } from '../state/measurementStore';
 
-export type MeasurementUnit = 'mm' | 'cm' | 'in' | 'm' | 'ft';
+export type MeasurementUnit = 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi';
 
 // Conversion factors to mm (base unit)
 const TO_MM = {
@@ -9,6 +9,8 @@ const TO_MM = {
   in: 25.4,
   m: 1000,
   ft: 304.8,
+  km: 1000000,
+  mi: 1609344,
 };
 
 // Convert any unit to any other unit
@@ -24,7 +26,7 @@ export function convertUnit(
 // Get the appropriate display unit based on unit system and value
 export function getDisplayUnit(
   valueInBaseUnit: number,
-  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft',
+  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi',
   unitSystem: UnitSystem
 ): { value: number; unit: MeasurementUnit } {
   // First convert to the base unit system
@@ -35,8 +37,12 @@ export function getDisplayUnit(
     valueInMm = valueInBaseUnit * 10;
   } else if (baseUnit === 'm') {
     valueInMm = valueInBaseUnit * 1000;
+  } else if (baseUnit === 'km') {
+    valueInMm = valueInBaseUnit * 1000000;
   } else if (baseUnit === 'in') {
     valueInMm = valueInBaseUnit * 25.4;
+  } else if (baseUnit === 'mi') {
+    valueInMm = valueInBaseUnit * 1609344;
   } else {
     valueInMm = valueInBaseUnit * 304.8;
   }
@@ -58,7 +64,7 @@ export function getDisplayUnit(
 // Format measurement value with appropriate unit
 export function formatMeasurement(
   valueInBaseUnit: number,
-  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft',
+  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi',
   unitSystem: UnitSystem,
   decimals: number = 1
 ): string {
@@ -96,7 +102,7 @@ export function getCalibrationUnits(unitSystem: UnitSystem): MeasurementUnit[] {
 // Format area measurement with appropriate unit
 export function formatAreaMeasurement(
   areaInBaseUnit: number, // area in square units of baseUnit
-  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft',
+  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi',
   unitSystem: UnitSystem,
   decimals: number = 1
 ): string {
@@ -108,8 +114,12 @@ export function formatAreaMeasurement(
     areaInMm2 = areaInBaseUnit * 100; // 1cm² = 100mm²
   } else if (baseUnit === 'm') {
     areaInMm2 = areaInBaseUnit * 1000000; // 1m² = 1,000,000mm²
+  } else if (baseUnit === 'km') {
+    areaInMm2 = areaInBaseUnit * 1000000000000; // 1km² = 1e12mm²
   } else if (baseUnit === 'in') {
     areaInMm2 = areaInBaseUnit * 645.16; // 1in² = 645.16mm²
+  } else if (baseUnit === 'mi') {
+    areaInMm2 = areaInBaseUnit * 2589988110336; // 1mi² = huge mm²
   } else {
     areaInMm2 = areaInBaseUnit * 92903.04; // 1ft² = 92903.04mm²
   }
@@ -143,6 +153,6 @@ export function formatAreaMeasurement(
 }
 
 // Get default calibration unit for unit system
-export function getDefaultCalibrationUnit(unitSystem: UnitSystem): 'mm' | 'cm' | 'in' | 'm' | 'ft' {
+export function getDefaultCalibrationUnit(unitSystem: UnitSystem): 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' {
   return unitSystem === 'metric' ? 'mm' : 'in';
 }

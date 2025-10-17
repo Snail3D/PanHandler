@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BlueprintDistanceModalProps {
   visible: boolean;
-  onComplete: (distance: number, unit: 'mm' | 'cm' | 'in' | 'm' | 'ft') => void;
+  onComplete: (distance: number, unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi') => void;
   onDismiss: () => void;
 }
 
@@ -15,7 +15,7 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss 
   const insets = useSafeAreaInsets();
   
   const [distance, setDistance] = useState('');
-  const [unit, setUnit] = useState<'mm' | 'cm' | 'in' | 'm' | 'ft'>('cm');
+  const [unit, setUnit] = useState<'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'>('cm');
 
   const distanceNum = parseFloat(distance);
   const isValid = !isNaN(distanceNum) && distanceNum > 0;
@@ -115,38 +115,74 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss 
                 />
               </View>
 
-              {/* Unit Toggle */}
-              <View style={{ 
-                flexDirection: 'row', 
-                padding: 4,
-                backgroundColor: 'rgba(120, 120, 128, 0.12)',
-                borderRadius: 10,
-                marginBottom: 20,
-              }}>
-                {(['mm', 'cm', 'in', 'm', 'ft'] as const).map((u) => (
-                  <Pressable
-                    key={u}
-                    onPress={() => {
-                      setUnit(u);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 10,
-                      borderRadius: 8,
-                      backgroundColor: unit === u ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
-                    }}
-                  >
-                    <Text style={{
-                      textAlign: 'center',
-                      fontSize: 14,
-                      fontWeight: '600',
-                      color: unit === u ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.45)',
-                    }}>
-                      {u}
-                    </Text>
-                  </Pressable>
-                ))}
+              {/* Unit Toggle - Two Rows */}
+              <View style={{ marginBottom: 20, gap: 8 }}>
+                {/* Row 1: Small units */}
+                <View style={{ 
+                  flexDirection: 'row', 
+                  padding: 4,
+                  backgroundColor: 'rgba(120, 120, 128, 0.12)',
+                  borderRadius: 10,
+                }}>
+                  {(['mm', 'cm', 'in', 'm', 'ft'] as const).map((u) => (
+                    <Pressable
+                      key={u}
+                      onPress={() => {
+                        setUnit(u);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 10,
+                        borderRadius: 8,
+                        backgroundColor: unit === u ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+                      }}
+                    >
+                      <Text style={{
+                        textAlign: 'center',
+                        fontSize: 14,
+                        fontWeight: '600',
+                        color: unit === u ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.45)',
+                      }}>
+                        {u}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                {/* Row 2: Large units (km, mi) */}
+                <View style={{ 
+                  flexDirection: 'row', 
+                  padding: 4,
+                  backgroundColor: 'rgba(120, 120, 128, 0.12)',
+                  borderRadius: 10,
+                  gap: 4,
+                }}>
+                  {(['km', 'mi'] as const).map((u) => (
+                    <Pressable
+                      key={u}
+                      onPress={() => {
+                        setUnit(u);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 10,
+                        borderRadius: 8,
+                        backgroundColor: unit === u ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+                      }}
+                    >
+                      <Text style={{
+                        textAlign: 'center',
+                        fontSize: 14,
+                        fontWeight: '600',
+                        color: unit === u ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.45)',
+                      }}>
+                        {u}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
               </View>
 
               {/* Live Preview */}

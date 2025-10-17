@@ -2963,6 +2963,8 @@ export default function DimensionOverlay({
           }}>
             {stepBrothersMode 
               ? "Best friends? 🤝"
+              : calibration?.calibrationType === 'blueprint' && calibration.blueprintScale
+              ? `${calibration.blueprintScale.distance}${calibration.blueprintScale.unit} between points`
               : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
               : coinCircle
@@ -6686,10 +6688,12 @@ export default function DimensionOverlay({
       <BlueprintPlacementModal
         visible={showBlueprintPlacementModal}
         onStartPlacement={() => {
-          // Hide modal and start placement
+          // Hide modal and start measurement mode for blueprint placement
           setShowBlueprintPlacementModal(false);
           setIsPlacingBlueprint(true);
-          setMenuHidden(true); // Hide menu during placement
+          setMeasurementMode(true); // Use existing measurement system
+          setShowCursor(true);
+          setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }}
         onDismiss={() => {
@@ -6840,6 +6844,7 @@ export default function DimensionOverlay({
             unit,
             referenceDistance: distance,
             calibrationType: 'blueprint' as const,
+            blueprintScale: { distance, unit }, // Store for display in badge
           };
           
           // Store calibration
