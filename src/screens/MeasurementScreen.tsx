@@ -1412,14 +1412,14 @@ export default function MeasurementScreen() {
             <Animated.View
               style={(() => {
                 'worklet';
-                const isVertical = isVerticalMode.value;
+                const horizontal = isHorizontal.value; // Use same check as horizontal line
                 return {
                   position: 'absolute',
                   top: -SCREEN_HEIGHT,
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
-                  opacity: isVertical ? 0 : 1, // Graceful fade via withTiming
+                  opacity: horizontal ? 1 : 0, // Hide when NOT horizontal (vertical mode)
                   transform: [
                     { translateX: bubbleX.value * 3 },
                     { translateY: bubbleY.value * 3 },
@@ -1442,7 +1442,7 @@ export default function MeasurementScreen() {
             </Animated.View>
 
             {/* Crosshairs overlay - center of screen */}
-            {/* ONLY visible in horizontal mode */}
+            {/* Always visible - bubble level for alignment */}
             <Animated.View 
               style={[
                 {
@@ -1455,13 +1455,6 @@ export default function MeasurementScreen() {
                   marginTop: -60,
                 },
                 crosshairContainerStyle,
-                (() => {
-                  'worklet';
-                  const horizontal = isHorizontal.value;
-                  return {
-                    opacity: horizontal ? 1 : 0, // Hide in vertical mode
-                  };
-                })(),
               ]}
               pointerEvents="none"
             >
