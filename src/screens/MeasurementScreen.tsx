@@ -680,6 +680,13 @@ export default function MeasurementScreen() {
     }
   }, [mode, alignmentStatus, isStable, isCapturing, autoCaptureEnabled]);
   
+  // Reset auto-capture when entering camera mode (user must tap button again)
+  useEffect(() => {
+    if (mode === 'camera') {
+      setAutoCaptureEnabled(false);
+    }
+  }, [mode]);
+  
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
     // Only show guidance in camera mode, not capturing
@@ -916,6 +923,12 @@ export default function MeasurementScreen() {
     try {
       setIsCapturing(true);
       
+      // Check camera permissions one more time
+      if (!permission?.granted) {
+        console.error('Camera permission not granted');
+        return;
+      }
+      
       // Pleasant camera flash effect - MUST complete before transition
       cameraFlashOpacity.value = 1;
       cameraFlashOpacity.value = withTiming(0, {
@@ -923,9 +936,13 @@ export default function MeasurementScreen() {
         easing: Easing.out(Easing.ease),
       });
       
+      // Wait a tiny bit for camera to be fully ready
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Take photo (torch is controlled by enableTorch prop on CameraView)
       const photo = await cameraRef.current.takePictureAsync({
         quality: 1,
+        skipProcessing: false,
       });
       
       if (photo?.uri) {
