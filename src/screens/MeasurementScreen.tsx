@@ -570,7 +570,7 @@ export default function MeasurementScreen() {
           
           // Use same formula as horizontal mode (which works well!)
           const bubbleXOffset = (normalizedGamma / 15) * maxBubbleOffset; // Left/right tilt → X movement
-          const bubbleYOffset = (forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
+          const bubbleYOffset = -(forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement (INVERTED for homing guide)
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
