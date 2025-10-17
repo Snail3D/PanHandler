@@ -513,7 +513,17 @@ export default function MeasurementScreen() {
         
         // Auto-detect horizontal (0°) or vertical (90°)
         const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
-        const absTilt = targetOrientation === 'horizontal' ? absBeta : Math.abs(absBeta - 90);
+        
+        // Calculate total tilt considering BOTH axes
+        let absTilt: number;
+        if (targetOrientation === 'horizontal') {
+          // Horizontal mode: device should be flat (beta ~0°, gamma ~0°)
+          // Calculate total deviation from level using both axes
+          absTilt = Math.sqrt(beta * beta + gamma * gamma);
+        } else {
+          // Vertical mode: device should be upright (beta ~90°)
+          absTilt = Math.abs(absBeta - 90);
+        }
         
         setTiltAngle(absTilt);
         
