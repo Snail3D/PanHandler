@@ -1810,10 +1810,11 @@ export default function DimensionOverlay({
       
       setMeasurements([...measurements, newMeasurement]);
       
-      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
-      if (mode === 'distance') {
-        detectAndMergePolygon([...measurements, newMeasurement]);
-      }
+      // 🔷 POLYGON AUTO-DETECTION: DISABLED - User can manually merge lines if desired
+      // Automatic detection was too aggressive and would snap to triangles prematurely
+      // if (mode === 'distance') {
+      //   detectAndMergePolygon([...measurements, newMeasurement]);
+      // }
       
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
