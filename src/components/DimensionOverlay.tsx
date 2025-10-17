@@ -997,15 +997,25 @@ export default function DimensionOverlay({
 
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    // Snap when placing second point in distance mode OR second point in angle mode (before vertex)
+    // Snap when placing second point in distance mode OR second point in angle mode (before vertex) OR blueprint mode
     const shouldSnap = (mode === 'distance' && currentPoints.length === 1) || 
-                       (mode === 'angle' && currentPoints.length === 1);
+                       (mode === 'angle' && currentPoints.length === 1) ||
+                       (isPlacingBlueprint && blueprintPoints.length === 1);
     
     if (!shouldSnap) {
       return { x: cursorX, y: cursorY, snapped: false };
     }
     
-    const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+    // Get the first point (either from currentPoints or blueprintPoints)
+    let firstPoint;
+    if (isPlacingBlueprint && blueprintPoints.length === 1) {
+      firstPoint = imageToScreen(blueprintPoints[0].x, blueprintPoints[0].y);
+    } else if (currentPoints.length > 0) {
+      firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+    } else {
+      return { x: cursorX, y: cursorY, snapped: false };
+    }
+    
     const dx = cursorX - firstPoint.x;
     const dy = cursorY - firstPoint.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
