@@ -343,8 +343,10 @@ export default function DimensionOverlay({
   
   // Blueprint scale placement
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
+  const [isPlacingBlueprint, setIsPlacingBlueprint] = useState(false); // Actually placing pins
   const [blueprintPoints, setBlueprintPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [showBlueprintDistanceModal, setShowBlueprintDistanceModal] = useState(false);
+  const blueprintLineOpacity = useSharedValue(1); // For fade-out animation
   
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
@@ -6683,7 +6685,13 @@ export default function DimensionOverlay({
       {/* Blueprint Placement Modal */}
       <BlueprintPlacementModal
         visible={showBlueprintPlacementModal}
-        pointsPlaced={blueprintPoints.length}
+        onStartPlacement={() => {
+          // Hide modal and start placement
+          setShowBlueprintPlacementModal(false);
+          setIsPlacingBlueprint(true);
+          setMenuHidden(true); // Hide menu during placement
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }}
         onDismiss={() => {
           setShowBlueprintPlacementModal(false);
           setBlueprintPoints([]);
@@ -6692,7 +6700,7 @@ export default function DimensionOverlay({
       />
 
       {/* Blueprint Placement Touch Overlay - Active when placing blueprint points */}
-      {showBlueprintPlacementModal && blueprintPoints.length < 2 && (
+      {isPlacingBlueprint && blueprintPoints.length < 2 && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}
           onStartShouldSetResponder={() => true}
@@ -6710,66 +6718,114 @@ export default function DimensionOverlay({
             // If we've placed 2 points, show distance input modal
             if (updatedPoints.length === 2) {
               setTimeout(() => {
-                setShowBlueprintPlacementModal(false);
+                setIsPlacingBlueprint(false);
                 setShowBlueprintDistanceModal(true);
-              }, 500); // Small delay to show checkmark animation
+              }, 300); // Small delay for visual feedback
             }
           }}
         />
       )}
 
+      {/* Instructional Text During Placement */}
+      {isPlacingBlueprint && (
+        <View style={{
+          position: 'absolute',
+          top: insets.top + 60,
+          left: 20,
+          right: 20,
+          zIndex: 35,
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderRadius: 16,
+            paddingHorizontal: 24,
+            paddingVertical: 16,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+          }}>
+            <Text style={{
+              fontSize: 16,
+              fontWeight: '600',
+              color: 'white',
+              textAlign: 'center',
+            }}>
+              {blueprintPoints.length === 0 && "Tap to place first point"}
+              {blueprintPoints.length === 1 && "Tap to place second point"}
+            </Text>
+          </View>
+        </View>
+      )}
+
       {/* Blueprint Points Visualization */}
-      {showBlueprintPlacementModal && blueprintPoints.length > 0 && (
-        <Svg style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 25 }} pointerEvents="none">
-          {/* Draw line between points if we have 2 */}
-          {blueprintPoints.length === 2 && (
-            <Line
-              x1={blueprintPoints[0].x}
-              y1={blueprintPoints[0].y}
-              x2={blueprintPoints[1].x}
-              y2={blueprintPoints[1].y}
-              stroke={sessionColor ? sessionColor.main : '#34C759'}
-              strokeWidth={3}
-              strokeDasharray="8,4"
-            />
-          )}
-          
-          {/* Draw circles for each point */}
-          {blueprintPoints.map((point, idx) => (
-            <React.Fragment key={idx}>
-              {/* Outer glow */}
-              <Circle
-                cx={point.x}
-                cy={point.y}
-                r={20}
-                fill={sessionColor ? sessionColor.main : '#34C759'}
-                opacity={0.2}
-              />
-              {/* Main circle */}
-              <Circle
-                cx={point.x}
-                cy={point.y}
-                r={12}
-                fill={sessionColor ? sessionColor.main : '#34C759'}
-                stroke="white"
+      {isPlacingBlueprint && blueprintPoints.length > 0 && (
+        <Animated.View style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex: 25,
+          opacity: blueprintLineOpacity,
+        }} pointerEvents="none">
+          <Svg style={{ width: '100%', height: '100%' }}>
+            {/* Draw line between points if we have 2 */}
+            {blueprintPoints.length === 2 && (
+              <Line
+                x1={blueprintPoints[0].x}
+                y1={blueprintPoints[0].y}
+                x2={blueprintPoints[1].x}
+                y2={blueprintPoints[1].y}
+                stroke="rgba(100, 100, 100, 0.8)"
                 strokeWidth={3}
+                strokeDasharray="8,4"
               />
-              {/* Center dot */}
-              <Circle
-                cx={point.x}
-                cy={point.y}
-                r={3}
-                fill="white"
-              />
-            </React.Fragment>
-          ))}
-        </Svg>
+            )}
+            
+            {/* Draw circles for each point */}
+            {blueprintPoints.map((point, idx) => (
+              <React.Fragment key={idx}>
+                {/* Outer glow */}
+                <Circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={20}
+                  fill="rgba(100, 100, 100, 0.3)"
+                />
+                {/* Main circle */}
+                <Circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={12}
+                  fill="rgba(100, 100, 100, 0.8)"
+                  stroke="white"
+                  strokeWidth={3}
+                />
+                {/* Center dot */}
+                <Circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={3}
+                  fill="white"
+                />
+              </React.Fragment>
+            ))}
+          </Svg>
+        </Animated.View>
       )}
 
       {/* Blueprint Distance Input Modal */}
       <BlueprintDistanceModal
         visible={showBlueprintDistanceModal}
         onComplete={(distance, unit) => {
+          // Fade out the line gracefully
+          blueprintLineOpacity.value = withTiming(0, {
+            duration: 400,
+            easing: Easing.out(Easing.ease),
+          });
+          
           // Calculate pixel distance between the two points
           const dx = blueprintPoints[1].x - blueprintPoints[0].x;
           const dy = blueprintPoints[1].y - blueprintPoints[0].y;
@@ -6789,10 +6845,14 @@ export default function DimensionOverlay({
           // Store calibration
           useStore.getState().setCalibration(newCalibration);
           
-          // Clean up
-          setShowBlueprintDistanceModal(false);
-          setBlueprintPoints([]);
-          setIsMapMode(false);
+          // Show menu again and clean up after fade
+          setTimeout(() => {
+            setMenuHidden(false);
+            setShowBlueprintDistanceModal(false);
+            setBlueprintPoints([]);
+            setIsMapMode(false);
+            blueprintLineOpacity.value = 1; // Reset for next time
+          }, 400);
           
           // Success haptic
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -6805,9 +6865,19 @@ export default function DimensionOverlay({
           });
         }}
         onDismiss={() => {
-          setShowBlueprintDistanceModal(false);
-          setBlueprintPoints([]);
-          setIsMapMode(false);
+          // Cancel - fade out and clean up
+          blueprintLineOpacity.value = withTiming(0, {
+            duration: 300,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setMenuHidden(false);
+            setShowBlueprintDistanceModal(false);
+            setBlueprintPoints([]);
+            setIsMapMode(false);
+            blueprintLineOpacity.value = 1; // Reset for next time
+          }, 300);
         }}
       />
 
