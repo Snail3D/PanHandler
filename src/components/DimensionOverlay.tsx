@@ -3735,14 +3735,20 @@ export default function DimensionOverlay({
                 if (distFromCenter > 20 && distFromCenter < radius - 20) {
                   // This is a circle drag, not point resize - fall through to measurement tap logic
                 } else {
-                  // Near center or edge - allow point resize
+                  // Near center or edge - allow point resize (expand/contract circle)
                   saveOriginalState(point.measurementId); // Save state before editing
                   setResizingPoint(point);
                   setDidDrag(false);
                   setIsSnapped(false);
                   dragStartPos.value = { x: pageX, y: pageY };
                   dragCurrentPos.value = { x: pageX, y: pageY };
+                  
+                  // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setTimeout(() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }, 150); // 150ms pause between taps
+                  
                   return;
                 }
               } else if (measurement && measurement.mode === 'rectangle' && measurement.points.length === 4) {
@@ -3777,20 +3783,32 @@ export default function DimensionOverlay({
                     setIsSnapped(false);
                     dragStartPos.value = { x: pageX, y: pageY };
                     dragCurrentPos.value = { x: pageX, y: pageY };
+                    
+                    // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setTimeout(() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }, 150); // 150ms pause between taps
+                    
                     return;
                   }
                 }
                 // Otherwise, fall through to treat as rectangle drag/tap
               } else {
-                // Not a circle center or rectangle - normal point resize behavior
+                // Not a circle center or rectangle - normal point resize behavior (polygons/freehand)
                 saveOriginalState(point.measurementId); // Save state before editing
                 setResizingPoint(point);
                 setDidDrag(false);
                 setIsSnapped(false); // Reset snap state when starting to resize
                 dragStartPos.value = { x: pageX, y: pageY };
                 dragCurrentPos.value = { x: pageX, y: pageY };
+                
+                // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setTimeout(() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }, 150); // 150ms pause between taps
+                
                 return;
               }
             }
