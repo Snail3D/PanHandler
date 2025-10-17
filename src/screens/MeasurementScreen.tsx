@@ -2005,6 +2005,11 @@ export default function MeasurementScreen() {
               imageUri={currentImageUri}
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
+              onSkipToMap={() => {
+                // Skip coin calibration, go straight to measurement screen
+                // WITHOUT coin calibration data (no coin badge info)
+                setMode('measurement');
+              }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}
             />
