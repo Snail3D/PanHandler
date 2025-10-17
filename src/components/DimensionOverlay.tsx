@@ -3006,12 +3006,31 @@ export default function DimensionOverlay({
         </Pressable>
       )}
       
-      {/* Recalibrate button - appears below calibration badge */}
-      {coinCircle && !showLockedInAnimation && !isCapturing && (
+      {/* Recalibrate button - appears below calibration badge when there's any calibration */}
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            if (onReset) onReset(true); // Pass true to trigger recalibrate mode
+            
+            // Scenario 1: Map scale ONLY (no coin, no other calibration)
+            // Reset map scale and reopen map scale modal (stay in measurement screen)
+            if (mapScale && !calibration && !coinCircle) {
+              setMapScale(null);
+              setIsMapMode(false);
+              setShowMapScaleModal(true);
+            }
+            // Scenario 2: BOTH calibration (coin/blueprint/verbal) AND map scale
+            // Reset both and go back to coin screen
+            else if (mapScale && (calibration || coinCircle)) {
+              setMapScale(null);
+              setIsMapMode(false);
+              if (onReset) onReset(true); // Go to coin calibration screen
+            }
+            // Scenario 3: Calibration ONLY (coin/blueprint/verbal, no map scale)
+            // Go back to coin calibration screen (original behavior)
+            else {
+              if (onReset) onReset(true); // Pass true to trigger recalibrate mode
+            }
           }}
           style={{
             position: 'absolute',
