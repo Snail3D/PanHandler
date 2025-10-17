@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.5] - 2025-10-17
+
+### 🐛 Photo Library Button Fix
+
+#### ✨ Bug Fix
+- **Photo Library Button Not Working** - Fixed z-index and pointer events issues
+  - Button was being blocked by shutter button container (z-index 20)
+  - Increased z-index from 10 → **25** (now above shutter)
+  - Added `pointerEvents: 'box-none'` to parent containers
+  - Added haptic feedback and logging for debugging
+  - Button now properly opens photo picker
+  
+#### 🔧 Technical Changes
+- Container z-index: 10 → 25
+- Added `pointerEvents: 'box-none'` to both parent Views
+- Added `console.log` and haptic feedback to button press
+- Made button async handler explicit
+
+#### 📁 Files Modified
+- `src/screens/MeasurementScreen.tsx` - Photo library button z-index and pointer events (lines 1713-1725)
+- `app.json` - Version bump to 2.1.5
+
+---
+
 ## [Alpha v2.1.4] - 2025-10-17
 
 ### 🎨 Faster Blur + Double-Tap Haptic Feedback
