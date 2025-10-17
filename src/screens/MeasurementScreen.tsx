@@ -2063,6 +2063,7 @@ export default function MeasurementScreen() {
                   zoomRotation={measurementZoom.rotation}
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
+                  sessionColor={shutterColor}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
