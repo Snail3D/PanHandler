@@ -174,6 +174,9 @@ export default function ZoomCalibration({
       if (coin) {
         setSelectedCoin(coin);
       }
+    } else {
+      // No last selected coin - open selector automatically
+      setShowCoinSelector(true);
     }
   }, [lastSelectedCoin]);
 
