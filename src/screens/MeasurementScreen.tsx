@@ -614,12 +614,15 @@ export default function MeasurementScreen() {
         // This is the natural way to measure objects on a table
         const isVertical = false; // Disabled vertical mode
         isVerticalMode.value = isVertical;
+        
+        // Check if orientation changed
         const wasHorizontal = isHorizontal.value;
-        isHorizontal.value = absBeta < 45; // True when looking down (horizontal)
+        const nowHorizontal = absBeta < 45; // Calculate new horizontal state
+        isHorizontal.value = nowHorizontal; // Update shared value
         
         // Smooth 500ms fade transition between "Look Down" and instructions
-        if (wasHorizontal !== isHorizontal.value) {
-          if (isHorizontal.value) {
+        if (wasHorizontal !== nowHorizontal) {
+          if (nowHorizontal) {
             // Switched to horizontal: fade out "Look Down", fade in instructions
             lookDownOpacity.value = withTiming(0, { duration: 500 });
             instructionsDisplayOpacity.value = withTiming(1, { duration: 500 });
@@ -732,10 +735,21 @@ export default function MeasurementScreen() {
   }, [mode]);
 
   // Auto-capture when holding shutter button and lines align
+  // ONLY in horizontal mode - vertical mode allows quick tap only
   useEffect(() => {
     // Guards: must have camera ref, correct mode, holding, not already capturing
-    // REMOVED isCameraReady check - if user is holding shutter, camera must be ready
+    // MUST be in horizontal mode (phone looking down) for auto-capture
     if (!cameraRef.current || mode !== 'camera' || isCapturing || !isHoldingShutter) {
+      return;
+    }
+    
+    // Check if phone is in horizontal mode (looking down)
+    const phoneIsHorizontal = isHorizontal.value;
+    if (!phoneIsHorizontal) {
+      // Vertical mode: auto-capture disabled, user must quick tap
+      if (__DEV__) {
+        console.log('⚠️ Auto-capture disabled in vertical mode - use quick tap');
+      }
       return;
     }
 
@@ -1357,7 +1371,7 @@ export default function MeasurementScreen() {
             </Animated.View>
 
             {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
-            {/* Only show when horizontal (looking down) */}
+            {/* Only show when horizontal (looking down) - graceful fade */}
             <Animated.View
               style={(() => {
                 'worklet';
@@ -1368,7 +1382,7 @@ export default function MeasurementScreen() {
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
-                  opacity: horizontal ? 1 : 0, // Only visible when horizontal
+                  opacity: horizontal ? 1 : 0, // Graceful fade via withTiming
                   transform: [
                     { translateX: bubbleX.value * 3 },
                     { translateY: bubbleY.value * 3 },
@@ -1377,21 +1391,21 @@ export default function MeasurementScreen() {
               })()}
               pointerEvents="none"
             >
-              {/* Horizontal red line (horizon) - always visible */}
+              {/* Horizontal red line (horizon) */}
               <View
                 style={{
                   position: 'absolute',
                   top: '50%',
                   left: 0,
                   right: 0,
-                  height: 2, // Thinner (was 3)
+                  height: 2,
                   backgroundColor: `${crosshairColor.main}CC`, // Use session color with 80% opacity
                   marginTop: -1,
                 }}
               />
             </Animated.View>
             
-            {/* Vertical red line - ONLY in horizontal mode */}
+            {/* Vertical red line - ONLY in horizontal mode - graceful fade */}
             <Animated.View
               style={(() => {
                 'worklet';
@@ -1402,7 +1416,7 @@ export default function MeasurementScreen() {
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
-                  opacity: isVertical ? 0 : 1, // Hide in vertical mode
+                  opacity: isVertical ? 0 : 1, // Graceful fade via withTiming
                   transform: [
                     { translateX: bubbleX.value * 3 },
                     { translateY: bubbleY.value * 3 },
