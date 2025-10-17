@@ -1155,15 +1155,6 @@ export default function MeasurementScreen() {
                   </Pressable>
                   <Pressable
                     onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setShowDiagnostic(true);
-                    }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <Ionicons name="medical-outline" size={28} color="#10B981" />
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
                       setFlashEnabled(!flashEnabled);
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
@@ -1402,48 +1393,54 @@ export default function MeasurementScreen() {
               />
             </Animated.View>
 
-            {/* "Look Straight Down" Message - Shows when NOT horizontal, positioned upper right */}
+            {/* "Look Down" Message - Shows when NOT horizontal, positioned center */}
             <Animated.View
               style={(() => {
                 'worklet';
                 const horizontal = isHorizontal.value;
                 return {
                   position: 'absolute',
-                  top: insets.top + 80,
+                  top: '35%',
+                  left: 24,
                   right: 24,
+                  alignItems: 'center',
                   opacity: horizontal ? 0 : 1,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8 }}>
-                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'right' }}>
-                  Look Straight Down
-                </Text>
-                <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 12, marginTop: 2, textAlign: 'right' }}>
-                  Point camera at table
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', textAlign: 'center' }}>
+                  Look Down
                 </Text>
               </View>
             </Animated.View>
 
-            {/* "Place Coin in the Middle" Message - Shows when horizontal but auto-capture not active, positioned upper right */}
+            {/* Instructions Message - Shows when horizontal, positioned center */}
             <Animated.View
               style={(() => {
                 'worklet';
                 const horizontal = isHorizontal.value;
-                const autoCaptureActive = autoCaptureEnabled;
                 return {
                   position: 'absolute',
-                  top: insets.top + 80,
+                  top: '30%',
+                  left: 24,
                   right: 24,
-                  opacity: horizontal && !autoCaptureActive ? 1 : 0,
+                  alignItems: 'center',
+                  opacity: horizontal ? 1 : 0,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8 }}>
-                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'right' }}>
-                  Place Coin in the Middle
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 20, paddingVertical: 16, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
+                  1. Place coin in center
+                </Text>
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
+                  2. Line up the lines
+                </Text>
+                <Text style={{ color: 'white', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24 }}>
+                  3. Press capture
                 </Text>
               </View>
             </Animated.View>
@@ -1690,49 +1687,27 @@ export default function MeasurementScreen() {
                   width: 80,
                   height: 80,
                   borderRadius: 40,
-                  backgroundColor: autoCaptureEnabled 
-                    ? (pressed ? 'rgba(76, 175, 80, 0.8)' : 'rgba(76, 175, 80, 1)') 
-                    : (pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.9)'),
+                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.9)',
                   borderWidth: 5,
-                  borderColor: autoCaptureEnabled ? '#4CAF50' : 'white',
+                  borderColor: 'white',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  shadowColor: autoCaptureEnabled ? '#4CAF50' : '#000',
+                  shadowColor: '#000',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.6,
                   shadowRadius: 12,
                   elevation: 10,
                 })}
               >
-                {autoCaptureEnabled ? (
-                  <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
-                ) : (
-                  <View style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    backgroundColor: 'white',
-                    borderWidth: 3,
-                    borderColor: '#333',
-                  }} />
-                )}
+                <View style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  backgroundColor: 'white',
+                  borderWidth: 3,
+                  borderColor: '#333',
+                }} />
               </Pressable>
-              
-              {/* Status text below button */}
-              <Text
-                style={{
-                  marginTop: 12,
-                  color: 'white',
-                  fontSize: 14,
-                  fontWeight: '700',
-                  textAlign: 'center',
-                  textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 4,
-                }}
-              >
-                {autoCaptureEnabled ? '✓ Auto-Capture Active' : 'Tap to Begin'}
-              </Text>
             </View>
           )}
           
