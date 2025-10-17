@@ -167,6 +167,7 @@ export default function MeasurementScreen() {
   const bubbleY = useSharedValue(0);
   const isVerticalMode = useSharedValue(false); // Track if phone is vertical
   const isHorizontal = useSharedValue(true); // Track if phone is horizontal (looking down)
+  const levelLinesOpacity = useSharedValue(1); // Smooth fade for red level lines
   
   // Session colors: Regenerate every time we enter camera mode for visual variety
   // This creates a fresh look for each photo session while maintaining consistency
@@ -631,6 +632,16 @@ export default function MeasurementScreen() {
             instructionsDisplayOpacity.value = withTiming(0, { duration: 500 });
             lookDownOpacity.value = withTiming(1, { duration: 500 });
           }
+        }
+        
+        // Smooth fade for level lines and center crosshairs when orientation changes
+        // Use withTiming instead of instant value change for graceful transitions
+        const targetOpacity = nowHorizontal ? 1 : 0;
+        if (Math.abs(levelLinesOpacity.value - targetOpacity) > 0.01) {
+          levelLinesOpacity.value = withTiming(targetOpacity, { 
+            duration: 400, // Smooth 400ms fade
+            easing: Easing.inOut(Easing.ease),
+          });
         }
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
@@ -1379,18 +1390,17 @@ export default function MeasurementScreen() {
             </Animated.View>
 
             {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
-            {/* Only show when horizontal (looking down) - graceful fade */}
+            {/* Graceful fade when switching horizontal/vertical */}
             <Animated.View
               style={(() => {
                 'worklet';
-                const horizontal = isHorizontal.value;
                 return {
                   position: 'absolute',
                   top: -SCREEN_HEIGHT,
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
-                  opacity: horizontal ? 1 : 0, // Graceful fade via withTiming
+                  opacity: levelLinesOpacity.value, // Smooth animated fade
                   transform: [
                     { translateX: bubbleX.value * 3 },
                     { translateY: bubbleY.value * 3 },
@@ -1413,18 +1423,17 @@ export default function MeasurementScreen() {
               />
             </Animated.View>
             
-            {/* Vertical red line - ONLY in horizontal mode - graceful fade */}
+            {/* Vertical red line - Graceful fade when switching horizontal/vertical */}
             <Animated.View
               style={(() => {
                 'worklet';
-                const horizontal = isHorizontal.value; // Use same check as horizontal line
                 return {
                   position: 'absolute',
                   top: -SCREEN_HEIGHT,
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
-                  opacity: horizontal ? 1 : 0, // Hide when NOT horizontal (vertical mode)
+                  opacity: levelLinesOpacity.value, // Smooth animated fade
                   transform: [
                     { translateX: bubbleX.value * 3 },
                     { translateY: bubbleY.value * 3 },
