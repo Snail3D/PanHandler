@@ -825,22 +825,26 @@ export default function MeasurementScreen() {
   // Cinematic fade-in when entering camera mode
   useEffect(() => {
     if (mode === 'camera') {
+      // Reset states immediately
+      setIsCapturing(false);
+      setIsTransitioning(false);
+      
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
       cameraFlashOpacity.value = 0; // Reset flash in case it's still visible
       
-      // Delay slightly to let camera initialize, then 1.5 second fade-in
+      // Faster fade-in (reduced from 1.5s to 0.6s)
       setTimeout(() => {
         cameraOpacity.value = withTiming(1, {
-          duration: 1500, // 1.5 second smooth fade
+          duration: 600, // Faster 0.6 second fade
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
         blackOverlayOpacity.value = withTiming(0, {
-          duration: 1500,
+          duration: 600,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
-      }, 300); // 300ms delay to let camera initialize
+      }, 150); // Reduced delay from 300ms to 150ms
     }
   }, [mode]);
 
@@ -1086,11 +1090,17 @@ export default function MeasurementScreen() {
   };
 
   const handleCancelCalibration = () => {
+    // Reset capturing states
+    setIsCapturing(false);
+    setIsTransitioning(false);
     setMode('camera'); // Go back to camera
     setSelectedCoin(null);
   };
 
   const handleRetakePhoto = () => {
+    // Reset all states
+    setIsCapturing(false);
+    setIsTransitioning(false);
     setImageUri(null);
     setCoinCircle(null);
     setCalibration(null);
