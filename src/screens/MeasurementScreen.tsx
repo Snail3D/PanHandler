@@ -531,28 +531,34 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Only gamma movement (left/right tilt)
+          // VERTICAL MODE: Only forward/backward tilt (up/down movement)
           // When phone is held vertically (portrait):
-          // - gamma ~0° = phone is upright (centered)
-          // - Positive gamma = phone tilts right = bubble goes LEFT (inverted)
-          // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
+          // - beta ~90° = phone is perfectly upright (centered)
+          // - beta > 90° = phone tilts forward = bubble goes DOWN
+          // - beta < 90° = phone tilts backward = bubble goes UP
           
-          // Add deadzone for centering - when gamma is between -2° and 2°, snap to center
-          let adjustedGamma = gamma;
-          if (Math.abs(gamma) < 2) {
-            adjustedGamma = 0; // Snap to center for better "locked in" feel
+          // Calculate deviation from 90° (perfect vertical)
+          const verticalDeviation = beta - 90;
+          
+          // Add deadzone for centering - when deviation is between -2° and 2°, snap to center
+          let adjustedDeviation = verticalDeviation;
+          if (Math.abs(verticalDeviation) < 2) {
+            adjustedDeviation = 0; // Snap to center for better "locked in" feel
           }
           
-          const bubbleXOffset = -(adjustedGamma / 15) * maxBubbleOffset; // Use gamma for left/right when vertical
+          // Use much gentler sensitivity (divide by 20 instead of 15) for easier alignment
+          const bubbleYOffset = (adjustedDeviation / 20) * maxBubbleOffset; // Forward/back = up/down
+          
+          // Lock X to center (no left-right movement in vertical mode!)
+          bubbleX.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 });
           
           // VERTICAL MODE: Much heavier damping for smoother movement
           // Higher damping = slower, smoother response (less jerky)
-          bubbleX.value = withSpring(bubbleXOffset, { 
-            damping: 40,      // Increased from 35 for even smoother
-            stiffness: 100,   // Decreased from 120 for gentler
-            mass: 1.5         // Increased from 1.2 for more weight/inertia
+          bubbleY.value = withSpring(bubbleYOffset, { 
+            damping: 40,      // Heavy damping for smooth
+            stiffness: 100,   // Soft spring
+            mass: 1.5         // Heavy mass for inertia
           });
-          bubbleY.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 }); // Lock Y to center when vertical
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
@@ -1447,6 +1453,43 @@ export default function MeasurementScreen() {
                       >
                         Capturing...
                       </Text>
+                    )}
+                    
+                    {/* Manual capture button - shows when stable and aligned */}
+                    {!isCapturing && alignmentStatus === 'good' && isStable && (
+                      <Pressable
+                        onPress={() => {
+                          if (cameraRef.current) {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                            takePicture();
+                          }
+                        }}
+                        style={({ pressed }) => ({
+                          marginTop: 20,
+                          backgroundColor: pressed ? 'rgba(76, 175, 80, 0.9)' : 'rgba(76, 175, 80, 1)',
+                          paddingVertical: 16,
+                          paddingHorizontal: 32,
+                          borderRadius: 30,
+                          shadowColor: '#4CAF50',
+                          shadowOffset: { width: 0, height: 4 },
+                          shadowOpacity: 0.6,
+                          shadowRadius: 12,
+                          elevation: 8,
+                        })}
+                      >
+                        <Text
+                          style={{
+                            color: 'white',
+                            fontSize: 20,
+                            fontWeight: '800',
+                            textAlign: 'center',
+                            letterSpacing: 0.5,
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          📸 Press Now to Begin
+                        </Text>
+                      </Pressable>
                     )}
                   </View>
                 )}
