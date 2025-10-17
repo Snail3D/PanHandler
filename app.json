@@ -4,7 +4,7 @@
     "slug": "panhandler",
     "scheme": "panhandler",
     "version": "1.86",
-    "orientation": "portrait",
+    "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "icon": "./assets/snail-logo.png",
@@ -36,7 +36,7 @@
       [
         "expo-screen-orientation",
         {
-          "initialOrientation": "PORTRAIT"
+          "initialOrientation": "DEFAULT"
         }
       ]
     ]
