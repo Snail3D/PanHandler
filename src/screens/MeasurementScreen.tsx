@@ -583,16 +583,16 @@ export default function MeasurementScreen() {
             finalY = bubbleYOffset * scale;
           }
           
-          // VERTICAL MODE: Use same spring as horizontal (fast and responsive)
+          // VERTICAL MODE: Use same fluid spring as horizontal
           bubbleX.value = withSpring(finalX, { 
-            damping: 20,
-            stiffness: 180,
-            mass: 0.8
+            damping: 15,
+            stiffness: 250,
+            mass: 0.5
           });
           bubbleY.value = withSpring(finalY, { 
-            damping: 20,
-            stiffness: 180,
-            mass: 0.8
+            damping: 15,
+            stiffness: 250,
+            mass: 0.5
           });
           
           // Update debug display (occasionally to avoid performance hit)
@@ -620,8 +620,8 @@ export default function MeasurementScreen() {
             finalY = bubbleYOffset * scale;
           }
           
-          bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 180, mass: 0.8 });
-          bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 180, mass: 0.8 });
+          bubbleX.value = withSpring(finalX, { damping: 15, stiffness: 250, mass: 0.5 }); // More fluid
+          bubbleY.value = withSpring(finalY, { damping: 15, stiffness: 250, mass: 0.5 }); // More fluid
         }
         
         // Calculate crosshair glow (0-1) based on how centered the bubble is
@@ -1325,10 +1325,10 @@ export default function MeasurementScreen() {
             <Animated.View
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
+                top: -SCREEN_HEIGHT, // Extend far beyond screen
+                left: -SCREEN_WIDTH,
+                right: -SCREEN_WIDTH,
+                bottom: -SCREEN_HEIGHT,
                 transform: [
                   { translateX: bubbleX.value * 5 }, // Amplify movement so it's visible
                   { translateY: bubbleY.value * 5 },
