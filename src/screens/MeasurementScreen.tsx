@@ -573,19 +573,45 @@ export default function MeasurementScreen() {
           // VERTICAL MODE: Simplified - only forward/backward tilt matters
           // User is looking straight at the coin, so left/right tilt (gamma) is ignored
           // 
-          // FORWARD/BACKWARD TILT (beta):
-          //   - beta ~90° = perfectly upright (horizon line centered)
-          //   - beta > 90° = tilts forward (top toward you) → horizon moves DOWN (positive Y)
-          //   - beta < 90° = tilts backward (top away) → horizon moves UP (negative Y)
+          // ROTATION HANDLING:
+          // Phone can be rotated (alpha) while held vertically - we need to track
+          // forward/backward tilt consistently regardless of rotation
+          // 
+          // Alpha (rotation around vertical axis):
+          //   - 0° = normal portrait
+          //   - 90° = rotated 90° clockwise
+          //   - 180° = upside down
+          //   - 270° = rotated 90° counter-clockwise
           
-          // Calculate deviation from 90° (perfect vertical)
-          const betaDeviation = beta - 90; // Positive = forward, negative = backward
+          // Normalize alpha to 0-360 range
+          const normalizedAlpha = ((alpha % 360) + 360) % 360;
+          
+          // Calculate effective forward/backward tilt accounting for rotation
+          // When rotated, beta and gamma swap and invert
+          let forwardBackwardTilt: number;
+          
+          if (normalizedAlpha < 45 || normalizedAlpha >= 315) {
+            // Normal orientation: use beta as-is
+            forwardBackwardTilt = beta - 90;
+          } else if (normalizedAlpha >= 45 && normalizedAlpha < 135) {
+            // Rotated 90° clockwise: gamma becomes forward/backward
+            forwardBackwardTilt = -gamma;
+          } else if (normalizedAlpha >= 135 && normalizedAlpha < 225) {
+            // Upside down: beta is inverted
+            forwardBackwardTilt = -(beta - 90);
+          } else {
+            // Rotated 90° counter-clockwise: gamma becomes forward/backward (inverted)
+            forwardBackwardTilt = gamma;
+          }
           
           // Only Y movement in vertical mode (horizon line moves up/down)
-          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset;
+          // Increased range: /8 instead of /15 for more dramatic movement
+          // Allow full screen movement - no artificial clamping
+          const bubbleYOffset = (forwardBackwardTilt / 8) * maxBubbleOffset;
           
-          // Clamp Y to max offset
-          let finalY = Math.max(-maxBubbleOffset, Math.min(maxBubbleOffset, bubbleYOffset));
+          // Don't clamp - let it move across full screen with 3x amplification
+          // This allows horizon to reach all quadrants
+          let finalY = bubbleYOffset;
           
           // No X movement in vertical mode
           bubbleX.value = withSpring(0, { 
@@ -604,7 +630,7 @@ export default function MeasurementScreen() {
             setDebugGamma(gamma);
             setDebugBeta(beta);
             setDebugBubbleXRaw(0); // No X movement in vertical mode
-            setDebugBubbleYRaw(bubbleYOffset);
+            setDebugBubbleYRaw(forwardBackwardTilt); // Show rotation-compensated tilt
             setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
