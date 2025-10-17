@@ -1848,16 +1848,25 @@ export default function MeasurementScreen() {
             >
               <Pressable
                 onPressIn={() => {
-                  // Start holding - enable auto-capture mode
-                  setIsHoldingShutter(true);
+                  // Capture orientation at press start to maintain consistent behavior
+                  const orientationAtPress = isHorizontal.value;
                   holdStartTimeRef.current = Date.now();
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   
-                  // Fade out instructions when user starts holding
-                  instructionsOpacity.value = withTiming(0, {
-                    duration: 400,
-                    easing: Easing.out(Easing.ease),
-                  });
+                  // Only enable hold mode if in horizontal orientation
+                  if (orientationAtPress) {
+                    // Horizontal mode: Start holding - enable auto-capture mode
+                    setIsHoldingShutter(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    
+                    // Fade out instructions when user starts holding
+                    instructionsOpacity.value = withTiming(0, {
+                      duration: 400,
+                      easing: Easing.out(Easing.ease),
+                    });
+                  } else {
+                    // Vertical mode: Just haptic feedback, no hold state
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
                 }}
                 onPressOut={() => {
                   // Release - check if it was a quick tap or hold
@@ -1883,8 +1892,8 @@ export default function MeasurementScreen() {
                     isCameraReady,
                   });
                   
-                  // If quick tap (< 200ms), take picture immediately
-                  // Don't trigger if already capturing (from auto-capture)
+                  // Quick tap (< 200ms) - always capture regardless of orientation
+                  // This allows manual capture in both horizontal and vertical modes
                   if (holdDuration < 200 && !isCapturing) {
                     takePicture();
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
