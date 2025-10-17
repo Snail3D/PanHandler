@@ -533,18 +533,15 @@ export default function ZoomCalibration({
 
 
 
-      {/* Bottom Controls - New Layout: LOCK IN at top, coin selector + map button below */}
+      {/* Bottom Controls - Single row: Map | LOCK IN | Coin */}
       {selectedCoin && (
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              bottom: insets.bottom + 40,
-              left: SCREEN_WIDTH * 0.10,
-              right: SCREEN_WIDTH * 0.10,
-            },
-            { opacity: lockInOpacity },
-          ]}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: insets.bottom + 40,
+            left: SCREEN_WIDTH * 0.10,
+            right: SCREEN_WIDTH * 0.10,
+          }}
         >
           <BlurView
             intensity={35}
@@ -565,105 +562,9 @@ export default function ZoomCalibration({
               borderWidth: 1,
               borderColor: 'rgba(255, 255, 255, 0.35)',
             }}>
-              {/* LOCK IN Button at TOP */}
-              <Pressable
-                onPress={handleLockIn}
-                style={({ pressed }) => ({
-                  backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
-                  borderRadius: 20,
-                  paddingVertical: 20,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 2,
-                  borderColor: 'rgba(255, 255, 255, 0.4)',
-                  marginBottom: 12,
-                  transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
-                })}
-              >
-                <Text style={{ 
-                  color: '#FFFFFF', 
-                  fontWeight: '900', 
-                  fontSize: 38,
-                  textAlign: 'center',
-                  letterSpacing: 2,
-                  textShadowColor: 'rgba(0, 0, 0, 0.3)',
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 4,
-                }}>
-                  LOCK IN
-                </Text>
-              </Pressable>
-
-              {/* Bottom Row: Coin Selector + Help + Map Button */}
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                {/* Coin Selector Button - Opens search when tapped */}
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowCoinSelector(true);
-                    setSearchQuery('');
-                  }}
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                    borderRadius: 16,
-                    paddingVertical: 14,
-                    paddingHorizontal: 10,
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: 'rgba(0, 0, 0, 0.08)',
-                  })}
-                >
-                  <Text style={{ fontSize: 20, marginBottom: 2 }}>🪙</Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.9)', 
-                    fontWeight: '700', 
-                    fontSize: 12,
-                    textAlign: 'center',
-                  }}>
-                    {selectedCoin.name}
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.5)', 
-                    fontSize: 10,
-                    fontWeight: '600',
-                  }}>
-                    {selectedCoin.diameter}mm
-                  </Text>
-                </Pressable>
-
-                {/* Help Button */}
-                {onHelp && (
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      onHelp();
-                    }}
-                    style={({ pressed }) => ({
-                      width: 70,
-                      backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 16,
-                      paddingVertical: 14,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 1,
-                      borderColor: 'rgba(0, 0, 0, 0.08)',
-                    })}
-                  >
-                    <Ionicons name="help-circle-outline" size={28} color="rgba(0, 0, 0, 0.7)" />
-                    <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.7)', 
-                      fontWeight: '700', 
-                      fontSize: 11,
-                      marginTop: 2,
-                      textAlign: 'center',
-                    }}>
-                      Help
-                    </Text>
-                  </Pressable>
-                )}
-
-                {/* Map Button */}
+              {/* Single Row: Map Scale + LOCK IN + Coin */}
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {/* Map Scale - LEFT COLUMN (1/5) */}
                 {onSkipToMap && (
                   <Pressable
                     onPress={() => {
@@ -674,8 +575,8 @@ export default function ZoomCalibration({
                       flex: 1,
                       backgroundColor: pressed ? 'rgba(66, 165, 245, 0.9)' : 'rgba(66, 165, 245, 0.8)',
                       borderRadius: 16,
-                      paddingVertical: 14,
-                      paddingHorizontal: 10,
+                      paddingVertical: 20,
+                      paddingHorizontal: 8,
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderWidth: 1,
@@ -686,18 +587,86 @@ export default function ZoomCalibration({
                     <Text style={{ 
                       color: 'white', 
                       fontWeight: '700', 
-                      fontSize: 12,
-                      marginTop: 2,
+                      fontSize: 10,
+                      marginTop: 4,
                       textAlign: 'center',
                     }}>
-                      Map Scale
+                      Map{'\n'}Scale
                     </Text>
                   </Pressable>
                 )}
+
+                {/* LOCK IN - CENTER (3/5) */}
+                <Pressable
+                  onPress={handleLockIn}
+                  style={({ pressed }) => ({
+                    flex: 3,
+                    backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
+                    borderRadius: 20,
+                    paddingVertical: 20,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 2,
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                    transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                  })}
+                >
+                  <Text style={{ 
+                    color: '#FFFFFF', 
+                    fontWeight: '900', 
+                    fontSize: 38,
+                    textAlign: 'center',
+                    letterSpacing: 2,
+                    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    LOCK IN
+                  </Text>
+                </Pressable>
+
+                {/* Coin - RIGHT COLUMN (1/5) */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowCoinSelector(true);
+                    setSearchQuery('');
+                  }}
+                  style={({ pressed }) => ({
+                    flex: 1,
+                    backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                    borderRadius: 16,
+                    paddingVertical: 20,
+                    paddingHorizontal: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: 'rgba(0, 0, 0, 0.08)',
+                  })}
+                >
+                  <Text style={{ fontSize: 22, marginBottom: 4 }}>🪙</Text>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.9)', 
+                    fontWeight: '700', 
+                    fontSize: 10,
+                    textAlign: 'center',
+                    lineHeight: 12,
+                  }}>
+                    {selectedCoin.name}
+                  </Text>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.5)', 
+                    fontSize: 8,
+                    fontWeight: '600',
+                    marginTop: 2,
+                  }}>
+                    {selectedCoin.diameter}mm
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </BlurView>
-        </Animated.View>
+        </View>
       )}
 
       {/* Coin Search Modal - Shows at TOP when selector button is tapped */}
@@ -885,6 +854,50 @@ export default function ZoomCalibration({
           </Pressable>
         </BlurView>
       </View>
+
+      {/* Help button - top-right corner */}
+      {onHelp && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            right: 16,
+          }}
+        >
+          <BlurView
+            intensity={30}
+            tint="light"
+            style={{
+              borderRadius: 20,
+              overflow: 'hidden',
+            }}
+          >
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onHelp();
+              }}
+              style={({ pressed }) => ({
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.7 : 1,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
+              })}
+            >
+              <Ionicons name="help-circle-outline" size={28} color="rgba(0, 0, 0, 0.7)" />
+            </Pressable>
+          </BlurView>
+        </View>
+      )}
 
       {/* Pinch-Zoom Tutorial Overlay - Always shows (animations are pretty!) */}
       {showTutorial && (
