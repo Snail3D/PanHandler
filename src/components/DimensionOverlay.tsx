@@ -516,13 +516,19 @@ export default function DimensionOverlay({
     }
   }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
 
-  // Clear map scale when new photo is loaded
+  // Restore map mode state from persisted calibration
   useEffect(() => {
-    // Clear map scale state when image URI changes (new photo loaded)
-    setMapScale(null);
-    setIsMapMode(false);
-    setShowMapScaleModal(false);
-  }, [currentImageUri]);
+    // When component mounts or calibration changes, check if we have map scale calibration
+    if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
+      // Restore map mode state from calibration
+      setIsMapMode(true);
+      setMapScale(calibration.verbalScale);
+    } else if (calibration?.calibrationType === 'coin' || calibration?.calibrationType === 'blueprint') {
+      // Ensure map mode is off for coin/blueprint calibration
+      setIsMapMode(false);
+      setMapScale(null);
+    }
+  }, [calibration]); // Run when calibration changes (including on app restore)
   
   // Track if we've shown the initial quote
   const hasShownInitialQuote = useRef(false);
