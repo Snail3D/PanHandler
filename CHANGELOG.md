@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.4] - 2025-10-17
+
+### 🎨 Faster Blur + Double-Tap Haptic Feedback
+
+#### ✨ Enhancements
+- **Faster Blur Progression** - Blur now visible immediately and ramps up 3x faster
+  - Starting blur: 5% → **15%** (3x more visible at 1x zoom)
+  - Maximum blur: 40% → **50%** (stronger focal point at 6x zoom)
+  - Same rate (7% per unit) but higher baseline across all zoom levels
+  - "Gets blurry way faster" - immediate visual feedback
+  
+- **Double-Tap Haptic for Expansion Mode** - Clear feedback when entering resize/expand mode
+  - Pattern: tap...pause (150ms)...tap
+  - Distinguishes "expansion mode" from "move mode"
+  - Applies to:
+    - Circle edge points (expand/contract circle)
+    - Rectangle corners (resize rectangle)
+    - Polygon/freehand points (reshape)
+  - Single tap = move shape, Double tap = resize shape
+
+#### 🔧 Technical Changes
+- Blur formula: Starting 0.05 → 0.15, max 0.40 → 0.50
+- Haptic: Added `setTimeout(() => Haptics.impact(), 150)` for second tap
+- 150ms delay between taps for distinct pattern
+
+#### 📁 Files Modified
+- `src/components/ZoomCalibration.tsx` - Blur formula (lines 400-404)
+- `src/components/DimensionOverlay.tsx` - Haptic feedback (lines 3746-3750, 3787-3791, 3806-3810)
+- `app.json` - Version bump to 2.1.4
+
+#### 📚 Documentation
+- `V2.1.4_BLUR_AND_HAPTICS.md` - Full implementation details
+
+---
+
 ## [Alpha v2.1.3] - 2025-10-17
 
 ### 🐛 Camera Button Alignment & Touch Area Fix
