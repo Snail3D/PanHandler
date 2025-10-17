@@ -573,75 +573,25 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: HYBRID approach
-          // Use GRAVITY to normalize for rotation, then BETA for tilt
+          // VERTICAL MODE: Only Y movement (X locked to center)
+          // Same simple formula as horizontal mode
+          const betaDeviation = beta - 90; // Positive = forward, negative = backward
+          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset;
           
-          if (data.acceleration) {
-            const { x, y, z } = data.acceleration;
-            
-            // Gravity vector magnitude (should be ~9.8 m/s²)
-            const gravityMagnitude = Math.sqrt(x*x + y*y + z*z);
-            
-            // When vertical & level: z ≈ -9.8, x ≈ 0, y ≈ 0
-            // When tilted forward: y becomes more negative
-            // When tilted backward: y becomes more positive
-            
-            // Normalize by gravity magnitude to handle rotation
-            const normalizedY = y / gravityMagnitude;
-            
-            // Also use beta for more sensitivity
-            const levelReference = 85;
-            const betaTilt = betaRaw - levelReference;
-            
-            // COMBINE: gravity y (rotation-invariant) + beta (sensitive)
-            // Weight them: 70% beta for sensitivity, 30% gravity for stability
-            const combinedTilt = betaTilt * 0.7 + (normalizedY * 50) * 0.3;
-            
-            // Dead zone ±3
-            const deadZone = 3;
-            let movement: number;
-            
-            if (Math.abs(combinedTilt) < deadZone) {
-              movement = combinedTilt * 1;
-            } else {
-              const beyond = Math.abs(combinedTilt) - deadZone;
-              const sign = combinedTilt >= 0 ? 1 : -1;
-              movement = sign * (deadZone + beyond * 3);
-            }
-            
-            // Movement: negative forward → line UP, positive backward → line DOWN
-            let bubbleYOffset = movement;
-            
-            // Clamp ±150px
-            bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
-            
-            const finalY = bubbleYOffset;
-            
-            bubbleX.value = withSpring(0, { 
-              damping: 25,
-              stiffness: 300,
-              mass: 0.4
-            });
-            bubbleY.value = withSpring(finalY, { 
-              damping: 25,
-              stiffness: 300,
-              mass: 0.4
-            });
-            
-            // Update debug display
-            if (Math.random() < 0.1) {
-              setDebugGamma(normalizedY); // Normalized gravity Y
-              setDebugBeta(betaTilt);  // Beta tilt
-              setDebugBubbleXRaw(combinedTilt); // Combined
-              setDebugBubbleYRaw(movement);
-              setDebugBubbleX(0);
-              setDebugBubbleY(finalY);
-            }
-          } else {
-            // Fallback if no acceleration data
-            bubbleX.value = withSpring(0, { damping: 25, stiffness: 300, mass: 0.4 });
-            bubbleY.value = withSpring(0, { damping: 25, stiffness: 300, mass: 0.4 });
-          }
+          // Clamp to max offset
+          let finalY = Math.max(-maxBubbleOffset, Math.min(maxBubbleOffset, bubbleYOffset));
+          
+          // No X movement in vertical mode
+          bubbleX.value = withSpring(0, { 
+            damping: 20,
+            stiffness: 180,
+            mass: 0.8
+          });
+          bubbleY.value = withSpring(finalY, { 
+            damping: 20,
+            stiffness: 180,
+            mass: 0.8
+          });
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
