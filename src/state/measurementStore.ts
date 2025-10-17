@@ -50,9 +50,9 @@ interface MeasurementStore {
   measurementMode: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand';
   calibration: {
     pixelsPerUnit: number;
-    unit: 'mm' | 'cm' | 'in';
+    unit: 'mm' | 'cm' | 'in' | 'm' | 'ft';
     referenceDistance: number;
-    calibrationType?: 'coin' | 'verbal';
+    calibrationType?: 'coin' | 'verbal' | 'blueprint';
     verbalScale?: VerbalScale;
   } | null;
   coinCircle: CoinCircle | null;
