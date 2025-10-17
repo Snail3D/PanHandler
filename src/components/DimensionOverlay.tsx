@@ -1552,9 +1552,8 @@ export default function DimensionOverlay({
     // Only check distance measurements
     const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
     
-    // Require at least 4 lines to form a polygon (squares/rectangles)
-    // This prevents premature triangle detection that users complained about
-    if (distanceLines.length < 4) return;
+    // Need at least 3 lines to form a polygon (triangle, square, etc.)
+    if (distanceLines.length < 3) return;
     
     // Find all connected chains of lines
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
