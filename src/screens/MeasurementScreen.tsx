@@ -573,67 +573,71 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Rotation-compensated forward/backward tilt
-          // Problem: Rotation (alpha) affects beta reading significantly
-          // Solution: Use trigonometry to extract true forward/backward tilt
+          // VERTICAL MODE: Use GRAVITY VECTOR instead of euler angles!
+          // Euler angles (beta/gamma/alpha) have complex non-linear interactions
+          // Gravity vector is ALWAYS pointing down - much simpler!
           
-          const levelReference = 85;
-          
-          // Normalize alpha to 0-360
-          const normalizedAlpha = ((alpha % 360) + 360) % 360;
-          const alphaRad = (normalizedAlpha * Math.PI) / 180;
-          
-          // Calculate true forward/backward tilt accounting for rotation
-          // When phone rotates, beta and gamma mix
-          // True tilt = weighted combination based on rotation angle
-          const betaTilt = betaRaw - levelReference;
-          const gammaTilt = gammaRaw;
-          
-          // Use rotation angle to unmix the axes
-          // cos(alpha) weights beta, sin(alpha) weights gamma
-          const trueTilt = betaTilt * Math.cos(alphaRad) - gammaTilt * Math.sin(alphaRad);
-          
-          // trueTilt: negative = forward, positive = backward
-          // Dead zone ±3°
-          const deadZone = 3;
-          let movement: number;
-          
-          if (Math.abs(trueTilt) < deadZone) {
-            movement = trueTilt * 1;
+          if (data.acceleration) {
+            const { x, y, z } = data.acceleration;
+            
+            // When phone is vertical & level:
+            // - x ≈ 0 (no left/right tilt)
+            // - y ≈ 0 (no forward/backward tilt)  
+            // - z ≈ -9.8 (gravity pulling down through screen)
+            
+            // When tilted FORWARD (look down):
+            // - y becomes negative (gravity pulls toward bottom edge)
+            // When tilted BACKWARD (look up):
+            // - y becomes positive (gravity pulls toward top edge)
+            
+            // Y component tells us forward/backward tilt!
+            // Rotation doesn't affect this - gravity is always down!
+            const forwardBackwardTilt = y * 10; // Scale to degrees-ish
+            
+            // Dead zone ±0.3 (in m/s²)
+            const deadZone = 0.3;
+            let movement: number;
+            
+            if (Math.abs(y) < deadZone) {
+              movement = forwardBackwardTilt * 1;
+            } else {
+              const beyond = Math.abs(y) - deadZone;
+              const sign = y >= 0 ? 1 : -1;
+              movement = sign * (deadZone * 10 + beyond * 30);
+            }
+            
+            // Movement: negative forward → line UP, positive backward → line DOWN
+            let bubbleYOffset = movement;
+            
+            // Clamp ±150px
+            bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
+            
+            const finalY = bubbleYOffset;
+            
+            bubbleX.value = withSpring(0, { 
+              damping: 25,
+              stiffness: 300,
+              mass: 0.4
+            });
+            bubbleY.value = withSpring(finalY, { 
+              damping: 25,
+              stiffness: 300,
+              mass: 0.4
+            });
+            
+            // Update debug display
+            if (Math.random() < 0.1) {
+              setDebugGamma(x); // Show x accel
+              setDebugBeta(y);  // Show y accel (forward/back)
+              setDebugBubbleXRaw(z); // Show z accel
+              setDebugBubbleYRaw(forwardBackwardTilt);
+              setDebugBubbleX(0);
+              setDebugBubbleY(finalY);
+            }
           } else {
-            const beyond = Math.abs(trueTilt) - deadZone;
-            const sign = trueTilt >= 0 ? 1 : -1;
-            movement = sign * (deadZone + beyond * 3);
-          }
-          
-          // Movement: negative forward → line UP, positive backward → line DOWN
-          let bubbleYOffset = movement;
-          
-          // Clamp ±150px
-          bubbleYOffset = Math.max(-150, Math.min(150, bubbleYOffset));
-          
-          const finalY = bubbleYOffset;
-          
-          // No X movement in vertical mode
-          bubbleX.value = withSpring(0, { 
-            damping: 25,  // Higher damping = less overshoot
-            stiffness: 300,  // Lower stiffness = gentler
-            mass: 0.4
-          });
-          bubbleY.value = withSpring(finalY, { 
-            damping: 25,  // Higher damping = less overshoot
-            stiffness: 300,  // Lower stiffness = gentler
-            mass: 0.4
-          });
-          
-          // Update debug display (occasionally to avoid performance hit)
-          if (Math.random() < 0.1) {
-            setDebugGamma(gammaRaw);
-            setDebugBeta(betaRaw);
-            setDebugBubbleXRaw(alpha);
-            setDebugBubbleYRaw(trueTilt);
-            setDebugBubbleX(0);
-            setDebugBubbleY(finalY);
+            // Fallback if no acceleration data
+            bubbleX.value = withSpring(0, { damping: 25, stiffness: 300, mass: 0.4 });
+            bubbleY.value = withSpring(0, { damping: 25, stiffness: 300, mass: 0.4 });
           }
         } else {
           // HORIZONTAL MODE: Both X and Y movement
