@@ -1086,31 +1086,20 @@ export default function MeasurementScreen() {
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
         
-        // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
-        // The camera view stays rendered but will fade out
-        setTimeout(() => {
-          setMode('zoomCalibrate');
-        }, 30); // Minimal delay just for the flash to start
+        // Switch mode immediately - calibration screen will handle its own render
+        setMode('zoomCalibrate');
         
-        // Start the visual transition AFTER mode switch
+        // Start the visual transition
+        // Fade out camera opacity to reveal the photo underneath
+        cameraOpacity.value = withTiming(0, {
+          duration: 100, // Very fast fade
+          easing: Easing.out(Easing.ease),
+        });
+        
+        // Unlock after transition
         setTimeout(() => {
-          // Fade out camera opacity to reveal the photo underneath
-          cameraOpacity.value = withTiming(0, {
-            duration: 150, // Much faster fade (was 300ms)
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-          });
-          
-          // Slight zoom morph for drama
-          screenScale.value = withSequence(
-            withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
-            withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
-          );
-          
-          // Unlock after full transition
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 150); // Match the fade duration
-        }, 50); // Start animations quickly after flash
+          setIsTransitioning(false);
+        }, 100);
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {

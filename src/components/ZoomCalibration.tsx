@@ -173,13 +173,14 @@ export default function ZoomCalibration({
       const coin = getCoinByName(lastSelectedCoin);
       if (coin) {
         setSelectedCoin(coin);
+        // Don't open selector if we have a valid coin
       } else {
-        // Last coin name exists but coin not found - open selector
-        setTimeout(() => setShowCoinSelector(true), 500);
+        // Last coin name exists but coin not found - open selector immediately
+        setShowCoinSelector(true);
       }
     } else {
-      // No last selected coin - open selector after a brief delay
-      setTimeout(() => setShowCoinSelector(true), 500);
+      // No last selected coin - open selector immediately
+      setShowCoinSelector(true);
     }
   }, [lastSelectedCoin]);
 
