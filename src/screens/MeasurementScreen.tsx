@@ -114,6 +114,7 @@ export default function MeasurementScreen() {
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
   const isVerticalMode = useSharedValue(false); // Track if phone is vertical
+  const isHorizontal = useSharedValue(true); // Track if phone is horizontal (looking down)
   
   // Pick random complementary colors for crosshairs and bubble (per session)
   const [sessionColors] = useState(() => {
@@ -566,51 +567,31 @@ export default function MeasurementScreen() {
         }
         
         // Animate bubble based on device tilt
-        // Detect if phone is horizontal or vertical
-        const isVertical = absBeta > 45; // Phone is held vertically (portrait)
-        isVerticalMode.value = isVertical; // Update shared value for crosshair rotation
+        // SIMPLIFIED: Always use horizontal mode (downward facing camera)
+        // This is the natural way to measure objects on a table
+        const isVertical = false; // Disabled vertical mode
+        isVerticalMode.value = isVertical;
+        isHorizontal.value = absBeta < 45; // True when looking down (horizontal)
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
-        if (isVertical) {
-          // VERTICAL MODE: Only Y movement (X locked to center)
-          // Same simple formula as horizontal mode
-          const betaDeviation = beta - 90; // Positive = forward, negative = backward
-          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset;
-          
-          // Clamp to max offset
-          let finalY = Math.max(-maxBubbleOffset, Math.min(maxBubbleOffset, bubbleYOffset));
-          
-          // No X movement in vertical mode
-          bubbleX.value = withSpring(0, { 
-            damping: 20,
-            stiffness: 180,
-            mass: 0.8
-          });
-          bubbleY.value = withSpring(finalY, { 
-            damping: 20,
-            stiffness: 180,
-            mass: 0.8
-          });
-        } else {
-          // HORIZONTAL MODE: Both X and Y movement
-          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
-          const bubbleYOffset = (beta / 15) * maxBubbleOffset; // Forward/back tilt
-          
-          // Clamp to circular boundary
-          const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
-          let finalX = bubbleXOffset;
-          let finalY = bubbleYOffset;
-          
-          if (distance > maxBubbleOffset) {
-            const scale = maxBubbleOffset / distance;
-            finalX = bubbleXOffset * scale;
-            finalY = bubbleYOffset * scale;
-          }
-          
-          bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 400, mass: 0.3 }); // Snappier, less jitter
-          bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 400, mass: 0.3 }); // Snappier, less jitter
+        // HORIZONTAL MODE: Both X and Y movement
+        const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
+        const bubbleYOffset = (beta / 15) * maxBubbleOffset; // Forward/back tilt
+        
+        // Clamp to circular boundary
+        const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
+        let finalX = bubbleXOffset;
+        let finalY = bubbleYOffset;
+        
+        if (distance > maxBubbleOffset) {
+          const scale = maxBubbleOffset / distance;
+          finalX = bubbleXOffset * scale;
+          finalY = bubbleYOffset * scale;
         }
+        
+        bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 400, mass: 0.3 });
+        bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 400, mass: 0.3 });
         
         // Calculate crosshair glow (0-1) based on how centered the bubble is
         const distanceFromCenter = Math.sqrt(bubbleX.value * bubbleX.value + bubbleY.value * bubbleY.value);
@@ -1340,21 +1321,21 @@ export default function MeasurementScreen() {
             </Animated.View>
 
             {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
-            {/* Horizontal mode: Both lines move (X and Y) */}
-            {/* Vertical mode: Only horizontal line moves (Y only, based on forward/backward tilt) */}
+            {/* Only show when horizontal (looking down) */}
             <Animated.View
               style={(() => {
                 'worklet';
-                const isVertical = isVerticalMode.value;
+                const horizontal = isHorizontal.value;
                 return {
                   position: 'absolute',
                   top: -SCREEN_HEIGHT,
                   left: -SCREEN_WIDTH,
                   right: -SCREEN_WIDTH,
                   bottom: -SCREEN_HEIGHT,
+                  opacity: horizontal ? 1 : 0, // Only visible when horizontal
                   transform: [
-                    { translateX: isVertical ? 0 : bubbleX.value * 3 }, // X only moves in horizontal mode
-                    { translateY: bubbleY.value * 3 }, // Y always moves
+                    { translateX: bubbleX.value * 3 },
+                    { translateY: bubbleY.value * 3 },
                   ],
                 };
               })()}
@@ -1507,6 +1488,68 @@ export default function MeasurementScreen() {
                   centerDotStyle,
                 ]}
               />
+            </Animated.View>
+
+            {/* "Look Straight Down" Message - Shows when NOT horizontal */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const horizontal = isHorizontal.value;
+                return {
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  right: 0,
+                  alignItems: 'center',
+                  marginTop: -40,
+                  opacity: horizontal ? 0 : 1,
+                  pointerEvents: 'none',
+                };
+              })()}
+            >
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', paddingHorizontal: 24, paddingVertical: 16, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 20, fontWeight: '600', textAlign: 'center' }}>
+                  Look Straight Down
+                </Text>
+                <Text style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 14, marginTop: 4, textAlign: 'center' }}>
+                  Point camera at table
+                </Text>
+              </View>
+            </Animated.View>
+
+            {/* Coin Placement Circle - Shows when horizontal */}
+            <Animated.View
+              style={(() => {
+                'worklet';
+                const horizontal = isHorizontal.value;
+                return {
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: 60, // Penny-sized
+                  height: 60,
+                  marginLeft: -30,
+                  marginTop: -30,
+                  opacity: horizontal ? 0.8 : 0,
+                  pointerEvents: 'none',
+                };
+              })()}
+            >
+              {/* Outer ring */}
+              <View style={{ 
+                width: 60, 
+                height: 60, 
+                borderRadius: 30,
+                borderWidth: 2,
+                borderColor: 'rgba(59, 130, 246, 0.8)',
+                backgroundColor: 'transparent',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <Text style={{ color: 'rgba(59, 130, 246, 0.9)', fontSize: 8, fontWeight: '600', textAlign: 'center' }}>
+                  COIN{'\n'}HERE
+                </Text>
+              </View>
             </Animated.View>
 
             {/* Auto-Capture Button - Positioned close to crosshairs for visibility */}
