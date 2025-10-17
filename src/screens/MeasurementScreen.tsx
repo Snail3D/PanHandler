@@ -559,23 +559,22 @@ export default function MeasurementScreen() {
           // Calculate deviation from 90° (perfect vertical)
           const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
           
-          // Add deadzone for centering
+          // Add deadzone for centering (reduced for testing)
           let adjustedForwardBackward = forwardBackwardTilt;
-          if (Math.abs(forwardBackwardTilt) < 2) {
+          if (Math.abs(forwardBackwardTilt) < 0.5) { // Tiny deadzone
             adjustedForwardBackward = 0;
           }
           
           let adjustedLeftRight = gamma;
-          if (Math.abs(gamma) < 2) {
+          if (Math.abs(gamma) < 0.5) { // Tiny deadzone
             adjustedLeftRight = 0;
           }
           
-          // Map to bubble movement (real physics with non-linear response)
-          // Use square root to make small tilts more responsive, large tilts less extreme
+          // Map to bubble movement (real physics with more aggressive response)
           const signX = adjustedLeftRight >= 0 ? 1 : -1;
           const signY = adjustedForwardBackward >= 0 ? 1 : -1;
-          const bubbleXOffset = -signX * Math.sqrt(Math.abs(adjustedLeftRight) * 3) * (maxBubbleOffset / 10); // Left/right tilt → X movement (inverted, non-linear)
-          const bubbleYOffset = signY * Math.sqrt(Math.abs(adjustedForwardBackward) * 3) * (maxBubbleOffset / 10); // Forward/back tilt → Y movement (non-linear)
+          const bubbleXOffset = -signX * Math.pow(Math.abs(adjustedLeftRight) / 3, 0.7) * maxBubbleOffset; // Left/right tilt → X movement (inverted, power curve)
+          const bubbleYOffset = signY * Math.pow(Math.abs(adjustedForwardBackward) / 3, 0.7) * maxBubbleOffset; // Forward/back tilt → Y movement (power curve)
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
