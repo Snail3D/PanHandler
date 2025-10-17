@@ -7,15 +7,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VerbalScale } from '../state/measurementStore';
 import Svg, { Path } from 'react-native-svg';
 
+type ScaleMode = 'verbal' | 'blueprint';
+
 interface VerbalScaleModalProps {
   visible: boolean;
   onComplete: (scale: VerbalScale) => void;
+  onBlueprintMode: () => void; // New: User wants to use blueprint mode
   onDismiss: () => void;
 }
 
-export default function VerbalScaleModal({ visible, onComplete, onDismiss }: VerbalScaleModalProps) {
+export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode, onDismiss }: VerbalScaleModalProps) {
   const insets = useSafeAreaInsets();
   
+  const [scaleMode, setScaleMode] = useState<ScaleMode>('verbal');
   const [screenDistance, setScreenDistance] = useState('1');
   const [screenUnit, setScreenUnit] = useState<'cm' | 'in'>('cm');
   const [realDistance, setRealDistance] = useState('');
@@ -142,13 +146,110 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                   color: 'rgba(0, 0, 0, 0.5)',
                   fontWeight: '500' 
                 }}>
-                  Enter your map or blueprint scale
+                  Choose your calibration method
                 </Text>
               </View>
 
               {/* Content */}
               <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                 <View style={{ padding: 20 }}>
+                  {/* Mode Selector */}
+                  <View style={{ 
+                    flexDirection: 'row', 
+                    marginBottom: 24,
+                    gap: 12,
+                  }}>
+                    {/* Verbal Scale Button */}
+                    <Pressable
+                      onPress={() => {
+                        setScaleMode('verbal');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
+                        flex: 1,
+                        backgroundColor: scaleMode === 'verbal' 
+                          ? 'rgba(52, 199, 89, 0.2)' 
+                          : 'rgba(255, 255, 255, 0.6)',
+                        borderRadius: 12,
+                        padding: 16,
+                        borderWidth: 2,
+                        borderColor: scaleMode === 'verbal' 
+                          ? 'rgba(52, 199, 89, 0.6)' 
+                          : 'rgba(0, 0, 0, 0.06)',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons 
+                        name="text-outline" 
+                        size={28} 
+                        color={scaleMode === 'verbal' ? '#2E7D32' : 'rgba(0, 0, 0, 0.4)'}
+                        style={{ marginBottom: 8 }}
+                      />
+                      <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: '700', 
+                        color: scaleMode === 'verbal' ? '#2E7D32' : 'rgba(0, 0, 0, 0.6)',
+                        textAlign: 'center',
+                      }}>
+                        Verbal Scale
+                      </Text>
+                      <Text style={{ 
+                        fontSize: 11, 
+                        color: scaleMode === 'verbal' ? 'rgba(46, 125, 50, 0.7)' : 'rgba(0, 0, 0, 0.4)',
+                        textAlign: 'center',
+                        marginTop: 4,
+                      }}>
+                        e.g. 1cm = 1km
+                      </Text>
+                    </Pressable>
+
+                    {/* Blueprint Scale Button */}
+                    <Pressable
+                      onPress={() => {
+                        setScaleMode('blueprint');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
+                        flex: 1,
+                        backgroundColor: scaleMode === 'blueprint' 
+                          ? 'rgba(52, 199, 89, 0.2)' 
+                          : 'rgba(255, 255, 255, 0.6)',
+                        borderRadius: 12,
+                        padding: 16,
+                        borderWidth: 2,
+                        borderColor: scaleMode === 'blueprint' 
+                          ? 'rgba(52, 199, 89, 0.6)' 
+                          : 'rgba(0, 0, 0, 0.06)',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons 
+                        name="finger-print-outline" 
+                        size={28} 
+                        color={scaleMode === 'blueprint' ? '#2E7D32' : 'rgba(0, 0, 0, 0.4)'}
+                        style={{ marginBottom: 8 }}
+                      />
+                      <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: '700', 
+                        color: scaleMode === 'blueprint' ? '#2E7D32' : 'rgba(0, 0, 0, 0.6)',
+                        textAlign: 'center',
+                      }}>
+                        Blueprint Scale
+                      </Text>
+                      <Text style={{ 
+                        fontSize: 11, 
+                        color: scaleMode === 'blueprint' ? 'rgba(46, 125, 50, 0.7)' : 'rgba(0, 0, 0, 0.4)',
+                        textAlign: 'center',
+                        marginTop: 4,
+                      }}>
+                        Place 2 points
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  {scaleMode === 'verbal' && (
+                    <>
                   {/* Scale Input Row */}
                   <View style={{ 
                     flexDirection: 'row', 
@@ -409,11 +510,77 @@ export default function VerbalScaleModal({ visible, onComplete, onDismiss }: Ver
                       ))}
                     </View>
                   )}
+                    </>
+                  )}
+
+                  {/* Blueprint Scale Mode */}
+                  {scaleMode === 'blueprint' && (
+                    <View style={{
+                      backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                      borderRadius: 14,
+                      padding: 20,
+                      borderWidth: 1,
+                      borderColor: 'rgba(52, 199, 89, 0.3)',
+                    }}>
+                      <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                        <Ionicons name="locate-outline" size={48} color="#2E7D32" />
+                      </View>
+                      <Text style={{
+                        fontSize: 18,
+                        fontWeight: '700',
+                        color: '#2E7D32',
+                        textAlign: 'center',
+                        marginBottom: 12,
+                      }}>
+                        Place Two Points
+                      </Text>
+                      <Text style={{
+                        fontSize: 14,
+                        color: 'rgba(0, 0, 0, 0.6)',
+                        textAlign: 'center',
+                        lineHeight: 20,
+                        marginBottom: 20,
+                      }}>
+                        You'll place two points on your blueprint or drawing, then enter the real-world distance between them.
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                          onBlueprintMode();
+                        }}
+                        style={({ pressed }) => ({
+                          backgroundColor: pressed 
+                            ? 'rgba(52, 199, 89, 0.9)' 
+                            : 'rgba(52, 199, 89, 0.85)',
+                          borderRadius: 16,
+                          paddingVertical: 16,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          shadowColor: '#34C759',
+                          shadowOffset: { width: 0, height: 4 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 12,
+                          borderWidth: 2,
+                          borderColor: 'rgba(255, 255, 255, 0.4)',
+                          transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                        })}
+                      >
+                        <Text style={{ 
+                          color: '#FFFFFF', 
+                          fontWeight: '800', 
+                          fontSize: 16,
+                          letterSpacing: 0.5,
+                        }}>
+                          START PLACEMENT
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
               </ScrollView>
 
-              {/* LOCK IN Button - matches calibration screen */}
-              {isValid && (
+              {/* LOCK IN Button - matches calibration screen (only for verbal mode) */}
+              {scaleMode === 'verbal' && isValid && (
                 <View style={{
                   paddingHorizontal: 16,
                   paddingTop: 14,

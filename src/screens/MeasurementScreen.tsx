@@ -2124,6 +2124,11 @@ export default function MeasurementScreen() {
           <VerbalScaleModal
             visible={showVerbalScaleModal}
             onComplete={handleVerbalScaleComplete}
+            onBlueprintMode={() => {
+              // For now, just dismiss - blueprint mode not supported in initial photo screen
+              setShowVerbalScaleModal(false);
+              setMode('camera');
+            }}
             onDismiss={() => {
               setShowVerbalScaleModal(false);
               setMode('camera'); // Go back to camera
