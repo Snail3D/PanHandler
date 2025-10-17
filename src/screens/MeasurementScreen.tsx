@@ -145,11 +145,6 @@ export default function MeasurementScreen() {
   const encouragementTextOpacity = useSharedValue(0);
   const reminderTextOpacity = useSharedValue(0);
   
-  // Tap-to-focus indicator
-  const [focusPoint, setFocusPoint] = useState<{ x: number; y: number } | null>(null);
-  const focusIndicatorOpacity = useSharedValue(0);
-  const focusIndicatorScale = useSharedValue(1);
-  
   // Debug: Display sensor values on screen
   const [debugGamma, setDebugGamma] = useState(0);
   const [debugBeta, setDebugBeta] = useState(0);
@@ -896,11 +891,6 @@ export default function MeasurementScreen() {
   const reminderTextAnimatedStyle = useAnimatedStyle(() => ({
     opacity: reminderTextOpacity.value,
   }));
-  
-  const focusIndicatorAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: focusIndicatorOpacity.value,
-    transform: [{ scale: focusIndicatorScale.value }],
-  }));
 
   if (!permission) {
     return (
@@ -1145,40 +1135,12 @@ export default function MeasurementScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <Pressable 
-            style={{ flex: 1 }}
-            onPress={async (event) => {
-              const { locationX, locationY } = event.nativeEvent;
-              if (cameraRef.current) {
-                try {
-                  // Show focus indicator at tap location
-                  setFocusPoint({ x: locationX, y: locationY });
-                  
-                  // Animate focus indicator
-                  focusIndicatorOpacity.value = 1;
-                  focusIndicatorScale.value = 1.5;
-                  focusIndicatorScale.value = withSpring(1, { damping: 15, stiffness: 200 });
-                  
-                  // Fade out after animation
-                  setTimeout(() => {
-                    focusIndicatorOpacity.value = withTiming(0, { duration: 500 });
-                  }, 800);
-                  
-                  // Focus camera at tap location
-                  // Note: Expo Camera v15+ handles focus automatically on tap
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                } catch (error) {
-                  __DEV__ && console.log('Focus error:', error);
-                }
-              }
-            }}
-          >
-            <CameraView 
+          <CameraView 
               ref={cameraRef}
               style={{ flex: 1 }}
               facing="back"
               enableTorch={flashEnabled}
-              autofocus="on"
+              autofocus="off"
             >
             {/* Top controls */}
             <View 
@@ -1839,31 +1801,7 @@ export default function MeasurementScreen() {
               </Text>
             </View>
           )}
-          
-          {/* Tap-to-Focus Indicator */}
-          {focusPoint && (
-            <Animated.View
-              pointerEvents="none"
-              style={[
-                {
-                  position: 'absolute',
-                  left: focusPoint.x - 40,
-                  top: focusPoint.y - 40,
-                  width: 80,
-                  height: 80,
-                  borderWidth: 2,
-                  borderColor: '#FFD700',
-                  borderRadius: 40,
-                  shadowColor: '#FFD700',
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.8,
-                  shadowRadius: 10,
-                },
-                focusIndicatorAnimatedStyle,
-              ]}
-            />
-          )}
-          </Pressable>
+          </CameraView>
           
           {/* Black overlay that fades out for smooth transition */}
           <Animated.View
