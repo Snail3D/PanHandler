@@ -23,6 +23,7 @@ import HelpModal from '../components/HelpModal';
 import TypewriterText from '../components/TypewriterText';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
+import DiagnosticScreen from './DiagnosticScreen';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -63,6 +64,7 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
+  const [showDiagnostic, setShowDiagnostic] = useState(false); // Diagnostic screen
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -150,6 +152,7 @@ export default function MeasurementScreen() {
   // Debug: Display sensor values on screen
   const [debugGamma, setDebugGamma] = useState(0);
   const [debugBeta, setDebugBeta] = useState(0);
+  const [debugAlpha, setDebugAlpha] = useState(0);
   const [debugBubbleX, setDebugBubbleX] = useState(0);
   const [debugBubbleY, setDebugBubbleY] = useState(0);
   const [debugBubbleXRaw, setDebugBubbleXRaw] = useState(0);
@@ -571,10 +574,10 @@ export default function MeasurementScreen() {
         
         if (isVertical) {
           // VERTICAL MODE: Track forward/backward tilt (beta only)
-          // Rotation (alpha) is ignored - only affects gamma, not our beta reading
+          // Use RAW beta to avoid filter lag/contamination from rotation
           
           // Beta: 90° = upright, >90° = tilt forward, <90° = tilt backward
-          const tiltDeviation = beta - 90;
+          const tiltDeviation = betaRaw - 90;
           
           // Dead zone: ±2° for sticky center feel
           const deadZone = 2;
@@ -1188,6 +1191,11 @@ export default function MeasurementScreen() {
     }
   };
 
+  // Diagnostic Mode
+  if (showDiagnostic) {
+    return <DiagnosticScreen onComplete={() => setShowDiagnostic(false)} />;
+  }
+
   // Camera Mode
   if (mode === 'camera') {
     return (
@@ -1253,6 +1261,15 @@ export default function MeasurementScreen() {
                   </Pressable>
                   <Pressable
                     onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setShowDiagnostic(true);
+                    }}
+                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Ionicons name="medical-outline" size={28} color="#10B981" />
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
                       setFlashEnabled(!flashEnabled);
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
@@ -1285,6 +1302,9 @@ export default function MeasurementScreen() {
                 }}
                 pointerEvents="none"
               >
+                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
+                  alpha: {debugAlpha.toFixed(1)}°
+                </Text>
                 <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
                   gamma: {debugGamma.toFixed(1)}°
                 </Text>
