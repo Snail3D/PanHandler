@@ -818,25 +818,19 @@ export default function MeasurementScreen() {
     shadowRadius: 6 + (crosshairGlow.value * 6),
   }));
   
-  // Rotate entire crosshair 90° when phone is vertical
+  // Don't rotate crosshair - keep it fixed
   const crosshairContainerStyle = useAnimatedStyle(() => ({
     transform: [
-      { rotate: isVerticalMode.value ? '90deg' : '0deg' }
+      { rotate: '0deg' } // No rotation in either mode
     ],
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: isVerticalMode.value
-      ? [
-          // Crosshair rotates 90° CW, try swapping without negating
-          { translateX: -bubbleY.value + 60 - 7 }, // Y → -X (negate Y for correct direction)
-          { translateY: bubbleX.value + 60 - 7 },  // X → Y (no negation)
-        ]
-      : [
-          // No rotation in horizontal mode
-          { translateX: bubbleX.value + 60 - 7 },
-          { translateY: bubbleY.value + 60 - 7 },
-        ],
+    // No swapping needed if crosshair doesn't rotate
+    transform: [
+      { translateX: bubbleX.value + 60 - 7 },
+      { translateY: bubbleY.value + 60 - 7 },
+    ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
