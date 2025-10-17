@@ -1902,14 +1902,14 @@ export default function MeasurementScreen() {
                     isCameraReady,
                   });
                   
-                  // Quick tap (< 200ms) - always capture regardless of orientation
-                  // This allows manual capture in both horizontal and vertical modes
-                  if (holdDuration < 200 && !isCapturing) {
+                  // Quick tap - capture in both orientations
+                  // Longer threshold (500ms) for better UX - user doesn't have to be super quick
+                  if (holdDuration < 500 && !isCapturing) {
                     takePicture();
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   } else if (isCapturing) {
                     __DEV__ && console.log('⚠️ Already capturing, skipping takePicture');
-                  } else if (wasHolding && holdDuration >= 200) {
+                  } else if (wasHolding && holdDuration >= 500) {
                     __DEV__ && console.log('✅ Released after hold - auto-capture should have triggered');
                   }
                 }}
