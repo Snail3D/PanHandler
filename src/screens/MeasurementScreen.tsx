@@ -1109,6 +1109,10 @@ export default function MeasurementScreen() {
       }
     } catch (error) {
       console.error('Error taking picture:', error);
+      // Make sure we reset states on error
+      setIsCapturing(false);
+      setIsHoldingShutter(false);
+      setIsTransitioning(false);
     } finally {
       setIsCapturing(false);
     }
@@ -1813,28 +1817,36 @@ export default function MeasurementScreen() {
                 onPressOut={() => {
                   // Release - check if it was a quick tap or hold
                   const holdDuration = Date.now() - holdStartTimeRef.current;
+                  const wasHolding = isHoldingShutter;
                   setIsHoldingShutter(false);
                   holdStartTimeRef.current = 0;
                   
-                  // Fade instructions back in when user releases
-                  instructionsOpacity.value = withTiming(1, {
-                    duration: 400,
-                    easing: Easing.in(Easing.ease),
-                  });
+                  // Only fade instructions back in if we're still in camera mode and not capturing
+                  if (mode === 'camera' && !isCapturing) {
+                    instructionsOpacity.value = withTiming(1, {
+                      duration: 400,
+                      easing: Easing.in(Easing.ease),
+                    });
+                  }
                   
                   __DEV__ && console.log('📸 Shutter released:', {
                     holdDuration,
+                    wasHolding,
                     isCapturing,
                     mode,
                     hasCameraRef: !!cameraRef.current,
+                    isCameraReady,
                   });
                   
                   // If quick tap (< 200ms), take picture immediately
+                  // Don't trigger if already capturing (from auto-capture)
                   if (holdDuration < 200 && !isCapturing) {
                     takePicture();
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   } else if (isCapturing) {
                     __DEV__ && console.log('⚠️ Already capturing, skipping takePicture');
+                  } else if (wasHolding && holdDuration >= 200) {
+                    __DEV__ && console.log('✅ Released after hold - auto-capture should have triggered');
                   }
                 }}
                 style={({ pressed }) => ({
