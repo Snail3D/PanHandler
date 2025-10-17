@@ -50,41 +50,41 @@ export default function BattlingBotsModal({
     const { measurementCount, freehandAttempts, hasUsedFreehand } = userStats;
     
     // Detect user behavior patterns
-    let behaviorDescription = "clicking around";
+    let behaviorDescription = "playing around with the app";
     if (freehandAttempts > 5) {
-      behaviorDescription = "drawing squiggly lines everywhere";
+      behaviorDescription = "drawing loops and squiggles nonstop";
     } else if (measurementCount > 10) {
-      behaviorDescription = "measuring everything";
+      behaviorDescription = "measuring literally everything";
     } else if (hasUsedFreehand) {
-      behaviorDescription = "testing the freehand tool";
+      behaviorDescription = "trying out the freehand feature";
     }
     
     return [
       {
         bot: 'left',
-        text: `User's been ${behaviorDescription}. Time to pitch?`,
+        text: `Alright, they've been ${behaviorDescription}. Should we pitch them?`,
       },
       {
         bot: 'right',
-        text: "Yeah. Perfect for wires, cables, irregular shapes...",
+        text: "Yeah, let's go. What's the angle?",
       },
       {
         bot: 'left',
-        text: "Maps too! Coastlines, borders, property lines.",
+        text: "Tell them it's great for cables, wires, measuring anything curvy...",
       },
       {
         bot: 'right',
-        text: "Exactly. It's like having a digital measuring string.",
+        text: "Oh! And maps. Coastlines, property lines, all that stuff.",
       },
       {
         bot: 'left',
-        text: "Wait... can they see this conversation?",
+        text: "Perfect. Basically a digital measuring tape but for squiggly things.",
       },
       {
         bot: 'right',
         shouldBackspace: true,
-        meanText: "Are you KIDDING me right—",
-        niceText: "Just act cool. Start pricing NOW!",
+        meanText: "Wait. Can they SEE this conversat—",
+        niceText: "...let's talk pricing. NOW.",
       },
     ];
   };
@@ -93,17 +93,19 @@ export default function BattlingBotsModal({
   const getNegotiationScript = (): BotMessage[] => [
     {
       bot: 'left',
-      text: "Okay so... $8.97?",
+      text: "Right. So... $8.97?",
     },
     {
       bot: 'right',
-      text: "Too high. Try $6.97.",
+      shouldBackspace: true,
+      meanText: "Way too expensive. This user isn't gonna pay th—",
+      niceText: "Let's do $6.97. Nice and reasonable.",
     },
     {
       bot: 'left',
       shouldBackspace: true,
-      meanText: "That's basically giving it aw—",
-      niceText: "How about we meet at $4.97?",
+      meanText: "Are you CRAZY? We'll barely make anyth—",
+      niceText: "Deal! Actually, $4.97. Final offer.",
     },
   ];
   
