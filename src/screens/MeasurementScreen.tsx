@@ -1537,8 +1537,13 @@ export default function MeasurementScreen() {
               {[30, 35, 40, 45, 50, 55, 60, 65, 70, 75].map((size, index) => {
                 const row = Math.floor(index / 5);
                 const col = index % 5;
-                const offsetX = 50 + (col * 70); // Spacing horizontally
-                const offsetY = 100 + (row * 100); // Spacing vertically
+                // Center the grid on screen
+                const gridWidth = 5 * 80; // 5 columns with 80px spacing
+                const gridHeight = 2 * 110; // 2 rows with 110px spacing
+                const startX = (SCREEN_WIDTH - gridWidth) / 2;
+                const startY = (SCREEN_HEIGHT - gridHeight) / 2;
+                const offsetX = startX + (col * 80);
+                const offsetY = startY + (row * 110);
                 
                 return (
                   <View
