@@ -570,48 +570,48 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Track forward/backward tilt with rotation compensation
-          // User is looking straight at the coin, so left/right tilt is ignored
-          // 
-          // ROTATION HANDLING:
-          // Use alpha to determine which axis represents forward/backward
-          const normalizedAlpha = ((alpha % 360) + 360) % 360;
+          // VERTICAL MODE: Only track forward/backward tilt (beta)
+          // Ignore left/right tilt (gamma) and rotation (alpha)
+          // User is looking straight at the coin
           
-          // Calculate effective forward/backward tilt accounting for rotation
-          let forwardBackwardTilt: number;
+          // Simple: just use beta deviation from 90° (upright)
+          const forwardBackwardTilt = beta - 90;
           
-          if (normalizedAlpha < 45 || normalizedAlpha >= 315) {
-            // Normal portrait orientation
-            forwardBackwardTilt = beta - 90;
-          } else if (normalizedAlpha >= 45 && normalizedAlpha < 135) {
-            // Rotated 90° clockwise (landscape right)
-            forwardBackwardTilt = -gamma;
-          } else if (normalizedAlpha >= 135 && normalizedAlpha < 225) {
-            // Upside down portrait
-            forwardBackwardTilt = -(beta - 90);
-          } else {
-            // Rotated 90° counter-clockwise (landscape left)
-            forwardBackwardTilt = gamma;
-          }
+          // CORRECT DIRECTION:
+          // - Tilt FORWARD (look down at table) = positive tilt → line goes UP (negative Y)
+          // - Tilt BACKWARD (look up at ceiling) = negative tilt → line goes DOWN (positive Y)
+          // This is INVERTED from what we had before
           
-          // NON-LINEAR RESPONSE with dead zone for natural feel
-          // Larger dead zone: ±3° = virtually no movement (very sticky at center)
-          // Gentle progressive increase beyond dead zone
-          const deadZone = 3;
+          // Dead zone: ±2° = sticky at center
+          const deadZone = 2;
           const absTilt = Math.abs(forwardBackwardTilt);
-          let bubbleYOffset: number;
+          let movement: number;
           
           if (absTilt < deadZone) {
-            // Inside dead zone - almost no movement (sticky center)
-            bubbleYOffset = forwardBackwardTilt * 0.2;
+            // Inside dead zone - minimal movement (sticky center)
+            movement = forwardBackwardTilt * 0.5;
           } else {
-            // Outside dead zone - gentle linear increase
-            // Start from dead zone boundary with smooth transition
+            // Outside dead zone - smooth linear response
             const beyondDeadZone = absTilt - deadZone;
             const sign = forwardBackwardTilt >= 0 ? 1 : -1;
-            // More gentle: linear with moderate multiplier
-            // 5° past dead zone (8° total) = ~20px, 15° past (18° total) = ~60px
-            bubbleYOffset = sign * (deadZone * 0.2 + beyondDeadZone * 4);
+            // Gentle multiplier: 10° tilt = ~50px movement
+            movement = sign * (deadZone * 0.5 + beyondDeadZone * 5);
+          }
+          
+          // INVERT: Looking down (positive tilt) = line goes UP (negative Y)
+          let bubbleYOffset = -movement;
+          
+          // SOFT LIMITS: Constrain to ~2/3 of screen (with 3x amplification = 2/3 * screen)
+          // Assuming screen height ~800px, limit to ±200px (becomes ±600px after 3x)
+          const maxOffset = 200; // Will be 600px after 3x amplification
+          
+          // Smooth asymptotic clamping - approaches limit but never quite reaches
+          // This creates a smooth "ease into limit" feel
+          if (Math.abs(bubbleYOffset) > maxOffset * 0.5) {
+            // Beyond halfway to limit - start applying resistance
+            const excess = Math.abs(bubbleYOffset) - maxOffset * 0.5;
+            const resistance = maxOffset * 0.5 + excess * 0.3; // Dampen further movement
+            bubbleYOffset = (bubbleYOffset >= 0 ? 1 : -1) * Math.min(resistance, maxOffset);
           }
           
           const finalY = bubbleYOffset;
