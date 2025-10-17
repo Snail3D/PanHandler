@@ -573,36 +573,58 @@ export default function MeasurementScreen() {
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
         if (isVertical) {
-          // VERTICAL MODE: Track forward/backward tilt (beta only)
-          // Use RAW beta to avoid filter lag/contamination from rotation
+          // VERTICAL MODE: Track forward/backward tilt
+          // Based on diagnostic: Beta ~85° when upright, decreases when tilting forward
+          // Rotation (alpha) DOES affect beta, so we need compensation
           
-          // Beta: 90° = upright, >90° = tilt forward, <90° = tilt backward
-          const tiltDeviation = betaRaw - 90;
+          // Use rotation to determine which sensor axis to read
+          const normalizedAlpha = ((alpha % 360) + 360) % 360;
           
-          // Dead zone: ±2° for sticky center feel
-          const deadZone = 2;
+          // Find baseline "level" value for current rotation
+          // Normal portrait: ~85° is level
+          let levelReference: number;
+          let currentTilt: number;
+          
+          if (normalizedAlpha < 45 || normalizedAlpha >= 315) {
+            // Normal portrait orientation
+            levelReference = 85;
+            currentTilt = levelReference - betaRaw; // Positive when tilted forward
+          } else if (normalizedAlpha >= 45 && normalizedAlpha < 135) {
+            // Rotated ~90° CW: use gamma instead
+            levelReference = 0;
+            currentTilt = gammaRaw - levelReference;
+          } else if (normalizedAlpha >= 135 && normalizedAlpha < 225) {
+            // Rotated ~180° (upside down): beta inverted
+            levelReference = 85;
+            currentTilt = betaRaw - levelReference;
+          } else {
+            // Rotated ~270° CCW: use inverted gamma
+            levelReference = 0;
+            currentTilt = -(gammaRaw - levelReference);
+          }
+          
+          // Now currentTilt: positive = forward, negative = backward
+          // Dead zone: ±3° for sticky center
+          const deadZone = 3;
           let movement: number;
           
-          if (Math.abs(tiltDeviation) < deadZone) {
-            // Inside dead zone - minimal movement (sticky)
-            movement = tiltDeviation * 1;
+          if (Math.abs(currentTilt) < deadZone) {
+            // Inside dead zone - minimal movement
+            movement = currentTilt * 1;
           } else {
             // Outside dead zone - linear response
-            const beyondDeadZone = Math.abs(tiltDeviation) - deadZone;
-            const sign = tiltDeviation >= 0 ? 1 : -1;
-            // 10° tilt (8° beyond dead zone) = 2 + 24 = 26px → 78px on screen
+            const beyondDeadZone = Math.abs(currentTilt) - deadZone;
+            const sign = currentTilt >= 0 ? 1 : -1;
             movement = sign * (deadZone + beyondDeadZone * 3);
           }
           
-          // INVERT: Looking down (positive) → line UP (negative Y)
-          //         Looking up (negative) → line DOWN (positive Y)
+          // Movement: positive forward tilt should move line UP (negative Y)
           let bubbleYOffset = -movement;
           
-          // Soft limits at ±150px (becomes ±450px with 3x amp, ~2/3 of 800px screen)
+          // Soft limits at ±150px
           if (Math.abs(bubbleYOffset) > 120) {
-            // Apply resistance near limits for smooth feel
             const excess = Math.abs(bubbleYOffset) - 120;
-            const damped = 120 + excess * 0.25; // 75% resistance
+            const damped = 120 + excess * 0.25;
             bubbleYOffset = (bubbleYOffset >= 0 ? 1 : -1) * Math.min(damped, 150);
           }
           
@@ -625,7 +647,7 @@ export default function MeasurementScreen() {
             setDebugGamma(gamma);
             setDebugBeta(beta);
             setDebugBubbleXRaw(0);
-            setDebugBubbleYRaw(tiltDeviation);
+            setDebugBubbleYRaw(currentTilt);
             setDebugBubbleX(0);
             setDebugBubbleY(finalY);
           }
