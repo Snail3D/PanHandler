@@ -148,6 +148,8 @@ export default function MeasurementScreen() {
   const [debugBeta, setDebugBeta] = useState(0);
   const [debugBubbleX, setDebugBubbleX] = useState(0);
   const [debugBubbleY, setDebugBubbleY] = useState(0);
+  const [debugBubbleXRaw, setDebugBubbleXRaw] = useState(0);
+  const [debugBubbleYRaw, setDebugBubbleYRaw] = useState(0);
   
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
@@ -590,6 +592,8 @@ export default function MeasurementScreen() {
           if (Math.random() < 0.1) {
             setDebugGamma(gamma);
             setDebugBeta(beta);
+            setDebugBubbleXRaw(bubbleXOffset);
+            setDebugBubbleYRaw(bubbleYOffset);
             setDebugBubbleX(finalX);
             setDebugBubbleY(finalY);
           }
@@ -815,19 +819,11 @@ export default function MeasurementScreen() {
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: isVerticalMode.value
-      ? [
-          // When crosshair rotates 90°, we need to swap and adjust coordinates
-          // Physical gamma (left/right tilt) → Visual Y-axis (up/down on screen)
-          // Physical beta (forward/back) → Visual X-axis (left/right on screen)
-          { translateX: -bubbleY.value + 60 - 7 }, // Use Y for X, negate for correct direction
-          { translateY: bubbleX.value + 60 - 7 },  // Use X for Y
-        ]
-      : [
-          // Normal mapping in horizontal mode
-          { translateX: bubbleX.value + 60 - 7 },
-          { translateY: bubbleY.value + 60 - 7 },
-        ],
+    transform: [
+      // Try NO swapping - direct mapping even in vertical mode
+      { translateX: bubbleX.value + 60 - 7 },
+      { translateY: bubbleY.value + 60 - 7 },
+    ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
@@ -1260,17 +1256,23 @@ export default function MeasurementScreen() {
                 }}
                 pointerEvents="none"
               >
-                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
                   gamma: {debugGamma.toFixed(1)}°
                 </Text>
-                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                <Text style={{ color: 'white', fontSize: 11, fontFamily: 'monospace' }}>
                   beta: {debugBeta.toFixed(1)}°
                 </Text>
-                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
-                  bubbleX: {debugBubbleX.toFixed(1)}px
+                <Text style={{ color: 'yellow', fontSize: 11, fontFamily: 'monospace' }}>
+                  raw X: {debugBubbleXRaw.toFixed(1)}
                 </Text>
-                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
-                  bubbleY: {debugBubbleY.toFixed(1)}px
+                <Text style={{ color: 'yellow', fontSize: 11, fontFamily: 'monospace' }}>
+                  raw Y: {debugBubbleYRaw.toFixed(1)}
+                </Text>
+                <Text style={{ color: 'lime', fontSize: 11, fontFamily: 'monospace' }}>
+                  final X: {debugBubbleX.toFixed(1)}
+                </Text>
+                <Text style={{ color: 'lime', fontSize: 11, fontFamily: 'monospace' }}>
+                  final Y: {debugBubbleY.toFixed(1)}
                 </Text>
               </View>
             )}
