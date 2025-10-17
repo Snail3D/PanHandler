@@ -140,11 +140,11 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
     const results = steps.map(step => {
       const avg = calculateAverage(step.id);
       if (!avg) return `${step.id}: No data`;
-      return `${step.id}:\n  alpha: ${avg.alpha.toFixed(1)}°\n  beta: ${avg.beta.toFixed(1)}°\n  gamma: ${avg.gamma.toFixed(1)}°\n  samples: ${avg.count}`;
+      return `${step.title}:\n  Alpha: ${avg.alpha.toFixed(1)}°\n  Beta: ${avg.beta.toFixed(1)}°\n  Gamma: ${avg.gamma.toFixed(1)}°`;
     }).join('\n\n');
     
-    console.log('DIAGNOSTIC RESULTS:\n' + results);
-    alert('Results logged to console! Check your terminal.');
+    // Show alert with results
+    alert('SENSOR READINGS:\n\n' + results + '\n\nPlease tell me these numbers!');
   };
 
   if (showResults) {
@@ -188,10 +188,10 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
           <View style={{ marginTop: 20, gap: 10 }}>
             <Pressable
               onPress={copyResults}
-              style={{ backgroundColor: '#3B82F6', padding: 16, borderRadius: 8, alignItems: 'center' }}
+              style={{ backgroundColor: '#10B981', padding: 16, borderRadius: 8, alignItems: 'center' }}
             >
               <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                Log Results to Console
+                Show Results Summary
               </Text>
             </Pressable>
             
