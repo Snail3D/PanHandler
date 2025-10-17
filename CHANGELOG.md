@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.7] - 2025-10-17
+
+### 🎯 Freehand Snap to Existing Points
+
+#### ✨ Enhancement
+- **Freehand Can Now Snap to Measurement Points** - Connect freehand to polygons and other shapes
+  - **Start Point Snap**: When starting freehand near existing point (~10px) → snaps to it
+  - **Mid-Draw Snap**: While drawing, if you approach existing point → snaps to it
+  - Allows connecting freehand curves to polygon corners, rectangle edges, etc.
+  - Same snap behavior as distance lines (1mm tight snap)
+  - Heavy haptic feedback when snap occurs
+  - Foundation for future shape merging functionality
+  
+#### 🎯 Use Cases
+- Start freehand from polygon corner (precise connection)
+- Draw freehand curve that connects to rectangle edge
+- Extend existing shapes with organic freehand curves
+- Create complex hybrid shapes (straight + curved lines)
+
+#### 🔧 Technical Implementation
+- Start point snap check when `prevPath.length === 0`
+- Mid-draw snap check when `prevPath.length >= 3`
+- Uses existing `snapToNearbyPoint()` function (1mm threshold)
+- Prevents duplicate points (>0.5px distance requirement)
+- Only snaps if closer than raw cursor position
+
+#### 📝 Note
+- Shapes remain separate measurements (for now)
+- Future update will add automatic merging (combined perimeter/area/color)
+- Snap functionality needs field testing before adding merge logic
+
+#### 📁 Files Modified
+- `src/components/DimensionOverlay.tsx` - Freehand snap logic (lines 3276-3290, 3345-3372)
+- `app.json` - Version bump to 2.1.7
+
+#### 📚 Documentation
+- `V2.1.7_FREEHAND_SNAP.md` - Full implementation details
+
+---
+
 ## [Alpha v2.1.6] - 2025-10-17
 
 ### 🎯 Smooth, Fluid Point Movement

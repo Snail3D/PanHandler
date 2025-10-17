@@ -3273,6 +3273,20 @@ export default function DimensionOverlay({
                   // Use functional update to ensure we have the latest state
                   setFreehandPath(prevPath => {
                     if (prevPath.length === 0) {
+                      // FIRST POINT: Check if we should snap to an existing point (like distance lines do)
+                      // This allows freehand to connect to polygons and other measurements
+                      const screenPos = imageToScreen(imageX, imageY);
+                      const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use tight snap (1mm)
+                      
+                      if (snapResult.snapped) {
+                        // Snap to existing point - allows connecting to polygons
+                        const snappedImageCoords = screenToImage(snapResult.x, snapResult.y);
+                        console.log('🎯 Freehand starting point snapped to existing point');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                        return [{ x: snappedImageCoords.x, y: snappedImageCoords.y }];
+                      }
+                      
+                      // No snap - start fresh
                       return [{ x: imageX, y: imageY }];
                     }
                     
@@ -3325,6 +3339,35 @@ export default function DimensionOverlay({
                             console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
                             // Continue drawing normally without snapping
                             return [...prevPath, { x: imageX, y: imageY }];
+                          }
+                        }
+                        
+                        // SNAP TO OTHER MEASUREMENTS: Check if we're close to any other measurement point
+                        // This allows connecting freehand to existing polygons/rectangles/etc (like distance lines do)
+                        if (prevPath.length >= 3) { // Need a few points before allowing snap to other measurements
+                          const screenPos = imageToScreen(imageX, imageY);
+                          const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use tight snap (1mm)
+                          
+                          if (snapResult.snapped) {
+                            // Snap to existing point - allows connecting to polygons mid-draw
+                            const snappedImageCoords = screenToImage(snapResult.x, snapResult.y);
+                            const distToSnap = Math.sqrt(
+                              Math.pow(imageX - snappedImageCoords.x, 2) + 
+                              Math.pow(imageY - snappedImageCoords.y, 2)
+                            );
+                            
+                            // Only snap if it's different from last point (prevent duplicate points)
+                            const lastPathPoint = prevPath[prevPath.length - 1];
+                            const distFromLast = Math.sqrt(
+                              Math.pow(snappedImageCoords.x - lastPathPoint.x, 2) + 
+                              Math.pow(snappedImageCoords.y - lastPathPoint.y, 2)
+                            );
+                            
+                            if (distFromLast > 0.5 && distToSnap < distance) {
+                              console.log('🎯 Freehand snapped to existing measurement point');
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                              return [...prevPath, { x: snappedImageCoords.x, y: snappedImageCoords.y }];
+                            }
                           }
                         }
                       }
