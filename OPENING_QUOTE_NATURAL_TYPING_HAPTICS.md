@@ -36,7 +36,12 @@ This creates engaging tactile feedback that feels natural without being overwhel
   - Ensures consistent feel across opening quote and bot negotiation screens
   - **Fixed rendering issue:** Removed nested BlurView that caused blank/invisible modal
   - **Added ScrollView** for negotiation stage (maxHeight: 600) to prevent content overflow
-  - **Shortened conversation** from 12 messages to 7 for snappier, tighter experience
+  - **Expanded conversation** to 9 messages total with better product pitching
+    - Behind-the-scenes: 6 messages (includes pitch about wires, cables, maps, coastlines)
+    - Negotiation: 3 messages (negotiate down from $8.97 → $6.97 → final $4.97)
+  - **New offer screen:** Single $4.97 final offer (down from 3 options)
+  - **Added countdown timer:** 60-second timer on offer screen, auto-declines when expires
+  - Timer turns red when ≤10 seconds remaining
 
 ## Code Location
 
