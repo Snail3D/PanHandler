@@ -828,10 +828,9 @@ export default function MeasurementScreen() {
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: isVerticalMode.value
       ? [
-          // Crosshair rotates 90° CW, bubble rotates with it
-          // After 90° CW: physical Y → visual X, physical X → visual -Y
-          { translateX: bubbleY.value + 60 - 7 },
-          { translateY: -bubbleX.value + 60 - 7 },
+          // Crosshair rotates 90° CW, try swapping without negating
+          { translateX: -bubbleY.value + 60 - 7 }, // Y → -X (negate Y for correct direction)
+          { translateY: bubbleX.value + 60 - 7 },  // X → Y (no negation)
         ]
       : [
           // No rotation in horizontal mode
