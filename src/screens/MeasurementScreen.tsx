@@ -1439,6 +1439,7 @@ export default function MeasurementScreen() {
             </Animated.View>
 
             {/* Crosshairs overlay - center of screen */}
+            {/* ONLY visible in horizontal mode */}
             <Animated.View 
               style={[
                 {
@@ -1451,6 +1452,13 @@ export default function MeasurementScreen() {
                   marginTop: -60,
                 },
                 crosshairContainerStyle,
+                (() => {
+                  'worklet';
+                  const horizontal = isHorizontal.value;
+                  return {
+                    opacity: horizontal ? 1 : 0, // Hide in vertical mode
+                  };
+                })(),
               ]}
               pointerEvents="none"
             >
@@ -1540,14 +1548,14 @@ export default function MeasurementScreen() {
               />
             </Animated.View>
 
-            {/* "Look Down" Message - Shows when NOT horizontal, positioned center */}
+            {/* "Aim Down" Message - Shows when NOT horizontal, same position as instructions */}
             <Animated.View
               style={(() => {
                 'worklet';
                 const opacity = lookDownOpacity.value;
                 return {
                   position: 'absolute',
-                  top: '35%',
+                  bottom: insets.bottom + 150, // Same position as instructions (above shutter)
                   left: 24,
                   right: 24,
                   alignItems: 'center',
@@ -1557,8 +1565,8 @@ export default function MeasurementScreen() {
               })()}
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: '600', textAlign: 'center' }}>
-                  Look Down
+                <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', textAlign: 'center' }}>
+                  Aim down for auto level/capture
                 </Text>
               </View>
             </Animated.View>
