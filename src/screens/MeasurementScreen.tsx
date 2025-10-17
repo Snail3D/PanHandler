@@ -1710,14 +1710,19 @@ export default function MeasurementScreen() {
                 bottom: 0, 
                 left: 0, 
                 right: 0, 
-                zIndex: 10,
-                paddingBottom: insets.bottom + 40 
+                zIndex: 25,
+                paddingBottom: insets.bottom + 40,
+                pointerEvents: 'box-none'
               }}
             >
-              <View style={{ alignItems: 'center' }}>
+              <View style={{ alignItems: 'center', pointerEvents: 'box-none' }}>
                 {/* Photo Library Button - Same size as shutter (80x80) */}
                 <Pressable
-                  onPress={pickImage}
+                  onPress={async () => {
+                    console.log('📸 Photo library button pressed');
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    await pickImage();
+                  }}
                   style={{ 
                     position: 'absolute', 
                     left: 32, 
