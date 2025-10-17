@@ -656,16 +656,16 @@ export default function MeasurementScreen() {
         crosshairGlow.value = withSpring(glowAmount, { damping: 20, stiffness: 400 });
         
         // Check BOTH angle stability AND motion stability
-        // STRICT for auto-capture: require near-perfect alignment
+        // RELAXED for auto-capture: more forgiving thresholds
         if (recentAngles.current.length >= 3 && recentAccelerations.current.length >= 3) {
-          // STRICT angle stability: 1° tolerance (very tight)
-          const angleThreshold = 1; // Was 5°, now 1° for precision
+          // RELAXED angle stability: 3° tolerance (more forgiving)
+          const angleThreshold = 3; // Increased from 1° to 3° for easier triggering
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
           const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // STRICT motion stability: minimal movement allowed
-          const motionThreshold = 0.15; // Was 0.4, now 0.15 for precision
+          // RELAXED motion stability: allow more movement
+          const motionThreshold = 0.3; // Increased from 0.15 to 0.3 for easier triggering
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
           const motionStable = (maxAccel - minAccel) <= motionThreshold;
@@ -674,17 +674,17 @@ export default function MeasurementScreen() {
           setIsStable(angleStable && motionStable);
         }
 
-        // Alignment status - STRICT: bubble must be within 2-3 pixels of center
+        // Alignment status - RELAXED: More forgiving thresholds for auto-capture
         let status: 'good' | 'warning' | 'bad';
         
         // Calculate pixel distance from center (bubble position)
         const bubbleDistancePixels = Math.sqrt(finalX * finalX + finalY * finalY);
         
-        // STRICT thresholds for auto-capture precision
-        if (bubbleDistancePixels <= 3 && absTilt <= 1) {
-          status = 'good';      // Within 3 pixels and < 1° tilt = perfect
-        } else if (bubbleDistancePixels <= 10 && absTilt <= 5) {
-          status = 'warning';   // Within 10 pixels and < 5° tilt = close
+        // RELAXED thresholds - easier to trigger auto-capture
+        if (bubbleDistancePixels <= 8 && absTilt <= 3) {
+          status = 'good';      // Within 8 pixels and < 3° tilt = good enough
+        } else if (bubbleDistancePixels <= 15 && absTilt <= 8) {
+          status = 'warning';   // Within 15 pixels and < 8° tilt = getting close
         } else {
           status = 'bad';       // Too far off
         }
@@ -732,8 +732,9 @@ export default function MeasurementScreen() {
 
   // Auto-capture when holding shutter button and lines align
   useEffect(() => {
-    // Strict guards: must have camera ref, correct mode, camera ready, holding, not already capturing
-    if (!cameraRef.current || mode !== 'camera' || !isCameraReady || isCapturing || !isHoldingShutter) {
+    // Guards: must have camera ref, correct mode, holding, not already capturing
+    // REMOVED isCameraReady check - if user is holding shutter, camera must be ready
+    if (!cameraRef.current || mode !== 'camera' || isCapturing || !isHoldingShutter) {
       return;
     }
 
@@ -748,22 +749,15 @@ export default function MeasurementScreen() {
     }
 
     if (alignmentStatus === 'good' && isStable) {
-      // Add small delay to ensure conditions are truly stable
-      const timer = setTimeout(() => {
-        // Double-check all conditions before capture
-        if (cameraRef.current && mode === 'camera' && isCameraReady && !isCapturing && isHoldingShutter) {
-          __DEV__ && console.log('🎯 Auto-capture triggered!', {
-            alignmentStatus,
-            isStable,
-            isHoldingShutter,
-          });
-          takePicture();
-        }
-      }, 100);
-      
-      return () => clearTimeout(timer);
+      // Trigger immediately when conditions are met (removed delay)
+      __DEV__ && console.log('🎯 Auto-capture triggered!', {
+        alignmentStatus,
+        isStable,
+        isHoldingShutter,
+      });
+      takePicture();
     }
-  }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter, isCameraReady]);
+  }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter]);
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
@@ -1062,27 +1056,27 @@ export default function MeasurementScreen() {
         // The camera view stays rendered but will fade out
         setTimeout(() => {
           setMode('zoomCalibrate');
-        }, 50); // Very small delay just for the flash to start
+        }, 30); // Minimal delay just for the flash to start
         
         // Start the visual transition AFTER mode switch
         setTimeout(() => {
           // Fade out camera opacity to reveal the photo underneath
           cameraOpacity.value = withTiming(0, {
-            duration: 300, // Faster fade
+            duration: 150, // Much faster fade (was 300ms)
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           });
           
           // Slight zoom morph for drama
           screenScale.value = withSequence(
-            withTiming(1.05, { duration: 150, easing: Easing.out(Easing.cubic) }), // Slight zoom in
-            withTiming(1, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
+            withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
+            withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
           );
           
           // Unlock after full transition
           setTimeout(() => {
             setIsTransitioning(false);
-          }, 300);
-        }, 100); // Start animations after flash
+          }, 150); // Match the fade duration
+        }, 50); // Start animations quickly after flash
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {
