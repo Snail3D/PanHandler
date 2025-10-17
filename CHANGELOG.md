@@ -4,6 +4,48 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v1.92] - 2025-10-17
+
+### 🎯 Auto-Capture Precision & Critical Bug Fixes
+
+#### 🐛 Bug Fixes
+- **Fixed Camera Ref Null Error** - Added strict guards to prevent crashes
+  - Disable `isHoldingShutter` immediately when capture starts
+  - Added camera ref check in auto-capture useEffect
+  - Double-check all conditions before triggering capture
+  
+- **Reset Hold State on Camera Entry** - Fixed persistent auto-capture
+  - `isHoldingShutter` now resets to `false` when entering camera mode
+  - User must press and hold again for each new photo session
+  - Prevents accidental auto-capture when returning to camera
+
+#### ⚡ Performance Improvements
+- **Background-Only Album Save** - Smooth workflow
+  - Photos save to "PanHandler" album in background (non-blocking)
+  - Removed album opening (no more interruption)
+  - Smooth transition to calibration screen
+  - User can find photos in gallery under "PanHandler" album
+
+#### 🎯 Ultra-Precise Auto-Capture
+- **Strictest Alignment Requirements** - Professional precision
+  - Bubble must be within **2-3 pixels** of center (was ~48px)
+  - Angle tolerance: **≤ 1°** (was 5°)
+  - Motion stability: **0.15 variance** (was 0.4)
+  - Result: Only captures when PERFECTLY level
+  
+#### 🔧 Technical Changes
+- `takePicture`: Added `setIsHoldingShutter(false)` to prevent double-capture
+- Auto-capture thresholds: 3px / 1° (strict precision)
+- Camera mode useEffect: Reset `isHoldingShutter` on entry
+- Auto-capture useEffect: Added camera ref guard
+- Album save: Removed `Linking.openURL` (background only)
+
+#### 📁 Files Modified
+- `src/screens/MeasurementScreen.tsx` - Bug fixes, precision thresholds, hold reset
+- `app.json` - Version bump to 1.92
+
+---
+
 ## [Alpha v1.91] - 2025-10-17
 
 ### 🎯 Press-and-Hold Auto-Capture & Photo UX Improvements

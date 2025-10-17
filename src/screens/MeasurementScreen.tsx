@@ -634,19 +634,16 @@ export default function MeasurementScreen() {
         crosshairGlow.value = withSpring(glowAmount, { damping: 20, stiffness: 400 });
         
         // Check BOTH angle stability AND motion stability
-        // Accessibility: After 10 seconds of holding, loosen requirements for Parkinson's/tremor support
+        // STRICT for auto-capture: require near-perfect alignment
         if (recentAngles.current.length >= 3 && recentAccelerations.current.length >= 3) {
-          const holdDuration = holdStartTime.current > 0 ? (Date.now() - holdStartTime.current) / 1000 : 0;
-          const isAccessibilityMode = holdDuration > 10; // After 10 seconds, be more forgiving
-          
-          // Angle stability: Much more relaxed - 5° is plenty good enough
-          const angleThreshold = isAccessibilityMode ? 8 : 5;
+          // STRICT angle stability: 1° tolerance (very tight)
+          const angleThreshold = 1; // Was 5°, now 1° for precision
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
           const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // Motion stability: Much more forgiving - allow natural hand movements
-          const motionThreshold = isAccessibilityMode ? 0.6 : 0.4;
+          // STRICT motion stability: minimal movement allowed
+          const motionThreshold = 0.15; // Was 0.4, now 0.15 for precision
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
           const motionStable = (maxAccel - minAccel) <= motionThreshold;
@@ -655,21 +652,19 @@ export default function MeasurementScreen() {
           setIsStable(angleStable && motionStable);
         }
 
-        // Alignment status - also relax tolerance after 10 seconds
-        const holdDuration = holdStartTime.current > 0 ? (Date.now() - holdStartTime.current) / 1000 : 0;
-        const isAccessibilityMode = holdDuration > 10;
-        
+        // Alignment status - STRICT: bubble must be within 2-3 pixels of center
         let status: 'good' | 'warning' | 'bad';
-        if (isAccessibilityMode) {
-          // More forgiving thresholds for accessibility
-          if (absTilt <= 8) status = 'good';      // Very relaxed
-          else if (absTilt <= 20) status = 'warning';
-          else status = 'bad';
+        
+        // Calculate pixel distance from center (bubble position)
+        const bubbleDistancePixels = Math.sqrt(finalX * finalX + finalY * finalY);
+        
+        // STRICT thresholds for auto-capture precision
+        if (bubbleDistancePixels <= 3 && absTilt <= 1) {
+          status = 'good';      // Within 3 pixels and < 1° tilt = perfect
+        } else if (bubbleDistancePixels <= 10 && absTilt <= 5) {
+          status = 'warning';   // Within 10 pixels and < 5° tilt = close
         } else {
-          // Much more relaxed standard tolerance - captures sooner
-          if (absTilt <= 5) status = 'good';      // Was 2° - now 5°
-          else if (absTilt <= 15) status = 'warning';  // Was 10° - now 15°
-          else status = 'bad';
+          status = 'bad';       // Too far off
         }
 
         setAlignmentStatus(status);
@@ -715,12 +710,14 @@ export default function MeasurementScreen() {
 
   // Auto-capture when holding shutter button and lines align
   useEffect(() => {
-    if (mode !== 'camera' || isCapturing || !isHoldingShutter) return;
+    // Strict guards: must have camera ref, correct mode, holding, not already capturing
+    if (!cameraRef.current || mode !== 'camera' || isCapturing || !isHoldingShutter) return;
 
     if (alignmentStatus === 'good' && isStable) {
       // Add small delay to ensure camera is fully mounted before taking picture
       const timer = setTimeout(() => {
-        if (mode === 'camera' && !isCapturing && cameraRef.current && isHoldingShutter) {
+        // Double-check conditions before capture
+        if (cameraRef.current && mode === 'camera' && !isCapturing && isHoldingShutter) {
           takePicture();
         }
       }, 100);
@@ -870,6 +867,7 @@ export default function MeasurementScreen() {
       // Reset states immediately
       setIsCapturing(false);
       setIsTransitioning(false);
+      setIsHoldingShutter(false); // Reset hold state so user must press again
       
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
@@ -965,6 +963,9 @@ export default function MeasurementScreen() {
       return;
     }
     
+    // Disable holding state to prevent double-capture
+    setIsHoldingShutter(false);
+    
     const wasAutoCapture = alignmentStatus === 'good' && isStable;
     
     try {
@@ -1049,7 +1050,7 @@ export default function MeasurementScreen() {
               // Save photo to library
               const asset = await MediaLibrary.createAssetAsync(photoToSave);
               
-              // Always save to "PanHandler" album
+              // Always save to "PanHandler" album in background (non-blocking)
               try {
                 // Get or create "PanHandler" album
                 let album = await MediaLibrary.getAlbumAsync('PanHandler');
@@ -1060,19 +1061,6 @@ export default function MeasurementScreen() {
                 }
                 
                 __DEV__ && console.log('✅ Photo saved to PanHandler album');
-                
-                // Open the album on iOS using Photos app URL scheme
-                // On Android, this will gracefully fail and just save the photo
-                if (Platform.OS === 'ios') {
-                  try {
-                    // Try to open the album - iOS will handle this automatically
-                    // The album will be accessible in Photos app under "Albums" section
-                    await Linking.openURL('photos-redirect://');
-                  } catch (linkError) {
-                    // Silently fail - photo still saved successfully
-                    __DEV__ && console.log('Could not open Photos app, but photo saved');
-                  }
-                }
               } catch (albumError) {
                 console.error('Failed to add to PanHandler album:', albumError);
                 __DEV__ && console.log('✅ Photo saved to camera roll only');
