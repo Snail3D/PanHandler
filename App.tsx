@@ -84,8 +84,10 @@ export default function App() {
     
     let currentIndex = 0;
     const typingSpeed = 25; // Fast typing for intro
+    let localIntervalId: NodeJS.Timeout | null = null;
+    let localTimeoutId: NodeJS.Timeout | null = null;
     
-    const intervalId = setInterval(() => {
+    localIntervalId = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
         
@@ -106,11 +108,14 @@ export default function App() {
         
         currentIndex++;
       } else {
-        clearInterval(intervalId);
+        if (localIntervalId) {
+          clearInterval(localIntervalId);
+          localIntervalId = null;
+        }
         setTypeIntervalId(null);
         
         // Hold for 2 seconds after typing, then cross-fade
-        const timeoutId = setTimeout(() => {
+        localTimeoutId = setTimeout(() => {
           // Fade out intro and fade in app simultaneously
           introOpacity.value = withTiming(0, { 
             duration: 1000,
@@ -126,17 +131,18 @@ export default function App() {
           }));
         }, 2000);
         
-        setHoldTimeoutId(timeoutId);
+        setHoldTimeoutId(localTimeoutId);
       }
     }, typingSpeed);
     
-    setTypeIntervalId(intervalId);
+    setTypeIntervalId(localIntervalId);
     
+    // Cleanup function - use local variables to avoid stale closures
     return () => {
-      clearInterval(intervalId);
-      if (holdTimeoutId) clearTimeout(holdTimeoutId);
+      if (localIntervalId) clearInterval(localIntervalId);
+      if (localTimeoutId) clearTimeout(localTimeoutId);
     };
-  }, []);
+  }, []); // Empty deps is correct - only run once on mount
   
   const introAnimatedStyle = useAnimatedStyle(() => ({
     opacity: introOpacity.value,
