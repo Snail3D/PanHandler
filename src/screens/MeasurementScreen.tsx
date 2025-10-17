@@ -158,6 +158,10 @@ export default function MeasurementScreen() {
   // Instructions fade animation
   const instructionsOpacity = useSharedValue(1);
   
+  // Animated opacity for look down / instructions fade transition
+  const lookDownOpacity = useSharedValue(0); // "Look Down" message
+  const instructionsDisplayOpacity = useSharedValue(1); // Instructions box (separate from hold fade)
+  
   // Bubble level
   const bubbleX = useSharedValue(0);
   const bubbleY = useSharedValue(0);
@@ -610,7 +614,21 @@ export default function MeasurementScreen() {
         // This is the natural way to measure objects on a table
         const isVertical = false; // Disabled vertical mode
         isVerticalMode.value = isVertical;
+        const wasHorizontal = isHorizontal.value;
         isHorizontal.value = absBeta < 45; // True when looking down (horizontal)
+        
+        // Smooth 500ms fade transition between "Look Down" and instructions
+        if (wasHorizontal !== isHorizontal.value) {
+          if (isHorizontal.value) {
+            // Switched to horizontal: fade out "Look Down", fade in instructions
+            lookDownOpacity.value = withTiming(0, { duration: 500 });
+            instructionsDisplayOpacity.value = withTiming(1, { duration: 500 });
+          } else {
+            // Switched to vertical: fade out instructions, fade in "Look Down"
+            instructionsDisplayOpacity.value = withTiming(0, { duration: 500 });
+            lookDownOpacity.value = withTiming(1, { duration: 500 });
+          }
+        }
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
         
@@ -878,7 +896,9 @@ export default function MeasurementScreen() {
       blackOverlayOpacity.value = 1;
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
       cameraFlashOpacity.value = 0; // Reset flash in case it's still visible
-      instructionsOpacity.value = 1; // Reset instructions to visible
+      instructionsOpacity.value = 1; // Reset instructions to visible (hold fade)
+      instructionsDisplayOpacity.value = 1; // Start with instructions visible
+      lookDownOpacity.value = 0; // Start with "Look Down" hidden
       
       // Faster fade-in (reduced from 1.5s to 0.6s)
       setTimeout(() => {
@@ -1496,14 +1516,14 @@ export default function MeasurementScreen() {
             <Animated.View
               style={(() => {
                 'worklet';
-                const horizontal = isHorizontal.value;
+                const opacity = lookDownOpacity.value;
                 return {
                   position: 'absolute',
                   top: '35%',
                   left: 24,
                   right: 24,
                   alignItems: 'center',
-                  opacity: horizontal ? 0 : 1,
+                  opacity: opacity,
                   pointerEvents: 'none',
                 };
               })()}
@@ -1519,15 +1539,15 @@ export default function MeasurementScreen() {
             <Animated.View
               style={(() => {
                 'worklet';
-                const horizontal = isHorizontal.value;
-                const opacity = instructionsOpacity.value;
+                const displayOpacity = instructionsDisplayOpacity.value;
+                const holdOpacity = instructionsOpacity.value;
                 return {
                   position: 'absolute',
                   bottom: insets.bottom + 150, // Above shutter button
                   left: 24,
                   right: 24,
                   alignItems: 'center',
-                  opacity: horizontal ? opacity : 0,
+                  opacity: displayOpacity * holdOpacity, // Combine both fade effects
                   pointerEvents: 'none',
                 };
               })()}
