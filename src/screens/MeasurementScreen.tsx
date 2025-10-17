@@ -570,9 +570,12 @@ export default function MeasurementScreen() {
             adjustedLeftRight = 0;
           }
           
-          // Map to bubble movement (real physics)
-          const bubbleXOffset = -(adjustedLeftRight / 15) * maxBubbleOffset; // Left/right tilt → X movement (inverted)
-          const bubbleYOffset = (adjustedForwardBackward / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
+          // Map to bubble movement (real physics with non-linear response)
+          // Use square root to make small tilts more responsive, large tilts less extreme
+          const signX = adjustedLeftRight >= 0 ? 1 : -1;
+          const signY = adjustedForwardBackward >= 0 ? 1 : -1;
+          const bubbleXOffset = -signX * Math.sqrt(Math.abs(adjustedLeftRight) * 3) * (maxBubbleOffset / 10); // Left/right tilt → X movement (inverted, non-linear)
+          const bubbleYOffset = signY * Math.sqrt(Math.abs(adjustedForwardBackward) * 3) * (maxBubbleOffset / 10); // Forward/back tilt → Y movement (non-linear)
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
