@@ -1330,8 +1330,8 @@ export default function MeasurementScreen() {
                 right: -SCREEN_WIDTH,
                 bottom: -SCREEN_HEIGHT,
                 transform: [
-                  { translateX: bubbleX.value * 5 }, // Amplify movement so it's visible
-                  { translateY: bubbleY.value * 5 },
+                  { translateX: bubbleX.value * 3 }, // Reduced amplification for smoother feel
+                  { translateY: bubbleY.value * 3 }, // Reduced amplification for smoother feel
                 ],
               }}
               pointerEvents="none"
@@ -1406,7 +1406,8 @@ export default function MeasurementScreen() {
                 ]}
               />
               
-              {/* COSMIC ENERGY BALL - Professional solid design */}
+              {/* COSMIC ENERGY BALL - Disabled in favor of red crosshairs */}
+              {false && (
               <Animated.View
                 style={[
                   {
@@ -1445,6 +1446,7 @@ export default function MeasurementScreen() {
                   }}
                 />
               </Animated.View>
+              )}
               
               {/* Center dot - morphs when bubble crosses */}
               <Animated.View
