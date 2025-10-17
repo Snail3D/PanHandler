@@ -29,6 +29,49 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
 
+// Session color system: Each camera session gets a random set of 3 contrasting colors
+// - Crosshair (camera + calibration): Main reference lines
+// - Bubble: Complementary color for level indicator
+// - Shutter: High-contrast action button color
+// Colors regenerate every time user returns to camera mode (new photo session)
+const COLOR_PAIRS = [
+  { 
+    crosshair: { main: '#3B82F6', glow: '#60A5FA' }, 
+    bubble: { main: '#F59E0B', glow: '#FBBF24' },
+    shutter: { main: '#EC4899', glow: '#F472B6' } // Pink
+  },
+  { 
+    crosshair: { main: '#8B5CF6', glow: '#A78BFA' }, 
+    bubble: { main: '#10B981', glow: '#34D399' },
+    shutter: { main: '#F97316', glow: '#FB923C' } // Orange
+  },
+  { 
+    crosshair: { main: '#EC4899', glow: '#F472B6' }, 
+    bubble: { main: '#06B6D4', glow: '#22D3EE' },
+    shutter: { main: '#84CC16', glow: '#A3E635' } // Lime
+  },
+  { 
+    crosshair: { main: '#EF4444', glow: '#F87171' }, 
+    bubble: { main: '#3B82F6', glow: '#60A5FA' },
+    shutter: { main: '#10B981', glow: '#34D399' } // Green
+  },
+  { 
+    crosshair: { main: '#10B981', glow: '#34D399' }, 
+    bubble: { main: '#8B5CF6', glow: '#A78BFA' },
+    shutter: { main: '#F59E0B', glow: '#FBBF24' } // Amber
+  },
+  { 
+    crosshair: { main: '#F59E0B', glow: '#FBBF24' }, 
+    bubble: { main: '#EC4899', glow: '#F472B6' },
+    shutter: { main: '#06B6D4', glow: '#22D3EE' } // Cyan
+  },
+  { 
+    crosshair: { main: '#06B6D4', glow: '#22D3EE' }, 
+    bubble: { main: '#EF4444', glow: '#F87171' },
+    shutter: { main: '#84CC16', glow: '#A3E635' } // Lime
+  },
+];
+
 // Helper function to add "AUTO LEVEL" badge to image (top right corner)
 // Captures a View containing the image + badge overlay
 async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<string | null> {
@@ -116,21 +159,15 @@ export default function MeasurementScreen() {
   const isVerticalMode = useSharedValue(false); // Track if phone is vertical
   const isHorizontal = useSharedValue(true); // Track if phone is horizontal (looking down)
   
-  // Pick random complementary colors for crosshairs and bubble (per session)
-  const [sessionColors] = useState(() => {
-    const colorPairs = [
-      { crosshair: { main: '#3B82F6', glow: '#60A5FA' }, bubble: { main: '#F59E0B', glow: '#FBBF24' } },    // Blue vs Amber
-      { crosshair: { main: '#8B5CF6', glow: '#A78BFA' }, bubble: { main: '#10B981', glow: '#34D399' } },    // Purple vs Green
-      { crosshair: { main: '#EC4899', glow: '#F472B6' }, bubble: { main: '#06B6D4', glow: '#22D3EE' } },    // Pink vs Cyan
-      { crosshair: { main: '#EF4444', glow: '#F87171' }, bubble: { main: '#3B82F6', glow: '#60A5FA' } },    // Red vs Blue
-      { crosshair: { main: '#10B981', glow: '#34D399' }, bubble: { main: '#8B5CF6', glow: '#A78BFA' } },    // Green vs Purple
-      { crosshair: { main: '#F59E0B', glow: '#FBBF24' }, bubble: { main: '#EC4899', glow: '#F472B6' } },    // Amber vs Pink
-      { crosshair: { main: '#06B6D4', glow: '#22D3EE' }, bubble: { main: '#EF4444', glow: '#F87171' } },    // Cyan vs Red
-    ];
-    return colorPairs[Math.floor(Math.random() * colorPairs.length)];
-  });
+  // Session colors: Regenerate every time we enter camera mode for visual variety
+  // This creates a fresh look for each photo session while maintaining consistency
+  // within a single session (camera → calibration → measurement)
+  const [sessionColors, setSessionColors] = useState(() => 
+    COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)]
+  );
   const crosshairColor = sessionColors.crosshair;
   const bubbleColor = sessionColors.bubble;
+  const shutterColor = sessionColors.shutter;
   
   const crosshairGlow = useSharedValue(0); // 0-1, lights up when bubble is centered
   
@@ -374,6 +411,17 @@ export default function MeasurementScreen() {
       }
     }
   }, []); // Only on mount
+  
+  // Regenerate session colors every time we enter camera mode for visual variety
+  // This creates a fresh look for each photo session while maintaining consistency
+  // within a single session (camera → calibration → measurement)
+  useEffect(() => {
+    if (mode === 'camera') {
+      // Pick new random color pair
+      const newColors = COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)];
+      setSessionColors(newColors);
+    }
+  }, [mode]);
   
   // Detect accessibility settings and device performance on mount
   useEffect(() => {
@@ -1698,13 +1746,13 @@ export default function MeasurementScreen() {
                   height: 80,
                   borderRadius: 40,
                   backgroundColor: pressed 
-                    ? `${crosshairColor.main}CC`  // 80% opacity when pressed
-                    : `${crosshairColor.main}E6`, // 90% opacity normally
+                    ? `${shutterColor.main}CC`  // 80% opacity when pressed
+                    : `${shutterColor.main}E6`, // 90% opacity normally
                   borderWidth: 5,
-                  borderColor: crosshairColor.glow,
+                  borderColor: shutterColor.glow,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  shadowColor: crosshairColor.main,
+                  shadowColor: shutterColor.main,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.6,
                   shadowRadius: 12,
@@ -1715,7 +1763,7 @@ export default function MeasurementScreen() {
                   width: 60,
                   height: 60,
                   borderRadius: 30,
-                  backgroundColor: crosshairColor.glow,
+                  backgroundColor: shutterColor.glow,
                   borderWidth: 3,
                   borderColor: '#333',
                 }} />
@@ -1789,6 +1837,7 @@ export default function MeasurementScreen() {
           {mode === 'zoomCalibrate' && (
             <ZoomCalibration
               imageUri={currentImageUri}
+              sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}

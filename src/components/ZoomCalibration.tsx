@@ -25,6 +25,7 @@ const VIBRANT_COLORS = [
 
 interface ZoomCalibrationProps {
   imageUri: string;
+  sessionColor?: { main: string; glow: string }; // Optional session color from camera for visual continuity
   onComplete: (calibrationData: {
     pixelsPerUnit: number;
     unit: string;
@@ -48,6 +49,7 @@ interface ZoomCalibrationProps {
 
 export default function ZoomCalibration({
   imageUri,
+  sessionColor,
   onComplete,
   onCancel,
   onHelp,
@@ -81,8 +83,13 @@ export default function ZoomCalibration({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
   
-  // Pick ONE random color on mount (don't rotate during use)
-  const [currentColor] = useState(() => VIBRANT_COLORS[Math.floor(Math.random() * VIBRANT_COLORS.length)]);
+  // Use session color if provided (from camera screen), otherwise fallback to random for backwards compatibility
+  const [currentColor] = useState(() => {
+    if (sessionColor) {
+      return sessionColor.main; // Use main color for consistency
+    }
+    return VIBRANT_COLORS[Math.floor(Math.random() * VIBRANT_COLORS.length)];
+  });
   
   // Get color name for instructions
   const getColorName = (color: string): string => {
