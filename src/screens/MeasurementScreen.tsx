@@ -656,16 +656,16 @@ export default function MeasurementScreen() {
         crosshairGlow.value = withSpring(glowAmount, { damping: 20, stiffness: 400 });
         
         // Check BOTH angle stability AND motion stability
-        // RELAXED for auto-capture: more forgiving thresholds
+        // PRECISE for auto-capture: tighter thresholds for ~1mm accuracy
         if (recentAngles.current.length >= 3 && recentAccelerations.current.length >= 3) {
-          // RELAXED angle stability: 3° tolerance (more forgiving)
-          const angleThreshold = 3; // Increased from 1° to 3° for easier triggering
+          // PRECISE angle stability: 1.5° tolerance to match alignment precision
+          const angleThreshold = 1.5; // Tight tolerance for precise capture
           const maxAngle = Math.max(...recentAngles.current);
           const minAngle = Math.min(...recentAngles.current);
           const angleStable = (maxAngle - minAngle) <= angleThreshold;
           
-          // RELAXED motion stability: allow more movement
-          const motionThreshold = 0.3; // Increased from 0.15 to 0.3 for easier triggering
+          // PRECISE motion stability: minimal movement for accuracy
+          const motionThreshold = 0.2; // Tight tolerance for stable capture
           const maxAccel = Math.max(...recentAccelerations.current);
           const minAccel = Math.min(...recentAccelerations.current);
           const motionStable = (maxAccel - minAccel) <= motionThreshold;
@@ -674,17 +674,18 @@ export default function MeasurementScreen() {
           setIsStable(angleStable && motionStable);
         }
 
-        // Alignment status - RELAXED: More forgiving thresholds for auto-capture
+        // Alignment status - PRECISE: ~1mm on screen for auto-capture accuracy
         let status: 'good' | 'warning' | 'bad';
         
         // Calculate pixel distance from center (bubble position)
         const bubbleDistancePixels = Math.sqrt(finalX * finalX + finalY * finalY);
         
-        // RELAXED thresholds - easier to trigger auto-capture
-        if (bubbleDistancePixels <= 8 && absTilt <= 3) {
-          status = 'good';      // Within 8 pixels and < 3° tilt = good enough
-        } else if (bubbleDistancePixels <= 15 && absTilt <= 8) {
-          status = 'warning';   // Within 15 pixels and < 8° tilt = getting close
+        // PRECISE thresholds for accurate auto-capture
+        // Typical phone: ~160 PPI = 6.3 pixels/mm, so 6 pixels ≈ 1mm
+        if (bubbleDistancePixels <= 6 && absTilt <= 1.5) {
+          status = 'good';      // Within ~1mm (6px) and < 1.5° tilt = precise
+        } else if (bubbleDistancePixels <= 12 && absTilt <= 5) {
+          status = 'warning';   // Within ~2mm (12px) and < 5° tilt = getting close
         } else {
           status = 'bad';       // Too far off
         }
