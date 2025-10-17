@@ -1682,9 +1682,9 @@ export default function MeasurementScreen() {
             >
               <Pressable
                 onPress={() => {
-                  // Toggle auto-capture mode
-                  setAutoCaptureEnabled(!autoCaptureEnabled);
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  // Take picture
+                  takePicture();
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }}
                 style={({ pressed }) => ({
                   width: 80,
