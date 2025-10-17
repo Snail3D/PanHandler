@@ -511,49 +511,7 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Help button - top-right corner */}
-      {onHelp && (
-        <View
-        style={{
-          position: 'absolute',
-          top: insets.top + 16,
-          right: 70,
-        }}
-        >
-          <BlurView
-            intensity={30}
-            tint="light"
-            style={{
-              borderRadius: 20,
-              overflow: 'hidden',
-            }}
-          >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onHelp();
-              }}
-              style={({ pressed }) => ({
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: pressed ? 0.7 : 1,
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.3)',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-              })}
-            >
-              <Ionicons name="help-circle-outline" size={24} color="rgba(0, 0, 0, 0.7)" />
-            </Pressable>
-          </BlurView>
-        </View>
-      )}
+
 
       {/* Bottom Controls - New Layout: LOCK IN at top, coin selector + map button below */}
       {selectedCoin && (
@@ -616,8 +574,8 @@ export default function ZoomCalibration({
                 </Text>
               </Pressable>
 
-              {/* Bottom Row: Coin Selector + Map Button */}
-              <View style={{ flexDirection: 'row', gap: 12 }}>
+              {/* Bottom Row: Coin Selector + Help + Map Button */}
+              <View style={{ flexDirection: 'row', gap: 10 }}>
                 {/* Coin Selector Button - Opens search when tapped */}
                 <Pressable
                   onPress={() => {
@@ -629,30 +587,61 @@ export default function ZoomCalibration({
                     flex: 1,
                     backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
                     borderRadius: 16,
-                    paddingVertical: 16,
-                    paddingHorizontal: 12,
+                    paddingVertical: 14,
+                    paddingHorizontal: 10,
                     alignItems: 'center',
                     borderWidth: 1,
                     borderColor: 'rgba(0, 0, 0, 0.08)',
                   })}
                 >
-                  <Text style={{ fontSize: 22, marginBottom: 4 }}>🪙</Text>
+                  <Text style={{ fontSize: 20, marginBottom: 2 }}>🪙</Text>
                   <Text style={{ 
                     color: 'rgba(0, 0, 0, 0.9)', 
                     fontWeight: '700', 
-                    fontSize: 14,
+                    fontSize: 12,
                     textAlign: 'center',
                   }}>
                     {selectedCoin.name}
                   </Text>
                   <Text style={{ 
                     color: 'rgba(0, 0, 0, 0.5)', 
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: '600',
                   }}>
                     {selectedCoin.diameter}mm
                   </Text>
                 </Pressable>
+
+                {/* Help Button */}
+                {onHelp && (
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      onHelp();
+                    }}
+                    style={({ pressed }) => ({
+                      width: 70,
+                      backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                      borderRadius: 16,
+                      paddingVertical: 14,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: 'rgba(0, 0, 0, 0.08)',
+                    })}
+                  >
+                    <Ionicons name="help-circle-outline" size={28} color="rgba(0, 0, 0, 0.7)" />
+                    <Text style={{ 
+                      color: 'rgba(0, 0, 0, 0.7)', 
+                      fontWeight: '700', 
+                      fontSize: 11,
+                      marginTop: 2,
+                      textAlign: 'center',
+                    }}>
+                      Help
+                    </Text>
+                  </Pressable>
+                )}
 
                 {/* Map Button */}
                 {onSkipToMap && (
@@ -665,8 +654,8 @@ export default function ZoomCalibration({
                       flex: 1,
                       backgroundColor: pressed ? 'rgba(66, 165, 245, 0.9)' : 'rgba(66, 165, 245, 0.8)',
                       borderRadius: 16,
-                      paddingVertical: 16,
-                      paddingHorizontal: 12,
+                      paddingVertical: 14,
+                      paddingHorizontal: 10,
                       alignItems: 'center',
                       justifyContent: 'center',
                       borderWidth: 1,
@@ -677,8 +666,8 @@ export default function ZoomCalibration({
                     <Text style={{ 
                       color: 'white', 
                       fontWeight: '700', 
-                      fontSize: 14,
-                      marginTop: 4,
+                      fontSize: 12,
+                      marginTop: 2,
                       textAlign: 'center',
                     }}>
                       Map Scale
@@ -901,16 +890,17 @@ export default function ZoomCalibration({
           >
             <Text
               style={{
-                fontSize: 17,
-                fontWeight: '700', // Sexy fun font weight!
-                color: 'rgba(255, 255, 255, 0.85)', // Lighter color
+                fontSize: 16,
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.85)',
                 textAlign: 'center',
                 textShadowColor: 'rgba(0, 0, 0, 0.7)',
                 textShadowOffset: { width: 0, height: 1 },
                 textShadowRadius: 4,
+                lineHeight: 22,
               }}
             >
-              Make sure the right coin is selected
+              {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
             </Text>
           </Animated.View>
 
