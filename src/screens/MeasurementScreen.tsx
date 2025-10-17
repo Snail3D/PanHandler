@@ -1711,27 +1711,26 @@ export default function MeasurementScreen() {
                 left: 0, 
                 right: 0, 
                 zIndex: 10,
-                paddingBottom: insets.bottom + 32 
+                paddingBottom: insets.bottom + 40 
               }}
             >
               <View style={{ alignItems: 'center' }}>
-                {/* Photo Library Button */}
+                {/* Photo Library Button - Same size as shutter (80x80) */}
                 <Pressable
                   onPress={pickImage}
                   style={{ 
                     position: 'absolute', 
                     left: 32, 
                     bottom: 0, 
-                    width: 56, 
-                    height: 56, 
-                    borderRadius: 28, 
+                    width: 80, 
+                    height: 80, 
+                    borderRadius: 40, 
                     backgroundColor: 'rgba(31, 41, 55, 0.8)', 
                     alignItems: 'center', 
-                    justifyContent: 'center',
-                    marginBottom: 3 
+                    justifyContent: 'center'
                   }}
                 >
-                  <Ionicons name="images-outline" size={28} color="white" />
+                  <Ionicons name="images-outline" size={36} color="white" />
                 </Pressable>
 
                 {/* Instructional Text Sequence - Positioned halfway between crosshairs and bottom */}
