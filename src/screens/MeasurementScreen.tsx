@@ -95,6 +95,10 @@ export default function MeasurementScreen() {
   const recentAccelerations = useRef<number[]>([]); // Track phone motion
   const lastHapticRef = useRef<'good' | 'warning' | 'bad'>('bad');
   
+  // Low-pass filter for smooth sensor readings (reduce jitter)
+  const smoothedBeta = useRef<number>(0);
+  const smoothedGamma = useRef<number>(0);
+  
   // Adaptive guidance system
   const [guidanceMessage, setGuidanceMessage] = useState<string | null>(null);
   const guidanceOpacity = useSharedValue(0);
@@ -495,16 +499,26 @@ export default function MeasurementScreen() {
     }
 
     // Adjust update rate based on device capability
-    // Low-end devices: 150ms (6.7fps) - gentler on CPU/battery
-    // Normal devices: 100ms (10fps) - smooth but efficient
-    const updateInterval = isLowEndDevice ? 150 : 100;
+    // Low-end devices: 50ms (20fps) - smooth enough
+    // Normal devices: 16ms (60fps) - buttery smooth like real bubble level
+    const updateInterval = isLowEndDevice ? 50 : 16;
     DeviceMotion.setUpdateInterval(updateInterval);
 
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
-        const beta = data.rotation.beta * (180 / Math.PI);
-        const gamma = data.rotation.gamma * (180 / Math.PI);
+        const betaRaw = data.rotation.beta * (180 / Math.PI);
+        const gammaRaw = data.rotation.gamma * (180 / Math.PI);
         const alpha = data.rotation.alpha * (180 / Math.PI); // Rotation/roll
+        
+        // Apply low-pass filter (exponential moving average) to reduce jitter
+        // Alpha = 0.3 gives smooth motion without too much lag
+        const filterAlpha = 0.3;
+        smoothedBeta.current = smoothedBeta.current * (1 - filterAlpha) + betaRaw * filterAlpha;
+        smoothedGamma.current = smoothedGamma.current * (1 - filterAlpha) + gammaRaw * filterAlpha;
+        
+        // Use smoothed values for all calculations
+        const beta = smoothedBeta.current;
+        const gamma = smoothedGamma.current;
         const absBeta = Math.abs(beta);
         
         // Store for guidance system
@@ -593,16 +607,16 @@ export default function MeasurementScreen() {
             finalY = bubbleYOffset * scale;
           }
           
-          // VERTICAL MODE: Use same fluid spring as horizontal
+          // VERTICAL MODE: Higher stiffness for snappier, less jittery response
           bubbleX.value = withSpring(finalX, { 
-            damping: 15,
-            stiffness: 250,
-            mass: 0.5
+            damping: 20,
+            stiffness: 400,
+            mass: 0.3
           });
           bubbleY.value = withSpring(finalY, { 
-            damping: 15,
-            stiffness: 250,
-            mass: 0.5
+            damping: 20,
+            stiffness: 400,
+            mass: 0.3
           });
           
           // Update debug display (occasionally to avoid performance hit)
@@ -630,14 +644,14 @@ export default function MeasurementScreen() {
             finalY = bubbleYOffset * scale;
           }
           
-          bubbleX.value = withSpring(finalX, { damping: 15, stiffness: 250, mass: 0.5 }); // More fluid
-          bubbleY.value = withSpring(finalY, { damping: 15, stiffness: 250, mass: 0.5 }); // More fluid
+          bubbleX.value = withSpring(finalX, { damping: 20, stiffness: 400, mass: 0.3 }); // Snappier, less jitter
+          bubbleY.value = withSpring(finalY, { damping: 20, stiffness: 400, mass: 0.3 }); // Snappier, less jitter
         }
         
         // Calculate crosshair glow (0-1) based on how centered the bubble is
         const distanceFromCenter = Math.sqrt(bubbleX.value * bubbleX.value + bubbleY.value * bubbleY.value);
         const glowAmount = Math.max(0, 1 - (distanceFromCenter / 15)); // Glow when within 15px of center
-        crosshairGlow.value = withSpring(glowAmount, { damping: 15, stiffness: 200 });
+        crosshairGlow.value = withSpring(glowAmount, { damping: 20, stiffness: 400 });
         
         // Check BOTH angle stability AND motion stability
         // Accessibility: After 10 seconds of holding, loosen requirements for Parkinson's/tremor support
