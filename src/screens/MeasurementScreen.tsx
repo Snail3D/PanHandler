@@ -567,13 +567,24 @@ export default function MeasurementScreen() {
           const bubbleXOffset = (adjustedBetaDeviation / 20) * maxBubbleOffset; // Forward/back
           const bubbleYOffset = -(adjustedGamma / 20) * maxBubbleOffset; // Left/right rotation (inverted)
           
+          // Clamp to circular boundary (stay within crosshairs)
+          const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
+          let finalX = bubbleXOffset;
+          let finalY = bubbleYOffset;
+          
+          if (distance > maxBubbleOffset) {
+            const scale = maxBubbleOffset / distance;
+            finalX = bubbleXOffset * scale;
+            finalY = bubbleYOffset * scale;
+          }
+          
           // VERTICAL MODE: Both axes move smoothly
-          bubbleX.value = withSpring(bubbleXOffset, { 
+          bubbleX.value = withSpring(finalX, { 
             damping: 40,
             stiffness: 100,
             mass: 1.5
           });
-          bubbleY.value = withSpring(bubbleYOffset, { 
+          bubbleY.value = withSpring(finalY, { 
             damping: 40,
             stiffness: 100,
             mass: 1.5
@@ -1528,17 +1539,9 @@ export default function MeasurementScreen() {
             >
               <Pressable
                 onPress={() => {
-                  if (!autoCaptureEnabled) {
-                    // Enable auto-capture mode
-                    setAutoCaptureEnabled(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  } else {
-                    // Manual capture if already enabled
-                    if (cameraRef.current) {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      takePicture();
-                    }
-                  }
+                  // Toggle auto-capture mode
+                  setAutoCaptureEnabled(!autoCaptureEnabled);
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 }}
                 style={({ pressed }) => ({
                   width: 80,
