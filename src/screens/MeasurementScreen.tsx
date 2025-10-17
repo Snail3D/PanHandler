@@ -559,7 +559,7 @@ export default function MeasurementScreen() {
           //   - gamma < 0 = tilts left → ball rolls RIGHT (positive X, inverted for real physics)
           
           // Calculate deviation from 90° (perfect vertical)
-          const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
+          const betaDeviation = beta - 90; // Positive = forward, negative = backward
           
           // IMPORTANT: In vertical mode, gamma can be offset by ~180°
           // Normalize gamma to -180 to +180 range centered around vertical orientation
@@ -568,9 +568,9 @@ export default function MeasurementScreen() {
             normalizedGamma = gamma - 180; // Convert 179° to -1°, 90° to -90°, etc.
           }
           
-          // Use same formula as horizontal mode (which works well!)
-          const bubbleXOffset = (normalizedGamma / 15) * maxBubbleOffset; // Left/right tilt → X movement
-          const bubbleYOffset = -(forwardBackwardTilt / 15) * maxBubbleOffset; // Forward/back tilt → Y movement (INVERTED for homing guide)
+          // Use EXACT same formula as horizontal mode (which works perfectly!)
+          const bubbleXOffset = -(normalizedGamma / 15) * maxBubbleOffset; // Same as horizontal
+          const bubbleYOffset = (betaDeviation / 15) * maxBubbleOffset; // Use beta deviation instead of raw beta
           
           // Clamp to circular boundary (stay within crosshairs)
           const distance = Math.sqrt(bubbleXOffset * bubbleXOffset + bubbleYOffset * bubbleYOffset);
@@ -826,18 +826,11 @@ export default function MeasurementScreen() {
   }));
   
   const bubbleStyle = useAnimatedStyle(() => ({
-    transform: isVerticalMode.value
-      ? [
-          // Crosshair rotates 90° clockwise in vertical mode
-          // After 90° CW rotation: Physical Y becomes Visual X, Physical X becomes Visual -Y
-          { translateX: bubbleY.value + 60 - 7 },  // beta/tilt → visual left/right
-          { translateY: -bubbleX.value + 60 - 7 }, // gamma/rotation → visual up/down (negated)
-        ]
-      : [
-          // Normal mapping in horizontal mode
-          { translateX: bubbleX.value + 60 - 7 },
-          { translateY: bubbleY.value + 60 - 7 },
-        ],
+    // SAME mapping for both modes - no swapping!
+    transform: [
+      { translateX: bubbleX.value + 60 - 7 },
+      { translateY: bubbleY.value + 60 - 7 },
+    ],
   }));
   
   const centerDotStyle = useAnimatedStyle(() => ({
