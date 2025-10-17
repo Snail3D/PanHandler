@@ -2110,21 +2110,23 @@ export default function MeasurementScreen() {
                         }, 500);
                       } else {
                         // Full reset: Clear everything and go to camera
-                        setMode('camera');
-                        
-                        // Clear image state so camera shows up
-                        setImageUri(null);
+                        // Clear measurements BEFORE setting imageUri to null (avoid AsyncStorage write)
+                        setCompletedMeasurements([]); // Clear measurements
+                        setCurrentPoints([]); // Clear points
                         setCoinCircle(null);
                         setCalibration(null);
                         setImageOrientation(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        setCompletedMeasurements([]); // Clear measurements
-                        setCurrentPoints([]); // Clear points
+                        
+                        setMode('camera');
+                        
+                        // Clear image state so camera shows up (do this LAST)
+                        setImageUri(null);
                         
                         // Camera's useEffect will handle the fade in
                         setTimeout(() => {
                           setIsTransitioning(false);
-                        }, 1800); // Wait for camera fade in
+                        }, 800); // Reduced from 1800ms - camera fades in faster than this
                       }
                     }, 300); // Wait for black fade to complete
                   }}
