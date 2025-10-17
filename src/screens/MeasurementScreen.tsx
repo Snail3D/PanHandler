@@ -1488,48 +1488,87 @@ export default function MeasurementScreen() {
                         Capturing...
                       </Text>
                     )}
-                    
-                    {/* Manual capture button - shows when stable and aligned */}
-                    {!isCapturing && alignmentStatus === 'good' && isStable && (
-                      <Pressable
-                        onPress={() => {
-                          if (cameraRef.current) {
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                            takePicture();
-                          }
-                        }}
-                        style={({ pressed }) => ({
-                          marginTop: 20,
-                          backgroundColor: pressed ? 'rgba(76, 175, 80, 0.9)' : 'rgba(76, 175, 80, 1)',
-                          paddingVertical: 16,
-                          paddingHorizontal: 32,
-                          borderRadius: 30,
-                          shadowColor: '#4CAF50',
-                          shadowOffset: { width: 0, height: 4 },
-                          shadowOpacity: 0.6,
-                          shadowRadius: 12,
-                          elevation: 8,
-                        })}
-                      >
-                        <Text
-                          style={{
-                            color: 'white',
-                            fontSize: 20,
-                            fontWeight: '800',
-                            textAlign: 'center',
-                            letterSpacing: 0.5,
-                            textTransform: 'uppercase',
-                          }}
-                        >
-                          📸 Press Now to Begin
-                        </Text>
-                      </Pressable>
-                    )}
                   </View>
                 )}
               </View>
             </View>
           </CameraView>
+          
+          {/* Bottom Shutter Button */}
+          {!isCapturing && (
+            <View
+              style={{
+                position: 'absolute',
+                bottom: insets.bottom + 40,
+                left: 0,
+                right: 0,
+                alignItems: 'center',
+                zIndex: 20,
+              }}
+            >
+              <Pressable
+                onPress={() => {
+                  if (!autoCaptureEnabled) {
+                    // Enable auto-capture mode
+                    setAutoCaptureEnabled(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  } else {
+                    // Manual capture if already enabled
+                    if (cameraRef.current) {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      takePicture();
+                    }
+                  }
+                }}
+                style={({ pressed }) => ({
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: autoCaptureEnabled 
+                    ? (pressed ? 'rgba(76, 175, 80, 0.8)' : 'rgba(76, 175, 80, 1)') 
+                    : (pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.9)'),
+                  borderWidth: 5,
+                  borderColor: autoCaptureEnabled ? '#4CAF50' : 'white',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowColor: autoCaptureEnabled ? '#4CAF50' : '#000',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.6,
+                  shadowRadius: 12,
+                  elevation: 10,
+                })}
+              >
+                {autoCaptureEnabled ? (
+                  <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
+                ) : (
+                  <View style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: 30,
+                    backgroundColor: 'white',
+                    borderWidth: 3,
+                    borderColor: '#333',
+                  }} />
+                )}
+              </Pressable>
+              
+              {/* Status text below button */}
+              <Text
+                style={{
+                  marginTop: 12,
+                  color: 'white',
+                  fontSize: 14,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 4,
+                }}
+              >
+                {autoCaptureEnabled ? '✓ Auto-Capture Active' : 'Tap to Begin'}
+              </Text>
+            </View>
+          )}
           
           {/* Tap-to-Focus Indicator */}
           {focusPoint && (
