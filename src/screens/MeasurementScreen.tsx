@@ -88,7 +88,7 @@ export default function MeasurementScreen() {
   // Auto-capture states
   const [isHoldingShutter, setIsHoldingShutter] = useState(false);
   const [autoCaptureEnabled, setAutoCaptureEnabled] = useState(false); // User must tap to enable
-  const [showAutoCaptureButton, setShowAutoCaptureButton] = useState(true); // Show button initially
+  const [showAutoCaptureButton, setShowAutoCaptureButton] = useState(false); // Hide auto-capture button - users can use bubble level and tap shutter
   const autoCaptureButtonOpacity = useSharedValue(1); // For fade animation
   const [tiltAngle, setTiltAngle] = useState(0);
   const [isStable, setIsStable] = useState(false);
