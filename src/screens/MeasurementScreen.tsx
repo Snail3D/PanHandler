@@ -143,6 +143,12 @@ export default function MeasurementScreen() {
   const focusIndicatorOpacity = useSharedValue(0);
   const focusIndicatorScale = useSharedValue(1);
   
+  // Debug: Display sensor values on screen
+  const [debugGamma, setDebugGamma] = useState(0);
+  const [debugBeta, setDebugBeta] = useState(0);
+  const [debugBubbleX, setDebugBubbleX] = useState(0);
+  const [debugBubbleY, setDebugBubbleY] = useState(0);
+  
   const cameraRef = useRef<CameraView>(null);
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
@@ -547,8 +553,8 @@ export default function MeasurementScreen() {
           //
           // LEFT/RIGHT TILT (gamma): 
           //   - gamma ~0° = no tilt (ball centered)
-          //   - gamma > 0 = tilts right → ball rolls RIGHT (positive X)
-          //   - gamma < 0 = tilts left → ball rolls LEFT (negative X)
+          //   - gamma > 0 = tilts right → ball rolls LEFT (negative X, inverted for real physics)
+          //   - gamma < 0 = tilts left → ball rolls RIGHT (positive X, inverted for real physics)
           
           // Calculate deviation from 90° (perfect vertical)
           const forwardBackwardTilt = beta - 90; // Positive = forward, negative = backward
@@ -565,7 +571,7 @@ export default function MeasurementScreen() {
           }
           
           // Map to bubble movement (real physics)
-          const bubbleXOffset = (adjustedLeftRight / 15) * maxBubbleOffset; // Left/right tilt → X movement
+          const bubbleXOffset = -(adjustedLeftRight / 15) * maxBubbleOffset; // Left/right tilt → X movement (inverted)
           const bubbleYOffset = (adjustedForwardBackward / 15) * maxBubbleOffset; // Forward/back tilt → Y movement
           
           // Clamp to circular boundary (stay within crosshairs)
@@ -590,6 +596,14 @@ export default function MeasurementScreen() {
             stiffness: 100,
             mass: 1.5
           });
+          
+          // Update debug display (occasionally to avoid performance hit)
+          if (Math.random() < 0.1) {
+            setDebugGamma(gamma);
+            setDebugBeta(beta);
+            setDebugBubbleX(finalX);
+            setDebugBubbleY(finalY);
+          }
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
@@ -1233,6 +1247,35 @@ export default function MeasurementScreen() {
                 <View style={{ width: 40, height: 40 }} />
               </View>
             </View>
+
+            {/* Debug Display - Top Left */}
+            {mode === 'camera' && (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: insets.top + 60,
+                  left: 20,
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  padding: 12,
+                  borderRadius: 8,
+                  zIndex: 100,
+                }}
+                pointerEvents="none"
+              >
+                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                  gamma: {debugGamma.toFixed(1)}°
+                </Text>
+                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                  beta: {debugBeta.toFixed(1)}°
+                </Text>
+                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                  bubbleX: {debugBubbleX.toFixed(1)}px
+                </Text>
+                <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
+                  bubbleY: {debugBubbleY.toFixed(1)}px
+                </Text>
+              </View>
+            )}
 
             {/* Crosshairs overlay - center of screen */}
             <Animated.View 
