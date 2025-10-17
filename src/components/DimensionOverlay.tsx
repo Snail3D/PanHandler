@@ -1090,11 +1090,12 @@ export default function DimensionOverlay({
   // moveMode: when true (moving points), use larger threshold (7mm) for easier snapping
   const snapToNearbyPoint = (cursorX: number, cursorY: number, moveMode: boolean = false): { x: number, y: number, snapped: boolean } => {
     // Calculate snap distance in pixels based on calibration
-    // Use larger threshold (7mm ~ half fingertip) when moving points, normal (1mm) when placing
-    const SNAP_DISTANCE_MM = moveMode ? 7 : 1;
+    // Use very small threshold (0.5mm) when moving points for smooth, fluid movement
+    // Only snap when VERY close to another point
+    const SNAP_DISTANCE_MM = moveMode ? 0.5 : 1;
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
-      : (moveMode ? 60 : 30); // fallback pixels if not calibrated
+      : (moveMode ? 5 : 30); // fallback pixels if not calibrated (5px when moving, very tight)
     
     // Check all existing measurement points
     for (const measurement of measurements) {

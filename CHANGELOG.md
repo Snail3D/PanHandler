@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Alpha v2.1.6] - 2025-10-17
+
+### 🎯 Smooth, Fluid Point Movement
+
+#### ✨ Enhancement
+- **Reduced Snap Threshold for Fluid Movement** - Rectangle/point adjustment now smooth instead of chunky
+  - Snap distance when moving: 7mm → **0.5mm** (14x tighter!)
+  - Pixel snap radius: ~70px → **~5px** (dramatic reduction)
+  - Movement feels smooth and fluid, not blocky
+  - Still snaps for alignment, but only when VERY close to another point
+  - Applies to all point dragging: rectangles, polygons, distance, angle
+  
+#### 🎯 User Experience
+- **Before**: Chunky, blocky movement with huge "magnetic" snap zones
+- **After**: Smooth, fluid movement with pinpoint snap accuracy
+- Snap still helps with alignment when needed
+- Natural, predictable behavior
+
+#### 🔧 Technical Changes
+- `SNAP_DISTANCE_MM` for moveMode: 7 → 0.5
+- Fallback snap pixels: 60 → 5
+- Comment updated for clarity
+
+#### 📁 Files Modified
+- `src/components/DimensionOverlay.tsx` - Snap threshold (lines 1094-1098)
+- `app.json` - Version bump to 2.1.6
+
+#### 📚 Documentation
+- `V2.1.6_SMOOTH_MOVEMENT.md` - Full implementation details
+
+---
+
 ## [Alpha v2.1.5] - 2025-10-17
 
 ### 🐛 Photo Library Button Fix
