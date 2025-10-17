@@ -1,24 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import { DeviceMotion } from 'expo-sensors';
+import { Ionicons } from '@expo/vector-icons';
 
 type DiagnosticStep = {
   id: string;
+  title: string;
   instruction: string;
+  icon: keyof typeof Ionicons.glyphMap;
   duration: number; // seconds to hold position
 };
 
 const steps: DiagnosticStep[] = [
-  { id: 'vertical-level', instruction: 'Hold phone VERTICAL and LEVEL (upright, not tilted)', duration: 3 },
-  { id: 'look-down', instruction: 'Tilt phone FORWARD (look down at table)', duration: 3 },
-  { id: 'look-up', instruction: 'Tilt phone BACKWARD (look up at ceiling)', duration: 3 },
-  { id: 'rotate-90', instruction: 'Hold VERTICAL and LEVEL, then ROTATE 90° clockwise', duration: 3 },
-  { id: 'rotate-180', instruction: 'Hold VERTICAL and LEVEL, then ROTATE 180° (upside down)', duration: 3 },
-  { id: 'rotate-270', instruction: 'Hold VERTICAL and LEVEL, then ROTATE 270° counter-clockwise', duration: 3 },
+  { 
+    id: 'vertical-level', 
+    title: 'Normal Portrait',
+    instruction: 'Hold phone upright like you\'re taking a selfie.\nKeep it level (not tilted forward or back).', 
+    icon: 'phone-portrait-outline',
+    duration: 3 
+  },
+  { 
+    id: 'look-down', 
+    title: 'Tilt Down',
+    instruction: 'Keep phone upright, but tilt the TOP forward.\nLike you\'re looking down at a coin on a table.', 
+    icon: 'arrow-down-circle-outline',
+    duration: 3 
+  },
+  { 
+    id: 'look-up', 
+    title: 'Tilt Up',
+    instruction: 'Keep phone upright, but tilt the TOP backward.\nLike you\'re looking up at the ceiling.', 
+    icon: 'arrow-up-circle-outline',
+    duration: 3 
+  },
+  { 
+    id: 'twist-right', 
+    title: 'Twist Right',
+    instruction: 'Hold phone upright and level.\nThen twist/spin it like turning a steering wheel clockwise.', 
+    icon: 'reload-outline',
+    duration: 3 
+  },
 ];
 
 type SensorReading = {
   stepId: string;
+  title: string;
   instruction: string;
   alpha: number;
   beta: number;
@@ -46,6 +72,7 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
         
         const reading: SensorReading = {
           stepId: steps[currentStepIndex].id,
+          title: steps[currentStepIndex].title,
           instruction: steps[currentStepIndex].instruction,
           alpha,
           beta,
@@ -135,9 +162,12 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
               
               return (
                 <View key={step.id} style={{ marginBottom: 20, padding: 15, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 8 }}>
-                  <Text style={{ color: '#60A5FA', fontSize: 14, fontWeight: 'bold', marginBottom: 8 }}>
-                    {step.instruction}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name={step.icon} size={24} color="#60A5FA" style={{ marginRight: 10 }} />
+                    <Text style={{ color: '#60A5FA', fontSize: 16, fontWeight: 'bold' }}>
+                      {step.title}
+                    </Text>
+                  </View>
                   <Text style={{ color: 'white', fontSize: 12, fontFamily: 'monospace' }}>
                     Alpha (rotation): {avg.alpha.toFixed(1)}°
                   </Text>
@@ -185,11 +215,22 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <View style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: 30, borderRadius: 16, width: '100%', maxWidth: 400 }}>
-          <Text style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', marginBottom: 10 }}>
+          <Text style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', marginBottom: 20 }}>
             Step {currentStepIndex + 1} of {steps.length}
           </Text>
           
-          <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 30 }}>
+          {/* Big Icon */}
+          <View style={{ alignItems: 'center', marginBottom: 20 }}>
+            <Ionicons name={currentStep.icon} size={80} color="#3B82F6" />
+          </View>
+          
+          {/* Title */}
+          <Text style={{ color: 'white', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 15 }}>
+            {currentStep.title}
+          </Text>
+          
+          {/* Instructions */}
+          <Text style={{ color: '#D1D5DB', fontSize: 16, textAlign: 'center', marginBottom: 30, lineHeight: 24 }}>
             {currentStep.instruction}
           </Text>
 
@@ -205,10 +246,10 @@ export default function DiagnosticScreen({ onComplete }: { onComplete: () => voi
           ) : (
             <Pressable
               onPress={startRecording}
-              style={{ backgroundColor: '#3B82F6', padding: 20, borderRadius: 8, alignItems: 'center' }}
+              style={{ backgroundColor: '#10B981', padding: 20, borderRadius: 12, alignItems: 'center' }}
             >
               <Text style={{ color: 'white', fontSize: 18, fontWeight: '600' }}>
-                Start Recording
+                Ready - Start Recording
               </Text>
             </Pressable>
           )}
