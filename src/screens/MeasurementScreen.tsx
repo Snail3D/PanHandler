@@ -1220,12 +1220,18 @@ export default function MeasurementScreen() {
     setIsCapturing(false);
     setIsTransitioning(false);
     setIsHoldingShutter(false); // Reset hold state
-    // Clear the image so camera can take new photos
-    setImageUri(null);
+    
+    // Clear calibration data
     setCoinCircle(null);
     setCalibration(null);
-    setMode('camera'); // Go back to camera
     setSelectedCoin(null);
+    
+    // IMPORTANT: Set mode to camera BEFORE clearing image
+    // This prevents race condition with useEffect that watches imageUri
+    setMode('camera');
+    
+    // Clear the image after mode change
+    setImageUri(null);
     
     __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
   };
