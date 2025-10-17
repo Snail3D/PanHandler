@@ -421,7 +421,8 @@ export default function BattlingBotsModal({
               elevation: 20,
             }}
           >
-                {stage === 'negotiation' ? (
+            <View>
+              {stage === 'negotiation' ? (
                   // Negotiation Stage
                   <View style={{ padding: 24 }}>
                     {/* Title */}
@@ -746,10 +747,10 @@ export default function BattlingBotsModal({
                   </Animated.View>
                 )}
               </View>
-            </View>
           </View>
-        </BlurView>
-      </Modal>
-    );
-  }
+        </View>
+      </BlurView>
+    </Modal>
+  );
+}
   
