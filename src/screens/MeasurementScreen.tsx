@@ -536,16 +536,23 @@ export default function MeasurementScreen() {
           // - gamma ~0° = phone is upright (centered)
           // - Positive gamma = phone tilts right = bubble goes LEFT (inverted)
           // - Negative gamma = phone tilts left = bubble goes RIGHT (inverted)
-          const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Use gamma for left/right when vertical
+          
+          // Add deadzone for centering - when gamma is between -2° and 2°, snap to center
+          let adjustedGamma = gamma;
+          if (Math.abs(gamma) < 2) {
+            adjustedGamma = 0; // Snap to center for better "locked in" feel
+          }
+          
+          const bubbleXOffset = -(adjustedGamma / 15) * maxBubbleOffset; // Use gamma for left/right when vertical
           
           // VERTICAL MODE: Much heavier damping for smoother movement
           // Higher damping = slower, smoother response (less jerky)
           bubbleX.value = withSpring(bubbleXOffset, { 
-            damping: 35,      // Was 20, now much heavier
-            stiffness: 120,   // Was 180, now softer
-            mass: 1.2         // Was 0.8, now heavier (more inertia)
+            damping: 40,      // Increased from 35 for even smoother
+            stiffness: 100,   // Decreased from 120 for gentler
+            mass: 1.5         // Increased from 1.2 for more weight/inertia
           });
-          bubbleY.value = withSpring(0, { damping: 35, stiffness: 120, mass: 1.2 }); // Lock Y to center when vertical
+          bubbleY.value = withSpring(0, { damping: 40, stiffness: 100, mass: 1.5 }); // Lock Y to center when vertical
         } else {
           // HORIZONTAL MODE: Both X and Y movement
           const bubbleXOffset = -(gamma / 15) * maxBubbleOffset; // Left/right tilt (inverted)
