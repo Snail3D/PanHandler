@@ -142,6 +142,7 @@ export default function DimensionOverlay({
   
   // Use store for persistent state
   const calibration = useStore((s) => s.calibration);
+  const setCalibration = useStore((s) => s.setCalibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const setUnitSystem = useStore((s) => s.setUnitSystem);
   const prevUnitSystemRef = useRef(unitSystem); // Track previous unit system to avoid infinite loops
@@ -1129,6 +1130,21 @@ export default function DimensionOverlay({
 
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
+    // Special case: Map Mode + Angle mode + placing second point (north reference) → ALWAYS lock to vertical
+    if (isMapMode && mode === 'angle' && currentPoints.length === 1) {
+      const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+      const dy = cursorY - firstPoint.y;
+      
+      // Don't snap if too close to first point (less than 20px)
+      const distance = Math.abs(dy);
+      if (distance < 20) {
+        return { x: cursorX, y: cursorY, snapped: false };
+      }
+      
+      // ALWAYS lock to vertical line (north reference)
+      return { x: firstPoint.x, y: cursorY, snapped: true };
+    }
+    
     // Snap when placing second point in distance mode OR second point in angle mode (before vertex) OR blueprint mode
     const shouldSnap = (mode === 'distance' && currentPoints.length === 1) || 
                        (mode === 'angle' && currentPoints.length === 1) ||
@@ -7215,6 +7231,43 @@ export default function DimensionOverlay({
           setMapScale(scale);
           setIsMapMode(true);
           setShowMapScaleModal(false);
+          
+          // Create calibration from verbal scale
+          // Convert screen measurement to pixels
+          const DPI = 160; // Standard Android DPI (iOS ~163, but 160 is close enough)
+          const pixelsPerInch = DPI;
+          const pixelsPerCm = DPI / 2.54;
+          
+          const screenPixels = scale.screenUnit === 'cm' 
+            ? scale.screenDistance * pixelsPerCm 
+            : scale.screenDistance * pixelsPerInch;
+          
+          // Convert real-world distance to mm for calibration
+          let realDistanceMm = 0;
+          if (scale.realUnit === 'km') {
+            realDistanceMm = scale.realDistance * 1000000; // km to mm
+          } else if (scale.realUnit === 'mi') {
+            realDistanceMm = scale.realDistance * 1609344; // mi to mm
+          } else if (scale.realUnit === 'm') {
+            realDistanceMm = scale.realDistance * 1000; // m to mm
+          } else if (scale.realUnit === 'ft') {
+            realDistanceMm = scale.realDistance * 304.8; // ft to mm
+          }
+          
+          // Calculate pixels per mm
+          const pixelsPerMm = screenPixels / realDistanceMm;
+          
+          // Create calibration object
+          const newCalibration = {
+            pixelsPerUnit: pixelsPerMm,
+            unit: 'mm' as const,
+            referenceDistance: realDistanceMm,
+            calibrationType: 'verbal' as const,
+            verbalScale: scale,
+          };
+          
+          setCalibration(newCalibration);
+          
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }}
         onBlueprintMode={() => {
