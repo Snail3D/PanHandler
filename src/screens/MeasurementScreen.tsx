@@ -1130,8 +1130,7 @@ export default function MeasurementScreen() {
           }, 50); // Start animations quickly after flash
         } else {
           // Vertical/portrait photo → Show photo type selection menu
-          console.log('📷 🔴🔴🔴 PORTRAIT PHOTO DETECTED (wall view) → Show photo type menu 🔴🔴🔴');
-          alert('PORTRAIT DETECTED - Should show menu!');
+          console.log('📷 PORTRAIT PHOTO DETECTED (wall view) → Show photo type menu');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
@@ -1147,9 +1146,8 @@ export default function MeasurementScreen() {
             setPendingPhotoUri(photo.uri);
             
             setTimeout(() => {
-              console.log('🔴 ABOUT TO SHOW MODAL');
+              console.log('🔴 Setting showPhotoTypeModal to TRUE');
               setShowPhotoTypeModal(true);
-              console.log('🔴 MODAL STATE SET TO TRUE');
               
               // Defer AsyncStorage write
               setTimeout(() => {
@@ -2207,14 +2205,6 @@ export default function MeasurementScreen() {
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-        
-        {/* Photo Type Selection Modal - For imported photos */}
-        <PhotoTypeSelectionModal
-          visible={showPhotoTypeModal}
-          onSelect={handlePhotoTypeSelection}
-          onCancel={() => setShowPhotoTypeModal(false)}
-          sessionColor={crosshairColor}
-        />
       </View>
     );
   }
@@ -2383,6 +2373,14 @@ export default function MeasurementScreen() {
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      
+      {/* Photo Type Selection Modal - Works in all modes */}
+      <PhotoTypeSelectionModal
+        visible={showPhotoTypeModal}
+        onSelect={handlePhotoTypeSelection}
+        onCancel={() => setShowPhotoTypeModal(false)}
+        sessionColor={crosshairColor}
+      />
       
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
