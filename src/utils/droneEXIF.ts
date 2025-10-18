@@ -733,31 +733,14 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         altitudeToUse = relativeAltitude;
         altitudeSource = 'XMP RelativeAltitude (AGL)';
       } 
-      // PRIORITY 2: Calculate from phone's current GPS altitude (GROUND REFERENCE METHOD!)
+      // PRIORITY 2: Manual altitude entry (reliable and user-friendly!)
       else {
-        console.log('🎯 XMP RelativeAltitude not found - using GROUND REFERENCE method');
-        alert('📍 STARTING GROUND REFERENCE - requesting phone location...');
-        
-        try {
-          const phoneAlt = await getPhoneAltitude();
-          
-          if (!phoneAlt) {
-            alert('⚠️ GROUND REFERENCE FAILED\n\nCould not get phone location.\nCheck location permissions!');
-            altitudeToUse = gps.altitude;
-            altitudeSource = 'GPS ASL (no phone location)';
-          } else if (!phoneAlt.altitude) {
-            alert('⚠️ GROUND REFERENCE FAILED\n\nPhone GPS has no altitude data!');
-            altitudeToUse = gps.altitude;
-            altitudeSource = 'GPS ASL (no altitude from phone)';
-          } else {
-          // Phone altitude received successfully!
-          
-          // Validate if ground reference is reliable based on GPS distance
-          const validation = validateGroundReference(
-            gps.latitude,
-            gps.longitude,
-            phoneAlt.latitude,
-            phoneAlt.longitude
+        console.log('🎯 XMP RelativeAltitude not found - will prompt for manual entry');
+        // Use temporary GPS altitude - UI will show manual entry modal
+        altitudeToUse = gps.altitude;
+        altitudeSource = 'Manual entry required';
+        // Note: The actual manual entry will happen in MeasurementScreen
+      }
           );
           
           console.log(`📏 Ground Reference Validation: ${validation.decision.toUpperCase()}`);
