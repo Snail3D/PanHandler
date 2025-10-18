@@ -70,6 +70,12 @@ interface MeasurementStore {
   globalDownloads: number; // Global download count (fetched from backend)
   hasSeenPinchTutorial: boolean; // Track if user has seen pinch-zoom tutorial
   hasSeenPanTutorial: boolean; // Track if user has seen pan tutorial on measurement screen
+  isDonor: boolean; // True if user clicked "Support Snail" button (donation tracking)
+  lastDonationSession: number; // Which session they donated at (for 40-session timer)
+  isFirstTimeDonor: boolean; // True only for the FIRST donation (to show special badge animation)
+  asteroidsHighScore: number; // Persistent high score for Asteroids easter egg game
+  panButtonTapCount: number; // Track taps on Pan button for Asteroids trigger (10 taps)
+  lastPanButtonTapTime: number; // Timestamp of last tap (reset if > 3 seconds)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
@@ -96,6 +102,11 @@ interface MeasurementStore {
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
   setHasSeenPinchTutorial: (hasSeen: boolean) => void;
   setHasSeenPanTutorial: (hasSeen: boolean) => void;
+  setIsDonor: (isDonor: boolean, sessionNumber?: number) => void; // Mark user as donor and set donation session
+  setIsFirstTimeDonor: (isFirst: boolean) => void; // Control first-time donor badge animation
+  setAsteroidsHighScore: (score: number) => void; // Update Asteroids high score
+  incrementPanButtonTap: () => void; // Increment tap count for Asteroids trigger
+  resetPanButtonTaps: () => void; // Reset tap counter
 }
 
 const useStore = create<MeasurementStore>()(
@@ -124,6 +135,12 @@ const useStore = create<MeasurementStore>()(
       globalDownloads: 1247,
       hasSeenPinchTutorial: false,
       hasSeenPanTutorial: false,
+      isDonor: false,
+      lastDonationSession: 0,
+      isFirstTimeDonor: false,
+      asteroidsHighScore: 0,
+      panButtonTapCount: 0,
+      lastPanButtonTapTime: 0,
 
       setImageUri: (uri, isAutoCaptured = false) => set((state) => { 
         // If setting a NEW image (not null), clear all measurements/calibration
@@ -238,6 +255,37 @@ const useStore = create<MeasurementStore>()(
       setHasSeenPinchTutorial: (hasSeen: boolean) => set({ hasSeenPinchTutorial: hasSeen }),
       
       setHasSeenPanTutorial: (hasSeen: boolean) => set({ hasSeenPanTutorial: hasSeen }),
+      
+      setIsDonor: (isDonor: boolean, sessionNumber?: number) => set((state) => ({
+        isDonor,
+        lastDonationSession: sessionNumber !== undefined ? sessionNumber : state.sessionCount,
+        isFirstTimeDonor: !state.isDonor && isDonor, // True only if transitioning from non-donor to donor
+      })),
+      
+      setIsFirstTimeDonor: (isFirst: boolean) => set({ isFirstTimeDonor: isFirst }),
+      
+      setAsteroidsHighScore: (score: number) => set({ asteroidsHighScore: score }),
+      
+      incrementPanButtonTap: () => set((state) => {
+        const now = Date.now();
+        const timeSinceLastTap = now - state.lastPanButtonTapTime;
+        
+        // Reset counter if more than 3 seconds since last tap
+        if (timeSinceLastTap > 3000) {
+          return {
+            panButtonTapCount: 1,
+            lastPanButtonTapTime: now,
+          };
+        }
+        
+        // Increment counter
+        return {
+          panButtonTapCount: state.panButtonTapCount + 1,
+          lastPanButtonTapTime: now,
+        };
+      }),
+      
+      resetPanButtonTaps: () => set({ panButtonTapCount: 0, lastPanButtonTapTime: 0 }),
     }),
     {
       name: 'measurement-settings',
@@ -253,6 +301,12 @@ const useStore = create<MeasurementStore>()(
         hasReviewedApp: state.hasReviewedApp, // Persist review status
         lastReviewPromptDate: state.lastReviewPromptDate, // Persist last prompt date
         hasSeenPinchTutorial: state.hasSeenPinchTutorial, // Persist tutorial state
+        isDonor: state.isDonor, // Persist donor status
+        lastDonationSession: state.lastDonationSession, // Persist donation session number
+        isFirstTimeDonor: state.isFirstTimeDonor, // Persist first-time donor flag
+        asteroidsHighScore: state.asteroidsHighScore, // Persist Asteroids high score
+        // panButtonTapCount: DON'T persist - resets each session
+        // lastPanButtonTapTime: DON'T persist - resets each session
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
         // Persist current work session
         currentImageUri: state.currentImageUri,

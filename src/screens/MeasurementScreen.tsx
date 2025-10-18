@@ -230,24 +230,29 @@ export default function MeasurementScreen() {
   const setCurrentPoints = useStore((s) => s.setCurrentPoints);
   const sessionCount = useStore((s) => s.sessionCount);
   const incrementSessionCount = useStore((s) => s.incrementSessionCount);
+  const isDonor = useStore((s) => s.isDonor);
+  const lastDonationSession = useStore((s) => s.lastDonationSession);
   
   // BattlingBots donation modal state  
   const [showBattlingBots, setShowBattlingBots] = useState(false);
   
-  // Track sessions and trigger BattlingBots modal every 10 sessions
+  // Track sessions and trigger BattlingBots modal (10 sessions for non-donors, 40 for donors)
   useEffect(() => {
     // Increment session count
     incrementSessionCount();
     
-    // Check if we should trigger BattlingBots (every 10 sessions: 10, 20, 30, etc.)
     const newSessionCount = sessionCount + 1; // Account for the increment we just did
     
-    if (newSessionCount % 10 === 0) {
+    // Determine trigger interval based on donor status
+    const triggerInterval = isDonor ? 40 : 10;
+    
+    // Check if we should trigger BattlingBots
+    if (newSessionCount % triggerInterval === 0) {
       // Show BattlingBots after a delay
       setTimeout(() => {
         setShowBattlingBots(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        console.log(`🤖 BattlingBots triggered at session ${newSessionCount}`);
+        console.log(`🤖 BattlingBots triggered at session ${newSessionCount} (${isDonor ? 'DONOR' : 'NON-DONOR'} mode)`);
       }, 2000); // Show 2s after app opens
     }
   }, []); // Only on mount
