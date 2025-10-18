@@ -6604,7 +6604,9 @@ export default function DimensionOverlay({
             top: insets.top + 16, // Same vertical position as AUTO LEVEL
             right: isAutoCaptured 
               ? 118  // Position right next to AUTO LEVEL badge (with small gap)
-              : 16,  // Position in top right when AUTO LEVEL is hidden
+              : (coinCircle || calibration || mapScale) 
+                ? 118  // Position left of Calibrated badge when no AUTO LEVEL
+                : 16,  // Position in top right when no badges present
             backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(100, 149, 237, 0.85)', // Session color with opacity
             width: 30,
             height: 30,
