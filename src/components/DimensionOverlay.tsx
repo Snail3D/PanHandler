@@ -164,6 +164,7 @@ export default function DimensionOverlay({
   const incrementFreehandTrial = useStore((s) => s.incrementFreehandTrial);
   const freehandOfferDismissed = useStore((s) => s.freehandOfferDismissed);
   const dismissFreehandOffer = useStore((s) => s.dismissFreehandOffer);
+  const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
   
   
   // Pro upgrade modal
@@ -1426,6 +1427,11 @@ export default function DimensionOverlay({
       
       // Calculate clockwise angle from north to destination
       let azimuth = (destAngle - northAngle) * (180 / Math.PI);
+      
+      // Apply magnetic declination correction
+      // Positive declination (East) = add to azimuth to get true bearing
+      // Negative declination (West) = subtract from azimuth to get true bearing
+      azimuth += magneticDeclination;
       
       // Normalize to 0-360 range
       if (azimuth < 0) azimuth += 360;
