@@ -1443,6 +1443,7 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(false, sessionCount);
+                        setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
                       style={{ backgroundColor: 'rgba(239, 68, 68, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
@@ -1454,6 +1455,7 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(true, sessionCount - 50);
+                        setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
                       style={{ backgroundColor: 'rgba(59, 130, 246, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
@@ -1465,6 +1467,7 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(true, sessionCount);
+                        setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
                       style={{ backgroundColor: 'rgba(16, 185, 129, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
