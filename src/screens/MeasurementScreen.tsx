@@ -1347,81 +1347,13 @@ export default function MeasurementScreen() {
         await detectOrientation(asset.uri);
         
         // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
-        let debugLog = '🔍 STARTING DETECTION\n';
         try {
-          debugLog += '✓ Import successful\n';
-          
-          // Add a small delay to ensure file is accessible
-          await new Promise(resolve => setTimeout(resolve, 100));
-          debugLog += '✓ 100ms delay complete\n';
-          
           const { extractDroneMetadata } = await import('../utils/droneEXIF');
-          debugLog += '✓ Module imported\n';
-          
-          const startTime = Date.now();
-          // PASS THE EXIF DATA FROM IMAGEPICKER!
           const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
-          const extractTime = Date.now() - startTime;
-          debugLog += `✓ Extraction complete (${extractTime}ms)\n`;
-          debugLog += `✓ Used ImagePicker EXIF: ${asset.exif ? 'YES' : 'NO'}\n`;
-          
-          // ONE COMPREHENSIVE DEBUG ALERT
-          const debugInfo = `🔍 DRONE DETECTION DEBUG
-
-⏱️ Timing:
-Extraction: ${extractTime}ms
-
-📁 File Info:
-URI Type: ${asset.uri.startsWith('file://') ? 'file://' : asset.uri.startsWith('ph://') ? 'ph://' : 'other'}
-URI: ${asset.uri.substring(0, 60)}...
-Width: ${asset.width}px
-Height: ${asset.height}px
-EXIF in asset: ${asset.exif ? 'YES' : 'NO'}
-
-🚁 Detection Results:
-isDrone: ${droneMetadata.isDrone}
-isOverhead: ${droneMetadata.isOverhead}
-confidence: ${droneMetadata.confidence}
-method: ${droneMetadata.detectionMethod}
-
-📊 EXIF Data:
-Make: ${droneMetadata.make || 'undefined'}
-Model: ${droneMetadata.model || 'undefined'}
-
-📏 ALTITUDE DATA (KEY INFO):
-RelativeAltitude: ${droneMetadata.relativeAltitude !== undefined ? droneMetadata.relativeAltitude + 'm AGL ✅' : 'NOT FOUND ❌'}
-AbsoluteAltitude: ${droneMetadata.absoluteAltitude !== undefined ? droneMetadata.absoluteAltitude + 'm ASL' : 'NOT FOUND'}
-GPS Altitude: ${droneMetadata.gps?.altitude !== undefined ? droneMetadata.gps.altitude + 'm ASL' : 'NOT FOUND'}
-Display: ${droneMetadata.displayName || 'undefined'}
-
-📍 GPS:
-HasGPS: ${!!droneMetadata.gps}
-Altitude: ${droneMetadata.gps?.altitude?.toFixed(2) || 'undefined'}m
-Lat: ${droneMetadata.gps?.latitude?.toFixed(6) || 'undefined'}
-Lon: ${droneMetadata.gps?.longitude?.toFixed(6) || 'undefined'}
-
-📐 Gimbal:
-HasGimbal: ${!!droneMetadata.gimbal}
-Pitch: ${droneMetadata.gimbal?.pitch?.toFixed(1) || 'undefined'}°
-Yaw: ${droneMetadata.gimbal?.yaw?.toFixed(1) || 'undefined'}°
-Roll: ${droneMetadata.gimbal?.roll?.toFixed(1) || 'undefined'}°
-
-📏 Calibration Data:
-HasSpecs: ${!!droneMetadata.specs}
-GSD: ${droneMetadata.groundSampleDistance?.toFixed(4) || 'undefined'} cm/px
-${droneMetadata.specs ? `Sensor: ${droneMetadata.specs.sensor.width}x${droneMetadata.specs.sensor.height}mm` : 'No specs'}
-${droneMetadata.specs ? `Focal: ${droneMetadata.specs.focalLength}mm` : ''}
-${droneMetadata.specs ? `Res: ${droneMetadata.specs.resolution.width}x${droneMetadata.specs.resolution.height}` : ''}
-
-✅ AUTO-CALIBRATE: ${droneMetadata.isDrone && droneMetadata.groundSampleDistance && droneMetadata.specs ? '✓ YES' : '✗ NO'}
-
-${debugLog}`;
-          
-          alert(debugInfo);
           
           // If drone detected, check if we need manual altitude entry
           if (droneMetadata.isDrone && droneMetadata.specs) {
-            console.log('🚁 Drone detected!');
+            console.log('🚁 Drone detected:', droneMetadata.displayName);
             
             // Check if we have RelativeAltitude from XMP
             if (droneMetadata.relativeAltitude && droneMetadata.relativeAltitude > 0 && droneMetadata.groundSampleDistance) {
@@ -1446,26 +1378,40 @@ ${debugLog}`;
               });
               
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              setMode('measurement');
+              
+              // Transition to measurement mode
+              setIsTransitioning(true);
+              transitionBlackOverlay.value = withTiming(1, {
+                duration: 150,
+                easing: Easing.in(Easing.ease),
+              });
+              
+              setTimeout(() => {
+                setMode('measurement');
+                setTimeout(() => {
+                  transitionBlackOverlay.value = withTiming(0, {
+                    duration: 250,
+                    easing: Easing.out(Easing.ease),
+                  });
+                  setTimeout(() => {
+                    setIsTransitioning(false);
+                  }, 250);
+                }, 150);
+              }, 150);
+              
+              return; // Exit early - skip normal calibration flow
               
             } else {
               // MANUAL ENTRY: No XMP altitude, show modal
               console.log('📝 No RelativeAltitude - showing manual entry modal');
               setPendingDroneData(droneMetadata);
               setShowManualAltitudeModal(true);
+              return; // Exit early - modal will handle calibration
             }
-          }
-              
-              setTimeout(() => {
-                setIsTransitioning(false);
-              }, 250);
-            }, 150);
-            
-            return; // Exit early - skip normal calibration flow
           }
         } catch (error) {
           console.error('Error checking for drone:', error);
-          alert(`DRONE CHECK FAILED\n\nError: ${error}\n\nProceeding with normal calibration...`);
+          // Silently continue to normal calibration flow
         }
         
         // NOT a drone (or no auto-calibration data) - proceed with normal calibration
