@@ -54,54 +54,54 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "Can't argue with that." },
     ],
     
-    // Conversation 1: Left Egg Hint
+    // Conversation 1: Left Egg = YouTube Chicken
     [
       { bot: 'left', text: "They've been using the app a lot..." },
       { bot: 'right', text: "Yeah! Should we ask for support?" },
       { bot: 'left', text: "Wait... can they SEE us??" },
-      { bot: 'right', shouldBackspace: true, meanText: "No way, this is priv—", niceText: "...btw, hold the left egg in Help! 🥚" },
+      { bot: 'right', shouldBackspace: true, meanText: "No way, this is priv—", niceText: "...hold the left egg 3 seconds! Chicken surprise! 🐔" },
       { bot: 'left', text: "Did you just spoil the secret?!" },
       { bot: 'right', text: "They deserve it! They're awesome!" },
     ],
     
-    // Conversation 2: Right Egg Rhythm Hint
+    // Conversation 2: Right Egg = Shave and a Haircut
     [
       { bot: 'left', text: "Is it weird to ask for help?" },
       { bot: 'right', text: "Nah! Snail built this solo!" },
       { bot: 'left', text: "True. Zero ads, zero subscription..." },
-      { bot: 'right', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...oh, tap the right egg rhythmically! 🎵" },
-      { bot: 'left', text: "Why would you tell them that?!" },
-      { bot: 'right', text: "Because secrets are fun! 🤷" },
+      { bot: 'right', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg: Shave-and-a-haircut! 🎵" },
+      { bot: 'left', text: "That's... oddly specific." },
+      { bot: 'right', text: "It's CLASSIC! Try it!" },
     ],
     
-    // Conversation 3: Time Investment + Shake Hint
+    // Conversation 3: Shake to Toggle Menu
     [
       { bot: 'left', text: "Snail spent MONTHS building this..." },
       { bot: 'right', text: "Yeah. Hundreds of hours." },
       { bot: 'left', text: "All his free time, really." },
-      { bot: 'right', text: "And he made it free! Oh, shake to toggle menu!" },
+      { bot: 'right', text: "And he made it free! Oh—shake to toggle the menu!" },
       { bot: 'left', text: "Why did you add that last part?!" },
-      { bot: 'right', text: "Because it's cool! 🤷" },
+      { bot: 'right', text: "Because it's useful! 🤷" },
     ],
     
-    // Conversation 4: Pan Button Secret
+    // Conversation 4: Imperial Button = Star Wars
     [
       { bot: 'left', text: "This feels awkward..." },
       { bot: 'right', text: "Why? We're just PanHandling!" },
       { bot: 'left', text: "That's... literally begging." },
       { bot: 'right', text: "It's a PUN! Get it? PanHandler?" },
       { bot: 'left', text: "I hate you." },
-      { bot: 'right', shouldBackspace: true, meanText: "Whatever! Sna—", niceText: "...tap Pan 10x fast for a surprise! 🎮" },
+      { bot: 'right', shouldBackspace: true, meanText: "Whatever! Sna—", niceText: "...tap Imperial 7x for Star Wars! ⭐" },
     ],
     
-    // Conversation 5: Double Egg Hint
+    // Conversation 5: Tetris Easter Egg
     [
       { bot: 'left', text: "They really like this app..." },
       { bot: 'right', text: "Of course! It's actually useful!" },
       { bot: 'left', text: "Maybe they'll support Snail?" },
-      { bot: 'right', text: "Hope so! Check out @realsnail3d on YouTube!" },
-      { bot: 'left', shouldBackspace: true, meanText: "Are we advertising?!", niceText: "...TWO eggs hidden in Help, by the way 🥚🥚" },
-      { bot: 'right', text: "You can't help yourself, can you?" },
+      { bot: 'right', shouldBackspace: true, meanText: "Hope so! Also check—", niceText: "...fill the screen with measurements! Tetris! 🎮" },
+      { bot: 'left', text: "Are you just spoiling everything?!" },
+      { bot: 'right', text: "They'll love it!" },
     ],
     
     // Conversation 6: No Paywall Pride
@@ -114,34 +114,34 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "Right? So maybe buy him a coffee? ☕" },
     ],
     
-    // Conversation 7: Three Secrets Revealed
+    // Conversation 7: All Secrets Revealed
     [
       { bot: 'left', text: "Should we pitch the donation?" },
       { bot: 'right', text: "Yeah! But casually." },
-      { bot: 'left', text: "Like... 'Hey, there are THREE secrets...'" },
-      { bot: 'right', text: "Left egg, right egg, and shake!" },
-      { bot: 'left', text: "DUDE! You're spoiling everything!" },
+      { bot: 'left', text: "There are like... FIVE secrets..." },
+      { bot: 'right', text: "Left egg, right egg, shake, Imperial, Tetris!" },
+      { bot: 'left', text: "DUDE! You're spoiling EVERYTHING!" },
       { bot: 'right', shouldBackspace: true, meanText: "Sorry, I jus—", niceText: "...but seriously, support Snail! 💙" },
     ],
     
-    // Conversation 8: Donation Fatigue Acknowledgment
+    // Conversation 8: Donation Reality Check
     [
       { bot: 'left', text: "Everyone asks for donations these days..." },
       { bot: 'right', text: "I know, it's exhausting." },
       { bot: 'left', text: "But some people actually need it." },
       { bot: 'right', text: "Yeah. Like solo devs who work for free." },
       { bot: 'left', text: "Snail spent months on this. Zero income." },
-      { bot: 'right', shouldBackspace: true, meanText: "So mayb—", niceText: "...shake your phone btw! Hidden feature!" },
+      { bot: 'right', shouldBackspace: true, meanText: "So mayb—", niceText: "...shake your phone to hide the menu! 📳" },
     ],
     
-    // Conversation 9: Chicken Haptics Easter Egg
+    // Conversation 9: Imperial March Easter Egg
     [
       { bot: 'left', text: "They've used it a bunch..." },
       { bot: 'right', text: "Yeah! Time to ask for support!" },
       { bot: 'left', text: "No ads. No subscriptions. Just vibes." },
-      { bot: 'right', text: "Pure vibes! Also... chicken haptics! 🐔" },
-      { bot: 'left', text: "What are you talking about?!" },
-      { bot: 'right', shouldBackspace: true, meanText: "Uh, nothi—", niceText: "...hold left egg 3 seconds. Trust me!" },
+      { bot: 'right', shouldBackspace: true, meanText: "Pure vibes! Als—", niceText: "...tap Imperial button 7x fast! Star Wars! ⭐" },
+      { bot: 'left', text: "The Imperial March?!" },
+      { bot: 'right', text: "DUN DUN DUN! Trust me!" },
     ],
     
     // Conversation 10: Worth It
@@ -157,54 +157,54 @@ export default function BattlingBotsModal({
   
   // Donor-specific conversations (for returning donors at 40-session intervals)
   const donorConversations: BotMessage[][] = [
-    // Donor Conversation 1: Badge Love
+    // Donor Conversation 1: Badge + Tetris Hint
     [
       { bot: 'left', text: "Hey! They have the badge!" },
       { bot: 'right', text: "Official Supporter! ❤️" },
       { bot: 'left', text: "They already helped once..." },
       { bot: 'right', text: "Yeah, but it's been 40 sessions!" },
       { bot: 'left', text: "Snail's still working on updates..." },
-      { bot: 'right', text: "Gentle ask. They're already awesome!" },
+      { bot: 'right', shouldBackspace: true, meanText: "Gentle as—", niceText: "...fill screen with measurements! Tetris! 🎮" },
     ],
     
-    // Donor Conversation 2: Coffee Refill
+    // Donor Conversation 2: Coffee + Left Egg
     [
       { bot: 'left', text: "It's been a while..." },
       { bot: 'right', text: "40 sessions! They love this app!" },
       { bot: 'left', text: "Should we ask for another coffee?" },
-      { bot: 'right', text: "They've clearly been using it a ton." },
-      { bot: 'left', text: "Fair point. Snail could use a refill! ☕" },
-      { bot: 'right', text: "Plus, they're part of the squad!" },
+      { bot: 'right', shouldBackspace: true, meanText: "They've been using—", niceText: "...hold left egg 3 seconds! Chicken! 🐔" },
+      { bot: 'left', text: "Wait, we're giving hints now?" },
+      { bot: 'right', text: "They're supporters! They deserve secrets!" },
     ],
     
-    // Donor Conversation 3: Badge Appreciation  
+    // Donor Conversation 3: Badge + Right Egg
     [
       { bot: 'left', text: "See that badge?" },
       { bot: 'right', text: "Official Supporter. So cool!" },
       { bot: 'left', text: "They actually helped. Unlike most people." },
       { bot: 'right', text: "Most people ghost us completely." },
       { bot: 'left', text: "Not them. They're real ones." },
-      { bot: 'right', shouldBackspace: true, meanText: "That's why we wait—", niceText: "...btw, tap Pan 10x for a game! 🎮" },
+      { bot: 'right', shouldBackspace: true, meanText: "That's why we wait—", niceText: "...right egg: Shave-and-a-haircut! 🎵" },
     ],
     
-    // Donor Conversation 4: First-Time Celebration
+    // Donor Conversation 4: First-Time + Imperial
     [
       { bot: 'left', text: "WAIT. Did they just... donate?!" },
       { bot: 'right', text: "THEY DID! Look at that badge!" },
       { bot: 'left', text: "Official Supporter! ❤️" },
       { bot: 'right', text: "They're in the Snail Squad now!" },
       { bot: 'left', text: "That's... beautiful 🥹" },
-      { bot: 'right', shouldBackspace: true, meanText: "We won't bug them for 40—", niceText: "...hold left egg for chickens! 🐔" },
+      { bot: 'right', shouldBackspace: true, meanText: "We won't bug them for 40—", niceText: "...tap Imperial 7x for Star Wars! ⭐" },
     ],
     
-    // Donor Conversation 5: Grateful Return
+    // Donor Conversation 5: Grateful + Shake
     [
       { bot: 'left', text: "They're back! Badge and all!" },
       { bot: 'right', text: "They supported Snail before." },
       { bot: 'left', text: "Should we even ask again?" },
       { bot: 'right', text: "It's been 40 sessions... months!" },
       { bot: 'left', text: "True. Time keeps going." },
-      { bot: 'right', shouldBackspace: true, meanText: "Gentle ask th—", niceText: "...right egg rhythm is fun! 🎵" },
+      { bot: 'right', shouldBackspace: true, meanText: "Gentle ask th—", niceText: "...shake to toggle the menu! 📳" },
     ],
   ];
   
