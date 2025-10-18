@@ -248,13 +248,34 @@ function calculateGroundMetrics(
 /**
  * Main extraction function - analyzes photo and returns drone metadata
  */
-export async function extractDroneMetadata(imageUri: string): Promise<DroneMetadata> {
+export async function extractDroneMetadata(imageUri: string, providedExif?: any): Promise<DroneMetadata> {
   try {
-    // Get asset info with EXIF
-    const asset = await MediaLibrary.getAssetInfoAsync(imageUri);
-    const exif: any = asset.exif;
+    let exif: any = providedExif || null;
+    let imageWidth = 0;
+    let imageHeight = 0;
     
+    // If EXIF not provided, try to get it from MediaLibrary
     if (!exif) {
+      try {
+        // Check if this is an asset library URI (photo already in camera roll)
+        if (imageUri.startsWith('ph://') || imageUri.startsWith('assets-library://')) {
+          const asset = await MediaLibrary.getAssetInfoAsync(imageUri);
+          if (asset && asset.exif) {
+            exif = asset.exif;
+            imageWidth = asset.width;
+            imageHeight = asset.height;
+          }
+        }
+        // Note: For file:// URIs from camera, EXIF may not be available
+        // User should import photos from camera roll for drone detection
+      } catch (e) {
+        console.log('Could not read EXIF from MediaLibrary');
+      }
+    }
+    
+    if (!exif || Object.keys(exif).length === 0) {
+      // No EXIF data available - return not a drone
+      console.log('No EXIF data found - not a drone photo');
       return {
         isDrone: false,
         isOverhead: false,
@@ -325,8 +346,8 @@ export async function extractDroneMetadata(imageUri: string): Promise<DroneMetad
         sensor: { width: sensorWidth, height: sensorHeight },
         focalLength,
         resolution: {
-          width: exif['ImageWidth'] || asset.width,
-          height: exif['ImageHeight'] || asset.height,
+          width: exif['ImageWidth'] || imageWidth || 4000,
+          height: exif['ImageHeight'] || imageHeight || 3000,
         },
         notes: 'Estimated from crop factor',
       };
