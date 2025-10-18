@@ -347,7 +347,12 @@ export default function MeasurementScreen() {
           const isLandscape = width > height;
           const orientation = isLandscape ? 'LANDSCAPE' : 'PORTRAIT';
           __DEV__ && console.log('📱 Image orientation:', orientation);
-          setImageOrientation(orientation);
+          
+          // ⚠️ CRITICAL: Defer AsyncStorage write to prevent UI blocking
+          setTimeout(() => {
+            setImageOrientation(orientation);
+          }, 200);
+          
           resolve();
         }, (error) => {
           console.error('Error getting image size:', error);
@@ -1425,12 +1430,19 @@ export default function MeasurementScreen() {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         
-        setImageUri(asset.uri, false); // false = not auto-captured
-        await detectOrientation(asset.uri);
+        // ⚠️ CRITICAL: Use local state first, defer AsyncStorage write
+        setCapturedPhotoUri(asset.uri); // Instant local state
+        await detectOrientation(asset.uri); // Already deferred inside
         
         // Show photo type selection modal for all imported photos
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
+        
+        // Defer AsyncStorage write to prevent UI blocking during import
+        setTimeout(() => {
+          setImageUri(asset.uri, false); // Background persist
+          __DEV__ && console.log('✅ Deferred imported photo AsyncStorage write complete');
+        }, 300);
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -2256,12 +2268,17 @@ export default function MeasurementScreen() {
                     setTimeout(() => {
                       if (recalibrateMode) {
                         // Recalibrate: Keep image, clear calibration AND measurements, go to zoomCalibrate
-                        setCoinCircle(null);
-                        setCalibration(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        setCompletedMeasurements([]); // Clear all measurements
-                        setCurrentPoints([]); // Clear current drawing points
                         setMode('zoomCalibrate');
+                        
+                        // ⚠️ CRITICAL: Defer AsyncStorage writes to prevent recalibration freeze
+                        setTimeout(() => {
+                          setCoinCircle(null);
+                          setCalibration(null);
+                          setCompletedMeasurements([]);
+                          setCurrentPoints([]);
+                          __DEV__ && console.log('✅ Deferred recalibrate AsyncStorage writes complete');
+                        }, 300);
                         
                         // Fade in the calibration screen
                         transitionBlackOverlay.value = withTiming(0, {
@@ -2273,23 +2290,25 @@ export default function MeasurementScreen() {
                         }, 500);
                       } else {
                         // Full reset: Clear everything and go to camera
-                        // Clear measurements BEFORE setting imageUri to null (avoid AsyncStorage write)
-                        setCompletedMeasurements([]); // Clear measurements
-                        setCurrentPoints([]); // Clear points
-                        setCoinCircle(null);
-                        setCalibration(null);
-                        setImageOrientation(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        
                         setMode('camera');
                         
-                        // Clear image state so camera shows up (do this LAST)
-                        setImageUri(null);
+                        // ⚠️ CRITICAL: Defer ALL AsyncStorage writes to prevent New Photo freeze
+                        setTimeout(() => {
+                          setCompletedMeasurements([]);
+                          setCurrentPoints([]);
+                          setCoinCircle(null);
+                          setCalibration(null);
+                          setImageOrientation(null);
+                          setCapturedPhotoUri(null); // Clear local state too
+                          setImageUri(null);
+                          __DEV__ && console.log('✅ Deferred New Photo AsyncStorage writes complete');
+                        }, 300);
                         
                         // Camera's useEffect will handle the fade in
                         setTimeout(() => {
                           setIsTransitioning(false);
-                        }, 800); // Reduced from 1800ms - camera fades in faster than this
+                        }, 800);
                       }
                     }, 300); // Wait for black fade to complete
                   }}
