@@ -754,6 +754,18 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           const result = calculateDroneRelativeAltitude(gps.altitude, phoneAlt.altitude);
           const calculatedAltitude = result.relativeAltitude;
           
+          // DEBUG ALERT - Show what's happening!
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+Drone GPS Alt: ${gps.altitude.toFixed(1)}m
+Phone GPS Alt: ${phoneAlt.altitude.toFixed(1)}m
+Calculated Height: ${calculatedAltitude.toFixed(1)}m
+
+This will be used for calibration!`);
+          
           if (validation.decision === 'auto') {
             // AUTO-CALIBRATE: Phone is close enough (< 100m), use it!
             altitudeToUse = calculatedAltitude;
