@@ -44,157 +44,157 @@ export default function BattlingBotsModal({
   
   // 10 random conversation variations with Easter egg hints
   const conversations: BotMessage[][] = [
-    // Conversation 1: "Can They See Us?" with Left Egg hint
+    // Conversation 1: Left Egg Hint
     [
-      { bot: 'left', text: "They've used the app 10 times now..." },
-      { bot: 'right', text: "Perfect timing! Should we tell them about Snail?" },
-      { bot: 'left', text: "Wait... can they SEE this conversation??" },
-      { bot: 'right', shouldBackspace: true, meanText: "Of course not, they can't—", niceText: "...anyway, try holding the left egg in the Help menu! 🥚" },
-      { bot: 'left', text: "Did you just give away a secret?!" },
-      { bot: 'right', text: "Oops. Well, they deserve it!" },
+      { bot: 'left', text: "They've been using the app a lot..." },
+      { bot: 'right', text: "Yeah! Should we ask for support?" },
+      { bot: 'left', text: "Wait... can they SEE us??" },
+      { bot: 'right', shouldBackspace: true, meanText: "No way, this is priv—", niceText: "...btw, hold the left egg in Help! 🥚" },
+      { bot: 'left', text: "Did you just spoil the secret?!" },
+      { bot: 'right', text: "They deserve it! They're awesome!" },
     ],
     
-    // Conversation 2: "Rhythm Hint"
+    // Conversation 2: Right Egg Rhythm Hint
     [
-      { bot: 'left', text: "Is it too soon to ask for support?" },
-      { bot: 'right', text: "They've made 10 measurements. They love this app!" },
-      { bot: 'left', text: "But asking for money feels weird..." },
-      { bot: 'right', text: "It's not asking! It's 'Hey, help Snail keep this alive!'" },
-      { bot: 'left', shouldBackspace: true, meanText: "I guess you're ri—", niceText: "...btw, tap the right egg to a rhythm 🎵" },
-      { bot: 'right', text: "Why did you tell them that?!" },
+      { bot: 'left', text: "Is it weird to ask for help?" },
+      { bot: 'right', text: "Nah! Snail built this solo!" },
+      { bot: 'left', text: "True. Zero ads, zero subscription..." },
+      { bot: 'right', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...oh, tap the right egg rhythmically! 🎵" },
+      { bot: 'left', text: "Why would you tell them that?!" },
+      { bot: 'right', text: "Because secrets are fun! 🤷" },
     ],
     
-    // Conversation 3: "Shake Hint"
+    // Conversation 3: Shake Gesture Hint
     [
-      { bot: 'left', text: "Snail's been paying for this out of pocket..." },
-      { bot: 'right', text: "Yeah, servers aren't free. Neither is his time." },
-      { bot: 'left', text: "Should we mention the donation link?" },
-      { bot: 'right', text: "Definitely. Oh! And they can shake their phone to toggle the menu!" },
-      { bot: 'left', text: "That's... not related to donations." },
-      { bot: 'right', text: "I know. But it's cool! 🤷" },
+      { bot: 'left', text: "Snail pays for the servers himself..." },
+      { bot: 'right', text: "Yeah, costs add up fast." },
+      { bot: 'left', text: "Should we mention the donation?" },
+      { bot: 'right', text: "Yes! Oh, and shake to toggle the menu!" },
+      { bot: 'left', text: "That has nothing to do with donations!" },
+      { bot: 'right', text: "I know, but it's cool!" },
     ],
     
-    // Conversation 4: "Passion Project"
+    // Conversation 4: Pan Button Secret
     [
-      { bot: 'left', text: "This is awkward. Should we really beg?" },
-      { bot: 'right', text: "We're not begging! We're PanHandling!" },
-      { bot: 'left', text: "That's... literally the same thing." },
-      { bot: 'right', text: "No no, it's a pun! The app is called PanHandler!" },
-      { bot: 'left', text: "...I hate you." },
-      { bot: 'right', text: "Anyway, Snail built this as a passion project. Zero ads!" },
+      { bot: 'left', text: "This feels awkward..." },
+      { bot: 'right', text: "Why? We're just PanHandling!" },
+      { bot: 'left', text: "That's... literally begging." },
+      { bot: 'right', text: "It's a PUN! Get it? PanHandler?" },
+      { bot: 'left', text: "I hate you." },
+      { bot: 'right', shouldBackspace: true, meanText: "Whatever! Sna—", niceText: "...tap Pan 10x fast for a surprise! 🎮" },
     ],
     
-    // Conversation 5: "YouTube Hint"
+    // Conversation 5: Double Egg Hint
     [
-      { bot: 'left', text: "They seem to really like the app..." },
-      { bot: 'right', text: "10 sessions! That's dedication!" },
-      { bot: 'left', text: "Maybe they'd support Snail?" },
-      { bot: 'right', text: "For sure! Also, check out @realsnail3d on YouTube!" },
-      { bot: 'left', shouldBackspace: true, meanText: "Wait, are we advertising now?!", niceText: "...there are TWO hidden eggs by the way 🥚🥚" },
+      { bot: 'left', text: "They really like this app..." },
+      { bot: 'right', text: "Of course! It's actually useful!" },
+      { bot: 'left', text: "Maybe they'll support Snail?" },
+      { bot: 'right', text: "Hope so! Check out @realsnail3d on YouTube!" },
+      { bot: 'left', shouldBackspace: true, meanText: "Are we advertising?!", niceText: "...TWO eggs hidden in Help, by the way 🥚🥚" },
       { bot: 'right', text: "You can't help yourself, can you?" },
     ],
     
-    // Conversation 6: "No Subscription"
+    // Conversation 6: No Paywall Pride
     [
-      { bot: 'left', text: "Other apps charge $10/month..." },
-      { bot: 'right', text: "Or $50/year with 'Pro' features locked." },
-      { bot: 'left', text: "Snail made everything free. No paywall." },
-      { bot: 'right', text: "Exactly! Just optional support if you want to help." },
-      { bot: 'left', text: "That's... actually really generous." },
-      { bot: 'right', text: "Right? So maybe they'll buy him a coffee! ☕" },
+      { bot: 'left', text: "Other apps charge $50/year..." },
+      { bot: 'right', text: "Or $10/month for basic features." },
+      { bot: 'left', text: "Snail made everything free!" },
+      { bot: 'right', text: "No paywall. No nagging. Just vibes." },
+      { bot: 'left', text: "That's... actually really cool." },
+      { bot: 'right', text: "Right? So maybe buy him a coffee? ☕" },
     ],
     
-    // Conversation 7: "Chicken Haptics Hint"
+    // Conversation 7: Three Secrets Revealed
     [
-      { bot: 'left', text: "Should we tell them about the donation link?" },
-      { bot: 'right', text: "Yeah! Snail needs support to keep this running." },
-      { bot: 'left', text: "No ads, no subscriptions, just vibes." },
-      { bot: 'right', text: "Pure vibes! Oh, and chicken haptics in the Help menu 🐔" },
-      { bot: 'left', text: "...what?" },
-      { bot: 'right', text: "Hold the left egg for 3 seconds. You'll see!" },
+      { bot: 'left', text: "Should we pitch the donation?" },
+      { bot: 'right', text: "Yeah! But casually." },
+      { bot: 'left', text: "Like... 'Hey, there are THREE secrets...'" },
+      { bot: 'right', text: "Left egg, right egg, and shake!" },
+      { bot: 'left', text: "DUDE! You're spoiling everything!" },
+      { bot: 'right', shouldBackspace: true, meanText: "Sorry, I jus—", niceText: "...but seriously, support Snail! 💙" },
     ],
     
-    // Conversation 8: "Behind the Scenes"
+    // Conversation 8: Solo Dev Struggle
     [
-      { bot: 'left', text: "They can definitely see us, right?" },
-      { bot: 'right', text: "No way. This is behind-the-scenes." },
-      { bot: 'left', shouldBackspace: true, meanText: "Good, because I was gonna say—", niceText: "...never mind. Let's just ask nicely." },
-      { bot: 'right', text: "Ask for support, you mean?" },
-      { bot: 'left', text: "Yeah. Snail's doing this solo. Zero team." },
-      { bot: 'right', text: "One guy. One dream. One coin-based measurement app!" },
+      { bot: 'left', text: "Can they see this?" },
+      { bot: 'right', text: "No way. This is private." },
+      { bot: 'left', shouldBackspace: true, meanText: "Good, because—", niceText: "...never mind. Let's just be honest." },
+      { bot: 'right', text: "About the donation?" },
+      { bot: 'left', text: "Yeah. Snail built this alone. Zero team." },
+      { bot: 'right', text: "One guy. One passion. One app!" },
     ],
     
-    // Conversation 9: "Easter Egg Master Hint"
+    // Conversation 9: Chicken Haptics Easter Egg
     [
-      { bot: 'left', text: "10 sessions. Should we pitch the donation?" },
-      { bot: 'right', text: "Absolutely! And mention the Easter eggs!" },
-      { bot: 'left', text: "There are THREE hidden surprises..." },
-      { bot: 'right', text: "Left egg, right egg, and a shake gesture!" },
-      { bot: 'left', text: "Dude, you're spoiling everything!" },
-      { bot: 'right', shouldBackspace: true, meanText: "Oops sorry—", niceText: "...but seriously, support Snail! ☕" },
+      { bot: 'left', text: "They've used it a bunch..." },
+      { bot: 'right', text: "Yeah! Time to ask for support!" },
+      { bot: 'left', text: "No ads. No subscriptions. Just vibes." },
+      { bot: 'right', text: "Pure vibes! Also... chicken haptics! 🐔" },
+      { bot: 'left', text: "What are you talking about?!" },
+      { bot: 'right', shouldBackspace: true, meanText: "Uh, nothi—", niceText: "...hold left egg 3 seconds. Trust me!" },
     ],
     
-    // Conversation 10: "The Real Talk"
+    // Conversation 10: The Real Talk
     [
       { bot: 'left', text: "Alright, real talk..." },
       { bot: 'right', text: "Real talk." },
-      { bot: 'left', text: "Snail made this app. Alone. With his own money." },
-      { bot: 'right', text: "No investors. No corporate backing. Just passion." },
-      { bot: 'left', text: "And you've used it 10 times now." },
-      { bot: 'right', text: "So if it's helped you... maybe help him back?" },
+      { bot: 'left', text: "Snail made this app. Alone. His own money." },
+      { bot: 'right', text: "No investors. No ads. Just passion." },
+      { bot: 'left', text: "And you've used it a TON." },
+      { bot: 'right', text: "So... maybe help keep it alive?" },
     ],
   ];
   
   // Donor-specific conversations (for returning donors at 40-session intervals)
   const donorConversations: BotMessage[][] = [
-    // Donor Conversation 1: "Badge Recognition"
+    // Donor Conversation 1: Badge Love
     [
-      { bot: 'left', text: "Hey, look! They have the badge!" },
-      { bot: 'right', text: "Official PanHandler Supporter! ❤️" },
-      { bot: 'left', text: "They already helped Snail once..." },
-      { bot: 'right', text: "Yeah, but servers keep running. Costs add up." },
-      { bot: 'left', text: "So... ask for more juice?" },
-      { bot: 'right', text: "Gently. They're already awesome!" },
+      { bot: 'left', text: "Hey! They have the badge!" },
+      { bot: 'right', text: "Official Supporter! ❤️" },
+      { bot: 'left', text: "They already helped once..." },
+      { bot: 'right', text: "Yeah, but it's been 40 sessions!" },
+      { bot: 'left', text: "Servers keep running, costs add up..." },
+      { bot: 'right', text: "Gentle ask. They're already awesome!" },
     ],
     
-    // Donor Conversation 2: "Time for a Refill"
+    // Donor Conversation 2: Coffee Refill
     [
-      { bot: 'left', text: "It's been 40 sessions since they donated..." },
-      { bot: 'right', text: "Time flies when you're measuring things!" },
+      { bot: 'left', text: "It's been a while..." },
+      { bot: 'right', text: "40 sessions! They love this app!" },
       { bot: 'left', text: "Should we ask for another coffee?" },
-      { bot: 'right', text: "I mean, they've clearly been using it a TON." },
+      { bot: 'right', text: "They've clearly been using it a ton." },
       { bot: 'left', text: "Fair point. Snail could use a refill! ☕" },
-      { bot: 'right', text: "Plus, they're already part of the squad!" },
+      { bot: 'right', text: "Plus, they're part of the squad!" },
     ],
     
-    // Donor Conversation 3: "Badge Appreciation"
+    // Donor Conversation 3: Badge Appreciation  
     [
-      { bot: 'left', text: "See that badge up there?" },
-      { bot: 'right', text: "Official PanHandler Supporter. So official!" },
-      { bot: 'left', text: "They earned that by actually helping." },
-      { bot: 'right', text: "Most people just use the app and ghost us." },
-      { bot: 'left', text: "Not these folks. They're real ones." },
-      { bot: 'right', text: "Which is why we waited 40 sessions to ask again!" },
+      { bot: 'left', text: "See that badge?" },
+      { bot: 'right', text: "Official Supporter. So cool!" },
+      { bot: 'left', text: "They actually helped. Unlike most people." },
+      { bot: 'right', text: "Most people ghost us completely." },
+      { bot: 'left', text: "Not them. They're real ones." },
+      { bot: 'right', shouldBackspace: true, meanText: "That's why we wait—", niceText: "...btw, tap Pan 10x for a game! 🎮" },
     ],
     
-    // Donor Conversation 4: "First-Time Donor Celebration"
+    // Donor Conversation 4: First-Time Celebration
     [
       { bot: 'left', text: "WAIT. Did they just... donate?!" },
       { bot: 'right', text: "THEY DID! Look at that badge!" },
-      { bot: 'left', text: "Official PanHandler Supporter! ❤️" },
-      { bot: 'right', text: "They're officially part of the Snail Squad now!" },
-      { bot: 'left', text: "That's... that's beautiful 🥹" },
-      { bot: 'right', text: "We won't bug them again for 40 sessions!" },
+      { bot: 'left', text: "Official Supporter! ❤️" },
+      { bot: 'right', text: "They're in the Snail Squad now!" },
+      { bot: 'left', text: "That's... beautiful 🥹" },
+      { bot: 'right', shouldBackspace: true, meanText: "We won't bug them for 40—", niceText: "...hold left egg for chickens! 🐔" },
     ],
     
-    // Donor Conversation 5: "Grateful Return"
+    // Donor Conversation 5: Grateful Return
     [
-      { bot: 'left', text: "They're back! And they have the badge!" },
-      { bot: 'right', text: "Means they already supported Snail." },
+      { bot: 'left', text: "They're back! Badge and all!" },
+      { bot: 'right', text: "They supported Snail before." },
       { bot: 'left', text: "Should we even ask again?" },
-      { bot: 'right', text: "It's been 40 sessions. That's like... months?" },
-      { bot: 'left', text: "True. Servers aren't free." },
-      { bot: 'right', text: "And they clearly love the app. Gentle ask!" },
+      { bot: 'right', text: "It's been 40 sessions... months!" },
+      { bot: 'left', text: "True. Servers cost money." },
+      { bot: 'right', shouldBackspace: true, meanText: "Gentle ask th—", niceText: "...right egg rhythm is fun! 🎵" },
     ],
   ];
   
@@ -432,7 +432,7 @@ export default function BattlingBotsModal({
     setIsDonor(true, sessionCount);
     
     // Open Buy Me a Coffee link
-    Linking.openURL("https://buymeacoffee.com/snail3d");
+    Linking.openURL("https://buymeacoffee.com/Snail3D");
     
     // Show success message with badge
     console.log('🎉 User clicked Support! isDonor = true, badge will show!');
@@ -658,22 +658,23 @@ export default function BattlingBotsModal({
                 </ScrollView>
               ) : (
                 // Offer Stage
-                <Animated.View style={[{ padding: 24 }, offerStyle]}>
+                <Animated.View style={[{ padding: 28 }, offerStyle]}>
                   {/* Title */}
-                  <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                  <View style={{ alignItems: 'center', marginBottom: 24 }}>
                     <Text style={{
-                      fontSize: 26,
+                      fontSize: 32,
                       fontWeight: '800',
                       color: '#1C1C1E',
-                      marginBottom: 8,
+                      marginBottom: 6,
                     }}>
                       Support Snail
                     </Text>
                     <Text style={{
-                      fontSize: 14,
+                      fontSize: 15,
                       color: '#8E8E93',
                       textAlign: 'center',
-                      lineHeight: 20,
+                      lineHeight: 22,
+                      fontWeight: '500',
                     }}>
                       PanHandler is a passion project.{'\n'}
                       Help keep it alive! ☕
@@ -682,20 +683,21 @@ export default function BattlingBotsModal({
 
                   {/* Feature List */}
                   <View style={{ 
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
                     borderRadius: 16,
-                    padding: 16,
-                    marginBottom: 20,
-                    gap: 10,
+                    padding: 18,
+                    marginBottom: 24,
+                    gap: 12,
                   }}>
-                    <Text style={{
-                      fontSize: 13,
-                      fontWeight: '700',
-                      color: '#3C3C43',
-                      marginBottom: 4,
-                    }}>
-                      💝 What you get:
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <Text style={{
+                        fontSize: 17,
+                        fontWeight: '700',
+                        color: '#1C1C1E',
+                      }}>
+                        💝 What you get:
+                      </Text>
+                    </View>
                     {[
                       'No ads, ever',
                       'No subscription fees',
@@ -703,9 +705,9 @@ export default function BattlingBotsModal({
                       'Made by @realsnail3d',
                       'Support keeps servers running!',
                     ].map((feature, i) => (
-                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                        <Ionicons name="checkmark-circle" size={18} color="#10B981" />
-                        <Text style={{ fontSize: 13, color: '#3C3C43', fontWeight: '500', flex: 1 }}>
+                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                        <Text style={{ fontSize: 14, color: '#3C3C43', fontWeight: '600', flex: 1 }}>
                           {feature}
                         </Text>
                       </View>
@@ -717,9 +719,9 @@ export default function BattlingBotsModal({
                     onPress={handleSupport}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? '#2563EB' : '#3B82F6',
-                      borderRadius: 16,
+                      borderRadius: 14,
                       padding: 18,
-                      marginBottom: 12,
+                      marginBottom: 14,
                       alignItems: 'center',
                       shadowColor: '#3B82F6',
                       shadowOffset: { width: 0, height: 4 },
@@ -728,11 +730,11 @@ export default function BattlingBotsModal({
                       elevation: 6,
                     })}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Ionicons name="cafe" size={20} color="white" />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <Ionicons name="cafe" size={22} color="white" />
                       <Text style={{
                         color: 'white',
-                        fontSize: 17,
+                        fontSize: 18,
                         fontWeight: '700',
                       }}>
                         Buy Me a Coffee
@@ -744,14 +746,14 @@ export default function BattlingBotsModal({
                   <Pressable
                     onPress={handleClose}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(120,120,128,0.08)' : 'transparent',
+                      backgroundColor: pressed ? 'rgba(120,120,128,0.12)' : 'transparent',
                       paddingVertical: 14,
                       borderRadius: 12,
                     })}
                   >
                     <Text style={{
                       color: '#8E8E93',
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: '600',
                       textAlign: 'center',
                     }}>
