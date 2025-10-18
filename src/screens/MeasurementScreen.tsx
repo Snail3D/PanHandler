@@ -1353,6 +1353,17 @@ export default function MeasurementScreen() {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         
+        console.log('📸 Photo imported from gallery');
+        console.log('📊 Asset info:', {
+          uri: asset.uri.substring(0, 60) + '...',
+          width: asset.width,
+          height: asset.height,
+          hasExif: !!asset.exif,
+          exifKeys: asset.exif ? Object.keys(asset.exif).slice(0, 10) : [],
+          make: asset.exif?.Make,
+          model: asset.exif?.Model,
+        });
+        
         setImageUri(asset.uri, false); // false = not auto-captured
         await detectOrientation(asset.uri);
         
@@ -1371,6 +1382,9 @@ export default function MeasurementScreen() {
             hasRelativeAltitude: !!droneMetadata.relativeAltitude,
             hasGSD: !!droneMetadata.groundSampleDistance,
           });
+          
+          // TEMPORARY DEBUG ALERT
+          alert(`DRONE DETECTION:\n\nisDrone: ${droneMetadata.isDrone}\nMake: ${droneMetadata.make || 'none'}\nModel: ${droneMetadata.model || 'none'}\nhasSpecs: ${!!droneMetadata.specs}\n\n${droneMetadata.isDrone ? 'Should show modal!' : 'Not a drone - normal calibration'}`);
           
           // If drone detected, check if we need manual altitude entry
           if (droneMetadata.isDrone && droneMetadata.specs) {
