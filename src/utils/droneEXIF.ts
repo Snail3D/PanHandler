@@ -39,6 +39,10 @@ export interface DroneMetadata {
     altitudeRef?: number; // 0 = above sea level, 1 = below
   };
   
+  // Altitude data
+  relativeAltitude?: number; // meters above ground level (AGL) - preferred for calibration!
+  absoluteAltitude?: number; // meters above sea level (ASL)
+  
   // Camera orientation (from DJI XMP)
   gimbal?: {
     pitch: number; // -90 = straight down, 0 = horizon
@@ -208,27 +212,51 @@ function parseGPSCoordinate(
 }
 
 /**
- * Extract DJI XMP metadata (gimbal angles, etc.)
+ * Extract DJI XMP metadata (gimbal angles, altitude, etc.)
  */
-function extractDJIXMP(exif: any): DroneMetadata['gimbal'] | undefined {
+function extractDJIXMP(exif: any): {
+  gimbal?: DroneMetadata['gimbal'];
+  relativeAltitude?: number;
+  absoluteAltitude?: number;
+} {
   try {
     // DJI stores XMP data with "drone-dji:" prefix
     const pitch = exif['drone-dji:GimbalPitchDegree'] || exif['GimbalPitchDegree'];
     const yaw = exif['drone-dji:GimbalYawDegree'] || exif['GimbalYawDegree'];
     const roll = exif['drone-dji:GimbalRollDegree'] || exif['GimbalRollDegree'];
     
+    // Extract altitude data (the key values we need!)
+    const relativeAlt = exif['drone-dji:RelativeAltitude'] || exif['RelativeAltitude'];
+    const absoluteAlt = exif['drone-dji:AbsoluteAltitude'] || exif['AbsoluteAltitude'];
+    
+    const result: {
+      gimbal?: DroneMetadata['gimbal'];
+      relativeAltitude?: number;
+      absoluteAltitude?: number;
+    } = {};
+    
     if (pitch !== undefined) {
-      return {
+      result.gimbal = {
         pitch: parseFloat(pitch),
         yaw: parseFloat(yaw || 0),
         roll: parseFloat(roll || 0),
       };
     }
+    
+    if (relativeAlt !== undefined) {
+      result.relativeAltitude = parseFloat(relativeAlt);
+    }
+    
+    if (absoluteAlt !== undefined) {
+      result.absoluteAltitude = parseFloat(absoluteAlt);
+    }
+    
+    return result;
   } catch (error) {
     console.log('Could not extract DJI XMP data:', error);
   }
   
-  return undefined;
+  return {};
 }
 
 /**
@@ -289,6 +317,48 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         
         // Convert piexifjs format to standard EXIF object
         exif = {};
+        
+        // Extract XMP data (DJI stores RelativeAltitude here!)
+        // XMP is embedded in the JPEG file as plain text XML
+        try {
+          // Read the file as text to search for XMP
+          const textData = await FileSystem.readAsStringAsync(imageUri, {
+            encoding: FileSystem.EncodingType.UTF8,
+          });
+          
+          // Find XMP packet (between <?xpacket and ?> tags)
+          const xmpStart = textData.indexOf('<x:xmpmeta');
+          const xmpEnd = textData.indexOf('</x:xmpmeta>') + 12;
+          
+          if (xmpStart !== -1 && xmpEnd > xmpStart) {
+            const xmpText = textData.substring(xmpStart, xmpEnd);
+            console.log('🔍 Found XMP data, length:', xmpText.length);
+            
+            // Parse DJI-specific XMP tags
+            // Example: <drone-dji:RelativeAltitude>54.3</drone-dji:RelativeAltitude>
+            const relAltMatch = xmpText.match(/<drone-dji:RelativeAltitude>([^<]+)<\/drone-dji:RelativeAltitude>/);
+            const absAltMatch = xmpText.match(/<drone-dji:AbsoluteAltitude>([^<]+)<\/drone-dji:AbsoluteAltitude>/);
+            const gimbalPitchMatch = xmpText.match(/<drone-dji:GimbalPitchDegree>([^<]+)<\/drone-dji:GimbalPitchDegree>/);
+            const gimbalYawMatch = xmpText.match(/<drone-dji:GimbalYawDegree>([^<]+)<\/drone-dji:GimbalYawDegree>/);
+            const gimbalRollMatch = xmpText.match(/<drone-dji:GimbalRollDegree>([^<]+)<\/drone-dji:GimbalRollDegree>/);
+            
+            if (relAltMatch) exif['drone-dji:RelativeAltitude'] = relAltMatch[1];
+            if (absAltMatch) exif['drone-dji:AbsoluteAltitude'] = absAltMatch[1];
+            if (gimbalPitchMatch) exif['drone-dji:GimbalPitchDegree'] = gimbalPitchMatch[1];
+            if (gimbalYawMatch) exif['drone-dji:GimbalYawDegree'] = gimbalYawMatch[1];
+            if (gimbalRollMatch) exif['drone-dji:GimbalRollDegree'] = gimbalRollMatch[1];
+            
+            console.log('📊 Extracted XMP tags:', {
+              relativeAlt: relAltMatch?.[1],
+              absoluteAlt: absAltMatch?.[1],
+              gimbalPitch: gimbalPitchMatch?.[1],
+            });
+          } else {
+            console.log('⚠️ No XMP data found in image');
+          }
+        } catch (xmpError) {
+          console.log('⚠️ XMP extraction failed:', xmpError);
+        }
         
         // Extract from "0th" IFD (main image data)
         if (exifObj['0th']) {
@@ -395,7 +465,10 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     }
     
     // Extract DJI gimbal data (need this for drone detection)
-    const gimbal = extractDJIXMP(exif);
+    const djiData = extractDJIXMP(exif);
+    const gimbal = djiData.gimbal;
+    const relativeAltitude = djiData.relativeAltitude;
+    const absoluteAltitude = djiData.absoluteAltitude;
     
     // Check if it's a drone - use multiple indicators for reliability
     // GPS altitude alone isn't enough (ground level in mountains = high altitude)
@@ -452,14 +525,25 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     // The user can always use Map Scale if they need more precision for extreme angles.
     const isOverhead = true; // Always true if we detected it as a drone
     
-    // Debug: Show overhead detection
+    // Debug: Show overhead detection and altitude info
     if (isDrone && gimbal) {
       const axes = [];
       if (gimbal.pitch !== 0) axes.push(`Pitch: ${gimbal.pitch.toFixed(1)}°`);
       if (gimbal.yaw !== 0) axes.push(`Yaw: ${gimbal.yaw.toFixed(1)}°`);
       if (gimbal.roll !== 0) axes.push(`Roll: ${gimbal.roll.toFixed(1)}°`);
       
-      alert(`GIMBAL DETECTED\n\n${axes.join('\n')}\n${axes.length}-axis gimbal\n\nAuto-calibrating from drone altitude!`);
+      const altInfo = [];
+      if (relativeAltitude !== undefined) {
+        altInfo.push(`✅ Relative: ${relativeAltitude.toFixed(1)}m AGL`);
+      }
+      if (absoluteAltitude !== undefined) {
+        altInfo.push(`Absolute: ${absoluteAltitude.toFixed(1)}m ASL`);
+      }
+      if (gps) {
+        altInfo.push(`GPS: ${gps.altitude.toFixed(1)}m ASL`);
+      }
+      
+      alert(`GIMBAL DETECTED\n\n${axes.join('\n')}\n${axes.length}-axis gimbal\n\nALTITUDE DATA:\n${altInfo.join('\n')}\n\nAuto-calibrating from drone altitude!`);
     } else if (isDrone) {
       alert(`DRONE DETECTED (no gimbal data)\n\nAssuming overhead photo.\nAuto-calibrating from altitude!`);
     }
@@ -566,9 +650,26 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     let groundCoverage: DroneMetadata['groundCoverage'] | undefined;
     
     if (specs && gps && isOverhead) {
-      const metrics = calculateGroundMetrics(gps.altitude, specs);
+      // PRIORITY 1: Use relative altitude (above ground level) if available
+      // This is what we really need for accurate GSD!
+      let altitudeToUse: number;
+      let altitudeSource: string;
+      
+      if (relativeAltitude !== undefined && relativeAltitude > 0) {
+        altitudeToUse = relativeAltitude;
+        altitudeSource = 'Relative (AGL)';
+      } else {
+        // Fallback to GPS altitude (absolute, above sea level)
+        // This will be less accurate in areas with high elevation
+        altitudeToUse = gps.altitude;
+        altitudeSource = 'GPS (ASL - may be inaccurate)';
+      }
+      
+      const metrics = calculateGroundMetrics(altitudeToUse, specs);
       groundSampleDistance = metrics.gsd;
       groundCoverage = metrics.coverage;
+      
+      console.log(`📐 GSD calculated using ${altitudeSource}: ${groundSampleDistance.toFixed(2)} cm/px at ${altitudeToUse.toFixed(1)}m`);
     }
     
     return {
@@ -578,6 +679,8 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       model,
       displayName: specs?.displayName || `${make} ${model}`,
       gps,
+      relativeAltitude,
+      absoluteAltitude,
       gimbal,
       specs,
       groundSampleDistance,
