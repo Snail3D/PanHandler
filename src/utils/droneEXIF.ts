@@ -2,6 +2,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import piexif from 'piexifjs';
 import { getGroundElevation, calculateRelativeAltitude } from './elevationAPI';
+import { getPhoneAltitude, calculateDroneRelativeAltitude, calculateGPSDistance, validateGroundReference } from './groundReference';
 
 /**
  * Drone specifications for auto-calibration
@@ -60,6 +61,19 @@ export interface DroneMetadata {
     width: number;  // meters
     height: number; // meters
   };
+  
+  // Ground reference validation (for automatic altitude calculation)
+  groundReferenceValidation?: {
+    isValid: boolean;
+    warnings: string[];
+    shouldPromptUser: boolean;
+    distance: number;
+    timeDiffMinutes: number | null;
+    phoneAltitude?: number;
+  };
+  
+  // Photo timestamp
+  timestamp?: number; // Unix timestamp in ms
   
   // Detection confidence
   confidence: 'high' | 'medium' | 'low' | 'none';
@@ -714,14 +728,53 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       let altitudeToUse: number;
       let altitudeSource: string;
       
+      // PRIORITY 1: Use relative altitude from XMP if available
       if (relativeAltitude !== undefined && relativeAltitude > 0) {
         altitudeToUse = relativeAltitude;
-        altitudeSource = 'Relative (AGL)';
-      } else {
-        // Fallback to GPS altitude (absolute, above sea level)
-        // This will be less accurate in areas with high elevation
-        altitudeToUse = gps.altitude;
-        altitudeSource = 'GPS (ASL - may be inaccurate)';
+        altitudeSource = 'XMP RelativeAltitude (AGL)';
+      } 
+      // PRIORITY 2: Calculate from phone's current GPS altitude (GROUND REFERENCE METHOD!)
+      else {
+        console.log('🎯 XMP RelativeAltitude not found - using GROUND REFERENCE method');
+        const phoneAlt = await getPhoneAltitude();
+        
+        if (phoneAlt && phoneAlt.altitude) {
+          // Validate if ground reference is reliable based on GPS distance
+          const validation = validateGroundReference(
+            gps.latitude,
+            gps.longitude,
+            phoneAlt.latitude,
+            phoneAlt.longitude
+          );
+          
+          console.log(`📏 Ground Reference Validation: ${validation.decision.toUpperCase()}`);
+          console.log(`   ${validation.message}`);
+          
+          // Calculate relative altitude using phone as ground reference
+          const result = calculateDroneRelativeAltitude(gps.altitude, phoneAlt.altitude);
+          const calculatedAltitude = result.relativeAltitude;
+          
+          if (validation.decision === 'auto') {
+            // AUTO-CALIBRATE: Phone is close enough (< 100m), use it!
+            altitudeToUse = calculatedAltitude;
+            altitudeSource = `Ground Reference (${validation.distance.toFixed(0)}m away) ✅`;
+            relativeAltitude = calculatedAltitude;
+          } else if (validation.decision === 'prompt') {
+            // PROMPT USER: Medium distance (100-500m), ask them to confirm
+            // For now, use calculated altitude (UI will prompt later)
+            altitudeToUse = calculatedAltitude;
+            altitudeSource = `Ground Reference (${validation.distance.toFixed(0)}m away - confirm location)`;
+            relativeAltitude = calculatedAltitude;
+          } else {
+            // SKIP: Too far away (> 500m), use Map Scale calibration instead
+            altitudeToUse = gps.altitude; // Temp use GPS (will skip to Map Scale)
+            altitudeSource = `Phone too far (${(validation.distance / 1000).toFixed(1)}km) - use Map Scale`;
+          }
+        } else {
+          // FALLBACK: Couldn't get phone location
+          altitudeToUse = gps.altitude;
+          altitudeSource = 'GPS ASL (no phone location available)';
+        }
       }
       
       const metrics = calculateGroundMetrics(altitudeToUse, specs);
