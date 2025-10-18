@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Image, Dimensions, StyleSheet, View, Text, InteractionManager } from 'react-native';
+import React, { useEffect } from 'react';
+import { Image, Dimensions, StyleSheet, View, Text } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -9,6 +9,7 @@ import Animated, {
   runOnJS,
   useAnimatedReaction,
 } from 'react-native-reanimated';
+import UniversalFingerprints from './UniversalFingerprints';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -16,6 +17,8 @@ interface ZoomableImageProps {
   imageUri: string;
   onTransformChange?: (scale: number, translateX: number, translateY: number, rotation: number) => void;
   onDoubleTapWhenLocked?: () => void; // Called when user double-taps while locked (e.g., to switch to Measure mode)
+  onPanStart?: (x: number, y: number) => void; // Called when pan gesture starts (for fingerprints)
+  fingerColor?: string; // Color for pan fingerprints
   initialScale?: number;
   initialTranslateX?: number;
   initialTranslateY?: number;
@@ -31,6 +34,8 @@ export default function ZoomableImage({
   imageUri, 
   onTransformChange,
   onDoubleTapWhenLocked,
+  onPanStart,
+  fingerColor = '#3B82F6',
   initialScale = 1,
   initialTranslateX = 0,
   initialTranslateY = 0,
@@ -231,6 +236,9 @@ export default function ZoomableImage({
 
   return (
     <>
+      {/* Universal fingerprints for pan gestures (multi-touch) */}
+      <UniversalFingerprints color={fingerColor} enabled={true} captureMultiTouch={true} />
+      
       <View 
         style={StyleSheet.absoluteFill} 
         pointerEvents="box-none"
