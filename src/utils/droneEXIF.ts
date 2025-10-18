@@ -736,58 +736,11 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       // PRIORITY 2: Manual altitude entry (reliable and user-friendly!)
       else {
         console.log('🎯 XMP RelativeAltitude not found - will prompt for manual entry');
-        // Use temporary GPS altitude - UI will show manual entry modal
-        altitudeToUse = gps.altitude;
+        // Don't calculate GSD yet - UI will show manual entry modal
+        // Return without GSD, MeasurementScreen will handle calibration after user enters altitude
+        altitudeToUse = gps.altitude; // Temporary placeholder
         altitudeSource = 'Manual entry required';
         // Note: The actual manual entry will happen in MeasurementScreen
-      }
-          );
-          
-          console.log(`📏 Ground Reference Validation: ${validation.decision.toUpperCase()}`);
-          console.log(`   ${validation.message}`);
-          
-          // Calculate relative altitude using phone as ground reference
-          const result = calculateDroneRelativeAltitude(gps.altitude, phoneAlt.altitude);
-          const calculatedAltitude = result.relativeAltitude;
-          
-          alert(`🎯 GROUND REFERENCE DEBUG
-
-Decision: ${validation.decision.toUpperCase()}
-Distance: ${validation.distance.toFixed(0)}m
-
-DRONE GPS:
-  Lat: ${gps.latitude.toFixed(6)}
-  Lon: ${gps.longitude.toFixed(6)}
-  Alt: ${gps.altitude.toFixed(1)}m
-
-PHONE GPS:
-  Lat: ${phoneAlt.latitude.toFixed(6)}
-  Lon: ${phoneAlt.longitude.toFixed(6)}
-  Alt: ${phoneAlt.altitude.toFixed(1)}m
-
-Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
-          if (validation.decision === 'auto') {
-            // AUTO-CALIBRATE: Phone is close enough (< 100m), use it!
-            altitudeToUse = calculatedAltitude;
-            altitudeSource = `Ground Reference (${validation.distance.toFixed(0)}m away) ✅`;
-            relativeAltitude = calculatedAltitude;
-          } else if (validation.decision === 'prompt') {
-            // PROMPT USER: Medium distance (100-500m), ask them to confirm
-            // For now, use calculated altitude (UI will prompt later)
-            altitudeToUse = calculatedAltitude;
-            altitudeSource = `Ground Reference (${validation.distance.toFixed(0)}m away - confirm location)`;
-            relativeAltitude = calculatedAltitude;
-          } else {
-            // SKIP: Too far away (> 500m), use Map Scale calibration instead
-            altitudeToUse = gps.altitude; // Temp use GPS (will skip to Map Scale)
-            altitudeSource = `Phone too far (${(validation.distance / 1000).toFixed(1)}km) - use Map Scale`;
-          }
-          }
-        } catch (error) {
-          alert(`❌ GROUND REFERENCE ERROR\n\n${error}`);
-          altitudeToUse = gps.altitude;
-          altitudeSource = 'GPS ASL (error getting phone location)';
-        }
       }
       
       const metrics = calculateGroundMetrics(altitudeToUse, specs);
