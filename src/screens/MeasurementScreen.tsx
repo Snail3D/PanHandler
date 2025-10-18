@@ -1268,63 +1268,71 @@ export default function MeasurementScreen() {
         await detectOrientation(asset.uri);
         
         // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
-        const { extractDroneMetadata } = await import('../utils/droneEXIF');
-        const droneMetadata = await extractDroneMetadata(asset.uri);
-        
-        // If drone detected with auto-calibration data, skip calibration screen!
-        if (droneMetadata.isDrone && droneMetadata.groundSampleDistance && droneMetadata.specs) {
-          console.log('🚁 Drone detected! Auto-calibrating...');
+        try {
+          const { extractDroneMetadata } = await import('../utils/droneEXIF');
+          const droneMetadata = await extractDroneMetadata(asset.uri);
           
-          // Calculate calibration from drone altitude
-          const mmPerPixel = droneMetadata.groundSampleDistance * 10; // cm to mm
-          const pixelsPerMM = 1 / mmPerPixel;
+          // Debug: Show what we got
+          alert(`DRONE CHECK\n\nisDrone: ${droneMetadata.isDrone}\nhasGSD: ${!!droneMetadata.groundSampleDistance}\nhasSpecs: ${!!droneMetadata.specs}\n\nMake: ${droneMetadata.make}\nModel: ${droneMetadata.model}\nAlt: ${droneMetadata.gps?.altitude}m`);
           
-          // Set calibration data directly
-          setCalibration({
-            pixelsPerUnit: pixelsPerMM,
-            unit: 'mm',
-            referenceDistance: droneMetadata.groundSampleDistance * 10,
-          });
-          
-          setCoinCircle({
-            centerX: droneMetadata.specs.resolution.width / 2,
-            centerY: droneMetadata.specs.resolution.height / 2,
-            radius: 100,
-            coinName: `Auto: ${droneMetadata.displayName || 'Drone'}`,
-            coinDiameter: droneMetadata.groundSampleDistance * 10,
-          });
-          
-          setMeasurementZoom({
-            scale: 1,
-            translateX: 0,
-            translateY: 0,
-            rotation: 0,
-          });
-          
-          // Show success message
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          
-          // Skip calibration, go DIRECTLY to measurement mode
-          setIsTransitioning(true);
-          transitionBlackOverlay.value = withTiming(1, {
-            duration: 150,
-            easing: Easing.in(Easing.ease),
-          });
-          
-          setTimeout(() => {
-            setMode('measurement'); // SKIP calibration, go straight to measurement!
+          // If drone detected with auto-calibration data, skip calibration screen!
+          if (droneMetadata.isDrone && droneMetadata.groundSampleDistance && droneMetadata.specs) {
+            console.log('🚁 Drone detected! Auto-calibrating...');
             
-            transitionBlackOverlay.value = withTiming(0, {
-              duration: 250,
-              easing: Easing.out(Easing.ease),
+            // Calculate calibration from drone altitude
+            const mmPerPixel = droneMetadata.groundSampleDistance * 10; // cm to mm
+            const pixelsPerMM = 1 / mmPerPixel;
+            
+            // Set calibration data directly
+            setCalibration({
+              pixelsPerUnit: pixelsPerMM,
+              unit: 'mm',
+              referenceDistance: droneMetadata.groundSampleDistance * 10,
+            });
+            
+            setCoinCircle({
+              centerX: droneMetadata.specs.resolution.width / 2,
+              centerY: droneMetadata.specs.resolution.height / 2,
+              radius: 100,
+              coinName: `Auto: ${droneMetadata.displayName || 'Drone'}`,
+              coinDiameter: droneMetadata.groundSampleDistance * 10,
+            });
+            
+            setMeasurementZoom({
+              scale: 1,
+              translateX: 0,
+              translateY: 0,
+              rotation: 0,
+            });
+            
+            // Show success message
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            
+            // Skip calibration, go DIRECTLY to measurement mode
+            setIsTransitioning(true);
+            transitionBlackOverlay.value = withTiming(1, {
+              duration: 150,
+              easing: Easing.in(Easing.ease),
             });
             
             setTimeout(() => {
-              setIsTransitioning(false);
-            }, 250);
-          }, 150);
-          
-          return; // Exit early - skip normal calibration flow
+              setMode('measurement'); // SKIP calibration, go straight to measurement!
+              
+              transitionBlackOverlay.value = withTiming(0, {
+                duration: 250,
+                easing: Easing.out(Easing.ease),
+              });
+              
+              setTimeout(() => {
+                setIsTransitioning(false);
+              }, 250);
+            }, 150);
+            
+            return; // Exit early - skip normal calibration flow
+          }
+        } catch (error) {
+          console.error('Error checking for drone:', error);
+          alert(`DRONE CHECK FAILED\n\nError: ${error}\n\nProceeding with normal calibration...`);
         }
         
         // NOT a drone (or no auto-calibration data) - proceed with normal calibration
