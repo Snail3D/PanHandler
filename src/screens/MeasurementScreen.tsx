@@ -119,6 +119,7 @@ export default function MeasurementScreen() {
   const [currentPhotoType, setCurrentPhotoType] = useState<PhotoType | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
+  const [skipToBlueprintMode, setSkipToBlueprintMode] = useState(false); // Track if user selected blueprint photo type
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -1087,31 +1088,16 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Check orientation FIRST before proceeding
-        const isHorizontal = await new Promise<boolean>((resolve) => {
-          Image.getSize(photo.uri, (width, height) => {
-            resolve(width > height);
-          }, () => {
-            resolve(false); // Default to false on error
-          });
-        });
-        
-        // Camera photos MUST be horizontal for coin calibration
-        if (!isHorizontal) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          // Show error - they need to rotate phone
-          alert("Please rotate your phone to landscape (horizontal) orientation to take measurement photos.");
-          setIsCapturing(false);
-          setIsHoldingShutter(false);
-          setIsTransitioning(false);
-          return;
-        }
-        
         // Set image URI immediately and start transition
         setImageUri(photo.uri, wasAutoCapture);
         
-        // Store orientation
-        setImageOrientation('LANDSCAPE');
+        // Detect orientation in background
+        Image.getSize(photo.uri, (width, height) => {
+          const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+          setImageOrientation(orientation);
+        }, (error) => {
+          console.error('Error detecting orientation:', error);
+        });
         
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
@@ -1397,9 +1383,8 @@ export default function MeasurementScreen() {
           if (type === 'map') {
             setShowVerbalScaleModal(true);
           } else if (type === 'blueprint') {
-            // Blueprint mode not yet implemented - show alert
-            alert("Blueprint mode coming soon! For now, please use Map Scale or Coin calibration.");
-            setMode('camera'); // Go back to camera
+            // Blueprint mode - set flag to open blueprint placement modal
+            setSkipToBlueprintMode(true);
           } else if (type === 'aerial') {
             // Show manual altitude modal if drone detected
             if (pendingDroneData) {
@@ -2250,6 +2235,7 @@ export default function MeasurementScreen() {
           visible={showPhotoTypeModal}
           onSelect={handlePhotoTypeSelection}
           onCancel={() => setShowPhotoTypeModal(false)}
+          sessionColor={crosshairColor}
         />
       </View>
     );
@@ -2327,6 +2313,7 @@ export default function MeasurementScreen() {
                   setImageOpacity={setImageOpacity}
                   sessionColor={shutterColor}
                   skipToMapMode={skipToMapMode}
+                  skipToBlueprintMode={skipToBlueprintMode}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
