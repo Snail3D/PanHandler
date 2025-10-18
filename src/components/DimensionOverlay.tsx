@@ -286,8 +286,13 @@ export default function DimensionOverlay({
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
-  const [hasShownAnimation, setHasShownAnimation] = useState(coinCircle ? true : false); // Start true if coinCircle already exists
+  const [hasShownAnimation, setHasShownAnimation] = useState(false); // Always start false - only show animation on first calibration
   const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
+  
+  // Reset animation flag when image changes (new photo = new session)
+  useEffect(() => {
+    setHasShownAnimation(false);
+  }, [currentImageUri]);
   
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
