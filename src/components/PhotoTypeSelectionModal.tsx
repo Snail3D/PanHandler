@@ -3,6 +3,7 @@ import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon, RulerIcon } from './CalibrationIcons';
 
 export type PhotoType = 'coin' | 'aerial' | 'map' | 'blueprint' | 'knownScale';
 
@@ -58,8 +59,8 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                 ]}
                 onPress={() => handleSelect('coin')}
               >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,149,0,0.15)' }]}>
-                  <Text style={styles.emoji}>🪙</Text>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,149,0,0.2)' }]}>
+                  <CoinIcon size={28} color="#FF9500" />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionTitle}>Coin Reference</Text>
@@ -67,7 +68,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     Classic calibration with a coin
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
               </Pressable>
 
               {/* Aerial Photo */}
@@ -78,8 +79,8 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                 ]}
                 onPress={() => handleSelect('aerial')}
               >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(0,199,190,0.15)' }]}>
-                  <Text style={styles.emoji}>✈️</Text>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(0,199,190,0.2)' }]}>
+                  <DroneIcon size={28} color="#00C7BE" />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionTitle}>Aerial Photo</Text>
@@ -87,7 +88,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     Auto-calibrate from drone metadata
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
               </Pressable>
 
               {/* Map Mode */}
@@ -98,8 +99,8 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                 ]}
                 onPress={() => handleSelect('map')}
               >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(0,122,255,0.15)' }]}>
-                  <Text style={styles.emoji}>🗺️</Text>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(0,122,255,0.2)' }]}>
+                  <MapIcon size={28} color="#007AFF" />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionTitle}>Map Mode</Text>
@@ -107,7 +108,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     Use verbal scale (1 inch = 10 miles)
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
               </Pressable>
 
               {/* Blueprint */}
@@ -118,8 +119,8 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                 ]}
                 onPress={() => handleSelect('blueprint')}
               >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(88,86,214,0.15)' }]}>
-                  <Text style={styles.emoji}>📐</Text>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(88,86,214,0.2)' }]}>
+                  <BlueprintIcon size={28} color="#5856D6" />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionTitle}>Blueprint</Text>
@@ -127,7 +128,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     Calibrate from scale bar
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
               </Pressable>
 
               {/* Known Scale */}
@@ -138,8 +139,8 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                 ]}
                 onPress={() => handleSelect('knownScale')}
               >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(52,199,89,0.15)' }]}>
-                  <Text style={styles.emoji}>📏</Text>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(52,199,89,0.2)' }]}>
+                  <RulerIcon size={28} color="#34C759" />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionTitle}>Known Scale</Text>
@@ -147,7 +148,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     Two-point with known distance
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#8E8E93" />
+                <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
               </Pressable>
             </View>
 
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   backdrop: {
     position: 'absolute',
@@ -183,89 +184,115 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   blurContainer: {
-    width: '85%',
-    maxWidth: 400,
-    borderRadius: 24,
+    width: '90%',
+    maxWidth: 420,
+    borderRadius: 28,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.4,
+    shadowRadius: 30,
+    elevation: 10,
   },
   modalContent: {
-    padding: 24,
+    padding: 28,
+    backgroundColor: 'rgba(255,255,255,0.05)', // Subtle white tint for watery effect
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 28,
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 26,
+    fontWeight: '800',
     color: '#FFFFFF',
-    marginBottom: 8,
-    letterSpacing: -0.5,
+    marginBottom: 10,
+    letterSpacing: -0.6,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   subtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.7)',
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.8)',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+    fontWeight: '500',
   },
   optionsContainer: {
-    gap: 12,
-    marginBottom: 20,
+    gap: 14,
+    marginBottom: 24,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.18)', // More opaque for watery glass effect
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.3)', // Stronger border
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   optionPressed: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    transform: [{ scale: 0.98 }],
+    backgroundColor: 'rgba(255,255,255,0.30)', // Brighter when pressed
+    transform: [{ scale: 0.97 }],
+    shadowOpacity: 0.25,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 54,
+    height: 54,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
-  },
-  emoji: {
-    fontSize: 24,
+    marginRight: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   optionTextContainer: {
     flex: 1,
   },
   optionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 2,
+    marginBottom: 3,
+    letterSpacing: -0.2,
   },
   optionDescription: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
-    lineHeight: 18,
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 19,
+    fontWeight: '500',
   },
   cancelButton: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 16,
+    padding: 18,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   cancelButtonPressed: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    transform: [{ scale: 0.98 }],
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    transform: [{ scale: 0.97 }],
   },
   cancelText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: '#FFFFFF',
+    letterSpacing: -0.2,
   },
 });
 

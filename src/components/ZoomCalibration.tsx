@@ -11,6 +11,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, wit
 import useStore from '../state/measurementStore';
 import TouchOverlayFingerprints from './TouchOverlayFingerprints';
 import { extractDroneMetadata, DroneMetadata } from '../utils/droneEXIF';
+import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon, RulerIcon } from './CalibrationIcons';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -716,9 +717,17 @@ export default function ZoomCalibration({
               borderColor: 'rgba(255, 255, 255, 0.35)',
             }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: 20, marginRight: 8 }}>
-                  {photoType === 'aerial' ? '✈️' : photoType === 'map' ? '🗺️' : photoType === 'blueprint' ? '📐' : '📏'}
-                </Text>
+                <View style={{ marginRight: 12 }}>
+                  {photoType === 'aerial' ? (
+                    <DroneIcon size={28} color="#00C7BE" />
+                  ) : photoType === 'map' ? (
+                    <MapIcon size={28} color="#007AFF" />
+                  ) : photoType === 'blueprint' ? (
+                    <BlueprintIcon size={28} color="#5856D6" />
+                  ) : (
+                    <RulerIcon size={28} color="#34C759" />
+                  )}
+                </View>
                 <View style={{ flex: 1 }}>
                   <Text style={{ 
                     color: 'rgba(0, 0, 0, 0.85)', 
@@ -736,10 +745,10 @@ export default function ZoomCalibration({
                     fontSize: 12,
                     lineHeight: 16,
                   }}>
-                    {photoType === 'aerial' ? 'Use Map Scale button for manual calibration' : 
-                     photoType === 'map' ? 'Tap Map Scale below to set verbal scale' : 
-                     photoType === 'blueprint' ? 'Place scale bar (coming soon!)' : 
-                     'Set known distance (coming soon!)'}
+                    {photoType === 'aerial' ? 'Tap button below to calibrate manually' : 
+                     photoType === 'map' ? 'Tap Map button below to set verbal scale' : 
+                     photoType === 'blueprint' ? 'Tap Blueprint button for scale bar (coming soon!)' : 
+                     'Tap Scale button for two points (coming soon!)'}
                   </Text>
                 </View>
               </View>
@@ -779,8 +788,8 @@ export default function ZoomCalibration({
             }}>
               {/* Single Row: Map Scale + LOCK IN + Coin */}
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                {/* Map Scale - LEFT COLUMN (1/5) */}
-                {onSkipToMap && (
+                {/* Dynamic Calibration Button - LEFT COLUMN (1/5) */}
+                {onSkipToMap && photoType && photoType !== 'coin' && (
                   <Pressable
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -798,7 +807,15 @@ export default function ZoomCalibration({
                       borderColor: 'rgba(255, 255, 255, 0.3)',
                     })}
                   >
-                    <Ionicons name="map-outline" size={24} color="white" />
+                    {photoType === 'aerial' ? (
+                      <DroneIcon size={24} color="white" />
+                    ) : photoType === 'map' ? (
+                      <MapIcon size={24} color="white" />
+                    ) : photoType === 'blueprint' ? (
+                      <BlueprintIcon size={24} color="white" />
+                    ) : (
+                      <RulerIcon size={24} color="white" />
+                    )}
                     <Text style={{ 
                       color: 'white', 
                       fontWeight: '700', 
@@ -806,7 +823,14 @@ export default function ZoomCalibration({
                       marginTop: 4,
                       textAlign: 'center',
                     }}>
-                      Map{'\n'}Scale
+                      {photoType === 'aerial' ? 'Drone' : 
+                       photoType === 'map' ? 'Map' : 
+                       photoType === 'blueprint' ? 'Blueprint' : 
+                       'Scale'}{'\n'}
+                      {photoType === 'aerial' ? 'Cal' : 
+                       photoType === 'map' ? 'Scale' : 
+                       photoType === 'blueprint' ? 'Bar' : 
+                       'Points'}
                     </Text>
                   </Pressable>
                 )}
@@ -860,13 +884,14 @@ export default function ZoomCalibration({
                       borderColor: 'rgba(0, 0, 0, 0.08)',
                     })}
                   >
-                    <Text style={{ fontSize: 22, marginBottom: 4 }}>🪙</Text>
+                    <CoinIcon size={24} color="#FF9500" />
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.9)', 
                       fontWeight: '700', 
                       fontSize: 10,
                       textAlign: 'center',
                       lineHeight: 12,
+                      marginTop: 4,
                     }}>
                       {selectedCoin.name}
                     </Text>
