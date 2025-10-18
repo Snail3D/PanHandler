@@ -1262,8 +1262,25 @@ export default function MeasurementScreen() {
       });
 
       if (!result.canceled && result.assets[0]) {
-        setImageUri(result.assets[0].uri, false); // false = not auto-captured
-        await detectOrientation(result.assets[0].uri);
+        const asset = result.assets[0];
+        
+        // Debug: Log EXIF data to see what we're getting
+        console.log('📸 Image picked from library');
+        console.log('URI:', asset.uri);
+        console.log('EXIF available:', !!asset.exif);
+        if (asset.exif) {
+          console.log('EXIF keys:', Object.keys(asset.exif).slice(0, 10).join(', '));
+          console.log('Make:', asset.exif.Make);
+          console.log('Model:', asset.exif.Model);
+          console.log('GPS:', {
+            lat: asset.exif.GPSLatitude,
+            lon: asset.exif.GPSLongitude,
+            alt: asset.exif.GPSAltitude
+          });
+        }
+        
+        setImageUri(asset.uri, false); // false = not auto-captured
+        await detectOrientation(asset.uri);
         
         // Smooth transition to calibration (same as taking photo)
         setIsTransitioning(true);
