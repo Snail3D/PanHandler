@@ -108,6 +108,7 @@ interface DimensionOverlayProps {
   onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
   skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
+  skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
 }
 
 export default function DimensionOverlay({ 
@@ -122,6 +123,7 @@ export default function DimensionOverlay({
   onReset,
   onMeasurementModeChange,
   skipToMapMode = false,
+  skipToBlueprintMode = false,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -602,6 +604,17 @@ export default function DimensionOverlay({
       setShowMapScaleModal(true);
     }
   }, [skipToMapMode, mapScale]);
+  
+  // Handle skipToBlueprintMode prop (from photo type selection)
+  const hasTriggeredSkipToBlueprint = useRef(false);
+  useEffect(() => {
+    if (skipToBlueprintMode && !hasTriggeredSkipToBlueprint.current) {
+      // User selected blueprint from photo type selection - open modal immediately
+      console.log('📐 skipToBlueprintMode triggered - opening blueprint placement modal');
+      hasTriggeredSkipToBlueprint.current = true;
+      setShowBlueprintPlacementModal(true);
+    }
+  }, [skipToBlueprintMode]);
   
   // Track if we've shown the initial quote
   const hasShownInitialQuote = useRef(false);
