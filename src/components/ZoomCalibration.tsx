@@ -208,9 +208,6 @@ export default function ZoomCalibration({
           setDroneData(metadata);
           setIsDroneDetected(true);
           
-          // Debug: Show what we detected
-          alert(`DRONE DETECTED\n\nisDrone: ${metadata.isDrone}\nisOverhead: ${metadata.isOverhead}\nhasGSD: ${!!metadata.groundSampleDistance}\nhasSpecs: ${!!metadata.specs}\n\nMake: ${metadata.make}\nModel: ${metadata.model}\nAlt: ${metadata.gps?.altitude}m\nPitch: ${metadata.gimbal?.pitch}°`);
-          
           // If it's an overhead drone photo, auto-calibrate and complete
           if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
             const debugInfo = {
@@ -221,13 +218,6 @@ export default function ZoomCalibration({
             };
             console.log('🚁 AUTO-CALIBRATING:', JSON.stringify(debugInfo));
             
-            // Show debug alert on screen
-            setTimeout(() => {
-              const gsd = metadata.groundSampleDistance || 0;
-              const alt = metadata.gps?.altitude || 0;
-              alert(`🚁 DRONE AUTO-CALIBRATED\n\nDrone: ${metadata.displayName}\nAltitude: ${alt.toFixed(1)}m\nGSD: ${gsd.toFixed(2)} cm/pixel\n\n1 pixel = ${(gsd * 10).toFixed(1)} mm`);
-            }, 1000);
-            
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             
             // Auto-calculate calibration from drone altitude
@@ -236,6 +226,9 @@ export default function ZoomCalibration({
             // So: 1 mm = 1/5.2 pixels = 0.192 pixels
             const mmPerPixel = metadata.groundSampleDistance * 10; // Convert cm to mm
             const pixelsPerMM = 1 / mmPerPixel;
+            
+            // Show calibration calculation
+            alert(`🚁 AUTO-CALIBRATING\n\nDrone: ${metadata.displayName}\nAltitude: ${metadata.gps?.altitude?.toFixed(1)}m\nGSD: ${metadata.groundSampleDistance?.toFixed(3)} cm/px\n\nCalc:\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\nThis calibration will be used for measurements!`);
             
             // Complete calibration immediately with drone data
             onComplete({
