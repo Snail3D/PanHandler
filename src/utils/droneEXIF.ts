@@ -616,9 +616,10 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         altInfo.push(`GPS: ${gps.altitude.toFixed(1)}m ASL`);
       }
       
-      alert(`GIMBAL DETECTED\n\n${axes.join('\n')}\n${axes.length}-axis gimbal\n\nALTITUDE DATA:\n${altInfo.join('\n')}\n\nAuto-calibrating from drone altitude!`);
+      console.log(`✈️ GIMBAL DETECTED: ${axes.join(', ')} (${axes.length}-axis gimbal)`);
+      console.log(`📏 ALTITUDE DATA: ${altInfo.join(', ')}`);
     } else if (isDrone) {
-      alert(`DRONE DETECTED (no gimbal data)\n\nAssuming overhead photo.\nAuto-calibrating from altitude!`);
+      console.log(`✈️ DRONE DETECTED (no gimbal data) - Assuming overhead photo`);
     }
     
     // Try to find drone in database
