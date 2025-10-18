@@ -28,6 +28,7 @@ const VIBRANT_COLORS = [
 interface ZoomCalibrationProps {
   imageUri: string;
   sessionColor?: { main: string; glow: string }; // Optional session color from camera for visual continuity
+  photoType?: 'coin' | 'aerial' | 'map' | 'blueprint' | 'knownScale' | null; // Photo type selection
   onComplete: (calibrationData: {
     pixelsPerUnit: number;
     unit: string;
@@ -53,6 +54,7 @@ interface ZoomCalibrationProps {
 export default function ZoomCalibration({
   imageUri,
   sessionColor,
+  photoType,
   onComplete,
   onSkipToMap,
   onCancel,
@@ -688,6 +690,64 @@ export default function ZoomCalibration({
       )}
 
 
+      {/* Photo Type Info Badge - Show for non-coin types */}
+      {photoType && photoType !== 'coin' && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: insets.bottom + 160,
+            left: SCREEN_WIDTH * 0.10,
+            right: SCREEN_WIDTH * 0.10,
+          }}
+        >
+          <BlurView
+            intensity={35}
+            tint="light"
+            style={{
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}
+          >
+            <View style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.5)',
+              borderRadius: 16,
+              padding: 14,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.35)',
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ fontSize: 20, marginRight: 8 }}>
+                  {photoType === 'aerial' ? '✈️' : photoType === 'map' ? '🗺️' : photoType === 'blueprint' ? '📐' : '📏'}
+                </Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.85)', 
+                    fontWeight: '700', 
+                    fontSize: 14,
+                    marginBottom: 4,
+                  }}>
+                    {photoType === 'aerial' ? 'Aerial Photo Mode' : 
+                     photoType === 'map' ? 'Map Mode Selected' : 
+                     photoType === 'blueprint' ? 'Blueprint Mode' : 
+                     'Known Scale Mode'}
+                  </Text>
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.6)', 
+                    fontSize: 12,
+                    lineHeight: 16,
+                  }}>
+                    {photoType === 'aerial' ? 'Use Map Scale button for manual calibration' : 
+                     photoType === 'map' ? 'Tap Map Scale below to set verbal scale' : 
+                     photoType === 'blueprint' ? 'Place scale bar (coming soon!)' : 
+                     'Set known distance (coming soon!)'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </BlurView>
+        </View>
+      )}
+
       {/* Bottom Controls - Single row: Map | LOCK IN | Coin */}
       {selectedCoin && (
         <View
@@ -780,52 +840,54 @@ export default function ZoomCalibration({
                   </Text>
                 </Pressable>
 
-                {/* Coin - RIGHT COLUMN (1/5) */}
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowCoinSelector(true);
-                    setSearchQuery('');
-                  }}
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                    borderRadius: 16,
-                    paddingVertical: 20,
-                    paddingHorizontal: 8,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 1,
-                    borderColor: 'rgba(0, 0, 0, 0.08)',
-                  })}
-                >
-                  <Text style={{ fontSize: 22, marginBottom: 4 }}>🪙</Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.9)', 
-                    fontWeight: '700', 
-                    fontSize: 10,
-                    textAlign: 'center',
-                    lineHeight: 12,
-                  }}>
-                    {selectedCoin.name}
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.5)', 
-                    fontSize: 8,
-                    fontWeight: '600',
-                    marginTop: 2,
-                  }}>
-                    {selectedCoin.diameter}mm
-                  </Text>
-                </Pressable>
+                {/* Coin - RIGHT COLUMN (1/5) - Only show for coin calibration */}
+                {(!photoType || photoType === 'coin') && (
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setShowCoinSelector(true);
+                      setSearchQuery('');
+                    }}
+                    style={({ pressed }) => ({
+                      flex: 1,
+                      backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                      borderRadius: 16,
+                      paddingVertical: 20,
+                      paddingHorizontal: 8,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                      borderColor: 'rgba(0, 0, 0, 0.08)',
+                    })}
+                  >
+                    <Text style={{ fontSize: 22, marginBottom: 4 }}>🪙</Text>
+                    <Text style={{ 
+                      color: 'rgba(0, 0, 0, 0.9)', 
+                      fontWeight: '700', 
+                      fontSize: 10,
+                      textAlign: 'center',
+                      lineHeight: 12,
+                    }}>
+                      {selectedCoin.name}
+                    </Text>
+                    <Text style={{ 
+                      color: 'rgba(0, 0, 0, 0.5)', 
+                      fontSize: 8,
+                      fontWeight: '600',
+                      marginTop: 2,
+                    }}>
+                      {selectedCoin.diameter}mm
+                    </Text>
+                  </Pressable>
+                )}
               </View>
             </View>
           </BlurView>
         </View>
       )}
 
-      {/* Coin Search Modal - Shows at TOP when selector button is tapped */}
-      {showCoinSelector && (
+      {/* Coin Search Modal - Shows at TOP when selector button is tapped - Only for coin calibration */}
+      {(!photoType || photoType === 'coin') && showCoinSelector && (
         <Animated.View
           style={[
             {
