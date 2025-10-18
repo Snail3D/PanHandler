@@ -1268,18 +1268,70 @@ export default function MeasurementScreen() {
         await detectOrientation(asset.uri);
         
         // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
+        let debugLog = '🔍 STARTING DETECTION\n';
         try {
+          debugLog += '✓ Import successful\n';
+          
           // Add a small delay to ensure file is accessible
           await new Promise(resolve => setTimeout(resolve, 100));
+          debugLog += '✓ 100ms delay complete\n';
           
           const { extractDroneMetadata } = await import('../utils/droneEXIF');
+          debugLog += '✓ Module imported\n';
           
-          alert(`Starting drone detection...\nURI: ${asset.uri.substring(0, 50)}...`);
-          
+          const startTime = Date.now();
           const droneMetadata = await extractDroneMetadata(asset.uri);
+          const extractTime = Date.now() - startTime;
+          debugLog += `✓ Extraction complete (${extractTime}ms)\n`;
           
-          // Debug: Show what we got
-          alert(`DRONE CHECK\n\nisDrone: ${droneMetadata.isDrone}\nhasGSD: ${!!droneMetadata.groundSampleDistance}\nhasSpecs: ${!!droneMetadata.specs}\n\nMake: ${droneMetadata.make}\nModel: ${droneMetadata.model}\nAlt: ${droneMetadata.gps?.altitude}m`);
+          // ONE COMPREHENSIVE DEBUG ALERT
+          const debugInfo = `🔍 DRONE DETECTION DEBUG
+
+⏱️ Timing:
+Extraction: ${extractTime}ms
+
+📁 File Info:
+URI Type: ${asset.uri.startsWith('file://') ? 'file://' : asset.uri.startsWith('ph://') ? 'ph://' : 'other'}
+URI: ${asset.uri.substring(0, 60)}...
+Width: ${asset.width}px
+Height: ${asset.height}px
+EXIF in asset: ${asset.exif ? 'YES' : 'NO'}
+
+🚁 Detection Results:
+isDrone: ${droneMetadata.isDrone}
+isOverhead: ${droneMetadata.isOverhead}
+confidence: ${droneMetadata.confidence}
+method: ${droneMetadata.detectionMethod}
+
+📊 EXIF Data:
+Make: ${droneMetadata.make || 'undefined'}
+Model: ${droneMetadata.model || 'undefined'}
+Display: ${droneMetadata.displayName || 'undefined'}
+
+📍 GPS:
+HasGPS: ${!!droneMetadata.gps}
+Altitude: ${droneMetadata.gps?.altitude?.toFixed(2) || 'undefined'}m
+Lat: ${droneMetadata.gps?.latitude?.toFixed(6) || 'undefined'}
+Lon: ${droneMetadata.gps?.longitude?.toFixed(6) || 'undefined'}
+
+📐 Gimbal:
+HasGimbal: ${!!droneMetadata.gimbal}
+Pitch: ${droneMetadata.gimbal?.pitch?.toFixed(1) || 'undefined'}°
+Yaw: ${droneMetadata.gimbal?.yaw?.toFixed(1) || 'undefined'}°
+Roll: ${droneMetadata.gimbal?.roll?.toFixed(1) || 'undefined'}°
+
+📏 Calibration Data:
+HasSpecs: ${!!droneMetadata.specs}
+GSD: ${droneMetadata.groundSampleDistance?.toFixed(4) || 'undefined'} cm/px
+${droneMetadata.specs ? `Sensor: ${droneMetadata.specs.sensor.width}x${droneMetadata.specs.sensor.height}mm` : 'No specs'}
+${droneMetadata.specs ? `Focal: ${droneMetadata.specs.focalLength}mm` : ''}
+${droneMetadata.specs ? `Res: ${droneMetadata.specs.resolution.width}x${droneMetadata.specs.resolution.height}` : ''}
+
+✅ AUTO-CALIBRATE: ${droneMetadata.isDrone && droneMetadata.groundSampleDistance && droneMetadata.specs ? '✓ YES' : '✗ NO'}
+
+${debugLog}`;
+          
+          alert(debugInfo);
           
           // If drone detected with auto-calibration data, skip calibration screen!
           if (droneMetadata.isDrone && droneMetadata.groundSampleDistance && droneMetadata.specs) {
