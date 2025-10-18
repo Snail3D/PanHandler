@@ -113,6 +113,16 @@ export default function MeasurementScreen() {
   // Manual altitude modal for drone photos
   const [showManualAltitudeModal, setShowManualAltitudeModal] = useState(false);
   const [pendingDroneData, setPendingDroneData] = useState<any>(null);
+  
+  // DEBUG: Log when modal state changes
+  useEffect(() => {
+    console.log('🔔 MODAL STATE CHANGED:', showManualAltitudeModal);
+    if (showManualAltitudeModal) {
+      console.log('📍 Modal showing NOW - stack trace:');
+      console.trace();
+    }
+  }, [showManualAltitudeModal]);
+  
   const [showDiagnostic, setShowDiagnostic] = useState(false); // Diagnostic screen
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
