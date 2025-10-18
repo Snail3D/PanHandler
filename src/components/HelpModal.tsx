@@ -702,6 +702,43 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   
+                  {/* NEW: Camera Controls */}
+                  <View style={{
+                    marginTop: 12,
+                    backgroundColor: 'rgba(52,199,89,0.08)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(52,199,89,0.2)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Ionicons name="settings-outline" size={18} color="#34C759" />
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
+                        Camera Controls
+                      </Text>
+                    </View>
+                    <View style={{ gap: 8 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 14, marginRight: 6 }}>🔘</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
+                          <Text style={{ fontWeight: '600' }}>Auto-Capture Toggle</Text> - Not a fan of hands-free? Just flip the switch and use the shutter button instead!
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 14, marginRight: 6 }}>👆</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
+                          <Text style={{ fontWeight: '600' }}>Tap-to-Focus</Text> - Tap anywhere on the preview to focus the camera. Perfect for close-ups or tricky lighting!
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                        <Text style={{ fontSize: 14, marginRight: 6 }}>🎨</Text>
+                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
+                          <Text style={{ fontWeight: '600' }}>Vibrant Bubble</Text> - The bubble level gets a random color each session (blue, purple, pink, cyan, green, amber, or red). Smooth physics, orientation-aware, and oh-so-satisfying!
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  
                   {/* Auto-Leveled Album Feature */}
                   <View style={{
                     marginTop: 12,
@@ -750,9 +787,136 @@ Thank you for helping us improve PanHandler!
                     • Tap "Lock In Calibration" when ready
                   </Text>
                 </View>
+                
+                {/* Recalibrate Button */}
+                <View style={{
+                  marginTop: 14,
+                  backgroundColor: 'rgba(239,68,68,0.12)',
+                  borderRadius: 14,
+                  padding: 14,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(239,68,68,0.25)',
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="refresh-outline" size={18} color="#EF4444" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#EF4444', marginLeft: 6 }}>
+                      Oops! Need a Do-Over?
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    Made a mistake with your calibration? No worries! Just tap the red <Text style={{ fontWeight: '600' }}>Recalibrate</Text> button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!
+                  </Text>
+                </View>
               </ExpandableSection>
 
               {/* Map Mode */}
+
+              {/* Drone Photo Calibration - NEW! */}
+              <ExpandableSection
+                icon="airplane"
+                title="🚁 Drone Photos? Skip the Coin!"
+                color="#00C7BE"
+                delay={175}
+                scrollY={scrollY}
+                index={1.5}
+              >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  Got overhead drone shots? PanHandler can auto-calibrate using the GPS and altitude data baked into your photos. No coin needed!
+                </Text>
+                
+                {/* How It Works */}
+                <View style={{
+                  backgroundColor: 'rgba(0,199,190,0.12)',
+                  borderRadius: 14,
+                  padding: 14,
+                  marginBottom: 12,
+                  borderWidth: 2,
+                  borderColor: 'rgba(0,199,190,0.25)',
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                    <Text style={{ fontSize: 18, marginRight: 8 }}>⚡</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#00A89D' }}>
+                      How It Works
+                    </Text>
+                  </View>
+                  <View style={{ gap: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Text style={{ fontSize: 16, marginRight: 8 }}>1️⃣</Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
+                        <Text style={{ fontWeight: '600' }}>Import your drone photo</Text> from the gallery
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Text style={{ fontSize: 16, marginRight: 8 }}>2️⃣</Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
+                        <Text style={{ fontWeight: '600' }}>Overhead shot?</Text> PanHandler auto-calibrates instantly using GPS + altitude. Done!
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Text style={{ fontSize: 16, marginRight: 8 }}>3️⃣</Text>
+                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
+                        <Text style={{ fontWeight: '600' }}>Tilted shot?</Text> You will see a helpful badge suggesting Map Scale for two-point calibration
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                
+                {/* Supported Drones */}
+                <View style={{
+                  backgroundColor: 'rgba(0,199,190,0.08)',
+                  borderRadius: 14,
+                  padding: 14,
+                  marginBottom: 12,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(0,199,190,0.2)',
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="list" size={18} color="#00C7BE" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#00C7BE', marginLeft: 6 }}>
+                      Supported Drones (22+ models!)
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
+                    <Text style={{ fontWeight: '600' }}>DJI:</Text> Neo, Mini (4 Pro, 3 Pro, 2, SE), Mavic (3, 2 Pro, Air 2), Phantom (4 Pro, 4 Advanced), Air (3, 2S), Inspire (2, 3)
+                  </Text>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
+                    <Text style={{ fontWeight: '600' }}>Others:</Text> Autel EVO series, Parrot Anafi series, Skydio 2+, and more!
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#8E8E93', lineHeight: 18, marginTop: 4, fontStyle: 'italic' }}>
+                    Unknown drone? No problem - PanHandler estimates from sensor data!
+                  </Text>
+                </View>
+                
+                {/* Requirements */}
+                <View style={{
+                  backgroundColor: 'rgba(255,149,0,0.08)',
+                  borderRadius: 12,
+                  padding: 12,
+                  marginBottom: 12,
+                  borderLeftWidth: 3,
+                  borderLeftColor: '#FF9500',
+                }}>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF9500', marginBottom: 6 }}>
+                    📋 What You Need
+                  </Text>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    • Overhead shot (looking straight down){'\n'}
+                    • Flat terrain works best{'\n'}
+                    • Photo must have GPS/altitude metadata
+                  </Text>
+                </View>
+                
+                {/* Pro Tip */}
+                <View style={{
+                  backgroundColor: 'rgba(0,199,190,0.15)',
+                  borderRadius: 10,
+                  padding: 10,
+                }}>
+                  <Text style={{ fontSize: 13, color: '#00A89D', fontWeight: '600', textAlign: 'center' }}>
+                    💡 Saves 30 seconds per photo! Perfect for surveyors, inspectors, and anyone who flies drones regularly.
+                  </Text>
+                </View>
+              </ExpandableSection>
 
               {/* Measurement Modes */}
               <ExpandableSection
@@ -1635,8 +1799,17 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points in Pan/Zoom mode
                   </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement 4 times rapidly to delete it
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
+                    🚁 <Text style={{ fontWeight: '600' }}>Use drone photos</Text> - Import overhead shots for instant auto-calibration (no coin needed!)
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
+                    🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                    📸 <Text style={{ fontWeight: '600' }}>Tap to focus</Text> - Tap the camera preview to focus on specific areas before capturing
                   </Text>
                 </View>
                 
