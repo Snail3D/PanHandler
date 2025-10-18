@@ -1332,12 +1332,26 @@ export default function MeasurementScreen() {
 
   const pickImage = async () => {
     try {
+      // Request media library permission first
+      if (!mediaLibraryPermission?.granted) {
+        console.log("📸 Requesting media library permission...");
+        const { granted } = await requestMediaLibraryPermission();
+        if (!granted) {
+          alert("Permission to access photo library is required to import photos. Please enable it in Settings.");
+          return;
+        }
+      }
+      
+      console.log("📸 Opening image picker...");
+      console.log('📸 Photo library button: opening image picker...');
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: false,
         quality: 1,
         exif: true, // Request EXIF data
       });
+
+      console.log('📷 Image picker returned:', { canceled: result.canceled, hasAsset: !!result.assets?.[0] });
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
