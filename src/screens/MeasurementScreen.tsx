@@ -1334,14 +1334,15 @@ export default function MeasurementScreen() {
     setMode('camera');
   };
 
-  const pickImage = async () => {
-
+  // Handle photo type selection from modal
   const handlePhotoTypeSelection = (type: PhotoType) => {
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
+    // TODO: Phase 2 - Pass photoType to ZoomCalibration
+    // For now, just proceed to calibration
     setIsTransitioning(true);
     transitionBlackOverlay.value = withTiming(1, {
       duration: 150,
@@ -1364,6 +1365,8 @@ export default function MeasurementScreen() {
       }, 250);
     }, 150);
   };
+
+  const pickImage = async () => {
     try {
       // Request media library permission first
       if (!mediaLibraryPermission?.granted) {
@@ -2491,11 +2494,13 @@ export default function MeasurementScreen() {
         droneModel={pendingDroneData?.displayName || 'Drone'}
         distance={pendingDroneData?.distance}
       />
-    </Animated.View>
-  );
+
+      {/* Photo Type Selection Modal - For imported photos */}
       <PhotoTypeSelectionModal
         visible={showPhotoTypeModal}
         onSelect={handlePhotoTypeSelection}
         onCancel={() => setShowPhotoTypeModal(false)}
       />
+    </Animated.View>
+  );
 }
