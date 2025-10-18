@@ -21,6 +21,7 @@ import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
 import TypewriterText from '../components/TypewriterText';
+import UniversalFingerprints from '../components/UniversalFingerprints';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
@@ -1308,6 +1309,9 @@ export default function MeasurementScreen() {
               enableTorch={flashEnabled}
               autofocus="off"
             >
+            {/* Universal fingerprints for camera taps */}
+            <UniversalFingerprints color={crosshairColor.main} enabled={true} />
+            
             {/* Top controls */}
             <View 
               style={{ 
@@ -2040,6 +2044,7 @@ export default function MeasurementScreen() {
               >
                 <ZoomableImage 
                   imageUri={currentImageUri}
+                  fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}
                   initialTranslateX={measurementZoom.translateX}
                   initialTranslateY={measurementZoom.translateY}
