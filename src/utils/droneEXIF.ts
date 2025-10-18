@@ -736,9 +736,22 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       // PRIORITY 2: Calculate from phone's current GPS altitude (GROUND REFERENCE METHOD!)
       else {
         console.log('🎯 XMP RelativeAltitude not found - using GROUND REFERENCE method');
-        const phoneAlt = await getPhoneAltitude();
+        alert('📍 STARTING GROUND REFERENCE - requesting phone location...');
         
-        if (phoneAlt && phoneAlt.altitude) {
+        try {
+          const phoneAlt = await getPhoneAltitude();
+          
+          if (!phoneAlt) {
+            alert('⚠️ GROUND REFERENCE FAILED\n\nCould not get phone location.\nCheck location permissions!');
+            altitudeToUse = gps.altitude;
+            altitudeSource = 'GPS ASL (no phone location)';
+          } else if (!phoneAlt.altitude) {
+            alert('⚠️ GROUND REFERENCE FAILED\n\nPhone GPS has no altitude data!');
+            altitudeToUse = gps.altitude;
+            altitudeSource = 'GPS ASL (no altitude from phone)';
+          } else {
+          // Phone altitude received successfully!
+          
           // Validate if ground reference is reliable based on GPS distance
           const validation = validateGroundReference(
             gps.latitude,
@@ -782,10 +795,11 @@ This will be used for calibration!`);
             altitudeToUse = gps.altitude; // Temp use GPS (will skip to Map Scale)
             altitudeSource = `Phone too far (${(validation.distance / 1000).toFixed(1)}km) - use Map Scale`;
           }
-        } else {
-          // FALLBACK: Couldn't get phone location
+          }
+        } catch (error) {
+          alert(`❌ GROUND REFERENCE ERROR\n\n${error}`);
           altitudeToUse = gps.altitude;
-          altitudeSource = 'GPS ASL (no phone location available)';
+          altitudeSource = 'GPS ASL (error getting phone location)';
         }
       }
       
