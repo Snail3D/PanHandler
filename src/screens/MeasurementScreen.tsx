@@ -599,10 +599,11 @@ export default function MeasurementScreen() {
         isVerticalMode.value = isVertical;
         
         // Check if orientation changed
-        // Phone is horizontal (looking at table) when beta is low (tilted down)
+        // Phone is horizontal (looking at table) ONLY if both axes are close to flat
+        // If phone is sideways (high gamma) while upright, it's NOT horizontal
         const absGamma = Math.abs(gamma);
         const wasHorizontal = isHorizontal.value;
-        const nowHorizontal = absBeta < 60; // Just check beta - more lenient
+        const nowHorizontal = absBeta < 45 && absGamma < 45; // Both axes must be within 45° of flat
         isHorizontal.value = nowHorizontal; // Update shared value
         
         // Smooth 500ms fade transition between "Look Down" and instructions
@@ -1081,22 +1082,17 @@ export default function MeasurementScreen() {
         );
         
         // Use phone TILT to determine if looking at table or wall
-        // Beta close to 0° (phone tilted down) = looking at table
-        // Beta close to 90° (phone upright) = looking at wall
-        // If sensors haven't initialized (both 0), default to table mode for better UX
+        // Phone is looking at table ONLY if BOTH axes are close to flat
+        // If phone is sideways (high gamma) it's NOT looking at table
         const absBeta = Math.abs(currentBeta);
         const absGamma = Math.abs(currentGamma);
-        
-        // If sensors are uninitialized (both exactly 0), default to table mode
-        const sensorsInitialized = currentBeta !== 0 || currentGamma !== 0;
-        const isLookingAtTable = !sensorsInitialized || absBeta < 60; // More lenient threshold
+        const isLookingAtTable = absBeta < 45 && absGamma < 45; // Both axes must be within 45° of flat
         
         console.log('📷 Photo captured - Phone tilt:', {
           beta: currentBeta.toFixed(1),
           gamma: currentGamma.toFixed(1),
           absBeta: absBeta.toFixed(1),
           absGamma: absGamma.toFixed(1),
-          sensorsInitialized,
           isLookingAtTable,
           decision: isLookingAtTable ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'
         });
