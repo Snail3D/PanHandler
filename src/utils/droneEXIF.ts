@@ -767,15 +767,173 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           const result = calculateDroneRelativeAltitude(gps.altitude, phoneAlt.altitude);
           const calculatedAltitude = result.relativeAltitude;
           
-          // DEBUG ALERT - Show what's happening!
           alert(`🎯 GROUND REFERENCE DEBUG
 
 Decision: ${validation.decision.toUpperCase()}
 Distance: ${validation.distance.toFixed(0)}m
 
-Drone GPS Alt: ${gps.altitude.toFixed(1)}m
-Phone GPS Alt: ${phoneAlt.altitude.toFixed(1)}m
-Calculated Height: ${calculatedAltitude.toFixed(1)}m
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+          alert(`🎯 GROUND REFERENCE DEBUG
+
+Decision: ${validation.decision.toUpperCase()}
+Distance: ${validation.distance.toFixed(0)}m
+
+DRONE GPS:
+  Lat: ${gps.latitude.toFixed(6)}
+  Lon: ${gps.longitude.toFixed(6)}
+  Alt: ${gps.altitude.toFixed(1)}m
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m
+
+Calculated: ${calculatedAltitude.toFixed(1)}m AGL`);
+
+PHONE GPS:
+  Lat: ${phoneAlt.latitude.toFixed(6)}
+  Lon: ${phoneAlt.longitude.toFixed(6)}
+  Alt: ${phoneAlt.altitude.toFixed(1)}m ASL
+
+Calculated Height: ${calculatedAltitude.toFixed(1)}m AGL
 
 This will be used for calibration!`);
           
