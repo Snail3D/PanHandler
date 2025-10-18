@@ -42,8 +42,18 @@ export default function BattlingBotsModal({
   
   const offerOpacity = useSharedValue(0);
   
-  // 10 random conversation variations with Easter egg hints
+  // 11 random conversation variations with Easter egg hints
   const conversations: BotMessage[][] = [
+    // Conversation 0: DONATION FATIGUE (NEW!)
+    [
+      { bot: 'left', text: "I know... everyone begs these days." },
+      { bot: 'right', text: "Yeah. It's exhausting." },
+      { bot: 'left', text: "But this guy actually built something." },
+      { bot: 'right', text: "Months of work. No ads. No paywall." },
+      { bot: 'left', shouldBackspace: true, meanText: "So mayb—", niceText: "...if ANY app deserves it, it's this one." },
+      { bot: 'right', text: "Can't argue with that." },
+    ],
+    
     // Conversation 1: Left Egg Hint
     [
       { bot: 'left', text: "They've been using the app a lot..." },
@@ -64,14 +74,14 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "Because secrets are fun! 🤷" },
     ],
     
-    // Conversation 3: Shake Gesture Hint
+    // Conversation 3: Time Investment + Shake Hint
     [
-      { bot: 'left', text: "Snail pays for the servers himself..." },
-      { bot: 'right', text: "Yeah, costs add up fast." },
-      { bot: 'left', text: "Should we mention the donation?" },
-      { bot: 'right', text: "Yes! Oh, and shake to toggle the menu!" },
-      { bot: 'left', text: "That has nothing to do with donations!" },
-      { bot: 'right', text: "I know, but it's cool!" },
+      { bot: 'left', text: "Snail spent MONTHS building this..." },
+      { bot: 'right', text: "Yeah. Hundreds of hours." },
+      { bot: 'left', text: "All his free time, really." },
+      { bot: 'right', text: "And he made it free! Oh, shake to toggle menu!" },
+      { bot: 'left', text: "Why did you add that last part?!" },
+      { bot: 'right', text: "Because it's cool! 🤷" },
     ],
     
     // Conversation 4: Pan Button Secret
@@ -114,14 +124,14 @@ export default function BattlingBotsModal({
       { bot: 'right', shouldBackspace: true, meanText: "Sorry, I jus—", niceText: "...but seriously, support Snail! 💙" },
     ],
     
-    // Conversation 8: Solo Dev Struggle
+    // Conversation 8: Donation Fatigue Acknowledgment
     [
-      { bot: 'left', text: "Can they see this?" },
-      { bot: 'right', text: "No way. This is private." },
-      { bot: 'left', shouldBackspace: true, meanText: "Good, because—", niceText: "...never mind. Let's just be honest." },
-      { bot: 'right', text: "About the donation?" },
-      { bot: 'left', text: "Yeah. Snail built this alone. Zero team." },
-      { bot: 'right', text: "One guy. One passion. One app!" },
+      { bot: 'left', text: "Everyone asks for donations these days..." },
+      { bot: 'right', text: "I know, it's exhausting." },
+      { bot: 'left', text: "But some people actually need it." },
+      { bot: 'right', text: "Yeah. Like solo devs who work for free." },
+      { bot: 'left', text: "Snail spent months on this. Zero income." },
+      { bot: 'right', shouldBackspace: true, meanText: "So mayb—", niceText: "...shake your phone btw! Hidden feature!" },
     ],
     
     // Conversation 9: Chicken Haptics Easter Egg
@@ -134,14 +144,14 @@ export default function BattlingBotsModal({
       { bot: 'right', shouldBackspace: true, meanText: "Uh, nothi—", niceText: "...hold left egg 3 seconds. Trust me!" },
     ],
     
-    // Conversation 10: The Real Talk
+    // Conversation 10: Worth It
     [
       { bot: 'left', text: "Alright, real talk..." },
       { bot: 'right', text: "Real talk." },
-      { bot: 'left', text: "Snail made this app. Alone. His own money." },
-      { bot: 'right', text: "No investors. No ads. Just passion." },
-      { bot: 'left', text: "And you've used it a TON." },
-      { bot: 'right', text: "So... maybe help keep it alive?" },
+      { bot: 'left', text: "I know everyone begs for donations now." },
+      { bot: 'right', text: "But this guy actually built something useful." },
+      { bot: 'left', text: "Months of work. Zero ads. Zero paywall." },
+      { bot: 'right', text: "If any app deserves support... it's this one." },
     ],
   ];
   
@@ -153,7 +163,7 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "Official Supporter! ❤️" },
       { bot: 'left', text: "They already helped once..." },
       { bot: 'right', text: "Yeah, but it's been 40 sessions!" },
-      { bot: 'left', text: "Servers keep running, costs add up..." },
+      { bot: 'left', text: "Snail's still working on updates..." },
       { bot: 'right', text: "Gentle ask. They're already awesome!" },
     ],
     
@@ -193,7 +203,7 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "They supported Snail before." },
       { bot: 'left', text: "Should we even ask again?" },
       { bot: 'right', text: "It's been 40 sessions... months!" },
-      { bot: 'left', text: "True. Servers cost money." },
+      { bot: 'left', text: "True. Time keeps going." },
       { bot: 'right', shouldBackspace: true, meanText: "Gentle ask th—", niceText: "...right egg rhythm is fun! 🎵" },
     ],
   ];
@@ -703,7 +713,7 @@ export default function BattlingBotsModal({
                       'No subscription fees',
                       'All features unlocked',
                       'Made by @realsnail3d',
-                      'Support keeps servers running!',
+                      'Hundreds of hours of work!',
                     ].map((feature, i) => (
                       <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                         <Ionicons name="checkmark-circle" size={20} color="#10B981" />
@@ -714,28 +724,31 @@ export default function BattlingBotsModal({
                     ))}
                   </View>
 
-                  {/* Support Button */}
+                  {/* Support Button - PROMINENT */}
                   <Pressable
                     onPress={handleSupport}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? '#2563EB' : '#3B82F6',
-                      borderRadius: 14,
-                      padding: 18,
-                      marginBottom: 14,
+                      backgroundColor: pressed ? '#059669' : '#10B981',
+                      borderRadius: 16,
+                      padding: 20,
+                      marginBottom: 16,
                       alignItems: 'center',
-                      shadowColor: '#3B82F6',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                      elevation: 6,
+                      shadowColor: '#10B981',
+                      shadowOffset: { width: 0, height: 6 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 12,
+                      elevation: 8,
+                      borderWidth: 2,
+                      borderColor: '#34D399',
                     })}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                      <Ionicons name="cafe" size={22} color="white" />
+                      <Ionicons name="cafe" size={24} color="white" />
                       <Text style={{
                         color: 'white',
-                        fontSize: 18,
-                        fontWeight: '700',
+                        fontSize: 19,
+                        fontWeight: '800',
+                        letterSpacing: 0.3,
                       }}>
                         Buy Me a Coffee
                       </Text>
@@ -746,13 +759,15 @@ export default function BattlingBotsModal({
                   <Pressable
                     onPress={handleClose}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(120,120,128,0.12)' : 'transparent',
-                      paddingVertical: 14,
-                      borderRadius: 12,
+                      backgroundColor: pressed ? 'rgba(120,120,128,0.16)' : 'rgba(120,120,128,0.08)',
+                      paddingVertical: 16,
+                      borderRadius: 14,
+                      borderWidth: 1,
+                      borderColor: 'rgba(120,120,128,0.2)',
                     })}
                   >
                     <Text style={{
-                      color: '#8E8E93',
+                      color: '#6B7280',
                       fontSize: 17,
                       fontWeight: '600',
                       textAlign: 'center',
