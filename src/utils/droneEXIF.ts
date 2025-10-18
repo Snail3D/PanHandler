@@ -330,9 +330,19 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           }
           
           // Parse DJI-specific XMP tags
-          // Example: <drone-dji:RelativeAltitude>54.3</drone-dji:RelativeAltitude>
-          const relAltMatch = xmpText.match(/<drone-dji:RelativeAltitude>([^<]+)<\/drone-dji:RelativeAltitude>/);
-          const absAltMatch = xmpText.match(/<drone-dji:AbsoluteAltitude>([^<]+)<\/drone-dji:AbsoluteAltitude>/);
+          // First, let's find ALL drone-dji tags to see what's available
+          const allDjiTags = xmpText.match(/<drone-dji:([^>]+)>([^<]+)<\/drone-dji:\1>/g);
+          console.log('🔍 ALL DJI XMP TAGS FOUND:', allDjiTags);
+          
+          // Try multiple altitude tag names (different DJI models use different names)
+          const relAltMatch = xmpText.match(/<drone-dji:RelativeAltitude>([^<]+)<\/drone-dji:RelativeAltitude>/) ||
+                             xmpText.match(/<drone-dji:relativeAltitude>([^<]+)<\/drone-dji:relativeAltitude>/) ||
+                             xmpText.match(/<drone-dji:FlightAltitude>([^<]+)<\/drone-dji:FlightAltitude>/) ||
+                             xmpText.match(/<drone-dji:Height>([^<]+)<\/drone-dji:Height>/);
+          
+          const absAltMatch = xmpText.match(/<drone-dji:AbsoluteAltitude>([^<]+)<\/drone-dji:AbsoluteAltitude>/) ||
+                             xmpText.match(/<drone-dji:absoluteAltitude>([^<]+)<\/drone-dji:absoluteAltitude>/);
+          
           const gimbalPitchMatch = xmpText.match(/<drone-dji:GimbalPitchDegree>([^<]+)<\/drone-dji:GimbalPitchDegree>/);
           const gimbalYawMatch = xmpText.match(/<drone-dji:GimbalYawDegree>([^<]+)<\/drone-dji:GimbalYawDegree>/);
           const gimbalRollMatch = xmpText.match(/<drone-dji:GimbalRollDegree>([^<]+)<\/drone-dji:GimbalRollDegree>/);
@@ -340,11 +350,15 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           if (relAltMatch) {
             exif['drone-dji:RelativeAltitude'] = relAltMatch[1];
             console.log('✅ Found RelativeAltitude:', relAltMatch[1]);
+          } else {
+            console.log('❌ RelativeAltitude not found in XMP');
           }
+          
           if (absAltMatch) {
             exif['drone-dji:AbsoluteAltitude'] = absAltMatch[1];
             console.log('✅ Found AbsoluteAltitude:', absAltMatch[1]);
           }
+          
           if (gimbalPitchMatch) exif['drone-dji:GimbalPitchDegree'] = gimbalPitchMatch[1];
           if (gimbalYawMatch) exif['drone-dji:GimbalYawDegree'] = gimbalYawMatch[1];
           if (gimbalRollMatch) exif['drone-dji:GimbalRollDegree'] = gimbalRollMatch[1];
