@@ -1835,6 +1835,46 @@ Thank you for helping us improve PanHandler!
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Works offline</Text> — lightweight and secure, everything runs locally
                       </Text>
                     </View>
+                    
+                    {/* Location privacy (GPS) */}
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Ionicons name="location-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>GPS for declination only (optional)</Text> — your location is NEVER stored, tracked, or sent to servers. Used only to calculate magnetic declination for maps.
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  {/* GPS detailed explanation */}
+                  <View style={{
+                    marginTop: 16,
+                    backgroundColor: 'rgba(52,199,89,0.08)',
+                    borderRadius: 12,
+                    padding: 14,
+                    borderLeftWidth: 3,
+                    borderLeftColor: '#34C759',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Ionicons name="location" size={16} color="#34C759" style={{ marginRight: 6 }} />
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759' }}>
+                        Session-Only Location Access
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
+                      When you tap "Auto-Detect" for magnetic declination:
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
+                      • Permission is requested fresh each time
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
+                      • GPS coordinates are used once and discarded
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
+                      • Only the declination value is saved (not your location)
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                      • No background tracking, ever
+                    </Text>
                   </View>
                 </Animated.View>
               </View>
