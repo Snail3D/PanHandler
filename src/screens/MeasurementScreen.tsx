@@ -1130,7 +1130,8 @@ export default function MeasurementScreen() {
           }, 50); // Start animations quickly after flash
         } else {
           // Vertical/portrait photo → Show photo type selection menu
-          console.log('📷 Portrait photo (wall view) → Show photo type menu');
+          console.log('📷 🔴🔴🔴 PORTRAIT PHOTO DETECTED (wall view) → Show photo type menu 🔴🔴🔴');
+          alert('PORTRAIT DETECTED - Should show menu!');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
@@ -1146,7 +1147,9 @@ export default function MeasurementScreen() {
             setPendingPhotoUri(photo.uri);
             
             setTimeout(() => {
+              console.log('🔴 ABOUT TO SHOW MODAL');
               setShowPhotoTypeModal(true);
+              console.log('🔴 MODAL STATE SET TO TRUE');
               
               // Defer AsyncStorage write
               setTimeout(() => {
