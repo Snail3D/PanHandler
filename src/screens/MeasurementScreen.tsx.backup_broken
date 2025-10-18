@@ -1465,18 +1465,21 @@ export default function MeasurementScreen() {
 
   const pickImage = async () => {
     try {
+      console.log('📸 Photo library button: pickImage function called');
+      
       // Request media library permission first
       if (!mediaLibraryPermission?.granted) {
         console.log("📸 Requesting media library permission...");
         const { granted } = await requestMediaLibraryPermission();
         if (!granted) {
+          console.log("❌ Permission denied");
           alert("Permission to access photo library is required to import photos. Please enable it in Settings.");
           return;
         }
+        console.log("✅ Permission granted");
       }
       
       console.log("📸 Opening image picker...");
-      console.log('📸 Photo library button: opening image picker...');
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: false,
@@ -1484,90 +1487,57 @@ export default function MeasurementScreen() {
         exif: true, // Request EXIF data
       });
 
-      console.log('📷 Image picker returned:', { canceled: result.canceled, hasAsset: !!result.assets?.[0] });
+      console.log('📷 Image picker returned:', { 
+        canceled: result.canceled, 
+        hasAsset: !!result.assets?.[0],
+        uri: result.assets?.[0]?.uri 
+      });
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
+        console.log('📷 Processing imported photo:', asset.uri);
         
-        setImageUri(asset.uri, false); // false = not auto-captured
-        await detectOrientation(asset.uri);
+        // ⚠️ CRITICAL: Use local state first, defer AsyncStorage write
+        setCapturedPhotoUri(asset.uri); // Instant local state
+        console.log('✅ Set capturedPhotoUri to local state');
         
-        // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
-        try {
-          const { extractDroneMetadata } = await import('../utils/droneEXIF');
-          const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
+        await detectOrientation(asset.uri); // Already deferred inside
+        console.log('✅ Orientation detected');
+        
+        // SAME PATTERN AS PHOTO CAPTURE (wall mode): Transition to measurement, THEN show modal
+        console.log('📷 Transitioning to measurement mode for gallery photo...');
+        setIsTransitioning(true);
+        transitionBlackOverlay.value = withTiming(1, {
+          duration: 150,
+          easing: Easing.in(Easing.ease),
+        });
+        
+        setTimeout(() => {
+          setMode('measurement');
           
-          // If drone detected, check if we need manual altitude entry
-          if (droneMetadata.isDrone && droneMetadata.specs) {
-            console.log('🚁 Drone detected:', droneMetadata.displayName);
+          // Store pending photo and show type selection
+          setPendingPhotoUri(asset.uri);
+          
+          setTimeout(() => {
+            console.log('🔴 Setting showPhotoTypeModal to TRUE');
+            setShowPhotoTypeModal(true);
             
-            // Check if we have RelativeAltitude from XMP
-            if (droneMetadata.relativeAltitude && droneMetadata.relativeAltitude > 0 && droneMetadata.groundSampleDistance) {
-              // AUTO-CALIBRATE: We have XMP altitude data!
-              console.log('✅ RelativeAltitude found in XMP - auto-calibrating');
-              
-              const mmPerPixel = droneMetadata.groundSampleDistance * 10;
-              const pixelsPerMM = 1 / mmPerPixel;
-              
-              setCalibration({
-                pixelsPerUnit: pixelsPerMM,
-                unit: 'mm',
-                referenceDistance: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              setCoinCircle({
-                centerX: droneMetadata.specs.resolution.width / 2,
-                centerY: droneMetadata.specs.resolution.height / 2,
-                radius: 100,
-                coinName: `Auto: ${droneMetadata.displayName || 'Drone'}`,
-                coinDiameter: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              
-              // Transition to measurement mode
-              setIsTransitioning(true);
-              transitionBlackOverlay.value = withTiming(1, {
-                duration: 150,
-                easing: Easing.in(Easing.ease),
-              });
-              
-              setTimeout(() => {
-                setMode('measurement');
-                setTimeout(() => {
-                  transitionBlackOverlay.value = withTiming(0, {
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                  });
-                  setTimeout(() => {
-                    setIsTransitioning(false);
-                  }, 250);
-                }, 150);
-              }, 150);
-              
-              return; // Exit early - skip normal calibration flow
-              
-            } else {
-              // MANUAL ENTRY: No XMP altitude, show modal
-              console.log('📝 No RelativeAltitude - showing manual entry modal');
-              setPendingDroneData(droneMetadata);
-              setShowManualAltitudeModal(true);
-              return; // Exit early - modal will handle calibration
-            }
-          }
-        } catch (error) {
-          console.error('Error checking for drone:', error);
-          // Silently continue to normal calibration flow
-        }
-        
-        // NOT a drone (or no auto-calibration data) - Show photo type selection modal
-        setPendingPhotoUri(asset.uri);
-        setShowPhotoTypeModal(true);
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
-    }
-  };
+            // Defer AsyncStorage write
+            setTimeout(() => {
+              setImageUri(asset.uri, false); // Background persist
+              console.log('✅ Deferred imported photo AsyncStorage write complete');
+            }, 200);
+            
+            transitionBlackOverlay.value = withTiming(0, {
+              duration: 250,
+              easing: Easing.out(Easing.ease),
+            });
+            
+            setTimeout(() => {
+              setIsTransitioning(false);
+            }, 250);
+          }, 50);
+        }, 150);
       } else {
         console.log('❌ Image picker cancelled or no asset');
       }
