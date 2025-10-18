@@ -107,6 +107,7 @@ interface DimensionOverlayProps {
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
   onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
+  skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
 }
 
 export default function DimensionOverlay({ 
@@ -120,6 +121,7 @@ export default function DimensionOverlay({
   onRegisterDoubleTapCallback,
   onReset,
   onMeasurementModeChange,
+  skipToMapMode = false,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -529,6 +531,17 @@ export default function DimensionOverlay({
       setMapScale(null);
     }
   }, [calibration]); // Run when calibration changes (including on app restore)
+  
+  // Handle skipToMapMode prop (from calibration screen's "Map Scale" button)
+  const hasTriggeredSkipToMap = useRef(false);
+  useEffect(() => {
+    if (skipToMapMode && !mapScale && !hasTriggeredSkipToMap.current) {
+      // User clicked "Map Scale" button in calibration - open modal immediately
+      console.log('🗺️ skipToMapMode triggered - opening map scale modal');
+      hasTriggeredSkipToMap.current = true;
+      setShowMapScaleModal(true);
+    }
+  }, [skipToMapMode, mapScale]);
   
   // Track if we've shown the initial quote
   const hasShownInitialQuote = useRef(false);
@@ -1679,6 +1692,16 @@ export default function DimensionOverlay({
           areaPx2 += (p1.x * p2.y - p2.x * p1.y);
         }
         areaPx2 = Math.abs(areaPx2) / 2;
+        
+        // Validate that area is not zero (collinear points)
+        if (areaPx2 < 1) {
+          console.log('⚠️ Polygon area is zero (collinear points), skipping. Area:', areaPx2);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showAlert('Invalid Polygon', 'All points are in a straight line. Please form a proper shape.', 'error');
+          return;
+        }
+        
+        console.log('✅ Polygon area:', areaPx2, 'px²');
         
         // Convert to physical units
         let perimeterStr: string;
@@ -3169,12 +3192,15 @@ export default function DimensionOverlay({
             console.log('🔍 Touch check:', { isMapMode, hasMapScale: !!mapScale });
             if (isMapMode && !mapScale) {
               console.log('⚠️ Blocking measurement - no map scale set');
+              // Triple haptic warning to make it VERY obvious
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 100);
+              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 200);
               showAlert(
                 'Set Map Scale First',
                 'Tap the Map button in the menu to set your map scale before measuring.',
                 'warning'
               );
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
               return; // Prevent any measurement placement
             }
             
