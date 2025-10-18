@@ -1064,35 +1064,39 @@ export default function MeasurementScreen() {
         // Store in local state immediately (no AsyncStorage blocking!)
         setCapturedPhotoUri(photo.uri);
         
-        // Detect orientation to determine auto-flow (must be synchronous!)
-        const photoOrientation: 'LANDSCAPE' | 'PORTRAIT' = await new Promise((resolve) => {
-          Image.getSize(
-            photo.uri, 
-            (width, height) => {
-              console.log(`📷 RAW IMAGE SIZE: ${width}x${height}`);
-              const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
-              console.log(`📷 DETECTED ORIENTATION: ${orientation} (width > height = ${width > height})`);
-              // Defer AsyncStorage write
-              setTimeout(() => {
-                setImageOrientation(orientation);
-              }, 300);
-              resolve(orientation);
-            }, 
-            (error) => {
-              console.error('Error detecting orientation:', error);
-              resolve('LANDSCAPE'); // Default to landscape on error
-            }
-          );
+        // Detect orientation for storage (defer AsyncStorage write)
+        Image.getSize(
+          photo.uri, 
+          (width, height) => {
+            const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+            setTimeout(() => {
+              setImageOrientation(orientation);
+            }, 300);
+          }, 
+          (error) => {
+            console.error('Error detecting orientation:', error);
+          }
+        );
+        
+        // Use phone TILT to determine if looking at table or wall
+        // Beta close to 0° = phone flat/tilted down = looking at table
+        // Beta close to 90° = phone upright = looking at wall
+        const absBeta = Math.abs(currentBeta);
+        const isLookingAtTable = absBeta < 45; // Less than 45° from horizontal = looking down at table
+        
+        console.log('📷 Photo captured - Phone tilt:', {
+          beta: currentBeta.toFixed(1),
+          absBeta: absBeta.toFixed(1),
+          isLookingAtTable,
+          decision: isLookingAtTable ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'
         });
         
-        console.log('📷 Photo captured - Final Orientation:', photoOrientation);
-        console.log('📷 Decision: ' + (photoOrientation === 'LANDSCAPE' ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'));
-        
-        // DECISION: LANDSCAPE photos (phone horizontal, looking at table) auto-proceed to coin calibration
-        // PORTRAIT photos (phone vertical, looking at wall) show photo type selection menu
-        if (photoOrientation === 'LANDSCAPE') {
-          // LANDSCAPE photo (horizontal phone looking at table) → Auto-proceed to coin calibration
-          console.log('📷 LANDSCAPE photo (table view - horizontal phone) → Auto coin calibration');
+        // DECISION: Use phone tilt, NOT photo orientation
+        // Phone tilted down (looking at table) → Auto coin calibration
+        // Phone upright (looking at wall) → Show menu
+        if (isLookingAtTable) {
+          // Phone looking down at table → Auto-proceed to coin calibration
+          console.log('📷 Phone tilted down (table) → Auto coin calibration');
           
           // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
           setIsTransitioning(true);
@@ -1132,8 +1136,8 @@ export default function MeasurementScreen() {
             }, 150); // Match the fade duration
           }, 50); // Start animations quickly after flash
         } else {
-          // PORTRAIT photo (vertical phone looking at wall) → Show photo type selection menu
-          console.log('📷 PORTRAIT PHOTO DETECTED (wall view - vertical phone) → Show photo type menu');
+          // Phone upright (looking at wall) → Show photo type selection menu
+          console.log('📷 Phone upright (wall) → Show photo type menu');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
