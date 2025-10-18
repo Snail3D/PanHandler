@@ -44,6 +44,22 @@ export default function BattlingBotsModal({
   
   const offerOpacity = useSharedValue(0);
   
+  // Skip animation - show full conversation immediately
+  const skipToEnd = () => {
+    const allMessages = script.map(msg => ({
+      bot: msg.bot,
+      text: msg.niceText || msg.text || ''
+    }));
+    setMessages(allMessages);
+    setCurrentText('');
+    setIsTyping(false);
+    setShowCursor(false);
+    setCurrentMessageIndex(script.length);
+    setStage('offer');
+    offerOpacity.value = withSpring(1, { damping: 20, stiffness: 90 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  };
+  
   // 11 random conversation variations with Easter egg hints
   const conversations: BotMessage[][] = [
     // Conversation 0: DONATION FATIGUE (NEW!)
@@ -252,13 +268,12 @@ export default function BattlingBotsModal({
     }
   }, [visible, isDonor, isFirstTimeDonor, conversationIndex]);
   
-  // Start typing when modal becomes visible
+  // Start typing when modal becomes visible - IMMEDIATE for testing!
   useEffect(() => {
     if (visible && script.length > 0 && currentMessageIndex === 0 && !isTyping) {
-      setTimeout(() => {
-        setIsTyping(true);
-        setShowCursor(true);
-      }, 500);
+      // Immediate start (no delay for testing)
+      setIsTyping(true);
+      setShowCursor(true);
     }
   }, [visible, script, currentMessageIndex, isTyping]);
   
@@ -352,19 +367,19 @@ export default function BattlingBotsModal({
                         setTimeout(() => {
                           setStage('offer');
                           offerOpacity.value = withSpring(1, { damping: 20, stiffness: 90 });
-                        }, 800);
+                        }, 400); // FASTER for testing (was 800ms)
                       } else {
                         setTimeout(() => {
                           setCurrentMessageIndex(prev => prev + 1);
                           setIsTyping(true);
                           setShowCursor(true);
-                        }, 600);
+                        }, 300); // FASTER for testing (was 600ms)
                       }
                     }
-                  }, 40);
+                   }, 20); // FASTER for testing (was 40ms)
                 }
-              }, 30);
-            }, 400);
+               }, 15); // FASTER backspace for testing (was 30ms)
+             }, 200); // FASTER pause for testing (was 400ms)
           }
         }
       }, 50);
@@ -522,6 +537,25 @@ export default function BattlingBotsModal({
                       </Text>
                       <Ionicons name="chatbubbles" size={28} color="#F59E0B" />
                     </View>
+                    {/* Skip Animation Button (Testing) */}
+                    {conversationIndex !== undefined && (
+                      <Pressable
+                        onPress={skipToEnd}
+                        style={({ pressed }) => ({
+                          marginTop: 12,
+                          backgroundColor: pressed ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
+                          paddingHorizontal: 16,
+                          paddingVertical: 8,
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: 'rgba(139, 92, 246, 0.3)',
+                        })}
+                      >
+                        <Text style={{ color: '#8B5CF6', fontSize: 13, fontWeight: '600' }}>
+                          ⚡ Skip Animation
+                        </Text>
+                      </Pressable>
+                    )}
                   </View>
 
                   {/* Split screen with bots */}
