@@ -210,6 +210,8 @@ export default function ZoomCalibration({
           
           // If it's an overhead drone photo, auto-calibrate and complete
           if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
+            alert(`🎉 AUTO-CALIBRATION TRIGGERED!\n\nWill calculate from:\nAlt: ${metadata.gps?.altitude}m\nGSD: ${metadata.groundSampleDistance} cm/px\n\nPress OK to auto-calibrate...`);
+            
             const debugInfo = {
               drone: metadata.displayName,
               altitude: metadata.gps?.altitude,
@@ -227,8 +229,7 @@ export default function ZoomCalibration({
             const mmPerPixel = metadata.groundSampleDistance * 10; // Convert cm to mm
             const pixelsPerMM = 1 / mmPerPixel;
             
-            // Show calibration calculation
-            alert(`🚁 AUTO-CALIBRATING\n\nDrone: ${metadata.displayName}\nAltitude: ${metadata.gps?.altitude?.toFixed(1)}m\nGSD: ${metadata.groundSampleDistance?.toFixed(3)} cm/px\n\nCalc:\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\nThis calibration will be used for measurements!`);
+            alert(`📐 CALIBRATION CALCULATED\n\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\nCalling onComplete() now...`);
             
             // Complete calibration immediately with drone data
             onComplete({
@@ -248,6 +249,8 @@ export default function ZoomCalibration({
                 translateY: 0,
               },
             });
+            
+            alert(`✅ onComplete() called! Should skip to measurement screen now.`);
           }
         }
       } catch (error) {
