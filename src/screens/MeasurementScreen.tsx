@@ -1343,6 +1343,9 @@ ${debugLog}`;
             const mmPerPixel = droneMetadata.groundSampleDistance * 10; // cm to mm
             const pixelsPerMM = 1 / mmPerPixel;
             
+            // Show calibration calculation
+            alert(`🧮 CALIBRATION MATH\n\nGSD: ${droneMetadata.groundSampleDistance.toFixed(4)} cm/px\nAltitude: ${droneMetadata.gps?.altitude}m\n\nCalculation:\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\npixelsPerUnit = ${pixelsPerMM.toFixed(4)}\n\nIf this is wrong, GSD calculation is the issue!`);
+            
             // Set calibration data directly
             setCalibration({
               pixelsPerUnit: pixelsPerMM,
