@@ -10,6 +10,7 @@ import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, Easing, withTiming } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import TouchOverlayFingerprints from './TouchOverlayFingerprints';
+import { extractDroneMetadata, DroneMetadata } from '../utils/droneEXIF';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -62,6 +63,10 @@ export default function ZoomCalibration({
   const setHasSeenPinchTutorial = useStore((s) => s.setHasSeenPinchTutorial);
   const [showTutorial, setShowTutorial] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  
+  // Drone detection state
+  const [droneData, setDroneData] = useState<DroneMetadata | null>(null);
+  const [isDroneDetected, setIsDroneDetected] = useState(false);
   
   // Lock-in button fade-in animation
   const lockInOpacity = useSharedValue(0);
@@ -193,6 +198,52 @@ export default function ZoomCalibration({
       setSearchResults([]);
     }
   }, [searchQuery]);
+
+  // Detect drone photo on mount
+  useEffect(() => {
+    const detectDrone = async () => {
+      try {
+        const metadata = await extractDroneMetadata(imageUri);
+        if (metadata) {
+          setDroneData(metadata);
+          setIsDroneDetected(true);
+          
+          // If it's an overhead drone photo, auto-calibrate and complete
+          if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            
+            // Auto-calculate calibration from drone altitude
+            // GSD is in cm/pixel, we need mm/pixel
+            const pixelsPerMM = 1 / (metadata.groundSampleDistance * 10); // Convert cm to mm
+            
+            // Complete calibration immediately with drone data
+            onComplete({
+              pixelsPerUnit: pixelsPerMM,
+              unit: 'mm',
+              referenceDistance: metadata.groundSampleDistance * 1000, // Convert to mm for display
+              coinCircle: {
+                centerX: metadata.specs.resolution.width / 2,
+                centerY: metadata.specs.resolution.height / 2,
+                radius: 100, // Arbitrary reference
+                coinName: `Auto: ${metadata.displayName || 'Drone'}`,
+                coinDiameter: metadata.groundSampleDistance * 1000,
+              },
+              initialZoom: {
+                scale: 1,
+                translateX: 0,
+                translateY: 0,
+              },
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error detecting drone:', error);
+        // Silently fail - just proceed with manual calibration
+      }
+    };
+    
+    detectDrone();
+  }, [imageUri]);
 
   // Show pinch-zoom tutorial on first use
   // Show tutorial animation (always, since it's pretty!)
@@ -541,6 +592,83 @@ export default function ZoomCalibration({
         </View>
       )}
 
+      {/* Drone Detection Badge - Shows when drone is detected but NOT overhead */}
+      {isDroneDetected && droneData && !droneData.isOverhead && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 80,
+            left: SCREEN_WIDTH * 0.10,
+            right: SCREEN_WIDTH * 0.10,
+          }}
+        >
+          <BlurView
+            intensity={35}
+            tint="light"
+            style={{
+              borderRadius: 20,
+              overflow: 'hidden',
+              shadowColor: '#00D4FF',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.4,
+              shadowRadius: 12,
+            }}
+          >
+            <View style={{
+              backgroundColor: 'rgba(0, 212, 255, 0.25)',
+              borderRadius: 20,
+              padding: 16,
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.4)',
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                <Text style={{ fontSize: 24, marginRight: 8 }}>🚁</Text>
+                <Text style={{
+                  color: 'white',
+                  fontWeight: '800',
+                  fontSize: 16,
+                  textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 2,
+                }}>
+                  {droneData.displayName || 'Drone'} Detected
+                </Text>
+              </View>
+              
+              {droneData.gps && (
+                <Text style={{
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 4,
+                }}>
+                  📍 Altitude: {droneData.gps.altitude.toFixed(1)}m
+                </Text>
+              )}
+              
+              {droneData.gimbal && (
+                <Text style={{
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 4,
+                }}>
+                  📐 Gimbal: {droneData.gimbal.pitch.toFixed(0)}° pitch
+                </Text>
+              )}
+              
+              <Text style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: 12,
+                fontWeight: '500',
+                marginTop: 4,
+              }}>
+                ℹ️ Use Map Scale for tilted/forward photos
+              </Text>
+            </View>
+          </BlurView>
+        </View>
+      )}
 
 
       {/* Bottom Controls - Single row: Map | LOCK IN | Coin */}
