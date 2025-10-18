@@ -1064,66 +1064,103 @@ export default function MeasurementScreen() {
         // Store in local state immediately (no AsyncStorage blocking!)
         setCapturedPhotoUri(photo.uri);
         
-        // Detect orientation in background (defer AsyncStorage write)
+        // Detect orientation to determine auto-flow
+        let photoOrientation: 'LANDSCAPE' | 'PORTRAIT' = 'LANDSCAPE';
         Image.getSize(photo.uri, (width, height) => {
-          const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+          photoOrientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
           // Defer AsyncStorage write
           setTimeout(() => {
-            setImageOrientation(orientation);
+            setImageOrientation(photoOrientation);
           }, 300);
         }, (error) => {
           console.error('Error detecting orientation:', error);
         });
         
-        // Check if camera was pointing down (horizontal phone position)
-        // Beta close to 0° = phone is flat/horizontal = camera pointing down at table
-        const absBeta = Math.abs(currentBeta);
-        const isCameraPointingDown = absBeta < 45; // < 45° from horizontal = pointing down
+        // Wait briefly for orientation detection
+        await new Promise(resolve => setTimeout(resolve, 100));
         
-        console.log('📷 Photo captured - Camera orientation:', {
-          beta: currentBeta.toFixed(1),
-          absBeta: absBeta.toFixed(1),
-          isCameraPointingDown,
-          interpretation: isCameraPointingDown ? 'Pointing down → Coin' : 'Pointing up/sideways → Ask user'
-        });
+        console.log('📷 Photo captured - Orientation:', photoOrientation);
         
-        // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
-        setIsTransitioning(true);
-        
-        // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
-        // The camera view stays rendered but will fade out
-        setTimeout(() => {
-          setMode('zoomCalibrate');
-        }, 30); // Minimal delay just for the flash to start
-        
-        // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
-        // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
-        // Write happens in background after UI transition is smooth
-        // See: SESSION_COMPLETE_OCT18_IMAGE_UNMOUNTING_FIX.md
-        setTimeout(() => {
-          setImageUri(photo.uri, wasAutoCapture);
-          __DEV__ && console.log('✅ Deferred AsyncStorage write complete');
-        }, 200); // Write after transition animations complete
-        
-        // Start the visual transition AFTER mode switch
-        setTimeout(() => {
-          // Fade out camera opacity to reveal the photo underneath
-          cameraOpacity.value = withTiming(0, {
-            duration: 150, // Much faster fade (was 300ms)
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        // DECISION: Landscape photos auto-proceed to coin calibration
+        // Portrait photos show photo type selection menu
+        if (photoOrientation === 'LANDSCAPE') {
+          // Horizontal/landscape photo → Auto-proceed to coin calibration
+          console.log('📷 Landscape photo → Auto coin calibration');
+          
+          // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
+          setIsTransitioning(true);
+          
+          // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
+          // The camera view stays rendered but will fade out
+          setTimeout(() => {
+            setMode('zoomCalibrate');
+          }, 30); // Minimal delay just for the flash to start
+          
+          // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
+          // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
+          // Write happens in background after UI transition is smooth
+          // See: SESSION_COMPLETE_OCT18_IMAGE_UNMOUNTING_FIX.md
+          setTimeout(() => {
+            setImageUri(photo.uri, wasAutoCapture);
+            __DEV__ && console.log('✅ Deferred AsyncStorage write complete');
+          }, 200); // Write after transition animations complete
+          
+          // Start the visual transition AFTER mode switch
+          setTimeout(() => {
+            // Fade out camera opacity to reveal the photo underneath
+            cameraOpacity.value = withTiming(0, {
+              duration: 150, // Much faster fade (was 300ms)
+              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+            });
+            
+            // Slight zoom morph for drama
+            screenScale.value = withSequence(
+              withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
+              withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
+            );
+            
+            // Unlock after full transition
+            setTimeout(() => {
+              setIsTransitioning(false);
+            }, 150); // Match the fade duration
+          }, 50); // Start animations quickly after flash
+        } else {
+          // Vertical/portrait photo → Show photo type selection menu
+          console.log('📷 Portrait photo → Show photo type menu');
+          
+          // Transition to measurement screen first, then show modal
+          setIsTransitioning(true);
+          transitionBlackOverlay.value = withTiming(1, {
+            duration: 150,
+            easing: Easing.in(Easing.ease),
           });
           
-          // Slight zoom morph for drama
-          screenScale.value = withSequence(
-            withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
-            withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
-          );
-          
-          // Unlock after full transition
           setTimeout(() => {
-            setIsTransitioning(false);
-          }, 150); // Match the fade duration
-        }, 50); // Start animations quickly after flash
+            setMode('measurement');
+            
+            // Store pending photo and show type selection
+            setPendingPhotoUri(photo.uri);
+            
+            setTimeout(() => {
+              setShowPhotoTypeModal(true);
+              
+              // Defer AsyncStorage write
+              setTimeout(() => {
+                setImageUri(photo.uri, wasAutoCapture);
+                __DEV__ && console.log('✅ Deferred AsyncStorage write complete (portrait)');
+              }, 200);
+              
+              transitionBlackOverlay.value = withTiming(0, {
+                duration: 250,
+                easing: Easing.out(Easing.ease),
+              });
+              
+              setTimeout(() => {
+                setIsTransitioning(false);
+              }, 250);
+            }, 50);
+          }, 150);
+        }
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {
