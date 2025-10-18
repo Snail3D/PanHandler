@@ -447,12 +447,15 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     }
     
     // Check if camera is pointing down (overhead/nadir)
-    const isOverhead = gimbal ? gimbal.pitch < -70 : true; // Assume overhead if no gimbal data
+    // Accept -60° to -90° as "overhead enough" for auto-calibration
+    // At -60°, the error is only ~15% (cos(60°) = 0.5, so 1/0.5 = 2x in worst direction)
+    // but for most measurements this is acceptable
+    const isOverhead = gimbal ? gimbal.pitch < -60 : true; // Assume overhead if no gimbal data
     
     // Debug: Show overhead detection
     if (isDrone) {
       const pitchInfo = gimbal ? `${gimbal.pitch.toFixed(1)}°` : 'No gimbal data (assuming overhead)';
-      alert(`OVERHEAD CHECK\n\nGimbal pitch: ${pitchInfo}\nIs overhead: ${isOverhead}\n\nNote: Overhead requires pitch < -70°`);
+      alert(`OVERHEAD CHECK\n\nGimbal pitch: ${pitchInfo}\nIs overhead: ${isOverhead}\n\nNote: Overhead accepts pitch < -60°\n(More lenient than -70° for flexibility)`);
     }
     
     // Try to find drone in database
