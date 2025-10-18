@@ -2714,7 +2714,8 @@ export default function DimensionOverlay({
     : 2;  // rectangle: 2 corners
   
   // Lock pan/zoom once any points are placed
-  const isPanZoomLocked = hasAnyMeasurements;
+  // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
+  const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
   
   // Handle label modal completion
   const handleLabelComplete = (label: string | null) => {

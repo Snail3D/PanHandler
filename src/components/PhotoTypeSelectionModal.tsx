@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, Modal, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon, RulerIcon } from './CalibrationIcons';
+import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon } from './CalibrationIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export type PhotoType = 'coin' | 'aerial' | 'map' | 'blueprint' | 'knownScale';
+export type PhotoType = 'coin' | 'aerial' | 'map' | 'blueprint';
 
 interface PhotoTypeOption {
   type: PhotoType;
@@ -40,17 +40,10 @@ const OPTIONS: PhotoTypeOption[] = [
   },
   {
     type: 'blueprint',
-    title: 'Blueprint',
-    subtitle: 'Calibrate from scale bar',
+    title: 'Known Scale / Blueprint',
+    subtitle: 'Two-point with known distance',
     icon: BlueprintIcon,
     color: '#5856D6',
-  },
-  {
-    type: 'knownScale',
-    title: 'Known Scale',
-    subtitle: 'Two-point with known distance',
-    icon: RulerIcon,
-    color: '#34C759',
   },
 ];
 
