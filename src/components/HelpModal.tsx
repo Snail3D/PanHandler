@@ -260,9 +260,9 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
   
-  // Easter egg: "Shave and a haircut" rhythm to toggle Pro/Free (only for non-paid users)
+  // Easter egg: "Shave and a haircut" rhythm to open YouTube link
   // User taps: "shave-and-a-hair-cut" (5 taps with correct rhythm)
-  // App responds: "dun-dun" (strong haptic response)
+  // App responds: "two-bits!" (strong haptic response) then opens link
   const [eggTaps, setEggTaps] = useState<number[]>([]); // Array of tap timestamps
   const eggTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -274,7 +274,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     { min: 100, max: 400 },   // 2nd gap: "and"
     { min: 50, max: 200 },    // 3rd gap: quick "a-hair" (fast double tap)
     { min: 100, max: 400 },   // 4th gap: "cut"
-    // 5th tap completes it, then we respond with "dun-dun" haptic!
+    // 5th tap completes it, then we respond with "two-bits!" haptic and open link!
   ];
   
   const checkShaveAndHaircutPattern = (taps: number[]) => {
@@ -2575,15 +2575,9 @@ Thank you for helping us improve PanHandler!
                       Hidden Surprises
                     </Text>
                     
-                    {/* Right egg - Shave and a haircut rhythm to toggle Pro/Free */}
+                    {/* Right egg - Shave and a haircut rhythm to open YouTube */}
                     <Pressable
                       onPress={() => {
-                        const actuallyPaidPro = false;
-                        
-                        if (actuallyPaidPro) {
-                          return;
-                        }
-                        
                         const now = Date.now();
                         
                         // Clear timeout if exists
@@ -2603,25 +2597,17 @@ Thank you for helping us improve PanHandler!
                         
                         // Check if we have 5 taps and they match the pattern
                         if (recentTaps.length === 5 && checkShaveAndHaircutPattern(recentTaps)) {
-                          // SUCCESS! Play "dun-dun" response (with dramatic pause)
+                          // SUCCESS! Play "two bits" response (with dramatic pause)
                           playTwoBitsResponse();
-                          
-                          // Toggle Pro/Free status
-                          const newProStatus = !isProUser;
-                          setIsProUser(newProStatus);
-                          
-                          // Reset freehand trial counter when toggling to free mode
-                          if (!newProStatus) {
-                            resetFreehandTrial();
-                          }
                           
                           // Clear taps
                           setEggTaps([]);
                           
-                          // Close help modal after response completes (1000ms pause + 350ms gap + buffer)
+                          // Open YouTube link after haptic response completes (1000ms pause + 350ms gap + buffer)
                           setTimeout(() => {
-                            onClose();
-                          }, 1600);
+                            Linking.openURL('https://youtu.be/rog8ou-ZepE?si=aVfNZf_i24xay02P');
+                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                          }, 1500);
                         }
                         
                         // Reset after 2 seconds of no taps
@@ -2635,7 +2621,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
-                    Hold the left egg for a surprise... or tap the right one rapidly 🐔🤔
+                    Hold the left egg for a surprise... or tap the right one to the rhythm 🐔🎵
                   </Text>
                 </Animated.View>
 
