@@ -312,6 +312,15 @@ export default function DimensionOverlay({
   const fingerOpacity = useSharedValue(0);
   const fingerScale = useSharedValue(1);
   const fingerRotation = useSharedValue(0);
+  
+  // Menu button fingerprints (session color)
+  const [menuFingerTouches, setMenuFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
+  const menuFingerOpacity = useSharedValue(0);
+  const menuFingerScale = useSharedValue(1);
+  
+  // Swipe trail effect (for menu closing)
+  const [swipeTrail, setSwipeTrail] = useState<Array<{x: number, y: number, id: string, timestamp: number}>>([]);
+  
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
@@ -657,6 +666,36 @@ export default function DimensionOverlay({
         runOnJS(setShowToast)(false);
       });
     }, 3000);
+  };
+  
+  // Create menu button fingerprint with session color
+  const createMenuFingerprint = (x: number, y: number) => {
+    const touch = {
+      x,
+      y,
+      id: `menu-touch-${Date.now()}`,
+      pressure: 0.7, // Default pressure for button taps
+      seed: Math.random(),
+    };
+    
+    setMenuFingerTouches([touch]);
+    
+    // Fade in
+    menuFingerOpacity.value = 0;
+    menuFingerScale.value = 0.8;
+    menuFingerOpacity.value = withTiming(1, { duration: 150 });
+    menuFingerScale.value = withSpring(1, { damping: 15, stiffness: 200 });
+    
+    // Fade out after 600ms
+    setTimeout(() => {
+      menuFingerOpacity.value = withTiming(0, { 
+        duration: 400,
+        easing: Easing.out(Easing.ease)
+      }, () => {
+        runOnJS(setMenuFingerTouches)([]);
+      });
+      menuFingerScale.value = withTiming(1.2, { duration: 400 });
+    }, 600);
   };
   
   // 🎮 Game-inspired haptic sequences for measurement modes
@@ -2717,6 +2756,17 @@ export default function DimensionOverlay({
   const menuSwipeGesture = Gesture.Pan()
     .minDistance(40) // Require more movement before activating
     .maxPointers(1) // Only single finger
+    .onUpdate((event) => {
+      'worklet';
+      // Record trail points during swipe
+      const trailPoint = {
+        x: event.absoluteX,
+        y: event.absoluteY,
+        id: `trail-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+      };
+      runOnJS(setSwipeTrail)((prev) => [...prev, trailPoint]);
+    })
     .onEnd((event) => {
       'worklet';
       // Detect horizontal swipe with velocity threshold
@@ -2736,6 +2786,11 @@ export default function DimensionOverlay({
         menuHiddenShared.value = true;
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+        
+        // Start fading trail after 100ms
+        runOnJS(setTimeout)(() => {
+          runOnJS(setSwipeTrail)([]);
+        }, 1000); // Clear after 1 second
       }
       // Swipe left OR right to open menu (when hidden)
       else if (isHorizontal && 
@@ -2749,6 +2804,9 @@ export default function DimensionOverlay({
         menuHiddenShared.value = false;
         runOnJS(setMenuHidden)(false);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        // Swipe didn't meet threshold, clear trail
+        runOnJS(setSwipeTrail)([]);
       }
     });
   
@@ -4671,6 +4729,141 @@ export default function DimensionOverlay({
         });
       })()}
 
+      {/* Menu button fingerprints (session color) */}
+      {(() => {
+        if (menuFingerTouches.length === 0 || !sessionColor) return null;
+        
+        const fingerColor = sessionColor.main;
+        
+        // Animated style for menu fingerprints
+        const menuEvaporationStyle = useAnimatedStyle(() => ({
+          opacity: menuFingerOpacity.value,
+          transform: [
+            { scale: menuFingerScale.value },
+          ]
+        }));
+        
+        return menuFingerTouches.map((touch) => {
+          const pressureScale = 0.85 + (touch.pressure * 0.3);
+          const baseRadius = 18 * pressureScale;
+          
+          const ridges = [];
+          const numRidges = 5;
+          
+          for (let i = 0; i < numRidges; i++) {
+            const radiusOffset = (touch.seed * 2 - 1) * 3;
+            const radius = baseRadius * (0.3 + i * 0.15) + radiusOffset;
+            const opacityVariation = 0.05 + (Math.sin(touch.seed * 10 + i) * 0.03);
+            
+            ridges.push({
+              radius,
+              opacity: 0.18 - (i * 0.025) + opacityVariation
+            });
+          }
+          
+          return (
+            <Animated.View
+              key={touch.id}
+              style={[
+                {
+                  position: 'absolute',
+                  left: touch.x - baseRadius - 5,
+                  top: touch.y - baseRadius - 5,
+                  width: (baseRadius + 5) * 2,
+                  height: (baseRadius + 5) * 2,
+                  pointerEvents: 'none',
+                },
+                menuEvaporationStyle
+              ]}
+            >
+              <Svg width={(baseRadius + 5) * 2} height={(baseRadius + 5) * 2}>
+                {ridges.reverse().map((ridge, idx) => (
+                  <Circle 
+                    key={idx}
+                    cx={baseRadius + 5} 
+                    cy={baseRadius + 5} 
+                    r={ridge.radius} 
+                    fill={fingerColor} 
+                    opacity={ridge.opacity}
+                  />
+                ))}
+                
+                {[...Array(8)].map((_, idx) => {
+                  const angle = (touch.seed * Math.PI * 2) + (idx * Math.PI / 4);
+                  const distance = baseRadius * (0.4 + (Math.sin(touch.seed * 20 + idx) * 0.2));
+                  const poreX = (baseRadius + 5) + Math.cos(angle) * distance;
+                  const poreY = (baseRadius + 5) + Math.sin(angle) * distance;
+                  const poreSize = 0.8 + (Math.cos(touch.seed * 30 + idx) * 0.4);
+                  
+                  return (
+                    <Circle 
+                      key={`pore-${idx}`}
+                      cx={poreX} 
+                      cy={poreY} 
+                      r={poreSize} 
+                      fill={fingerColor} 
+                      opacity={0.12}
+                    />
+                  );
+                })}
+              </Svg>
+            </Animated.View>
+          );
+        });
+      })()}
+
+      {/* Swipe trail effect (fading fingerprints along swipe path) */}
+      {(() => {
+        if (swipeTrail.length === 0 || !sessionColor) return null;
+        
+        const fingerColor = sessionColor.main;
+        const now = Date.now();
+        const trailDuration = 1000; // 1 second fade
+        
+        return swipeTrail.map((point, index) => {
+          const age = now - point.timestamp;
+          const progress = Math.min(age / trailDuration, 1);
+          
+          // Fade out from start to end
+          const startProgress = index / swipeTrail.length;
+          const fadeOpacity = (1 - progress) * (1 - startProgress * 0.5);
+          
+          const baseRadius = 12;
+          
+          return (
+            <View
+              key={point.id}
+              style={{
+                position: 'absolute',
+                left: point.x - baseRadius - 3,
+                top: point.y - baseRadius - 3,
+                width: (baseRadius + 3) * 2,
+                height: (baseRadius + 3) * 2,
+                opacity: fadeOpacity,
+                pointerEvents: 'none',
+              }}
+            >
+              <Svg width={(baseRadius + 3) * 2} height={(baseRadius + 3) * 2}>
+                <Circle 
+                  cx={baseRadius + 3} 
+                  cy={baseRadius + 3} 
+                  r={baseRadius * 0.8} 
+                  fill={fingerColor} 
+                  opacity={0.15}
+                />
+                <Circle 
+                  cx={baseRadius + 3} 
+                  cy={baseRadius + 3} 
+                  r={baseRadius * 0.5} 
+                  fill={fingerColor} 
+                  opacity={0.2}
+                />
+              </Svg>
+            </View>
+          );
+        });
+      })()}
+
       {/* Subtle guide lines - only show in Pan mode after calibration, hide when measurements exist */}
       {!measurementMode && calibration && Array.isArray(measurements) && measurements.length === 0 && (
         <View
@@ -5636,12 +5829,16 @@ export default function DimensionOverlay({
           {/* Mode Toggle: Edit/Move vs Measure */}
           <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
-              onPress={() => {
+              onPress={(event) => {
                 setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(false);
                 setShowCursor(false);
                 setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                
+                // Create fingerprint at touch location
+                const { pageX, pageY } = event.nativeEvent;
+                createMenuFingerprint(pageX, pageY);
               }}
               onPressIn={() => {
                 setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BTN_IN', mode: 'IN' });
@@ -6408,16 +6605,16 @@ export default function DimensionOverlay({
             right: isAutoCaptured 
               ? 118  // Position right next to AUTO LEVEL badge (with small gap)
               : 16,  // Position in top right when AUTO LEVEL is hidden
-            backgroundColor: 'rgba(100, 149, 237, 0.85)', // Softer cornflower blue
+            backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(100, 149, 237, 0.85)', // Session color with opacity
             width: 30,
             height: 30,
             borderRadius: 15,
             justifyContent: 'center',
             alignItems: 'center',
-            shadowColor: '#000',
+            shadowColor: sessionColor ? sessionColor.main : '#000',
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
+            shadowOpacity: 0.35,
+            shadowRadius: 6,
             elevation: 5,
           }}
         >
