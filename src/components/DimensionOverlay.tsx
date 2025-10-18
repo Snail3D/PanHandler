@@ -5842,11 +5842,8 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            bottom: insets.bottom + 80, // Lower position as shown in image
-            left: 0,
-            right: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
+            bottom: insets.bottom + 40, // Lower - closer to bottom
+            right: 16, // Positioned on the right
             zIndex: 31,
           }}
         >
