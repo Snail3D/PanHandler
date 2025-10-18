@@ -210,11 +210,20 @@ export default function ZoomCalibration({
           
           // If it's an overhead drone photo, auto-calibrate and complete
           if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
-            console.log('🚁 AUTO-CALIBRATING DRONE PHOTO');
-            console.log('Drone:', metadata.displayName);
-            console.log('Altitude:', metadata.gps?.altitude, 'm');
-            console.log('GSD:', metadata.groundSampleDistance, 'cm/pixel');
-            console.log('Resolution:', metadata.specs.resolution);
+            const debugInfo = {
+              drone: metadata.displayName,
+              altitude: metadata.gps?.altitude,
+              gsd: metadata.groundSampleDistance,
+              resolution: metadata.specs.resolution,
+            };
+            console.log('🚁 AUTO-CALIBRATING:', JSON.stringify(debugInfo));
+            
+            // Show debug alert on screen
+            setTimeout(() => {
+              const gsd = metadata.groundSampleDistance || 0;
+              const alt = metadata.gps?.altitude || 0;
+              alert(`🚁 DRONE AUTO-CALIBRATED\n\nDrone: ${metadata.displayName}\nAltitude: ${alt.toFixed(1)}m\nGSD: ${gsd.toFixed(2)} cm/pixel\n\n1 pixel = ${(gsd * 10).toFixed(1)} mm`);
+            }, 1000);
             
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             
@@ -224,9 +233,6 @@ export default function ZoomCalibration({
             // So: 1 mm = 1/5.2 pixels = 0.192 pixels
             const mmPerPixel = metadata.groundSampleDistance * 10; // Convert cm to mm
             const pixelsPerMM = 1 / mmPerPixel;
-            
-            console.log('Calculated mmPerPixel:', mmPerPixel);
-            console.log('Calculated pixelsPerMM:', pixelsPerMM);
             
             // Complete calibration immediately with drone data
             onComplete({
