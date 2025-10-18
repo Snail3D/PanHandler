@@ -5850,7 +5850,7 @@ export default function DimensionOverlay({
           )}
       </View>
 
-      {/* Official PanHandler Supporter Badge - Bottom Right Corner */}
+      {/* PanHandler Supporter Badge - Bottom Right Corner */}
       {isDonor && (
         <View
           style={{
@@ -5858,9 +5858,9 @@ export default function DimensionOverlay({
             bottom: insets.bottom + 16, // Bottom safe area + padding
             right: 16,
             backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 10,
+            paddingHorizontal: 8,
+            paddingVertical: 6,
+            borderRadius: 8,
             alignItems: 'center',
             zIndex: 31,
             shadowColor: '#FF1493',
@@ -5872,30 +5872,22 @@ export default function DimensionOverlay({
             borderColor: 'rgba(255, 255, 255, 0.3)',
           }}
         >
-          <View style={{ alignItems: 'center', gap: 2 }}>
+          <View style={{ alignItems: 'center', gap: 1 }}>
+            <Text style={{ fontSize: 12 }}>❤️</Text>
             <Text style={{ 
               color: 'white', 
-              fontSize: 11, 
-              fontWeight: '800',
-              letterSpacing: 0.5,
-              textAlign: 'center',
-            }}>
-              Official
-            </Text>
-            <Text style={{ 
-              color: 'white', 
-              fontSize: 11, 
-              fontWeight: '800',
-              letterSpacing: 0.5,
+              fontSize: 8, 
+              fontWeight: '700',
+              letterSpacing: 0.3,
               textAlign: 'center',
             }}>
               PanHandler
             </Text>
             <Text style={{ 
               color: 'white', 
-              fontSize: 11, 
-              fontWeight: '800',
-              letterSpacing: 0.5,
+              fontSize: 8, 
+              fontWeight: '700',
+              letterSpacing: 0.3,
               textAlign: 'center',
             }}>
               Supporter
