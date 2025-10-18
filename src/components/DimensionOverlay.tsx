@@ -1630,10 +1630,34 @@ export default function DimensionOverlay({
         // 🎉 FOUND A CLOSED POLYGON!
         console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
         
-        // Extract all points in order (excluding duplicates at connections)
+        // Extract all unique points in order
+        // For each line, add its start point (end point is the next line's start)
         const polygonPoints: Array<{x: number, y: number}> = [];
         for (let i = 0; i < chain.length; i++) {
-          polygonPoints.push(chain[i].points[0]);
+          const line = chain[i];
+          const point = { x: line.points[0].x, y: line.points[0].y };
+          polygonPoints.push(point);
+          console.log(`  Point ${i}:`, point);
+        }
+        
+        console.log('🔷 Polygon points extracted:', polygonPoints.length, 'points');
+        
+        // Check if all points are at the same location (collapsed polygon)
+        if (polygonPoints.length >= 2) {
+          const first = polygonPoints[0];
+          const allSame = polygonPoints.every(p => 
+            Math.abs(p.x - first.x) < 1 && Math.abs(p.y - first.y) < 1
+          );
+          if (allSame) {
+            console.log('⚠️ All polygon points are at the same location (collapsed), skipping');
+            return;
+          }
+        }
+        
+        // Validate polygon has at least 3 unique points
+        if (polygonPoints.length < 3) {
+          console.log('⚠️ Polygon has fewer than 3 points, skipping');
+          return;
         }
         
         // Calculate perimeter (sum of all line lengths)
@@ -3142,7 +3166,9 @@ export default function DimensionOverlay({
             console.log('👆 Touch started - activating cursor');
             
             // CHECK: If in map mode without calibration, show alert
+            console.log('🔍 Touch check:', { isMapMode, hasMapScale: !!mapScale });
             if (isMapMode && !mapScale) {
+              console.log('⚠️ Blocking measurement - no map scale set');
               showAlert(
                 'Set Map Scale First',
                 'Tap the Map button in the menu to set your map scale before measuring.',
