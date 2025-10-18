@@ -4659,11 +4659,8 @@ export default function DimensionOverlay({
 
       {/* Finger touch indicators - organic fingerprint-like patterns with evaporation */}
       {(() => {
-        const nextMeasurementIndex = currentPoints.length === requiredPoints 
-          ? measurements.length + 1 
-          : measurements.length;
-        const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
-        const fingerColor = nextColor.main;
+        // Use session color for ALL fingerprints (universal approach)
+        const fingerColor = sessionColor ? sessionColor.main : '#3B82F6'; // Fallback to blue
         
         // Animated style for evaporation effect
         const evaporationStyle = useAnimatedStyle(() => ({
@@ -5974,7 +5971,7 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {\/* Circle *\/}
+              {/* Circle */}
               <Pressable
                 onPress={(event) => {
                   const { pageX, pageY } = event.nativeEvent;
