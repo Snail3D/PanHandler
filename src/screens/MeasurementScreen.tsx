@@ -1280,9 +1280,11 @@ export default function MeasurementScreen() {
           debugLog += '✓ Module imported\n';
           
           const startTime = Date.now();
-          const droneMetadata = await extractDroneMetadata(asset.uri);
+          // PASS THE EXIF DATA FROM IMAGEPICKER!
+          const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
           const extractTime = Date.now() - startTime;
           debugLog += `✓ Extraction complete (${extractTime}ms)\n`;
+          debugLog += `✓ Used ImagePicker EXIF: ${asset.exif ? 'YES' : 'NO'}\n`;
           
           // ONE COMPREHENSIVE DEBUG ALERT
           const debugInfo = `🔍 DRONE DETECTION DEBUG
