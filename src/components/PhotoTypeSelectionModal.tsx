@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, Modal, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon } from './CalibrationIcons';
+import { CoinIcon, MapIcon, BlueprintIcon } from './CalibrationIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export type PhotoType = 'coin' | 'aerial' | 'map' | 'blueprint';
+export type PhotoType = 'coin' | 'map' | 'blueprint';
 
 interface PhotoTypeOption {
   type: PhotoType;
@@ -23,13 +23,6 @@ const OPTIONS: PhotoTypeOption[] = [
     subtitle: 'Classic calibration with a coin',
     icon: CoinIcon,
     color: '#FF9500',
-  },
-  {
-    type: 'aerial',
-    title: 'Aerial Photo',
-    subtitle: 'Auto-calibrate from drone metadata',
-    icon: DroneIcon,
-    color: '#00C7BE',
   },
   {
     type: 'map',
@@ -237,7 +230,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
             <Pressable
               onPress={handleCancel}
               style={({ pressed }) => ({
-                marginTop: 20,
+                marginTop: 32,
                 transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
               })}
             >
