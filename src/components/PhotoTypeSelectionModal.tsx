@@ -40,8 +40,8 @@ const OPTIONS: PhotoTypeOption[] = [
   },
   {
     type: 'blueprint',
-    title: 'Known Scale / Blueprint',
-    subtitle: 'Two-point with known distance',
+    title: 'Known Scale Mode',
+    subtitle: 'For aerial photos, blueprints, and more',
     icon: BlueprintIcon,
     color: '#5856D6',
   },
