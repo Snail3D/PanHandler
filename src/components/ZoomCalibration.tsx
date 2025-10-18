@@ -208,6 +208,9 @@ export default function ZoomCalibration({
           setDroneData(metadata);
           setIsDroneDetected(true);
           
+          // Debug: Show what we detected
+          alert(`DRONE DETECTED\n\nisDrone: ${metadata.isDrone}\nisOverhead: ${metadata.isOverhead}\nhasGSD: ${!!metadata.groundSampleDistance}\nhasSpecs: ${!!metadata.specs}\n\nMake: ${metadata.make}\nModel: ${metadata.model}\nAlt: ${metadata.gps?.altitude}m\nPitch: ${metadata.gimbal?.pitch}°`);
+          
           // If it's an overhead drone photo, auto-calibrate and complete
           if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
             const debugInfo = {
