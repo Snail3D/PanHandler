@@ -2346,21 +2346,6 @@ export default function MeasurementScreen() {
         </>
       )}
 
-      {/* BattlingBots Donation Modal - ALWAYS RENDER FOR TESTING */}
-      <BattlingBotsModal 
-        visible={true}
-        onClose={() => {
-          setShowBattlingBots(false);
-          // Reset first-time donor flag after showing celebration
-          if (isFirstTimeDonor) {
-            setIsFirstTimeDonor(false);
-          }
-        }} 
-        isDonor={isDonor}
-        isFirstTimeDonor={isFirstTimeDonor}
-        conversationIndex={testConversationIndex}
-      />
-
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       
@@ -2379,6 +2364,21 @@ export default function MeasurementScreen() {
           },
           transitionBlackOverlayStyle,
         ]}
+      />
+
+      {/* BattlingBots Donation Modal - RENDER AFTER BLACK OVERLAY */}
+      <BattlingBotsModal 
+        visible={true}
+        onClose={() => {
+          setShowBattlingBots(false);
+          // Reset first-time donor flag after showing celebration
+          if (isFirstTimeDonor) {
+            setIsFirstTimeDonor(false);
+          }
+        }} 
+        isDonor={isDonor}
+        isFirstTimeDonor={isFirstTimeDonor}
+        conversationIndex={testConversationIndex}
       />
 
     </Animated.View>
