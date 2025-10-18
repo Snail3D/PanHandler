@@ -1308,6 +1308,11 @@ method: ${droneMetadata.detectionMethod}
 📊 EXIF Data:
 Make: ${droneMetadata.make || 'undefined'}
 Model: ${droneMetadata.model || 'undefined'}
+
+📏 ALTITUDE DATA (KEY INFO):
+RelativeAltitude: ${droneMetadata.relativeAltitude !== undefined ? droneMetadata.relativeAltitude + 'm AGL ✅' : 'NOT FOUND ❌'}
+AbsoluteAltitude: ${droneMetadata.absoluteAltitude !== undefined ? droneMetadata.absoluteAltitude + 'm ASL' : 'NOT FOUND'}
+GPS Altitude: ${droneMetadata.gps?.altitude !== undefined ? droneMetadata.gps.altitude + 'm ASL' : 'NOT FOUND'}
 Display: ${droneMetadata.displayName || 'undefined'}
 
 📍 GPS:
