@@ -544,34 +544,46 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     const absoluteAltitude = djiData.absoluteAltitude;
     
     // Check if it's a drone - use multiple indicators for reliability
-    // GPS altitude alone isn't enough (ground level in mountains = high altitude)
     let isDrone = false;
     
-    if (gps) {
-      // Factor 1: Known drone manufacturer
-      const knownDroneMakes = ['DJI', 'Autel', 'Parrot', 'Skydio', 'Yuneec', 'Holy Stone'];
-      const isKnownDroneMake = knownDroneMakes.some(dm => make?.includes(dm));
-      
-      // Factor 2: Model code looks like drone (e.g., FC8671, EVO, Anafi)
-      const droneModelPatterns = /^(FC\d+|EVO|Anafi|Mavic|Phantom|Mini|Air|Inspire)/i;
-      const isDroneModel = model ? droneModelPatterns.test(model) : false;
-      
-      // Factor 3: Has gimbal data (DJI XMP)
-      const hasGimbalData = !!gimbal;
-      
-      // Factor 4: Altitude (less reliable, but still useful)
-      const hasSignificantAltitude = gps.altitude > 50; // 50m = ~164 feet
-      
-      // Decision logic:
-      if (isKnownDroneMake || isDroneModel) {
-        // Definitely a drone if manufacturer/model matches
-        isDrone = true;
-      } else if (hasGimbalData && hasSignificantAltitude) {
-        // Has gimbal data + altitude = probably a drone
-        isDrone = true;
-      }
-      // Note: Phone photos from ground level (even in mountains) won't be detected as drones
-      // unless they have drone-specific indicators (manufacturer, model, gimbal)
+    console.log('🔍 Drone Detection Factors:', {
+      hasMake: !!make,
+      makeValue: make,
+      hasModel: !!model,
+      modelValue: model,
+      hasGPS: !!gps,
+      hasGimbal: !!gimbal,
+      gimbalPitch: gimbal?.pitch,
+    });
+    
+    // Factor 1: Has gimbal data (MOST RELIABLE - phones don't have gimbals!)
+    const hasGimbalData = !!gimbal;
+    
+    // Factor 2: Known drone manufacturer
+    const knownDroneMakes = ['DJI', 'Autel', 'Parrot', 'Skydio', 'Yuneec', 'Holy Stone'];
+    const isKnownDroneMake = make ? knownDroneMakes.some(dm => make.includes(dm)) : false;
+    
+    // Factor 3: Model code looks like drone (e.g., FC8671, EVO, Anafi)
+    const droneModelPatterns = /^(FC\d+|EVO|Anafi|Mavic|Phantom|Mini|Air|Inspire)/i;
+    const isDroneModel = model ? droneModelPatterns.test(model) : false;
+    
+    console.log('🎯 Detection Logic:', {
+      hasGimbalData,
+      isKnownDroneMake,
+      isDroneModel,
+    });
+    
+    // Decision logic (NO ALTITUDE CHECK - altitude alone is unreliable):
+    if (hasGimbalData) {
+      // Phones don't have gimbals - this is the BEST indicator!
+      console.log('✅ DRONE: Has gimbal data (phones don\'t have gimbals)');
+      isDrone = true;
+    } else if (isKnownDroneMake || isDroneModel) {
+      // Manufacturer or model matches known drones
+      console.log('✅ DRONE: Known make or model pattern');
+      isDrone = true;
+    } else {
+      console.log('❌ NOT DRONE: No gimbal, no drone make/model');
     }
     
     if (!isDrone) {
