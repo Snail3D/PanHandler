@@ -1837,10 +1837,11 @@ export default function DimensionOverlay({
         areaPx2 = Math.abs(areaPx2) / 2;
         
         // Validate that area is not zero (collinear points)
-        if (areaPx2 < 1) {
-          console.log('⚠️ Polygon area is zero (collinear points), skipping. Area:', areaPx2);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          showAlert('Invalid Polygon', 'All points are in a straight line. Please form a proper shape.', 'error');
+        // Only reject if EXACTLY zero or extremely small (< 0.5 px²) to be more forgiving
+        if (areaPx2 < 0.5) {
+          console.log('⚠️ Polygon area too small (collinear or nearly flat), skipping. Area:', areaPx2.toFixed(2), 'px²');
+          // Silently skip - don't show error alert (was causing blank modal issues)
+          // Just don't create the polygon, let user continue placing lines
           return;
         }
         
