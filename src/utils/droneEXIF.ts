@@ -404,8 +404,39 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       }
     }
     
-    // Check if it's a drone (has GPS and altitude > 10m)
-    const isDrone = !!gps && gps.altitude > 10;
+    // Extract DJI gimbal data (need this for drone detection)
+    const gimbal = extractDJIXMP(exif);
+    
+    // Check if it's a drone - use multiple indicators for reliability
+    // GPS altitude alone isn't enough (ground level in mountains = high altitude)
+    let isDrone = false;
+    
+    if (gps) {
+      // Factor 1: Known drone manufacturer
+      const knownDroneMakes = ['DJI', 'Autel', 'Parrot', 'Skydio', 'Yuneec', 'Holy Stone'];
+      const isKnownDroneMake = knownDroneMakes.some(dm => make?.includes(dm));
+      
+      // Factor 2: Model code looks like drone (e.g., FC8671, EVO, Anafi)
+      const droneModelPatterns = /^(FC\d+|EVO|Anafi|Mavic|Phantom|Mini|Air|Inspire)/i;
+      const isDroneModel = model ? droneModelPatterns.test(model) : false;
+      
+      // Factor 3: Has gimbal data (DJI XMP)
+      const hasGimbalData = !!gimbal;
+      
+      // Factor 4: Altitude (less reliable, but still useful)
+      const hasSignificantAltitude = gps.altitude > 50; // 50m = ~164 feet
+      
+      // Decision logic:
+      if (isKnownDroneMake || isDroneModel) {
+        // Definitely a drone if manufacturer/model matches
+        isDrone = true;
+      } else if (hasGimbalData && hasSignificantAltitude) {
+        // Has gimbal data + altitude = probably a drone
+        isDrone = true;
+      }
+      // Note: Phone photos from ground level (even in mountains) won't be detected as drones
+      // unless they have drone-specific indicators (manufacturer, model, gimbal)
+    }
     
     if (!isDrone) {
       return {
@@ -416,8 +447,14 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
       };
     }
     
-    // Extract DJI gimbal data
-    const gimbal = extractDJIXMP(exif);
+    if (!isDrone) {
+      return {
+        isDrone: false,
+        isOverhead: false,
+        confidence: 'none',
+        detectionMethod: 'manual_required',
+      };
+    }
     
     // Check if camera is pointing down (overhead/nadir)
     const isOverhead = gimbal ? gimbal.pitch < -70 : true; // Assume overhead if no gimbal data
@@ -428,55 +465,95 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     let detectionMethod: DroneMetadata['detectionMethod'] = 'database';
     let confidence: DroneMetadata['confidence'] = 'high';
     
-    // If exact match not found, try fuzzy matching for DJI drones
-    if (!specs && make === 'DJI' && model) {
-      // Look for any DJI entry that contains similar specs
-      // For DJI Neo variants (FC3582, FC8671, etc.), use common Neo specs
-      if (model.startsWith('FC')) {
-        // Assume it's a compact DJI drone (Neo, Mini, etc.)
-        // Use conservative specs that work for most compact DJI drones
+    // If exact match not found, try intelligent estimation
+    if (!specs) {
+      // Strategy 1: Use focal length + 35mm equivalent (most reliable)
+      if (exif['FocalLength'] && exif['FocalLengthIn35mmFilm']) {
+        const focalLength = parseFloat(exif['FocalLength']);
+        const focalLength35mm = parseFloat(exif['FocalLengthIn35mmFilm']);
+        const cropFactor = focalLength35mm / focalLength;
+        
+        // Estimate sensor size from crop factor
+        const sensorWidth = 36 / cropFactor; // Full frame = 36mm
+        const sensorHeight = 24 / cropFactor;
+        
         specs = {
-          make: 'DJI',
-          model: model,
-          displayName: `DJI ${model}`,
-          sensor: { width: 6.17, height: 4.55 }, // Conservative 1/2" sensor
-          focalLength: 1.48, // Common for compact drones
+          make: make || 'Unknown',
+          model: model || 'Unknown',
+          displayName: `${make} ${model}`,
+          sensor: { width: sensorWidth, height: sensorHeight },
+          focalLength,
           resolution: {
             width: exif['ImageWidth'] || imageWidth || 4000,
             height: exif['ImageHeight'] || imageHeight || 3000,
           },
-          notes: 'Auto-detected DJI compact drone (using conservative specs)',
+          notes: 'Auto-detected from focal length (accurate)',
         };
+        
+        detectionMethod = 'estimated';
+        confidence = 'high'; // Focal length estimation is quite accurate!
+      }
+      // Strategy 2: Use image dimensions + conservative assumptions
+      else if (exif['ImageWidth'] && exif['ImageHeight']) {
+        const imgWidth = exif['ImageWidth'] || imageWidth;
+        const imgHeight = exif['ImageHeight'] || imageHeight;
+        
+        // Estimate based on image resolution
+        // Most consumer drones: 12-48MP, 1/2.3" to 1" sensors
+        const megapixels = (imgWidth * imgHeight) / 1000000;
+        
+        // Heuristics based on common drone specs:
+        let estimatedSensorWidth: number;
+        let estimatedFocalLength: number;
+        
+        if (megapixels >= 20) {
+          // High-res (20+ MP) = larger sensor (1" or APS-C)
+          estimatedSensorWidth = 13.2; // 1" sensor
+          estimatedFocalLength = 8.8; // Common for 1" drones
+        } else if (megapixels >= 12) {
+          // Mid-res (12-20 MP) = medium sensor (1/2" to 1/2.3")
+          estimatedSensorWidth = 6.17; // 1/2" sensor (DJI Mini/Neo)
+          estimatedFocalLength = 4.5; // Common wide angle
+        } else {
+          // Low-res (<12 MP) = small sensor (1/2.3" or smaller)
+          estimatedSensorWidth = 6.17; // Conservative 1/2.3"
+          estimatedFocalLength = 4.5;
+        }
+        
+        const estimatedSensorHeight = estimatedSensorWidth * (imgHeight / imgWidth);
+        
+        specs = {
+          make: make || 'Unknown',
+          model: model || 'Unknown',
+          displayName: `${make || 'Unknown'} ${model || 'Drone'}`,
+          sensor: { width: estimatedSensorWidth, height: estimatedSensorHeight },
+          focalLength: estimatedFocalLength,
+          resolution: { width: imgWidth, height: imgHeight },
+          notes: `Auto-detected from ${megapixels.toFixed(1)}MP image (conservative estimate)`,
+        };
+        
         detectionMethod = 'estimated';
         confidence = 'medium';
       }
     }
     
-    // If still not found, try to estimate from focal length
-    if (!specs && exif['FocalLength'] && exif['FocalLengthIn35mmFilm']) {
-      const focalLength = parseFloat(exif['FocalLength']);
-      const focalLength35mm = parseFloat(exif['FocalLengthIn35mmFilm']);
-      const cropFactor = focalLength35mm / focalLength;
-      
-      // Estimate sensor size from crop factor
-      const sensorWidth = 36 / cropFactor; // Full frame = 36mm
-      const sensorHeight = 24 / cropFactor;
-      
+    // If still not found, use ultra-conservative fallback (last resort)
+    if (!specs) {
       specs = {
         make: make || 'Unknown',
-        model: model || 'Unknown',
-        displayName: `${make} ${model}`,
-        sensor: { width: sensorWidth, height: sensorHeight },
-        focalLength,
+        model: model || 'Unknown', 
+        displayName: `${make || 'Unknown'} ${model || 'Drone'}`,
+        sensor: { width: 6.17, height: 4.55 }, // Conservative 1/2" sensor (most common)
+        focalLength: 4.5, // Conservative wide angle
         resolution: {
           width: exif['ImageWidth'] || imageWidth || 4000,
           height: exif['ImageHeight'] || imageHeight || 3000,
         },
-        notes: 'Estimated from crop factor',
+        notes: 'Fallback conservative estimate - may be less accurate',
       };
       
       detectionMethod = 'estimated';
-      confidence = 'medium';
+      confidence = 'low';
     }
     
     // Calculate ground metrics if we have specs
