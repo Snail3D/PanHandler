@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView } from 'react-native';
+import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView, ActivityIndicator } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VerbalScale } from '../state/measurementStore';
+import useStore from '../state/measurementStore';
 import Svg, { Path } from 'react-native-svg';
 
 type ScaleMode = 'verbal' | 'blueprint';
@@ -19,12 +21,20 @@ interface VerbalScaleModalProps {
 export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode, onDismiss }: VerbalScaleModalProps) {
   const insets = useSafeAreaInsets();
   
+  // Access store for magnetic declination
+  const magneticDeclination = useStore((s) => s.magneticDeclination);
+  const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
+  
   const [scaleMode, setScaleMode] = useState<ScaleMode>('verbal');
   const [screenDistance, setScreenDistance] = useState('1');
   const [screenUnit, setScreenUnit] = useState<'cm' | 'in'>('cm');
   const [realDistance, setRealDistance] = useState('');
   const [realUnit, setRealUnit] = useState<'km' | 'mi' | 'm' | 'ft'>('km');
   const [showExamples, setShowExamples] = useState(false);
+  
+  // Magnetic declination state
+  const [declinationInput, setDeclinationInput] = useState(magneticDeclination.toString());
+  const [isLoadingGPS, setIsLoadingGPS] = useState(false);
 
   const screenNum = parseFloat(screenDistance);
   const realNum = parseFloat(realDistance);
@@ -50,6 +60,67 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
     setRealUnit(example.realUnit);
     setShowExamples(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+  
+  // Fetch magnetic declination using GPS
+  const fetchDeclinationFromGPS = async () => {
+    setIsLoadingGPS(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    try {
+      // Request location permission
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status !== 'granted') {
+        alert('GPS permission denied. Please enable location services to use this feature.');
+        setIsLoadingGPS(false);
+        return;
+      }
+      
+      // Get current location
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      
+      const { latitude, longitude } = location.coords;
+      
+      // Fetch magnetic declination from NOAA API
+      // Using the Magnetic Field Calculator API
+      const response = await fetch(
+        `https://www.ngdc.noaa.gov/geomag-web/calculators/calculateDeclination?lat1=${latitude}&lon1=${longitude}&resultFormat=json`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch declination data');
+      }
+      
+      const data = await response.json();
+      const declination = data.result[0].declination;
+      
+      // Update state and store
+      setDeclinationInput(declination.toFixed(2));
+      setMagneticDeclination(parseFloat(declination.toFixed(2)));
+      
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Error fetching declination:', error);
+      alert('Could not fetch declination from GPS. Please enter manually or check your internet connection.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsLoadingGPS(false);
+    }
+  };
+  
+  // Apply manual declination input
+  const applyManualDeclination = () => {
+    const declination = parseFloat(declinationInput);
+    if (isNaN(declination)) {
+      alert('Please enter a valid declination value (e.g., 14.5 for 14.5° East, -10.2 for 10.2° West)');
+      return;
+    }
+    
+    setMagneticDeclination(declination);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   return (
@@ -516,6 +587,116 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                       ))}
                     </View>
                   )}
+                  
+                  {/* Magnetic Declination Section */}
+                  <View style={{
+                    marginTop: 20,
+                    padding: 16,
+                    backgroundColor: 'rgba(100, 150, 255, 0.12)',
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: 'rgba(100, 150, 255, 0.25)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                      <Ionicons name="compass-outline" size={22} color="#0066FF" />
+                      <Text style={{ 
+                        marginLeft: 8,
+                        fontSize: 16, 
+                        fontWeight: '700', 
+                        color: 'rgba(0, 0, 0, 0.85)' 
+                      }}>
+                        Magnetic Declination
+                      </Text>
+                    </View>
+                    
+                    <Text style={{ 
+                      fontSize: 13, 
+                      color: 'rgba(0, 0, 0, 0.6)',
+                      marginBottom: 12,
+                      lineHeight: 18,
+                    }}>
+                      Set your magnetic declination to correct azimuth measurements for true north. Positive = East, Negative = West.
+                    </Text>
+                    
+                    {/* Declination Input Row */}
+                    <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                      {/* Manual Input */}
+                      <View style={{ flex: 1 }}>
+                        <TextInput
+                          value={declinationInput}
+                          onChangeText={setDeclinationInput}
+                          placeholder="0.0"
+                          keyboardType="numeric"
+                          onBlur={applyManualDeclination}
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            borderRadius: 10,
+                            borderWidth: 1,
+                            borderColor: 'rgba(0, 0, 0, 0.08)',
+                            padding: 12,
+                            fontSize: 15,
+                            fontWeight: '600',
+                            color: 'rgba(0, 0, 0, 0.85)',
+                            textAlign: 'center',
+                          }}
+                        />
+                      </View>
+                      
+                      {/* GPS Button */}
+                      <Pressable
+                        onPress={fetchDeclinationFromGPS}
+                        disabled={isLoadingGPS}
+                        style={({ pressed }) => ({
+                          backgroundColor: isLoadingGPS 
+                            ? 'rgba(100, 150, 255, 0.3)' 
+                            : pressed 
+                              ? 'rgba(100, 150, 255, 0.9)' 
+                              : 'rgba(100, 150, 255, 0.85)',
+                          borderRadius: 10,
+                          paddingHorizontal: 20,
+                          paddingVertical: 12,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          minWidth: 100,
+                          borderWidth: 1,
+                          borderColor: 'rgba(255, 255, 255, 0.3)',
+                        })}
+                      >
+                        {isLoadingGPS ? (
+                          <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="location" size={18} color="#FFFFFF" />
+                            <Text style={{ 
+                              marginLeft: 6,
+                              color: '#FFFFFF', 
+                              fontWeight: '700', 
+                              fontSize: 14 
+                            }}>
+                              GPS
+                            </Text>
+                          </View>
+                        )}
+                      </Pressable>
+                    </View>
+                    
+                    {/* Current Declination Display */}
+                    <View style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                      borderRadius: 8,
+                      padding: 10,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
+                        Current:
+                      </Text>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#0066FF' }}>
+                        {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
+                      </Text>
+                    </View>
+                  </View>
                     </>
                   )}
 
