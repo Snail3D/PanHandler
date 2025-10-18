@@ -2346,9 +2346,9 @@ export default function MeasurementScreen() {
         </>
       )}
 
-      {/* BattlingBots Donation Modal */}
+      {/* BattlingBots Donation Modal - ALWAYS RENDER FOR TESTING */}
       <BattlingBotsModal 
-        visible={showBattlingBots} 
+        visible={true}
         onClose={() => {
           setShowBattlingBots(false);
           // Reset first-time donor flag after showing celebration
