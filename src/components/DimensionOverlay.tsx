@@ -5541,24 +5541,41 @@ export default function DimensionOverlay({
                 </Text>
               </View>
               
-              {/* Coin reference info */}
+              {/* Coin/Drone reference info */}
               {calibration && coinCircle && (
                 <View
                   style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backgroundColor: coinCircle.coinName.startsWith('Auto:') 
+                      ? 'rgba(0, 200, 255, 0.15)' // Cyan tint for drone
+                      : 'rgba(0, 0, 0, 0.7)', // Black for coin
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderRadius: 5,
+                    borderWidth: coinCircle.coinName.startsWith('Auto:') ? 1 : 0,
+                    borderColor: 'rgba(0, 200, 255, 0.3)',
                   }}
                 >
-                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    {coinCircle.coinName}
-                  </Text>
-                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    {unitSystem === 'imperial' 
-                      ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
-                      : `${coinCircle.coinDiameter.toFixed(2)}mm`}
-                  </Text>
+                  {coinCircle.coinName.startsWith('Auto:') ? (
+                    <>
+                      <Text style={{ color: '#00D4FF', fontSize: 11, fontWeight: '700' }}>
+                        🚁 {coinCircle.coinName.replace('Auto: ', '')}
+                      </Text>
+                      <Text style={{ color: '#A0E0FF', fontSize: 9, fontWeight: '500' }}>
+                        Auto-calibrated from altitude
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                        {coinCircle.coinName}
+                      </Text>
+                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                        {unitSystem === 'imperial' 
+                          ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+                          : `${coinCircle.coinDiameter.toFixed(2)}mm`}
+                      </Text>
+                    </>
+                  )}
                 </View>
               )}
             </View>
