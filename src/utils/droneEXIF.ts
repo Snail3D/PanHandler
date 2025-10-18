@@ -287,12 +287,6 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         console.log('✅ EXIF loaded successfully');
         console.log('EXIF keys:', Object.keys(exifObj));
         
-        // Show what we found
-        const hasGPS = exifObj['GPS'] && Object.keys(exifObj['GPS'] || {}).length > 0;
-        const has0th = exifObj['0th'] && Object.keys(exifObj['0th'] || {}).length > 0;
-        alert(`piexifjs SUCCESS!\n\nHas GPS: ${hasGPS}\nHas 0th: ${has0th}\nGPS keys: ${hasGPS ? Object.keys(exifObj['GPS'] || {}).length : 0}`);
-        
-        
         // Convert piexifjs format to standard EXIF object
         exif = {};
         
@@ -347,13 +341,9 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           altitude: exif['GPSAltitude'],
         });
         
-        // Debug: Show what we extracted
-        alert(`EXTRACTED EXIF!\n\nMake: ${exif['Make']}\nModel: ${exif['Model']}\nGPSAlt (parsed): ${exif['GPSAltitude']}m\n\nThis will now work!`);
-        
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e);
         console.log('⚠️ piexifjs failed, trying MediaLibrary fallback:', e);
-        alert(`piexifjs FAILED\n\nError: ${errorMsg}\n\nTrying MediaLibrary...`);
         
         // Fallback to MediaLibrary
         try {
@@ -458,6 +448,12 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     
     // Check if camera is pointing down (overhead/nadir)
     const isOverhead = gimbal ? gimbal.pitch < -70 : true; // Assume overhead if no gimbal data
+    
+    // Debug: Show overhead detection
+    if (isDrone) {
+      const pitchInfo = gimbal ? `${gimbal.pitch.toFixed(1)}°` : 'No gimbal data (assuming overhead)';
+      alert(`OVERHEAD CHECK\n\nGimbal pitch: ${pitchInfo}\nIs overhead: ${isOverhead}\n\nNote: Overhead requires pitch < -70°`);
+    }
     
     // Try to find drone in database
     const dbKey = `${make}/${model}`;
@@ -591,7 +587,6 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     };
   }
 }
-
 /**
  * Convert pixel coordinates to GPS coordinates (for overhead photos only)
  */
