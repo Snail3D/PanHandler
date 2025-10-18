@@ -1258,6 +1258,7 @@ export default function MeasurementScreen() {
         mediaTypes: ['images'],
         allowsEditing: false,
         quality: 1,
+        exif: true, // Request EXIF data
       });
 
       if (!result.canceled && result.assets[0]) {
