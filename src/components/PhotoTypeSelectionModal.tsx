@@ -72,6 +72,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
       transparent
       animationType="fade"
       statusBarTranslucent
+      presentationStyle="overFullScreen"
       onRequestClose={handleCancel}
     >
       <View style={{
