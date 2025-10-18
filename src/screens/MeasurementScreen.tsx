@@ -237,16 +237,19 @@ export default function MeasurementScreen() {
   
   // BattlingBots donation modal state  
   const [showBattlingBots, setShowBattlingBots] = useState(false);
-  
-  // Increment session count on app mount
-  useEffect(() => {
-    incrementSessionCount();
-  }, []);
+  const [hasIncrementedSession, setHasIncrementedSession] = useState(false);
   
   // Trigger BattlingBots when entering measurement screen (not on app mount)
   useEffect(() => {
     if (mode === 'measurement' && currentImageUri) {
-      // Only check on measurement screen
+      // Increment session count ONCE when reaching measurement screen
+      // This prevents blocking the camera → calibration transition
+      if (!hasIncrementedSession) {
+        incrementSessionCount();
+        setHasIncrementedSession(true);
+      }
+      
+      // Check if we should trigger BattlingBots (after incrementing)
       const triggerInterval = isDonor ? 40 : 10;
       const shouldTrigger = sessionCount % triggerInterval === 0;
       
@@ -259,7 +262,12 @@ export default function MeasurementScreen() {
         }, 2000);
       }
     }
-  }, [mode]); // Trigger when mode changes to measurement
+    
+    // Reset flag when returning to camera (for next session)
+    if (mode === 'camera') {
+      setHasIncrementedSession(false);
+    }
+  }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
