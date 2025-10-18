@@ -26,6 +26,7 @@ import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
 import ManualAltitudeModal from '../components/ManualAltitudeModal';
+import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
@@ -113,6 +114,9 @@ export default function MeasurementScreen() {
   const [showManualAltitudeModal, setShowManualAltitudeModal] = useState(false);
   const [pendingDroneData, setPendingDroneData] = useState<any>(null);
   const [showDiagnostic, setShowDiagnostic] = useState(false); // Diagnostic screen
+  const [showPhotoTypeModal, setShowPhotoTypeModal] = useState(false);
+  const [pendingPhotoUri, setPendingPhotoUri] = useState<string | null>(null);
+  const [currentPhotoType, setCurrentPhotoType] = useState<PhotoType | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
   
@@ -1331,6 +1335,35 @@ export default function MeasurementScreen() {
   };
 
   const pickImage = async () => {
+
+  const handlePhotoTypeSelection = (type: PhotoType) => {
+    setShowPhotoTypeModal(false);
+    setCurrentPhotoType(type);
+    
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    setIsTransitioning(true);
+    transitionBlackOverlay.value = withTiming(1, {
+      duration: 150,
+      easing: Easing.in(Easing.ease),
+    });
+    
+    setTimeout(() => {
+      if (type === 'map') {
+        setSkipToMapMode(true);
+      }
+      setMode('zoomCalibrate');
+      
+      transitionBlackOverlay.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+      
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 250);
+    }, 150);
+  };
     try {
       // Request media library permission first
       if (!mediaLibraryPermission?.granted) {
@@ -1427,29 +1460,9 @@ export default function MeasurementScreen() {
           // Silently continue to normal calibration flow
         }
         
-        // NOT a drone (or no auto-calibration data) - proceed with normal calibration
-        // Smooth transition to calibration (same as taking photo)
-        setIsTransitioning(true);
-        
-        // Quick fade to black
-        transitionBlackOverlay.value = withTiming(1, {
-          duration: 150,
-          easing: Easing.in(Easing.ease),
-        });
-        
-        setTimeout(() => {
-          setMode('zoomCalibrate'); // Go straight to calibration screen
-          
-          // Fade in calibration screen
-          transitionBlackOverlay.value = withTiming(0, {
-            duration: 250,
-            easing: Easing.out(Easing.ease),
-          });
-          
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 250);
-        }, 150);
+        // NOT a drone (or no auto-calibration data) - Show photo type selection modal
+        setPendingPhotoUri(asset.uri);
+        setShowPhotoTypeModal(true);
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -2480,4 +2493,9 @@ export default function MeasurementScreen() {
       />
     </Animated.View>
   );
+      <PhotoTypeSelectionModal
+        visible={showPhotoTypeModal}
+        onSelect={handlePhotoTypeSelection}
+        onCancel={() => setShowPhotoTypeModal(false)}
+      />
 }
