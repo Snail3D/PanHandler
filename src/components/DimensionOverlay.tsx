@@ -5842,23 +5842,22 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            bottom: insets.bottom + 200,
+            bottom: insets.bottom + 80, // Lower position as shown in image
             left: 0,
             right: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 31, // Above AUTO LEVEL badge
+            zIndex: 31,
           }}
         >
           <View
             style={{
               backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
-              paddingHorizontal: 10,
-              paddingVertical: 6,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
               borderRadius: 8,
-              flexDirection: 'row',
               alignItems: 'center',
-              gap: 6,
+              justifyContent: 'center',
               shadowColor: '#FF1493',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.3,
@@ -5868,15 +5867,34 @@ export default function DimensionOverlay({
               borderColor: 'rgba(255, 255, 255, 0.3)',
             }}
           >
-          <Text style={{ fontSize: 14 }}>❤️</Text>
-          <Text style={{ 
-            color: 'white', 
-            fontSize: 9, 
-            fontWeight: '800',
-            letterSpacing: 0.3,
-          }}>
-            Official PanHandler Supporter
-          </Text>
+            <Text style={{ fontSize: 14, marginBottom: 2 }}>❤️</Text>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 9, 
+              fontWeight: '800',
+              letterSpacing: 0.3,
+              textAlign: 'center',
+            }}>
+              Official
+            </Text>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 9, 
+              fontWeight: '800',
+              letterSpacing: 0.3,
+              textAlign: 'center',
+            }}>
+              PanHandler
+            </Text>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 9, 
+              fontWeight: '800',
+              letterSpacing: 0.3,
+              textAlign: 'center',
+            }}>
+              Supporter
+            </Text>
           </View>
         </View>
       )}
@@ -6767,7 +6785,7 @@ export default function DimensionOverlay({
       {/* REMOVED: Old Pro upgrade modal - Now using donation-based BattlingBots in MeasurementScreen */}
 
       {/* Help Button - Positioned next to AUTO LEVEL badge */}
-      {coinCircle && !showLockedInAnimation && !isCapturing && (
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => setShowHelpModal(true)}
           onLongPress={() => {
