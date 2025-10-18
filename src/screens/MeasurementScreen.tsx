@@ -1349,7 +1349,11 @@ ${debugLog}`;
             const pixelsPerMM = 1 / mmPerPixel;
             
             // Show calibration calculation
-            alert(`🧮 CALIBRATION MATH\n\nGSD: ${droneMetadata.groundSampleDistance.toFixed(4)} cm/px\nAltitude: ${droneMetadata.gps?.altitude}m\n\nCalculation:\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\npixelsPerUnit = ${pixelsPerMM.toFixed(4)}\n\nIf this is wrong, GSD calculation is the issue!`);
+            const altUsed = droneMetadata.relativeAltitude !== undefined && droneMetadata.relativeAltitude > 0 
+              ? `${droneMetadata.relativeAltitude.toFixed(1)}m (Relative AGL) ✅` 
+              : `${droneMetadata.gps?.altitude.toFixed(1)}m (GPS ASL) ⚠️`;
+            
+            alert(`🧮 CALIBRATION MATH\n\nGSD: ${droneMetadata.groundSampleDistance.toFixed(4)} cm/px\n\nAltitude used: ${altUsed}\n\nCalculation:\n1 pixel = ${mmPerPixel.toFixed(2)} mm\n1 mm = ${pixelsPerMM.toFixed(4)} pixels\n\npixelsPerUnit = ${pixelsPerMM.toFixed(4)}\n\n${droneMetadata.relativeAltitude === undefined ? '❌ RelativeAltitude NOT found in XMP!\nUsing GPS altitude (inaccurate!)' : '✅ Using accurate RelativeAltitude!'}`);
             
             // Set calibration data directly
             setCalibration({
