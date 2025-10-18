@@ -9,13 +9,22 @@ interface BlueprintDistanceModalProps {
   visible: boolean;
   onComplete: (distance: number, unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi') => void;
   onDismiss: () => void;
+  mode?: 'blueprint' | 'aerial'; // Type of calibration
 }
 
-export default function BlueprintDistanceModal({ visible, onComplete, onDismiss }: BlueprintDistanceModalProps) {
+export default function BlueprintDistanceModal({ visible, onComplete, onDismiss, mode = 'blueprint' }: BlueprintDistanceModalProps) {
   const insets = useSafeAreaInsets();
   
   const [distance, setDistance] = useState('');
   const [unit, setUnit] = useState<'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'>('cm');
+
+  const isAerial = mode === 'aerial';
+  const title = isAerial ? 'Ground Distance' : 'Enter Distance';
+  const promptText = isAerial
+    ? 'What is the real-world ground distance between the two points?'
+    : 'What is the real-world distance between the two points you placed?';
+  const icon = isAerial ? 'airplane-outline' : 'resize-outline';
+  const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 
   const distanceNum = parseFloat(distance);
   const isValid = !isNaN(distanceNum) && distanceNum > 0;
@@ -58,9 +67,9 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss 
               {/* Header */}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="resize-outline" size={24} color="#2E7D32" style={{ marginRight: 8 }} />
+                  <Ionicons name={icon as any} size={24} color={iconColor} style={{ marginRight: 8 }} />
                   <Text style={{ fontSize: 20, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
-                    Enter Distance
+                    {title}
                   </Text>
                 </View>
                 <Pressable
@@ -87,7 +96,7 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss 
                 color: 'rgba(0, 0, 0, 0.6)',
                 lineHeight: 20,
               }}>
-                What is the real-world distance between the two points you placed?
+                {promptText}
               </Text>
 
               {/* Distance Input */}

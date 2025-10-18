@@ -25,7 +25,6 @@ import TouchOverlayFingerprints from '../components/TouchOverlayFingerprints';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
-import ManualAltitudeModal from '../components/ManualAltitudeModal';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -120,6 +119,7 @@ export default function MeasurementScreen() {
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
   const [skipToBlueprintMode, setSkipToBlueprintMode] = useState(false); // Track if user selected blueprint photo type
+  const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -1386,14 +1386,8 @@ export default function MeasurementScreen() {
             // Blueprint mode - set flag to open blueprint placement modal
             setSkipToBlueprintMode(true);
           } else if (type === 'aerial') {
-            // Show manual altitude modal if drone detected
-            if (pendingDroneData) {
-              setShowManualAltitudeModal(true);
-            } else {
-              // No drone data - shouldn't happen but handle it
-              alert("No drone data found. Please use another calibration method.");
-              setMode('camera');
-            }
+            // Aerial photos use two-point calibration with aerial-specific language
+            setSkipToAerialMode(true);
           } else if (type === 'knownScale') {
             // Known scale (ruler) mode not yet implemented
             alert("Ruler mode coming soon! For now, please use Map Scale or Coin calibration.");
@@ -1442,75 +1436,7 @@ export default function MeasurementScreen() {
         setImageUri(asset.uri, false); // false = not auto-captured
         await detectOrientation(asset.uri);
         
-        // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
-        try {
-          const { extractDroneMetadata } = await import('../utils/droneEXIF');
-          const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
-          
-          // If drone detected, check if we need manual altitude entry
-          if (droneMetadata.isDrone && droneMetadata.specs) {
-            console.log('🚁 Drone detected:', droneMetadata.displayName);
-            
-            // Check if we have RelativeAltitude from XMP
-            if (droneMetadata.relativeAltitude && droneMetadata.relativeAltitude > 0 && droneMetadata.groundSampleDistance) {
-              // AUTO-CALIBRATE: We have XMP altitude data!
-              console.log('✅ RelativeAltitude found in XMP - auto-calibrating');
-              
-              const mmPerPixel = droneMetadata.groundSampleDistance * 10;
-              const pixelsPerMM = 1 / mmPerPixel;
-              
-              setCalibration({
-                pixelsPerUnit: pixelsPerMM,
-                unit: 'mm',
-                referenceDistance: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              setCoinCircle({
-                centerX: droneMetadata.specs.resolution.width / 2,
-                centerY: droneMetadata.specs.resolution.height / 2,
-                radius: 100,
-                coinName: `Auto: ${droneMetadata.displayName || 'Drone'}`,
-                coinDiameter: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              
-              // Transition to measurement mode
-              setIsTransitioning(true);
-              transitionBlackOverlay.value = withTiming(1, {
-                duration: 150,
-                easing: Easing.in(Easing.ease),
-              });
-              
-              setTimeout(() => {
-                setMode('measurement');
-                setTimeout(() => {
-                  transitionBlackOverlay.value = withTiming(0, {
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                  });
-                  setTimeout(() => {
-                    setIsTransitioning(false);
-                  }, 250);
-                }, 150);
-              }, 150);
-              
-              return; // Exit early - skip normal calibration flow
-              
-            } else {
-              // MANUAL ENTRY: No XMP altitude, show modal
-              console.log('📝 No RelativeAltitude - showing manual entry modal');
-              setPendingDroneData(droneMetadata);
-              setShowManualAltitudeModal(true);
-              return; // Exit early - modal will handle calibration
-            }
-          }
-        } catch (error) {
-          console.error('Error checking for drone:', error);
-          // Silently continue to normal calibration flow
-        }
-        
-        // NOT a drone (or no auto-calibration data) - Show photo type selection modal
+        // Show photo type selection modal for all imported photos
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
       }
@@ -2314,6 +2240,7 @@ export default function MeasurementScreen() {
                   sessionColor={shutterColor}
                   skipToMapMode={skipToMapMode}
                   skipToBlueprintMode={skipToBlueprintMode}
+                  skipToAerialMode={skipToAerialMode}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
@@ -2536,14 +2463,6 @@ export default function MeasurementScreen() {
         ]}
       />
 
-      {/* Manual Altitude Entry Modal - For drone photos without XMP altitude */}
-      <ManualAltitudeModal
-        visible={showManualAltitudeModal}
-        onConfirm={handleManualAltitudeConfirm}
-        onCancel={handleManualAltitudeCancel}
-        droneModel={pendingDroneData?.displayName || 'Drone'}
-        distance={pendingDroneData?.distance}
-      />
     </Animated.View>
   );
 }

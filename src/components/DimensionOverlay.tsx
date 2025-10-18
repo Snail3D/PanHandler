@@ -109,6 +109,7 @@ interface DimensionOverlayProps {
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
   skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
   skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
+  skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
 }
 
 export default function DimensionOverlay({ 
@@ -124,6 +125,7 @@ export default function DimensionOverlay({
   onMeasurementModeChange,
   skipToMapMode = false,
   skipToBlueprintMode = false,
+  skipToAerialMode = false,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -612,9 +614,22 @@ export default function DimensionOverlay({
       // User selected blueprint from photo type selection - open modal immediately
       console.log('📐 skipToBlueprintMode triggered - opening blueprint placement modal');
       hasTriggeredSkipToBlueprint.current = true;
+      setIsAerialMode(false); // Blueprint mode
       setShowBlueprintPlacementModal(true);
     }
   }, [skipToBlueprintMode]);
+  
+  // Handle skipToAerialMode prop (from photo type selection)
+  const hasTriggeredSkipToAerial = useRef(false);
+  useEffect(() => {
+    if (skipToAerialMode && !hasTriggeredSkipToAerial.current) {
+      // User selected aerial from photo type selection - open modal immediately with aerial language
+      console.log('✈️ skipToAerialMode triggered - opening aerial placement modal');
+      hasTriggeredSkipToAerial.current = true;
+      setIsAerialMode(true); // Aerial mode
+      setShowBlueprintPlacementModal(true);
+    }
+  }, [skipToAerialMode]);
   
   // Track if we've shown the initial quote
   const hasShownInitialQuote = useRef(false);
@@ -7208,9 +7223,10 @@ export default function DimensionOverlay({
         }}
       />
 
-      {/* Blueprint Placement Modal */}
+      {/* Blueprint/Aerial Placement Modal */}
       <BlueprintPlacementModal
         visible={showBlueprintPlacementModal}
+        mode={isAerialMode ? 'aerial' : 'blueprint'}
         onStartPlacement={() => {
           // Hide modal and start measurement mode for blueprint placement
           setShowBlueprintPlacementModal(false);
@@ -7296,6 +7312,7 @@ export default function DimensionOverlay({
       {/* Blueprint Distance Input Modal */}
       <BlueprintDistanceModal
         visible={showBlueprintDistanceModal}
+        mode={isAerialMode ? 'aerial' : 'blueprint'}
         onComplete={(distance, unit) => {
           // Fade out the line gracefully
           blueprintLineOpacity.value = withTiming(0, {
