@@ -300,45 +300,68 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     try {
       console.log('📸 Reading XMP data from:', imageUri);
       
-      // Read the file as text to search for XMP
-      const textData = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: FileSystem.EncodingType.UTF8,
+      // Read file as base64 first (safer for binary JPEG data)
+      const base64Data = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
       });
       
-      // Find XMP packet (between <x:xmpmeta> tags)
-      const xmpStart = textData.indexOf('<x:xmpmeta');
-      const xmpEnd = textData.indexOf('</x:xmpmeta>') + 12;
+      // Convert base64 to binary string for searching
+      // We'll decode it in chunks to avoid memory issues
+      let binaryString = '';
+      try {
+        binaryString = atob(base64Data);
+      } catch (e) {
+        console.log('⚠️ Failed to decode base64:', e);
+      }
       
-      if (xmpStart !== -1 && xmpEnd > xmpStart) {
-        const xmpText = textData.substring(xmpStart, xmpEnd);
-        console.log('🔍 Found XMP data, length:', xmpText.length);
+      if (binaryString) {
+        // Find XMP packet in binary data
+        // XMP starts with <?xpacket or <x:xmpmeta
+        const xmpStart = binaryString.indexOf('<x:xmpmeta');
+        const xmpEnd = binaryString.indexOf('</x:xmpmeta>');
         
-        // Initialize exif object if not provided
-        if (!exif) {
-          exif = {};
+        if (xmpStart !== -1 && xmpEnd > xmpStart) {
+          const xmpText = binaryString.substring(xmpStart, xmpEnd + 12);
+          console.log('🔍 Found XMP data, length:', xmpText.length);
+          
+          // Initialize exif object if not provided
+          if (!exif) {
+            exif = {};
+          }
+          
+          // Parse DJI-specific XMP tags
+          // Example: <drone-dji:RelativeAltitude>54.3</drone-dji:RelativeAltitude>
+          const relAltMatch = xmpText.match(/<drone-dji:RelativeAltitude>([^<]+)<\/drone-dji:RelativeAltitude>/);
+          const absAltMatch = xmpText.match(/<drone-dji:AbsoluteAltitude>([^<]+)<\/drone-dji:AbsoluteAltitude>/);
+          const gimbalPitchMatch = xmpText.match(/<drone-dji:GimbalPitchDegree>([^<]+)<\/drone-dji:GimbalPitchDegree>/);
+          const gimbalYawMatch = xmpText.match(/<drone-dji:GimbalYawDegree>([^<]+)<\/drone-dji:GimbalYawDegree>/);
+          const gimbalRollMatch = xmpText.match(/<drone-dji:GimbalRollDegree>([^<]+)<\/drone-dji:GimbalRollDegree>/);
+          
+          if (relAltMatch) {
+            exif['drone-dji:RelativeAltitude'] = relAltMatch[1];
+            console.log('✅ Found RelativeAltitude:', relAltMatch[1]);
+          }
+          if (absAltMatch) {
+            exif['drone-dji:AbsoluteAltitude'] = absAltMatch[1];
+            console.log('✅ Found AbsoluteAltitude:', absAltMatch[1]);
+          }
+          if (gimbalPitchMatch) exif['drone-dji:GimbalPitchDegree'] = gimbalPitchMatch[1];
+          if (gimbalYawMatch) exif['drone-dji:GimbalYawDegree'] = gimbalYawMatch[1];
+          if (gimbalRollMatch) exif['drone-dji:GimbalRollDegree'] = gimbalRollMatch[1];
+          
+          console.log('📊 Extracted XMP tags:', {
+            relativeAlt: relAltMatch?.[1],
+            absoluteAlt: absAltMatch?.[1],
+            gimbalPitch: gimbalPitchMatch?.[1],
+          });
+        } else {
+          console.log('⚠️ No XMP data found in image (searched binary string)');
+          // Try alternative XMP markers
+          const alt1 = binaryString.indexOf('<?xpacket');
+          const alt2 = binaryString.indexOf('<rdf:RDF');
+          const alt3 = binaryString.indexOf('drone-dji:');
+          console.log('Alternative markers:', { xpacket: alt1 !== -1, rdfRDF: alt2 !== -1, droneDji: alt3 !== -1 });
         }
-        
-        // Parse DJI-specific XMP tags
-        // Example: <drone-dji:RelativeAltitude>54.3</drone-dji:RelativeAltitude>
-        const relAltMatch = xmpText.match(/<drone-dji:RelativeAltitude>([^<]+)<\/drone-dji:RelativeAltitude>/);
-        const absAltMatch = xmpText.match(/<drone-dji:AbsoluteAltitude>([^<]+)<\/drone-dji:AbsoluteAltitude>/);
-        const gimbalPitchMatch = xmpText.match(/<drone-dji:GimbalPitchDegree>([^<]+)<\/drone-dji:GimbalPitchDegree>/);
-        const gimbalYawMatch = xmpText.match(/<drone-dji:GimbalYawDegree>([^<]+)<\/drone-dji:GimbalYawDegree>/);
-        const gimbalRollMatch = xmpText.match(/<drone-dji:GimbalRollDegree>([^<]+)<\/drone-dji:GimbalRollDegree>/);
-        
-        if (relAltMatch) exif['drone-dji:RelativeAltitude'] = relAltMatch[1];
-        if (absAltMatch) exif['drone-dji:AbsoluteAltitude'] = absAltMatch[1];
-        if (gimbalPitchMatch) exif['drone-dji:GimbalPitchDegree'] = gimbalPitchMatch[1];
-        if (gimbalYawMatch) exif['drone-dji:GimbalYawDegree'] = gimbalYawMatch[1];
-        if (gimbalRollMatch) exif['drone-dji:GimbalRollDegree'] = gimbalRollMatch[1];
-        
-        console.log('📊 Extracted XMP tags:', {
-          relativeAlt: relAltMatch?.[1],
-          absoluteAlt: absAltMatch?.[1],
-          gimbalPitch: gimbalPitchMatch?.[1],
-        });
-      } else {
-        console.log('⚠️ No XMP data found in image');
       }
     } catch (xmpError) {
       console.log('⚠️ XMP extraction failed:', xmpError);
