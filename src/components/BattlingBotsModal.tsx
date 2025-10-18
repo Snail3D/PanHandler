@@ -498,6 +498,8 @@ export default function BattlingBotsModal({
       transparent
       animationType="fade"
       onRequestClose={handleClose}
+      presentationStyle="overFullScreen"
+      statusBarTranslucent
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>

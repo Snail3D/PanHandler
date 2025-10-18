@@ -2368,7 +2368,7 @@ export default function MeasurementScreen() {
 
       {/* BattlingBots Donation Modal - RENDER AFTER BLACK OVERLAY */}
       <BattlingBotsModal 
-        visible={true}
+        visible={showBattlingBots}
         onClose={() => {
           setShowBattlingBots(false);
           // Reset first-time donor flag after showing celebration
