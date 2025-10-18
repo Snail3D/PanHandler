@@ -237,28 +237,29 @@ export default function MeasurementScreen() {
   
   // BattlingBots donation modal state  
   const [showBattlingBots, setShowBattlingBots] = useState(false);
-  const [testConversationIndex, setTestConversationIndex] = useState(0);
   
-  // Track sessions and trigger BattlingBots modal (10 sessions for non-donors, 40 for donors)
+  // Increment session count on app mount
   useEffect(() => {
-    // Increment session count
     incrementSessionCount();
-    
-    const newSessionCount = sessionCount + 1; // Account for the increment we just did
-    
-    // Determine trigger interval based on donor status
-    const triggerInterval = isDonor ? 40 : 10;
-    
-    // Check if we should trigger BattlingBots
-    if (newSessionCount % triggerInterval === 0) {
-      // Show BattlingBots after a delay
-      setTimeout(() => {
-        setShowBattlingBots(true);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        console.log(`🤖 BattlingBots triggered at session ${newSessionCount} (${isDonor ? 'DONOR' : 'NON-DONOR'} mode)`);
-      }, 2000); // Show 2s after app opens
+  }, []);
+  
+  // Trigger BattlingBots when entering measurement screen (not on app mount)
+  useEffect(() => {
+    if (mode === 'measurement' && currentImageUri) {
+      // Only check on measurement screen
+      const triggerInterval = isDonor ? 40 : 10;
+      const shouldTrigger = sessionCount % triggerInterval === 0;
+      
+      if (shouldTrigger) {
+        // Show after 2 second delay
+        setTimeout(() => {
+          setShowBattlingBots(true);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          console.log(`🤖 BattlingBots triggered at session ${sessionCount} on measurement screen`);
+        }, 2000);
+      }
     }
-  }, []); // Only on mount
+  }, [mode]); // Trigger when mode changes to measurement
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -1435,64 +1436,7 @@ export default function MeasurementScreen() {
                 paddingTop: insets.top + 16 
               }}
             >
-                <View style={{ flexDirection: 'column', gap: 8 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
-                  {/* Test Buttons - Left Side */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Pressable
-                      onPress={() => {
-                        console.log('🔴 NOT DONOR BUTTON CLICKED');
-                        const setIsDonor = useStore.getState().setIsDonor;
-                        const sessionCount = useStore.getState().sessionCount;
-                        setIsDonor(false, sessionCount);
-                        setTestConversationIndex(0); // Reset to first
-                        console.log('Setting showBattlingBots to TRUE');
-                        setShowBattlingBots(true);
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      }}
-                      style={{ backgroundColor: 'rgba(239, 68, 68, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
-                    >
-                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Not Donor</Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => {
-                        const setIsDonor = useStore.getState().setIsDonor;
-                        const sessionCount = useStore.getState().sessionCount;
-                        setIsDonor(true, sessionCount - 50);
-                        setTestConversationIndex(0); // Reset to first
-                        setShowBattlingBots(true);
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      }}
-                      style={{ backgroundColor: 'rgba(59, 130, 246, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
-                    >
-                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Old Donor</Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => {
-                        const setIsDonor = useStore.getState().setIsDonor;
-                        const sessionCount = useStore.getState().sessionCount;
-                        setIsDonor(true, sessionCount);
-                        setTestConversationIndex(0); // Reset to first
-                        setShowBattlingBots(true);
-                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      }}
-                      style={{ backgroundColor: 'rgba(16, 185, 129, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
-                    >
-                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>New Donor</Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() => {
-                        setTestConversationIndex(prev => prev + 1);
-                        setShowBattlingBots(false);
-                        setTimeout(() => setShowBattlingBots(true), 100);
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }}
-                      style={{ backgroundColor: 'rgba(168, 85, 247, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
-                    >
-                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Next →</Text>
-                    </Pressable>
-                  </View>
-                  
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
                   {/* Original Controls - Right Side */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                     <Pressable
@@ -1520,16 +1464,6 @@ export default function MeasurementScreen() {
                     </Pressable>
                   </View>
                 </View>
-                
-                {/* Status Display */}
-                <View style={{ paddingHorizontal: 24 }}>
-                  <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, alignSelf: 'flex-start' }}>
-                    <Text style={{ color: 'white', fontSize: 10 }}>
-                      {isDonor ? '✅ Donor' : '❌ Not Donor'} | Conv: #{testConversationIndex + 1} | Session: {sessionCount}
-                    </Text>
-                  </View>
-                </View>
-              </View>
             </View>
 
             {/* Fixed gray crosshairs - REFERENCE (always centered) */}
@@ -2378,7 +2312,6 @@ export default function MeasurementScreen() {
         }} 
         isDonor={isDonor}
         isFirstTimeDonor={isFirstTimeDonor}
-        conversationIndex={testConversationIndex}
       />
 
     </Animated.View>
