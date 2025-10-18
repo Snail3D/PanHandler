@@ -3141,6 +3141,17 @@ export default function DimensionOverlay({
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
             
+            // CHECK: If in map mode without calibration, show alert
+            if (isMapMode && !mapScale) {
+              showAlert(
+                'Set Map Scale First',
+                'Tap the Map button in the menu to set your map scale before measuring.',
+                'warning'
+              );
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+              return; // Prevent any measurement placement
+            }
+            
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
             setFingerTouches([{ 
