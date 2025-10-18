@@ -1064,20 +1064,24 @@ export default function MeasurementScreen() {
         // Store in local state immediately (no AsyncStorage blocking!)
         setCapturedPhotoUri(photo.uri);
         
-        // Detect orientation to determine auto-flow
-        let photoOrientation: 'LANDSCAPE' | 'PORTRAIT' = 'LANDSCAPE';
-        Image.getSize(photo.uri, (width, height) => {
-          photoOrientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
-          // Defer AsyncStorage write
-          setTimeout(() => {
-            setImageOrientation(photoOrientation);
-          }, 300);
-        }, (error) => {
-          console.error('Error detecting orientation:', error);
+        // Detect orientation to determine auto-flow (must be synchronous!)
+        const photoOrientation: 'LANDSCAPE' | 'PORTRAIT' = await new Promise((resolve) => {
+          Image.getSize(
+            photo.uri, 
+            (width, height) => {
+              const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+              // Defer AsyncStorage write
+              setTimeout(() => {
+                setImageOrientation(orientation);
+              }, 300);
+              resolve(orientation);
+            }, 
+            (error) => {
+              console.error('Error detecting orientation:', error);
+              resolve('LANDSCAPE'); // Default to landscape on error
+            }
+          );
         });
-        
-        // Wait briefly for orientation detection
-        await new Promise(resolve => setTimeout(resolve, 100));
         
         console.log('📷 Photo captured - Orientation:', photoOrientation);
         
@@ -1085,7 +1089,7 @@ export default function MeasurementScreen() {
         // Portrait photos show photo type selection menu
         if (photoOrientation === 'LANDSCAPE') {
           // Horizontal/landscape photo → Auto-proceed to coin calibration
-          console.log('📷 Landscape photo → Auto coin calibration');
+          console.log('📷 Landscape photo (table view) → Auto coin calibration');
           
           // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
           setIsTransitioning(true);
@@ -1126,7 +1130,7 @@ export default function MeasurementScreen() {
           }, 50); // Start animations quickly after flash
         } else {
           // Vertical/portrait photo → Show photo type selection menu
-          console.log('📷 Portrait photo → Show photo type menu');
+          console.log('📷 Portrait photo (wall view) → Show photo type menu');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
