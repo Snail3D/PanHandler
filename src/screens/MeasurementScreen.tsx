@@ -109,6 +109,7 @@ export default function MeasurementScreen() {
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
   const [showDiagnostic, setShowDiagnostic] = useState(false); // Diagnostic screen
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
+  const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -430,6 +431,8 @@ export default function MeasurementScreen() {
       // Pick new random color pair
       const newColors = COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)];
       setSessionColors(newColors);
+      // Reset skipToMapMode flag when returning to camera
+      setSkipToMapMode(false);
     }
   }, [mode]);
   
@@ -2013,9 +2016,9 @@ export default function MeasurementScreen() {
               onComplete={handleCalibrationComplete}
               onSkipToMap={() => {
                 // Skip coin calibration, go to measurement screen
-                // Modal will NOT open automatically - user can pan/zoom first
+                // Set flag to open map scale modal automatically
+                setSkipToMapMode(true);
                 setMode('measurement');
-                // Don't open modal immediately - let user position image first
               }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}
@@ -2076,6 +2079,7 @@ export default function MeasurementScreen() {
                   viewRef={measurementViewRef}
                   setImageOpacity={setImageOpacity}
                   sessionColor={shutterColor}
+                  skipToMapMode={skipToMapMode}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
