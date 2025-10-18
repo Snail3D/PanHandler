@@ -1069,7 +1069,9 @@ export default function MeasurementScreen() {
           Image.getSize(
             photo.uri, 
             (width, height) => {
+              console.log(`📷 RAW IMAGE SIZE: ${width}x${height}`);
               const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+              console.log(`📷 DETECTED ORIENTATION: ${orientation} (width > height = ${width > height})`);
               // Defer AsyncStorage write
               setTimeout(() => {
                 setImageOrientation(orientation);
@@ -1083,7 +1085,8 @@ export default function MeasurementScreen() {
           );
         });
         
-        console.log('📷 Photo captured - Orientation:', photoOrientation);
+        console.log('📷 Photo captured - Final Orientation:', photoOrientation);
+        console.log('📷 Decision: ' + (photoOrientation === 'LANDSCAPE' ? 'AUTO COIN CALIBRATION' : 'SHOW MENU'));
         
         // DECISION: Landscape photos auto-proceed to coin calibration
         // Portrait photos show photo type selection menu
