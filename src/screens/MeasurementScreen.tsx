@@ -1050,10 +1050,13 @@ export default function MeasurementScreen() {
         // Store in local state immediately (no AsyncStorage blocking!)
         setCapturedPhotoUri(photo.uri);
         
-        // Detect orientation in background
+        // Detect orientation in background (defer AsyncStorage write)
         Image.getSize(photo.uri, (width, height) => {
           const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
-          setImageOrientation(orientation);
+          // Defer AsyncStorage write
+          setTimeout(() => {
+            setImageOrientation(orientation);
+          }, 300);
         }, (error) => {
           console.error('Error detecting orientation:', error);
         });
@@ -1168,15 +1171,7 @@ export default function MeasurementScreen() {
   };
 
   const handleCalibrationComplete = (calibrationData: any) => {
-    setCalibration({
-      pixelsPerUnit: calibrationData.pixelsPerUnit,
-      unit: calibrationData.unit,
-      referenceDistance: calibrationData.referenceDistance,
-    });
-
-    setCoinCircle(calibrationData.coinCircle);
-    
-    // Set the initial measurement zoom from calibration
+    // Set the initial measurement zoom from calibration (local state, not persisted)
     setMeasurementZoom({
       scale: calibrationData.initialZoom.scale,
       translateX: calibrationData.initialZoom.translateX,
@@ -1189,6 +1184,19 @@ export default function MeasurementScreen() {
     
     // Simpler approach: Just fade to black, switch instantly, fade in
     setIsTransitioning(true);
+    
+    // ⚠️ CRITICAL: Defer AsyncStorage writes to prevent measurement screen lockup
+    // Writing calibration + coinCircle blocks UI thread for 100-1000ms
+    // Must happen AFTER transition to measurement screen
+    setTimeout(() => {
+      setCalibration({
+        pixelsPerUnit: calibrationData.pixelsPerUnit,
+        unit: calibrationData.unit,
+        referenceDistance: calibrationData.referenceDistance,
+      });
+      setCoinCircle(calibrationData.coinCircle);
+      __DEV__ && console.log('✅ Deferred calibration AsyncStorage write complete');
+    }, 600); // Write after transition to measurement completes
     
     // Fade to black quickly
     transitionBlackOverlay.value = withTiming(1, {
