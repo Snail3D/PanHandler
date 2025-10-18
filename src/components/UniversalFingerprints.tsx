@@ -49,8 +49,8 @@ export default function UniversalFingerprints({
   if (captureMultiTouch) {
     return (
       <View
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-        pointerEvents="box-none"
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }}
+        pointerEvents="none"
         onTouchStart={(event) => {
           const touches = event.nativeEvent.touches;
           const newTouches = Array.from(touches).map((touch, index) => ({
@@ -138,8 +138,8 @@ export default function UniversalFingerprints({
   // Default single-touch mode (for taps)
   return (
     <View
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-      pointerEvents="box-none"
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }}
+      pointerEvents="none"
       onStartShouldSetResponder={() => true}
       onResponderGrant={(event) => {
         const { pageX, pageY } = event.nativeEvent;

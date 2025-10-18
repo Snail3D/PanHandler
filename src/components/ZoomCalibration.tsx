@@ -9,7 +9,7 @@ import ZoomableImage from './ZoomableImageV2';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withSequence, Easing, withTiming } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
-import UniversalFingerprints from './UniversalFingerprints';
+import TouchOverlayFingerprints from './TouchOverlayFingerprints';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -384,11 +384,9 @@ export default function ZoomCalibration({
   }));
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'black' }}>
-      {/* Universal fingerprints for calibration taps */}
-      <UniversalFingerprints color={sessionColor?.main || currentColor} enabled={true} />
-      
-      {/* Zoomable Image */}
+    <TouchOverlayFingerprints color={sessionColor?.main || currentColor} enabled={true}>
+      <View style={{ flex: 1, backgroundColor: 'black' }}>
+        {/* Zoomable Image */}
       <ZoomableImage
         imageUri={imageUri}
         fingerColor={sessionColor?.main || currentColor}
@@ -1057,5 +1055,6 @@ export default function ZoomCalibration({
         </View>
       )}
     </View>
+    </TouchOverlayFingerprints>
   );
 }

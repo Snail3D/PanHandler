@@ -21,7 +21,7 @@ import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
 import TypewriterText from '../components/TypewriterText';
-import UniversalFingerprints from '../components/UniversalFingerprints';
+import TouchOverlayFingerprints from '../components/TouchOverlayFingerprints';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
@@ -1302,17 +1302,15 @@ export default function MeasurementScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <CameraView 
-              ref={cameraRef}
-              style={{ flex: 1 }}
-              facing="back"
-              enableTorch={flashEnabled}
-              autofocus="off"
-            >
-            {/* Universal fingerprints for camera taps */}
-            <UniversalFingerprints color={crosshairColor.main} enabled={true} />
-            
-            {/* Top controls */}
+          <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
+            <CameraView 
+                ref={cameraRef}
+                style={{ flex: 1 }}
+                facing="back"
+                enableTorch={flashEnabled}
+                autofocus="off"
+              >
+              {/* Top controls */}
             <View 
               style={{ 
                 position: 'absolute', 
@@ -1850,6 +1848,7 @@ export default function MeasurementScreen() {
               </View>
             </View>
           </CameraView>
+          </TouchOverlayFingerprints>
           
           {/* Bottom Shutter Button */}
           {!isCapturing && (
