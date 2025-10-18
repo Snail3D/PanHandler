@@ -11,7 +11,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring, withRepeat, wit
 import useStore from '../state/measurementStore';
 import TouchOverlayFingerprints from './TouchOverlayFingerprints';
 import { extractDroneMetadata, DroneMetadata } from '../utils/droneEXIF';
-import { CoinIcon, DroneIcon, MapIcon, BlueprintIcon, RulerIcon } from './CalibrationIcons';
+import { CoinIcon } from './CalibrationIcons';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -29,7 +29,6 @@ const VIBRANT_COLORS = [
 interface ZoomCalibrationProps {
   imageUri: string;
   sessionColor?: { main: string; glow: string }; // Optional session color from camera for visual continuity
-  photoType?: 'coin' | 'aerial' | 'map' | 'blueprint' | 'knownScale' | null; // Photo type selection
   onComplete: (calibrationData: {
     pixelsPerUnit: number;
     unit: string;
@@ -47,7 +46,6 @@ interface ZoomCalibrationProps {
       translateY: number;
     };
   }) => void;
-  onSkipToMap?: () => void; // New prop for skipping to measurement screen without coin calibration
   onCancel: () => void;
   onHelp?: () => void;
 }
@@ -55,9 +53,7 @@ interface ZoomCalibrationProps {
 export default function ZoomCalibration({
   imageUri,
   sessionColor,
-  photoType,
   onComplete,
-  onSkipToMap,
   onCancel,
   onHelp,
 }: ZoomCalibrationProps) {
@@ -691,71 +687,7 @@ export default function ZoomCalibration({
       )}
 
 
-      {/* Photo Type Info Badge - Show for non-coin types */}
-      {photoType && photoType !== 'coin' && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: insets.bottom + 160,
-            left: SCREEN_WIDTH * 0.10,
-            right: SCREEN_WIDTH * 0.10,
-          }}
-        >
-          <BlurView
-            intensity={35}
-            tint="light"
-            style={{
-              borderRadius: 16,
-              overflow: 'hidden',
-            }}
-          >
-            <View style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.5)',
-              borderRadius: 16,
-              padding: 14,
-              borderWidth: 1,
-              borderColor: 'rgba(255, 255, 255, 0.35)',
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ marginRight: 12 }}>
-                  {photoType === 'aerial' ? (
-                    <DroneIcon size={28} color="#00C7BE" />
-                  ) : photoType === 'map' ? (
-                    <MapIcon size={28} color="#007AFF" />
-                  ) : photoType === 'blueprint' ? (
-                    <BlueprintIcon size={28} color="#5856D6" />
-                  ) : (
-                    <RulerIcon size={28} color="#34C759" />
-                  )}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.85)', 
-                    fontWeight: '700', 
-                    fontSize: 14,
-                    marginBottom: 4,
-                  }}>
-                    {photoType === 'aerial' ? 'Aerial Photo Mode' : 
-                     photoType === 'map' ? 'Map Mode Selected' : 
-                     photoType === 'blueprint' ? 'Blueprint Mode' : 
-                     'Known Scale Mode'}
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.6)', 
-                    fontSize: 12,
-                    lineHeight: 16,
-                  }}>
-                    {photoType === 'aerial' ? 'Tap button below to calibrate manually' : 
-                     photoType === 'map' ? 'Tap Map button below to set verbal scale' : 
-                     photoType === 'blueprint' ? 'Tap Blueprint button for scale bar (coming soon!)' : 
-                     'Tap Scale button for two points (coming soon!)'}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </BlurView>
-        </View>
-      )}
+
 
       {/* Bottom Controls - Single row: Map | LOCK IN | Coin */}
       {selectedCoin && (
@@ -786,60 +718,13 @@ export default function ZoomCalibration({
               borderWidth: 1,
               borderColor: 'rgba(255, 255, 255, 0.35)',
             }}>
-              {/* Single Row: Map Scale + LOCK IN + Coin */}
+              {/* Single Row: LOCK IN + Coin */}
               <View style={{ flexDirection: 'row', gap: 8 }}>
-                {/* Dynamic Calibration Button - LEFT COLUMN (1/5) */}
-                {onSkipToMap && photoType && photoType !== 'coin' && (
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      onSkipToMap();
-                    }}
-                    style={({ pressed }) => ({
-                      flex: 1,
-                      backgroundColor: pressed ? 'rgba(66, 165, 245, 0.9)' : 'rgba(66, 165, 245, 0.8)',
-                      borderRadius: 16,
-                      paddingVertical: 20,
-                      paddingHorizontal: 8,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 1,
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                    })}
-                  >
-                    {photoType === 'aerial' ? (
-                      <DroneIcon size={24} color="white" />
-                    ) : photoType === 'map' ? (
-                      <MapIcon size={24} color="white" />
-                    ) : photoType === 'blueprint' ? (
-                      <BlueprintIcon size={24} color="white" />
-                    ) : (
-                      <RulerIcon size={24} color="white" />
-                    )}
-                    <Text style={{ 
-                      color: 'white', 
-                      fontWeight: '700', 
-                      fontSize: 10,
-                      marginTop: 4,
-                      textAlign: 'center',
-                    }}>
-                      {photoType === 'aerial' ? 'Drone' : 
-                       photoType === 'map' ? 'Map' : 
-                       photoType === 'blueprint' ? 'Blueprint' : 
-                       'Scale'}{'\n'}
-                      {photoType === 'aerial' ? 'Cal' : 
-                       photoType === 'map' ? 'Scale' : 
-                       photoType === 'blueprint' ? 'Bar' : 
-                       'Points'}
-                    </Text>
-                  </Pressable>
-                )}
-
-                {/* LOCK IN - CENTER (3/5) */}
+                {/* LOCK IN - CENTER (4/5) */}
                 <Pressable
                   onPress={handleLockIn}
                   style={({ pressed }) => ({
-                    flex: 3,
+                    flex: 4,
                     backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
                     borderRadius: 20,
                     paddingVertical: 20,
@@ -864,14 +749,13 @@ export default function ZoomCalibration({
                   </Text>
                 </Pressable>
 
-                {/* Coin - RIGHT COLUMN (1/5) - Only show for coin calibration */}
-                {(!photoType || photoType === 'coin') && (
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setShowCoinSelector(true);
-                      setSearchQuery('');
-                    }}
+                {/* Coin - RIGHT COLUMN (1/5) */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowCoinSelector(true);
+                    setSearchQuery('');
+                  }}
                     style={({ pressed }) => ({
                       flex: 1,
                       backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
@@ -904,15 +788,14 @@ export default function ZoomCalibration({
                       {selectedCoin.diameter}mm
                     </Text>
                   </Pressable>
-                )}
               </View>
             </View>
           </BlurView>
         </View>
       )}
 
-      {/* Coin Search Modal - Shows at TOP when selector button is tapped - Only for coin calibration */}
-      {(!photoType || photoType === 'coin') && showCoinSelector && (
+      {/* Coin Search Modal - Shows at TOP when selector button is tapped */}
+      {showCoinSelector && (
         <Animated.View
           style={[
             {
