@@ -1434,31 +1434,80 @@ export default function MeasurementScreen() {
                 paddingTop: insets.top + 16 
               }}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <Pressable
-                    onPress={() => {
-                      __DEV__ && console.log('🔵 Help button pressed in camera screen');
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setShowHelpModal(true);
-                    }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <Ionicons name="help-circle-outline" size={28} color="white" />
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      setFlashEnabled(!flashEnabled);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <Ionicons 
-                      name={flashEnabled ? "flash" : "flash-off"} 
-                      size={26} 
-                      color={flashEnabled ? "#FFD700" : "white"} 
-                    />
-                  </Pressable>
+              <View style={{ flexDirection: 'column', gap: 8 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
+                  {/* Test Buttons - Left Side */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Pressable
+                      onPress={() => {
+                        const setIsDonor = useStore.getState().setIsDonor;
+                        const sessionCount = useStore.getState().sessionCount;
+                        setIsDonor(false, sessionCount);
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      }}
+                      style={{ backgroundColor: 'rgba(239, 68, 68, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    >
+                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Not Donor</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        const setIsDonor = useStore.getState().setIsDonor;
+                        const sessionCount = useStore.getState().sessionCount;
+                        setIsDonor(true, sessionCount - 50);
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      }}
+                      style={{ backgroundColor: 'rgba(59, 130, 246, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    >
+                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Old Donor</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        const setIsDonor = useStore.getState().setIsDonor;
+                        const sessionCount = useStore.getState().sessionCount;
+                        setIsDonor(true, sessionCount);
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      }}
+                      style={{ backgroundColor: 'rgba(16, 185, 129, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    >
+                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>New Donor</Text>
+                    </Pressable>
+                  </View>
+                  
+                  {/* Original Controls - Right Side */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Pressable
+                      onPress={() => {
+                        __DEV__ && console.log('🔵 Help button pressed in camera screen');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setShowHelpModal(true);
+                      }}
+                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Ionicons name="help-circle-outline" size={28} color="white" />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setFlashEnabled(!flashEnabled);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Ionicons 
+                        name={flashEnabled ? "flash" : "flash-off"} 
+                        size={26} 
+                        color={flashEnabled ? "#FFD700" : "white"} 
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+                
+                {/* Status Display */}
+                <View style={{ paddingHorizontal: 24 }}>
+                  <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, alignSelf: 'flex-start' }}>
+                    <Text style={{ color: 'white', fontSize: 10 }}>
+                      Status: {isDonor ? '✅ Donor' : '❌ Not Donor'} | Session: {sessionCount} | Last Donation: {lastDonationSession}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
