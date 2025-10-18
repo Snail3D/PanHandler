@@ -5842,7 +5842,7 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 16,
+            top: insets.top + 4,
             right: 12,
             backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
             paddingHorizontal: 10,
@@ -5880,7 +5880,7 @@ export default function DimensionOverlay({
           style={{
             position: 'absolute',
             top: isDonor 
-              ? insets.top + 56 // 40px below donor badge (16 + 34 height + 6 gap)
+              ? insets.top + 44 // 40px below donor badge (4 + 34 height + 6 gap)
               : insets.top + 16, // Normal position when no donor badge
             right: 12,
             backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
