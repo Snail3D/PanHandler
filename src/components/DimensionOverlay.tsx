@@ -156,24 +156,9 @@ export default function DimensionOverlay({
   const setMeasurements = useStore((s) => s.setCompletedMeasurements);
   const userEmail = useStore((s) => s.userEmail);
   const setUserEmail = useStore((s) => s.setUserEmail);
-  const isProUser = useStore((s) => s.isProUser);
-  const setIsProUser = useStore((s) => s.setIsProUser);
   const hasSeenPanTutorial = useStore((s) => s.hasSeenPanTutorial);
   const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
-  const freehandTrialUsed = useStore((s) => s.freehandTrialUsed);
-  const freehandTrialLimit = useStore((s) => s.freehandTrialLimit);
-  const incrementFreehandTrial = useStore((s) => s.incrementFreehandTrial);
-  const freehandOfferDismissed = useStore((s) => s.freehandOfferDismissed);
-  const dismissFreehandOffer = useStore((s) => s.dismissFreehandOffer);
   const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
-  
-  
-  // Pro upgrade modal
-  const [showProModal, setShowProModal] = useState(false);
-  
-  // Freehand trial modals
-  const [showFreehandOfferModal, setShowFreehandOfferModal] = useState(false);
-  const [showFreehandConfirmModal, setShowFreehandConfirmModal] = useState(false);
   
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
@@ -2800,11 +2785,7 @@ export default function DimensionOverlay({
           let nextIndex = (currentIndex + 1) % modes.length;
           let nextMode = modes[nextIndex];
           
-          // Skip freehand if not available (check trial)
-          if (nextMode === 'freehand' && !isProUser && freehandTrialUsed >= freehandTrialLimit) {
-            nextIndex = (nextIndex + 1) % modes.length;
-            nextMode = modes[nextIndex];
-          }
+          // Freehand is now always available (donation-based, not paywall)
           
           runOnJS(setMode)(nextMode);
           runOnJS(setModeColorIndex)(nextIndex);
@@ -2816,11 +2797,7 @@ export default function DimensionOverlay({
           let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           let prevMode = modes[prevIndex];
           
-          // Skip freehand if not available (check trial)
-          if (prevMode === 'freehand' && !isProUser && freehandTrialUsed >= freehandTrialLimit) {
-            prevIndex = (prevIndex - 1 + modes.length) % modes.length;
-            prevMode = modes[prevIndex];
-          }
+          // Freehand is now always available (donation-based, not paywall)
           
           runOnJS(setMode)(prevMode);
           runOnJS(setModeColorIndex)(prevIndex);
@@ -6716,28 +6693,7 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
           
-          
-          {/* Pro status footer */}
-          <Pressable
-            onPress={() => {
-              // Simple: Show Pro modal for free users
-              if (!isProUser) {
-                console.log('🤖 Opening Battling Bots Modal!');
-                setShowProModal(true);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }
-            }}
-            style={{
-              marginTop: 4,
-              paddingVertical: 6,
-              paddingHorizontal: 12,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.4)', fontWeight: '500' }}>
-              {isProUser ? '✨ Pro User' : 'Tap for Pro Features'}
-            </Text>
-          </Pressable>
+          {/* Pro status footer - REMOVED: Now donation-based via BattlingBots */}
         </View>
         </BlurView>
           </Animated.View>

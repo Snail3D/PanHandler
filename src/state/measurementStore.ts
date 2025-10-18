@@ -62,7 +62,6 @@ interface MeasurementStore {
   magneticDeclination: number; // Magnetic declination in degrees for maps (positive = east, negative = west)
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
-  isProUser: boolean; // Pro user status for paywall (only for Freehand tool)
   savedZoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null; // Restore zoom/pan/rotation
   sessionCount: number; // Track app opens (incremented each time app becomes active)
   reviewPromptCount: number; // Track how many times we've asked (max 2)
@@ -71,11 +70,6 @@ interface MeasurementStore {
   globalDownloads: number; // Global download count (fetched from backend)
   hasSeenPinchTutorial: boolean; // Track if user has seen pinch-zoom tutorial
   hasSeenPanTutorial: boolean; // Track if user has seen pan tutorial on measurement screen
-  freehandTrialUsed: number; // Number of freehand measurements used (max 10)
-  freehandTrialLimit: number; // Maximum free freehand uses (10)
-  freehandOfferDismissed: boolean; // User permanently dismissed the freehand upgrade offer
-  specialOfferTriggered: boolean; // Track if special $6.97 offer has been triggered
-  specialOfferSessionsLeft: number; // Sessions left to accept special offer (3, 2, 1)
   
   setImageUri: (uri: string | null, isAutoCaptured?: boolean) => void;
   incrementSessionCount: () => void;
@@ -99,15 +93,9 @@ interface MeasurementStore {
   setDefaultUnitSystem: (system: UnitSystem) => void; // Set preferred default for new sessions
   setMagneticDeclination: (degrees: number) => void; // Set magnetic declination for maps
   setUserEmail: (email: string | null) => void;
-  setIsProUser: (isPro: boolean) => void;
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
   setHasSeenPinchTutorial: (hasSeen: boolean) => void;
   setHasSeenPanTutorial: (hasSeen: boolean) => void;
-  incrementFreehandTrial: () => void; // Increment freehand trial usage
-  resetFreehandTrial: () => void; // Reset counter (for testing)
-  dismissFreehandOffer: () => void; // User permanently dismissed the freehand offer
-  decrementSpecialOfferSessions: () => void; // Decrement special offer sessions counter
-  dismissSpecialOffer: () => void; // Permanently dismiss special offer
 }
 
 const useStore = create<MeasurementStore>()(
@@ -128,7 +116,6 @@ const useStore = create<MeasurementStore>()(
       magneticDeclination: 0, // Default: no declination adjustment
       lastSelectedCoin: null,
       userEmail: null,
-      isProUser: false,
       savedZoomState: null,
       sessionCount: 0,
       reviewPromptCount: 0,
@@ -137,11 +124,6 @@ const useStore = create<MeasurementStore>()(
       globalDownloads: 1247,
       hasSeenPinchTutorial: false,
       hasSeenPanTutorial: false,
-      freehandTrialUsed: 0,
-      freehandTrialLimit: 10,
-      freehandOfferDismissed: false,
-      specialOfferTriggered: false,
-      specialOfferSessionsLeft: 3,
 
       setImageUri: (uri, isAutoCaptured = false) => set((state) => { 
         // If setting a NEW image (not null), clear all measurements/calibration
@@ -247,8 +229,6 @@ const useStore = create<MeasurementStore>()(
 
       setUserEmail: (email: string | null) => set({ userEmail: email }),
 
-      setIsProUser: (isPro: boolean) => set({ isProUser: isPro }),
-
       // ⚠️ WARNING: This writes to AsyncStorage via persist middleware
       // NEVER call this in high-frequency callbacks (onUpdate, onTransformChange, etc.)
       // ALWAYS debounce this with 500ms+ delay to prevent JS thread blocking
@@ -258,20 +238,6 @@ const useStore = create<MeasurementStore>()(
       setHasSeenPinchTutorial: (hasSeen: boolean) => set({ hasSeenPinchTutorial: hasSeen }),
       
       setHasSeenPanTutorial: (hasSeen: boolean) => set({ hasSeenPanTutorial: hasSeen }),
-      
-      incrementFreehandTrial: () => set((state) => ({ 
-        freehandTrialUsed: Math.min(state.freehandTrialLimit, state.freehandTrialUsed + 1) 
-      })),
-      
-      resetFreehandTrial: () => set({ freehandTrialUsed: 0 }), // Reset counter (for testing)
-      
-      dismissFreehandOffer: () => set({ freehandOfferDismissed: true }),
-      
-      decrementSpecialOfferSessions: () => set((state) => ({ 
-        specialOfferSessionsLeft: Math.max(0, state.specialOfferSessionsLeft - 1) 
-      })),
-      
-      dismissSpecialOffer: () => set({ specialOfferTriggered: false, specialOfferSessionsLeft: 0 }),
     }),
     {
       name: 'measurement-settings',
@@ -282,16 +248,11 @@ const useStore = create<MeasurementStore>()(
         magneticDeclination: state.magneticDeclination, // Persist declination setting
         lastSelectedCoin: state.lastSelectedCoin,
         userEmail: state.userEmail, // Persist user email
-        isProUser: state.isProUser, // Persist pro status
         sessionCount: state.sessionCount, // Persist session count
         reviewPromptCount: state.reviewPromptCount, // Persist review prompt count
         hasReviewedApp: state.hasReviewedApp, // Persist review status
         lastReviewPromptDate: state.lastReviewPromptDate, // Persist last prompt date
         hasSeenPinchTutorial: state.hasSeenPinchTutorial, // Persist tutorial state
-        freehandTrialUsed: state.freehandTrialUsed, // Persist freehand trial usage
-        freehandOfferDismissed: state.freehandOfferDismissed, // Persist freehand offer dismissal
-        specialOfferTriggered: state.specialOfferTriggered, // Persist special offer trigger status
-        specialOfferSessionsLeft: state.specialOfferSessionsLeft, // Persist special offer sessions
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
         // Persist current work session
         currentImageUri: state.currentImageUri,
