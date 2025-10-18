@@ -2182,6 +2182,13 @@ export default function MeasurementScreen() {
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+        
+        {/* Photo Type Selection Modal - For imported photos */}
+        <PhotoTypeSelectionModal
+          visible={showPhotoTypeModal}
+          onSelect={handlePhotoTypeSelection}
+          onCancel={() => setShowPhotoTypeModal(false)}
+        />
       </View>
     );
   }
@@ -2493,13 +2500,6 @@ export default function MeasurementScreen() {
         onCancel={handleManualAltitudeCancel}
         droneModel={pendingDroneData?.displayName || 'Drone'}
         distance={pendingDroneData?.distance}
-      />
-
-      {/* Photo Type Selection Modal - For imported photos */}
-      <PhotoTypeSelectionModal
-        visible={showPhotoTypeModal}
-        onSelect={handlePhotoTypeSelection}
-        onCancel={() => setShowPhotoTypeModal(false)}
       />
     </Animated.View>
   );
