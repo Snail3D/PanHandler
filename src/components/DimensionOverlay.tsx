@@ -6115,10 +6115,12 @@ export default function DimensionOverlay({
             {/* Map Mode Toggle */}
             <Pressable
               onPress={() => {
+                console.log('🗺️ Map button pressed:', { isMapMode, hasMapScale: !!mapScale });
                 if (!isMapMode) {
                   // Turning ON map mode
                   if (mapScale) {
                     // Scale already exists for this photo - just activate map mode
+                    console.log('✅ Activating map mode (scale exists)');
                     setIsMapMode(true);
                     // Dora "We did it!" - Triumphant celebratory sequence! 🗺️
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -6127,10 +6129,12 @@ export default function DimensionOverlay({
                     setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
                   } else {
                     // No scale yet - show modal to set scale
+                    console.log('📋 No scale - showing modal');
                     setShowMapScaleModal(true);
                   }
                 } else {
                   // Turning OFF map mode - keep scale for this photo session
+                  console.log('⏸️ Deactivating map mode (keeping scale)');
                   setIsMapMode(false);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
