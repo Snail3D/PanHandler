@@ -454,7 +454,12 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     
     // Debug: Show overhead detection
     if (isDrone && gimbal) {
-      alert(`GIMBAL DETECTED\n\nPitch: ${gimbal.pitch.toFixed(1)}°\nYaw: ${gimbal.yaw.toFixed(1)}°\nRoll: ${gimbal.roll.toFixed(1)}°\n\nAuto-calibrating from drone altitude!`);
+      const axes = [];
+      if (gimbal.pitch !== 0) axes.push(`Pitch: ${gimbal.pitch.toFixed(1)}°`);
+      if (gimbal.yaw !== 0) axes.push(`Yaw: ${gimbal.yaw.toFixed(1)}°`);
+      if (gimbal.roll !== 0) axes.push(`Roll: ${gimbal.roll.toFixed(1)}°`);
+      
+      alert(`GIMBAL DETECTED\n\n${axes.join('\n')}\n${axes.length}-axis gimbal\n\nAuto-calibrating from drone altitude!`);
     } else if (isDrone) {
       alert(`DRONE DETECTED (no gimbal data)\n\nAssuming overhead photo.\nAuto-calibrating from altitude!`);
     }
