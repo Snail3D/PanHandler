@@ -447,15 +447,16 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     }
     
     // Check if camera is pointing down (overhead/nadir)
-    // Accept -60° to -90° as "overhead enough" for auto-calibration
-    // At -60°, the error is only ~15% (cos(60°) = 0.5, so 1/0.5 = 2x in worst direction)
-    // but for most measurements this is acceptable
-    const isOverhead = gimbal ? gimbal.pitch < -60 : true; // Assume overhead if no gimbal data
+    // If gimbal data exists at all, treat as overhead and auto-calibrate!
+    // Rationale: Only drones have gimbals. If there's gimbal data, it's a drone photo.
+    // The user can always use Map Scale if they need more precision for extreme angles.
+    const isOverhead = true; // Always true if we detected it as a drone
     
     // Debug: Show overhead detection
-    if (isDrone) {
-      const pitchInfo = gimbal ? `${gimbal.pitch.toFixed(1)}°` : 'No gimbal data (assuming overhead)';
-      alert(`OVERHEAD CHECK\n\nGimbal pitch: ${pitchInfo}\nIs overhead: ${isOverhead}\n\nNote: Overhead accepts pitch < -60°\n(More lenient than -70° for flexibility)`);
+    if (isDrone && gimbal) {
+      alert(`GIMBAL DETECTED\n\nPitch: ${gimbal.pitch.toFixed(1)}°\nYaw: ${gimbal.yaw.toFixed(1)}°\nRoll: ${gimbal.roll.toFixed(1)}°\n\nAuto-calibrating from drone altitude!`);
+    } else if (isDrone) {
+      alert(`DRONE DETECTED (no gimbal data)\n\nAssuming overhead photo.\nAuto-calibrating from altitude!`);
     }
     
     // Try to find drone in database
