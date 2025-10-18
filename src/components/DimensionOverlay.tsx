@@ -447,6 +447,14 @@ export default function DimensionOverlay({
     opacity: panTutorialOpacity.value,
   }));
   
+  // Menu fingerprint animated style
+  const menuEvaporationStyle = useAnimatedStyle(() => ({
+    opacity: menuFingerOpacity.value,
+    transform: [
+      { scale: menuFingerScale.value },
+    ]
+  }));
+  
   // Show inspirational quote overlay
 
   // Clean up freehand state when switching away from freehand mode
@@ -2770,9 +2778,11 @@ export default function DimensionOverlay({
         id: `trail-${Date.now()}-${Math.random()}`,
         timestamp: Date.now(),
       };
+      console.log('🎨 Trail point recorded:', trailPoint);
       runOnJS(setSwipeTrail)((prev) => {
         // Safety check: ensure prev is always an array
         const currentTrail = Array.isArray(prev) ? prev : [];
+        console.log('🎨 Current trail length:', currentTrail.length);
         return [...currentTrail, trailPoint];
       });
     })
@@ -4744,14 +4754,6 @@ export default function DimensionOverlay({
         
         const fingerColor = sessionColor.main;
         
-        // Animated style for menu fingerprints
-        const menuEvaporationStyle = useAnimatedStyle(() => ({
-          opacity: menuFingerOpacity.value,
-          transform: [
-            { scale: menuFingerScale.value },
-          ]
-        }));
-        
         return menuFingerTouches.map((touch) => {
           const pressureScale = 0.85 + (touch.pressure * 0.3);
           const baseRadius = 18 * pressureScale;
@@ -4823,7 +4825,15 @@ export default function DimensionOverlay({
 
       {/* Swipe trail effect (fading fingerprints along swipe path) */}
       {(() => {
+        console.log('🎨 Swipe Trail Check:', { 
+          isArray: Array.isArray(swipeTrail), 
+          length: swipeTrail?.length, 
+          hasSessionColor: !!sessionColor 
+        });
+        
         if (!Array.isArray(swipeTrail) || swipeTrail.length === 0 || !sessionColor) return null;
+        
+        console.log('🎨 Rendering', swipeTrail.length, 'trail points');
         
         const fingerColor = sessionColor.main;
         const now = Date.now();
@@ -5919,7 +5929,9 @@ export default function DimensionOverlay({
               <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
-                onPress={() => {
+                onPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  createMenuFingerprint(pageX, pageY);
                   playModeHaptic('rectangle');
                   setMode('rectangle');
                   setCurrentPoints([]);
