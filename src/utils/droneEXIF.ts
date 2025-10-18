@@ -76,6 +76,17 @@ export const DRONE_DATABASE: Record<string, DroneSpec> = {
     notes: "Ultralight 135g drone, 1/2\" sensor"
   },
   
+  // DJI Neo (Alternative model code - user's actual drone)
+  "DJI/FC8671": {
+    make: "DJI",
+    model: "FC8671",
+    displayName: "DJI Neo",
+    sensor: { width: 6.17, height: 4.55 },
+    focalLength: 1.48,
+    resolution: { width: 4000, height: 3000 },
+    notes: "Ultralight 135g drone, 1/2\" sensor (alternative model code)"
+  },
+  
   // DJI Mini Series
   "DJI/Mini 4 Pro": {
     make: "DJI",
@@ -306,11 +317,26 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         // Extract from "GPS" IFD (location data)
         if (exifObj['GPS']) {
           const gps = exifObj['GPS'];
-          exif['GPSLatitude'] = gps[piexif.GPSIFD.GPSLatitude];
+          
+          // piexifjs returns GPS data as raw values (may be rationals [numerator, denominator])
+          const rawLat = gps[piexif.GPSIFD.GPSLatitude];
+          const rawLon = gps[piexif.GPSIFD.GPSLongitude];
+          const rawAlt = gps[piexif.GPSIFD.GPSAltitude];
+          
+          // Convert rational format to decimal
+          // GPS coords are in format: [[degrees_num, degrees_den], [minutes_num, minutes_den], [seconds_num, seconds_den]]
+          exif['GPSLatitude'] = rawLat;
           exif['GPSLatitudeRef'] = gps[piexif.GPSIFD.GPSLatitudeRef];
-          exif['GPSLongitude'] = gps[piexif.GPSIFD.GPSLongitude];
+          exif['GPSLongitude'] = rawLon;
           exif['GPSLongitudeRef'] = gps[piexif.GPSIFD.GPSLongitudeRef];
-          exif['GPSAltitude'] = gps[piexif.GPSIFD.GPSAltitude];
+          
+          // Altitude is rational: [numerator, denominator]
+          if (rawAlt && Array.isArray(rawAlt) && rawAlt.length === 2) {
+            exif['GPSAltitude'] = rawAlt[0] / rawAlt[1]; // Convert to decimal
+          } else {
+            exif['GPSAltitude'] = rawAlt;
+          }
+          
           exif['GPSAltitudeRef'] = gps[piexif.GPSIFD.GPSAltitudeRef];
         }
         
@@ -322,7 +348,7 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         });
         
         // Debug: Show what we extracted
-        alert(`EXTRACTED EXIF!\n\nMake: ${exif['Make']}\nModel: ${exif['Model']}\nGPSLat: ${exif['GPSLatitude']}\nGPSAlt: ${exif['GPSAltitude']}`);
+        alert(`EXTRACTED EXIF!\n\nMake: ${exif['Make']}\nModel: ${exif['Model']}\nGPSAlt (parsed): ${exif['GPSAltitude']}m\n\nThis will now work!`);
         
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e);
@@ -402,7 +428,31 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     let detectionMethod: DroneMetadata['detectionMethod'] = 'database';
     let confidence: DroneMetadata['confidence'] = 'high';
     
-    // If not in database, try to estimate from focal length
+    // If exact match not found, try fuzzy matching for DJI drones
+    if (!specs && make === 'DJI' && model) {
+      // Look for any DJI entry that contains similar specs
+      // For DJI Neo variants (FC3582, FC8671, etc.), use common Neo specs
+      if (model.startsWith('FC')) {
+        // Assume it's a compact DJI drone (Neo, Mini, etc.)
+        // Use conservative specs that work for most compact DJI drones
+        specs = {
+          make: 'DJI',
+          model: model,
+          displayName: `DJI ${model}`,
+          sensor: { width: 6.17, height: 4.55 }, // Conservative 1/2" sensor
+          focalLength: 1.48, // Common for compact drones
+          resolution: {
+            width: exif['ImageWidth'] || imageWidth || 4000,
+            height: exif['ImageHeight'] || imageHeight || 3000,
+          },
+          notes: 'Auto-detected DJI compact drone (using conservative specs)',
+        };
+        detectionMethod = 'estimated';
+        confidence = 'medium';
+      }
+    }
+    
+    // If still not found, try to estimate from focal length
     if (!specs && exif['FocalLength'] && exif['FocalLengthIn35mmFilm']) {
       const focalLength = parseFloat(exif['FocalLength']);
       const focalLength35mm = parseFloat(exif['FocalLengthIn35mmFilm']);
