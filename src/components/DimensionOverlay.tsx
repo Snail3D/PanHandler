@@ -1705,11 +1705,18 @@ export default function DimensionOverlay({
   const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
     const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
     
+    console.log('🔷 detectAndMergePolygon called with', allMeasurements.length, 'total measurements');
+    
     // Only check distance measurements
     const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
     
+    console.log('🔷 Found', distanceLines.length, 'distance lines');
+    
     // Need at least 3 lines to form a polygon (triangle, square, etc.)
-    if (distanceLines.length < 3) return;
+    if (distanceLines.length < 3) {
+      console.log('🔷 Not enough lines for polygon (need 3+)');
+      return;
+    }
     
     // Find all connected chains of lines
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
@@ -1771,6 +1778,8 @@ export default function DimensionOverlay({
       const usedIds = new Set<string>();
       const chain = findConnectedChain(startLine, usedIds);
       
+      console.log('🔷 Chain found:', chain.length, 'lines connected');
+      
       if (chain.length < 3) continue; // Need at least 3 lines
       
       // Check if chain forms a closed loop
@@ -1781,6 +1790,9 @@ export default function DimensionOverlay({
         Math.pow(lastPoint.x - firstPoint.x, 2) + 
         Math.pow(lastPoint.y - firstPoint.y, 2)
       );
+      
+      console.log('🔷 Closing distance:', closingDistance.toFixed(2), 'px (tolerance:', SNAP_TOLERANCE, 'px)');
+      console.log('🔷 First point:', firstPoint, 'Last point:', lastPoint);
       
       if (closingDistance < SNAP_TOLERANCE) {
         // 🎉 FOUND A CLOSED POLYGON!
