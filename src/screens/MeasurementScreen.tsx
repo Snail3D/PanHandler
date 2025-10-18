@@ -1086,13 +1086,13 @@ export default function MeasurementScreen() {
         });
         
         console.log('📷 Photo captured - Final Orientation:', photoOrientation);
-        console.log('📷 Decision: ' + (photoOrientation === 'LANDSCAPE' ? 'AUTO COIN CALIBRATION' : 'SHOW MENU'));
+        console.log('📷 Decision: ' + (photoOrientation === 'PORTRAIT' ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'));
         
-        // DECISION: Landscape photos auto-proceed to coin calibration
-        // Portrait photos show photo type selection menu
-        if (photoOrientation === 'LANDSCAPE') {
-          // Horizontal/landscape photo → Auto-proceed to coin calibration
-          console.log('📷 Landscape photo (table view) → Auto coin calibration');
+        // DECISION: PORTRAIT photos (phone vertical, looking at table) auto-proceed to coin calibration
+        // LANDSCAPE photos (phone horizontal, looking at wall) show photo type selection menu
+        if (photoOrientation === 'PORTRAIT') {
+          // PORTRAIT photo (vertical phone looking down at table) → Auto-proceed to coin calibration
+          console.log('📷 PORTRAIT photo (table view - vertical phone) → Auto coin calibration');
           
           // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
           setIsTransitioning(true);
@@ -1132,8 +1132,8 @@ export default function MeasurementScreen() {
             }, 150); // Match the fade duration
           }, 50); // Start animations quickly after flash
         } else {
-          // Vertical/portrait photo → Show photo type selection menu
-          console.log('📷 PORTRAIT PHOTO DETECTED (wall view) → Show photo type menu');
+          // LANDSCAPE photo (horizontal phone looking at wall) → Show photo type selection menu
+          console.log('📷 LANDSCAPE PHOTO DETECTED (wall view - horizontal phone) → Show photo type menu');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
