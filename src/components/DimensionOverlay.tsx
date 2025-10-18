@@ -5887,7 +5887,9 @@ export default function DimensionOverlay({
               </View>
             </Pressable>
             <Pressable
-              onPress={() => {
+              onPress={(event) => {
+                const { pageX, pageY } = event.nativeEvent;
+                createMenuFingerprint(pageX, pageY);
                 setDebugInfo({ lastTouch: Date.now(), interceptor: 'MEASURE_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(true);
                 setShowCursor(true);
@@ -5972,9 +5974,11 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {/* Circle */}
+              {\/* Circle *\/}
               <Pressable
-                onPress={() => {
+                onPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  createMenuFingerprint(pageX, pageY);
                   playModeHaptic('circle');
                   setMode('circle');
                   setCurrentPoints([]);
