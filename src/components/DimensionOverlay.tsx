@@ -5850,21 +5850,19 @@ export default function DimensionOverlay({
           )}
       </View>
 
-      {/* Official PanHandler Supporter Badge - Top Right (above AUTO LEVEL) */}
+      {/* Official PanHandler Supporter Badge - Bottom Right Corner */}
       {isDonor && (
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 4,
-            right: 12,
+            bottom: insets.bottom + 16, // Bottom safe area + padding
+            right: 16,
             backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
-            paddingHorizontal: 10,
-            paddingVertical: 6,
-            borderRadius: 8,
-            flexDirection: 'row',
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 10,
             alignItems: 'center',
-            gap: 6,
-            zIndex: 31, // Above AUTO LEVEL badge
+            zIndex: 31,
             shadowColor: '#FF1493',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
@@ -5874,27 +5872,45 @@ export default function DimensionOverlay({
             borderColor: 'rgba(255, 255, 255, 0.3)',
           }}
         >
-          <Text style={{ fontSize: 14 }}>❤️</Text>
-          <Text style={{ 
-            color: 'white', 
-            fontSize: 9, 
-            fontWeight: '800',
-            letterSpacing: 0.3,
-          }}>
-            Official PanHandler Supporter
-          </Text>
+          <View style={{ alignItems: 'center', gap: 2 }}>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 11, 
+              fontWeight: '800',
+              letterSpacing: 0.5,
+              textAlign: 'center',
+            }}>
+              Official
+            </Text>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 11, 
+              fontWeight: '800',
+              letterSpacing: 0.5,
+              textAlign: 'center',
+            }}>
+              PanHandler
+            </Text>
+            <Text style={{ 
+              color: 'white', 
+              fontSize: 11, 
+              fontWeight: '800',
+              letterSpacing: 0.5,
+              textAlign: 'center',
+            }}>
+              Supporter
+            </Text>
+          </View>
         </View>
       )}
 
-      {/* Auto-capture badge - top-right corner (BELOW donor badge) */}
+      {/* Auto-capture badge - top-right corner */}
       {isAutoCaptured && (
         <Pressable
           onPress={handleAutoLevelTap}
           style={{
             position: 'absolute',
-            top: isDonor 
-              ? insets.top + 44 // 40px below donor badge (4 + 34 height + 6 gap)
-              : insets.top + 16, // Normal position when no donor badge
+            top: insets.top + 16, // Normal position (donor badge moved to bottom)
             right: 12,
             backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 8,
