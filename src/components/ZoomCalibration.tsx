@@ -210,23 +210,35 @@ export default function ZoomCalibration({
           
           // If it's an overhead drone photo, auto-calibrate and complete
           if (metadata.isOverhead && metadata.groundSampleDistance && metadata.specs) {
+            console.log('🚁 AUTO-CALIBRATING DRONE PHOTO');
+            console.log('Drone:', metadata.displayName);
+            console.log('Altitude:', metadata.gps?.altitude, 'm');
+            console.log('GSD:', metadata.groundSampleDistance, 'cm/pixel');
+            console.log('Resolution:', metadata.specs.resolution);
+            
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             
             // Auto-calculate calibration from drone altitude
-            // GSD is in cm/pixel, we need mm/pixel
-            const pixelsPerMM = 1 / (metadata.groundSampleDistance * 10); // Convert cm to mm
+            // GSD is in cm/pixel, we need pixels/mm
+            // Example: GSD = 0.52 cm/pixel means 1 pixel = 5.2 mm
+            // So: 1 mm = 1/5.2 pixels = 0.192 pixels
+            const mmPerPixel = metadata.groundSampleDistance * 10; // Convert cm to mm
+            const pixelsPerMM = 1 / mmPerPixel;
+            
+            console.log('Calculated mmPerPixel:', mmPerPixel);
+            console.log('Calculated pixelsPerMM:', pixelsPerMM);
             
             // Complete calibration immediately with drone data
             onComplete({
               pixelsPerUnit: pixelsPerMM,
               unit: 'mm',
-              referenceDistance: metadata.groundSampleDistance * 1000, // Convert to mm for display
+              referenceDistance: metadata.groundSampleDistance * 10, // GSD in mm
               coinCircle: {
                 centerX: metadata.specs.resolution.width / 2,
                 centerY: metadata.specs.resolution.height / 2,
                 radius: 100, // Arbitrary reference
                 coinName: `Auto: ${metadata.displayName || 'Drone'}`,
-                coinDiameter: metadata.groundSampleDistance * 1000,
+                coinDiameter: metadata.groundSampleDistance * 10, // GSD in mm
               },
               initialZoom: {
                 scale: 1,
