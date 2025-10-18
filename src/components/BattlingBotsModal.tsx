@@ -4,10 +4,13 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import useStore from '../state/measurementStore';
 
 interface BattlingBotsModalProps {
   visible: boolean;
   onClose: () => void;
+  isDonor?: boolean; // Pass donor status to show different conversations
+  isFirstTimeDonor?: boolean; // Show special first-time donor conversation
 }
 
 type BotMessage = {
