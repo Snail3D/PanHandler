@@ -27,6 +27,8 @@ import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
+import BlueprintPlacementModal from '../components/BlueprintPlacementModal';
+import BlueprintDistanceModal from '../components/BlueprintDistanceModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
@@ -122,6 +124,7 @@ export default function MeasurementScreen() {
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
   const [skipToBlueprintMode, setSkipToBlueprintMode] = useState(false); // Track if user selected blueprint photo type
   const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
+  const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -1438,9 +1441,9 @@ export default function MeasurementScreen() {
           if (type === 'map') {
             setShowVerbalScaleModal(true);
           } else if (type === 'blueprint') {
-            // Blueprint mode handles known scale, aerial photos, blueprints, rulers, etc.
-            // User will be prompted if they want aerial mode (with aerial language) or blueprint mode
+            // Show blueprint placement modal
             setSkipToBlueprintMode(true);
+            setShowBlueprintPlacementModal(true);
           }
           
           transitionBlackOverlay.value = withTiming(0, {
@@ -2388,6 +2391,21 @@ export default function MeasurementScreen() {
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      
+      {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
+      <BlueprintPlacementModal
+        visible={showBlueprintPlacementModal}
+        mode={skipToAerialMode ? 'aerial' : 'blueprint'}
+        onStartPlacement={() => {
+          setShowBlueprintPlacementModal(false);
+          // DimensionOverlay will handle the pin placement with skipToBlueprintMode flag
+        }}
+        onDismiss={() => {
+          setShowBlueprintPlacementModal(false);
+          setSkipToBlueprintMode(false);
+          setMode('camera');
+        }}
+      />
       
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
