@@ -2381,14 +2381,6 @@ export default function MeasurementScreen() {
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       
-      {/* Photo Type Selection Modal - Works in all modes */}
-      <PhotoTypeSelectionModal
-        visible={showPhotoTypeModal}
-        onSelect={handlePhotoTypeSelection}
-        onCancel={() => setShowPhotoTypeModal(false)}
-        sessionColor={crosshairColor}
-      />
-      
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
         pointerEvents="none"
@@ -2404,6 +2396,14 @@ export default function MeasurementScreen() {
           },
           transitionBlackOverlayStyle,
         ]}
+      />
+      
+      {/* Photo Type Selection Modal - Must render AFTER black overlay so it appears on top */}
+      <PhotoTypeSelectionModal
+        visible={showPhotoTypeModal}
+        onSelect={handlePhotoTypeSelection}
+        onCancel={() => setShowPhotoTypeModal(false)}
+        sessionColor={crosshairColor}
       />
 
       {/* BattlingBots Donation Modal - RENDER AFTER BLACK OVERLAY */}
