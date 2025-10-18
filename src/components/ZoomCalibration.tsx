@@ -73,9 +73,9 @@ export default function ZoomCalibration({
   
   // Pinch tutorial animation values
   const leftFingerX = useSharedValue(SCREEN_WIDTH / 2 - 30);
-  const leftFingerY = useSharedValue(SCREEN_HEIGHT * 0.33 + 100); // Below the coin (now at 1/3 height)
+  const leftFingerY = useSharedValue(SCREEN_HEIGHT * 0.33 + 160); // Just below the coin circle (inside visible area)
   const rightFingerX = useSharedValue(SCREEN_WIDTH / 2 + 30);
-  const rightFingerY = useSharedValue(SCREEN_HEIGHT * 0.33 + 100); // Below the coin (now at 1/3 height)
+  const rightFingerY = useSharedValue(SCREEN_HEIGHT * 0.33 + 160); // Just below the coin circle (inside visible area)
   const tutorialOpacity = useSharedValue(0);
   const coinTextOpacity = useSharedValue(0); // For "select coin" text
   const arrowOpacity = useSharedValue(0); // For arrow pointing to coin selector
