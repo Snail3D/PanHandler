@@ -321,6 +321,9 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           altitude: exif['GPSAltitude'],
         });
         
+        // Debug: Show what we extracted
+        alert(`EXTRACTED EXIF!\n\nMake: ${exif['Make']}\nModel: ${exif['Model']}\nGPSLat: ${exif['GPSLatitude']}\nGPSAlt: ${exif['GPSAltitude']}`);
+        
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : String(e);
         console.log('⚠️ piexifjs failed, trying MediaLibrary fallback:', e);
