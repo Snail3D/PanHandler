@@ -250,6 +250,13 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const setIsProUser = useStore((s) => s.setIsProUser);
   const resetFreehandTrial = useStore((s) => s.resetFreehandTrial);
   
+  // Settings state
+  const userEmail = useStore((s) => s.userEmail);
+  const defaultUnitSystem = useStore((s) => s.defaultUnitSystem);
+  const setDefaultUnitSystem = useStore((s) => s.setDefaultUnitSystem);
+  const magneticDeclination = useStore((s) => s.magneticDeclination);
+  const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
+  
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
   
@@ -2111,6 +2118,176 @@ Thank you for helping us improve PanHandler!
                         (who is actually good at math)
                       </Text>
                     </Text>
+                  </View>
+                </Animated.View>
+              </View>
+
+              {/* Settings Section */}
+              <View style={{ marginBottom: 20, marginTop: 12 }}>
+                <Animated.View 
+                  entering={FadeIn.delay(725)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    borderRadius: 20,
+                    padding: 20,
+                    shadowColor: '#5856D6',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 12,
+                    elevation: 4,
+                    borderWidth: 1,
+                    borderColor: 'rgba(88,86,214,0.2)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                    <View style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'rgba(88,86,214,0.15)',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 10,
+                    }}>
+                      <Ionicons name="settings" size={24} color="#5856D6" />
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
+                      Settings
+                    </Text>
+                  </View>
+                  
+                  {/* Email Address Setting */}
+                  <View style={{ marginBottom: 16 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                      Email Address
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 10 }}>
+                      Used to auto-populate email reports. Your email stays on your device.
+                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        showAlert(
+                          'Change Email',
+                          'This feature is coming soon! For now, your email will be requested when sending reports.',
+                          'info'
+                        );
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
+                        borderRadius: 12,
+                        padding: 14,
+                        borderWidth: 1,
+                        borderColor: 'rgba(88,86,214,0.2)',
+                      })}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 14, color: '#5856D6', fontWeight: '600' }}>
+                          {userEmail || 'Not set'}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={18} color="#5856D6" />
+                      </View>
+                    </Pressable>
+                  </View>
+
+                  {/* Default Measurement System */}
+                  <View style={{ marginBottom: 16 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                      Default Measurement System
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 10 }}>
+                      Your preferred units for new sessions. You can still change units during a session.
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: 10 }}>
+                      <Pressable
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          setDefaultUnitSystem('metric');
+                        }}
+                        style={({ pressed }) => ({
+                          flex: 1,
+                          backgroundColor: defaultUnitSystem === 'metric' 
+                            ? '#5856D6' 
+                            : pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
+                          borderRadius: 12,
+                          padding: 14,
+                          borderWidth: 1,
+                          borderColor: defaultUnitSystem === 'metric' 
+                            ? '#5856D6' 
+                            : 'rgba(88,86,214,0.2)',
+                        })}
+                      >
+                        <Text style={{ 
+                          fontSize: 14, 
+                          color: defaultUnitSystem === 'metric' ? 'white' : '#5856D6',
+                          fontWeight: '600',
+                          textAlign: 'center',
+                        }}>
+                          Metric (mm)
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          setDefaultUnitSystem('imperial');
+                        }}
+                        style={({ pressed }) => ({
+                          flex: 1,
+                          backgroundColor: defaultUnitSystem === 'imperial' 
+                            ? '#5856D6' 
+                            : pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
+                          borderRadius: 12,
+                          padding: 14,
+                          borderWidth: 1,
+                          borderColor: defaultUnitSystem === 'imperial' 
+                            ? '#5856D6' 
+                            : 'rgba(88,86,214,0.2)',
+                        })}
+                      >
+                        <Text style={{ 
+                          fontSize: 14, 
+                          color: defaultUnitSystem === 'imperial' ? 'white' : '#5856D6',
+                          fontWeight: '600',
+                          textAlign: 'center',
+                        }}>
+                          Imperial (in)
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+
+                  {/* Magnetic Declination */}
+                  <View>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                      Magnetic Declination (Maps)
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 10 }}>
+                      Adjust for the difference between True North and Magnetic North on maps.
+                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        showAlert(
+                          'Magnetic Declination',
+                          'Enter your local magnetic declination in degrees. Positive for East, negative for West. Find your location\'s declination at ngdc.noaa.gov',
+                          'info'
+                        );
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
+                        borderRadius: 12,
+                        padding: 14,
+                        borderWidth: 1,
+                        borderColor: 'rgba(88,86,214,0.2)',
+                      })}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 14, color: '#5856D6', fontWeight: '600' }}>
+                          {magneticDeclination}° {magneticDeclination >= 0 ? 'East' : 'West'}
+                        </Text>
+                        <Ionicons name="chevron-forward" size={18} color="#5856D6" />
+                      </View>
+                    </Pressable>
                   </View>
                 </Animated.View>
               </View>

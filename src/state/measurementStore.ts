@@ -57,7 +57,9 @@ interface MeasurementStore {
     blueprintScale?: { distance: number; unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }; // Store for display
   } | null;
   coinCircle: CoinCircle | null;
-  unitSystem: UnitSystem;
+  unitSystem: UnitSystem; // Current session unit system (changes mid-session)
+  defaultUnitSystem: UnitSystem; // User's preferred default for NEW sessions
+  magneticDeclination: number; // Magnetic declination in degrees for maps (positive = east, negative = west)
   lastSelectedCoin: string | null; // Store coin name
   userEmail: string | null; // User's email for auto-population
   isProUser: boolean; // Pro user status for paywall (only for Freehand tool)
@@ -94,6 +96,8 @@ interface MeasurementStore {
   setLastSelectedCoin: (coinName: string) => void;
   updatePointPosition: (pointId: string, x: number, y: number) => void;
   setUnitSystem: (system: UnitSystem) => void;
+  setDefaultUnitSystem: (system: UnitSystem) => void; // Set preferred default for new sessions
+  setMagneticDeclination: (degrees: number) => void; // Set magnetic declination for maps
   setUserEmail: (email: string | null) => void;
   setIsProUser: (isPro: boolean) => void;
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
@@ -120,6 +124,8 @@ const useStore = create<MeasurementStore>()(
       calibration: null,
       coinCircle: null,
       unitSystem: 'metric',
+      defaultUnitSystem: 'metric', // Default preference for new sessions
+      magneticDeclination: 0, // Default: no declination adjustment
       lastSelectedCoin: null,
       userEmail: null,
       isProUser: false,
@@ -152,6 +158,8 @@ const useStore = create<MeasurementStore>()(
             calibration: null,
             savedZoomState: null,
             imageOrientation: null,
+            // Apply default unit system for new session
+            unitSystem: state.defaultUnitSystem,
           };
         }
         
@@ -233,6 +241,10 @@ const useStore = create<MeasurementStore>()(
 
       setUnitSystem: (system: UnitSystem) => set({ unitSystem: system }),
 
+      setDefaultUnitSystem: (system: UnitSystem) => set({ defaultUnitSystem: system }),
+
+      setMagneticDeclination: (degrees: number) => set({ magneticDeclination: degrees }),
+
       setUserEmail: (email: string | null) => set({ userEmail: email }),
 
       setIsProUser: (isPro: boolean) => set({ isProUser: isPro }),
@@ -266,6 +278,8 @@ const useStore = create<MeasurementStore>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ 
         unitSystem: state.unitSystem,
+        defaultUnitSystem: state.defaultUnitSystem, // Persist default preference
+        magneticDeclination: state.magneticDeclination, // Persist declination setting
         lastSelectedCoin: state.lastSelectedCoin,
         userEmail: state.userEmail, // Persist user email
         isProUser: state.isProUser, // Persist pro status
