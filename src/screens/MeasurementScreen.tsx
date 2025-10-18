@@ -1099,6 +1099,18 @@ export default function MeasurementScreen() {
           console.error('Error detecting orientation:', error);
         });
         
+        // Check if camera was pointing down (horizontal phone position)
+        // Beta close to 0° = phone is flat/horizontal = camera pointing down at table
+        const absBeta = Math.abs(currentBeta);
+        const isCameraPointingDown = absBeta < 45; // < 45° from horizontal = pointing down
+        
+        console.log('📷 Photo captured - Camera orientation:', {
+          beta: currentBeta.toFixed(1),
+          absBeta: absBeta.toFixed(1),
+          isCameraPointingDown,
+          interpretation: isCameraPointingDown ? 'Pointing down → Coin' : 'Pointing up/sideways → Ask user'
+        });
+        
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
         
