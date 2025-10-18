@@ -777,8 +777,9 @@ export default function BattlingBotsModal({
                       backgroundColor: pressed ? '#059669' : '#10B981',
                       borderRadius: 16,
                       padding: 20,
-                      marginBottom: 16,
+                      marginBottom: 24, // Increased from 16 for more space
                       alignItems: 'center',
+                      justifyContent: 'center', // Center content
                       shadowColor: '#10B981',
                       shadowOffset: { width: 0, height: 6 },
                       shadowOpacity: 0.4,
@@ -788,10 +789,10 @@ export default function BattlingBotsModal({
                       borderColor: '#34D399',
                     })}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                      <Ionicons name="cafe" size={24} color="white" />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                      <Ionicons name="cafe" size={24} color="rgba(0, 0, 0, 0.75)" />
                       <Text style={{
-                        color: 'white',
+                        color: 'rgba(0, 0, 0, 0.85)',
                         fontSize: 19,
                         fontWeight: '800',
                         letterSpacing: 0.3,
