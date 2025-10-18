@@ -159,6 +159,7 @@ export default function DimensionOverlay({
   const hasSeenPanTutorial = useStore((s) => s.hasSeenPanTutorial);
   const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
   const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
+  const isDonor = useStore((s) => s.isDonor); // Check if user is a supporter
   
   // STUB: Pro/Free system removed - Freehand is now free for everyone!
   const isProUser = true; // All users have access to all features
@@ -5830,13 +5831,51 @@ export default function DimensionOverlay({
           )}
       </View>
 
-      {/* Auto-capture badge - top-right corner (OUTSIDE viewRef to allow taps) */}
+      {/* Official PanHandler Supporter Badge - Top Right (above AUTO LEVEL) */}
+      {isDonor && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 16,
+            right: 12,
+            backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            zIndex: 31, // Above AUTO LEVEL badge
+            shadowColor: '#FF1493',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 5,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+          }}
+        >
+          <Text style={{ fontSize: 14 }}>❤️</Text>
+          <Text style={{ 
+            color: 'white', 
+            fontSize: 9, 
+            fontWeight: '800',
+            letterSpacing: 0.3,
+          }}>
+            Official PanHandler Supporter
+          </Text>
+        </View>
+      )}
+
+      {/* Auto-capture badge - top-right corner (BELOW donor badge) */}
       {isAutoCaptured && (
         <Pressable
           onPress={handleAutoLevelTap}
           style={{
             position: 'absolute',
-            top: insets.top + 16,
+            top: isDonor 
+              ? insets.top + 56 // 40px below donor badge (16 + 34 height + 6 gap)
+              : insets.top + 16, // Normal position when no donor badge
             right: 12,
             backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 8,
