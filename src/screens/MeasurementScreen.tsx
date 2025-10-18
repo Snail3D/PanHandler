@@ -1441,10 +1441,12 @@ export default function MeasurementScreen() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <Pressable
                       onPress={() => {
+                        console.log('🔴 NOT DONOR BUTTON CLICKED');
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(false, sessionCount);
                         setTestConversationIndex(0); // Reset to first
+                        console.log('Setting showBattlingBots to TRUE');
                         setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
