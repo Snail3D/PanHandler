@@ -11,6 +11,7 @@ interface BattlingBotsModalProps {
   onClose: () => void;
   isDonor?: boolean; // Pass donor status to show different conversations
   isFirstTimeDonor?: boolean; // Show special first-time donor conversation
+  conversationIndex?: number; // Force specific conversation (for testing)
 }
 
 type BotMessage = {
@@ -26,6 +27,7 @@ export default function BattlingBotsModal({
   onClose,
   isDonor = false,
   isFirstTimeDonor = false,
+  conversationIndex,
 }: BattlingBotsModalProps) {
   // Access store for donation tracking
   const setIsDonor = useStore((s) => s.setIsDonor);
@@ -211,11 +213,18 @@ export default function BattlingBotsModal({
   // Pick random conversation
   const [script, setScript] = useState<BotMessage[]>([]);
   
-  // Pick random conversation on mount
+  // Pick conversation on mount or when conversationIndex changes
   useEffect(() => {
     if (visible) {
+      // If conversationIndex provided (testing mode), use it directly
+      if (conversationIndex !== undefined) {
+        const convos = isDonor ? donorConversations : conversations;
+        const index = conversationIndex % convos.length; // Wrap around
+        setScript(convos[index]);
+        console.log(`🎯 BattlingBots: Showing ${isDonor ? 'DONOR' : 'NON-DONOR'} conversation #${index + 1} (TEST MODE)`);
+      }
       // If first-time donor, always show celebration conversation (donor conversation #4)
-      if (isFirstTimeDonor) {
+      else if (isFirstTimeDonor) {
         setScript(donorConversations[3]); // "First-Time Donor Celebration"
         console.log('🎉 BattlingBots: Showing FIRST-TIME DONOR celebration!');
       }
@@ -241,7 +250,7 @@ export default function BattlingBotsModal({
       setShowCursor(false);
       offerOpacity.value = 0;
     }
-  }, [visible, isDonor, isFirstTimeDonor]);
+  }, [visible, isDonor, isFirstTimeDonor, conversationIndex]);
   
   // Start typing when modal becomes visible
   useEffect(() => {

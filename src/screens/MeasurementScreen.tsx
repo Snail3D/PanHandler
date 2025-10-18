@@ -237,6 +237,7 @@ export default function MeasurementScreen() {
   
   // BattlingBots donation modal state  
   const [showBattlingBots, setShowBattlingBots] = useState(false);
+  const [testConversationIndex, setTestConversationIndex] = useState(0);
   
   // Track sessions and trigger BattlingBots modal (10 sessions for non-donors, 40 for donors)
   useEffect(() => {
@@ -1434,7 +1435,7 @@ export default function MeasurementScreen() {
                 paddingTop: insets.top + 16 
               }}
             >
-              <View style={{ flexDirection: 'column', gap: 8 }}>
+                <View style={{ flexDirection: 'column', gap: 8 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24 }}>
                   {/* Test Buttons - Left Side */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -1443,6 +1444,7 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(false, sessionCount);
+                        setTestConversationIndex(0); // Reset to first
                         setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
@@ -1455,6 +1457,7 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(true, sessionCount - 50);
+                        setTestConversationIndex(0); // Reset to first
                         setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
@@ -1467,12 +1470,24 @@ export default function MeasurementScreen() {
                         const setIsDonor = useStore.getState().setIsDonor;
                         const sessionCount = useStore.getState().sessionCount;
                         setIsDonor(true, sessionCount);
+                        setTestConversationIndex(0); // Reset to first
                         setShowBattlingBots(true);
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                       }}
                       style={{ backgroundColor: 'rgba(16, 185, 129, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
                     >
                       <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>New Donor</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setTestConversationIndex(prev => prev + 1);
+                        setShowBattlingBots(false);
+                        setTimeout(() => setShowBattlingBots(true), 100);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ backgroundColor: 'rgba(168, 85, 247, 0.9)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    >
+                      <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>Next →</Text>
                     </Pressable>
                   </View>
                   
@@ -1508,7 +1523,7 @@ export default function MeasurementScreen() {
                 <View style={{ paddingHorizontal: 24 }}>
                   <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, alignSelf: 'flex-start' }}>
                     <Text style={{ color: 'white', fontSize: 10 }}>
-                      Status: {isDonor ? '✅ Donor' : '❌ Not Donor'} | Session: {sessionCount} | Last Donation: {lastDonationSession}
+                      {isDonor ? '✅ Donor' : '❌ Not Donor'} | Conv: #{testConversationIndex + 1} | Session: {sessionCount}
                     </Text>
                   </View>
                 </View>
@@ -2341,6 +2356,7 @@ export default function MeasurementScreen() {
         }} 
         isDonor={isDonor}
         isFirstTimeDonor={isFirstTimeDonor}
+        conversationIndex={testConversationIndex}
       />
 
       {/* Help Modal */}
