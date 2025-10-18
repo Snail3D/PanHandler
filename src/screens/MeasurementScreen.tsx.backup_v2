@@ -1504,40 +1504,19 @@ export default function MeasurementScreen() {
         await detectOrientation(asset.uri); // Already deferred inside
         console.log('✅ Orientation detected');
         
-        // SAME PATTERN AS PHOTO CAPTURE (wall mode): Transition to measurement, THEN show modal
-        console.log('📷 Transitioning to measurement mode for gallery photo...');
-        setIsTransitioning(true);
-        transitionBlackOverlay.value = withTiming(1, {
-          duration: 150,
-          easing: Easing.in(Easing.ease),
-        });
+        // Show photo type selection modal for all imported photos
+        setPendingPhotoUri(asset.uri);
+        console.log('✅ Set pendingPhotoUri:', asset.uri);
         
+        console.log('📋 About to show photo type modal...');
+        setShowPhotoTypeModal(true);
+        console.log('✅ showPhotoTypeModal set to TRUE');
+        
+        // Defer AsyncStorage write to prevent UI blocking during import
         setTimeout(() => {
-          setMode('measurement');
-          
-          // Store pending photo and show type selection
-          setPendingPhotoUri(asset.uri);
-          
-          setTimeout(() => {
-            console.log('🔴 Setting showPhotoTypeModal to TRUE');
-            setShowPhotoTypeModal(true);
-            
-            // Defer AsyncStorage write
-            setTimeout(() => {
-              setImageUri(asset.uri, false); // Background persist
-              console.log('✅ Deferred imported photo AsyncStorage write complete');
-            }, 200);
-            
-            transitionBlackOverlay.value = withTiming(0, {
-              duration: 250,
-              easing: Easing.out(Easing.ease),
-            });
-            
-            setTimeout(() => {
-              setIsTransitioning(false);
-            }, 250);
-          }, 50);
-        }, 150);
+          setImageUri(asset.uri, false); // Background persist
+          console.log('✅ Deferred imported photo AsyncStorage write complete');
+        }, 300);
       } else {
         console.log('❌ Image picker cancelled or no asset');
       }
