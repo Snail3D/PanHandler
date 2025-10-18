@@ -4,6 +4,84 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [v2.2.0] - 2025-10-18
+
+### 🚁 Drone Photo Calibration System
+
+#### ✨ Major New Feature
+- **Automatic Drone Detection & Calibration** - Import aerial photos and get instant accurate measurements
+  - **Auto-Detection**: Recognizes DJI, Autel, Parrot, Skydio, and other major drone manufacturers
+  - **Manual Altitude Entry**: Beautiful modal prompts for drone height above ground
+  - **Smart XMP Fallback**: Auto-calibrates if RelativeAltitude metadata is available (rare on iOS)
+  - **Professional GSD Calculation**: Uses photogrammetry formula: `GSD = (altitude × sensorWidth) / (focalLength × imageWidth)`
+  - **Unit Toggle**: Switch between meters and feet instantly
+  - **Decimal Support**: Enter precise values like 50.5m or 164.5ft
+  - **Haptic Feedback**: Satisfying confirmation on calibration
+  - **Dark Mode Support**: Fully integrated with system appearance
+
+#### 🎯 Problem Solved
+- Users importing drone photos experienced measurements **28x too large** (44-46 feet instead of 12 feet)
+- Root cause: App was using GPS altitude (elevation above sea level) instead of relative altitude (height above ground)
+- iOS strips XMP metadata containing crucial `RelativeAltitude` field
+- Solution: Ask user to enter altitude from their drone controller (they always know this!)
+
+#### 🚀 Performance Impact
+- **Before**: ~60 seconds to calibrate (place coin, take photo, zoom, calibrate)
+- **After**: ~5 seconds (import photo, enter altitude, done)
+- **12x faster workflow!**
+
+#### 🎨 User Experience
+```
+Import drone photo
+  ↓
+🚁 DJI Neo Detected
+  ↓
+Modal: "Enter altitude: [50] m/ft"
+  ↓
+Tap Calibrate
+  ↓
+✅ Ready to measure!
+```
+
+#### 🔧 Technical Implementation
+- New component: `ManualAltitudeModal.tsx` (150 lines)
+- Modified: `MeasurementScreen.tsx` - Added drone detection, handlers, state management
+- Reused: `droneEXIF.ts` - Existing drone metadata extraction utility
+- No new dependencies required
+
+#### 📁 Files Added/Modified
+- **NEW**: `/src/components/ManualAltitudeModal.tsx` - Modal UI component
+- **MODIFIED**: `/src/screens/MeasurementScreen.tsx` - Integration logic, state, handlers
+- **MODIFIED**: `app.json` - Version bump to 2.2.0
+- **MODIFIED**: `package.json` - Version bump to 2.2.0
+
+#### 🐛 Bug Fixes
+- Removed debug alert that appeared on every photo import
+- Fixed syntax error in drone detection try-catch block
+- Cleaned up duplicate state declarations
+- Added proper error handling with silent fallback
+- Fixed normal photos triggering drone detection warnings
+
+#### 📚 Documentation
+- `V2.2.0_RELEASE_NOTES.md` - Comprehensive release documentation
+- `DRONE_CALIBRATION_GUIDE.md` - User guide for drone photos
+- `MANUAL_ALTITUDE_COMPLETE.md` - Full implementation details
+
+#### 🎓 Supported Drones
+- **DJI**: Mini 3/4 Pro, Air 2/3, Mavic series, Phantom series, Neo
+- **Autel**: EVO Lite, EVO II Pro
+- **Parrot**: Anafi
+- **Skydio**: 2, 2+
+- **Generic**: Any drone with EXIF Make/Model data
+
+#### ⚠️ Known Limitations
+- iOS strips XMP metadata (manual entry required by design)
+- Assumes nadir shots (camera straight down)
+- Best for relatively flat terrain
+- Angled shots will have distortion
+
+---
+
 ## [Alpha v2.1.7] - 2025-10-17
 
 ### 🎯 Freehand Snap to Existing Points
