@@ -20,12 +20,12 @@ import ZoomCalibration from '../components/ZoomCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
+import BattlingBotsModal from '../components/BattlingBotsModal';
 import TypewriterText from '../components/TypewriterText';
 import TouchOverlayFingerprints from '../components/TouchOverlayFingerprints';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
-import ManualAltitudeModal from '../components/ManualAltitudeModal';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -109,6 +109,7 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
+  const [capturedPhotoUri, setCapturedPhotoUri] = useState<string | null>(null); // Local state to hold photo before AsyncStorage write
   
   // Manual altitude modal for drone photos
   const [showManualAltitudeModal, setShowManualAltitudeModal] = useState(false);
@@ -119,6 +120,8 @@ export default function MeasurementScreen() {
   const [currentPhotoType, setCurrentPhotoType] = useState<PhotoType | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false); // Track if camera is ready for capture
   const [skipToMapMode, setSkipToMapMode] = useState(false); // Track if user clicked "Map Scale" button in calibration
+  const [skipToBlueprintMode, setSkipToBlueprintMode] = useState(false); // Track if user selected blueprint photo type
+  const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
   
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -228,43 +231,44 @@ export default function MeasurementScreen() {
   const setCurrentPoints = useStore((s) => s.setCurrentPoints);
   const sessionCount = useStore((s) => s.sessionCount);
   const incrementSessionCount = useStore((s) => s.incrementSessionCount);
-  const isProUser = useStore((s) => s.isProUser);
-  const setIsProUser = useStore((s) => s.setIsProUser);
-  const specialOfferTriggered = useStore((s) => s.specialOfferTriggered);
-  const specialOfferSessionsLeft = useStore((s) => s.specialOfferSessionsLeft);
-  const decrementSpecialOfferSessions = useStore((s) => s.decrementSpecialOfferSessions);
-  const dismissSpecialOffer = useStore((s) => s.dismissSpecialOffer);
+  const isDonor = useStore((s) => s.isDonor);
+  const lastDonationSession = useStore((s) => s.lastDonationSession);
+  const isFirstTimeDonor = useStore((s) => s.isFirstTimeDonor);
+  const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
   
-  // Special offer modal state
-  const [showSpecialOffer, setShowSpecialOffer] = useState(false);
-  const specialOfferOpacity = useSharedValue(0);
-  const specialOfferTranslateY = useSharedValue(-100);
+  // BattlingBots donation modal state  
+  const [showBattlingBots, setShowBattlingBots] = useState(false);
+  const [hasIncrementedSession, setHasIncrementedSession] = useState(false);
   
-  // Get funny copy based on sessions left
-  const getSpecialOfferCopy = (sessionsLeft: number) => {
-    if (sessionsLeft === 3) {
-      return {
-        title: "⚠️ ERROR: Squiggly Line Not Found",
-        message: "We noticed you haven't tried our fancy freehand tool yet. You know... for when straight lines are just too mainstream.",
-        price: "$6.97",
-        sessionsText: "3 sessions to decide",
-      };
-    } else if (sessionsLeft === 2) {
-      return {
-        title: "💪 You're Twisting Our Arm",
-        message: "Alright tough guy, we'll drop it even MORE. But seriously, this squiggly line is pretty cool...",
-        price: "$5.97",
-        sessionsText: "Only 2 sessions left!",
-      };
-    } else {
-      return {
-        title: "🚨 LAST CHANCE ALERT",
-        message: "This is it. Final price. We're basically giving it away. After this? Full price forever.",
-        price: "$4.97",
-        sessionsText: "LAST SESSION",
-      };
+  // Trigger BattlingBots when entering measurement screen (not on app mount)
+  useEffect(() => {
+    if (mode === 'measurement' && currentImageUri) {
+      // Increment session count ONCE when reaching measurement screen
+      // This prevents blocking the camera → calibration transition
+      if (!hasIncrementedSession) {
+        incrementSessionCount();
+        setHasIncrementedSession(true);
+      }
+      
+      // Check if we should trigger BattlingBots (after incrementing)
+      const triggerInterval = isDonor ? 40 : 10;
+      const shouldTrigger = sessionCount % triggerInterval === 0;
+      
+      if (shouldTrigger) {
+        // Show after 2 second delay
+        setTimeout(() => {
+          setShowBattlingBots(true);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          console.log(`🤖 BattlingBots triggered at session ${sessionCount} on measurement screen`);
+        }, 2000);
+      }
     }
-  };
+    
+    // Reset flag when returning to camera (for next session)
+    if (mode === 'camera') {
+      setHasIncrementedSession(false);
+    }
+  }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -343,7 +347,12 @@ export default function MeasurementScreen() {
           const isLandscape = width > height;
           const orientation = isLandscape ? 'LANDSCAPE' : 'PORTRAIT';
           __DEV__ && console.log('📱 Image orientation:', orientation);
-          setImageOrientation(orientation);
+          
+          // ⚠️ CRITICAL: Defer AsyncStorage write to prevent UI blocking
+          setTimeout(() => {
+            setImageOrientation(orientation);
+          }, 200);
+          
           resolve();
         }, (error) => {
           console.error('Error getting image size:', error);
@@ -404,34 +413,6 @@ export default function MeasurementScreen() {
     setMode('measurement'); // Skip ZoomCalibration, go straight to measurement
   };
 
-  // Track sessions and trigger special offer (on mount only)
-  useEffect(() => {
-    // Increment session count
-    incrementSessionCount();
-    
-    // Check if we should trigger special offer (sessions 50, 51, 52 for free users)
-    const newSessionCount = sessionCount + 1; // Account for the increment we just did
-    
-    if (!isProUser && newSessionCount >= 50 && newSessionCount <= 52) {
-      // Update store to mark offer as triggered if first time
-      if (!specialOfferTriggered && newSessionCount === 50) {
-        // First time hitting 50 - trigger the offer system
-        useStore.setState({ specialOfferTriggered: true, specialOfferSessionsLeft: 3 });
-      } else if (specialOfferTriggered && specialOfferSessionsLeft > 0) {
-        // Already triggered, decrement counter
-        decrementSpecialOfferSessions();
-      }
-      
-      // Show modal if sessions left > 0
-      if (specialOfferSessionsLeft > 0 || newSessionCount === 50) {
-        setTimeout(() => {
-          setShowSpecialOffer(true);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        }, 2000); // Show 2s after app opens
-      }
-    }
-  }, []); // Only on mount
-  
   // Regenerate session colors every time we enter camera mode for visual variety
   // This creates a fresh look for each photo session while maintaining consistency
   // within a single session (camera → calibration → measurement)
@@ -480,17 +461,6 @@ export default function MeasurementScreen() {
     
     detectAccessibilityAndPerformance();
   }, []); // Only on mount
-  
-  // Animate special offer banner in/out
-  useEffect(() => {
-    if (showSpecialOffer) {
-      specialOfferOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) });
-      specialOfferTranslateY.value = withSpring(0, { damping: 20, stiffness: 150 });
-    } else {
-      specialOfferOpacity.value = withTiming(0, { duration: 300 });
-      specialOfferTranslateY.value = withTiming(-100, { duration: 300 });
-    }
-  }, [showSpecialOffer]);
   
   // Instructional text sequence: Initial → Encouragement → Reminder
   useEffect(() => {
@@ -629,8 +599,10 @@ export default function MeasurementScreen() {
         isVerticalMode.value = isVertical;
         
         // Check if orientation changed
+        // Phone is horizontal (looking at table) when beta is low (tilted down)
+        const absGamma = Math.abs(gamma);
         const wasHorizontal = isHorizontal.value;
-        const nowHorizontal = absBeta < 45; // Calculate new horizontal state
+        const nowHorizontal = absBeta < 60; // Just check beta - more lenient
         isHorizontal.value = nowHorizontal; // Update shared value
         
         // Smooth 500ms fade transition between "Look Down" and instructions
@@ -997,11 +969,6 @@ export default function MeasurementScreen() {
     opacity: cameraFlashOpacity.value,
   }));
   
-  const specialOfferAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: specialOfferTranslateY.value }],
-    opacity: specialOfferOpacity.value,
-  }));
-  
   const instructionalTextAnimatedStyle = useAnimatedStyle(() => ({
     opacity: instructionalTextOpacity.value,
   }));
@@ -1067,6 +1034,15 @@ export default function MeasurementScreen() {
       // Check camera permissions one more time
       if (!permission?.granted) {
         console.error('Camera permission not granted');
+        setIsCapturing(false);
+        return;
+      }
+      
+      // ⚠️ CRITICAL: Check if camera ref exists
+      if (!cameraRef.current) {
+        console.error('Camera ref is null - camera not ready');
+        setIsCapturing(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
       
@@ -1087,42 +1063,126 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Set image URI immediately and start transition
-        setImageUri(photo.uri, wasAutoCapture);
+        // Store in local state immediately (no AsyncStorage blocking!)
+        setCapturedPhotoUri(photo.uri);
         
-        // Start orientation detection in background (non-blocking)
-        detectOrientation(photo.uri).catch(err => {
-          console.error('Orientation detection failed:', err);
+        // Detect orientation for storage (defer AsyncStorage write)
+        Image.getSize(
+          photo.uri, 
+          (width, height) => {
+            const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
+            setTimeout(() => {
+              setImageOrientation(orientation);
+            }, 300);
+          }, 
+          (error) => {
+            console.error('Error detecting orientation:', error);
+          }
+        );
+        
+        // Use phone TILT to determine if looking at table or wall
+        // Beta close to 0° (phone tilted down) = looking at table
+        // Beta close to 90° (phone upright) = looking at wall
+        // If sensors haven't initialized (both 0), default to table mode for better UX
+        const absBeta = Math.abs(currentBeta);
+        const absGamma = Math.abs(currentGamma);
+        
+        // If sensors are uninitialized (both exactly 0), default to table mode
+        const sensorsInitialized = currentBeta !== 0 || currentGamma !== 0;
+        const isLookingAtTable = !sensorsInitialized || absBeta < 60; // More lenient threshold
+        
+        console.log('📷 Photo captured - Phone tilt:', {
+          beta: currentBeta.toFixed(1),
+          gamma: currentGamma.toFixed(1),
+          absBeta: absBeta.toFixed(1),
+          absGamma: absGamma.toFixed(1),
+          sensorsInitialized,
+          isLookingAtTable,
+          decision: isLookingAtTable ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'
         });
         
-        // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
-        setIsTransitioning(true);
-        
-        // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
-        // The camera view stays rendered but will fade out
-        setTimeout(() => {
-          setMode('zoomCalibrate');
-        }, 30); // Minimal delay just for the flash to start
-        
-        // Start the visual transition AFTER mode switch
-        setTimeout(() => {
-          // Fade out camera opacity to reveal the photo underneath
-          cameraOpacity.value = withTiming(0, {
-            duration: 150, // Much faster fade (was 300ms)
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        // DECISION: Use phone tilt, NOT photo orientation
+        // Phone tilted down (looking at table) → Auto coin calibration
+        // Phone upright (looking at wall) → Show menu
+        if (isLookingAtTable) {
+          // Phone looking down at table → Auto-proceed to coin calibration
+          console.log('📷 Phone tilted down (table) → Auto coin calibration');
+          
+          // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
+          setIsTransitioning(true);
+          
+          // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
+          // The camera view stays rendered but will fade out
+          setTimeout(() => {
+            setMode('zoomCalibrate');
+          }, 30); // Minimal delay just for the flash to start
+          
+          // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
+          // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
+          // Write happens in background after UI transition is smooth
+          // See: SESSION_COMPLETE_OCT18_IMAGE_UNMOUNTING_FIX.md
+          setTimeout(() => {
+            setImageUri(photo.uri, wasAutoCapture);
+            __DEV__ && console.log('✅ Deferred AsyncStorage write complete');
+          }, 200); // Write after transition animations complete
+          
+          // Start the visual transition AFTER mode switch
+          setTimeout(() => {
+            // Fade out camera opacity to reveal the photo underneath
+            cameraOpacity.value = withTiming(0, {
+              duration: 150, // Much faster fade (was 300ms)
+              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+            });
+            
+            // Slight zoom morph for drama
+            screenScale.value = withSequence(
+              withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
+              withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
+            );
+            
+            // Unlock after full transition
+            setTimeout(() => {
+              setIsTransitioning(false);
+            }, 150); // Match the fade duration
+          }, 50); // Start animations quickly after flash
+        } else {
+          // Phone upright (looking at wall) → Show photo type selection menu
+          console.log('📷 Phone upright (wall) → Show photo type menu');
+          
+          // Transition to measurement screen first, then show modal
+          setIsTransitioning(true);
+          transitionBlackOverlay.value = withTiming(1, {
+            duration: 150,
+            easing: Easing.in(Easing.ease),
           });
           
-          // Slight zoom morph for drama
-          screenScale.value = withSequence(
-            withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
-            withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
-          );
-          
-          // Unlock after full transition
           setTimeout(() => {
-            setIsTransitioning(false);
-          }, 150); // Match the fade duration
-        }, 50); // Start animations quickly after flash
+            setMode('measurement');
+            
+            // Store pending photo and show type selection
+            setPendingPhotoUri(photo.uri);
+            
+            setTimeout(() => {
+              console.log('🔴 Setting showPhotoTypeModal to TRUE');
+              setShowPhotoTypeModal(true);
+              
+              // Defer AsyncStorage write
+              setTimeout(() => {
+                setImageUri(photo.uri, wasAutoCapture);
+                __DEV__ && console.log('✅ Deferred AsyncStorage write complete (portrait)');
+              }, 200);
+              
+              transitionBlackOverlay.value = withTiming(0, {
+                duration: 250,
+                easing: Easing.out(Easing.ease),
+              });
+              
+              setTimeout(() => {
+                setIsTransitioning(false);
+              }, 250);
+            }, 50);
+          }, 150);
+        }
         
         // Save to camera roll in background (non-blocking for UI)
         (async () => {
@@ -1184,15 +1244,7 @@ export default function MeasurementScreen() {
   };
 
   const handleCalibrationComplete = (calibrationData: any) => {
-    setCalibration({
-      pixelsPerUnit: calibrationData.pixelsPerUnit,
-      unit: calibrationData.unit,
-      referenceDistance: calibrationData.referenceDistance,
-    });
-
-    setCoinCircle(calibrationData.coinCircle);
-    
-    // Set the initial measurement zoom from calibration
+    // Set the initial measurement zoom from calibration (local state, not persisted)
     setMeasurementZoom({
       scale: calibrationData.initialZoom.scale,
       translateX: calibrationData.initialZoom.translateX,
@@ -1200,8 +1252,24 @@ export default function MeasurementScreen() {
       rotation: calibrationData.initialZoom.rotation || 0,
     });
     
+    // Clear local photo state now that it's persisted
+    setCapturedPhotoUri(null);
+    
     // Simpler approach: Just fade to black, switch instantly, fade in
     setIsTransitioning(true);
+    
+    // ⚠️ CRITICAL: Defer AsyncStorage writes to prevent measurement screen lockup
+    // Writing calibration + coinCircle blocks UI thread for 100-1000ms
+    // Must happen AFTER transition to measurement screen
+    setTimeout(() => {
+      setCalibration({
+        pixelsPerUnit: calibrationData.pixelsPerUnit,
+        unit: calibrationData.unit,
+        referenceDistance: calibrationData.referenceDistance,
+      });
+      setCoinCircle(calibrationData.coinCircle);
+      __DEV__ && console.log('✅ Deferred calibration AsyncStorage write complete');
+    }, 600); // Write after transition to measurement completes
     
     // Fade to black quickly
     transitionBlackOverlay.value = withTiming(1, {
@@ -1242,7 +1310,8 @@ export default function MeasurementScreen() {
     // This prevents race condition with useEffect that watches imageUri
     setMode('camera');
     
-    // Clear the image after mode change
+    // Clear BOTH local and persisted image states
+    setCapturedPhotoUri(null);
     setImageUri(null);
     
     __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
@@ -1341,29 +1410,60 @@ export default function MeasurementScreen() {
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
-    // TODO: Phase 2 - Pass photoType to ZoomCalibration
-    // For now, just proceed to calibration
-    setIsTransitioning(true);
-    transitionBlackOverlay.value = withTiming(1, {
-      duration: 150,
-      easing: Easing.in(Easing.ease),
-    });
-    
-    setTimeout(() => {
-      if (type === 'map') {
-        setSkipToMapMode(true);
-      }
-      setMode('zoomCalibrate');
-      
-      transitionBlackOverlay.value = withTiming(0, {
-        duration: 250,
-        easing: Easing.out(Easing.ease),
+    // COIN: Go to calibration screen for coin calibration
+    if (type === 'coin') {
+      setIsTransitioning(true);
+      transitionBlackOverlay.value = withTiming(1, {
+        duration: 150,
+        easing: Easing.in(Easing.ease),
       });
       
       setTimeout(() => {
-        setIsTransitioning(false);
-      }, 250);
-    }, 150);
+        setMode('zoomCalibrate');
+        
+        transitionBlackOverlay.value = withTiming(0, {
+          duration: 250,
+          easing: Easing.out(Easing.ease),
+        });
+        
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 250);
+      }, 150);
+    }
+    // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
+    // The appropriate modal will be triggered there
+    else {
+      setIsTransitioning(true);
+      transitionBlackOverlay.value = withTiming(1, {
+        duration: 150,
+        easing: Easing.in(Easing.ease),
+      });
+      
+      setTimeout(() => {
+        setMode('measurement');
+        
+        // Show the appropriate modal based on photo type
+        setTimeout(() => {
+          if (type === 'map') {
+            setShowVerbalScaleModal(true);
+          } else if (type === 'blueprint') {
+            // Blueprint mode handles known scale, aerial photos, blueprints, rulers, etc.
+            // User will be prompted if they want aerial mode (with aerial language) or blueprint mode
+            setSkipToBlueprintMode(true);
+          }
+          
+          transitionBlackOverlay.value = withTiming(0, {
+            duration: 250,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 250);
+        }, 50);
+      }, 150);
+    }
   };
 
   const pickImage = async () => {
@@ -1392,80 +1492,19 @@ export default function MeasurementScreen() {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         
-        setImageUri(asset.uri, false); // false = not auto-captured
-        await detectOrientation(asset.uri);
+        // ⚠️ CRITICAL: Use local state first, defer AsyncStorage write
+        setCapturedPhotoUri(asset.uri); // Instant local state
+        await detectOrientation(asset.uri); // Already deferred inside
         
-        // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
-        try {
-          const { extractDroneMetadata } = await import('../utils/droneEXIF');
-          const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
-          
-          // If drone detected, check if we need manual altitude entry
-          if (droneMetadata.isDrone && droneMetadata.specs) {
-            console.log('🚁 Drone detected:', droneMetadata.displayName);
-            
-            // Check if we have RelativeAltitude from XMP
-            if (droneMetadata.relativeAltitude && droneMetadata.relativeAltitude > 0 && droneMetadata.groundSampleDistance) {
-              // AUTO-CALIBRATE: We have XMP altitude data!
-              console.log('✅ RelativeAltitude found in XMP - auto-calibrating');
-              
-              const mmPerPixel = droneMetadata.groundSampleDistance * 10;
-              const pixelsPerMM = 1 / mmPerPixel;
-              
-              setCalibration({
-                pixelsPerUnit: pixelsPerMM,
-                unit: 'mm',
-                referenceDistance: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              setCoinCircle({
-                centerX: droneMetadata.specs.resolution.width / 2,
-                centerY: droneMetadata.specs.resolution.height / 2,
-                radius: 100,
-                coinName: `Auto: ${droneMetadata.displayName || 'Drone'}`,
-                coinDiameter: droneMetadata.groundSampleDistance * 10,
-              });
-              
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              
-              // Transition to measurement mode
-              setIsTransitioning(true);
-              transitionBlackOverlay.value = withTiming(1, {
-                duration: 150,
-                easing: Easing.in(Easing.ease),
-              });
-              
-              setTimeout(() => {
-                setMode('measurement');
-                setTimeout(() => {
-                  transitionBlackOverlay.value = withTiming(0, {
-                    duration: 250,
-                    easing: Easing.out(Easing.ease),
-                  });
-                  setTimeout(() => {
-                    setIsTransitioning(false);
-                  }, 250);
-                }, 150);
-              }, 150);
-              
-              return; // Exit early - skip normal calibration flow
-              
-            } else {
-              // MANUAL ENTRY: No XMP altitude, show modal
-              console.log('📝 No RelativeAltitude - showing manual entry modal');
-              setPendingDroneData(droneMetadata);
-              setShowManualAltitudeModal(true);
-              return; // Exit early - modal will handle calibration
-            }
-          }
-        } catch (error) {
-          console.error('Error checking for drone:', error);
-          // Silently continue to normal calibration flow
-        }
-        
-        // NOT a drone (or no auto-calibration data) - Show photo type selection modal
+        // Show photo type selection modal for all imported photos
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
+        
+        // Defer AsyncStorage write to prevent UI blocking during import
+        setTimeout(() => {
+          setImageUri(asset.uri, false); // Background persist
+          __DEV__ && console.log('✅ Deferred imported photo AsyncStorage write complete');
+        }, 300);
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -1501,33 +1540,34 @@ export default function MeasurementScreen() {
                 paddingTop: insets.top + 16 
               }}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <Pressable
-                    onPress={() => {
-                      __DEV__ && console.log('🔵 Help button pressed in camera screen');
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setShowHelpModal(true);
-                    }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <Ionicons name="help-circle-outline" size={28} color="white" />
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      setFlashEnabled(!flashEnabled);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    <Ionicons 
-                      name={flashEnabled ? "flash" : "flash-off"} 
-                      size={26} 
-                      color={flashEnabled ? "#FFD700" : "white"} 
-                    />
-                  </Pressable>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
+                  {/* Original Controls - Right Side */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Pressable
+                      onPress={() => {
+                        __DEV__ && console.log('🔵 Help button pressed in camera screen');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setShowHelpModal(true);
+                      }}
+                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Ionicons name="help-circle-outline" size={28} color="white" />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setFlashEnabled(!flashEnabled);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <Ionicons 
+                        name={flashEnabled ? "flash" : "flash-off"} 
+                        size={26} 
+                        color={flashEnabled ? "#FFD700" : "white"} 
+                      />
+                    </Pressable>
+                  </View>
                 </View>
-              </View>
             </View>
 
             {/* Fixed gray crosshairs - REFERENCE (always centered) */}
@@ -2182,34 +2222,25 @@ export default function MeasurementScreen() {
         
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-        
-        {/* Photo Type Selection Modal - For imported photos */}
-        <PhotoTypeSelectionModal
-          visible={showPhotoTypeModal}
-          onSelect={handlePhotoTypeSelection}
-          onCancel={() => setShowPhotoTypeModal(false)}
-        />
       </View>
     );
   }
 
   // Calibration or Measurement Mode
+  // Use capturedPhotoUri (local state) OR currentImageUri (persisted) for display
+  const displayImageUri = capturedPhotoUri || currentImageUri;
+  
   return (
     <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, screenTransitionStyle]}>
-      {currentImageUri && (
+      {displayImageUri && (
         <>
           {/* Zoom Calibration Mode */}
           {mode === 'zoomCalibrate' && (
             <ZoomCalibration
-              imageUri={currentImageUri}
+              key={displayImageUri}
+              imageUri={displayImageUri}
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
-              onSkipToMap={() => {
-                // Skip coin calibration, go to measurement screen
-                // Set flag to open map scale modal automatically
-                setSkipToMapMode(true);
-                setMode('measurement');
-              }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}
             />
@@ -2217,7 +2248,7 @@ export default function MeasurementScreen() {
 
           {/* Measurement Mode */}
           {mode === 'measurement' && (
-            <View style={{ flex: 1 }}>
+            <View key={displayImageUri} style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
               <View 
                 ref={measurementViewRef} 
@@ -2229,7 +2260,8 @@ export default function MeasurementScreen() {
                 }}
               >
                 <ZoomableImage 
-                  imageUri={currentImageUri}
+                  key={displayImageUri}
+                  imageUri={displayImageUri}
                   fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}
                   initialTranslateX={measurementZoom.translateX}
@@ -2271,6 +2303,8 @@ export default function MeasurementScreen() {
                   setImageOpacity={setImageOpacity}
                   sessionColor={shutterColor}
                   skipToMapMode={skipToMapMode}
+                  skipToBlueprintMode={skipToBlueprintMode}
+                  skipToAerialMode={skipToAerialMode}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
@@ -2288,12 +2322,17 @@ export default function MeasurementScreen() {
                     setTimeout(() => {
                       if (recalibrateMode) {
                         // Recalibrate: Keep image, clear calibration AND measurements, go to zoomCalibrate
-                        setCoinCircle(null);
-                        setCalibration(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        setCompletedMeasurements([]); // Clear all measurements
-                        setCurrentPoints([]); // Clear current drawing points
                         setMode('zoomCalibrate');
+                        
+                        // ⚠️ CRITICAL: Defer AsyncStorage writes to prevent recalibration freeze
+                        setTimeout(() => {
+                          setCoinCircle(null);
+                          setCalibration(null);
+                          setCompletedMeasurements([]);
+                          setCurrentPoints([]);
+                          __DEV__ && console.log('✅ Deferred recalibrate AsyncStorage writes complete');
+                        }, 300);
                         
                         // Fade in the calibration screen
                         transitionBlackOverlay.value = withTiming(0, {
@@ -2305,23 +2344,25 @@ export default function MeasurementScreen() {
                         }, 500);
                       } else {
                         // Full reset: Clear everything and go to camera
-                        // Clear measurements BEFORE setting imageUri to null (avoid AsyncStorage write)
-                        setCompletedMeasurements([]); // Clear measurements
-                        setCurrentPoints([]); // Clear points
-                        setCoinCircle(null);
-                        setCalibration(null);
-                        setImageOrientation(null);
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        
                         setMode('camera');
                         
-                        // Clear image state so camera shows up (do this LAST)
-                        setImageUri(null);
+                        // ⚠️ CRITICAL: Defer ALL AsyncStorage writes to prevent New Photo freeze
+                        setTimeout(() => {
+                          setCompletedMeasurements([]);
+                          setCurrentPoints([]);
+                          setCoinCircle(null);
+                          setCalibration(null);
+                          setImageOrientation(null);
+                          setCapturedPhotoUri(null); // Clear local state too
+                          setImageUri(null);
+                          __DEV__ && console.log('✅ Deferred New Photo AsyncStorage writes complete');
+                        }, 300);
                         
                         // Camera's useEffect will handle the fade in
                         setTimeout(() => {
                           setIsTransitioning(false);
-                        }, 800); // Reduced from 1800ms - camera fades in faster than this
+                        }, 800);
                       }
                     }, 300); // Wait for black fade to complete
                   }}
@@ -2347,134 +2388,16 @@ export default function MeasurementScreen() {
         </>
       )}
 
-      {/* Special Offer Banner - Only show in measurement mode */}
-      {mode === 'measurement' && !isProUser && showSpecialOffer && specialOfferSessionsLeft > 0 && (
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              top: insets.top + 20,
-              left: 20,
-              right: 20,
-              zIndex: 100000,
-            },
-            specialOfferAnimatedStyle,
-          ]}
-        >
-          <Pressable
-            onPress={() => {
-              setShowSpecialOffer(false);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-            style={{ flex: 1 }}
-          >
-            <BlurView
-              intensity={100}
-              tint="light"
-              style={{
-                borderRadius: 24,
-                overflow: 'hidden',
-                shadowColor: '#5856D6',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.4,
-                shadowRadius: 16,
-                elevation: 12,
-                borderWidth: 2,
-                borderColor: 'rgba(88, 86, 214, 0.4)',
-              }}
-            >
-              <View style={{ padding: 24, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}>
-                {/* Squiggly Line Icon */}
-                <View style={{ alignItems: 'center', marginBottom: 12 }}>
-                  <Svg width="50" height="50" viewBox="0 0 60 60">
-                    <Path
-                      d="M 10 30 Q 20 15, 30 30 T 50 30"
-                      stroke="#5856D6"
-                      strokeWidth="3"
-                      fill="none"
-                      strokeLinecap="round"
-                    />
-                    <Path d="M 10 30 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="#5856D6" />
-                    <Path d="M 50 30 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="#5856D6" />
-                  </Svg>
-                </View>
-
-                {/* Title */}
-                <Text style={{
-                  fontSize: 18,
-                  fontWeight: '800',
-                  color: '#1C1C1E',
-                  textAlign: 'center',
-                  marginBottom: 10,
-                  textShadowColor: 'rgba(0, 0, 0, 0.1)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 2,
-                }}>
-                  {getSpecialOfferCopy(specialOfferSessionsLeft).title}
-                </Text>
-
-                {/* Message - Typewriter Effect */}
-                <TypewriterText
-                  text={getSpecialOfferCopy(specialOfferSessionsLeft).message}
-                  speed={25}
-                  style={{
-                    fontSize: 14,
-                    color: '#3C3C43',
-                    textAlign: 'center',
-                    lineHeight: 20,
-                    marginBottom: 16,
-                  }}
-                />
-
-                {/* Price Badge */}
-                <View style={{
-                  backgroundColor: 'rgba(88, 86, 214, 0.2)',
-                  borderRadius: 12,
-                  paddingVertical: 8,
-                  paddingHorizontal: 16,
-                  alignSelf: 'center',
-                  marginBottom: 12,
-                  borderWidth: 1.5,
-                  borderColor: 'rgba(88, 86, 214, 0.4)',
-                }}>
-                  <Text style={{ fontSize: 32, fontWeight: '900', color: '#5856D6', textAlign: 'center' }}>
-                    {getSpecialOfferCopy(specialOfferSessionsLeft).price}
-                  </Text>
-                </View>
-
-                {/* Countdown */}
-                <View style={{
-                  backgroundColor: 'rgba(255, 149, 0, 0.15)',
-                  borderRadius: 10,
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  alignSelf: 'center',
-                  marginBottom: 14,
-                  borderWidth: 1.5,
-                  borderColor: 'rgba(255, 149, 0, 0.3)',
-                }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#1C1C1E', textAlign: 'center' }}>
-                    ⏰ {getSpecialOfferCopy(specialOfferSessionsLeft).sessionsText}
-                  </Text>
-                </View>
-
-                {/* Tap to dismiss hint */}
-                <Text style={{
-                  fontSize: 12,
-                  color: 'rgba(0, 0, 0, 0.5)',
-                  textAlign: 'center',
-                  fontStyle: 'italic',
-                }}>
-                  Tap to dismiss
-                </Text>
-              </View>
-            </BlurView>
-          </Pressable>
-        </Animated.View>
-      )}
-
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      
+      {/* Photo Type Selection Modal - Works in all modes */}
+      <PhotoTypeSelectionModal
+        visible={showPhotoTypeModal}
+        onSelect={handlePhotoTypeSelection}
+        onCancel={() => setShowPhotoTypeModal(false)}
+        sessionColor={crosshairColor}
+      />
       
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
@@ -2493,14 +2416,20 @@ export default function MeasurementScreen() {
         ]}
       />
 
-      {/* Manual Altitude Entry Modal - For drone photos without XMP altitude */}
-      <ManualAltitudeModal
-        visible={showManualAltitudeModal}
-        onConfirm={handleManualAltitudeConfirm}
-        onCancel={handleManualAltitudeCancel}
-        droneModel={pendingDroneData?.displayName || 'Drone'}
-        distance={pendingDroneData?.distance}
+      {/* BattlingBots Donation Modal - RENDER AFTER BLACK OVERLAY */}
+      <BattlingBotsModal 
+        visible={showBattlingBots}
+        onClose={() => {
+          setShowBattlingBots(false);
+          // Reset first-time donor flag after showing celebration
+          if (isFirstTimeDonor) {
+            setIsFirstTimeDonor(false);
+          }
+        }} 
+        isDonor={isDonor}
+        isFirstTimeDonor={isFirstTimeDonor}
       />
+
     </Animated.View>
   );
 }
