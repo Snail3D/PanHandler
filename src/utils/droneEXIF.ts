@@ -300,8 +300,22 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     try {
       console.log('📸 Reading XMP data from:', imageUri);
       
+      // If this is a ph:// URI (iOS photo library), try to get the actual file URI
+      let fileUriToRead = imageUri;
+      if (imageUri.startsWith('ph://')) {
+        try {
+          const assetInfo = await MediaLibrary.getAssetInfoAsync(imageUri);
+          if (assetInfo && assetInfo.localUri) {
+            fileUriToRead = assetInfo.localUri;
+            console.log('📱 Using MediaLibrary localUri:', fileUriToRead);
+          }
+        } catch (e) {
+          console.log('⚠️ Could not get MediaLibrary localUri, using original URI');
+        }
+      }
+      
       // Read file as base64 first (safer for binary JPEG data)
-      const base64Data = await FileSystem.readAsStringAsync(imageUri, {
+      const base64Data = await FileSystem.readAsStringAsync(fileUriToRead, {
         encoding: FileSystem.EncodingType.Base64,
       });
       
