@@ -2210,6 +2210,14 @@ export default function MeasurementScreen() {
           ]}
         />
         
+        {/* Photo Type Selection Modal - Must be inside camera mode return */}
+        <PhotoTypeSelectionModal
+          visible={showPhotoTypeModal}
+          onSelect={handlePhotoTypeSelection}
+          onCancel={() => setShowPhotoTypeModal(false)}
+          sessionColor={crosshairColor}
+        />
+        
         {/* Help Modal - needs to be here for camera mode */}
         <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       </View>
@@ -2398,14 +2406,6 @@ export default function MeasurementScreen() {
         ]}
       />
       
-      {/* Photo Type Selection Modal - Must render AFTER black overlay so it appears on top */}
-      <PhotoTypeSelectionModal
-        visible={showPhotoTypeModal}
-        onSelect={handlePhotoTypeSelection}
-        onCancel={() => setShowPhotoTypeModal(false)}
-        sessionColor={crosshairColor}
-      />
-
       {/* BattlingBots Donation Modal - RENDER AFTER BLACK OVERLAY */}
       <BattlingBotsModal 
         visible={showBattlingBots}
