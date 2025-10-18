@@ -1,4 +1,6 @@
 import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+import piexif from 'piexifjs';
 
 /**
  * Drone specifications for auto-calibration
@@ -254,28 +256,86 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
     let imageWidth = 0;
     let imageHeight = 0;
     
-    // If EXIF not provided, try to get it from MediaLibrary
+    // If EXIF not provided, try to read it with piexifjs (most reliable method)
     if (!exif) {
       try {
-        // Check if this is an asset library URI (photo already in camera roll)
-        if (imageUri.startsWith('ph://') || imageUri.startsWith('assets-library://')) {
-          const asset = await MediaLibrary.getAssetInfoAsync(imageUri);
-          if (asset && asset.exif) {
-            exif = asset.exif;
-            imageWidth = asset.width;
-            imageHeight = asset.height;
-          }
+        console.log('📸 Reading EXIF with piexifjs from:', imageUri);
+        
+        // Read image as base64
+        const base64 = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        // Add JPEG header if needed
+        const jpegData = `data:image/jpeg;base64,${base64}`;
+        
+        // Extract EXIF using piexifjs
+        const exifObj = piexif.load(jpegData);
+        console.log('✅ EXIF loaded successfully');
+        console.log('EXIF keys:', Object.keys(exifObj));
+        
+        // Convert piexifjs format to standard EXIF object
+        exif = {};
+        
+        // Extract from "0th" IFD (main image data)
+        if (exifObj['0th']) {
+          const zeroth = exifObj['0th'];
+          exif['Make'] = zeroth[piexif.ImageIFD.Make];
+          exif['Model'] = zeroth[piexif.ImageIFD.Model];
+          exif['ImageWidth'] = zeroth[piexif.ImageIFD.ImageWidth];
+          exif['ImageHeight'] = zeroth[piexif.ImageIFD.ImageLength];
+          imageWidth = exif['ImageWidth'] || 0;
+          imageHeight = exif['ImageHeight'] || 0;
         }
-        // Note: For file:// URIs from camera, EXIF may not be available
-        // User should import photos from camera roll for drone detection
+        
+        // Extract from "Exif" IFD (camera settings)
+        if (exifObj['Exif']) {
+          const exifIFD = exifObj['Exif'];
+          exif['FocalLength'] = exifIFD[piexif.ExifIFD.FocalLength];
+          exif['FocalLengthIn35mmFilm'] = exifIFD[piexif.ExifIFD.FocalLengthIn35mmFilm];
+        }
+        
+        // Extract from "GPS" IFD (location data)
+        if (exifObj['GPS']) {
+          const gps = exifObj['GPS'];
+          exif['GPSLatitude'] = gps[piexif.GPSIFD.GPSLatitude];
+          exif['GPSLatitudeRef'] = gps[piexif.GPSIFD.GPSLatitudeRef];
+          exif['GPSLongitude'] = gps[piexif.GPSIFD.GPSLongitude];
+          exif['GPSLongitudeRef'] = gps[piexif.GPSIFD.GPSLongitudeRef];
+          exif['GPSAltitude'] = gps[piexif.GPSIFD.GPSAltitude];
+          exif['GPSAltitudeRef'] = gps[piexif.GPSIFD.GPSAltitudeRef];
+        }
+        
+        console.log('📊 Extracted EXIF:', {
+          make: exif['Make'],
+          model: exif['Model'],
+          hasGPS: !!(exif['GPSLatitude'] && exif['GPSLongitude']),
+          altitude: exif['GPSAltitude'],
+        });
+        
       } catch (e) {
-        console.log('Could not read EXIF from MediaLibrary');
+        console.log('⚠️ piexifjs failed, trying MediaLibrary fallback:', e);
+        
+        // Fallback to MediaLibrary
+        try {
+          // Check if this is an asset library URI (photo already in camera roll)
+          if (imageUri.startsWith('ph://') || imageUri.startsWith('assets-library://')) {
+            const asset = await MediaLibrary.getAssetInfoAsync(imageUri);
+            if (asset && asset.exif) {
+              exif = asset.exif;
+              imageWidth = asset.width;
+              imageHeight = asset.height;
+            }
+          }
+        } catch (e2) {
+          console.log('❌ MediaLibrary also failed');
+        }
       }
     }
     
     if (!exif || Object.keys(exif).length === 0) {
       // No EXIF data available - return not a drone
-      console.log('No EXIF data found - not a drone photo');
+      console.log('❌ No EXIF data found - not a drone photo');
       return {
         isDrone: false,
         isOverhead: false,
