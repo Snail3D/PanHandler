@@ -2756,6 +2756,11 @@ export default function DimensionOverlay({
   const menuSwipeGesture = Gesture.Pan()
     .minDistance(40) // Require more movement before activating
     .maxPointers(1) // Only single finger
+    .onStart(() => {
+      'worklet';
+      // Clear any existing trail when starting new swipe
+      runOnJS(setSwipeTrail)([]);
+    })
     .onUpdate((event) => {
       'worklet';
       // Record trail points during swipe
@@ -2765,7 +2770,11 @@ export default function DimensionOverlay({
         id: `trail-${Date.now()}-${Math.random()}`,
         timestamp: Date.now(),
       };
-      runOnJS(setSwipeTrail)((prev) => [...prev, trailPoint]);
+      runOnJS(setSwipeTrail)((prev) => {
+        // Safety check: ensure prev is always an array
+        const currentTrail = Array.isArray(prev) ? prev : [];
+        return [...currentTrail, trailPoint];
+      });
     })
     .onEnd((event) => {
       'worklet';
@@ -4814,7 +4823,7 @@ export default function DimensionOverlay({
 
       {/* Swipe trail effect (fading fingerprints along swipe path) */}
       {(() => {
-        if (swipeTrail.length === 0 || !sessionColor) return null;
+        if (!Array.isArray(swipeTrail) || swipeTrail.length === 0 || !sessionColor) return null;
         
         const fingerColor = sessionColor.main;
         const now = Date.now();
