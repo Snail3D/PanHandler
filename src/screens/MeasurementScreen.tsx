@@ -1087,13 +1087,31 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
+        // Check orientation FIRST before proceeding
+        const isHorizontal = await new Promise<boolean>((resolve) => {
+          Image.getSize(photo.uri, (width, height) => {
+            resolve(width > height);
+          }, () => {
+            resolve(false); // Default to false on error
+          });
+        });
+        
+        // Camera photos MUST be horizontal for coin calibration
+        if (!isHorizontal) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          // Show error - they need to rotate phone
+          alert("Please rotate your phone to landscape (horizontal) orientation to take measurement photos.");
+          setIsCapturing(false);
+          setIsHoldingShutter(false);
+          setIsTransitioning(false);
+          return;
+        }
+        
         // Set image URI immediately and start transition
         setImageUri(photo.uri, wasAutoCapture);
         
-        // Start orientation detection in background (non-blocking)
-        detectOrientation(photo.uri).catch(err => {
-          console.error('Orientation detection failed:', err);
-        });
+        // Store orientation
+        setImageOrientation('LANDSCAPE');
         
         // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
         setIsTransitioning(true);
@@ -1341,29 +1359,73 @@ export default function MeasurementScreen() {
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
-    // TODO: Phase 2 - Pass photoType to ZoomCalibration
-    // For now, just proceed to calibration
-    setIsTransitioning(true);
-    transitionBlackOverlay.value = withTiming(1, {
-      duration: 150,
-      easing: Easing.in(Easing.ease),
-    });
-    
-    setTimeout(() => {
-      if (type === 'map') {
-        setSkipToMapMode(true);
-      }
-      setMode('zoomCalibrate');
-      
-      transitionBlackOverlay.value = withTiming(0, {
-        duration: 250,
-        easing: Easing.out(Easing.ease),
+    // COIN: Go to calibration screen for coin calibration
+    if (type === 'coin') {
+      setIsTransitioning(true);
+      transitionBlackOverlay.value = withTiming(1, {
+        duration: 150,
+        easing: Easing.in(Easing.ease),
       });
       
       setTimeout(() => {
-        setIsTransitioning(false);
-      }, 250);
-    }, 150);
+        setMode('zoomCalibrate');
+        
+        transitionBlackOverlay.value = withTiming(0, {
+          duration: 250,
+          easing: Easing.out(Easing.ease),
+        });
+        
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 250);
+      }, 150);
+    }
+    // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
+    // The appropriate modal will be triggered there
+    else {
+      setIsTransitioning(true);
+      transitionBlackOverlay.value = withTiming(1, {
+        duration: 150,
+        easing: Easing.in(Easing.ease),
+      });
+      
+      setTimeout(() => {
+        setMode('measurement');
+        
+        // Show the appropriate modal based on photo type
+        setTimeout(() => {
+          if (type === 'map') {
+            setShowVerbalScaleModal(true);
+          } else if (type === 'blueprint') {
+            // Blueprint mode not yet implemented - show alert
+            alert("Blueprint mode coming soon! For now, please use Map Scale or Coin calibration.");
+            setMode('camera'); // Go back to camera
+          } else if (type === 'aerial') {
+            // Show manual altitude modal if drone detected
+            if (pendingDroneData) {
+              setShowManualAltitudeModal(true);
+            } else {
+              // No drone data - shouldn't happen but handle it
+              alert("No drone data found. Please use another calibration method.");
+              setMode('camera');
+            }
+          } else if (type === 'knownScale') {
+            // Known scale (ruler) mode not yet implemented
+            alert("Ruler mode coming soon! For now, please use Map Scale or Coin calibration.");
+            setMode('camera');
+          }
+          
+          transitionBlackOverlay.value = withTiming(0, {
+            duration: 250,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 250);
+        }, 50);
+      }, 150);
+    }
   };
 
   const pickImage = async () => {
@@ -2203,14 +2265,7 @@ export default function MeasurementScreen() {
             <ZoomCalibration
               imageUri={currentImageUri}
               sessionColor={crosshairColor}
-              photoType={currentPhotoType}
               onComplete={handleCalibrationComplete}
-              onSkipToMap={() => {
-                // Skip coin calibration, go to measurement screen
-                // Set flag to open map scale modal automatically
-                setSkipToMapMode(true);
-                setMode('measurement');
-              }}
               onCancel={handleCancelCalibration}
               onHelp={() => setShowHelpModal(true)}
             />
