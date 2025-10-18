@@ -2261,9 +2261,9 @@ export default function DimensionOverlay({
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
-                        // Snap threshold: 2mm in real-world distance (much less sensitive)
-                        const snapThresholdMM = 2;
-                        const snapThresholdPixels = calibration ? snapThresholdMM * calibration.pixelsPerUnit : 10;
+                        // Snap threshold: 5mm in real-world distance (more forgiving)
+                        const snapThresholdMM = 5;
+                        const snapThresholdPixels = calibration ? snapThresholdMM * calibration.pixelsPerUnit : 15;
                         
                         if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)

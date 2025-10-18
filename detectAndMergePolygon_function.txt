@@ -1,0 +1,175 @@
+  const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
+    const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
+    
+    // Only check distance measurements
+    const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
+    
+    // Need at least 3 lines to form a polygon (triangle, square, etc.)
+    if (distanceLines.length < 3) return;
+    
+    // Find all connected chains of lines
+    const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
+      const chain: Measurement[] = [startLine];
+      usedIds.add(startLine.id);
+      
+      let currentEndpoint = startLine.points[1]; // End of current line
+      let foundConnection = true;
+      
+      while (foundConnection) {
+        foundConnection = false;
+        
+        // Find a line that starts where current line ends
+        for (const line of distanceLines) {
+          if (usedIds.has(line.id)) continue;
+          
+          const lineStart = line.points[0];
+          const lineEnd = line.points[1];
+          
+          // Check if line starts at current endpoint
+          const distToStart = Math.sqrt(
+            Math.pow(lineStart.x - currentEndpoint.x, 2) + 
+            Math.pow(lineStart.y - currentEndpoint.y, 2)
+          );
+          
+          // Check if line ends at current endpoint (reverse direction)
+          const distToEnd = Math.sqrt(
+            Math.pow(lineEnd.x - currentEndpoint.x, 2) + 
+            Math.pow(lineEnd.y - currentEndpoint.y, 2)
+          );
+          
+          if (distToStart < SNAP_TOLERANCE) {
+            // Line connects forward
+            chain.push(line);
+            usedIds.add(line.id);
+            currentEndpoint = lineEnd;
+            foundConnection = true;
+            break;
+          } else if (distToEnd < SNAP_TOLERANCE) {
+            // Line connects backward - reverse it
+            const reversedLine = {
+              ...line,
+              points: [lineEnd, lineStart]
+            };
+            chain.push(reversedLine);
+            usedIds.add(line.id);
+            currentEndpoint = lineStart;
+            foundConnection = true;
+            break;
+          }
+        }
+      }
+      
+      return chain;
+    };
+    
+    // Try to find closed polygons
+    for (const startLine of distanceLines) {
+      const usedIds = new Set<string>();
+      const chain = findConnectedChain(startLine, usedIds);
+      
+      if (chain.length < 3) continue; // Need at least 3 lines
+      
+      // Check if chain forms a closed loop
+      const firstPoint = chain[0].points[0];
+      const lastPoint = chain[chain.length - 1].points[1];
+      
+      const closingDistance = Math.sqrt(
+        Math.pow(lastPoint.x - firstPoint.x, 2) + 
+        Math.pow(lastPoint.y - firstPoint.y, 2)
+      );
+      
+      if (closingDistance < SNAP_TOLERANCE) {
+        // 🎉 FOUND A CLOSED POLYGON!
+        console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
+        
+        // Extract all points in order (excluding duplicates at connections)
+        const polygonPoints: Array<{x: number, y: number}> = [];
+        for (let i = 0; i < chain.length; i++) {
+          polygonPoints.push(chain[i].points[0]);
+        }
+        
+        // Calculate perimeter (sum of all line lengths)
+        let perimeterPx = 0;
+        for (const line of chain) {
+          const p1 = line.points[0];
+          const p2 = line.points[1];
+          const length = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          perimeterPx += length;
+        }
+        
+        // Calculate area using shoelace formula
+        let areaPx2 = 0;
+        for (let i = 0; i < polygonPoints.length; i++) {
+          const p1 = polygonPoints[i];
+          const p2 = polygonPoints[(i + 1) % polygonPoints.length];
+          areaPx2 += (p1.x * p2.y - p2.x * p1.y);
+        }
+        areaPx2 = Math.abs(areaPx2) / 2;
+        
+        // Convert to physical units
+        let perimeterStr: string;
+        let areaStr: string;
+        let physicalArea: number;
+        
+        if (isMapMode && mapScale) {
+          // Map mode
+          const perimeterDist = convertToMapScale(perimeterPx);
+          perimeterStr = formatMapValue(perimeterDist);
+          
+          // For area, we need to square the scale factor
+          const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
+          const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
+          physicalArea = areaDist2;
+          areaStr = formatMapScaleArea(areaDist2);
+        } else {
+          // Coin calibration mode
+          const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
+          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+          
+          const areaInUnits2 = areaPx2 / Math.pow(calibration?.pixelsPerUnit || 1, 2);
+          physicalArea = areaInUnits2;
+          areaStr = formatAreaMeasurement(areaInUnits2, calibration?.unit || 'mm', unitSystem);
+        }
+        
+        // Create new polygon measurement
+        const polygonMeasurement: Measurement = {
+          id: Date.now().toString(),
+          points: polygonPoints,
+          value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area
+          perimeter: perimeterStr, // For inline label
+          mode: 'polygon' as any, // New mode type
+          area: physicalArea,
+          isClosed: true,
+          calibrationMode: isMapMode ? 'map' : 'coin',
+          ...(isMapMode && mapScale && { mapScaleData: mapScale }),
+        };
+        
+        // Remove the individual lines and add the polygon
+        const remainingMeasurements = allMeasurements.filter(m => !usedIds.has(m.id));
+        setMeasurements([...remainingMeasurements, polygonMeasurement]);
+        
+        // Success haptic!
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        console.log('🔷 Polygon created:', {
+          sides: chain.length,
+          perimeter: perimeterStr,
+          area: areaStr
+        });
+        
+        return; // Only merge one polygon at a time
+      }
+    }
+  };
+
+  const placePoint = (x: number, y: number) => {
+    // Convert screen tap to original image coordinates
+    const imageCoords = screenToImage(x, y);
+    console.log('🎯 Placing point:');
+    console.log('  Screen coords:', x, y);
+    console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
+    console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
+    
+    const requiredPoints = mode === 'distance' ? 2 
+      : mode === 'angle' ? 3 
