@@ -231,6 +231,7 @@ export default function BattlingBotsModal({
   
   // Pick conversation on mount or when conversationIndex changes
   useEffect(() => {
+    console.log('🤖 BattlingBots useEffect triggered:', { visible, conversationIndex, isDonor, isFirstTimeDonor });
     if (visible) {
       // If conversationIndex provided (testing mode), use it directly
       if (conversationIndex !== undefined) {
