@@ -109,6 +109,7 @@ export default function MeasurementScreen() {
   const [showVerbalScaleModal, setShowVerbalScaleModal] = useState(false);
   const [flashEnabled, setFlashEnabled] = useState(false); // Flash OFF by default, torch when enabled
   const [isTransitioning, setIsTransitioning] = useState(false); // Track if we're mid-transition
+  const [capturedPhotoUri, setCapturedPhotoUri] = useState<string | null>(null); // Local state to hold photo before AsyncStorage write
   
   // Manual altitude modal for drone photos
   const [showManualAltitudeModal, setShowManualAltitudeModal] = useState(false);
@@ -1046,8 +1047,8 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Set image URI immediately and start transition
-        setImageUri(photo.uri, wasAutoCapture);
+        // Store in local state immediately (no AsyncStorage blocking!)
+        setCapturedPhotoUri(photo.uri);
         
         // Detect orientation in background
         Image.getSize(photo.uri, (width, height) => {
@@ -1077,6 +1078,15 @@ export default function MeasurementScreen() {
         setTimeout(() => {
           setMode('zoomCalibrate');
         }, 30); // Minimal delay just for the flash to start
+        
+        // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
+        // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
+        // Write happens in background after UI transition is smooth
+        // See: SESSION_COMPLETE_OCT18_IMAGE_UNMOUNTING_FIX.md
+        setTimeout(() => {
+          setImageUri(photo.uri, wasAutoCapture);
+          __DEV__ && console.log('✅ Deferred AsyncStorage write complete');
+        }, 200); // Write after transition animations complete
         
         // Start the visual transition AFTER mode switch
         setTimeout(() => {
@@ -1174,6 +1184,9 @@ export default function MeasurementScreen() {
       rotation: calibrationData.initialZoom.rotation || 0,
     });
     
+    // Clear local photo state now that it's persisted
+    setCapturedPhotoUri(null);
+    
     // Simpler approach: Just fade to black, switch instantly, fade in
     setIsTransitioning(true);
     
@@ -1216,7 +1229,8 @@ export default function MeasurementScreen() {
     // This prevents race condition with useEffect that watches imageUri
     setMode('camera');
     
-    // Clear the image after mode change
+    // Clear BOTH local and persisted image states
+    setCapturedPhotoUri(null);
     setImageUri(null);
     
     __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
@@ -2139,15 +2153,18 @@ export default function MeasurementScreen() {
   }
 
   // Calibration or Measurement Mode
+  // Use capturedPhotoUri (local state) OR currentImageUri (persisted) for display
+  const displayImageUri = capturedPhotoUri || currentImageUri;
+  
   return (
     <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, screenTransitionStyle]}>
-      {currentImageUri && (
+      {displayImageUri && (
         <>
           {/* Zoom Calibration Mode */}
           {mode === 'zoomCalibrate' && (
             <ZoomCalibration
-              key={currentImageUri}
-              imageUri={currentImageUri}
+              key={displayImageUri}
+              imageUri={displayImageUri}
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
               onCancel={handleCancelCalibration}
@@ -2157,7 +2174,7 @@ export default function MeasurementScreen() {
 
           {/* Measurement Mode */}
           {mode === 'measurement' && (
-            <View key={currentImageUri} style={{ flex: 1 }}>
+            <View key={displayImageUri} style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
               <View 
                 ref={measurementViewRef} 
@@ -2169,8 +2186,8 @@ export default function MeasurementScreen() {
                 }}
               >
                 <ZoomableImage 
-                  key={currentImageUri}
-                  imageUri={currentImageUri}
+                  key={displayImageUri}
+                  imageUri={displayImageUri}
                   fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}
                   initialTranslateX={measurementZoom.translateX}
