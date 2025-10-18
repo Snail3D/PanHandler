@@ -634,34 +634,33 @@ export default function ZoomCalibration({
           <View style={{
             backgroundColor: 'rgba(255, 255, 255, 0.45)',
             borderRadius: 28,
-            padding: 20,
+            padding: 14, // Reduced from 20
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
-            {/* Single Row: LOCK IN with coin info on right */}
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              {/* LOCK IN - Takes full width with coin info inside on right */}
+            {/* Single Row: LOCK IN (75%) with coin info (25%) on right */}
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {/* LOCK IN - 75% width */}
               <Pressable
                 onPress={handleLockIn}
                 disabled={!selectedCoin}
                 style={({ pressed }) => ({
-                  flex: 1,
+                  flex: 3, // 75% width (3 of 4 columns)
                   backgroundColor: !selectedCoin 
                     ? 'rgba(150, 150, 150, 0.4)'
                     : pressed ? `${currentColor}E6` : `${currentColor}F2`,
-                  borderRadius: 22,
-                  paddingVertical: 28,
+                  borderRadius: 20,
+                  paddingVertical: 24, // Reduced from 28
                   paddingHorizontal: 20,
-                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
+                  justifyContent: 'center',
                   borderWidth: 2,
                   borderColor: 'rgba(255, 255, 255, 0.4)',
                   transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                   opacity: !selectedCoin ? 0.5 : 1,
                 })}
               >
-                {/* LOCK IN text on left */}
+                {/* LOCK IN text */}
                 <Text style={{ 
                   color: !selectedCoin ? '#FFFFFF' : currentColor,
                   fontWeight: '900', 
@@ -673,58 +672,57 @@ export default function ZoomCalibration({
                 }}>
                   LOCK IN
                 </Text>
+              </Pressable>
 
-                {/* Coin info on right */}
-                <Pressable
-                  onPress={(e) => {
-                    e.stopPropagation(); // Prevent LOCK IN from firing
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowCoinSelector(true);
-                    setSearchQuery('');
-                  }}
-                  style={({ pressed: coinPressed }) => ({
-                    backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                    borderRadius: 16,
-                    paddingVertical: 12,
-                    paddingHorizontal: 16,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minWidth: 120,
-                  })}
-                >
-                  <CoinIcon size={32} color="#FF9500" />
-                  {selectedCoin ? (
-                    <>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.9)', 
-                        fontWeight: '700', 
-                        fontSize: 12,
-                        textAlign: 'center',
-                        marginTop: 6,
-                      }}>
-                        {selectedCoin.name}
-                      </Text>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.5)', 
-                        fontSize: 10,
-                        fontWeight: '600',
-                        marginTop: 2,
-                      }}>
-                        {selectedCoin.diameter}mm
-                      </Text>
-                    </>
-                  ) : (
+              {/* Coin info on right - 25% width */}
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setShowCoinSelector(true);
+                  setSearchQuery('');
+                }}
+                style={({ pressed: coinPressed }) => ({
+                  flex: 1, // 25% width (1 of 4 columns)
+                  backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+                  borderRadius: 20,
+                  paddingVertical: 12,
+                  paddingHorizontal: 8,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                })}
+              >
+                <CoinIcon size={32} color="#FF9500" />
+                {selectedCoin ? (
+                  <>
                     <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.7)', 
+                      color: 'rgba(0, 0, 0, 0.9)', 
                       fontWeight: '700', 
                       fontSize: 11,
                       textAlign: 'center',
-                      marginTop: 6,
+                      marginTop: 4,
                     }}>
-                      Tap to Select
+                      {selectedCoin.name}
                     </Text>
-                  )}
-                </Pressable>
+                    <Text style={{ 
+                      color: 'rgba(0, 0, 0, 0.5)', 
+                      fontSize: 9,
+                      fontWeight: '600',
+                      marginTop: 2,
+                    }}>
+                      {selectedCoin.diameter}mm
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.7)', 
+                    fontWeight: '700', 
+                    fontSize: 10,
+                    textAlign: 'center',
+                    marginTop: 4,
+                  }}>
+                    Tap to{'\n'}Select
+                  </Text>
+                )}
               </Pressable>
             </View>
           </View>
@@ -975,37 +973,7 @@ export default function ZoomCalibration({
             pointerEvents: 'none',
           }}
         >
-          {/* Coin selection prompt - above the coin circle */}
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                top: SCREEN_HEIGHT * 0.33 - 260, // Above coin at 1/3 height
-                alignItems: 'center',
-                paddingHorizontal: 40,
-              },
-              { opacity: coinTextOpacity },
-            ]}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: 'rgba(255, 255, 255, 0.85)',
-                textAlign: 'center',
-                textShadowColor: 'rgba(0, 0, 0, 0.7)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 4,
-                lineHeight: 22,
-              }}
-            >
-              {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
-            </Text>
-          </Animated.View>
-
-          {/* Arrow removed - text is enough! */}
-
-          {/* Pinch tutorial text - MOVED DOWN between circle and bottom controls */}
+          {/* Pinch tutorial text - between circle and bottom controls */}
           <Animated.View
             style={[
               {
@@ -1055,7 +1023,7 @@ export default function ZoomCalibration({
                     textShadowOffset: { width: 0, height: 2 },
                     textShadowRadius: 4,
                   },
-                  animatedTextPulseStyle, // Only pulsing, no rotation!
+                  animatedTextPulseStyle,
                 ]}
               >
                 {getColorName(currentColor)}
@@ -1073,6 +1041,23 @@ export default function ZoomCalibration({
                 {" circle"}
               </Text>
             </View>
+            
+            {/* Moved instruction text here - below Pinch to Zoom */}
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.85)',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.7)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 4,
+                lineHeight: 21,
+                marginTop: 16,
+              }}
+            >
+              {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
+            </Text>
           </Animated.View>
 
           {/* Animated finger indicators - positioned below coin circle */}
