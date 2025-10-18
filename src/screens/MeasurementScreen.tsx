@@ -2146,6 +2146,7 @@ export default function MeasurementScreen() {
           {/* Zoom Calibration Mode */}
           {mode === 'zoomCalibrate' && (
             <ZoomCalibration
+              key={currentImageUri}
               imageUri={currentImageUri}
               sessionColor={crosshairColor}
               onComplete={handleCalibrationComplete}
@@ -2156,7 +2157,7 @@ export default function MeasurementScreen() {
 
           {/* Measurement Mode */}
           {mode === 'measurement' && (
-            <View style={{ flex: 1 }}>
+            <View key={currentImageUri} style={{ flex: 1 }}>
               {/* Capture container for the image + measurements */}
               <View 
                 ref={measurementViewRef} 
@@ -2168,6 +2169,7 @@ export default function MeasurementScreen() {
                 }}
               >
                 <ZoomableImage 
+                  key={currentImageUri}
                   imageUri={currentImageUri}
                   fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}

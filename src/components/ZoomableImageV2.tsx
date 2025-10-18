@@ -74,6 +74,18 @@ export default function ZoomableImage({
     fadeOpacity.value = withTiming(1, { duration: 150 });
   }, [locked]);
 
+  // Cleanup: Reset transform values when imageUri changes to ensure fresh state
+  useEffect(() => {
+    // Reset to initial values when image changes
+    scale.value = initialScale;
+    savedScale.value = initialScale;
+    translateX.value = initialTranslateX;
+    translateY.value = initialTranslateY;
+    savedTranslateX.value = initialTranslateX;
+    savedTranslateY.value = initialTranslateY;
+    rotation.value = initialRotation;
+    savedRotation.value = initialRotation;
+  }, [imageUri]);
 
   // Notify parent of initial transform values on mount
   useEffect(() => {
