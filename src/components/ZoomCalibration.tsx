@@ -184,7 +184,7 @@ export default function ZoomCalibration({
         setShowCoinSelector(true);
       }
     } else {
-      // No last selected coin - open selector immediately
+      // No last selected coin - open selector immediately on first use
       setShowCoinSelector(true);
     }
   }, [lastSelectedCoin]);
@@ -610,110 +610,127 @@ export default function ZoomCalibration({
 
 
 
-      {/* Bottom Controls - Single row: Map | LOCK IN | Coin */}
-      {selectedCoin && (
-        <View
+      {/* Bottom Controls - Always visible, taller design */}
+      <View
+        style={{
+          position: 'absolute',
+          bottom: insets.bottom + 40,
+          left: SCREEN_WIDTH * 0.10,
+          right: SCREEN_WIDTH * 0.10,
+        }}
+      >
+        <BlurView
+          intensity={35}
+          tint="light"
           style={{
-            position: 'absolute',
-            bottom: insets.bottom + 40,
-            left: SCREEN_WIDTH * 0.10,
-            right: SCREEN_WIDTH * 0.10,
+            borderRadius: 28,
+            overflow: 'hidden',
+            shadowColor: currentColor,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 20,
           }}
         >
-          <BlurView
-            intensity={35}
-            tint="light"
-            style={{
-              borderRadius: 24,
-              overflow: 'hidden',
-              shadowColor: currentColor,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 20,
-            }}
-          >
-            <View style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.45)',
-              borderRadius: 24,
-              padding: 16,
-              borderWidth: 1,
-              borderColor: 'rgba(255, 255, 255, 0.35)',
-            }}>
-              {/* Single Row: LOCK IN + Coin */}
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                {/* LOCK IN - CENTER (4/5) */}
-                <Pressable
-                  onPress={handleLockIn}
-                  style={({ pressed }) => ({
-                    flex: 4,
-                    backgroundColor: pressed ? `${currentColor}E6` : `${currentColor}F2`,
-                    borderRadius: 20,
-                    paddingVertical: 20,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 2,
-                    borderColor: 'rgba(255, 255, 255, 0.4)',
-                    transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
-                  })}
-                >
-                  <Text style={{ 
-                    color: '#FFFFFF', 
-                    fontWeight: '900', 
-                    fontSize: 38,
-                    textAlign: 'center',
-                    letterSpacing: 2,
-                    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-                    textShadowOffset: { width: 0, height: 2 },
-                    textShadowRadius: 4,
-                  }}>
-                    LOCK IN
-                  </Text>
-                </Pressable>
+          <View style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.45)',
+            borderRadius: 28,
+            padding: 20,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.35)',
+          }}>
+            {/* Single Row: LOCK IN + Coin */}
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              {/* LOCK IN - CENTER (4/5) */}
+              <Pressable
+                onPress={handleLockIn}
+                disabled={!selectedCoin}
+                style={({ pressed }) => ({
+                  flex: 4,
+                  backgroundColor: !selectedCoin 
+                    ? 'rgba(150, 150, 150, 0.4)'
+                    : pressed ? `${currentColor}E6` : `${currentColor}F2`,
+                  borderRadius: 22,
+                  paddingVertical: 28,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2,
+                  borderColor: 'rgba(255, 255, 255, 0.4)',
+                  transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                  opacity: !selectedCoin ? 0.5 : 1,
+                })}
+              >
+                <Text style={{ 
+                  color: '#FFFFFF', 
+                  fontWeight: '900', 
+                  fontSize: 42,
+                  textAlign: 'center',
+                  letterSpacing: 2,
+                  textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                  textShadowOffset: { width: 0, height: 2 },
+                  textShadowRadius: 4,
+                }}>
+                  LOCK IN
+                </Text>
+              </Pressable>
 
-                {/* Coin - RIGHT COLUMN (1/5) */}
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowCoinSelector(true);
-                    setSearchQuery('');
-                  }}
-                    style={({ pressed }) => ({
-                      flex: 1,
-                      backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 16,
-                      paddingVertical: 20,
-                      paddingHorizontal: 8,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 1,
-                      borderColor: 'rgba(0, 0, 0, 0.08)',
-                    })}
-                  >
-                    <CoinIcon size={24} color="#FF9500" />
+              {/* Coin - RIGHT COLUMN (1/5) */}
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setShowCoinSelector(true);
+                  setSearchQuery('');
+                }}
+                style={({ pressed }) => ({
+                  flex: 1,
+                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  borderRadius: 20,
+                  paddingVertical: 28,
+                  paddingHorizontal: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: 'rgba(0, 0, 0, 0.08)',
+                })}
+              >
+                <CoinIcon size={32} color="#FF9500" />
+                {selectedCoin ? (
+                  <>
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.9)', 
                       fontWeight: '700', 
-                      fontSize: 10,
+                      fontSize: 11,
                       textAlign: 'center',
-                      lineHeight: 12,
-                      marginTop: 4,
+                      lineHeight: 14,
+                      marginTop: 6,
                     }}>
                       {selectedCoin.name}
                     </Text>
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.5)', 
-                      fontSize: 8,
+                      fontSize: 9,
                       fontWeight: '600',
                       marginTop: 2,
                     }}>
                       {selectedCoin.diameter}mm
                     </Text>
-                  </Pressable>
-              </View>
+                  </>
+                ) : (
+                  <Text style={{ 
+                    color: 'rgba(0, 0, 0, 0.7)', 
+                    fontWeight: '700', 
+                    fontSize: 10,
+                    textAlign: 'center',
+                    lineHeight: 13,
+                    marginTop: 6,
+                  }}>
+                    Tap to{'\n'}Select{'\n'}Coin
+                  </Text>
+                )}
+              </Pressable>
             </View>
-          </BlurView>
-        </View>
-      )}
+          </View>
+        </BlurView>
+      </View>
 
       {/* Coin Search Modal - Shows at TOP when selector button is tapped */}
       {showCoinSelector && (
