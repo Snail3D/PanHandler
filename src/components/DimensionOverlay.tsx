@@ -347,6 +347,11 @@ export default function DimensionOverlay({
   // Hide measurement labels toggle
   const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
   
+  // Easter egg: 7 rapid taps on Imperial button
+  const [imperialTapCount, setImperialTapCount] = useState(0);
+  const [imperialTapTimestamps, setImperialTapTimestamps] = useState<number[]>([]);
+  const imperialTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Map Mode state
   const [isMapMode, setIsMapMode] = useState(false);
   const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
@@ -377,6 +382,43 @@ export default function DimensionOverlay({
   
   // Get current vibrant color
   const getCurrentModeColor = () => vibrantColors[modeColorIndex % vibrantColors.length];
+  
+  // Imperial button 7-tap easter egg handler
+  const handleImperialTap = () => {
+    const now = Date.now();
+    const newTimestamps = [...imperialTapTimestamps, now];
+    
+    // Keep only recent taps (within 2 seconds)
+    const recentTaps = newTimestamps.filter(t => now - t < 2000);
+    setImperialTapTimestamps(recentTaps);
+    
+    // Clear existing timeout
+    if (imperialTapTimeoutRef.current) {
+      clearTimeout(imperialTapTimeoutRef.current);
+    }
+    
+    // Check if we have 7 rapid taps
+    if (recentTaps.length === 7) {
+      // SUCCESS! Trigger easter egg
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      
+      // Open the same link as the auto-flash button easter egg
+      setTimeout(() => {
+        Linking.openURL('https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98');
+      }, 300);
+      
+      // Clear taps
+      setImperialTapTimestamps([]);
+    } else {
+      // Light haptic feedback for each tap
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      // Reset after 2 seconds of inactivity
+      imperialTapTimeoutRef.current = setTimeout(() => {
+        setImperialTapTimestamps([]);
+      }, 2000);
+    }
+  };
   
   // Mode swipe animation for finger tracking
   const modeSwipeOffset = useSharedValue(0);
@@ -6393,7 +6435,7 @@ export default function DimensionOverlay({
               <Pressable
                 onPress={() => {
                   setUnitSystem('imperial');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleImperialTap();
                 }}
                 style={{
                   flex: 1,
