@@ -1,7 +1,7 @@
 # 🎯 PanHandler - Message for Ken (and Future Bots)
 
 **App Name:** PanHandler  
-**Current Version:** 1.86  
+**Current Version:** 2.3.1  
 **Type:** iOS Measurement & CAD Tool  
 **Status:** Alpha - Active Development  
 
@@ -407,11 +407,13 @@ You'll see warnings like:
 
 ---
 
-## 🎯 CURRENT STATE (v1.86)
+## 🎯 CURRENT STATE (v2.3.1)
 
 ### What's Working
 ✅ Camera with bubble level + auto-capture  
-✅ **Adaptive guidance system** (new!) - "Hold still", "Tilt forward", etc.
+✅ **Dual-axis phone orientation detection** - Beta + gamma for accurate table/wall detection
+✅ **Simplified photo routing** - More lenient thresholds (60° instead of 45°)
+✅ **Sensor initialization fallback** - Defaults to table mode if sensors haven't initialized
 ✅ Coin calibration with animated rings  
 ✅ Map/verbal scale calibration  
 ✅ 5 measurement tools (Distance, Circle, Rectangle, Angle, Freehand)  
@@ -423,6 +425,13 @@ You'll see warnings like:
 ✅ Background audio support  
 ✅ Persistent map scale display  
 ✅ Recalibrate button (keep photo, clear measurements)  
+✅ **Supporter badge at bottom center** - No longer covers UI elements
+
+### Recent Fixes (v2.3.1)
+- Fixed "nothing happens" bug when taking photos (simplified orientation detection)
+- Moved Official PanHandler Supporter badge to bottom center of screen
+- More robust sensor initialization handling
+- Increased orientation threshold from 45° to 60° for better UX
 
 ### Known Issues
 - Reanimated warnings (informational, not breaking)
@@ -569,6 +578,9 @@ PanHandler is a precision tool with complex gesture handling and measurement log
 
 ## 📝 VERSION HISTORY QUICK REF
 
+- **v2.3.1** - Photo capture fix, supporter badge repositioned, simplified orientation detection
+- **v2.3.0** - Dual-axis phone orientation detection (beta + gamma)
+- **v2.2.0** - Photo type routing based on phone tilt
 - **v1.86** - Adaptive camera guidance system (contextual helpers)
 - **v1.85** - Map scale persistence, background audio, button spacing polish
 - **v1.8** - Smart calibration hint, menu swipe gestures, elegant animations
