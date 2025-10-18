@@ -1269,7 +1269,13 @@ export default function MeasurementScreen() {
         
         // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
         try {
+          // Add a small delay to ensure file is accessible
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           const { extractDroneMetadata } = await import('../utils/droneEXIF');
+          
+          alert(`Starting drone detection...\nURI: ${asset.uri.substring(0, 50)}...`);
+          
           const droneMetadata = await extractDroneMetadata(asset.uri);
           
           // Debug: Show what we got
