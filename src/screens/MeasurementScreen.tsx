@@ -1389,11 +1389,9 @@ export default function MeasurementScreen() {
           if (type === 'map') {
             setShowVerbalScaleModal(true);
           } else if (type === 'blueprint') {
-            // Blueprint mode (also handles known scale/ruler) - set flag to open blueprint placement modal
+            // Blueprint mode handles known scale, aerial photos, blueprints, rulers, etc.
+            // User will be prompted if they want aerial mode (with aerial language) or blueprint mode
             setSkipToBlueprintMode(true);
-          } else if (type === 'aerial') {
-            // Aerial photos use two-point calibration with aerial-specific language
-            setSkipToAerialMode(true);
           }
           
           transitionBlackOverlay.value = withTiming(0, {
