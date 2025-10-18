@@ -811,113 +811,6 @@ Thank you for helping us improve PanHandler!
 
               {/* Map Mode */}
 
-              {/* Drone Photo Calibration - NEW! */}
-              <ExpandableSection
-                icon="airplane"
-                title="🚁 Drone Photos? Skip the Coin!"
-                color="#00C7BE"
-                delay={175}
-                scrollY={scrollY}
-                index={1.5}
-              >
-                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Got overhead drone shots? PanHandler can auto-calibrate using the GPS and altitude data baked into your photos. No coin needed!
-                </Text>
-                
-                {/* How It Works */}
-                <View style={{
-                  backgroundColor: 'rgba(0,199,190,0.12)',
-                  borderRadius: 14,
-                  padding: 14,
-                  marginBottom: 12,
-                  borderWidth: 2,
-                  borderColor: 'rgba(0,199,190,0.25)',
-                }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                    <Text style={{ fontSize: 18, marginRight: 8 }}>⚡</Text>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#00A89D' }}>
-                      How It Works
-                    </Text>
-                  </View>
-                  <View style={{ gap: 8 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Text style={{ fontSize: 16, marginRight: 8 }}>1️⃣</Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Import your drone photo</Text> from the gallery
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Text style={{ fontSize: 16, marginRight: 8 }}>2️⃣</Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Overhead shot?</Text> PanHandler auto-calibrates instantly using GPS + altitude. Done!
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Text style={{ fontSize: 16, marginRight: 8 }}>3️⃣</Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Tilted shot?</Text> You will see a helpful badge suggesting Map Scale for two-point calibration
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                
-                {/* Supported Drones */}
-                <View style={{
-                  backgroundColor: 'rgba(0,199,190,0.08)',
-                  borderRadius: 14,
-                  padding: 14,
-                  marginBottom: 12,
-                  borderWidth: 1.5,
-                  borderColor: 'rgba(0,199,190,0.2)',
-                }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="list" size={18} color="#00C7BE" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#00C7BE', marginLeft: 6 }}>
-                      Supported Drones (22+ models!)
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
-                    <Text style={{ fontWeight: '600' }}>DJI:</Text> Neo, Mini (4 Pro, 3 Pro, 2, SE), Mavic (3, 2 Pro, Air 2), Phantom (4 Pro, 4 Advanced), Air (3, 2S), Inspire (2, 3)
-                  </Text>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
-                    <Text style={{ fontWeight: '600' }}>Others:</Text> Autel EVO series, Parrot Anafi series, Skydio 2+, and more!
-                  </Text>
-                  <Text style={{ fontSize: 12, color: '#8E8E93', lineHeight: 18, marginTop: 4, fontStyle: 'italic' }}>
-                    Unknown drone? No problem - PanHandler estimates from sensor data!
-                  </Text>
-                </View>
-                
-                {/* Requirements */}
-                <View style={{
-                  backgroundColor: 'rgba(255,149,0,0.08)',
-                  borderRadius: 12,
-                  padding: 12,
-                  marginBottom: 12,
-                  borderLeftWidth: 3,
-                  borderLeftColor: '#FF9500',
-                }}>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#FF9500', marginBottom: 6 }}>
-                    📋 What You Need
-                  </Text>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
-                    • Overhead shot (looking straight down){'\n'}
-                    • Flat terrain works best{'\n'}
-                    • Photo must have GPS/altitude metadata
-                  </Text>
-                </View>
-                
-                {/* Pro Tip */}
-                <View style={{
-                  backgroundColor: 'rgba(0,199,190,0.15)',
-                  borderRadius: 10,
-                  padding: 10,
-                }}>
-                  <Text style={{ fontSize: 13, color: '#00A89D', fontWeight: '600', textAlign: 'center' }}>
-                    💡 Saves 30 seconds per photo! Perfect for surveyors, inspectors, and anyone who flies drones regularly.
-                  </Text>
-                </View>
-              </ExpandableSection>
-
               {/* Measurement Modes */}
               <ExpandableSection
                 icon="resize"
@@ -1803,9 +1696,6 @@ Thank you for helping us improve PanHandler!
                     🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement 4 times rapidly to delete it
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🚁 <Text style={{ fontWeight: '600' }}>Use drone photos</Text> - Import overhead shots for instant auto-calibration (no coin needed!)
-                  </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
@@ -2009,45 +1899,6 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </View>
                     
-                    {/* Location privacy (GPS) */}
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="location-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
-                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>GPS for declination only (optional)</Text> — your location is NEVER stored, tracked, or sent to servers. Used only to calculate magnetic declination for maps.
-                      </Text>
-                    </View>
-                  </View>
-                  
-                  {/* GPS detailed explanation */}
-                  <View style={{
-                    marginTop: 16,
-                    backgroundColor: 'rgba(52,199,89,0.08)',
-                    borderRadius: 12,
-                    padding: 14,
-                    borderLeftWidth: 3,
-                    borderLeftColor: '#34C759',
-                  }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                      <Ionicons name="location" size={16} color="#34C759" style={{ marginRight: 6 }} />
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759' }}>
-                        Session-Only Location Access
-                      </Text>
-                    </View>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
-                      When you tap "Auto-Detect" for magnetic declination:
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
-                      • Permission is requested fresh each time
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
-                      • GPS coordinates are used once and discarded
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 4 }}>
-                      • Only the declination value is saved (not your location)
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
-                      • No background tracking, ever
-                    </Text>
                   </View>
                 </Animated.View>
               </View>
