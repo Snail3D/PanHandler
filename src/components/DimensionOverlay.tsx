@@ -355,6 +355,7 @@ export default function DimensionOverlay({
   // Blueprint scale placement
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
   const [isPlacingBlueprint, setIsPlacingBlueprint] = useState(false); // Actually placing pins
+  const [isAerialMode, setIsAerialMode] = useState(false); // Track if blueprint is for aerial photos (shows drones instead of circles)
   const [blueprintPoints, setBlueprintPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [showBlueprintDistanceModal, setShowBlueprintDistanceModal] = useState(false);
   const blueprintLineOpacity = useSharedValue(1); // For fade-out animation
