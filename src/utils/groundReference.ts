@@ -10,13 +10,10 @@
  */
 
 import * as Location from 'expo-location';
+import { Alert, Linking, Platform } from 'react-native';
 
 /**
- * Get the phone's current GPS altitude
- * This represents the ground reference altitude (where user is standing)
- * 
- * Note: This will be slightly higher than true ground if user is standing (5-6 feet)
- * but it's accurate enough for drone measurements (within 2m typically)
+ * Get the phone's current GPS altitude with proper permission handling
  */
 export async function getPhoneAltitude(): Promise<{
   altitude: number;
@@ -27,14 +24,49 @@ export async function getPhoneAltitude(): Promise<{
   try {
     console.log('📍 Getting phone GPS altitude for ground reference...');
     
-    // Request location permissions
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('❌ Location permission denied');
+    // Check if location services are enabled
+    const isEnabled = await Location.hasServicesEnabledAsync();
+    if (!isEnabled) {
+      Alert.alert(
+        '📍 Location Services Disabled',
+        'Please enable Location Services in your phone settings to use automatic drone calibration.\n\nWould you like to open Settings?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings() }
+        ]
+      );
       return null;
     }
     
-    // Get current position with high accuracy
+    // Check current permission status
+    const { status: currentStatus } = await Location.getForegroundPermissionsAsync();
+    
+    if (currentStatus === 'denied') {
+      Alert.alert(
+        '📍 Location Permission Required',
+        'This app needs location access to automatically calibrate drone photos.\n\nPlease enable it in Settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings() }
+        ]
+      );
+      return null;
+    }
+    
+    // Request permission if needed
+    if (currentStatus !== 'granted') {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          '❌ Permission Denied',
+          'Automatic calibration disabled. You can manually enter the drone altitude instead.'
+        );
+        return null;
+      }
+    }
+    
+    // Get current position
+    console.log('📡 Getting GPS location...');
     const location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.High,
     });
@@ -43,12 +75,14 @@ export async function getPhoneAltitude(): Promise<{
     const accuracy = location.coords.altitudeAccuracy;
     
     if (altitude === null || altitude === undefined) {
-      console.log('❌ No altitude data available from phone GPS');
+      Alert.alert(
+        '⚠️ No Altitude Data',
+        'Your phone GPS does not provide altitude information. Please use manual altitude entry instead.'
+      );
       return null;
     }
     
-    console.log(`✅ Phone altitude: ${altitude.toFixed(1)}m ASL (accuracy: ±${accuracy?.toFixed(1)}m)`);
-    console.log(`📍 Phone location: ${location.coords.latitude.toFixed(6)}, ${location.coords.longitude.toFixed(6)}`);
+    console.log(`✅ Phone altitude: ${altitude.toFixed(1)}m ASL`);
     
     return {
       altitude,
@@ -59,13 +93,16 @@ export async function getPhoneAltitude(): Promise<{
     
   } catch (error) {
     console.error('❌ Error getting phone altitude:', error);
+    Alert.alert(
+      '⚠️ Location Error',
+      'Could not get phone location. Please check that Location Services are enabled.'
+    );
     return null;
   }
 }
 
 /**
  * Calculate drone's relative altitude (height above ground)
- * using phone's current altitude as ground reference
  */
 export function calculateDroneRelativeAltitude(
   droneGPSAltitude: number,
@@ -74,11 +111,8 @@ export function calculateDroneRelativeAltitude(
   relativeAltitude: number;
   notes: string;
 } {
-  // Drone altitude - phone altitude = height above phone
-  // Phone is typically 5-6 feet (1.5-2m) above ground when user is standing
   const relativeAlt = droneGPSAltitude - phoneAltitude;
   
-  // Add note about accuracy
   let notes = '';
   if (relativeAlt < 5) {
     notes = 'Warning: Drone very close to ground. May be inaccurate.';
@@ -88,12 +122,7 @@ export function calculateDroneRelativeAltitude(
     notes = 'Calculated from phone current location. Assumes phone is near ground level where drone was flying.';
   }
   
-  console.log(`📐 Relative altitude calculation:
-Drone GPS Altitude: ${droneGPSAltitude.toFixed(1)}m ASL
-Phone Altitude: ${phoneAltitude.toFixed(1)}m ASL (ground reference)
-Drone Height Above Ground: ${relativeAlt.toFixed(1)}m AGL
-
-${notes}`);
+  console.log(`📐 Relative altitude: ${relativeAlt.toFixed(1)}m AGL`);
   
   return {
     relativeAltitude: relativeAlt,
@@ -102,8 +131,7 @@ ${notes}`);
 }
 
 /**
- * Calculate distance between two GPS coordinates (in meters)
- * Used to verify phone is reasonably close to where drone photo was taken
+ * Calculate GPS distance in meters
  */
 export function calculateGPSDistance(
   lat1: number,
@@ -111,7 +139,7 @@ export function calculateGPSDistance(
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371e3; // Earth radius in meters
+  const R = 6371e3;
   const phi1 = (lat1 * Math.PI) / 180;
   const phi2 = (lat2 * Math.PI) / 180;
   const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
@@ -121,12 +149,11 @@ export function calculateGPSDistance(
     Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   
-  return R * c; // Distance in meters
+  return R * c;
 }
 
 /**
- * Validate if ground reference is reliable based on GPS DISTANCE
- * (Ignores time - user might still be at property hours later!)
+ * Validate ground reference based on GPS distance
  */
 export function validateGroundReference(
   droneLatitude: number,
@@ -138,7 +165,6 @@ export function validateGroundReference(
   distance: number;
   message: string;
 } {
-  // Calculate distance between drone photo and phone
   const distance = calculateGPSDistance(
     droneLatitude,
     droneLongitude,
@@ -146,9 +172,6 @@ export function validateGroundReference(
     phoneLongitude
   );
   
-  // SMART DECISION TREE:
-  
-  // 1. Very close (< 100m) → AUTO-CALIBRATE silently ✅
   if (distance < 100) {
     return {
       decision: 'auto',
@@ -157,7 +180,6 @@ export function validateGroundReference(
     };
   }
   
-  // 2. Medium distance (100m - 500m) → ASK USER to confirm
   if (distance < 500) {
     return {
       decision: 'prompt',
@@ -166,7 +188,6 @@ export function validateGroundReference(
     };
   }
   
-  // 3. Far away (> 500m) → SKIP to Map Scale calibration
   return {
     decision: 'skip',
     distance,
