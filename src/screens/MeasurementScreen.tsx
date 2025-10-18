@@ -2203,6 +2203,7 @@ export default function MeasurementScreen() {
             <ZoomCalibration
               imageUri={currentImageUri}
               sessionColor={crosshairColor}
+              photoType={currentPhotoType}
               onComplete={handleCalibrationComplete}
               onSkipToMap={() => {
                 // Skip coin calibration, go to measurement screen
