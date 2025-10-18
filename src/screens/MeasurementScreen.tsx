@@ -1032,6 +1032,15 @@ export default function MeasurementScreen() {
       // Check camera permissions one more time
       if (!permission?.granted) {
         console.error('Camera permission not granted');
+        setIsCapturing(false);
+        return;
+      }
+      
+      // ⚠️ CRITICAL: Check if camera ref exists
+      if (!cameraRef.current) {
+        console.error('Camera ref is null - camera not ready');
+        setIsCapturing(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
       }
       
@@ -1380,15 +1389,11 @@ export default function MeasurementScreen() {
           if (type === 'map') {
             setShowVerbalScaleModal(true);
           } else if (type === 'blueprint') {
-            // Blueprint mode - set flag to open blueprint placement modal
+            // Blueprint mode (also handles known scale/ruler) - set flag to open blueprint placement modal
             setSkipToBlueprintMode(true);
           } else if (type === 'aerial') {
             // Aerial photos use two-point calibration with aerial-specific language
             setSkipToAerialMode(true);
-          } else if (type === 'knownScale') {
-            // Known scale (ruler) mode not yet implemented
-            alert("Ruler mode coming soon! For now, please use Map Scale or Coin calibration.");
-            setMode('camera');
           }
           
           transitionBlackOverlay.value = withTiming(0, {
