@@ -232,6 +232,8 @@ export default function MeasurementScreen() {
   const incrementSessionCount = useStore((s) => s.incrementSessionCount);
   const isDonor = useStore((s) => s.isDonor);
   const lastDonationSession = useStore((s) => s.lastDonationSession);
+  const isFirstTimeDonor = useStore((s) => s.isFirstTimeDonor);
+  const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
   
   // BattlingBots donation modal state  
   const [showBattlingBots, setShowBattlingBots] = useState(false);
@@ -2278,7 +2280,15 @@ export default function MeasurementScreen() {
       {/* BattlingBots Donation Modal */}
       <BattlingBotsModal 
         visible={showBattlingBots} 
-        onClose={() => setShowBattlingBots(false)} 
+        onClose={() => {
+          setShowBattlingBots(false);
+          // Reset first-time donor flag after showing celebration
+          if (isFirstTimeDonor) {
+            setIsFirstTimeDonor(false);
+          }
+        }} 
+        isDonor={isDonor}
+        isFirstTimeDonor={isFirstTimeDonor}
       />
 
       {/* Help Modal */}

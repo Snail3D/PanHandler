@@ -246,9 +246,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   const globalDownloads = useStore((s) => s.globalDownloads);
-  const isProUser = useStore((s) => s.isProUser);
-  const setIsProUser = useStore((s) => s.setIsProUser);
-  const resetFreehandTrial = useStore((s) => s.resetFreehandTrial);
+  // REMOVED: Pro/Free system no longer exists - freehand is free for all!
   
   // Settings state
   const userEmail = useStore((s) => s.userEmail);
@@ -352,14 +350,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
       const currentImageUri = useStore.getState().currentImageUri;
       const calibration = useStore.getState().calibration;
       const measurements = useStore.getState().completedMeasurements;
-      const isProUser = useStore.getState().isProUser;
+      const isDonor = useStore.getState().isDonor;
       
       // Build session activity log
       const sessionLog = [
         currentImageUri ? '✓ Photo captured' : '✗ No photo',
         calibration ? `✓ Calibrated (${calibration.calibrationType || 'unknown'} method)` : '✗ Not calibrated',
         measurements?.length > 0 ? `✓ ${measurements.length} measurement(s) made` : '✗ No measurements',
-        `User type: ${isProUser ? 'Pro' : 'Free'}`,
+        `Donor status: ${isDonor ? 'Supporter ❤️' : 'Non-donor'}`,
       ].join(' → ');
       
       // Capture screenshot of modal (optional - try but don't block on failure)
