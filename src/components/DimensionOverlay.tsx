@@ -1,7 +1,7 @@
 // DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
 // CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Dimensions, Alert, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -18,9 +18,13 @@ import useStore, { CompletedMeasurement } from '../state/measurementStore';
 import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
+import BlueprintPlacementModal from './BlueprintPlacementModal';
+import BlueprintDistanceModal from './BlueprintDistanceModal';
 import LabelModal from './LabelModal';
 import EmailPromptModal from './EmailPromptModal';
 import AlertModal from './AlertModal';
+import TypewriterText from './TypewriterText';
+import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 import SnailIcon from './SnailIcon';
 
@@ -67,11 +71,11 @@ const MEASUREMENT_COLORS: Record<MeasurementMode, Array<{ main: string; glow: st
     { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    
   ],
   polygon: [
-    { main: '#10B981', glow: '#10B981', name: 'Green' },     // Polygon uses same colors as freehand
-    { main: '#3B82F6', glow: '#3B82F6', name: 'Blue' },      
-    { main: '#F59E0B', glow: '#F59E0B', name: 'Amber' },     
-    { main: '#EC4899', glow: '#EC4899', name: 'Pink' },      
-    { main: '#8B5CF6', glow: '#8B5CF6', name: 'Purple' },    
+    { main: '#F97316', glow: '#F97316', name: 'Orange' },    // Polygons get orange (unified look)
+    { main: '#EAB308', glow: '#EAB308', name: 'Yellow' },
+    { main: '#84CC16', glow: '#84CC16', name: 'Lime' },
+    { main: '#14B8A6', glow: '#14B8A6', name: 'Teal' },
+    { main: '#A855F7', glow: '#A855F7', name: 'Purple' },
   ],
 };
 
@@ -99,6 +103,13 @@ interface DimensionOverlayProps {
   zoomRotation?: number;
   viewRef?: React.RefObject<View | null>;
   setImageOpacity?: (opacity: number) => void;
+  sessionColor?: { main: string; glow: string }; // Session color from camera for visual continuity
+  onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
+  onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
+  onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
+  skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
+  skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
+  skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
 }
 
 export default function DimensionOverlay({ 
@@ -108,6 +119,13 @@ export default function DimensionOverlay({
   zoomRotation = 0,
   viewRef: externalViewRef,
   setImageOpacity,
+  sessionColor,
+  onRegisterDoubleTapCallback,
+  onReset,
+  onMeasurementModeChange,
+  skipToMapMode = false,
+  skipToBlueprintMode = false,
+  skipToAerialMode = false,
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -124,6 +142,7 @@ export default function DimensionOverlay({
   
   // Use store for persistent state
   const calibration = useStore((s) => s.calibration);
+  const setCalibration = useStore((s) => s.setCalibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const setUnitSystem = useStore((s) => s.setUnitSystem);
   const prevUnitSystemRef = useRef(unitSystem); // Track previous unit system to avoid infinite loops
@@ -137,23 +156,42 @@ export default function DimensionOverlay({
   const setMeasurements = useStore((s) => s.setCompletedMeasurements);
   const userEmail = useStore((s) => s.userEmail);
   const setUserEmail = useStore((s) => s.setUserEmail);
-  const isProUser = useStore((s) => s.isProUser);
-  const setIsProUser = useStore((s) => s.setIsProUser);
+  const hasSeenPanTutorial = useStore((s) => s.hasSeenPanTutorial);
+  const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
+  const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
+  const isDonor = useStore((s) => s.isDonor); // Check if user is a supporter
   
+  // STUB: Pro/Free system removed - Freehand is now free for everyone!
+  const isProUser = true; // All users have access to all features
+  const freehandTrialUsed = 0; // No trial system
+  const freehandTrialLimit = 999; // No limits
+  const incrementFreehandTrial = () => {}; // No-op
+  const freehandOfferDismissed = true; // No offers
+  const dismissFreehandOffer = () => {}; // No-op
+  const setIsProUser = () => {}; // No-op
+  const [showProModal, setShowProModal] = useState(false); // Unused
+  const [showFreehandOfferModal, setShowFreehandOfferModal] = useState(false); // Unused
+  const [showFreehandConfirmModal, setShowFreehandConfirmModal] = useState(false); // Unused
   
-  // Pro upgrade modal
-  const [showProModal, setShowProModal] = useState(false);
+  // Pan tutorial state
+  const [showPanTutorial, setShowPanTutorial] = useState(false);
+  const panTutorialOpacity = useSharedValue(0);
+  const panTutorialScale = useSharedValue(1); // For zoom-responsive scaling
+  const panTutorialTranslateX = useSharedValue(0); // Track horizontal movement
+  const panTutorialTranslateY = useSharedValue(0); // Track vertical movement
+  const tutorialStartPosition = useRef({ x: zoomTranslateX, y: zoomTranslateY }); // Initial position when tutorial starts
+  const lastPanPosition = useRef({ x: zoomTranslateX, y: zoomTranslateY });
+  const lastZoomScale = useRef(zoomScale);
+  const lastRotation = useRef(zoomRotation); // Track rotation too!
+  const isDismissing = useRef(false); // Prevent multiple dismissals
   
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
   
-  // 5-tap Pro/Free toggle for testing (REMOVE IN PRODUCTION)
-  const [proToggleTapCount, setProToggleTapCount] = useState(0);
-  const [proToggleLastTapTime, setProToggleLastTapTime] = useState(0);
-  
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
+  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false); // Success modal for saves
   const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
@@ -199,6 +237,21 @@ export default function DimensionOverlay({
     setAlertConfig(prev => ({ ...prev, visible: false }));
   };
   
+  // Smart calibration hint state
+  interface MeasurementAttempt {
+    type: 'distance' | 'circle' | 'rectangle' | 'angle' | 'freehand' | 'polygon';
+    centerX: number;
+    centerY: number;
+    timestamp: number;
+  }
+  
+  const [attemptHistory, setAttemptHistory] = useState<MeasurementAttempt[]>([]);
+  const [hasShownCalibrationHint, setHasShownCalibrationHint] = useState(false);
+  const [showCalibrationHint, setShowCalibrationHint] = useState(false);
+  const hintOpacity = useSharedValue(0);
+  const hintScale = useSharedValue(0.8);
+  const hintColorShift = useSharedValue(0); // 0-1 for color animation
+  
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
   const [resizingPoint, setResizingPoint] = useState<{ measurementId: string, pointIndex: number } | null>(null);
@@ -209,6 +262,11 @@ export default function DimensionOverlay({
   // Rapid tap to delete feature
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
   const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
+  
+  // Label editing feature - double tap to add/edit label
+  const [labelEditingMeasurementId, setLabelEditingMeasurementId] = useState<string | null>(null);
+  const [showLabelEditModal, setShowLabelEditModal] = useState(false);
+  const [labelTapState, setLabelTapState] = useState<{ measurementId: string, lastTapTime: number } | null>(null);
   
   // Undo history for measurement edits - stores original state before first edit
   const [measurementHistory, setMeasurementHistory] = useState<Map<string, Measurement>>(new Map());
@@ -222,14 +280,38 @@ export default function DimensionOverlay({
   const [freehandActivating, setFreehandActivating] = useState(false); // Waiting for activation
   const [freehandClosedLoop, setFreehandClosedLoop] = useState(false); // Track if loop is closed (lasso mode)
   const freehandClosedLoopRef = useRef(false); // Sync ref to avoid async state issues
+  // Lock zoom/pan/rotation when freehand drawing starts to prevent coordinate drift
+  const freehandZoomLockRef = useRef<{ scale: number; translateX: number; translateY: number; rotation: number } | null>(null);
+  const [isShowingSpeedWarning, setIsShowingSpeedWarning] = useState(false); // Track if showing "too fast" message to prevent flicker
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
-  const [hasShownAnimation, setHasShownAnimation] = useState(coinCircle ? true : false); // Start true if coinCircle already exists
+  const [hasShownAnimation, setHasShownAnimation] = useState(false); // Always start false - only show animation on first calibration
   const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
+  
+  // Reset animation flag when image changes (new photo = new session)
+  useEffect(() => {
+    setHasShownAnimation(false);
+  }, [currentImageUri]);
   
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
+  
+  // DEBUG: Track touch interceptions
+  const [debugInfo, setDebugInfo] = useState({ lastTouch: 0, interceptor: '', mode: '' });
+  
+  // Register the callback with parent so it can be called on double-tap
+  useEffect(() => {
+    if (onRegisterDoubleTapCallback) {
+      const switchToMeasureMode = () => {
+        setMeasurementMode(true);
+        setShowCursor(true);
+        setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      };
+      onRegisterDoubleTapCallback(switchToMeasureMode);
+    }
+  }, [onRegisterDoubleTapCallback]);
   const [showCursor, setShowCursor] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
   const [isSnapped, setIsSnapped] = useState(false); // Track if cursor is snapped to horizontal/vertical
@@ -239,6 +321,15 @@ export default function DimensionOverlay({
   const fingerOpacity = useSharedValue(0);
   const fingerScale = useSharedValue(1);
   const fingerRotation = useSharedValue(0);
+  
+  // Menu button fingerprints (session color)
+  const [menuFingerTouches, setMenuFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
+  const menuFingerOpacity = useSharedValue(0);
+  const menuFingerScale = useSharedValue(1);
+  
+  // Swipe trail effect (for menu closing)
+  const [swipeTrail, setSwipeTrail] = useState<Array<{x: number, y: number, id: string, timestamp: number}>>([]);
+  
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
@@ -257,6 +348,7 @@ export default function DimensionOverlay({
   const menuTranslateX = useSharedValue(0);
   const menuOpacity = useSharedValue(1); // For shake fade animation
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
+  const menuHiddenShared = useSharedValue(false); // Shared value for gesture worklets
   
   // Legend collapse state
   const [legendCollapsed, setLegendCollapsed] = useState(false);
@@ -264,10 +356,23 @@ export default function DimensionOverlay({
   // Hide measurement labels toggle
   const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
   
+  // Easter egg: 7 rapid taps on Imperial button
+  const [imperialTapCount, setImperialTapCount] = useState(0);
+  const [imperialTapTimestamps, setImperialTapTimestamps] = useState<number[]>([]);
+  const imperialTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Map Mode state
   const [isMapMode, setIsMapMode] = useState(false);
   const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
   const [showMapScaleModal, setShowMapScaleModal] = useState(false);
+  
+  // Blueprint scale placement
+  const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
+  const [isPlacingBlueprint, setIsPlacingBlueprint] = useState(false); // Actually placing pins
+  const [isAerialMode, setIsAerialMode] = useState(false); // Track if blueprint is for aerial photos (shows drones instead of circles)
+  const [blueprintPoints, setBlueprintPoints] = useState<Array<{ x: number; y: number }>>([]);
+  const [showBlueprintDistanceModal, setShowBlueprintDistanceModal] = useState(false);
+  const blueprintLineOpacity = useSharedValue(1); // For fade-out animation
   
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
@@ -287,6 +392,43 @@ export default function DimensionOverlay({
   // Get current vibrant color
   const getCurrentModeColor = () => vibrantColors[modeColorIndex % vibrantColors.length];
   
+  // Imperial button 7-tap easter egg handler
+  const handleImperialTap = () => {
+    const now = Date.now();
+    const newTimestamps = [...imperialTapTimestamps, now];
+    
+    // Keep only recent taps (within 2 seconds)
+    const recentTaps = newTimestamps.filter(t => now - t < 2000);
+    setImperialTapTimestamps(recentTaps);
+    
+    // Clear existing timeout
+    if (imperialTapTimeoutRef.current) {
+      clearTimeout(imperialTapTimeoutRef.current);
+    }
+    
+    // Check if we have 7 rapid taps
+    if (recentTaps.length === 7) {
+      // SUCCESS! Trigger easter egg
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      
+      // Open the same link as the auto-flash button easter egg
+      setTimeout(() => {
+        Linking.openURL('https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98');
+      }, 300);
+      
+      // Clear taps
+      setImperialTapTimestamps([]);
+    } else {
+      // Light haptic feedback for each tap
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      // Reset after 2 seconds of inactivity
+      imperialTapTimeoutRef.current = setTimeout(() => {
+        setImperialTapTimestamps([]);
+      }, 2000);
+    }
+  };
+  
   // Mode swipe animation for finger tracking
   const modeSwipeOffset = useSharedValue(0);
   
@@ -294,8 +436,10 @@ export default function DimensionOverlay({
   const [showQuote, setShowQuote] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
   const [displayedText, setDisplayedText] = useState('');
+  const [isQuoteTyping, setIsQuoteTyping] = useState(false);
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
+  const [quoteHapticFired, setQuoteHapticFired] = useState(false); // DEBUG: Visual indicator
   
   // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
@@ -306,6 +450,7 @@ export default function DimensionOverlay({
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
   const [showCalculatorWords, setShowCalculatorWords] = useState(false);
+  const [stepBrothersMode, setStepBrothersMode] = useState(false); // Step Brothers Easter egg!
   const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -349,6 +494,19 @@ export default function DimensionOverlay({
     transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
   }));
   
+  // Animated style for pan tutorial with zoom-responsive scaling
+  const panTutorialAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: panTutorialOpacity.value,
+  }));
+  
+  // Menu fingerprint animated style
+  const menuEvaporationStyle = useAnimatedStyle(() => ({
+    opacity: menuFingerOpacity.value,
+    transform: [
+      { scale: menuFingerScale.value },
+    ]
+  }));
+  
   // Show inspirational quote overlay
 
   // Clean up freehand state when switching away from freehand mode
@@ -361,20 +519,147 @@ export default function DimensionOverlay({
     }
   }, [mode]);
 
-  // Clear map scale when new photo is loaded
+  // Show pan tutorial on first load for NEW photos (fresh session with no measurements)
   useEffect(() => {
-    // Clear map scale state when image URI changes (new photo loaded)
-    setMapScale(null);
-    setIsMapMode(false);
-    setShowMapScaleModal(false);
-  }, [currentImageUri]);
+    // Only show for fresh photos (no measurements yet = new session)
+    // Don't show if user is returning to saved work with existing measurements
+    const isFreshPhoto = measurements.length === 0;
+    
+    if (isFreshPhoto) {
+      // Show tutorial after a brief delay
+      const timer = setTimeout(() => {
+        // Record starting position when tutorial appears
+        tutorialStartPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+        lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
+        lastZoomScale.current = zoomScale;
+        lastRotation.current = zoomRotation;
+        
+        setShowPanTutorial(true);
+        panTutorialOpacity.value = withSpring(1, { damping: 20, stiffness: 100 });
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []); // Only run once on mount
+
+  // Detect panning/measuring/zooming/rotating and fade out tutorial - CINEMATIC
+  useEffect(() => {
+    if (!showPanTutorial || isDismissing.current) return; // Don't process if already dismissing!
+    
+    // Dismiss if user switches to measure mode
+    if (measurementMode) {
+      isDismissing.current = true;
+      // Cinematic fade out
+      panTutorialOpacity.value = withTiming(0, { 
+        duration: 800,
+        easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
+      });
+      setTimeout(() => {
+        setShowPanTutorial(false); // Remove from DOM after animation completes
+        isDismissing.current = false; // Reset for next time
+      }, 800);
+      return;
+    }
+    
+    // Calculate total movement from START position
+    const deltaX = zoomTranslateX - tutorialStartPosition.current.x;
+    const deltaY = zoomTranslateY - tutorialStartPosition.current.y;
+    const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
+    const rotationDelta = Math.abs(zoomRotation - lastRotation.current);
+    
+    // ANY movement detected? Fade out CINEMATICALLY!
+    const anyMovement = totalMovement > 10 || zoomDelta > 0.02 || rotationDelta > 1;
+    
+    if (anyMovement) {
+      isDismissing.current = true; // Lock it so we don't fire multiple times!
+      
+      // Cinematic fade - like entering a movie scene 🎬
+      panTutorialOpacity.value = withTiming(0, { 
+        duration: 800, // Longer, more graceful
+        easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
+      });
+      
+      setTimeout(() => {
+        setShowPanTutorial(false); // Remove from DOM after animation completes
+        isDismissing.current = false; // Reset for next time
+      }, 800);
+    }
+  }, [zoomTranslateX, zoomTranslateY, zoomScale, zoomRotation, showPanTutorial, measurementMode]);
+
+  // Restore map mode state from persisted calibration
+  useEffect(() => {
+    // When component mounts or calibration changes, check if we have map scale calibration
+    if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
+      // Restore map mode state from calibration
+      setIsMapMode(true);
+      setMapScale(calibration.verbalScale);
+    } else if (calibration?.calibrationType === 'coin' || calibration?.calibrationType === 'blueprint') {
+      // Ensure map mode is off for coin/blueprint calibration
+      setIsMapMode(false);
+      setMapScale(null);
+    }
+  }, [calibration]); // Run when calibration changes (including on app restore)
+  
+  // Handle skipToMapMode prop (from calibration screen's "Map Scale" button)
+  const hasTriggeredSkipToMap = useRef(false);
+  useEffect(() => {
+    if (skipToMapMode && !mapScale && !hasTriggeredSkipToMap.current) {
+      // User clicked "Map Scale" button in calibration - open modal immediately
+      console.log('🗺️ skipToMapMode triggered - opening map scale modal');
+      hasTriggeredSkipToMap.current = true;
+      setShowMapScaleModal(true);
+    }
+  }, [skipToMapMode, mapScale]);
+  
+  // Handle skipToBlueprintMode prop (from photo type selection)
+  const hasTriggeredSkipToBlueprint = useRef(false);
+  useEffect(() => {
+    if (skipToBlueprintMode && !hasTriggeredSkipToBlueprint.current) {
+      // User selected blueprint from photo type selection - open modal immediately
+      console.log('📐 skipToBlueprintMode triggered - opening blueprint placement modal');
+      hasTriggeredSkipToBlueprint.current = true;
+      setIsAerialMode(false); // Blueprint mode
+      setShowBlueprintPlacementModal(true);
+    }
+  }, [skipToBlueprintMode]);
+  
+  // Handle skipToAerialMode prop (from photo type selection)
+  const hasTriggeredSkipToAerial = useRef(false);
+  useEffect(() => {
+    if (skipToAerialMode && !hasTriggeredSkipToAerial.current) {
+      // User selected aerial from photo type selection - open modal immediately with aerial language
+      console.log('✈️ skipToAerialMode triggered - opening aerial placement modal');
+      hasTriggeredSkipToAerial.current = true;
+      setIsAerialMode(true); // Aerial mode
+      setShowBlueprintPlacementModal(true);
+    }
+  }, [skipToAerialMode]);
+  
+  // Track if we've shown the initial quote
+  const hasShownInitialQuote = useRef(false);
+  
+  // Show quote overlay on app launch (when no image present)
+  useEffect(() => {
+    if (!hasShownInitialQuote.current && !currentImageUri) {
+      console.log('🎬 App launch - showing opening quote');
+      hasShownInitialQuote.current = true;
+      showQuoteOverlay();
+    }
+  }, [currentImageUri]); // Watch for currentImageUri to load from AsyncStorage
 
   const showQuoteOverlay = () => {
+    // IMMEDIATE haptic to test if this function is even called
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400);
+    
     const quote = getRandomQuote();
     setCurrentQuote(quote);
     setDisplayedText('');
     setQuoteTapCount(0);
     setShowQuote(true);
+    setIsQuoteTyping(true);
     
     // Smooth fade in with spring physics for buttery smoothness
     quoteOpacity.value = withSpring(1, {
@@ -382,30 +667,52 @@ export default function DimensionOverlay({
       stiffness: 90,
       mass: 0.5,
     });
+  };
+  
+  // Quote typing effect with haptics (separate useEffect like BattlingBotsModal)
+  useEffect(() => {
+    // FIRE IMMEDIATELY to test if this useEffect EVER runs
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     
-    // Type out the quote text
-    const fullText = `"${quote.text}"`;
-    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    if (!isQuoteTyping || !currentQuote) return;
+    
+    // IMMEDIATE Heavy haptic at the very start
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    
+    const fullText = `"${currentQuote.text}"`;
+    const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
     
-    let currentIndex = 0;
-    const typingSpeed = 30; // milliseconds per character (normal reading speed)
+    const typingSpeed = 50;
+    const timeouts: NodeJS.Timeout[] = [];
     
-    const typeInterval = setInterval(() => {
-      if (currentIndex < completeText.length) {
-        setDisplayedText(completeText.substring(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        clearInterval(typeInterval);
-        // Auto-dismiss after 5 seconds of being fully displayed
-        setTimeout(() => {
-          dismissQuote();
-        }, 5000);
-      }
-    }, typingSpeed);
+    // Add haptics during typing - every 4th character
+    setDisplayedText(completeText.substring(0, 1));
     
-    return () => clearInterval(typeInterval);
-  };
+    for (let i = 1; i < completeText.length; i++) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(completeText.substring(0, i + 1));
+        
+        // Haptic feedback every 4 characters (not too frequent, noticeable)
+        if (i % 4 === 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
+        
+        if (i === completeText.length - 1) {
+          setIsQuoteTyping(false);
+          setTimeout(() => {
+            dismissQuote();
+          }, 5000);
+        }
+      }, i * typingSpeed);
+      
+      timeouts.push(timeout);
+    }
+    
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
+  }, [isQuoteTyping, currentQuote]);
   
   const dismissQuote = () => {
     quoteOpacity.value = withTiming(0, { 
@@ -445,7 +752,73 @@ export default function DimensionOverlay({
     }, 3000);
   };
   
-  // Calculator words for Easter egg (classic upside-down calculator words)
+  // Create menu button fingerprint with session color
+  const createMenuFingerprint = (x: number, y: number) => {
+    const touch = {
+      x,
+      y,
+      id: `menu-touch-${Date.now()}`,
+      pressure: 0.7, // Default pressure for button taps
+      seed: Math.random(),
+    };
+    
+    setMenuFingerTouches([touch]);
+    
+    // Fade in
+    menuFingerOpacity.value = 0;
+    menuFingerScale.value = 0.8;
+    menuFingerOpacity.value = withTiming(1, { duration: 150 });
+    menuFingerScale.value = withSpring(1, { damping: 15, stiffness: 200 });
+    
+    // Fade out after 600ms
+    setTimeout(() => {
+      menuFingerOpacity.value = withTiming(0, { 
+        duration: 400,
+        easing: Easing.out(Easing.ease)
+      }, () => {
+        runOnJS(setMenuFingerTouches)([]);
+      });
+      menuFingerScale.value = withTiming(1.2, { duration: 400 });
+    }, 600);
+  };
+  
+  // 🎮 Game-inspired haptic sequences for measurement modes
+  const playModeHaptic = (mode: MeasurementMode) => {
+    switch(mode) {
+      case 'distance':
+        // Sonic Spin Dash - Quick ascending buzz (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 40);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+        break;
+      case 'angle':
+        // Street Fighter Hadouken - Charge then release (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 120); // Extra punch!
+        break;
+      case 'circle':
+        // Pac-Man wakka - Quick oscillating (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 60); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120); // Upgraded
+        break;
+      case 'rectangle':
+        // Tetris rotate - Solid mechanical click (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 50); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100); // Extra thump!
+        break;
+      case 'freehand':
+        // Mario Paint - Creative bounce (BEEFED UP!)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 70); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 140); // Upgraded
+        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 210); // Upgraded
+        break;
+    }
+  };
+  
   const CALCULATOR_WORDS = ['HELLO', 'BOOBS', '80085', '5318008', 'SHELL', '07734', 'GOOGLE', '376616', 'BOOBLESS', '553780085'];
   
   // Easter egg: Calibrated badge tap handler
@@ -459,14 +832,19 @@ export default function DimensionOverlay({
     setCalibrateTapCount(newCount);
     
     if (newCount >= 5) {
-      // Activate Easter egg!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Activate Easter eggs! Step Brothers + Calculator words
+      // Stronger haptic feedback
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
+      
       setShowCalculatorWords(true);
+      setStepBrothersMode(true); // "YEP!" mode
       setCalibrateTapCount(0);
       
       // Auto-dismiss after 5 seconds
       setTimeout(() => {
         setShowCalculatorWords(false);
+        setStepBrothersMode(false);
       }, 5000);
     } else {
       // Reset counter after 2 seconds of no taps
@@ -476,7 +854,7 @@ export default function DimensionOverlay({
     }
   };
   
-  // Easter egg: AUTO LEVEL badge tap handler
+  // Easter egg: AUTO LEVEL badge tap handler - WITH HAPTIC RICKROLL! 🎵
   const handleAutoLevelTap = () => {
     // Clear existing timeout
     if (autoLevelTapTimeoutRef.current) {
@@ -487,16 +865,47 @@ export default function DimensionOverlay({
     setAutoLevelTapCount(newCount);
     
     if (newCount >= 7) {
-      // Activate Easter egg!
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // HAPTIC RICKROLL SEQUENCE! 🎵 (BEEFED UP!)
+      // Mimics the iconic rhythm and feel of that famous song
       setAutoLevelTapCount(0);
       
-      // Open YouTube video with autoplay
-      const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
-      Linking.openURL(youtubeUrl).catch(err => {
-        showAlert('Error', 'Could not open video', 'error');
-        console.error('Failed to open URL:', err);
-      });
+      // Intro beats (iconic piano notes) - BEEFED UP!
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 200); // Upgraded from Light
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 550); // Upgraded
+      
+      // First phrase rhythm (4 beats) - MORE PUNCH!
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 800);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1000); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1350); // Upgraded
+      
+      // Second phrase rhythm (4 beats) - KEEP IT STRONG!
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1600);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1800); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1950); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2100); // Upgraded
+      
+      // Third phrase rhythm (4 beats) - CLIMAX!
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2400);
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2600); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2800); // Upgraded
+      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2950); // Upgraded
+      
+      // Final beat + SUCCESS! - DOUBLE IMPACT!
+      setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
+        
+        // NOW open the video! 😂
+        const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
+        Linking.openURL(youtubeUrl).catch(err => {
+          showAlert('Error', 'Could not open video', 'error');
+          console.error('Failed to open URL:', err);
+        });
+      }, 3200);
+      
     } else {
       // Reset counter after 2 seconds of no taps
       autoLevelTapTimeoutRef.current = setTimeout(() => {
@@ -672,17 +1081,92 @@ export default function DimensionOverlay({
     return { x: screenX, y: screenY };
   };
 
+  // Smart calibration hint - detect when user struggles with measurements
+  const checkForCalibrationIssues = (newMeasurement: Measurement) => {
+    // Don't show if already shown for this photo
+    if (hasShownCalibrationHint) return;
+    
+    // Calculate center point of new measurement
+    const centerX = newMeasurement.points.reduce((sum, p) => sum + p.x, 0) / newMeasurement.points.length;
+    const centerY = newMeasurement.points.reduce((sum, p) => sum + p.y, 0) / newMeasurement.points.length;
+    
+    // Create new attempt
+    const attempt: MeasurementAttempt = {
+      type: newMeasurement.mode,
+      centerX,
+      centerY,
+      timestamp: Date.now(),
+    };
+    
+    // Filter recent attempts (last 20 seconds)
+    const now = Date.now();
+    const recentAttempts = attemptHistory.filter(a => now - a.timestamp < 20000);
+    
+    // Count attempts in same area (80px radius) and same type
+    const nearbyAttempts = recentAttempts.filter(a => {
+      const distance = Math.sqrt(
+        Math.pow(a.centerX - centerX, 2) + 
+        Math.pow(a.centerY - centerY, 2)
+      );
+      return distance < 80 && a.type === newMeasurement.mode;
+    });
+    
+    // Check threshold (distance = 4, others = 5) - less sensitive to avoid false positives
+    const threshold = newMeasurement.mode === 'distance' ? 3 : 4; // -1 because we count the new one
+    
+    if (nearbyAttempts.length >= threshold) {
+      // Trigger hint!
+      console.log('🎯 Calibration hint triggered:', {
+        attempts: nearbyAttempts.length + 1,
+        type: newMeasurement.mode,
+        threshold: threshold + 1,
+      });
+      setShowCalibrationHint(true);
+      setHasShownCalibrationHint(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    
+    // Update history (keep last 10 attempts)
+    const updatedHistory = [...recentAttempts, attempt].slice(-10);
+    setAttemptHistory(updatedHistory);
+  };
+
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    // Snap when placing second point in distance mode OR second point in angle mode (before vertex)
+    // Special case: Map Mode + Angle mode + placing second point (north reference) → ALWAYS lock to vertical
+    if (isMapMode && mode === 'angle' && currentPoints.length === 1) {
+      const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+      const dy = cursorY - firstPoint.y;
+      
+      // Don't snap if too close to first point (less than 20px)
+      const distance = Math.abs(dy);
+      if (distance < 20) {
+        return { x: cursorX, y: cursorY, snapped: false };
+      }
+      
+      // ALWAYS lock to vertical line (north reference)
+      return { x: firstPoint.x, y: cursorY, snapped: true };
+    }
+    
+    // Snap when placing second point in distance mode OR second point in angle mode (before vertex) OR blueprint mode
     const shouldSnap = (mode === 'distance' && currentPoints.length === 1) || 
-                       (mode === 'angle' && currentPoints.length === 1);
+                       (mode === 'angle' && currentPoints.length === 1) ||
+                       (isPlacingBlueprint && blueprintPoints.length === 1);
     
     if (!shouldSnap) {
       return { x: cursorX, y: cursorY, snapped: false };
     }
     
-    const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+    // Get the first point (either from currentPoints or blueprintPoints)
+    let firstPoint;
+    if (isPlacingBlueprint && blueprintPoints.length === 1) {
+      firstPoint = imageToScreen(blueprintPoints[0].x, blueprintPoints[0].y);
+    } else if (currentPoints.length > 0) {
+      firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
+    } else {
+      return { x: cursorX, y: cursorY, snapped: false };
+    }
+    
     const dx = cursorX - firstPoint.x;
     const dy = cursorY - firstPoint.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -785,11 +1269,12 @@ export default function DimensionOverlay({
   // moveMode: when true (moving points), use larger threshold (7mm) for easier snapping
   const snapToNearbyPoint = (cursorX: number, cursorY: number, moveMode: boolean = false): { x: number, y: number, snapped: boolean } => {
     // Calculate snap distance in pixels based on calibration
-    // Use larger threshold (7mm ~ half fingertip) when moving points, normal (1mm) when placing
-    const SNAP_DISTANCE_MM = moveMode ? 7 : 1;
+    // Use very small threshold (0.5mm) when moving points for smooth, fluid movement
+    // Only snap when VERY close to another point
+    const SNAP_DISTANCE_MM = moveMode ? 0.5 : 1;
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
-      : (moveMode ? 60 : 30); // fallback pixels if not calibrated
+      : (moveMode ? 5 : 30); // fallback pixels if not calibrated (5px when moving, very tight)
     
     // Check all existing measurement points
     for (const measurement of measurements) {
@@ -868,27 +1353,31 @@ export default function DimensionOverlay({
 
   // Helper: Format map scale distance (for lines, perimeters)
   const formatMapScaleDistance = (pixelDistance: number): string => {
-    if (!mapScale) return '';
+    if (!mapScale) return "";
     
     const mapDistance = convertToMapScale(pixelDistance);
     
-    // Format based on map's real unit and user's preferred unit system
-    if (mapScale.realUnit === 'km') {
-      return unitSystem === 'imperial' 
-        ? `${(mapDistance * 0.621371).toFixed(2)} mi` // km to mi
-        : `${mapDistance.toFixed(2)} km`;
-    } else if (mapScale.realUnit === 'mi') {
-      return unitSystem === 'metric'
-        ? `${(mapDistance * 1.60934).toFixed(2)} km` // mi to km
-        : `${mapDistance.toFixed(2)} mi`;
-    } else if (mapScale.realUnit === 'm') {
-      return unitSystem === 'imperial'
-        ? `${(mapDistance * 3.28084).toFixed(0)} ft` // m to ft
-        : `${mapDistance.toFixed(0)} m`;
+    // ALWAYS use map scale's real unit (don't convert based on user preference)
+    // If user set map scale to miles, output should be in miles
+    if (mapScale.realUnit === "km") {
+      return `${mapDistance.toFixed(2)} km`;
+    } else if (mapScale.realUnit === "mi") {
+      return `${mapDistance.toFixed(2)} mi`;
+    } else if (mapScale.realUnit === "m") {
+      return `${mapDistance.toFixed(0)} m`;
     } else { // ft
-      return unitSystem === 'metric'
-        ? `${(mapDistance * 0.3048).toFixed(0)} m` // ft to m
-        : `${mapDistance.toFixed(0)} ft`;
+      // Format as feet'inches"
+      const totalInches = Math.round(mapDistance * 12); // Convert to total inches first
+      const feet = Math.floor(totalInches / 12);
+      const inches = totalInches % 12;
+      
+      // If no inches, just show feet
+      if (inches === 0) {
+        return `${feet}'`;
+      }
+      
+      // Show feet and inches
+      return `${feet}'${inches}"`;
     }
   };
 
@@ -896,23 +1385,16 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
     
-    // Format based on map's real unit and user's preferred unit system
+    // ALWAYS use map scale's real unit (don't convert based on user preference)
+    // If user set map scale to miles, output should be in square miles
     if (mapScale.realUnit === 'km') {
-      return unitSystem === 'imperial' 
-        ? `${(areaInMapUnits2 * 0.386102).toFixed(2)} mi²` // km² to mi²
-        : `${areaInMapUnits2.toFixed(2)} km²`;
+      return `${areaInMapUnits2.toFixed(2)} km²`;
     } else if (mapScale.realUnit === 'mi') {
-      return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 2.58999).toFixed(2)} km²` // mi² to km²
-        : `${areaInMapUnits2.toFixed(2)} mi²`;
+      return `${areaInMapUnits2.toFixed(2)} mi²`;
     } else if (mapScale.realUnit === 'm') {
-      return unitSystem === 'imperial'
-        ? `${(areaInMapUnits2 * 10.7639).toFixed(0)} ft²` // m² to ft²
-        : `${areaInMapUnits2.toFixed(0)} m²`;
+      return `${areaInMapUnits2.toFixed(0)} m²`;
     } else { // ft
-      return unitSystem === 'metric'
-        ? `${(areaInMapUnits2 * 0.092903).toFixed(0)} m²` // ft² to m²
-        : `${areaInMapUnits2.toFixed(0)} ft²`;
+      return `${areaInMapUnits2.toFixed(0)} ft²`;
     }
   };
 
@@ -964,6 +1446,11 @@ export default function DimensionOverlay({
       
       // Calculate clockwise angle from north to destination
       let azimuth = (destAngle - northAngle) * (180 / Math.PI);
+      
+      // Apply magnetic declination correction
+      // Positive declination (East) = add to azimuth to get true bearing
+      // Negative declination (West) = subtract from azimuth to get true bearing
+      azimuth += magneticDeclination;
       
       // Normalize to 0-360 range
       if (azimuth < 0) azimuth += 360;
@@ -1166,9 +1653,252 @@ export default function DimensionOverlay({
         area: undefined, // Clear area - no longer accurate after editing
         isClosed: true // Still marked as closed, just no area
       };
+    } else if (mode === 'polygon') {
+      // Recalculate perimeter and area for polygons
+      let perimeter = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        const segmentLength = Math.sqrt(
+          Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+        );
+        perimeter += segmentLength;
+      }
+      
+      // Calculate area using Shoelace formula
+      let areaPixels = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        areaPixels += (p1.x * p2.y - p2.x * p1.y);
+      }
+      areaPixels = Math.abs(areaPixels) / 2;
+      
+      // Map Mode: Apply scale conversion
+      let perimeterStr: string;
+      let areaStr: string;
+      let area: number;
+      if (isMapMode && mapScale) {
+        perimeterStr = formatMapScaleDistance(perimeter);
+        area = areaPixels * Math.pow(mapScale.realDistance / mapScale.screenDistance, 2);
+        areaStr = formatMapScaleArea(area);
+      } else {
+        const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
+        perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+        const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+        area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
+        areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+      }
+      
+      return { 
+        ...measurement, 
+        perimeter: perimeterStr, 
+        value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area in legend
+        area: area,
+      };
     }
     
     return measurement;
+  };
+
+  // 🔷 POLYGON AUTO-DETECTION: Detect closed polygons from connected distance lines
+  const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
+    const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
+    
+    // Only check distance measurements
+    const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
+    
+    // Need at least 3 lines to form a polygon (triangle, square, etc.)
+    if (distanceLines.length < 3) return;
+    
+    // Find all connected chains of lines
+    const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
+      const chain: Measurement[] = [startLine];
+      usedIds.add(startLine.id);
+      
+      let currentEndpoint = startLine.points[1]; // End of current line
+      let foundConnection = true;
+      
+      while (foundConnection) {
+        foundConnection = false;
+        
+        // Find a line that starts where current line ends
+        for (const line of distanceLines) {
+          if (usedIds.has(line.id)) continue;
+          
+          const lineStart = line.points[0];
+          const lineEnd = line.points[1];
+          
+          // Check if line starts at current endpoint
+          const distToStart = Math.sqrt(
+            Math.pow(lineStart.x - currentEndpoint.x, 2) + 
+            Math.pow(lineStart.y - currentEndpoint.y, 2)
+          );
+          
+          // Check if line ends at current endpoint (reverse direction)
+          const distToEnd = Math.sqrt(
+            Math.pow(lineEnd.x - currentEndpoint.x, 2) + 
+            Math.pow(lineEnd.y - currentEndpoint.y, 2)
+          );
+          
+          if (distToStart < SNAP_TOLERANCE) {
+            // Line connects forward
+            chain.push(line);
+            usedIds.add(line.id);
+            currentEndpoint = lineEnd;
+            foundConnection = true;
+            break;
+          } else if (distToEnd < SNAP_TOLERANCE) {
+            // Line connects backward - reverse it
+            const reversedLine = {
+              ...line,
+              points: [lineEnd, lineStart]
+            };
+            chain.push(reversedLine);
+            usedIds.add(line.id);
+            currentEndpoint = lineStart;
+            foundConnection = true;
+            break;
+          }
+        }
+      }
+      
+      return chain;
+    };
+    
+    // Try to find closed polygons
+    for (const startLine of distanceLines) {
+      const usedIds = new Set<string>();
+      const chain = findConnectedChain(startLine, usedIds);
+      
+      if (chain.length < 3) continue; // Need at least 3 lines
+      
+      // Check if chain forms a closed loop
+      const firstPoint = chain[0].points[0];
+      const lastPoint = chain[chain.length - 1].points[1];
+      
+      const closingDistance = Math.sqrt(
+        Math.pow(lastPoint.x - firstPoint.x, 2) + 
+        Math.pow(lastPoint.y - firstPoint.y, 2)
+      );
+      
+      if (closingDistance < SNAP_TOLERANCE) {
+        // 🎉 FOUND A CLOSED POLYGON!
+        console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
+        
+        // Extract all unique points in order
+        // For each line, add its start point (end point is the next line's start)
+        const polygonPoints: Array<{x: number, y: number}> = [];
+        for (let i = 0; i < chain.length; i++) {
+          const line = chain[i];
+          const point = { x: line.points[0].x, y: line.points[0].y };
+          polygonPoints.push(point);
+          console.log(`  Point ${i}:`, point);
+        }
+        
+        console.log('🔷 Polygon points extracted:', polygonPoints.length, 'points');
+        
+        // Check if all points are at the same location (collapsed polygon)
+        if (polygonPoints.length >= 2) {
+          const first = polygonPoints[0];
+          const allSame = polygonPoints.every(p => 
+            Math.abs(p.x - first.x) < 1 && Math.abs(p.y - first.y) < 1
+          );
+          if (allSame) {
+            console.log('⚠️ All polygon points are at the same location (collapsed), skipping');
+            return;
+          }
+        }
+        
+        // Validate polygon has at least 3 unique points
+        if (polygonPoints.length < 3) {
+          console.log('⚠️ Polygon has fewer than 3 points, skipping');
+          return;
+        }
+        
+        // Calculate perimeter (sum of all line lengths)
+        let perimeterPx = 0;
+        for (const line of chain) {
+          const p1 = line.points[0];
+          const p2 = line.points[1];
+          const length = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          perimeterPx += length;
+        }
+        
+        // Calculate area using shoelace formula
+        let areaPx2 = 0;
+        for (let i = 0; i < polygonPoints.length; i++) {
+          const p1 = polygonPoints[i];
+          const p2 = polygonPoints[(i + 1) % polygonPoints.length];
+          areaPx2 += (p1.x * p2.y - p2.x * p1.y);
+        }
+        areaPx2 = Math.abs(areaPx2) / 2;
+        
+        // Validate that area is not zero (collinear points)
+        if (areaPx2 < 1) {
+          console.log('⚠️ Polygon area is zero (collinear points), skipping. Area:', areaPx2);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showAlert('Invalid Polygon', 'All points are in a straight line. Please form a proper shape.', 'error');
+          return;
+        }
+        
+        console.log('✅ Polygon area:', areaPx2, 'px²');
+        
+        // Convert to physical units
+        let perimeterStr: string;
+        let areaStr: string;
+        let physicalArea: number;
+        
+        if (isMapMode && mapScale) {
+          // Map mode
+          const perimeterDist = convertToMapScale(perimeterPx);
+          perimeterStr = formatMapValue(perimeterDist);
+          
+          // For area, we need to square the scale factor
+          const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
+          const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
+          physicalArea = areaDist2;
+          areaStr = formatMapScaleArea(areaDist2);
+        } else {
+          // Coin calibration mode
+          const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
+          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+          
+          const areaInUnits2 = areaPx2 / Math.pow(calibration?.pixelsPerUnit || 1, 2);
+          physicalArea = areaInUnits2;
+          areaStr = formatAreaMeasurement(areaInUnits2, calibration?.unit || 'mm', unitSystem);
+        }
+        
+        // Create new polygon measurement
+        const polygonMeasurement: Measurement = {
+          id: Date.now().toString(),
+          points: polygonPoints,
+          value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area
+          perimeter: perimeterStr, // For inline label
+          mode: 'polygon' as any, // New mode type
+          area: physicalArea,
+          isClosed: true,
+          calibrationMode: isMapMode ? 'map' : 'coin',
+          ...(isMapMode && mapScale && { mapScaleData: mapScale }),
+        };
+        
+        // Remove the individual lines and add the polygon
+        const remainingMeasurements = allMeasurements.filter(m => !usedIds.has(m.id));
+        setMeasurements([...remainingMeasurements, polygonMeasurement]);
+        
+        // Success haptic!
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        console.log('🔷 Polygon created:', {
+          sides: chain.length,
+          perimeter: perimeterStr,
+          area: areaStr
+        });
+        
+        return; // Only merge one polygon at a time
+      }
+    }
   };
 
   const placePoint = (x: number, y: number) => {
@@ -1185,14 +1915,14 @@ export default function DimensionOverlay({
       : 2; // rectangle
     const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
     
-    // Auto-enable measurement mode and lock pan/zoom after first point
-    if (currentPoints.length === 0 && measurements.length === 0) {
-      setMeasurementMode(true);
-    }
-    
     if (currentPoints.length + 1 < requiredPoints) {
       // Still need more points
       setCurrentPoints([...currentPoints, newPoint]);
+      
+      // Auto-enable measurement mode after first point (async to avoid blocking)
+      if (currentPoints.length === 0 && measurements.length === 0) {
+        setTimeout(() => setMeasurementMode(true), 0);
+      }
     } else {
       // This completes a measurement
       let completedPoints = [...currentPoints, newPoint];
@@ -1286,179 +2016,15 @@ export default function DimensionOverlay({
       });
       
       setMeasurements([...measurements, newMeasurement]);
-      setCurrentPoints([]); // Reset for next measurement
       
-      // Check for polygon auto-detection (only for distance lines)
+      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
+      // Require at least 4 lines (squares/rectangles) to prevent premature triangle snapping
       if (mode === 'distance') {
-        const updatedMeasurements = [...measurements, newMeasurement];
-        detectAndMergePolygon(updatedMeasurements);
-      }
-    }
-  };
-
-  // Polygon auto-detection: automatically detect and merge 3+ connected distance lines into a polygon
-  const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
-    const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
-    
-    // Only check distance measurements
-    const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
-    
-    // Need at least 3 lines to form a polygon (triangle, square, etc.)
-    if (distanceLines.length < 3) return;
-    
-    // Find all connected chains of lines
-    const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
-      const chain: Measurement[] = [startLine];
-      usedIds.add(startLine.id);
-      
-      let currentEndpoint = startLine.points[1]; // End of current line
-      let foundConnection = true;
-      
-      while (foundConnection) {
-        foundConnection = false;
-        
-        // Find a line that starts where current line ends
-        for (const line of distanceLines) {
-          if (usedIds.has(line.id)) continue;
-          
-          const lineStart = line.points[0];
-          const lineEnd = line.points[1];
-          
-          // Check if line starts at current endpoint
-          const distToStart = Math.sqrt(
-            Math.pow(lineStart.x - currentEndpoint.x, 2) + 
-            Math.pow(lineStart.y - currentEndpoint.y, 2)
-          );
-          
-          // Check if line ends at current endpoint (reverse direction)
-          const distToEnd = Math.sqrt(
-            Math.pow(lineEnd.x - currentEndpoint.x, 2) + 
-            Math.pow(lineEnd.y - currentEndpoint.y, 2)
-          );
-          
-          if (distToStart < SNAP_TOLERANCE) {
-            // Line connects forward
-            chain.push(line);
-            usedIds.add(line.id);
-            currentEndpoint = lineEnd;
-            foundConnection = true;
-            break;
-          } else if (distToEnd < SNAP_TOLERANCE) {
-            // Line connects backward - reverse it
-            const reversedLine = {
-              ...line,
-              points: [lineEnd, lineStart]
-            };
-            chain.push(reversedLine);
-            usedIds.add(line.id);
-            currentEndpoint = lineStart;
-            foundConnection = true;
-            break;
-          }
-        }
+        detectAndMergePolygon([...measurements, newMeasurement]);
       }
       
-      return chain;
-    };
-    
-    // Try to find closed polygons
-    for (const startLine of distanceLines) {
-      const usedIds = new Set<string>();
-      const chain = findConnectedChain(startLine, usedIds);
-      
-      if (chain.length < 3) continue; // Need at least 3 lines
-      
-      // Check if chain forms a closed loop
-      const firstPoint = chain[0].points[0];
-      const lastPoint = chain[chain.length - 1].points[1];
-      
-      const closingDistance = Math.sqrt(
-        Math.pow(lastPoint.x - firstPoint.x, 2) + 
-        Math.pow(lastPoint.y - firstPoint.y, 2)
-      );
-      
-      if (closingDistance < SNAP_TOLERANCE) {
-        // 🎉 FOUND A CLOSED POLYGON!
-        console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
-        
-        // Extract all points in order (excluding duplicates at connections)
-        const polygonPoints: Array<{x: number, y: number}> = [];
-        for (let i = 0; i < chain.length; i++) {
-          polygonPoints.push(chain[i].points[0]);
-        }
-        
-        // Calculate perimeter (sum of all line lengths)
-        let perimeterPx = 0;
-        for (const line of chain) {
-          const p1 = line.points[0];
-          const p2 = line.points[1];
-          const length = Math.sqrt(
-            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
-          );
-          perimeterPx += length;
-        }
-        
-        // Calculate area using shoelace formula
-        let areaPx2 = 0;
-        for (let i = 0; i < polygonPoints.length; i++) {
-          const p1 = polygonPoints[i];
-          const p2 = polygonPoints[(i + 1) % polygonPoints.length];
-          areaPx2 += (p1.x * p2.y - p2.x * p1.y);
-        }
-        areaPx2 = Math.abs(areaPx2) / 2;
-        
-        // Convert to physical units
-        let perimeterStr: string;
-        let areaStr: string;
-        let physicalArea: number;
-        
-        if (isMapMode && mapScale) {
-          // Map mode
-          const perimeterDist = convertToMapScale(perimeterPx);
-          perimeterStr = formatMapValue(perimeterDist);
-          
-          // For area, we need to square the scale factor
-          const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
-          const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
-          physicalArea = areaDist2;
-          areaStr = formatMapScaleArea(areaDist2);
-        } else {
-          // Coin calibration mode
-          const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
-          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
-          
-          const areaInUnits2 = areaPx2 / Math.pow(calibration?.pixelsPerUnit || 1, 2);
-          physicalArea = areaInUnits2;
-          areaStr = formatAreaMeasurement(areaInUnits2, calibration?.unit || 'mm', unitSystem);
-        }
-        
-        // Create new polygon measurement (use freehand mode with isClosed flag)
-        const polygonMeasurement: Measurement = {
-          id: Date.now().toString(),
-          points: polygonPoints,
-          value: `${perimeterStr} (A: ${areaStr})`, // Show both perimeter and area
-          perimeter: perimeterStr, // For inline label
-          mode: 'freehand', // Reuse freehand rendering for polygons
-          area: physicalArea,
-          isClosed: true,
-          calibrationMode: isMapMode ? 'map' : 'coin',
-          ...(isMapMode && mapScale && { mapScaleData: mapScale }),
-        };
-        
-        // Remove the individual lines and add the polygon
-        const remainingMeasurements = allMeasurements.filter(m => !usedIds.has(m.id));
-        setMeasurements([...remainingMeasurements, polygonMeasurement]);
-        
-        // Success haptic!
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        console.log('🔷 Polygon created:', {
-          sides: chain.length,
-          perimeter: perimeterStr,
-          area: areaStr
-        });
-        
-        return; // Only merge one polygon at a time
-      }
+      checkForCalibrationIssues(newMeasurement); // Check if user is struggling
+      setCurrentPoints([]); // Reset for next measurement
     }
   };
 
@@ -1522,6 +2088,59 @@ export default function DimensionOverlay({
     };
   }, []);
   
+  // Reset calibration hint for new photos
+  useEffect(() => {
+    // Reset hint state when image changes
+    setAttemptHistory([]);
+    setHasShownCalibrationHint(false);
+    setShowCalibrationHint(false);
+    hintOpacity.value = 0;
+    hintScale.value = 0.8;
+  }, [currentImageUri]);
+  
+  // Animate hint appearance
+  useEffect(() => {
+    if (showCalibrationHint) {
+      // Graceful fade in + scale up
+      hintOpacity.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.4, 0, 0.2, 1) });
+      hintScale.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.34, 1.56, 0.64, 1) }); // Spring-like ease
+      
+      // Color shift animation (loops forever)
+      hintColorShift.value = withTiming(1, { 
+        duration: 3000, 
+        easing: Easing.inOut(Easing.ease) 
+      }, (finished) => {
+        if (finished) {
+          hintColorShift.value = 0;
+          hintColorShift.value = withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) });
+        }
+      });
+    } else {
+      // Fade out
+      hintOpacity.value = withTiming(0, { duration: 300 });
+      hintScale.value = withTiming(0.9, { duration: 300 });
+    }
+  }, [showCalibrationHint]);
+  
+  // Animated styles for hint (must be at top level, not inside conditional)
+  const hintBackgroundStyle = useAnimatedStyle(() => ({
+    opacity: hintOpacity.value,
+  }));
+  
+  const hintCardStyle = useAnimatedStyle(() => {
+    // Color shift between amber, orange, and rose
+    const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
+    const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
+    const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
+    
+    return {
+      transform: [{ scale: hintScale.value }],
+      backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
+      borderRadius: 28, // Match the BlurView radius for smooth corners
+      overflow: 'hidden', // Ensure children respect the rounded corners
+    };
+  });
+  
   // Tetris Easter egg trigger - detect when legend fills screen
   useEffect(() => {
     if (hasTriggeredTetris || measurements.length === 0) return;
@@ -1567,6 +2186,9 @@ export default function DimensionOverlay({
         setMenuHidden(prev => {
           const newState = !prev;
           
+          // Sync shared value for gesture worklets
+          menuHiddenShared.value = newState;
+          
           // Animate menu position AND opacity
           if (newState) {
             // Hide menu - fade out while sliding
@@ -1597,12 +2219,17 @@ export default function DimensionOverlay({
 
   // Recalculate all measurement values when unit system changes
   useEffect(() => {
-    // Only recalculate if unit system actually changed (not on initial mount or measurement changes)
-    if (prevUnitSystemRef.current === unitSystem || measurements.length === 0) {
-      prevUnitSystemRef.current = unitSystem;
+    // Don't run on mount or if no measurements exist
+    if (measurements.length === 0) {
       return;
     }
     
+    // Only recalculate if unit system actually changed
+    if (prevUnitSystemRef.current === unitSystem) {
+      return;
+    }
+    
+    console.log('🔄 Unit system changed, recalculating all measurements...');
     prevUnitSystemRef.current = unitSystem;
     
     const updatedMeasurements = measurements.map(m => {
@@ -1665,6 +2292,42 @@ export default function DimensionOverlay({
         } else {
           newValue = perimeterStr;
         }
+      } else if (m.mode === 'polygon') {
+        // Recalculate polygon perimeter
+        let perimeter = 0;
+        for (let i = 0; i < m.points.length; i++) {
+          const p1 = m.points[i];
+          const p2 = m.points[(i + 1) % m.points.length];
+          const segmentLength = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          perimeter += segmentLength;
+        }
+        
+        // Map Mode: Apply scale conversion
+        let perimeterStr: string;
+        if (isMapMode && mapScale) {
+          perimeterStr = formatMapScaleDistance(perimeter);
+        } else {
+          const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
+          perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+        }
+        
+        // Recalculate area if it exists
+        if (m.area !== undefined) {
+          let areaStr: string;
+          if (isMapMode && mapScale) {
+            // Area is already stored in real units, just need to format it
+            const areaDisplay = m.area;
+            areaStr = formatMapScaleArea(areaDisplay);
+          } else {
+            areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
+          }
+          newValue = `${perimeterStr} (A: ${areaStr})`;
+          newPerimeter = perimeterStr; // Store perimeter separately for inline display
+        } else {
+          newValue = perimeterStr;
+        }
       }
       
       return {
@@ -1677,11 +2340,21 @@ export default function DimensionOverlay({
       };
     });
     
+    console.log('✅ Updated', updatedMeasurements.length, 'measurements for', unitSystem, 'system');
     setMeasurements(updatedMeasurements);
-  }, [unitSystem]); // Only depend on unitSystem - using ref to prevent infinite loops
+  }, [unitSystem, measurements, calibration, isMapMode, mapScale, calculateDistance, calculateAngle, formatMeasurement, formatAreaMeasurement, formatMapScaleDistance, formatMapScaleArea, convertToMapScale]); // Include all dependencies
 
   const handleClear = () => {
-    // Check if the last measurement has been edited (has history)
+    // Priority 1: If user is placing points, undo last point
+    if (currentPoints.length > 0) {
+      // Remove just the last point, not all points
+      setCurrentPoints(currentPoints.slice(0, -1));
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      console.log('↩️ Removed last point, remaining:', currentPoints.length - 1);
+      return;
+    }
+    
+    // Priority 2: Check if the last measurement has been edited (has history)
     if (measurements.length > 0) {
       const lastMeasurement = measurements[measurements.length - 1];
       
@@ -1705,9 +2378,6 @@ export default function DimensionOverlay({
         setMeasurements(measurements.slice(0, -1));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-    } else if (currentPoints.length > 0) {
-      // If no completed measurements, clear current points
-      setCurrentPoints([]);
     }
   };
   
@@ -1797,7 +2467,7 @@ export default function DimensionOverlay({
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Please grant photo library access.');
+        showAlert('Permission Required', 'Please grant photo library access.', 'warning');
         return;
       }
       
@@ -1806,7 +2476,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('View Error', 'View ref not available. Try again.');
+        showAlert('View Error', 'View ref not available. Try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1817,14 +2487,28 @@ export default function DimensionOverlay({
         quality: 0.9,
         result: 'tmpfile',
       });
-      await MediaLibrary.createAssetAsync(measurementsUri);
+      const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
+      
+      // Add to "PanHandler Measurements" album
+      try {
+        const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync([measurementsAsset], album, false);
+        } else {
+          await MediaLibrary.createAlbumAsync('PanHandler Measurements', measurementsAsset, false);
+        }
+        __DEV__ && console.log('✅ Measurements saved to Camera Roll + PanHandler Measurements album');
+      } catch (albumError) {
+        console.error('Failed to add to PanHandler Measurements album:', albumError);
+        __DEV__ && console.log('✅ Measurements saved to Camera Roll only');
+      }
       
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View lost during capture.');
+        showAlert('Error', 'View lost during capture.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1837,15 +2521,26 @@ export default function DimensionOverlay({
         quality: 1.0,
         result: 'tmpfile',
       });
-      await MediaLibrary.createAssetAsync(labelOnlyUri);
+      const labelOnlyAsset = await MediaLibrary.createAssetAsync(labelOnlyUri);
+      
+      // Add label-only version to "PanHandler Measurements" album
+      try {
+        const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync([labelOnlyAsset], album, false);
+        }
+        __DEV__ && console.log('✅ Label-only version also saved to PanHandler Measurements album');
+      } catch (albumError) {
+        console.error('Failed to add label-only to album:', albumError);
+      }
       
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
       setIsCapturing(false);
       setCurrentLabel(null);
       
-      showToastNotification(label ? `"${label}" saved!` : 'Saved to Photos!');
-      
+      // Show success modal instead of toast
+      setShowSaveSuccessModal(true);
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
@@ -1853,7 +2548,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      Alert.alert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`);
+      showAlert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
@@ -1865,14 +2560,14 @@ export default function DimensionOverlay({
 
   const performEmail = async (label: string | null) => {
     if (!currentImageUri) {
-      Alert.alert('Email Error', 'No image to export.');
+      showAlert('Email Error', 'No image to export.', 'error');
       return;
     }
     
     try {
       const isAvailable = await MailComposer.isAvailableAsync();
       if (!isAvailable) {
-        Alert.alert('Email Not Available', 'No email app is configured.');
+        showAlert('Email Not Available', 'No email app is configured.', 'warning');
         return;
       }
 
@@ -1903,7 +2598,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View not ready. Wait and try again.');
+        showAlert('Error', 'View not ready. Wait and try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -1954,7 +2649,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        Alert.alert('Error', 'View lost during label capture.');
+        showAlert('Error', 'View lost during label capture.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -1993,22 +2688,23 @@ export default function DimensionOverlay({
     } catch (error) {
       setIsCapturing(false);
       setCurrentLabel(null);
-      Alert.alert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
 
   const handleReset = () => {
-    // Instant reset without confirmation
-    const setImageUri = useStore.getState().setImageUri;
-    const setCoinCircle = useStore.getState().setCoinCircle;
-    const setCalibration = useStore.getState().setCalibration;
+    // Don't clear state here - let the parent's transition handle it properly
+    // This prevents the measurement screen from unmounting before the transition starts
     
-    setImageUri(null);
-    setCoinCircle(null);
-    setCalibration(null);
+    // Call parent's reset callback to return to camera mode
+    onReset?.();
     
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // Camera shutter haptic: da-da-da-da! 📸
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 240);
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
@@ -2018,7 +2714,8 @@ export default function DimensionOverlay({
     : 2;  // rectangle: 2 corners
   
   // Lock pan/zoom once any points are placed
-  const isPanZoomLocked = hasAnyMeasurements;
+  // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
+  const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
   
   // Handle label modal completion
   const handleLabelComplete = (label: string | null) => {
@@ -2041,6 +2738,31 @@ export default function DimensionOverlay({
     setPendingAction(null);
   };
   
+  // Handle label editing for existing measurements (double-tap feature)
+  const handleLabelEditComplete = (label: string | null) => {
+    setShowLabelEditModal(false);
+    
+    if (labelEditingMeasurementId) {
+      // Update the measurement with the new label
+      const updatedMeasurements = measurements.map(m => {
+        if (m.id === labelEditingMeasurementId) {
+          return { ...m, label };
+        }
+        return m;
+      });
+      setMeasurements(updatedMeasurements);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      console.log('✅ Label updated for measurement:', labelEditingMeasurementId);
+    }
+    
+    setLabelEditingMeasurementId(null);
+  };
+  
+  const handleLabelEditDismiss = () => {
+    setShowLabelEditModal(false);
+    setLabelEditingMeasurementId(null);
+  };
+  
   // Animated style for menu sliding
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: menuTranslateX.value }],
@@ -2053,45 +2775,12 @@ export default function DimensionOverlay({
   }));
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
-  const menuPanGesture = Gesture.Pan()
-    .minDistance(20) // Require 20px movement before activating
-    .onUpdate((event) => {
-      // Only respond to horizontal swipes
-      if (Math.abs(event.translationX) > Math.abs(event.translationY)) {
-        if (event.translationX < -50 && !menuHidden) {
-          // Swipe left to hide (to right side)
-          menuTranslateX.value = Math.max(event.translationX, -SCREEN_WIDTH);
-        } else if (event.translationX > 50 && menuHidden && tabSide === 'right') {
-          // Swipe right to show (from right side)
-          menuTranslateX.value = Math.min(SCREEN_WIDTH + event.translationX, 0);
-        }
-      }
-    })
-    .onEnd((event) => {
-      const threshold = SCREEN_WIDTH * 0.3;
-      // Require FAST swipe (high velocity) to collapse menu - prevents accidental collapse when swiping modes
-      const minVelocity = 800; // pixels/second - must be a fast swipe
-      const isFastSwipe = Math.abs(event.velocityX) > minVelocity;
-      
-      if (Math.abs(event.translationX) > threshold && isFastSwipe) {
-        // Hide menu to the right - fast swipe detected
-        menuTranslateX.value = SCREEN_WIDTH;
-        menuOpacity.value = 1;
-        runOnJS(setMenuHidden)(true);
-        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
-      } else {
-        // Show menu - slow swipe or didn't cross threshold
-        menuTranslateX.value = withSpring(0);
-        menuOpacity.value = 1;
-        runOnJS(setMenuHidden)(false);
-        if (Math.abs(event.translationX) > 20) {
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-        }
-      }
-    });
-  
-  // Swipe gesture for cycling through measurement modes - FLUID VERSION with finger tracking
+
+  // Swipe gesture for cycling through measurement modes - SIMPLE VERSION that doesn't interfere with buttons
   const modeSwitchGesture = Gesture.Pan()
+    .minDistance(20) // Require 20px movement before activating - allows taps to work instantly
+    .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
+    .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
       // Reset offset when gesture starts
       modeSwipeOffset.value = 0;
@@ -2115,33 +2804,25 @@ export default function DimensionOverlay({
           let nextIndex = (currentIndex + 1) % modes.length;
           let nextMode = modes[nextIndex];
           
-          // Skip freehand if not Pro (keep bouncing through modes)
-          if (nextMode === 'freehand' && !isProUser) {
-            nextIndex = (nextIndex + 1) % modes.length;
-            nextMode = modes[nextIndex];
-          }
+          // Freehand is now always available (donation-based, not paywall)
           
           runOnJS(setMode)(nextMode);
           runOnJS(setModeColorIndex)(nextIndex);
           runOnJS(setCurrentPoints)([]);
           runOnJS(setMeasurementMode)(true);
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         } else {
           // Swipe right - previous mode
           let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           let prevMode = modes[prevIndex];
           
-          // Skip freehand if not Pro (keep bouncing through modes)
-          if (prevMode === 'freehand' && !isProUser) {
-            prevIndex = (prevIndex - 1 + modes.length) % modes.length;
-            prevMode = modes[prevIndex];
-          }
+          // Freehand is now always available (donation-based, not paywall)
           
           runOnJS(setMode)(prevMode);
           runOnJS(setModeColorIndex)(prevIndex);
           runOnJS(setCurrentPoints)([]);
           runOnJS(setMeasurementMode)(true);
-          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+          runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         }
       }
       
@@ -2168,14 +2849,85 @@ export default function DimensionOverlay({
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
     });
   
+  // Quick swipe gesture to collapse/expand menu
+  const menuSwipeGesture = Gesture.Pan()
+    .minDistance(40) // Require more movement before activating
+    .maxPointers(1) // Only single finger
+    .onStart(() => {
+      'worklet';
+      // Clear any existing trail when starting new swipe
+      runOnJS(setSwipeTrail)([]);
+    })
+    .onUpdate((event) => {
+      'worklet';
+      // Record trail points during swipe
+      const trailPoint = {
+        x: event.absoluteX,
+        y: event.absoluteY,
+        id: `trail-${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+      };
+      console.log('🎨 Trail point recorded:', trailPoint);
+      runOnJS(setSwipeTrail)((prev) => {
+        // Safety check: ensure prev is always an array
+        const currentTrail = Array.isArray(prev) ? prev : [];
+        console.log('🎨 Current trail length:', currentTrail.length);
+        return [...currentTrail, trailPoint];
+      });
+    })
+    .onEnd((event) => {
+      'worklet';
+      // Detect horizontal swipe with velocity threshold
+      const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
+      const threshold = SCREEN_WIDTH * 0.25; // 25% of screen width
+      const velocityThreshold = 800; // Faster swipe required = 800 units/sec
+      
+      // Swipe right OR left to collapse menu (both directions work!)
+      if (isHorizontal && 
+          (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > velocityThreshold) &&
+          !menuHiddenShared.value) {
+        menuTranslateX.value = withSpring(SCREEN_WIDTH, {
+          damping: 20,
+          stiffness: 300,
+        });
+        menuOpacity.value = 1;
+        menuHiddenShared.value = true;
+        runOnJS(setMenuHidden)(true);
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+        
+        // Start fading trail after 100ms
+        runOnJS(setTimeout)(() => {
+          runOnJS(setSwipeTrail)([]);
+        }, 1000); // Clear after 1 second
+      }
+      // Swipe left OR right to open menu (when hidden)
+      else if (isHorizontal && 
+               (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > velocityThreshold) &&
+               menuHiddenShared.value) {
+        menuTranslateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 300,
+        });
+        menuOpacity.value = 1;
+        menuHiddenShared.value = false;
+        runOnJS(setMenuHidden)(false);
+        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        // Swipe didn't meet threshold, clear trail
+        runOnJS(setSwipeTrail)([]);
+      }
+    });
+  
   const toggleMenuFromTab = () => {
     if (menuHidden) {
       menuTranslateX.value = withSpring(0);
       menuOpacity.value = 1; // Ensure visible
+      menuHiddenShared.value = false;
       setMenuHidden(false);
     } else {
       menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
       menuOpacity.value = 1; // Reset for next show
+      menuHiddenShared.value = true;
       setMenuHidden(true);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -2184,21 +2936,281 @@ export default function DimensionOverlay({
   const collapseMenu = () => {
     menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
     menuOpacity.value = 1; // Reset for next show
+    menuHiddenShared.value = true;
     setMenuHidden(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
+  // Memoize measurement rendering to prevent re-calculating SVG on every state change
+  const renderedMeasurements = useMemo(() => {
+    if (hideMeasurementsForCapture) return null;
+    
+    return measurements.map((measurement, idx) => {
+      const color = getMeasurementColor(idx, measurement.mode);
+      
+      if (measurement.mode === 'distance') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Outer glow layers */}
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            {/* Main line */}
+            <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            {/* End caps */}
+            <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
+            <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
+            {/* Point markers with reduced glow (50%) */}
+            {/* P0 glow layers */}
+            <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P1 glow layers */}
+            <Circle cx={p1.x} cy={p1.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'angle') {
+        const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+        
+        // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
+        // In normal mode, draw from p1 (vertex) to p0 and p2
+        const vertex = isMapMode ? p0 : p1;
+        const arm1 = isMapMode ? p1 : p0;
+        const arm2 = isMapMode ? p2 : p2;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
+            {/* Main lines */}
+            <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
+            <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
+            {/* Point markers with reduced glow (50%) */}
+            {/* P0 glow layers */}
+            <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P1 (vertex in normal mode, north ref in map mode) */}
+            <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
+            <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
+            <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
+            {/* P2 glow layers */}
+            <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={p2.x} cy={p2.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'circle') {
+        const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+        const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+        const screenRadius = Math.sqrt(
+          Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
+        );
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+            {/* Main circle */}
+            <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
+            {/* Center marker with reduced glow (50%) */}
+            <Circle cx={center.x} cy={center.y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={center.x} cy={center.y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={center.x} cy={center.y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={center.x} cy={center.y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'rectangle') {
+        // Get all 4 corners
+        const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Calculate bounding box for rectangle rendering
+        const xCoords = corners.map(c => c.x);
+        const yCoords = corners.map(c => c.y);
+        const minX = Math.min(...xCoords);
+        const maxX = Math.max(...xCoords);
+        const minY = Math.min(...yCoords);
+        const maxY = Math.max(...yCoords);
+        const width = maxX - minX;
+        const height = maxY - minY;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers */}
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
+            {/* Main rectangle */}
+            <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
+            {/* Corner markers - all 4 corners with reduced glow (50%) */}
+            {corners.map((corner, cornerIdx) => (
+              <React.Fragment key={`corner-${cornerIdx}`}>
+                <Circle cx={corner.x} cy={corner.y} r="6" fill={color.glow} opacity="0.05" />
+                <Circle cx={corner.x} cy={corner.y} r="5" fill={color.glow} opacity="0.075" />
+                <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} opacity="0.05" />
+                <Circle cx={corner.x} cy={corner.y} r="3" fill={color.main} opacity="0.1" />
+                <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+              </React.Fragment>
+            ))}
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'freehand') {
+        // Render freehand path
+        if (measurement.points.length < 2) return null;
+        
+        // Convert all points to screen coordinates
+        const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Generate simple polyline that exactly follows the drawn path
+        // This prevents morphing issues from Bezier curve interpolation
+        let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+        for (let i = 1; i < screenPoints.length; i++) {
+          pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
+        }
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Glow layers for freehand path */}
+            <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Main freehand path */}
+            <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Start and end point markers with reduced glow (50%) */}
+            {/* Start point */}
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+            {/* End point */}
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.glow} opacity="0.05" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="5" fill={color.glow} opacity="0.075" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
+            <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+          </React.Fragment>
+        );
+      } else if (measurement.mode === 'polygon') {
+        // Render auto-detected polygon with filled area
+        if (measurement.points.length < 3) return null;
+        
+        // Convert all points to screen coordinates
+        const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
+        
+        // Generate polygon path (closed)
+        let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
+        for (let i = 1; i < screenPoints.length; i++) {
+          pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
+        }
+        pathData += ' Z'; // Close the path
+        
+        // Calculate centroid for label placement
+        let centroidX = 0, centroidY = 0;
+        for (const p of screenPoints) {
+          centroidX += p.x;
+          centroidY += p.y;
+        }
+        centroidX /= screenPoints.length;
+        centroidY /= screenPoints.length;
+        
+        return (
+          <React.Fragment key={measurement.id}>
+            {/* Filled area with transparency */}
+            <Path d={pathData} fill={color.main} opacity="0.15" />
+            {/* Glow layers for outline */}
+            <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Main outline */}
+            <Path d={pathData} stroke={color.main} strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Corner markers */}
+            {screenPoints.map((point, i) => (
+              <React.Fragment key={`corner-${i}`}>
+                <Circle cx={point.x} cy={point.y} r="6" fill={color.glow} opacity="0.05" />
+                <Circle cx={point.x} cy={point.y} r="5" fill={color.glow} opacity="0.075" />
+                <Circle cx={point.x} cy={point.y} r="4" fill={color.main} opacity="0.05" />
+                <Circle cx={point.x} cy={point.y} r="3" fill={color.main} opacity="0.1" />
+                <Circle cx={point.x} cy={point.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
+              </React.Fragment>
+            ))}
+          </React.Fragment>
+        );
+      }
+      return null;
+    });
+  }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isMapMode]);
+
   return (
     <>
+      {/* Universal Touch Overlay - Captures ALL touches for fingerprints */}
+      <View
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
+        pointerEvents="box-none"
+        onStartShouldSetResponder={() => true}
+        onResponderGrant={(event) => {
+          const { pageX, pageY } = event.nativeEvent;
+          const pressure = event.nativeEvent.force || 0.5;
+          
+          // Create fingerprint at touch location with session color
+          setFingerTouches([{ 
+            x: pageX, 
+            y: pageY, 
+            id: `universal-touch-${Date.now()}`,
+            pressure: pressure,
+            seed: Math.random()
+          }]);
+          
+          fingerOpacity.value = withTiming(1, { duration: 150 });
+          fingerScale.value = 1;
+          fingerRotation.value = 0;
+        }}
+        onResponderRelease={() => {
+          // Fade out fingerprint
+          fingerOpacity.value = withTiming(0, { 
+            duration: 800, 
+            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
+          });
+          fingerScale.value = withTiming(1.5, { 
+            duration: 800, 
+            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
+          });
+          fingerRotation.value = withTiming(15, { 
+            duration: 800, 
+            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
+          });
+        }}
+      />
+      
       {/* Persistent "Calibration Locked" indicator */}
-      {coinCircle && !showLockedInAnimation && (
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && (
         <Pressable
           onPress={handleCalibratedTap}
-          className="absolute z-20"
           style={{
+            position: 'absolute',
+            zIndex: 20,
             top: isAutoCaptured ? insets.top + 50 : insets.top + 16,
             right: 16,
-            backgroundColor: 'rgba(52, 199, 89, 0.9)',
+            backgroundColor: stepBrothersMode ? 'rgba(59, 130, 246, 0.95)' : 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 12,
@@ -2211,9 +3223,9 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="checkmark-circle" size={16} color="white" />
+            <Ionicons name={stepBrothersMode ? "thumbs-up" : "checkmark-circle"} size={16} color="white" />
             <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
-              Calibrated
+              {stepBrothersMode ? "YEP!" : "Calibrated"}
             </Text>
           </View>
           <Text style={{ 
@@ -2222,13 +3234,104 @@ export default function DimensionOverlay({
             fontWeight: '500', 
             marginTop: 2 
           }}>
-            {calibration?.calibrationType === 'verbal' && calibration.verbalScale
+            {stepBrothersMode 
+              ? "Best friends? 🤝"
+              : calibration?.calibrationType === 'blueprint' && calibration.blueprintScale
+              ? `${calibration.blueprintScale.distance}${calibration.blueprintScale.unit} between points`
+              : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
+              : mapScale && !coinCircle
+              ? `${mapScale.screenDistance}${mapScale.screenUnit} = ${mapScale.realDistance}${mapScale.realUnit}`
               : coinCircle
               ? `${coinCircle.coinName} • ${coinCircle.coinDiameter.toFixed(1)}mm`
               : 'Calibrated'
             }
           </Text>
+          {/* Show "Verbal scale" and "Locked in" when map scale is locked in (regardless of current mode) */}
+          {!stepBrothersMode && mapScale && coinCircle && (
+            <View style={{ marginTop: 4, alignItems: 'center' }}>
+              <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.75)', 
+                fontSize: 8, 
+                fontWeight: '600',
+                letterSpacing: 0.3
+              }}>
+                Verbal scale
+              </Text>
+              <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.9)', 
+                fontSize: 9, 
+                fontWeight: '700',
+                letterSpacing: 0.2,
+                marginTop: 1
+              }}>
+                {mapScale.screenDistance}{mapScale.screenUnit} = {mapScale.realDistance}{mapScale.realUnit}
+              </Text>
+              <Text style={{ 
+                color: 'rgba(255, 255, 255, 0.75)', 
+                fontSize: 8, 
+                fontWeight: '600',
+                letterSpacing: 0.3,
+                marginTop: 1
+              }}>
+                Locked in
+              </Text>
+            </View>
+          )}
+        </Pressable>
+      )}
+      
+      {/* Recalibrate button - appears below calibration badge when there's any calibration */}
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            
+            // Scenario 1: Map scale ONLY (no coin, no other calibration)
+            // Reset map scale and reopen map scale modal (stay in measurement screen)
+            if (mapScale && !calibration && !coinCircle) {
+              setMapScale(null);
+              setIsMapMode(false);
+              setShowMapScaleModal(true);
+            }
+            // Scenario 2: BOTH calibration (coin/blueprint/verbal) AND map scale
+            // Reset both and go back to coin screen
+            else if (mapScale && (calibration || coinCircle)) {
+              setMapScale(null);
+              setIsMapMode(false);
+              if (onReset) onReset(true); // Go to coin calibration screen
+            }
+            // Scenario 3: Calibration ONLY (coin/blueprint/verbal, no map scale)
+            // Go back to coin calibration screen (original behavior)
+            else {
+              if (onReset) onReset(true); // Pass true to trigger recalibrate mode
+            }
+          }}
+          style={{
+            position: 'absolute',
+            zIndex: 20,
+            top: mapScale 
+              ? (isAutoCaptured ? insets.top + 50 + 95 : insets.top + 16 + 95)  // Extra space for map scale info (shown even when not in map mode)
+              : (isAutoCaptured ? insets.top + 50 + 60 : insets.top + 16 + 60),   // Normal spacing
+            right: 16,
+            backgroundColor: 'rgba(239, 68, 68, 0.9)', // Red color for reset action
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 8,
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
+            elevation: 4,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="refresh-outline" size={14} color="white" />
+            <Text style={{ color: 'white', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
+              Recalibrate
+            </Text>
+          </View>
         </Pressable>
       )}
 
@@ -2251,20 +3354,20 @@ export default function DimensionOverlay({
               style={{
                 width: 44,
                 height: 80,
-                backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                backgroundColor: sessionColor ? sessionColor.main : 'rgba(128, 128, 128, 0.5)',
                 borderTopLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderBottomLeftRadius: tabSide === 'right' ? 16 : 0,
                 borderTopRightRadius: tabSide === 'left' ? 16 : 0,
                 borderBottomRightRadius: tabSide === 'left' ? 16 : 0,
                 justifyContent: 'center',
                 alignItems: 'center',
-                shadowColor: '#000',
+                shadowColor: sessionColor ? sessionColor.main : '#000',
                 shadowOffset: { width: tabSide === 'right' ? -2 : 2, height: 0 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
+                shadowOpacity: sessionColor ? 0.4 : 0.1,
+                shadowRadius: sessionColor ? 8 : 4,
                 elevation: 4,
                 borderWidth: 1,
-                borderColor: 'rgba(128, 128, 128, 0.3)',
+                borderColor: sessionColor ? 'rgba(255, 255, 255, 0.3)' : 'rgba(128, 128, 128, 0.3)',
                 [tabSide === 'right' ? 'borderRightWidth' : 'borderLeftWidth']: 0,
               }}
             >
@@ -2289,6 +3392,22 @@ export default function DimensionOverlay({
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
             console.log('👆 Touch started - activating cursor');
+            
+            // CHECK: If in map mode without calibration, show alert
+            console.log('🔍 Touch check:', { isMapMode, hasMapScale: !!mapScale });
+            if (isMapMode && !mapScale) {
+              console.log('⚠️ Blocking measurement - no map scale set');
+              // Triple haptic warning to make it VERY obvious
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 100);
+              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 200);
+              showAlert(
+                'Set Map Scale First',
+                'Tap the Map button in the menu to set your map scale before measuring.',
+                'warning'
+              );
+              return; // Prevent any measurement placement
+            }
             
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
@@ -2323,21 +3442,32 @@ export default function DimensionOverlay({
                 clearTimeout(freehandActivationTimerRef.current);
               }
               
+              // 🌟 Samus Charge Beam - Progressive power build-up (RESTORED!)
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
+              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
+              
               freehandActivationTimerRef.current = setTimeout(() => {
-                // Activation complete - start drawing!
+                // 1.5s - FULLY CHARGED! Ready to fire! 🔥
                 setIsDrawingFreehand(true);
                 setFreehandActivating(false);
                 
-                // Don't add first point here - let onResponderMove handle it
-                // This ensures the path starts from the current finger position, not where they initially pressed
+                // LOCK zoom/pan/rotation state to prevent coordinate drift during drawing
+                freehandZoomLockRef.current = {
+                  scale: zoomScale,
+                  translateX: zoomTranslateX,
+                  translateY: zoomTranslateY,
+                  rotation: zoomRotation,
+                };
+                console.log('🔒 Locked zoom state:', freehandZoomLockRef.current);
                 
-                // Strong haptic feedback to signal drawing has started
+                // Powerful "weapon charged" haptic
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 console.log('🎨 Freehand drawing activated!');
-              }, 1500); // 1.5 seconds
-              
-              // Light haptic on initial press
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }, 1500);
               return; // Skip normal cursor logic for freehand
             }
             
@@ -2412,16 +3542,75 @@ export default function DimensionOverlay({
                 setCursorSpeed(cursorMoveSpeed);
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
                 
+                // Handle speed-based activation control with hysteresis
+                if (freehandActivating) {
+                  // Hysteresis: Different thresholds for starting/stopping warning
+                  const speedThresholdHigh = 0.3; // Show warning when speed exceeds this
+                  const speedThresholdLow = 0.15; // Hide warning when speed drops below this
+                  
+                  // Update warning state with hysteresis
+                  if (!isShowingSpeedWarning && cursorMoveSpeed > speedThresholdHigh) {
+                    setIsShowingSpeedWarning(true);
+                  } else if (isShowingSpeedWarning && cursorMoveSpeed < speedThresholdLow) {
+                    setIsShowingSpeedWarning(false);
+                  }
+                  
+                  // Cancel timer if moving too fast
+                  if (cursorMoveSpeed > speedThresholdHigh) {
+                    if (freehandActivationTimerRef.current) {
+                      clearTimeout(freehandActivationTimerRef.current);
+                      freehandActivationTimerRef.current = null;
+                    }
+                  } 
+                  // Restart timer if slowed down and timer isn't already running
+                  else if (!freehandActivationTimerRef.current) {
+                    // Restart the 1.5s timer
+                    freehandActivationTimerRef.current = setTimeout(() => {
+                      setIsDrawingFreehand(true);
+                      setFreehandActivating(false);
+                      setIsShowingSpeedWarning(false);
+                      
+                      // LOCK zoom/pan/rotation state
+                      freehandZoomLockRef.current = {
+                        scale: zoomScale,
+                        translateX: zoomTranslateX,
+                        translateY: zoomTranslateY,
+                        rotation: zoomRotation,
+                      };
+                      
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                      console.log('🎨 Freehand drawing activated after slowing down!');
+                    }, 1500);
+                  }
+                }
+                
                 // If already drawing, add points to path
                 // IMPORTANT: Use cursor position (rawCursorX, rawCursorY), not finger position (pageX, pageY)
                 if (isDrawingFreehand) {
-                  const imageX = (rawCursorX - zoomTranslateX) / zoomScale;
-                  const imageY = (rawCursorY - zoomTranslateY) / zoomScale;
+                  // Use locked zoom state to prevent coordinate drift from zoom changes during drawing
+                  const lockedZoom = freehandZoomLockRef.current || { scale: zoomScale, translateX: zoomTranslateX, translateY: zoomTranslateY, rotation: zoomRotation };
+                  const imageX = (rawCursorX - lockedZoom.translateX) / lockedZoom.scale;
+                  const imageY = (rawCursorY - lockedZoom.translateY) / lockedZoom.scale;
                   
                   // Only add point if it's far enough from the last point (smooth path)
                   // Use functional update to ensure we have the latest state
                   setFreehandPath(prevPath => {
                     if (prevPath.length === 0) {
+                      // FIRST POINT: Check if we should snap to an existing point (like distance lines do)
+                      // This allows freehand to connect to polygons and other measurements
+                      const screenPos = imageToScreen(imageX, imageY);
+                      const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use tight snap (1mm)
+                      
+                      if (snapResult.snapped) {
+                        // Snap to existing point - allows connecting to polygons
+                        const snappedImageCoords = screenToImage(snapResult.x, snapResult.y);
+                        console.log('🎯 Freehand starting point snapped to existing point');
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                        return [{ x: snappedImageCoords.x, y: snappedImageCoords.y }];
+                      }
+                      
+                      // No snap - start fresh
                       return [{ x: imageX, y: imageY }];
                     }
                     
@@ -2431,8 +3620,8 @@ export default function DimensionOverlay({
                       Math.pow(imageY - lastPoint.y, 2)
                     );
                     
-                    // Minimum distance: 2 image pixels (zoom independent)
-                    if (distance > 2) {
+                    // Minimum distance: 0.5 image pixels for smooth, fluid lines
+                    if (distance > 0.5) {
                       // LASSO SNAP: Check if we're close to the starting point (to close the loop)
                       if (prevPath.length >= 10) { // Need at least 10 points to make a meaningful loop
                         const firstPoint = prevPath[0];
@@ -2440,9 +3629,22 @@ export default function DimensionOverlay({
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
-                        // Snap threshold: 5mm in real-world distance (more forgiving)
-                        const snapThresholdMM = 5;
-                        const snapThresholdPixels = calibration ? snapThresholdMM * calibration.pixelsPerUnit : 15;
+                        // Snap threshold: EXTREMELY TIGHT - only snap when virtually touching the start point
+                        // The snap zone should be roughly the size of the starting point circle itself
+                        // Use 0.3mm in real-world units (about the size of a small dot)
+                        let snapThresholdPixels = 1.5; // Default: 1.5 image pixels (extremely tight)
+                        
+                        if (calibration) {
+                          // Convert 0.3mm to pixels based on calibration unit
+                          const snapThresholdMM = 0.3; // 0.3mm real-world distance (size of a small dot)
+                          if (calibration.unit === 'mm') {
+                            snapThresholdPixels = snapThresholdMM * calibration.pixelsPerUnit;
+                          } else if (calibration.unit === 'cm') {
+                            snapThresholdPixels = (snapThresholdMM / 10) * calibration.pixelsPerUnit;
+                          } else if (calibration.unit === 'in') {
+                            snapThresholdPixels = (snapThresholdMM / 25.4) * calibration.pixelsPerUnit;
+                          }
+                        }
                         
                         if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
@@ -2461,6 +3663,35 @@ export default function DimensionOverlay({
                             console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
                             // Continue drawing normally without snapping
                             return [...prevPath, { x: imageX, y: imageY }];
+                          }
+                        }
+                        
+                        // SNAP TO OTHER MEASUREMENTS: Check if we're close to any other measurement point
+                        // This allows connecting freehand to existing polygons/rectangles/etc (like distance lines do)
+                        if (prevPath.length >= 3) { // Need a few points before allowing snap to other measurements
+                          const screenPos = imageToScreen(imageX, imageY);
+                          const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use tight snap (1mm)
+                          
+                          if (snapResult.snapped) {
+                            // Snap to existing point - allows connecting to polygons mid-draw
+                            const snappedImageCoords = screenToImage(snapResult.x, snapResult.y);
+                            const distToSnap = Math.sqrt(
+                              Math.pow(imageX - snappedImageCoords.x, 2) + 
+                              Math.pow(imageY - snappedImageCoords.y, 2)
+                            );
+                            
+                            // Only snap if it's different from last point (prevent duplicate points)
+                            const lastPathPoint = prevPath[prevPath.length - 1];
+                            const distFromLast = Math.sqrt(
+                              Math.pow(snappedImageCoords.x - lastPathPoint.x, 2) + 
+                              Math.pow(snappedImageCoords.y - lastPathPoint.y, 2)
+                            );
+                            
+                            if (distFromLast > 0.5 && distToSnap < distance) {
+                              console.log('🎯 Freehand snapped to existing measurement point');
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                              return [...prevPath, { x: snappedImageCoords.x, y: snappedImageCoords.y }];
+                            }
                           }
                         }
                       }
@@ -2584,8 +3815,8 @@ export default function DimensionOverlay({
                 console.log('⚠️ Freehand activation cancelled (released too early)');
                 
                 // Continue to evaporation effect
-              } else if (isDrawingFreehand && freehandPath.length >= 5) {
-                // If they were drawing, complete the measurement (require at least 5 points for a meaningful path)
+              } else if (isDrawingFreehand && freehandPath.length >= 2) {
+                // If they were drawing, complete the measurement (require at least 2 points for a line)
                 // Use ref instead of state to avoid async state issues
                 const isClosedLoop = freehandClosedLoopRef.current;
                 console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
@@ -2678,6 +3909,11 @@ export default function DimensionOverlay({
                   console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
                   
                   setMeasurements([...measurements, newMeasurement]);
+                  
+                  // Increment freehand trial counter if not Pro
+                  if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
+                    incrementFreehandTrial();
+                  }
                 } else {
                   console.log('⚠️ Area calculation skipped - conditions not met:', {
                     isClosedLoop,
@@ -2707,6 +3943,11 @@ export default function DimensionOverlay({
                   
                   setMeasurements([...measurements, newMeasurement]);
                   
+                  // Increment freehand trial counter if not Pro
+                  if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
+                    incrementFreehandTrial();
+                  }
+                  
                   // Log reason for no area
                   if (isClosedLoop && selfIntersects) {
                     console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
@@ -2722,16 +3963,20 @@ export default function DimensionOverlay({
                 setFreehandActivating(false);
                 setFreehandClosedLoop(false); // Reset closed loop state
                 freehandClosedLoopRef.current = false; // Reset ref too
+                freehandZoomLockRef.current = null; // Clear zoom lock
+                console.log('🔓 Cleared zoom lock');
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
-                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 5 - discarding');
+                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 2 - discarding');
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
+                freehandZoomLockRef.current = null; // Clear zoom lock
+                console.log('🔓 Cleared zoom lock (path too short)');
               }
               
               // Evaporation effect for freehand mode - organic fade with slight expansion and dissipation
@@ -2795,8 +4040,32 @@ export default function DimensionOverlay({
               fingerRotation.value = 0;
             }, 500);
             
+            // Blueprint placement mode
+            if (isPlacingBlueprint) {
+              // Convert screen position to image coordinates for blueprint points
+              const imageCoords = screenToImage(cursorPosition.x, cursorPosition.y);
+              const newPoint = { x: imageCoords.x, y: imageCoords.y };
+              const updatedPoints = [...blueprintPoints, newPoint];
+              setBlueprintPoints(updatedPoints);
+              
+              // Haptic feedback
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              
+              // If we've placed 2 points, show distance input modal
+              if (updatedPoints.length === 2) {
+                setIsPlacingBlueprint(false);
+                setMeasurementMode(false);
+                setShowCursor(false);
+                setTimeout(() => {
+                  setShowBlueprintDistanceModal(true);
+                }, 100);
+              } else {
+                // Keep cursor visible for second point
+                setShowCursor(false);
+              }
+            }
             // For circle mode
-            if (mode === 'circle') {
+            else if (mode === 'circle') {
               if (currentPoints.length === 0) {
                 // First tap: place center point
                 placePoint(cursorPosition.x, cursorPosition.y);
@@ -2831,6 +4100,7 @@ export default function DimensionOverlay({
           }}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
+            setDebugInfo({ lastTouch: Date.now(), interceptor: 'TAP_OVERLAY', mode: measurementMode ? 'MEASURE' : 'PAN' });
             
             // Check if tapping any measurement point first (distance, angle, circle, rectangle)
             const point = getTappedMeasurementPoint(pageX, pageY);
@@ -2857,14 +4127,20 @@ export default function DimensionOverlay({
                 if (distFromCenter > 20 && distFromCenter < radius - 20) {
                   // This is a circle drag, not point resize - fall through to measurement tap logic
                 } else {
-                  // Near center or edge - allow point resize
+                  // Near center or edge - allow point resize (expand/contract circle)
                   saveOriginalState(point.measurementId); // Save state before editing
                   setResizingPoint(point);
                   setDidDrag(false);
                   setIsSnapped(false);
                   dragStartPos.value = { x: pageX, y: pageY };
                   dragCurrentPos.value = { x: pageX, y: pageY };
+                  
+                  // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setTimeout(() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }, 150); // 150ms pause between taps
+                  
                   return;
                 }
               } else if (measurement && measurement.mode === 'rectangle' && measurement.points.length === 4) {
@@ -2899,20 +4175,32 @@ export default function DimensionOverlay({
                     setIsSnapped(false);
                     dragStartPos.value = { x: pageX, y: pageY };
                     dragCurrentPos.value = { x: pageX, y: pageY };
+                    
+                    // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setTimeout(() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }, 150); // 150ms pause between taps
+                    
                     return;
                   }
                 }
                 // Otherwise, fall through to treat as rectangle drag/tap
               } else {
-                // Not a circle center or rectangle - normal point resize behavior
+                // Not a circle center or rectangle - normal point resize behavior (polygons/freehand)
                 saveOriginalState(point.measurementId); // Save state before editing
                 setResizingPoint(point);
                 setDidDrag(false);
                 setIsSnapped(false); // Reset snap state when starting to resize
                 dragStartPos.value = { x: pageX, y: pageY };
                 dragCurrentPos.value = { x: pageX, y: pageY };
+                
+                // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setTimeout(() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }, 150); // 150ms pause between taps
+                
                 return;
               }
             }
@@ -3191,7 +4479,7 @@ export default function DimensionOverlay({
                     setIsSnapped(false);
                     return;
                   } else {
-                    // Increment tap count
+                    // Increment tap count (1, 2, 3...)
                     setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }
@@ -3228,7 +4516,7 @@ export default function DimensionOverlay({
                   setIsSnapped(false);
                   return;
                 } else {
-                  // Increment tap count
+                  // Increment tap count (1, 2, 3...)
                   setTapDeleteState({ measurementId: tappedId, count: newCount, lastTapTime: now });
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
@@ -3293,7 +4581,12 @@ export default function DimensionOverlay({
           // Determine label based on state
           let label = 'Hold to start';
           if (freehandActivating) {
-            label = 'Hold...';
+            // Use state to show warning (prevents flickering with hysteresis)
+            if (isShowingSpeedWarning) {
+              label = 'Slow down to draw';
+            } else {
+              label = 'Hold...';
+            }
           } else if (isDrawingFreehand) {
             label = 'Drawing';
           }
@@ -3360,8 +4653,66 @@ export default function DimensionOverlay({
           );
         })()}
         
+        {/* Blueprint cursor (gray) */}
+        {showCursor && isPlacingBlueprint && (() => {
+          // Gray colors for blueprint mode
+          const cursorColor = 'rgba(100, 100, 100, 0.8)';
+          const glowColor = 'rgba(150, 150, 150, 0.6)';
+          
+          // Calculate dynamic glow opacity based on cursor speed
+          const minGlowOpacity = 0.07;
+          const maxGlowOpacity = 0.14;
+          const speedFactor = Math.min(cursorSpeed / 2, 1);
+          const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
+          
+          return (
+            <View
+              style={{
+                position: 'absolute',
+                left: cursorPosition.x - 50,
+                top: cursorPosition.y - 50,
+                width: 100,
+                height: 100,
+              }}
+              pointerEvents="none"
+            >
+              <Svg width={100} height={100}>
+                {/* Outer ring glow layers - gray */}
+                <Circle cx={50} cy={50} r={32} fill="none" stroke={glowColor} strokeWidth="8" opacity={dynamicGlowOpacity * 0.7} />
+                <Circle cx={50} cy={50} r={31} fill="none" stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                {/* Outer ring - gray */}
+                <Circle cx={50} cy={50} r={30} fill="none" stroke={cursorColor} strokeWidth="3" opacity={0.8} />
+                {/* Inner circle - gray */}
+                <Circle cx={50} cy={50} r={15} fill="rgba(100, 100, 100, 0.2)" stroke={cursorColor} strokeWidth="2" />
+                {/* Crosshair lines - gray */}
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={glowColor} strokeWidth="6" opacity={dynamicGlowOpacity} />
+                <Line x1={10} y1={50} x2={35} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
+                <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
+                
+                {/* Yellow center dot */}
+                <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
+                <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
+                <Circle cx={50} cy={50} r={2} fill="#000000" opacity={1} />
+                <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
+                <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
+              </Svg>
+              <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
+                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                  {blueprintPoints.length === 0 && 'Place first point'}
+                  {blueprintPoints.length === 1 && 'Place second point'}
+                </Text>
+              </View>
+            </View>
+          );
+        })()}
+        
         {/* Regular cursor (for other modes) */}
-        {showCursor && mode !== 'freehand' && (() => {
+        {showCursor && mode !== 'freehand' && !isPlacingBlueprint && (() => {
           // Determine which measurement this will be (if completing current or starting new)
           const nextMeasurementIndex = currentPoints.length === requiredPoints 
             ? measurements.length + 1  // Current measurement will be saved, this is the next one
@@ -3436,11 +4787,8 @@ export default function DimensionOverlay({
 
       {/* Finger touch indicators - organic fingerprint-like patterns with evaporation */}
       {(() => {
-        const nextMeasurementIndex = currentPoints.length === requiredPoints 
-          ? measurements.length + 1 
-          : measurements.length;
-        const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
-        const fingerColor = nextColor.main;
+        // Use session color for ALL fingerprints (universal approach)
+        const fingerColor = sessionColor ? sessionColor.main : '#3B82F6'; // Fallback to blue
         
         // Animated style for evaporation effect
         const evaporationStyle = useAnimatedStyle(() => ({
@@ -3521,6 +4869,141 @@ export default function DimensionOverlay({
                 })}
               </Svg>
             </Animated.View>
+          );
+        });
+      })()}
+
+      {/* Menu button fingerprints (session color) */}
+      {(() => {
+        if (menuFingerTouches.length === 0 || !sessionColor) return null;
+        
+        const fingerColor = sessionColor.main;
+        
+        return menuFingerTouches.map((touch) => {
+          const pressureScale = 0.85 + (touch.pressure * 0.3);
+          const baseRadius = 18 * pressureScale;
+          
+          const ridges = [];
+          const numRidges = 5;
+          
+          for (let i = 0; i < numRidges; i++) {
+            const radiusOffset = (touch.seed * 2 - 1) * 3;
+            const radius = baseRadius * (0.3 + i * 0.15) + radiusOffset;
+            const opacityVariation = 0.05 + (Math.sin(touch.seed * 10 + i) * 0.03);
+            
+            ridges.push({
+              radius,
+              opacity: 0.18 - (i * 0.025) + opacityVariation
+            });
+          }
+          
+          return (
+            <Animated.View
+              key={touch.id}
+              style={[
+                {
+                  position: 'absolute',
+                  left: touch.x - baseRadius - 5,
+                  top: touch.y - baseRadius - 5,
+                  width: (baseRadius + 5) * 2,
+                  height: (baseRadius + 5) * 2,
+                  pointerEvents: 'none',
+                },
+                menuEvaporationStyle
+              ]}
+            >
+              <Svg width={(baseRadius + 5) * 2} height={(baseRadius + 5) * 2}>
+                {ridges.reverse().map((ridge, idx) => (
+                  <Circle 
+                    key={idx}
+                    cx={baseRadius + 5} 
+                    cy={baseRadius + 5} 
+                    r={ridge.radius} 
+                    fill={fingerColor} 
+                    opacity={ridge.opacity}
+                  />
+                ))}
+                
+                {[...Array(8)].map((_, idx) => {
+                  const angle = (touch.seed * Math.PI * 2) + (idx * Math.PI / 4);
+                  const distance = baseRadius * (0.4 + (Math.sin(touch.seed * 20 + idx) * 0.2));
+                  const poreX = (baseRadius + 5) + Math.cos(angle) * distance;
+                  const poreY = (baseRadius + 5) + Math.sin(angle) * distance;
+                  const poreSize = 0.8 + (Math.cos(touch.seed * 30 + idx) * 0.4);
+                  
+                  return (
+                    <Circle 
+                      key={`pore-${idx}`}
+                      cx={poreX} 
+                      cy={poreY} 
+                      r={poreSize} 
+                      fill={fingerColor} 
+                      opacity={0.12}
+                    />
+                  );
+                })}
+              </Svg>
+            </Animated.View>
+          );
+        });
+      })()}
+
+      {/* Swipe trail effect (fading fingerprints along swipe path) */}
+      {(() => {
+        console.log('🎨 Swipe Trail Check:', { 
+          isArray: Array.isArray(swipeTrail), 
+          length: swipeTrail?.length, 
+          hasSessionColor: !!sessionColor 
+        });
+        
+        if (!Array.isArray(swipeTrail) || swipeTrail.length === 0 || !sessionColor) return null;
+        
+        console.log('🎨 Rendering', swipeTrail.length, 'trail points');
+        
+        const fingerColor = sessionColor.main;
+        const now = Date.now();
+        const trailDuration = 1000; // 1 second fade
+        
+        return swipeTrail.map((point, index) => {
+          const age = now - point.timestamp;
+          const progress = Math.min(age / trailDuration, 1);
+          
+          // Fade out from start to end
+          const startProgress = index / swipeTrail.length;
+          const fadeOpacity = (1 - progress) * (1 - startProgress * 0.5);
+          
+          const baseRadius = 12;
+          
+          return (
+            <View
+              key={point.id}
+              style={{
+                position: 'absolute',
+                left: point.x - baseRadius - 3,
+                top: point.y - baseRadius - 3,
+                width: (baseRadius + 3) * 2,
+                height: (baseRadius + 3) * 2,
+                opacity: fadeOpacity,
+                pointerEvents: 'none',
+              }}
+            >
+              <Svg width={(baseRadius + 3) * 2} height={(baseRadius + 3) * 2}>
+                <Circle 
+                  cx={baseRadius + 3} 
+                  cy={baseRadius + 3} 
+                  r={baseRadius * 0.8} 
+                  fill={fingerColor} 
+                  opacity={0.15}
+                />
+                <Circle 
+                  cx={baseRadius + 3} 
+                  cy={baseRadius + 3} 
+                  r={baseRadius * 0.5} 
+                  fill={fingerColor} 
+                  opacity={0.2}
+                />
+              </Svg>
+            </View>
           );
         });
       })()}
@@ -3617,175 +5100,7 @@ export default function DimensionOverlay({
             })()}
 
             {/* Draw completed measurements */}
-            {!hideMeasurementsForCapture && measurements.map((measurement, idx) => {
-              const color = getMeasurementColor(idx, measurement.mode);
-              
-              if (measurement.mode === 'distance') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Outer glow layers */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    {/* Main line */}
-                    <Line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    {/* End caps */}
-                    <Line x1={p0.x} y1={p0.y - 12} x2={p0.x} y2={p0.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
-                    <Line x1={p1.x} y1={p1.y - 12} x2={p1.x} y2={p1.y + 12} stroke={color.main} strokeWidth="2" strokeLinecap="round" />
-                    {/* Point markers with reduced glow (50%) */}
-                    {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P1 glow layers */}
-                    <Circle cx={p1.x} cy={p1.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'angle') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
-                
-                // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
-                // In normal mode, draw from p1 (vertex) to p0 and p2
-                const vertex = isMapMode ? p0 : p1;
-                const arm1 = isMapMode ? p1 : p0;
-                const arm2 = isMapMode ? p2 : p2;
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="12" opacity="0.15" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.glow} strokeWidth="8" opacity="0.25" strokeLinecap="round" />
-                    {/* Main lines */}
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-                    <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
-                    {/* Point markers with reduced glow (50%) */}
-                    {/* P0 glow layers */}
-                    <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P1 (vertex in normal mode, north ref in map mode) */}
-                    <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
-                    <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
-                    <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* P2 glow layers */}
-                    <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={p2.x} cy={p2.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={p2.x} cy={p2.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'circle') {
-                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const edge = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                const screenRadius = Math.sqrt(
-                  Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
-                );
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
-                    {/* Main circle */}
-                    <Circle cx={center.x} cy={center.y} r={screenRadius} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Center marker with reduced glow (50%) */}
-                    <Circle cx={center.x} cy={center.y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={center.x} cy={center.y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={center.x} cy={center.y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={center.x} cy={center.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'rectangle') {
-                // Get all 4 corners
-                const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
-                
-                // Calculate bounding box for rectangle rendering
-                const xCoords = corners.map(c => c.x);
-                const yCoords = corners.map(c => c.y);
-                const minX = Math.min(...xCoords);
-                const maxX = Math.max(...xCoords);
-                const minY = Math.min(...yCoords);
-                const maxY = Math.max(...yCoords);
-                const width = maxX - minX;
-                const height = maxY - minY;
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers */}
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="12" opacity="0.15" />
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.glow} strokeWidth="8" opacity="0.25" />
-                    {/* Main rectangle */}
-                    <Rect x={minX} y={minY} width={width} height={height} fill="none" stroke={color.main} strokeWidth="2.5" />
-                    {/* Corner markers - all 4 corners with reduced glow (50%) */}
-                    {corners.map((corner, cornerIdx) => (
-                      <React.Fragment key={`corner-${cornerIdx}`}>
-                        <Circle cx={corner.x} cy={corner.y} r="6" fill={color.glow} opacity="0.05" />
-                        <Circle cx={corner.x} cy={corner.y} r="5" fill={color.glow} opacity="0.075" />
-                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} opacity="0.05" />
-                        <Circle cx={corner.x} cy={corner.y} r="3" fill={color.main} opacity="0.1" />
-                        <Circle cx={corner.x} cy={corner.y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                );
-              } else if (measurement.mode === 'freehand') {
-                // Render freehand path
-                if (measurement.points.length < 2) return null;
-                
-                // Convert all points to screen coordinates
-                const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
-                
-                // Generate simple polyline that exactly follows the drawn path
-                // This prevents morphing issues from Bezier curve interpolation
-                let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
-                for (let i = 1; i < screenPoints.length; i++) {
-                  pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
-                }
-                
-                return (
-                  <React.Fragment key={measurement.id}>
-                    {/* Glow layers for freehand path */}
-                    <Path d={pathData} stroke={color.glow} strokeWidth="12" opacity="0.15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    <Path d={pathData} stroke={color.glow} strokeWidth="8" opacity="0.25" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    {/* Main freehand path */}
-                    <Path d={pathData} stroke={color.main} strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    {/* Start and end point markers with reduced glow (50%) */}
-                    {/* Start point */}
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[0].x} cy={screenPoints[0].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                    {/* End point */}
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="6" fill={color.glow} opacity="0.05" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="5" fill={color.glow} opacity="0.075" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} opacity="0.05" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="3" fill={color.main} opacity="0.1" />
-                    <Circle cx={screenPoints[screenPoints.length - 1].x} cy={screenPoints[screenPoints.length - 1].y} r="4" fill={color.main} stroke="white" strokeWidth="1" />
-                  </React.Fragment>
-                );
-              }
-              return null;
-            })}
+            {renderedMeasurements}
 
             {/* Draw live freehand path preview while drawing */}
             {mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1 && (() => {
@@ -3966,6 +5281,19 @@ export default function DimensionOverlay({
                   screenX = sumX / measurement.points.length;
                   screenY = sumY / measurement.points.length;
                 }
+              } else if (measurement.mode === 'polygon') {
+                // Label at centroid of polygon
+                if (measurement.points && measurement.points.length > 0) {
+                  // Calculate centroid
+                  let sumX = 0, sumY = 0;
+                  measurement.points.forEach(p => {
+                    const screenPoint = imageToScreen(p.x, p.y);
+                    sumX += screenPoint.x;
+                    sumY += screenPoint.y;
+                  });
+                  screenX = sumX / measurement.points.length;
+                  screenY = sumY / measurement.points.length;
+                }
               }
               return { measurement, idx: originalIdx, color, screenX, screenY };
             });
@@ -4002,57 +5330,97 @@ export default function DimensionOverlay({
             }
 
             // Render labels with adjusted positions
-            return labelData.map(({ measurement, idx, color, screenX, screenY }) => (
-              <View
-                key={measurement.id}
-                style={{
-                  position: 'absolute',
-                  left: screenX - 60,
-                  top: screenY,
-                  alignItems: 'center',
-                }}
-                pointerEvents="none"
-              >
-                {/* Small number badge */}
-                <View
+            return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
+              // Handle double-tap on label to open edit modal (only when NOT in measurement mode)
+              const handleLabelPress = () => {
+                if (!measurementMode) {
+                  const now = Date.now();
+                  const TAP_TIMEOUT = 300; // 300ms for double-tap detection
+                  
+                  if (labelTapState?.measurementId === measurement.id && (now - labelTapState.lastTapTime) < TAP_TIMEOUT) {
+                    // Second tap - open editor
+                    setLabelEditingMeasurementId(measurement.id);
+                    setShowLabelEditModal(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    setLabelTapState(null);
+                  } else {
+                    // First tap - record time
+                    setLabelTapState({ measurementId: measurement.id, lastTapTime: now });
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                }
+              };
+
+              return (
+                <Pressable
+                  key={measurement.id}
                   style={{
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    width: 24,
-                    height: 24,
-                    borderRadius: 12,
-                    justifyContent: 'center',
+                    position: 'absolute',
+                    left: screenX - 60,
+                    top: screenY,
                     alignItems: 'center',
-                    marginBottom: 4,
                   }}
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleLabelPress}
                 >
-                  <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-                    {idx + 1}
-                  </Text>
-                </View>
-                {/* Measurement value */}
-                <View
-                  style={{
-                    backgroundColor: color.main,
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 6,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 1.5 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3,
-                    elevation: 4,
-                  }}
-                >
-                  <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                    {/* For closed freehand loops, show only perimeter on label (area is in legend) */}
-                    {measurement.mode === 'freehand' && measurement.perimeter
-                      ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
-                      : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
-                    }
-                  </Text>
-                </View>
-              </View>
-            ));
+                  {/* Small number badge */}
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.7)',
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                      {idx + 1}
+                    </Text>
+                  </View>
+                  {/* Measurement value */}
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1.5 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+                      {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
+                      {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
+                        ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
+                        : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
+                      }
+                    </Text>
+                  </View>
+                  {/* Custom label text if present */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 120,
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              );
+            });
           })()}
 
           {/* Side labels for rectangles - Width on left, Height on top */}
@@ -4079,16 +5447,26 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
+            // Handle label tap to open edit modal (only when NOT in measurement mode)
+            const handleRectLabelPress = () => {
+              if (!measurementMode) {
+                setLabelEditingMeasurementId(measurement.id);
+                setShowLabelEditModal(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }
+            };
+            
             return (
               <React.Fragment key={`${measurement.id}-sides`}>
                 {/* Width label on left side (vertical dimension) */}
-                <View
+                <Pressable
                   style={{
                     position: 'absolute',
                     left: minX - 70,
                     top: centerY - 15,
                   }}
-                  pointerEvents="none"
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleRectLabelPress}
                 >
                   <View
                     style={{
@@ -4107,16 +5485,17 @@ export default function DimensionOverlay({
                       H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
                     </Text>
                   </View>
-                </View>
+                </Pressable>
                 
                 {/* Length label on top side (horizontal dimension) */}
-                <View
+                <Pressable
                   style={{
                     position: 'absolute',
                     left: centerX - 40,
                     top: minY - 35,
                   }}
-                  pointerEvents="none"
+                  pointerEvents={measurementMode ? "none" : "auto"}
+                  onPress={handleRectLabelPress}
                 >
                   <View
                     style={{
@@ -4135,7 +5514,25 @@ export default function DimensionOverlay({
                       L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
                     </Text>
                   </View>
-                </View>
+                  {/* Custom label text for rectangle - appears below width line */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 100,
+                        alignSelf: 'center',
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
               </React.Fragment>
             );
           })}
@@ -4201,7 +5598,7 @@ export default function DimensionOverlay({
                 }}
                 pointerEvents="none"
               >
-                <Text className="text-white font-bold text-base">
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
                   {value}
                 </Text>
               </View>
@@ -4233,24 +5630,41 @@ export default function DimensionOverlay({
                 </Text>
               </View>
               
-              {/* Coin reference info */}
+              {/* Coin/Drone reference info */}
               {calibration && coinCircle && (
                 <View
                   style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backgroundColor: coinCircle.coinName.startsWith('Auto:') 
+                      ? 'rgba(0, 200, 255, 0.15)' // Cyan tint for drone
+                      : 'rgba(0, 0, 0, 0.7)', // Black for coin
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderRadius: 5,
+                    borderWidth: coinCircle.coinName.startsWith('Auto:') ? 1 : 0,
+                    borderColor: 'rgba(0, 200, 255, 0.3)',
                   }}
                 >
-                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    {coinCircle.coinName}
-                  </Text>
-                  <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                    {unitSystem === 'imperial' 
-                      ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
-                      : `${coinCircle.coinDiameter.toFixed(2)}mm`}
-                  </Text>
+                  {coinCircle.coinName.startsWith('Auto:') ? (
+                    <>
+                      <Text style={{ color: '#00D4FF', fontSize: 11, fontWeight: '700' }}>
+                        🚁 {coinCircle.coinName.replace('Auto: ', '')}
+                      </Text>
+                      <Text style={{ color: '#A0E0FF', fontSize: 9, fontWeight: '500' }}>
+                        Auto-calibrated from altitude
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                        {coinCircle.coinName}
+                      </Text>
+                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                        {unitSystem === 'imperial' 
+                          ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
+                          : `${coinCircle.coinDiameter.toFixed(2)}mm`}
+                      </Text>
+                    </>
+                  )}
                 </View>
               )}
             </View>
@@ -4271,7 +5685,7 @@ export default function DimensionOverlay({
               pointerEvents={isCapturing ? 'none' : 'box-none'}
             >
               {/* Header with collapse/expand button */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 4, paddingBottom: legendCollapsed ? 0 : 4, borderBottomWidth: legendCollapsed ? 0 : 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
                 <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', opacity: 0.7 }}>
                   LEGEND
                 </Text>
@@ -4291,8 +5705,8 @@ export default function DimensionOverlay({
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
                       {legendCollapsed ? '+' : '−'}
                     </Text>
-                  </Pressable>
-                )}
+        </Pressable>
+      )}
               </View>
               
               {/* Measurement items - hidden when collapsed (except during capture) */}
@@ -4375,11 +5789,20 @@ export default function DimensionOverlay({
                           const area = measurement.width * measurement.height;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
                           return `${displayValue} (A: ${areaStr})`;
+                        } else if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter && measurement.area !== undefined) {
+                          // Show perimeter and area for closed freehand loops and polygons
+                          return measurement.value; // Already formatted as "perimeter (A: area)"
                         }
                         
                         return displayValue;
                       })()}
                     </Text>
+                    {/* Label text if present */}
+                    {measurement.label && (
+                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 7, fontWeight: '500', fontStyle: 'italic', marginTop: 4 }}>
+                        {measurement.label}
+                      </Text>
+                    )}
                   </View>
                 );
               })}
@@ -4414,15 +5837,53 @@ export default function DimensionOverlay({
           )}
       </View>
 
-      {/* Auto-capture badge - top-right corner (OUTSIDE viewRef to allow taps) */}
+      {/* Official PanHandler Supporter Badge - Top Right (above AUTO LEVEL) */}
+      {isDonor && (
+        <View
+          style={{
+            position: 'absolute',
+            top: insets.top + 4,
+            right: 12,
+            backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            zIndex: 31, // Above AUTO LEVEL badge
+            shadowColor: '#FF1493',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 5,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+          }}
+        >
+          <Text style={{ fontSize: 14 }}>❤️</Text>
+          <Text style={{ 
+            color: 'white', 
+            fontSize: 9, 
+            fontWeight: '800',
+            letterSpacing: 0.3,
+          }}>
+            Official PanHandler Supporter
+          </Text>
+        </View>
+      )}
+
+      {/* Auto-capture badge - top-right corner (BELOW donor badge) */}
       {isAutoCaptured && (
         <Pressable
           onPress={handleAutoLevelTap}
           style={{
             position: 'absolute',
-            top: insets.top + 16,
+            top: isDonor 
+              ? insets.top + 44 // 40px below donor badge (4 + 34 height + 6 gap)
+              : insets.top + 16, // Normal position when no donor badge
             right: 12,
-            backgroundColor: 'rgba(0, 200, 0, 0.9)',
+            backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
             paddingHorizontal: 8,
             paddingVertical: 4,
             borderRadius: 6,
@@ -4438,13 +5899,17 @@ export default function DimensionOverlay({
         </Pressable>
       )}
 
-      {/* Bottom toolbar - Water droplet style with slide gesture */}
+      {/* Bottom toolbar - Water droplet style */}
       {!menuMinimized && !isCapturing && (
-        <GestureDetector gesture={menuPanGesture}>
+        <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
-            className="absolute left-0 right-0 z-20"
+            pointerEvents="auto"
             style={[
               { 
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                zIndex: 9999, // Super high priority
                 bottom: insets.bottom + 16,
                 paddingHorizontal: 24,
               },
@@ -4561,13 +6026,21 @@ export default function DimensionOverlay({
                 </View>
 
           {/* Mode Toggle: Edit/Move vs Measure */}
-          <View className="flex-row mb-2" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+          <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
             <Pressable
-              onPress={() => {
+              onPress={(event) => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(false);
                 setShowCursor(false);
-                setSelectedMeasurementId(null); // Clear selection when switching to Edit mode
+                setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                
+                // Create fingerprint at touch location
+                const { pageX, pageY } = event.nativeEvent;
+                createMenuFingerprint(pageX, pageY);
+              }}
+              onPressIn={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BTN_IN', mode: 'IN' });
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
@@ -4577,7 +6050,7 @@ export default function DimensionOverlay({
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
                   size={14} 
@@ -4594,13 +6067,17 @@ export default function DimensionOverlay({
               </View>
             </Pressable>
             <Pressable
-              onPress={() => {
+              onPress={(event) => {
+                const { pageX, pageY } = event.nativeEvent;
+                createMenuFingerprint(pageX, pageY);
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'MEASURE_BUTTON', mode: 'PRESS' });
                 setMeasurementMode(true);
-                // Show cursor immediately at center for instant feedback
                 setShowCursor(true);
                 setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
-                // Stronger haptic to signal mode change
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }}
+              onPressIn={() => {
+                setDebugInfo({ lastTouch: Date.now(), interceptor: 'MEASURE_BTN_IN', mode: 'IN' });
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
@@ -4610,7 +6087,7 @@ export default function DimensionOverlay({
                 backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons 
                   name="create-outline" 
                   size={14} 
@@ -4631,15 +6108,17 @@ export default function DimensionOverlay({
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <GestureDetector gesture={modeSwitchGesture}>
             <Animated.View style={[{ marginBottom: 8 }, modeSwipeAnimatedStyle]}>
-              <View className="flex-row" style={{ backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
                 {/* Box (Rectangle) */}
                 <Pressable
-                onPress={() => {
+                onPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  createMenuFingerprint(pageX, pageY);
+                  playModeHaptic('rectangle');
                   setMode('rectangle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4677,12 +6156,14 @@ export default function DimensionOverlay({
 
               {/* Circle */}
               <Pressable
-                onPress={() => {
+                onPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  createMenuFingerprint(pageX, pageY);
+                  playModeHaptic('circle');
                   setMode('circle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4721,11 +6202,11 @@ export default function DimensionOverlay({
               {/* Angle */}
               <Pressable
                 onPress={() => {
+                  playModeHaptic('angle');
                   setMode('angle');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 style={{
                   flex: 1,
@@ -4767,11 +6248,11 @@ export default function DimensionOverlay({
               {/* Distance (long-press also activates freehand) */}
               <Pressable
                 onPress={() => {
+                  playModeHaptic('distance');
                   setMode('distance');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1); // Rotate color
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setModeColorIndex((prev) => prev + 1);
                 }}
                 onPressIn={() => {
                   // Start long-press timer for freehand mode
@@ -4779,18 +6260,28 @@ export default function DimensionOverlay({
                     clearTimeout(freehandLongPressRef.current);
                   }
                   freehandLongPressRef.current = setTimeout(() => {
-                    // Activate freehand mode
+                    // Activate freehand mode - check trial
                     if (!isProUser) {
-                      setShowProModal(true);
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                      return;
+                      // Check if trial exhausted
+                      if (freehandTrialUsed >= freehandTrialLimit) {
+                        console.log('🤖 Freehand trial exhausted! Opening modal...');
+                        if (freehandOfferDismissed) {
+                          console.log('🤖 Offer was dismissed, showing Battling Bots Modal');
+                          setShowProModal(true);
+                        } else {
+                          console.log('📧 Showing freehand offer modal first');
+                          setShowFreehandOfferModal(true);
+                        }
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                        return;
+                      }
                     }
+                    playModeHaptic('freehand');
                     setMode('freehand');
                     setCurrentPoints([]);
                     setMeasurementMode(true);
                     setIsDrawingFreehand(false);
-                    // Don't show cursor until user touches screen
-                    setModeColorIndex((prev) => prev + 1); // Rotate color when long-press activates
+                    setModeColorIndex((prev) => prev + 1);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     console.log('🎨 Freehand mode activated via long-press');
                   }, 500); // 500ms long-press
@@ -4836,20 +6327,43 @@ export default function DimensionOverlay({
                 </View>
               </Pressable>
 
-              {/* Freehand (PRO ONLY - activated by tapping here OR long-pressing Distance) */}
+              {/* Freehand (FREE TRIAL: 10 uses, then PRO) */}
               <Pressable
                 onPress={() => {
-                  if (!isProUser) {
+                  // Check if user is pro
+                  if (isProUser) {
+                    playModeHaptic('freehand');
+                    setMode('freehand');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setIsDrawingFreehand(false);
+                    setModeColorIndex((prev) => prev + 1);
+                    return;
+                  }
+                  
+                  // Check if trial is exhausted and offer dismissed
+                  if (freehandTrialUsed >= freehandTrialLimit && freehandOfferDismissed) {
+                    // Show Pro modal
                     setShowProModal(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
+                  
+                  // Check if trial is exhausted but offer not yet dismissed
+                  if (freehandTrialUsed >= freehandTrialLimit && !freehandOfferDismissed) {
+                    // Show special offer modal
+                    setShowFreehandOfferModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                    return;
+                  }
+                  
+                  // User still has free tries - activate freehand
+                  playModeHaptic('freehand');
                   setMode('freehand');
                   setCurrentPoints([]);
                   setMeasurementMode(true);
                   setIsDrawingFreehand(false);
                   setModeColorIndex((prev) => prev + 1);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={{
                   flex: 1,
@@ -4887,28 +6401,99 @@ export default function DimensionOverlay({
                     Free
                   </Text>
                 </View>
-                  {!isProUser && (
-                    <View style={{
-                      position: 'absolute',
-                      top: -2,
-                      right: -2,
-                      backgroundColor: '#FFD700',
-                      paddingHorizontal: 3,
-                      paddingVertical: 1,
-                      borderRadius: 4,
-                    }}>
-                      <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
-                    </View>
-                  )}
+                  {/* Badge showing trial status or PRO */}
+                  {(() => {
+                    if (isProUser) {
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FFD700',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO</Text>
+                        </View>
+                      );
+                    }
+                    
+                    const remaining = freehandTrialLimit - freehandTrialUsed;
+                    
+                    if (remaining > 1) {
+                      // Show "10 FREE" → "9 LEFT" → "2 LEFT"
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#34C759',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>
+                            {freehandTrialUsed === 0 ? `${freehandTrialLimit} FREE` : `${remaining} LEFT`}
+                          </Text>
+                        </View>
+                      );
+                    } else if (remaining === 1) {
+                      // Show "1 LEFT" in orange
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FF9500',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>1 LEFT</Text>
+                        </View>
+                      );
+                    } else if (!freehandOfferDismissed) {
+                      // Trial exhausted, offer not dismissed - show special badge
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FF3B30',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#FFF' }}>OFFER</Text>
+                        </View>
+                      );
+                    } else {
+                      // Trial exhausted, offer dismissed - show PRO lock
+                      return (
+                        <View style={{
+                          position: 'absolute',
+                          top: -2,
+                          right: -2,
+                          backgroundColor: '#FFD700',
+                          paddingHorizontal: 3,
+                          paddingVertical: 1,
+                          borderRadius: 4,
+                        }}>
+                          <Text style={{ fontSize: 7, fontWeight: '900', color: '#000' }}>PRO 🔒</Text>
+                        </View>
+                      );
+                    }
+                  })()}
               </Pressable>
             </View>
             </Animated.View>
           </GestureDetector>
 
           {/* Unit System and Map Mode Row */}
-          <View className="flex-row mb-2" style={{ gap: 6 }}>
+          <View style={{ flexDirection: 'row', marginBottom: 8, gap: 6 }}>
             {/* Unit System Toggle: Metric vs Imperial - Compact */}
-            <View className="flex-row" style={{ flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
               <Pressable
                 onPress={() => {
                   setUnitSystem('metric');
@@ -4921,7 +6506,7 @@ export default function DimensionOverlay({
                   backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
-                <View className="flex-row items-center justify-center">
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
                     fontSize: 10,
@@ -4934,7 +6519,7 @@ export default function DimensionOverlay({
               <Pressable
                 onPress={() => {
                   setUnitSystem('imperial');
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  handleImperialTap();
                 }}
                 style={{
                   flex: 1,
@@ -4943,7 +6528,7 @@ export default function DimensionOverlay({
                   backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
-                <View className="flex-row items-center justify-center">
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
                     fontSize: 10,
@@ -4958,18 +6543,26 @@ export default function DimensionOverlay({
             {/* Map Mode Toggle */}
             <Pressable
               onPress={() => {
+                console.log('🗺️ Map button pressed:', { isMapMode, hasMapScale: !!mapScale });
                 if (!isMapMode) {
                   // Turning ON map mode
                   if (mapScale) {
                     // Scale already exists for this photo - just activate map mode
+                    console.log('✅ Activating map mode (scale exists)');
                     setIsMapMode(true);
+                    // Dora "We did it!" - Triumphant celebratory sequence! 🗺️
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 80);
+                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+                    setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
                   } else {
                     // No scale yet - show modal to set scale
+                    console.log('📋 No scale - showing modal');
                     setShowMapScaleModal(true);
                   }
                 } else {
                   // Turning OFF map mode - keep scale for this photo session
+                  console.log('⏸️ Deactivating map mode (keeping scale)');
                   setIsMapMode(false);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
@@ -4984,7 +6577,7 @@ export default function DimensionOverlay({
                 paddingHorizontal: 8,
               }}
             >
-              <View className="flex-row items-center justify-center">
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Map icon - folded map with panels */}
                 <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
                   {/* Three vertical panels of a folded map */}
@@ -5024,15 +6617,37 @@ export default function DimensionOverlay({
           {/* Tip */}
           {/* Helper instructions - always show based on mode */}
           {currentPoints.length === 0 && (
-            <View className={`${measurementMode ? 'bg-green-50' : selectedMeasurementId ? 'bg-purple-50' : 'bg-blue-50'} rounded-lg px-3 py-2 mb-3`}>
-              <Text className={`${measurementMode ? 'text-green-800' : selectedMeasurementId ? 'text-purple-800' : 'text-blue-800'} text-xs text-center`}>
+            <View style={{ 
+              backgroundColor: measurementMode ? 'rgba(240, 253, 244, 1)' : selectedMeasurementId ? 'rgba(250, 245, 255, 1)' : 'rgba(239, 246, 255, 1)',
+              borderRadius: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              marginBottom: 12
+            }}>
+              <Text style={{ 
+                color: measurementMode ? 'rgba(22, 101, 52, 1)' : selectedMeasurementId ? 'rgba(107, 33, 168, 1)' : 'rgba(30, 64, 175, 1)',
+                fontSize: 12,
+                textAlign: 'center'
+              }}>
                 {measurementMode 
                   ? mode === 'circle' 
                     ? '⭕ Tap center, then tap edge of circle'
                     : mode === 'rectangle'
                     ? '⬜ Tap first corner, then tap opposite corner'
                     : mode === 'freehand'
-                    ? '✏️ Touch and drag to draw freehand path'
+                    ? (() => {
+                        // Dynamic helper for freehand drawing
+                        if (isDrawingFreehand && freehandPath.length > 5) {
+                          // Check if path self-intersects
+                          const selfIntersects = doesPathSelfIntersect(freehandPath);
+                          if (selfIntersects) {
+                            return '❌ Cannot find surface area - path crossed itself';
+                          } else {
+                            return '💡 Connect end to first point to find surface area';
+                          }
+                        }
+                        return '✏️ Touch and drag to draw freehand path';
+                      })()
                     : mode === 'angle'
                     ? isMapMode
                       ? '🧭 Tap 3 points: start location, north reference, destination'
@@ -5066,8 +6681,8 @@ export default function DimensionOverlay({
           
           {/* Locked notice */}
           {isPanZoomLocked && (
-            <View className="bg-amber-50 rounded-lg px-3 py-2 mb-3">
-              <Text className="text-amber-800 text-xs text-center">
+            <View style={{ backgroundColor: 'rgba(254, 243, 199, 1)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12 }}>
+              <Text style={{ color: 'rgba(146, 64, 14, 1)', fontSize: 12, textAlign: 'center' }}>
                 🔒 Pan/zoom locked • Remove all measurements to unlock
               </Text>
             </View>
@@ -5113,7 +6728,13 @@ export default function DimensionOverlay({
 
             {/* New Photo button - always visible in the same row */}
             <Pressable
-              onPress={handleReset}
+              onPress={() => {
+                // Longer delay to ensure gestures are fully released
+                // requestAnimationFrame wasn't enough, use 100ms timeout
+                setTimeout(() => {
+                  handleReset();
+                }, 100);
+              }}
               style={{
                 flex: 1,
                 backgroundColor: 'rgba(255, 59, 48, 0.85)',
@@ -5129,290 +6750,50 @@ export default function DimensionOverlay({
             </Pressable>
           </View>
           
-          
-          {/* Pro status footer */}
-          <Pressable
-            onPress={() => {
-              // SECRET TEST FEATURE: 5 fast taps to toggle Pro/Free (REMOVE IN PRODUCTION)
-              const now = Date.now();
-              let newCount = proToggleTapCount;
-              
-              // Reset counter if more than 1 second since last tap
-              if (now - proToggleLastTapTime > 1000) {
-                newCount = 1;
-              } else {
-                newCount = proToggleTapCount + 1;
-              }
-              
-              setProToggleTapCount(newCount);
-              setProToggleLastTapTime(now);
-              
-              if (newCount >= 5) {
-                // Toggle Pro/Free status
-                const newProStatus = !isProUser;
-                setIsProUser(newProStatus);
-                setProToggleTapCount(0);
-                
-                if (newProStatus) {
-                  // Switched to Pro
-                  Alert.alert('🎉 Pro Mode Enabled!', 'All pro features are now available for testing!');
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                } else {
-                  // Switched to Free
-                  Alert.alert('🔄 Free User Mode', 'Switched to Free User for testing!');
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                }
-              } else {
-                // Only show modal on 1st tap if Free user (not during rapid tapping)
-                if (newCount === 1 && !isProUser) {
-                  setTimeout(() => {
-                    // Check if user didn't continue tapping (still at 1 tap after 500ms)
-                    if (proToggleTapCount === 1) {
-                      setShowProModal(true);
-                    }
-                  }, 500);
-                }
-                
-                // Haptic feedback for tap counting
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }
-            }}
-            style={{
-              marginTop: 4,
-              paddingVertical: 6,
-              paddingHorizontal: 12,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 11, color: 'rgba(0, 0, 0, 0.4)', fontWeight: '500' }}>
-              {isProUser ? '✨ Pro User' : 'Tap for Pro Features'}
-            </Text>
-          </Pressable>
+          {/* Pro status footer - REMOVED: Now donation-based via BattlingBots */}
         </View>
         </BlurView>
           </Animated.View>
         </GestureDetector>
       )}
       
-      {/* Pro Upgrade Modal */}
-      <Modal
-        visible={showProModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowProModal(false)}
-      >
-        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-          <Pressable
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
-            onPress={() => setShowProModal(false)}
-          >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={{
-                width: '100%',
-                maxWidth: 400,
-                borderRadius: 20,
-                overflow: 'hidden',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.2,
-                shadowRadius: 20,
-                elevation: 16,
-              }}
-            >
-              <BlurView intensity={35} tint="light">
-                <View style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.35)',
-                  padding: 28,
-                }}>
-                  {/* Header */}
-                  <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                    <View style={{ 
-                      backgroundColor: 'rgba(88, 86, 214, 0.85)', 
-                      width: 64, 
-                      height: 64, 
-                      borderRadius: 32, 
-                      justifyContent: 'center', 
-                      alignItems: 'center', 
-                      marginBottom: 12 
-                    }}>
-                      <Ionicons name="star" size={32} color="white" />
-                    </View>
-                    <Text style={{ fontSize: 24, fontWeight: '700', color: '#1C1C1E', marginBottom: 4 }}>
-                      Upgrade to Pro
-                    </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', textAlign: 'center' }}>
-                      Unlock the Freehand tool
-                    </Text>
-                  </View>
-                  
-                  {/* Comparison Chart */}
-                  <View style={{ marginBottom: 20 }}>
-                    <View style={{ 
-                      borderRadius: 14, 
-                      borderWidth: 1, 
-                      borderColor: 'rgba(0,0,0,0.08)',
-                      overflow: 'hidden',
-                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                    }}>
-                      {/* Table Header */}
-                      <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.12)', paddingVertical: 12 }}>
-                        <View style={{ flex: 2, paddingHorizontal: 12 }}>
-                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#3C3C43' }}>FEATURE</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                          <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>FREE</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>PRO</Text>
-                        </View>
-                      </View>
-                      
-                      {/* Table Row - Freehand Tool (last free tool, subtle red shadow to indicate dividing line) */}
-                      <View style={{ 
-                        flexDirection: 'row', 
-                        paddingVertical: 12, 
-                        borderTopWidth: 1, 
-                        borderTopColor: 'rgba(0,0,0,0.06)',
-                        shadowColor: '#FF3B30',
-                        shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 8,
-                        backgroundColor: 'rgba(255, 59, 48, 0.06)',
-                      }}>
-                        <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center' }}>
-                          <Text style={{ fontSize: 14, color: '#1C1C1E', marginRight: 6 }}>Freehand Tool</Text>
-                          {/* Small illustrative icon */}
-                          <Svg width="20" height="20" viewBox="0 0 20 20">
-                            {/* Curvy freehand line */}
-                            <Path
-                              d="M 3 10 Q 6 6, 10 10 T 17 10"
-                              stroke="#5856D6"
-                              strokeWidth="1.5"
-                              fill="none"
-                              strokeLinecap="round"
-                            />
-                            {/* Measurement markers */}
-                            <Circle cx="3" cy="10" r="1.5" fill="#5856D6" />
-                            <Circle cx="17" cy="10" r="1.5" fill="#5856D6" />
-                          </Svg>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                          {/* X icon with darker background shadow */}
-                          <View style={{
-                            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                            borderRadius: 10,
-                            width: 20,
-                            height: 20,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                            <Ionicons name="close-circle" size={20} color="#D1D5DB" />
-                          </View>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                          <Ionicons name="checkmark-circle" size={20} color="#5856D6" />
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  {/* Price */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(88, 86, 214, 0.12)', 
-                    borderRadius: 12, 
-                    padding: 16, 
-                    marginBottom: 20, 
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: 'rgba(88, 86, 214, 0.2)',
-                  }}>
-                    <Text style={{ fontSize: 36, fontWeight: '700', color: '#5856D6' }}>$9.97</Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43' }}>One-time purchase • Lifetime access</Text>
-                  </View>
-                  
-                  {/* Purchase Button */}
-                  <Pressable
-                    onPress={() => {
-                      setShowProModal(false);
-                      Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(88, 86, 214, 0.95)' : 'rgba(88, 86, 214, 0.85)',
-                      borderRadius: 14,
-                      paddingVertical: 16,
-                      marginBottom: 12,
-                      shadowColor: '#5856D6',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                    })}
-                  >
-                    <Text style={{ color: 'white', fontSize: 17, fontWeight: '600', textAlign: 'center' }}>Purchase Pro</Text>
-                  </Pressable>
-                  
-                  {/* Restore Purchase Button */}
-                  <Pressable
-                    onPress={() => {
-                      Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
-                    }}
-                    style={{ paddingVertical: 12, marginBottom: 8 }}
-                  >
-                    <Text style={{ color: '#5856D6', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Restore Purchase</Text>
-                  </Pressable>
-                  
-                  {/* Maybe Later Button */}
-                  <Pressable
-                    onPress={() => setShowProModal(false)}
-                    style={{ paddingVertical: 12 }}
-                  >
-                    <Text style={{ color: '#8E8E93', fontSize: 15, textAlign: 'center', fontWeight: '600' }}>Maybe Later</Text>
-                  </Pressable>
-                </View>
-              </BlurView>
-            </Pressable>
-          </Pressable>
-        </BlurView>
-      </Modal>
+      {/* Battling Bots Pro Upgrade Modal */}
+      {/* REMOVED: Old Pro upgrade modal - Now using donation-based BattlingBots in MeasurementScreen */}
 
-      {/* Help Button - Floating centered horizontally */}
-      {!menuHidden && !isCapturing && (
-        <View
+      {/* Help Button - Positioned next to AUTO LEVEL badge */}
+      {coinCircle && !showLockedInAnimation && !isCapturing && (
+        <Pressable
+          onPress={() => setShowHelpModal(true)}
+          onLongPress={() => {
+            // Secret: Long-press to clear saved email (for testing)
+            setUserEmail(null);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
+          }}
           style={{
             position: 'absolute',
-            top: insets.top + 20,
-            left: SCREEN_WIDTH / 2 - 13,
-            zIndex: 50,
+            zIndex: 30, // Same as AUTO LEVEL badge
+            top: insets.top + 16, // Same vertical position as AUTO LEVEL
+            right: isAutoCaptured 
+              ? 118  // Position right next to AUTO LEVEL badge (with small gap)
+              : (coinCircle || calibration || mapScale) 
+                ? 118  // Position left of Calibrated badge when no AUTO LEVEL
+                : 16,  // Position in top right when no badges present
+            backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(100, 149, 237, 0.85)', // Session color with opacity
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: sessionColor ? sessionColor.main : '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.35,
+            shadowRadius: 6,
+            elevation: 5,
           }}
-          pointerEvents="box-none"
         >
-          <Pressable
-            onPress={() => setShowHelpModal(true)}
-            onLongPress={() => {
-              // Secret: Long-press to clear saved email (for testing)
-              setUserEmail(null);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              Alert.alert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!');
-            }}
-            style={{
-              backgroundColor: 'rgba(0, 122, 255, 0.9)',
-              width: 26,
-              height: 26,
-              borderRadius: 13,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-              elevation: 5,
-            }}
-          >
-            <Ionicons name="help-circle-outline" size={16} color="white" />
-          </Pressable>
-        </View>
+          <Ionicons name="help-circle-outline" size={18} color="white" />
+        </Pressable>
       )}
 
       {/* Help Modal */}
@@ -5424,6 +6805,18 @@ export default function DimensionOverlay({
         onComplete={handleLabelComplete}
         onDismiss={handleLabelDismiss}
         initialValue={currentLabel}
+        isMapMode={isMapMode}
+        actionType={pendingAction || 'save'}
+      />
+      
+      {/* Label Edit Modal - for editing existing measurement labels via double-tap */}
+      <LabelModal 
+        visible={showLabelEditModal} 
+        onComplete={handleLabelEditComplete}
+        onDismiss={handleLabelEditDismiss}
+        initialValue={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.label : null}
+        isMapMode={isMapMode}
+        measurementMode={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.mode : undefined}
       />
       
       {/* Email Prompt Modal */}
@@ -5839,13 +7232,654 @@ export default function DimensionOverlay({
           setMapScale(scale);
           setIsMapMode(true);
           setShowMapScaleModal(false);
+          
+          // Create calibration from verbal scale
+          // Convert screen measurement to pixels
+          const DPI = 160; // Standard Android DPI (iOS ~163, but 160 is close enough)
+          const pixelsPerInch = DPI;
+          const pixelsPerCm = DPI / 2.54;
+          
+          const screenPixels = scale.screenUnit === 'cm' 
+            ? scale.screenDistance * pixelsPerCm 
+            : scale.screenDistance * pixelsPerInch;
+          
+          // Convert real-world distance to mm for calibration
+          let realDistanceMm = 0;
+          if (scale.realUnit === 'km') {
+            realDistanceMm = scale.realDistance * 1000000; // km to mm
+          } else if (scale.realUnit === 'mi') {
+            realDistanceMm = scale.realDistance * 1609344; // mi to mm
+          } else if (scale.realUnit === 'm') {
+            realDistanceMm = scale.realDistance * 1000; // m to mm
+          } else if (scale.realUnit === 'ft') {
+            realDistanceMm = scale.realDistance * 304.8; // ft to mm
+          }
+          
+          // Calculate pixels per mm
+          const pixelsPerMm = screenPixels / realDistanceMm;
+          
+          // Create calibration object
+          const newCalibration = {
+            pixelsPerUnit: pixelsPerMm,
+            unit: 'mm' as const,
+            referenceDistance: realDistanceMm,
+            calibrationType: 'verbal' as const,
+            verbalScale: scale,
+          };
+          
+          setCalibration(newCalibration);
+          
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }}
+        onBlueprintMode={() => {
+          // User wants to place points for blueprint scale
+          setShowMapScaleModal(false);
+          setShowBlueprintPlacementModal(true);
         }}
         onDismiss={() => {
           // If dismissing without setting scale, turn off map mode
           setIsMapMode(false);
           setShowMapScaleModal(false);
         }}
+      />
+
+      {/* Blueprint/Aerial Placement Modal */}
+      <BlueprintPlacementModal
+        visible={showBlueprintPlacementModal}
+        mode={isAerialMode ? 'aerial' : 'blueprint'}
+        onStartPlacement={() => {
+          // Hide modal and start measurement mode for blueprint placement
+          setShowBlueprintPlacementModal(false);
+          setIsPlacingBlueprint(true);
+          setMeasurementMode(true); // Use existing measurement system
+          setShowCursor(true);
+          setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }}
+        onDismiss={() => {
+          setShowBlueprintPlacementModal(false);
+          setBlueprintPoints([]);
+          setIsMapMode(false);
+        }}
+      />
+
+
+
+      {/* Blueprint Points Visualization */}
+      {isPlacingBlueprint && blueprintPoints.length > 0 && (
+        <Animated.View style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex: 25,
+          opacity: blueprintLineOpacity,
+        }} pointerEvents="none">
+          <Svg style={{ width: '100%', height: '100%' }}>
+            {/* Draw line between points if we have 2 */}
+            {blueprintPoints.length === 2 && (() => {
+              const p0 = imageToScreen(blueprintPoints[0].x, blueprintPoints[0].y);
+              const p1 = imageToScreen(blueprintPoints[1].x, blueprintPoints[1].y);
+              return (
+                <Line
+                  x1={p0.x}
+                  y1={p0.y}
+                  x2={p1.x}
+                  y2={p1.y}
+                  stroke="rgba(100, 100, 100, 0.8)"
+                  strokeWidth={3}
+                  strokeDasharray="8,4"
+                />
+              );
+            })()}
+            
+            {/* Draw circles for each point */}
+            {blueprintPoints.map((point, idx) => {
+              const screenPoint = imageToScreen(point.x, point.y);
+              return (
+                <React.Fragment key={idx}>
+                  {/* Outer glow */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={20}
+                    fill="rgba(100, 100, 100, 0.3)"
+                  />
+                  {/* Main circle */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={12}
+                    fill="rgba(100, 100, 100, 0.8)"
+                    stroke="white"
+                    strokeWidth={3}
+                  />
+                  {/* Center dot */}
+                  <Circle
+                    cx={screenPoint.x}
+                    cy={screenPoint.y}
+                    r={3}
+                    fill="white"
+                  />
+                </React.Fragment>
+              );
+            })}
+          </Svg>
+        </Animated.View>
+      )}
+
+      {/* Blueprint Distance Input Modal */}
+      <BlueprintDistanceModal
+        visible={showBlueprintDistanceModal}
+        mode={isAerialMode ? 'aerial' : 'blueprint'}
+        onComplete={(distance, unit) => {
+          // Fade out the line gracefully
+          blueprintLineOpacity.value = withTiming(0, {
+            duration: 400,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          // Calculate pixel distance between the two points
+          const dx = blueprintPoints[1].x - blueprintPoints[0].x;
+          const dy = blueprintPoints[1].y - blueprintPoints[0].y;
+          const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Calculate pixels per unit
+          const pixelsPerUnit = pixelDistance / distance;
+          
+          // Create calibration object
+          const newCalibration = {
+            pixelsPerUnit,
+            unit,
+            referenceDistance: distance,
+            calibrationType: 'blueprint' as const,
+            blueprintScale: { distance, unit }, // Store for display in badge
+          };
+          
+          // Store calibration
+          useStore.getState().setCalibration(newCalibration);
+          
+          // Show menu again and clean up after fade
+          setTimeout(() => {
+            setMenuHidden(false);
+            setShowBlueprintDistanceModal(false);
+            setBlueprintPoints([]);
+            setIsMapMode(false);
+            blueprintLineOpacity.value = 1; // Reset for next time
+          }, 400);
+          
+          // Success haptic
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          
+          console.log('🎯 Blueprint calibration complete:', {
+            pixelDistance,
+            realDistance: distance,
+            unit,
+            pixelsPerUnit,
+          });
+        }}
+        onDismiss={() => {
+          // Cancel - fade out and clean up
+          blueprintLineOpacity.value = withTiming(0, {
+            duration: 300,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setMenuHidden(false);
+            setShowBlueprintDistanceModal(false);
+            setBlueprintPoints([]);
+            setIsMapMode(false);
+            blueprintLineOpacity.value = 1; // Reset for next time
+          }, 300);
+        }}
+      />
+
+      {/* Pan Tutorial Overlay - Shows on first load after calibration */}
+      {showPanTutorial && (
+        <Animated.View
+          style={[{
+            position: 'absolute',
+            top: SCREEN_HEIGHT / 2 - 120,
+            left: 40,
+            right: 40,
+            alignItems: 'center',
+            pointerEvents: 'none',
+          }, panTutorialAnimatedStyle]}
+        >
+          {/* Instructional Text - 15% BIGGER (confident & polished!) */}
+          <Text
+            style={{
+              fontSize: 17, // Was 15, now ~15% bigger (rounded)
+              fontWeight: '500',
+              color: 'rgba(255, 255, 255, 0.95)',
+              textAlign: 'center',
+              marginBottom: 21, // Was 18, now ~15% bigger (rounded)
+              textShadowColor: 'rgba(0, 0, 0, 0.6)',
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+              lineHeight: 24, // Was 21, now ~15% bigger (rounded)
+              letterSpacing: 0.3,
+            }}
+          >
+            {"Pan around and align your photo\nusing the guides, then select\nyour measurement"}
+          </Text>
+
+          {/* Measurement Mode Icons - 15% BIGGER */}
+          {/* Was gap: 16, now 18 (~15% bigger rounded) */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 18 }}>
+            {/* Box */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={32} height={32} viewBox="0 0 24 24">
+                <Rect x="4" y="4" width="16" height="16" stroke="white" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Circle */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={32} height={32} viewBox="0 0 24 24">
+                <Circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Angle */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={32} height={32} viewBox="0 0 24 24">
+                <Line x1="4" y1="20" x2="20" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <Line x1="4" y1="20" x2="20" y2="20" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <Path d="M 10 20 A 8 8 0 0 1 8 12" stroke="white" strokeWidth="1.5" fill="none" />
+              </Svg>
+            </View>
+
+            {/* Line */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={32} height={32} viewBox="0 0 24 24">
+                <Line x1="4" y1="12" x2="20" y2="12" stroke="white" strokeWidth="2" />
+                <Circle cx="4" cy="12" r="3" fill="white" />
+                <Circle cx="20" cy="12" r="3" fill="white" />
+              </Svg>
+            </View>
+
+            {/* Freehand */}
+            <View style={{ alignItems: 'center' }}>
+              <Svg width={32} height={32} viewBox="0 0 24 24">
+                <Path 
+                  d="M 4 12 Q 7 8, 10 12 T 16 12 Q 18 13, 20 10" 
+                  stroke="white" 
+                  strokeWidth="2.5" 
+                  fill="none"
+                  strokeLinecap="round"
+                />
+              </Svg>
+            </View>
+          </View>
+        </Animated.View>
+      )}
+
+      {/* Save Success Modal - Glassmorphic & Beautiful */}
+      {showSaveSuccessModal && (
+        <Pressable
+          onPress={() => setShowSaveSuccessModal(false)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10000,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: 'rgba(20, 20, 20, 0.95)',
+              borderRadius: 24,
+              padding: 32,
+              alignItems: 'center',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.5,
+              shadowRadius: 30,
+              minWidth: 280,
+            }}
+          >
+            {/* Success Icon */}
+            <View
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}
+            >
+              <Ionicons name="checkmark-circle" size={48} color="rgba(76, 175, 80, 1)" />
+            </View>
+
+            {/* Success Message */}
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: '700',
+                color: 'white',
+                marginBottom: 8,
+                textAlign: 'center',
+              }}
+            >
+              Saved!
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                color: 'rgba(255, 255, 255, 0.8)',
+                textAlign: 'center',
+                lineHeight: 20,
+              }}
+            >
+              Your measurements have been{'\n'}saved to Photos
+            </Text>
+
+            {/* Tap anywhere hint */}
+            <Text
+              style={{
+                fontSize: 13,
+                color: 'rgba(255, 255, 255, 0.5)',
+                marginTop: 24,
+                fontStyle: 'italic',
+              }}
+            >
+              Tap anywhere to continue
+            </Text>
+          </View>
+        </Pressable>
+      )}
+
+      {/* Smart Calibration Hint */}
+      {showCalibrationHint && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 9999,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            },
+            hintBackgroundStyle,
+          ]}
+        >
+          <Pressable
+            onPress={() => {
+              setShowCalibrationHint(false);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+          <Animated.View style={hintCardStyle} pointerEvents="none">
+            <BlurView
+              intensity={100}
+              tint="light"
+              style={{
+                padding: 28,
+                borderRadius: 28,
+                maxWidth: SCREEN_WIDTH * 0.85,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 12,
+                overflow: 'hidden',
+              }}
+            >
+              <View style={{ marginBottom: 16 }}>
+                <Ionicons name="warning-outline" size={40} color="rgba(255, 255, 255, 0.95)" />
+              </View>
+              
+              <Text style={{ 
+                fontSize: 20, 
+                fontWeight: '800', 
+                color: 'white', 
+                marginBottom: 10, 
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 4,
+              }}>
+                Measurements seem off?
+              </Text>
+              
+              <Text style={{ 
+                fontSize: 16, 
+                color: 'rgba(255, 255, 255, 0.95)', 
+                textAlign: 'center', 
+                marginBottom: 20,
+                fontWeight: '600',
+                textShadowColor: 'rgba(0, 0, 0, 0.2)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}>
+                Check your calibration (upper right)
+              </Text>
+              
+              <Text style={{ 
+                fontSize: 13, 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textAlign: 'center', 
+                fontStyle: 'italic',
+                fontWeight: '500',
+              }}>
+                Tap anywhere to dismiss
+              </Text>
+            </BlurView>
+          </Animated.View>
+        </Animated.View>
+      )}
+
+      {/* Freehand Trial Offer Modal - First Time */}
+      <Modal
+        visible={showFreehandOfferModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowFreehandOfferModal(false)}
+      >
+        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+          <Pressable
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+            onPress={() => {
+              // Don't dismiss on backdrop tap - force user to make choice
+            }}
+          >
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: 400,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 20,
+                padding: 24,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
+                elevation: 20,
+              }}
+            >
+              {/* Typewriter message */}
+              <TypewriterText
+                text="Hey there! I noticed you're out of free freehand measurements. Would you like to upgrade to Pro for just $6.97 (normally $9.97)?"
+                speed={25}
+                style={{
+                  fontSize: 16,
+                  color: '#1C1C1E',
+                  lineHeight: 24,
+                  marginBottom: 24,
+                }}
+              />
+
+              {/* Buttons */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandOfferModal(false);
+                    setShowFreehandConfirmModal(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
+                    No Thanks
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandOfferModal(false);
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#007AFF',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
+                    Upgrade Now
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </BlurView>
+      </Modal>
+
+      {/* Freehand Trial Confirm Modal - Second Chance */}
+      <Modal
+        visible={showFreehandConfirmModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowFreehandConfirmModal(false)}
+      >
+        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+          <Pressable
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
+            onPress={() => {
+              // Don't dismiss on backdrop tap
+            }}
+          >
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: 400,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 20,
+                padding: 24,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 30,
+                elevation: 20,
+              }}
+            >
+              {/* Typewriter message */}
+              <TypewriterText
+                text="Are you sure? This special offer won't be shown again."
+                speed={25}
+                style={{
+                  fontSize: 16,
+                  color: '#1C1C1E',
+                  lineHeight: 24,
+                  marginBottom: 24,
+                }}
+              />
+
+              {/* Buttons */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandConfirmModal(false);
+                    dismissFreehandOffer();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
+                    {"I'm Sure"}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    setShowFreehandConfirmModal(false);
+                    setShowProModal(true);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#34C759',
+                    paddingVertical: 14,
+                    borderRadius: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
+                    Yes, Upgrade
+                  </Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          </Pressable>
+        </BlurView>
+      </Modal>
+
+      {/* Alert Modal */}
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+        onConfirm={() => {
+          if (alertConfig.onConfirm) alertConfig.onConfirm();
+          closeAlert();
+        }}
+        onClose={closeAlert}
       />
     </>
   );
