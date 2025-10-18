@@ -272,3 +272,110 @@ Time doesn't matter - a user could be at the same property measuring all day.
 This insight transformed a flawed time-based validation into a robust distance-based validation that actually reflects real-world usage patterns.
 
 🧠 **BIG BRAIN ACTIVATED** 🧠
+
+---
+
+## 🚀 ENHANCEMENT: Manual Altitude Entry
+
+### The Complete Flow:
+
+**1. Phone Very Close (< 100m)**
+```
+✅ Silent automatic calibration
+User experience: "Auto-calibrated from drone altitude!"
+```
+
+**2. Phone Medium Distance (100-500m)**
+```
+❓ Modal: "Are you at the property where this drone photo was taken?"
+├─ YES → Auto-calibrate
+└─ NO → Manual altitude entry modal
+```
+
+**3. Phone Far Away (> 500m)**
+```
+⌨️ Direct to manual altitude entry modal
+"Enter drone height above ground: [50] meters/feet"
+💡 "Shown on drone controller or DJI app"
+```
+
+### Manual Altitude Entry Modal
+
+**Features:**
+- Text input for altitude value
+- Toggle between meters/feet
+- Clear hint: "Shown on drone controller or DJI app"
+- Shows distance from phone to drone location
+- Converts feet to meters automatically
+- Validates input (must be > 0)
+
+**User Experience:**
+```
+┌─────────────────────────────────┐
+│     🚁 DJI Neo                   │
+│  5.2km from photo location       │
+│                                  │
+│  Enter drone height above        │
+│  ground when photo was taken     │
+│                                  │
+│  ┌─────────┐  ┌──┐              │
+│  │   50    │  │m │              │
+│  └─────────┘  └──┘              │
+│                │ft│              │
+│                └──┘              │
+│                                  │
+│  💡 Shown on drone controller    │
+│     or DJI app                   │
+│                                  │
+│  [Cancel]      [Calibrate]       │
+└─────────────────────────────────┘
+```
+
+### Why This is Perfect:
+
+✅ **User knows the altitude** - It's displayed on their drone controller!
+✅ **Fast** - Takes 2 seconds to enter
+✅ **More accurate** than trying to use GPS from far away
+✅ **Universal** - Works for any drone, any location, any time
+✅ **Fallback** - Always available if automatic methods fail
+
+### Implementation:
+
+**New Component:** `/src/components/ManualAltitudeModal.tsx`
+- Clean modal UI
+- Meters/feet toggle
+- Input validation
+- Converts to meters for calculations
+
+**Integration:** Updated drone detection flow
+- Checks GPS distance
+- < 100m → Auto
+- 100-500m → Prompt then manual if NO
+- > 500m → Direct to manual entry
+
+---
+
+## The Complete Solution Hierarchy
+
+```
+Import Drone Photo
+    ↓
+Check for XMP RelativeAltitude
+    ├─ Found → Use it (most accurate)
+    └─ Not found → Check phone GPS distance
+        ├─ < 100m → Auto-calibrate (silent)
+        ├─ 100-500m → Ask user
+        │   ├─ At property → Auto-calibrate
+        │   └─ Not at property → Manual entry
+        └─ > 500m → Manual altitude entry
+            └─ User cancels → Map Scale calibration
+```
+
+**Result:** ALWAYS gets accurate calibration, no matter what! 🎯
+
+---
+
+**Status:** ✅ COMPLETE WITH MANUAL ENTRY
+**Version:** 2.0.8
+**Date:** October 18, 2025
+**Files Added:** ManualAltitudeModal.tsx
