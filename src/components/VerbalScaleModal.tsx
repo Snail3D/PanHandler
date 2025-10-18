@@ -696,6 +696,39 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                         {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
                       </Text>
                     </View>
+                    
+                    {/* Map Orientation Reminder - only show if declination is set */}
+                    {magneticDeclination !== 0 && (
+                      <View style={{
+                        marginTop: 12,
+                        padding: 12,
+                        backgroundColor: 'rgba(255, 180, 0, 0.15)',
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 180, 0, 0.3)',
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                      }}>
+                        <Ionicons name="information-circle" size={20} color="#FF9500" style={{ marginRight: 8, marginTop: 2 }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ 
+                            fontSize: 12, 
+                            fontWeight: '700',
+                            color: 'rgba(0, 0, 0, 0.85)',
+                            marginBottom: 4,
+                          }}>
+                            Map Orientation Required
+                          </Text>
+                          <Text style={{ 
+                            fontSize: 11, 
+                            color: 'rgba(0, 0, 0, 0.65)',
+                            lineHeight: 16,
+                          }}>
+                            Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements.
+                          </Text>
+                        </View>
+                      </View>
+                    )}
                   </View>
                     </>
                   )}
