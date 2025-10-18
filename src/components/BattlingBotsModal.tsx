@@ -24,7 +24,14 @@ type BotMessage = {
 export default function BattlingBotsModal({ 
   visible, 
   onClose,
+  isDonor = false,
+  isFirstTimeDonor = false,
 }: BattlingBotsModalProps) {
+  // Access store for donation tracking
+  const setIsDonor = useStore((s) => s.setIsDonor);
+  const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
+  const sessionCount = useStore((s) => s.sessionCount);
+  
   const [stage, setStage] = useState<'negotiation' | 'offer'>('negotiation');
   const [messages, setMessages] = useState<Array<{ bot: 'left' | 'right', text: string }>>([]);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -138,15 +145,82 @@ export default function BattlingBotsModal({
     ],
   ];
   
+  // Donor-specific conversations (for returning donors at 40-session intervals)
+  const donorConversations: BotMessage[][] = [
+    // Donor Conversation 1: "Badge Recognition"
+    [
+      { bot: 'left', text: "Hey, look! They have the badge!" },
+      { bot: 'right', text: "Official PanHandler Supporter! ❤️" },
+      { bot: 'left', text: "They already helped Snail once..." },
+      { bot: 'right', text: "Yeah, but servers keep running. Costs add up." },
+      { bot: 'left', text: "So... ask for more juice?" },
+      { bot: 'right', text: "Gently. They're already awesome!" },
+    ],
+    
+    // Donor Conversation 2: "Time for a Refill"
+    [
+      { bot: 'left', text: "It's been 40 sessions since they donated..." },
+      { bot: 'right', text: "Time flies when you're measuring things!" },
+      { bot: 'left', text: "Should we ask for another coffee?" },
+      { bot: 'right', text: "I mean, they've clearly been using it a TON." },
+      { bot: 'left', text: "Fair point. Snail could use a refill! ☕" },
+      { bot: 'right', text: "Plus, they're already part of the squad!" },
+    ],
+    
+    // Donor Conversation 3: "Badge Appreciation"
+    [
+      { bot: 'left', text: "See that badge up there?" },
+      { bot: 'right', text: "Official PanHandler Supporter. So official!" },
+      { bot: 'left', text: "They earned that by actually helping." },
+      { bot: 'right', text: "Most people just use the app and ghost us." },
+      { bot: 'left', text: "Not these folks. They're real ones." },
+      { bot: 'right', text: "Which is why we waited 40 sessions to ask again!" },
+    ],
+    
+    // Donor Conversation 4: "First-Time Donor Celebration"
+    [
+      { bot: 'left', text: "WAIT. Did they just... donate?!" },
+      { bot: 'right', text: "THEY DID! Look at that badge!" },
+      { bot: 'left', text: "Official PanHandler Supporter! ❤️" },
+      { bot: 'right', text: "They're officially part of the Snail Squad now!" },
+      { bot: 'left', text: "That's... that's beautiful 🥹" },
+      { bot: 'right', text: "We won't bug them again for 40 sessions!" },
+    ],
+    
+    // Donor Conversation 5: "Grateful Return"
+    [
+      { bot: 'left', text: "They're back! And they have the badge!" },
+      { bot: 'right', text: "Means they already supported Snail." },
+      { bot: 'left', text: "Should we even ask again?" },
+      { bot: 'right', text: "It's been 40 sessions. That's like... months?" },
+      { bot: 'left', text: "True. Servers aren't free." },
+      { bot: 'right', text: "And they clearly love the app. Gentle ask!" },
+    ],
+  ];
+  
   // Pick random conversation
   const [script, setScript] = useState<BotMessage[]>([]);
   
   // Pick random conversation on mount
   useEffect(() => {
     if (visible) {
-      const randomIndex = Math.floor(Math.random() * conversations.length);
-      setScript(conversations[randomIndex]);
-      console.log(`🤖 BattlingBots: Showing conversation #${randomIndex + 1}`);
+      // If first-time donor, always show celebration conversation (donor conversation #4)
+      if (isFirstTimeDonor) {
+        setScript(donorConversations[3]); // "First-Time Donor Celebration"
+        console.log('🎉 BattlingBots: Showing FIRST-TIME DONOR celebration!');
+      }
+      // If returning donor, pick random donor conversation
+      else if (isDonor) {
+        const randomIndex = Math.floor(Math.random() * donorConversations.length);
+        setScript(donorConversations[randomIndex]);
+        console.log(`🤖 BattlingBots: Showing DONOR conversation #${randomIndex + 1}`);
+      }
+      // Non-donor: pick random regular conversation
+      else {
+        const randomIndex = Math.floor(Math.random() * conversations.length);
+        setScript(conversations[randomIndex]);
+        console.log(`🤖 BattlingBots: Showing NON-DONOR conversation #${randomIndex + 1}`);
+      }
       
       // Reset state
       setStage('negotiation');
@@ -157,7 +231,7 @@ export default function BattlingBotsModal({
       setShowCursor(false);
       offerOpacity.value = 0;
     }
-  }, [visible]);
+  }, [visible, isDonor, isFirstTimeDonor]);
   
   // Start typing when modal becomes visible
   useEffect(() => {
@@ -353,7 +427,16 @@ export default function BattlingBotsModal({
   
   const handleSupport = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Mark user as donor and track session
+    setIsDonor(true, sessionCount);
+    
+    // Open Buy Me a Coffee link
     Linking.openURL("https://buymeacoffee.com/snail3d");
+    
+    // Show success message with badge
+    console.log('🎉 User clicked Support! isDonor = true, badge will show!');
+    
     onClose();
   };
   

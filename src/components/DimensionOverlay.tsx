@@ -160,6 +160,18 @@ export default function DimensionOverlay({
   const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
   const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
   
+  // STUB: Pro/Free system removed - Freehand is now free for everyone!
+  const isProUser = true; // All users have access to all features
+  const freehandTrialUsed = 0; // No trial system
+  const freehandTrialLimit = 999; // No limits
+  const incrementFreehandTrial = () => {}; // No-op
+  const freehandOfferDismissed = true; // No offers
+  const dismissFreehandOffer = () => {}; // No-op
+  const setIsProUser = () => {}; // No-op
+  const [showProModal, setShowProModal] = useState(false); // Unused
+  const [showFreehandOfferModal, setShowFreehandOfferModal] = useState(false); // Unused
+  const [showFreehandConfirmModal, setShowFreehandConfirmModal] = useState(false); // Unused
+  
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
   const panTutorialOpacity = useSharedValue(0);
@@ -6701,19 +6713,7 @@ export default function DimensionOverlay({
       )}
       
       {/* Battling Bots Pro Upgrade Modal */}
-      <BattlingBotsModal
-        visible={showProModal}
-        onAccept={(price) => {
-          setShowProModal(false);
-          showAlert('Pro Upgrade', `Payment integration would go here for $${price.toFixed(2)}. For now, tap the footer 5 times fast to unlock!`, 'info');
-        }}
-        onDecline={() => setShowProModal(false)}
-        userStats={{
-          measurementCount: measurements.length,
-          freehandAttempts: freehandTrialUsed,
-          hasUsedFreehand: freehandTrialUsed > 0,
-        }}
-      />
+      {/* REMOVED: Old Pro upgrade modal - Now using donation-based BattlingBots in MeasurementScreen */}
 
       {/* Help Button - Positioned next to AUTO LEVEL badge */}
       {coinCircle && !showLockedInAnimation && !isCapturing && (
