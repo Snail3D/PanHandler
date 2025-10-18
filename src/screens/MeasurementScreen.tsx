@@ -1348,8 +1348,19 @@ export default function MeasurementScreen() {
         
         // CHECK FOR DRONE PHOTO BEFORE CALIBRATION
         try {
+          console.log('🔍 Checking if photo is from drone...');
           const { extractDroneMetadata } = await import('../utils/droneEXIF');
           const droneMetadata = await extractDroneMetadata(asset.uri, asset.exif);
+          
+          console.log('📊 Drone Detection Results:', {
+            isDrone: droneMetadata.isDrone,
+            hasSpecs: !!droneMetadata.specs,
+            displayName: droneMetadata.displayName,
+            make: droneMetadata.make,
+            model: droneMetadata.model,
+            hasRelativeAltitude: !!droneMetadata.relativeAltitude,
+            hasGSD: !!droneMetadata.groundSampleDistance,
+          });
           
           // If drone detected, check if we need manual altitude entry
           if (droneMetadata.isDrone && droneMetadata.specs) {
@@ -1404,10 +1415,14 @@ export default function MeasurementScreen() {
             } else {
               // MANUAL ENTRY: No XMP altitude, show modal
               console.log('📝 No RelativeAltitude - showing manual entry modal');
+              console.log('🎯 Setting pendingDroneData and showing modal NOW');
               setPendingDroneData(droneMetadata);
               setShowManualAltitudeModal(true);
+              console.log('✅ Modal state set to TRUE');
               return; // Exit early - modal will handle calibration
             }
+          } else {
+            console.log('❌ Not a drone photo or no specs - proceeding with normal calibration');
           }
         } catch (error) {
           console.error('Error checking for drone:', error);
