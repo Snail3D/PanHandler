@@ -1086,13 +1086,13 @@ export default function MeasurementScreen() {
         });
         
         console.log('📷 Photo captured - Final Orientation:', photoOrientation);
-        console.log('📷 Decision: ' + (photoOrientation === 'PORTRAIT' ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'));
+        console.log('📷 Decision: ' + (photoOrientation === 'LANDSCAPE' ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'));
         
-        // DECISION: PORTRAIT photos (phone vertical, looking at table) auto-proceed to coin calibration
-        // LANDSCAPE photos (phone horizontal, looking at wall) show photo type selection menu
-        if (photoOrientation === 'PORTRAIT') {
-          // PORTRAIT photo (vertical phone looking down at table) → Auto-proceed to coin calibration
-          console.log('📷 PORTRAIT photo (table view - vertical phone) → Auto coin calibration');
+        // DECISION: LANDSCAPE photos (phone horizontal, looking at table) auto-proceed to coin calibration
+        // PORTRAIT photos (phone vertical, looking at wall) show photo type selection menu
+        if (photoOrientation === 'LANDSCAPE') {
+          // LANDSCAPE photo (horizontal phone looking at table) → Auto-proceed to coin calibration
+          console.log('📷 LANDSCAPE photo (table view - horizontal phone) → Auto coin calibration');
           
           // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
           setIsTransitioning(true);
@@ -1132,8 +1132,8 @@ export default function MeasurementScreen() {
             }, 150); // Match the fade duration
           }, 50); // Start animations quickly after flash
         } else {
-          // LANDSCAPE photo (horizontal phone looking at wall) → Show photo type selection menu
-          console.log('📷 LANDSCAPE PHOTO DETECTED (wall view - horizontal phone) → Show photo type menu');
+          // PORTRAIT photo (vertical phone looking at wall) → Show photo type selection menu
+          console.log('📷 PORTRAIT PHOTO DETECTED (wall view - vertical phone) → Show photo type menu');
           
           // Transition to measurement screen first, then show modal
           setIsTransitioning(true);
