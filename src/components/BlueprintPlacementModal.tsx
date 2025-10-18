@@ -9,10 +9,20 @@ interface BlueprintPlacementModalProps {
   visible: boolean;
   onStartPlacement: () => void; // Called when user taps "Place Pins Now"
   onDismiss: () => void;
+  mode?: 'blueprint' | 'aerial'; // Type of calibration
 }
 
-export default function BlueprintPlacementModal({ visible, onStartPlacement, onDismiss }: BlueprintPlacementModalProps) {
+export default function BlueprintPlacementModal({ visible, onStartPlacement, onDismiss, mode = 'blueprint' }: BlueprintPlacementModalProps) {
   const insets = useSafeAreaInsets();
+
+  const isAerial = mode === 'aerial';
+  const title = isAerial ? 'Aerial Photo Scale' : 'Blueprint Scale';
+  const instructionTitle = isAerial ? 'Place Two Ground Reference Points' : 'Place Two Reference Points';
+  const instructionText = isAerial 
+    ? "Tap two points on the ground in your aerial photo with a known distance between them. Then enter the real-world distance."
+    : "You'll tap two points on a known distance in your blueprint or drawing. Then enter the real-world distance.";
+  const icon = isAerial ? 'airplane-outline' : 'locate-outline';
+  const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -46,9 +56,9 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             {/* Header */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="locate-outline" size={24} color="#2E7D32" style={{ marginRight: 8 }} />
+                <Ionicons name={icon as any} size={24} color={iconColor} style={{ marginRight: 8 }} />
                 <Text style={{ fontSize: 18, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
-                  Blueprint Scale
+                  {title}
                 </Text>
               </View>
               <Pressable
@@ -85,7 +95,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 textAlign: 'center',
                 marginBottom: 8,
               }}>
-                Place Two Reference Points
+                {instructionTitle}
               </Text>
               <Text style={{
                 fontSize: 13,
@@ -93,7 +103,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 textAlign: 'center',
                 lineHeight: 18,
               }}>
-                You'll tap two points on a known distance in your blueprint or drawing. Then enter the real-world distance.
+                {instructionText}
               </Text>
             </View>
 
