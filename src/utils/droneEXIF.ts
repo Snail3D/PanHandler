@@ -266,6 +266,8 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
           encoding: FileSystem.EncodingType.Base64,
         });
         
+        console.log('✅ File read successfully, length:', base64.length);
+        
         // Add JPEG header if needed
         const jpegData = `data:image/jpeg;base64,${base64}`;
         
@@ -273,6 +275,12 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         const exifObj = piexif.load(jpegData);
         console.log('✅ EXIF loaded successfully');
         console.log('EXIF keys:', Object.keys(exifObj));
+        
+        // Show what we found
+        const hasGPS = exifObj['GPS'] && Object.keys(exifObj['GPS'] || {}).length > 0;
+        const has0th = exifObj['0th'] && Object.keys(exifObj['0th'] || {}).length > 0;
+        alert(`piexifjs SUCCESS!\n\nHas GPS: ${hasGPS}\nHas 0th: ${has0th}\nGPS keys: ${hasGPS ? Object.keys(exifObj['GPS'] || {}).length : 0}`);
+        
         
         // Convert piexifjs format to standard EXIF object
         exif = {};
@@ -314,7 +322,9 @@ export async function extractDroneMetadata(imageUri: string, providedExif?: any)
         });
         
       } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
         console.log('⚠️ piexifjs failed, trying MediaLibrary fallback:', e);
+        alert(`piexifjs FAILED\n\nError: ${errorMsg}\n\nTrying MediaLibrary...`);
         
         // Fallback to MediaLibrary
         try {
