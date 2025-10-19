@@ -3343,21 +3343,43 @@ export default function DimensionOverlay({
             // Scenario 1: Map scale ONLY (no coin, no other calibration)
             // Reset map scale and reopen map scale modal (stay in measurement screen)
             if (mapScale && !calibration && !coinCircle) {
+              console.log('📍 Recalibrating: Map scale only');
               setMapScale(null);
               setIsMapMode(false);
               setShowMapScaleModal(true);
             }
-            // Scenario 2: BOTH calibration (coin/blueprint/verbal) AND map scale
-            // Reset both and go back to coin screen
-            else if (mapScale && (calibration || coinCircle)) {
+            // Scenario 2: Map scale + Verbal calibration
+            // Reset map scale, reopen map modal (keep verbal as base calibration)
+            else if (mapScale && calibration?.calibrationType === 'verbal') {
+              console.log('📍 Recalibrating: Map scale with verbal base');
+              setMapScale(null);
+              setIsMapMode(false);
+              setShowMapScaleModal(true);
+            }
+            // Scenario 3: Map scale + Coin calibration
+            // User likely wants to recalibrate the coin, so go back to coin screen
+            else if (mapScale && coinCircle) {
+              console.log('📍 Recalibrating: Map scale with coin base - returning to coin screen');
               setMapScale(null);
               setIsMapMode(false);
               if (onReset) onReset(true); // Go to coin calibration screen
             }
-            // Scenario 3: Calibration ONLY (coin/verbal, no map scale)
-            // Go back to coin calibration screen (original behavior)
+            // Scenario 4: Coin calibration ONLY (no map scale)
+            // Go back to coin calibration screen
+            else if (coinCircle) {
+              console.log('📍 Recalibrating: Coin only - returning to coin screen');
+              if (onReset) onReset(true);
+            }
+            // Scenario 5: Verbal calibration ONLY (no map scale)
+            // Go back to camera to retake photo (verbal modal is in MeasurementScreen)
+            else if (calibration?.calibrationType === 'verbal') {
+              console.log('📍 Recalibrating: Verbal only - returning to camera');
+              if (onReset) onReset(false); // Go back to camera
+            }
+            // Fallback: Unknown state, go to coin screen
             else {
-              if (onReset) onReset(true); // Pass true to trigger recalibrate mode
+              console.log('📍 Recalibrating: Unknown state - returning to coin screen');
+              if (onReset) onReset(true);
             }
           }}
           style={{
