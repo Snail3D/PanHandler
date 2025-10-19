@@ -26,20 +26,22 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ 
-        position: 'absolute',
-        top: insets.top + 40, // Higher position so doesn't cover pan text
-        left: 32,
-        right: 32,
-        maxWidth: 300, // Smaller max width (was 360)
-        alignSelf: 'center',
-        borderRadius: 14,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-      }}>
+      {/* Full-screen container that allows touches to pass through */}
+      <View style={{ flex: 1 }} pointerEvents="box-none">
+        <View style={{ 
+          position: 'absolute',
+          top: insets.top + 40, // Higher position so doesn't cover pan text
+          left: 32,
+          right: 32,
+          maxWidth: 300, // Smaller max width (was 360)
+          alignSelf: 'center',
+          borderRadius: 14,
+          overflow: 'hidden',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.3,
+          shadowRadius: 16,
+        }}>
         <BlurView
           intensity={40}
           tint="light"
@@ -173,6 +175,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             </Pressable>
           </View>
         </BlurView>
+      </View>
       </View>
     </Modal>
   );
