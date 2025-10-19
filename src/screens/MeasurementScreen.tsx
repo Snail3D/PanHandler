@@ -1427,35 +1427,20 @@ export default function MeasurementScreen() {
     // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
     // The appropriate modal will be triggered there
     else {
-      setIsTransitioning(true);
-      transitionBlackOverlay.value = withTiming(1, {
-        duration: 150,
-        easing: Easing.in(Easing.ease),
-      });
+      // DON'T use black transition for blueprint/map - causes lockup
+      // Just switch modes directly
+      setMode('measurement');
       
+      // Show the appropriate modal after a tiny delay to let measurement screen render
       setTimeout(() => {
-        setMode('measurement');
-        
-        // Show the appropriate modal based on photo type
-        setTimeout(() => {
-          if (type === 'map') {
-            setShowVerbalScaleModal(true);
-          } else if (type === 'blueprint') {
-            // Show blueprint placement modal
-            setSkipToBlueprintMode(true);
-            setShowBlueprintPlacementModal(true);
-          }
-          
-          transitionBlackOverlay.value = withTiming(0, {
-            duration: 250,
-            easing: Easing.out(Easing.ease),
-          });
-          
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 250);
-        }, 50);
-      }, 150);
+        if (type === 'map') {
+          setShowVerbalScaleModal(true);
+        } else if (type === 'blueprint') {
+          // Show blueprint placement modal
+          setSkipToBlueprintMode(true);
+          setShowBlueprintPlacementModal(true);
+        }
+      }, 100);
     }
   };
 
