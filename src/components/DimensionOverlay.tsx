@@ -3340,9 +3340,13 @@ export default function DimensionOverlay({
               // Reset measurement states to allow pan/zoom
               setMeasurementMode(false); // CRITICAL: Allow pan/zoom gestures
               setIsPlacingBlueprint(false); // Not placing yet - just showing modal
-              // Reopen blueprint placement modal
-              setShowBlueprintPlacementModal(true);
               setMenuHidden(true); // Hide menu when modal appears
+              
+              // Small delay to ensure pan/zoom gestures remain responsive
+              setTimeout(() => {
+                setShowBlueprintPlacementModal(true);
+              }, 150);
+              
               // Measurements stay intact - will be recalculated when new pins placed
               return;
             }
