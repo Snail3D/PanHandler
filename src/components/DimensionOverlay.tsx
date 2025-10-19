@@ -2406,8 +2406,10 @@ export default function DimensionOverlay({
     handleClear();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     
-    // After 500ms delay, start repeating undo every 333ms (1/3 second)
-    undoTimeoutRef.current = setTimeout(() => {
+    let deleteCount = 0; // Track how many deletions for acceleration
+    
+    // Start with slower interval, then speed up like backspace
+    const startDeletion = (interval: number) => {
       undoIntervalRef.current = setInterval(() => {
         // Get current measurements from store
         const currentMeasurements = useStore.getState().completedMeasurements;
@@ -2422,6 +2424,7 @@ export default function DimensionOverlay({
           return;
         }
         
+        // Delete one measurement
         if (currentMeasurements.length > 0) {
           setMeasurements(currentMeasurements.slice(0, -1));
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -2429,8 +2432,30 @@ export default function DimensionOverlay({
           setCurrentPoints([]);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
-      }, 333); // Delete one every 1/3 second
-    }, 500); // 500ms initial delay before repeating
+        
+        deleteCount++;
+        
+        // Accelerate after certain milestones (like backspace)
+        if (deleteCount === 3 && interval === 300) {
+          // After 3 deletions at slow speed, speed up to medium
+          clearInterval(undoIntervalRef.current!);
+          startDeletion(150);
+        } else if (deleteCount === 8 && interval === 150) {
+          // After 5 more at medium speed, speed up to fast
+          clearInterval(undoIntervalRef.current!);
+          startDeletion(75);
+        } else if (deleteCount === 15 && interval === 75) {
+          // After 7 more at fast speed, speed up to very fast
+          clearInterval(undoIntervalRef.current!);
+          startDeletion(40);
+        }
+      }, interval);
+    };
+    
+    // After 400ms delay, start slow deletion (300ms intervals)
+    undoTimeoutRef.current = setTimeout(() => {
+      startDeletion(300); // Start slow
+    }, 400);
   };
   
   const stopUndoLongPress = () => {
