@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { Audio } from 'expo-av';
 // import * as StoreReview from 'expo-store-review'; // Temporarily disabled - native module not loaded
 import MeasurementScreen from "./src/screens/MeasurementScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
@@ -34,6 +35,28 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 */
 
 export default function App() {
+  // Configure audio session to allow background music/YouTube to continue playing
+  useEffect(() => {
+    const configureAudioSession = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: false, // Don't play audio in silent mode
+          staysActiveInBackground: false, // Don't keep audio active in background
+          shouldDuckAndroid: false, // Don't lower other apps' audio
+          playThroughEarpieceAndroid: false,
+          allowsRecordingIOS: false, // We don't need recording
+          interruptionModeIOS: 0, // DoNotMix = 0 (don't interrupt other audio)
+          interruptionModeAndroid: 1, // DoNotMix = 1 (don't interrupt other audio)
+        });
+        console.log('✅ Audio session configured - background audio will continue playing');
+      } catch (error) {
+        console.warn('⚠️ Failed to configure audio session:', error);
+      }
+    };
+    
+    configureAudioSession();
+  }, []);
+  
   // Intro screen state
   const [showIntro, setShowIntro] = useState(true);
   const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
