@@ -1436,9 +1436,8 @@ export default function MeasurementScreen() {
         if (type === 'map') {
           setShowVerbalScaleModal(true);
         } else if (type === 'blueprint') {
-          // Show blueprint placement modal
+          // Show blueprint placement modal (handled by DimensionOverlay)
           setSkipToBlueprintMode(true);
-          setShowBlueprintPlacementModal(true);
         }
       }, 100);
     }
@@ -2378,19 +2377,7 @@ export default function MeasurementScreen() {
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
       
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
-      <BlueprintPlacementModal
-        visible={showBlueprintPlacementModal}
-        mode={skipToAerialMode ? 'aerial' : 'blueprint'}
-        onStartPlacement={() => {
-          setShowBlueprintPlacementModal(false);
-          // DimensionOverlay will handle the pin placement with skipToBlueprintMode flag
-        }}
-        onDismiss={() => {
-          setShowBlueprintPlacementModal(false);
-          setSkipToBlueprintMode(false);
-          setMode('camera');
-        }}
-      />
+      {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
       
       {/* FORCE BLACK Transition Overlay - ALWAYS rendered, above everything */}
       <Animated.View
