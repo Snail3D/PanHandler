@@ -3300,6 +3300,18 @@ export default function DimensionOverlay({
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             
+            // BLUEPRINT MODE: Reopen pin placement, keep measurements, recalculate with new calibration
+            if (calibration?.calibrationType === 'blueprint') {
+              console.log('📍 Recalibrating blueprint mode - keeping measurements');
+              // Clear current blueprint calibration
+              setCalibration(null);
+              setBlueprintPoints([]);
+              // Reopen blueprint placement modal
+              setShowBlueprintPlacementModal(true);
+              // Measurements stay intact - will be recalculated when new pins placed
+              return;
+            }
+            
             // Scenario 1: Map scale ONLY (no coin, no other calibration)
             // Reset map scale and reopen map scale modal (stay in measurement screen)
             if (mapScale && !calibration && !coinCircle) {
@@ -3314,7 +3326,7 @@ export default function DimensionOverlay({
               setIsMapMode(false);
               if (onReset) onReset(true); // Go to coin calibration screen
             }
-            // Scenario 3: Calibration ONLY (coin/blueprint/verbal, no map scale)
+            // Scenario 3: Calibration ONLY (coin/verbal, no map scale)
             // Go back to coin calibration screen (original behavior)
             else {
               if (onReset) onReset(true); // Pass true to trigger recalibrate mode
@@ -7340,6 +7352,13 @@ export default function DimensionOverlay({
           
           // Store calibration
           useStore.getState().setCalibration(newCalibration);
+          
+          // Recalculate ALL existing measurements with new calibration
+          if (measurements.length > 0) {
+            console.log('🔄 Recalculating', measurements.length, 'measurements with new blueprint calibration');
+            const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m));
+            setMeasurements(recalibratedMeasurements);
+          }
           
           // Show menu again and clean up after fade
           setTimeout(() => {
