@@ -4143,7 +4143,8 @@ export default function DimensionOverlay({
       )}
 
       {/* Tap detection overlay for selecting/deleting measurements - always active when not in measurement mode */}
-      {!measurementMode && measurements.length > 0 && (
+      {/* CRITICAL: Don't block touches when blueprint modal is showing (user needs pan/zoom access) */}
+      {!measurementMode && measurements.length > 0 && !showBlueprintPlacementModal && !isPlacingBlueprint && (
         <View
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}
           onStartShouldSetResponder={() => true}

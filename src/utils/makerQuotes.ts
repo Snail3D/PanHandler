@@ -250,7 +250,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Many of life's failures are people who did not realize how close they were to success when they gave up.", author: "Thomas Edison" },
   { text: "We don't know a millionth of one percent about anything.", author: "Thomas Edison" },
   { text: "Everything comes to him who hustles while he waits.", author: "Thomas Edison" },
-  { text: "Non-violence leads to the highest ethics, which is the goal of all evolution.", author: "Thomas Edison" },
   { text: "The doctor of the future will give no medicine, but will interest her or his patients in the care of the human frame.", author: "Thomas Edison" },
   { text: "Results! Why, man, I have gotten a lot of results. I know several thousand things that won't work.", author: "Thomas Edison" },
   { text: "Being busy does not always mean real work.", author: "Thomas Edison" },
@@ -1851,7 +1850,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Within the period of human history we do not know of a single instance of the transformation of one species into another.", author: "Thomas Hunt Morgan", year: "1916" },
   
   // Hermann Muller (Geneticist)
-  { text: "It has become evident that the primary lesson of the study of evolution is that all evolution is coevolution.", author: "Hermann Muller", year: "1950" },
   { text: "The gene as the basis of life.", author: "Hermann Muller", year: "1927" },
   
   // Lynn Margulis (Evolutionary Biologist)
@@ -1861,16 +1859,10 @@ export const makerQuotes: MakerQuote[] = [
   // Stephen Jay Gould (Paleontologist)
   { text: "The most erroneous stories are those we think we know best - and therefore never scrutinize or question.", author: "Stephen Jay Gould", year: "1989" },
   { text: "Details are all that matters; God dwells in these and you never get to see Him if you don't struggle to get them right.", author: "Stephen Jay Gould", year: "1991" },
-  { text: "Evolution is a process of constant branching and expansion.", author: "Stephen Jay Gould", year: "1980" },
   { text: "Science is an integral part of culture. It's not this foreign thing, done by an arcane priesthood.", author: "Stephen Jay Gould", year: "1989" },
   
   // Ernst Mayr (Evolutionary Biologist)
   { text: "Theory helps us to bear our ignorance of facts.", author: "Ernst Mayr", year: "1985" },
-  { text: "According to the concept of transformational evolution, first clearly articulated by Lamarck, evolution consists of the gradual transformation of organisms from one condition of existence to another.", author: "Ernst Mayr", year: "1991" },
-  
-  // Theodosius Dobzhansky (Geneticist)
-  { text: "Nothing in biology makes sense except in the light of evolution.", author: "Theodosius Dobzhansky", year: "1973" },
-  { text: "The evolution of life on Earth is a process of diversification and integration.", author: "Theodosius Dobzhansky", year: "1970" },
   
   // Julian Huxley (Evolutionary Biologist)
   { text: "The human species can, if it wishes, transcend itself.", author: "Julian Huxley", year: "1957" },
