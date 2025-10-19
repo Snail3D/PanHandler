@@ -28,12 +28,12 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={{ 
         position: 'absolute',
-        top: insets.top + 60, // Lower position
-        left: 20,
-        right: 20,
-        maxWidth: 360, // Limit width
+        top: insets.top + 80, // Even lower position for better view
+        left: 32,
+        right: 32,
+        maxWidth: 300, // Smaller max width (was 360)
         alignSelf: 'center',
-        borderRadius: 16,
+        borderRadius: 14,
         overflow: 'hidden',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
@@ -44,22 +44,22 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
           intensity={40}
           tint="light"
           style={{
-            borderRadius: 16,
+            borderRadius: 14,
             overflow: 'hidden',
           }}
         >
           <View style={{
             backgroundColor: 'rgba(255, 255, 255, 0.45)',
-            borderRadius: 16,
+            borderRadius: 14,
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.4)',
-            padding: 16, // Reduced from 20
+            padding: 12, // Smaller padding (was 16)
           }}>
             {/* Header */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name={icon as any} size={24} color={iconColor} style={{ marginRight: 8 }} />
-                <Text style={{ fontSize: 18, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
+                <Ionicons name={icon as any} size={20} color={iconColor} style={{ marginRight: 6 }} />
+                <Text style={{ fontSize: 16, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
                   {title}
                 </Text>
               </View>
@@ -69,41 +69,41 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                   onDismiss();
                 }}
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 14,
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
                   backgroundColor: 'rgba(0, 0, 0, 0.08)',
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
               >
-                <Ionicons name="close" size={16} color="rgba(0, 0, 0, 0.6)" />
+                <Ionicons name="close" size={14} color="rgba(0, 0, 0, 0.6)" />
               </Pressable>
             </View>
 
             {/* Instructions */}
             <View style={{
               backgroundColor: 'rgba(100, 100, 100, 0.15)',
-              borderRadius: 12,
-              padding: 12, // Reduced from 16
-              marginBottom: 12, // Reduced from 16
+              borderRadius: 10,
+              padding: 10,
+              marginBottom: 10,
               borderWidth: 1,
               borderColor: 'rgba(100, 100, 100, 0.3)',
             }}>
               <Text style={{
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: '600',
                 color: 'rgba(0, 0, 0, 0.8)',
                 textAlign: 'center',
-                marginBottom: 8,
+                marginBottom: 6,
               }}>
                 {instructionTitle}
               </Text>
               <Text style={{
-                fontSize: 13,
+                fontSize: 11,
                 color: 'rgba(0, 0, 0, 0.6)',
                 textAlign: 'center',
-                lineHeight: 18,
+                lineHeight: 16,
               }}>
                 {instructionText}
               </Text>
@@ -112,16 +112,16 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             {/* Pan/Zoom tip */}
             <View style={{
               backgroundColor: 'rgba(33, 150, 243, 0.12)',
-              borderRadius: 10,
-              padding: 10, // Reduced from 12
-              marginBottom: 16, // Reduced from 20
+              borderRadius: 8,
+              padding: 8,
+              marginBottom: 12,
               borderWidth: 1,
               borderColor: 'rgba(33, 150, 243, 0.25)',
             }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                <Ionicons name="hand-left-outline" size={16} color="#2196F3" style={{ marginRight: 6 }} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
+                <Ionicons name="hand-left-outline" size={14} color="#2196F3" style={{ marginRight: 4 }} />
                 <Text style={{
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: '600',
                   color: '#2196F3',
                 }}>
@@ -129,15 +129,15 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 </Text>
               </View>
               <Text style={{
-                fontSize: 11,
+                fontSize: 10,
                 color: 'rgba(0, 0, 0, 0.6)',
-                lineHeight: 16,
+                lineHeight: 14,
               }}>
-                Use pinch to zoom and drag to pan. Position your image perfectly before placing pins.
+                Pinch to zoom, two-finger drag to pan
               </Text>
             </View>
 
-            {/* Ready to Place Pins Button */}
+            {/* Ready to Place Pins Button - Centered text */}
             <Pressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -147,8 +147,9 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 backgroundColor: pressed 
                   ? 'rgba(100, 100, 100, 0.9)' 
                   : 'rgba(100, 100, 100, 0.85)',
-                borderRadius: 14, // Reduced from 16
-                paddingVertical: 14, // Reduced from 18
+                borderRadius: 12,
+                paddingVertical: 12,
+                paddingHorizontal: 16,
                 alignItems: 'center',
                 justifyContent: 'center',
                 shadowColor: '#000',
@@ -163,10 +164,11 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
               <Text style={{ 
                 color: '#FFFFFF', 
                 fontWeight: '800', 
-                fontSize: 18,
+                fontSize: 15,
                 letterSpacing: 0.5,
+                textAlign: 'center', // Center the text
               }}>
-                READY - PLACE PINS
+                PLACE PINS
               </Text>
             </Pressable>
           </View>

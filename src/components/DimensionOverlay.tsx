@@ -3333,6 +3333,9 @@ export default function DimensionOverlay({
               // Clear current blueprint calibration
               setCalibration(null);
               setBlueprintPoints([]);
+              // Reset measurement states to allow pan/zoom
+              setMeasurementMode(false); // CRITICAL: Allow pan/zoom gestures
+              setIsPlacingBlueprint(false); // Not placing yet - just showing modal
               // Reopen blueprint placement modal
               setShowBlueprintPlacementModal(true);
               setMenuHidden(true); // Hide menu when modal appears
@@ -5984,7 +5987,7 @@ export default function DimensionOverlay({
       )}
 
       {/* Bottom toolbar - Water droplet style */}
-      {!menuMinimized && !isCapturing && !isPlacingBlueprint && (
+      {!menuMinimized && !isCapturing && !isPlacingBlueprint && !showBlueprintPlacementModal && (
         <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
             pointerEvents="auto"
