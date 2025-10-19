@@ -84,7 +84,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
               backgroundColor: 'rgba(100, 100, 100, 0.15)',
               borderRadius: 12,
               padding: 16,
-              marginBottom: 20,
+              marginBottom: 16,
               borderWidth: 1,
               borderColor: 'rgba(100, 100, 100, 0.3)',
             }}>
@@ -107,7 +107,35 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
               </Text>
             </View>
 
-            {/* Place Pins Now Button */}
+            {/* Pan/Zoom tip */}
+            <View style={{
+              backgroundColor: 'rgba(33, 150, 243, 0.12)',
+              borderRadius: 10,
+              padding: 12,
+              marginBottom: 20,
+              borderWidth: 1,
+              borderColor: 'rgba(33, 150, 243, 0.25)',
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                <Ionicons name="hand-left-outline" size={16} color="#2196F3" style={{ marginRight: 6 }} />
+                <Text style={{
+                  fontSize: 13,
+                  fontWeight: '600',
+                  color: '#2196F3',
+                }}>
+                  Pan & Zoom First
+                </Text>
+              </View>
+              <Text style={{
+                fontSize: 11,
+                color: 'rgba(0, 0, 0, 0.6)',
+                lineHeight: 16,
+              }}>
+                Use pinch to zoom and drag to pan. Position your image perfectly before placing pins.
+              </Text>
+            </View>
+
+            {/* Ready to Place Pins Button */}
             <Pressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -136,7 +164,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 fontSize: 18,
                 letterSpacing: 0.5,
               }}>
-                PLACE PINS NOW
+                READY - PLACE PINS
               </Text>
             </Pressable>
           </View>

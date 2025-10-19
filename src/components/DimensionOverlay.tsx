@@ -5921,7 +5921,7 @@ export default function DimensionOverlay({
       )}
 
       {/* Bottom toolbar - Water droplet style */}
-      {!menuMinimized && !isCapturing && (
+      {!menuMinimized && !isCapturing && !isPlacingBlueprint && (
         <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
             pointerEvents="auto"
@@ -6566,7 +6566,11 @@ export default function DimensionOverlay({
                 fontSize: 12,
                 textAlign: 'center'
               }}>
-                {measurementMode 
+                {isPlacingBlueprint
+                  ? blueprintPoints.length === 0
+                    ? '📍 Pinch to zoom • Drag to pan • Then tap to place first pin'
+                    : '📍 Tap to place second pin on known distance'
+                  : measurementMode 
                   ? mode === 'circle' 
                     ? '⭕ Tap center, then tap edge of circle'
                     : mode === 'rectangle'
