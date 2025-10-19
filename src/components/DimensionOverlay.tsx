@@ -621,6 +621,7 @@ export default function DimensionOverlay({
       hasTriggeredSkipToBlueprint.current = true;
       setIsAerialMode(false); // Blueprint mode
       setShowBlueprintPlacementModal(true);
+      setMenuHidden(true); // Hide menu when modal appears
     }
   }, [skipToBlueprintMode]);
   
@@ -633,6 +634,7 @@ export default function DimensionOverlay({
       hasTriggeredSkipToAerial.current = true;
       setIsAerialMode(true); // Aerial mode
       setShowBlueprintPlacementModal(true);
+      setMenuHidden(true); // Hide menu when modal appears
     }
   }, [skipToAerialMode]);
   
@@ -3308,6 +3310,7 @@ export default function DimensionOverlay({
               setBlueprintPoints([]);
               // Reopen blueprint placement modal
               setShowBlueprintPlacementModal(true);
+              setMenuHidden(true); // Hide menu when modal appears
               // Measurements stay intact - will be recalculated when new pins placed
               return;
             }
@@ -7241,10 +7244,11 @@ export default function DimensionOverlay({
         visible={showBlueprintPlacementModal}
         mode={isAerialMode ? 'aerial' : 'blueprint'}
         onStartPlacement={() => {
-          // Hide modal and start measurement mode for blueprint placement
+          // User clicked "READY - PLACE PINS" button
+          // NOW start measurement mode for blueprint placement
           setShowBlueprintPlacementModal(false);
           setIsPlacingBlueprint(true);
-          setMeasurementMode(true); // Use existing measurement system
+          setMeasurementMode(true); // Activate touch overlay for pin placement
           setShowCursor(true);
           setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -7253,6 +7257,7 @@ export default function DimensionOverlay({
           setShowBlueprintPlacementModal(false);
           setBlueprintPoints([]);
           setIsMapMode(false);
+          setMenuHidden(false); // Show menu again if user cancels
         }}
       />
 

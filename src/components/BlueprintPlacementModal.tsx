@@ -25,12 +25,14 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
   const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={{ 
         position: 'absolute',
-        top: insets.top + 20,
+        top: insets.top + 60, // Lower position
         left: 20,
         right: 20,
+        maxWidth: 360, // Limit width
+        alignSelf: 'center',
         borderRadius: 16,
         overflow: 'hidden',
         shadowColor: '#000',
@@ -51,7 +53,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             borderRadius: 16,
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.4)',
-            padding: 20,
+            padding: 16, // Reduced from 20
           }}>
             {/* Header */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -83,8 +85,8 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             <View style={{
               backgroundColor: 'rgba(100, 100, 100, 0.15)',
               borderRadius: 12,
-              padding: 16,
-              marginBottom: 16,
+              padding: 12, // Reduced from 16
+              marginBottom: 12, // Reduced from 16
               borderWidth: 1,
               borderColor: 'rgba(100, 100, 100, 0.3)',
             }}>
@@ -111,8 +113,8 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
             <View style={{
               backgroundColor: 'rgba(33, 150, 243, 0.12)',
               borderRadius: 10,
-              padding: 12,
-              marginBottom: 20,
+              padding: 10, // Reduced from 12
+              marginBottom: 16, // Reduced from 20
               borderWidth: 1,
               borderColor: 'rgba(33, 150, 243, 0.25)',
             }}>
@@ -145,8 +147,8 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 backgroundColor: pressed 
                   ? 'rgba(100, 100, 100, 0.9)' 
                   : 'rgba(100, 100, 100, 0.85)',
-                borderRadius: 16,
-                paddingVertical: 18,
+                borderRadius: 14, // Reduced from 16
+                paddingVertical: 14, // Reduced from 18
                 alignItems: 'center',
                 justifyContent: 'center',
                 shadowColor: '#000',
