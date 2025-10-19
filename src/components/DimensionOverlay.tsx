@@ -620,12 +620,8 @@ export default function DimensionOverlay({
       console.log('📐 skipToBlueprintMode triggered - opening blueprint placement modal');
       hasTriggeredSkipToBlueprint.current = true;
       setIsAerialMode(false); // Blueprint mode
+      setShowBlueprintPlacementModal(true);
       setMenuHidden(true); // Hide menu when modal appears
-      
-      // Small delay to ensure ZoomableImage gestures are initialized
-      setTimeout(() => {
-        setShowBlueprintPlacementModal(true);
-      }, 150);
     }
   }, [skipToBlueprintMode]);
   
@@ -3205,7 +3201,10 @@ export default function DimensionOverlay({
   }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isMapMode]);
 
   return (
-    <>
+    <View 
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+      pointerEvents={showBlueprintPlacementModal ? "box-none" : "auto"}
+    >
       {/* Universal Touch Overlay - Captures ALL touches for fingerprints */}
       <View
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
@@ -7905,6 +7904,6 @@ export default function DimensionOverlay({
         }}
         onClose={closeAlert}
       />
-    </>
+    </View>
   );
 }
