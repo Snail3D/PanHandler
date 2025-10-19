@@ -28,7 +28,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={{ 
         position: 'absolute',
-        top: insets.top + 80, // Even lower position for better view
+        top: insets.top + 40, // Higher position so doesn't cover pan text
         left: 32,
         right: 32,
         maxWidth: 300, // Smaller max width (was 360)
