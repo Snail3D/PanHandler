@@ -262,66 +262,10 @@ export default function ZoomCalibration({
   }, [imageUri]);
 
   // Show pinch-zoom tutorial on first use
-  // Show tutorial animation (always, since it's pretty!)
+  // Pinch tutorial disabled - users know how to pinch!
   useEffect(() => {
     initialZoomScale.current = zoomScale;
-    
-    setTimeout(() => {
-      setShowTutorial(true);
-      
-      // Fade in coin selection text + arrow first
-      coinTextOpacity.value = withSpring(1, { damping: 20 });
-      arrowOpacity.value = withSpring(1, { damping: 20 });
-      
-      // Fade in instruction text (will stay responsive to zoom)
-      instructionTextOpacity.value = withTiming(1, { duration: 800, easing: Easing.bezier(0.4, 0, 0.2, 1) });
-      
-      // Then show pinch animation after 1 second - CINEMATIC FADE IN 🎬
-      setTimeout(() => {
-        tutorialOpacity.value = withTiming(1, { 
-          duration: 600,
-          easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth
-        });
-        
-        // Animate fingers pinching outward (zoom in gesture)
-        const animatePinch = () => {
-          leftFingerX.value = withSequence(
-            withSpring(SCREEN_WIDTH / 2 - 30),
-            withSpring(SCREEN_WIDTH / 2 - 80, { damping: 15 }),
-            withSpring(SCREEN_WIDTH / 2 - 30, { damping: 15 })
-          );
-          rightFingerX.value = withSequence(
-            withSpring(SCREEN_WIDTH / 2 + 30),
-            withSpring(SCREEN_WIDTH / 2 + 80, { damping: 15 }),
-            withSpring(SCREEN_WIDTH / 2 + 30, { damping: 15 })
-          );
-        };
-        
-        // Run animation 3 times (was 2)
-        animatePinch();
-        setTimeout(animatePinch, 2000); // Slowed down (was 1500)
-        setTimeout(animatePinch, 4000); // Third animation
-      }, 1000);
-      
-      // Auto-hide tutorial overlays after 7 seconds - but keep instruction text responsive to zoom
-      setTimeout(() => {
-        tutorialOpacity.value = withTiming(0, { 
-          duration: 800,
-          easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth
-        });
-        coinTextOpacity.value = withTiming(0, { 
-          duration: 800,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        });
-        arrowOpacity.value = withTiming(0, { 
-          duration: 800,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        });
-        setTimeout(() => {
-          setShowTutorial(false);
-        }, 800);
-      }, 7000);
-    }, 800); // Delay so user sees the screen first
+    // Tutorial animations removed per user request
   }, []);
   
   // Detect zoom and dismiss tutorial gracefully - CINEMATIC 🎬
