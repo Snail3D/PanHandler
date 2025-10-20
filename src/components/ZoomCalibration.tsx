@@ -138,29 +138,27 @@ export default function ZoomCalibration({
   const ringOpacity = useSharedValue(0);
   
   useEffect(() => {
-    // Start elegant pulsing animation when tutorial shows
-    if (showTutorial) {
-      // Calculate circumference for dash offset animation
-      const circumference = 2 * Math.PI * referenceRadiusPixels;
-      
-      // Animate dash offset to create spinning effect
-      ringDashOffset.value = withRepeat(
-        withTiming(circumference, { duration: 4000, easing: Easing.linear }),
-        -1, // Infinite loop
-        false
-      );
-      
-      // Sexy pulsing opacity - breathes in and out
-      ringOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.9, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
-          withTiming(0.3, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) })
-        ),
-        -1, // Infinite pulse
-        false
-      );
-    }
-  }, [showTutorial]);
+    // Start elegant pulsing animation for text and ring (always show)
+    // Calculate circumference for dash offset animation
+    const circumference = 2 * Math.PI * referenceRadiusPixels;
+    
+    // Animate dash offset to create spinning effect
+    ringDashOffset.value = withRepeat(
+      withTiming(circumference, { duration: 4000, easing: Easing.linear }),
+      -1, // Infinite loop
+      false
+    );
+    
+    // Sexy pulsing opacity - breathes in and out
+    ringOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.9, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
+        withTiming(0.3, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) })
+      ),
+      -1, // Infinite pulse
+      false
+    );
+  }, []);
   
   // Animated style for ring opacity only
   const animatedRingOpacityStyle = useAnimatedStyle(() => ({
@@ -399,7 +397,7 @@ export default function ZoomCalibration({
   }));
 
   const tutorialTextStyle = useAnimatedStyle(() => ({
-    opacity: tutorialOpacity.value,
+    opacity: instructionTextOpacity.value, // Use instructionTextOpacity (not tutorialOpacity)
   }));
 
   return (
