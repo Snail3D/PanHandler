@@ -1,7 +1,23 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MMKV } from 'react-native-mmkv';
 import { Point, Measurement } from '../types/measurement';
+
+// Use MMKV instead of AsyncStorage - 10-100x faster, non-blocking
+const storage = new MMKV();
+
+const mmkvStorage = {
+  setItem: (name: string, value: string) => {
+    return storage.set(name, value);
+  },
+  getItem: (name: string) => {
+    const value = storage.getString(name);
+    return value ?? null;
+  },
+  removeItem: (name: string) => {
+    return storage.delete(name);
+  },
+};
 
 export type UnitSystem = 'metric' | 'imperial';
 
@@ -289,7 +305,7 @@ const useStore = create<MeasurementStore>()(
     }),
     {
       name: 'measurement-settings',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({ 
         unitSystem: state.unitSystem,
         defaultUnitSystem: state.defaultUnitSystem, // Persist default preference
@@ -304,7 +320,7 @@ const useStore = create<MeasurementStore>()(
         isDonor: state.isDonor, // Persist donor status
         lastDonationSession: state.lastDonationSession, // Persist donation session number
         isFirstTimeDonor: state.isFirstTimeDonor, // Persist first-time donor flag
-        asteroidsHighScore: state.asteroidsHighScore, // Persist Asteroids high score
+        // asteroidsHighScore: REMOVED - asteroids feature not working
         // panButtonTapCount: DON'T persist - resets each session
         // lastPanButtonTapTime: DON'T persist - resets each session
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
