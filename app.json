@@ -3,7 +3,7 @@
     "name": "PanHandler",
     "slug": "panhandler",
     "scheme": "panhandler",
-    "version": "2.5.4",
+    "version": "2.5.5",
     "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,

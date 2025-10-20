@@ -3351,8 +3351,9 @@ export default function DimensionOverlay({
                 onPanZoomLockChange(shouldLockPanZoom);
               }
               
-              // Clear current blueprint calibration
-              setCalibration(null);
+              // DON'T clear calibration yet - keep it so measurements display correctly
+              // It will be replaced when new calibration is set
+              // setCalibration(null); // REMOVED - keep old calibration until new one is ready
               setBlueprintPoints([]);
               // Reset measurement states
               setMeasurementMode(false);
