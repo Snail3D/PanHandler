@@ -925,11 +925,15 @@ export default function MeasurementScreen() {
   }, []); // Only run on mount
 
   // Watch for image changes and reset mode to camera when image is cleared
+  // IMPORTANT: Check both capturedPhotoUri AND currentImageUri
+  // capturedPhotoUri is set immediately on photo capture (before MMKV write)
+  // currentImageUri is set later after MMKV write completes
   useEffect(() => {
-    if (!currentImageUri && mode !== 'camera') {
+    const hasImage = capturedPhotoUri || currentImageUri;
+    if (!hasImage && mode !== 'camera') {
       setMode('camera');
     }
-  }, [currentImageUri, mode]);
+  }, [capturedPhotoUri, currentImageUri, mode]);
 
   // Cinematic fade-in when entering camera mode
   useEffect(() => {
@@ -1120,14 +1124,11 @@ export default function MeasurementScreen() {
           // Phone looking down at table → Auto-proceed to coin calibration
           console.log('📷 Phone tilted down (table) → Auto coin calibration');
           
-          // CINEMATIC MORPH: Camera → Calibration (same photo, just morph the UI!)
+          // CRITICAL FIX: Set capturedPhotoUri + mode together so they batch in same render
+          // This ensures displayImageUri is not null when ZoomCalibration mounts
+          setCapturedPhotoUri(photo.uri);
           setIsTransitioning(true);
-          
-          // IMPORTANT: Immediately switch mode to prevent camera from being unmounted during transition
-          // The camera view stays rendered but will fade out
-          setTimeout(() => {
-            setMode('zoomCalibrate');
-          }, 30); // Minimal delay just for the flash to start
+          setMode('zoomCalibrate');
           
           // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
           // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
