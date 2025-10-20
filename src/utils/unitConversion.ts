@@ -59,12 +59,19 @@ export function getDisplayUnit(
       return { value: valueInMm / 1000000, unit: 'km' };
     }
   } else {
-    // Imperial: use inches for values less than 12 inches, feet otherwise
+    // Imperial: intelligently choose unit based on magnitude (inches → feet → miles)
     const valueInInches = valueInMm / 25.4;
+    
     if (valueInInches < 12) {
+      // Less than 1 foot → show inches
       return { value: valueInInches, unit: 'in' };
-    } else {
+    } else if (valueInInches < 63360) {
+      // Less than 1 mile (63,360 inches) → show feet
       return { value: valueInInches / 12, unit: 'ft' };
+    } else {
+      // 1 mile or more → show miles
+      const valueInMiles = valueInMm / 1609344;
+      return { value: valueInMiles, unit: 'mi' };
     }
   }
 }
@@ -120,7 +127,11 @@ export function formatMeasurement(
     return `${feet}'${inches}"`;
   }
   
-  // Fallback for miles or other units
+  if (unit === 'mi') {
+    return `${value.toFixed(2)} ${unit}`; // 1.52 mi, 10.25 mi
+  }
+  
+  // Fallback for other units
   return `${value.toFixed(decimals)} ${unit}`;
 }
 
