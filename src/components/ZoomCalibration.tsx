@@ -427,103 +427,106 @@ export default function ZoomCalibration({
 
       {/* Reference Circle Overlay - Beautiful glowing ring (only show when coin selected) */}
       {selectedCoin && (
-        <View
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          pointerEvents="none"
-        >
-          <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-            <Defs>
-              <RadialGradient id="glowGradient" cx="50%" cy="50%">
-                <Stop offset="0%" stopColor={currentColor} stopOpacity="0.08" />
-                <Stop offset="70%" stopColor={currentColor} stopOpacity="0.03" />
-                <Stop offset="100%" stopColor={currentColor} stopOpacity="0" />
-              </RadialGradient>
+        <>
+          {/* SVG overlay with pointer events disabled */}
+          <View
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            pointerEvents="none"
+          >
+            <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
+              <Defs>
+                <RadialGradient id="glowGradient" cx="50%" cy="50%">
+                  <Stop offset="0%" stopColor={currentColor} stopOpacity="0.08" />
+                  <Stop offset="70%" stopColor={currentColor} stopOpacity="0.03" />
+                  <Stop offset="100%" stopColor={currentColor} stopOpacity="0" />
+                </RadialGradient>
+                
+                {/* Mask to create the clear circle "window" */}
+                <Mask id="circleMask">
+                  {/* White = visible, Black = hidden */}
+                  <Rect x="0" y="0" width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
+                  <Circle cx={referenceCenterX} cy={referenceCenterY} r={referenceRadiusPixels} fill="black" />
+                </Mask>
+              </Defs>
               
-              {/* Mask to create the clear circle "window" */}
-              <Mask id="circleMask">
-                {/* White = visible, Black = hidden */}
-                <Rect x="0" y="0" width={SCREEN_WIDTH} height={SCREEN_HEIGHT} fill="white" />
-                <Circle cx={referenceCenterX} cy={referenceCenterY} r={referenceRadiusPixels} fill="black" />
-              </Mask>
-            </Defs>
+              {/* Dynamic blur overlay OUTSIDE the circle - intensity increases with zoom */}
+              {/* Two-phase blur: Fast ramp 1x→6x (15%→50%), slow ramp 6x→35x (50%→60%) */}
+              {/* Inside the coin circle stays crystal clear as focal point */}
+              <Rect 
+                x="0" 
+                y="0" 
+                width={SCREEN_WIDTH} 
+                height={SCREEN_HEIGHT} 
+                fill={`rgba(255, 255, 255, ${
+                  zoomScale <= 6
+                    ? Math.min(0.15 + (zoomScale - 1) * 0.07, 0.50)  // Fast: 1x→6x = 15%→50% (7% per zoom unit)
+                    : Math.min(0.50 + (zoomScale - 6) * 0.0034, 0.60) // Slow: 6x→35x = 50%→60% (0.34% per zoom unit)
+                })`}
+                mask="url(#circleMask)"
+              />
+              
+              {/* Outer glow */}
+              <Circle
+                cx={referenceCenterX}
+                cy={referenceCenterY}
+                r={referenceRadiusPixels + 30}
+                fill="url(#glowGradient)"
+              />
+              
+              {/* Main circle - clean, minimal stroke, 10% darker */}
+              <Circle
+                cx={referenceCenterX}
+                cy={referenceCenterY}
+                r={referenceRadiusPixels}
+                fill="none"
+                stroke={currentColor}
+                strokeWidth="3"
+                opacity="0.7"
+              />
+              
+              {/* Inner highlight ring for depth */}
+              <Circle
+                cx={referenceCenterX}
+                cy={referenceCenterY}
+                r={referenceRadiusPixels - 3}
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.3)"
+                strokeWidth="1.5"
+              />
+            </Svg>
             
-            {/* Dynamic blur overlay OUTSIDE the circle - intensity increases with zoom */}
-            {/* Two-phase blur: Fast ramp 1x→6x (15%→50%), slow ramp 6x→35x (50%→60%) */}
-            {/* Inside the coin circle stays crystal clear as focal point */}
-            <Rect 
-              x="0" 
-              y="0" 
-              width={SCREEN_WIDTH} 
-              height={SCREEN_HEIGHT} 
-              fill={`rgba(255, 255, 255, ${
-                zoomScale <= 6
-                  ? Math.min(0.15 + (zoomScale - 1) * 0.07, 0.50)  // Fast: 1x→6x = 15%→50% (7% per zoom unit)
-                  : Math.min(0.50 + (zoomScale - 6) * 0.0034, 0.60) // Slow: 6x→35x = 50%→60% (0.34% per zoom unit)
-              })`}
-              mask="url(#circleMask)"
-            />
-            
-            {/* Outer glow */}
-            <Circle
-              cx={referenceCenterX}
-              cy={referenceCenterY}
-              r={referenceRadiusPixels + 30}
-              fill="url(#glowGradient)"
-            />
-            
-            {/* Main circle - clean, minimal stroke, 10% darker */}
-            <Circle
-              cx={referenceCenterX}
-              cy={referenceCenterY}
-              r={referenceRadiusPixels}
-              fill="none"
-              stroke={currentColor}
-              strokeWidth="3"
-              opacity="0.7"
-            />
-            
-            {/* Inner highlight ring for depth */}
-            <Circle
-              cx={referenceCenterX}
-              cy={referenceCenterY}
-              r={referenceRadiusPixels - 3}
-              fill="none"
-              stroke="rgba(255, 255, 255, 0.3)"
-              strokeWidth="1.5"
-            />
-          </Svg>
-          
-          {/* Animated rotating ring overlay - shows during tutorial */}
-          {showTutorial && (
-            <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  width: SCREEN_WIDTH,
-                  height: SCREEN_HEIGHT,
-                },
-                animatedRingOpacityStyle,
-              ]}
-              pointerEvents="none"
-            >
-              <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
-                <Circle
-                  cx={referenceCenterX}
-                  cy={referenceCenterY}
-                  r={referenceRadiusPixels}
-                  fill="none"
-                  stroke={currentColor}
-                  strokeWidth="8"
-                  strokeDasharray="50 30"
-                  strokeLinecap="round"
-                />
-              </Svg>
-            </Animated.View>
-          )}
+            {/* Animated rotating ring overlay - shows during tutorial */}
+            {showTutorial && (
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    width: SCREEN_WIDTH,
+                    height: SCREEN_HEIGHT,
+                  },
+                  animatedRingOpacityStyle,
+                ]}
+                pointerEvents="none"
+              >
+                <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
+                  <Circle
+                    cx={referenceCenterX}
+                    cy={referenceCenterY}
+                    r={referenceRadiusPixels}
+                    fill="none"
+                    stroke={currentColor}
+                    strokeWidth="8"
+                    strokeDasharray="50 30"
+                    strokeLinecap="round"
+                  />
+                </Svg>
+              </Animated.View>
+            )}
+          </View>
           
           {/* Coin name - floating beautifully inside, tappable to change */}
+          {/* IMPORTANT: This is OUTSIDE the pointerEvents="none" View so it's tappable */}
           <View
-            pointerEvents="box-none"
             style={{
               position: 'absolute',
               left: referenceCenterX - 120,
@@ -540,6 +543,7 @@ export default function ZoomCalibration({
               style={({ pressed }) => ({
                 transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
                 alignItems: 'center',
+                padding: 8, // Add padding for larger tap area
               })}
             >
               <Text style={{ 
@@ -586,7 +590,7 @@ export default function ZoomCalibration({
               {zoomScale.toFixed(2)}×
             </Text>
           </View>
-        </View>
+        </>
       )}
 
 
