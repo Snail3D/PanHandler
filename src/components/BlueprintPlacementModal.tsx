@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -24,10 +24,20 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
   const icon = isAerial ? 'airplane-outline' : 'locate-outline';
   const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 
+  if (!visible) return null;
+
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      {/* Full-screen container that allows touches to pass through */}
-      <View style={{ flex: 1 }} pointerEvents="box-none">
+    <View 
+      style={{ 
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 100, // High z-index to appear above other UI
+      }} 
+      pointerEvents="box-none"
+    >
         <View style={{ 
           position: 'absolute',
           top: insets.top + 40, // Higher position so doesn't cover pan text
@@ -176,7 +186,6 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
           </View>
         </BlurView>
       </View>
-      </View>
-    </Modal>
+    </View>
   );
 }
