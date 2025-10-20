@@ -6,6 +6,23 @@ import { Point, Measurement } from '../types/measurement';
 // Use MMKV instead of AsyncStorage - 10-100x faster, non-blocking
 const storage = new MMKV();
 
+// ONE-TIME FIX: Clear old persisted session data (v3.0.3)
+// This removes the huge persisted work sessions that were causing slowness
+try {
+  const oldData = storage.getString('measurement-settings');
+  if (oldData) {
+    const parsed = JSON.parse(oldData);
+    // If it has currentImageUri, it's old format - clear and rebuild with just settings
+    if (parsed?.state?.currentImageUri !== undefined) {
+      console.log('🧹 Clearing old work session data from MMKV...');
+      storage.delete('measurement-settings');
+      console.log('✅ Old data cleared - app will be fast now!');
+    }
+  }
+} catch (e) {
+  // Ignore errors, just making sure we clear if needed
+}
+
 const mmkvStorage = {
   setItem: (name: string, value: string) => {
     return storage.set(name, value);
