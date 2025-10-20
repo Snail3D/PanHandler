@@ -145,7 +145,7 @@ export default function DimensionOverlay({
   const setCalibration = useStore((s) => s.setCalibration);
   const unitSystem = useStore((s) => s.unitSystem);
   const setUnitSystem = useStore((s) => s.setUnitSystem);
-  const prevUnitSystemRef = useRef(unitSystem); // Track previous unit system to avoid infinite loops
+  const prevUnitSystemRef = useRef<'metric' | 'imperial' | null>(null); // Track previous unit system (start null to force first recalc)
   const currentImageUri = useStore((s) => s.currentImageUri);
   const isAutoCaptured = useStore((s) => s.isAutoCaptured);
   const coinCircle = useStore((s) => s.coinCircle);
