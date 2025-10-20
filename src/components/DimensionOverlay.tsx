@@ -3704,8 +3704,8 @@ export default function DimensionOverlay({
                         );
                         
                         // Snap threshold: Use PIXELS for universal, scale-independent behavior
-                        // Reduced from 18 to 12 pixels for more deliberate closure
-                        const snapThresholdPixels = 12; // Tighter for deliberate loop closing
+                        // 15 pixels = balanced between easy to catch and deliberate
+                        const snapThresholdPixels = 15; // Sweet spot between 12 (too tight) and 18 (too loose)
                         
                         if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
