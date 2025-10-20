@@ -7271,6 +7271,22 @@ export default function DimensionOverlay({
           
           setCalibration(newCalibration);
           
+          // Recalculate ALL existing measurements with new calibration (same as blueprint recalibration)
+          if (measurements.length > 0) {
+            console.log('🔄 Recalculating', measurements.length, 'measurements with new verbal scale calibration');
+            // Pass the NEW calibration directly to ensure it uses the new scale
+            const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m, newCalibration));
+            
+            // Update measurements immediately
+            setMeasurements(recalibratedMeasurements);
+            
+            // Force unit system ref to null so the useEffect will recalculate display values
+            // This ensures the UI updates with the new calibration
+            prevUnitSystemRef.current = null;
+            
+            console.log('✅ Measurements recalculated with new verbal scale calibration');
+          }
+          
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }}
         onBlueprintMode={() => {
