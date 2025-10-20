@@ -1142,39 +1142,29 @@ export default function MeasurementScreen() {
           // Phone upright (looking at wall) → Show photo type selection menu
           console.log('📷 Phone upright (wall) → Show photo type menu');
           
-          // Transition to measurement screen first, then show modal
-          setIsTransitioning(true);
-          transitionBlackOverlay.value = withTiming(1, {
-            duration: 150,
-            easing: Easing.in(Easing.ease),
-          });
+          // STAY in camera mode and show modal here
+          // Don't transition to measurement yet - wait for user selection
           
+          // Store pending photo
+          setPendingPhotoUri(photo.uri);
+          
+          // Small delay then show modal (stay in camera mode!)
           setTimeout(() => {
-            setMode('measurement');
+            console.log('🔴 Setting showPhotoTypeModal to TRUE');
+            setShowPhotoTypeModal(true);
             
-            // Store pending photo and show type selection
-            setPendingPhotoUri(photo.uri);
-            
+            // Defer AsyncStorage write
             setTimeout(() => {
-              console.log('🔴 Setting showPhotoTypeModal to TRUE');
-              setShowPhotoTypeModal(true);
+              // Clear old calibration to prevent auto-restore
+              setCoinCircle(null);
+              setCalibration(null);
+              setCompletedMeasurements([]);
+              setCurrentPoints([]);
               
-              // Defer AsyncStorage write
-              setTimeout(() => {
-                setImageUri(photo.uri, wasAutoCapture);
-                __DEV__ && console.log('✅ Deferred AsyncStorage write complete (portrait)');
-              }, 200);
-              
-              transitionBlackOverlay.value = withTiming(0, {
-                duration: 250,
-                easing: Easing.out(Easing.ease),
-              });
-              
-              setTimeout(() => {
-                setIsTransitioning(false);
-              }, 250);
-            }, 50);
-          }, 150);
+              setImageUri(photo.uri, wasAutoCapture);
+              __DEV__ && console.log('✅ Deferred AsyncStorage write complete (wall photo)');
+            }, 200);
+          }, 100);
         }
         
         // Save to camera roll in background (non-blocking for UI)
