@@ -263,9 +263,17 @@ export default function ZoomCalibration({
 
   // Show pinch-zoom tutorial on first use
   // Pinch tutorial disabled - users know how to pinch!
+  // Show instruction text but NOT finger animations
   useEffect(() => {
     initialZoomScale.current = zoomScale;
-    // Tutorial animations removed per user request
+    
+    // Fade in instruction text after a short delay
+    setTimeout(() => {
+      instructionTextOpacity.value = withTiming(1, { 
+        duration: 800, 
+        easing: Easing.bezier(0.4, 0, 0.2, 1) 
+      });
+    }, 500);
   }, []);
   
   // Detect zoom and dismiss tutorial gracefully - CINEMATIC 🎬
@@ -903,7 +911,108 @@ export default function ZoomCalibration({
         </View>
       )}
 
-      {/* Pinch-Zoom Tutorial Overlay - Always shows (animations are pretty!) */}
+      {/* Instruction text overlay - Always visible */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        {/* Instruction text - between circle and bottom controls */}
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: SCREEN_HEIGHT * 0.33 + 260, // Below coin circle
+              alignItems: 'center',
+              paddingHorizontal: 40,
+            },
+            tutorialTextStyle,
+          ]}
+        >
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: '700',
+              color: 'white',
+              textAlign: 'center',
+              marginBottom: 8,
+              textShadowColor: 'rgba(0, 0, 0, 0.8)',
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 4,
+            }}
+          >
+            Pinch to Zoom
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: 'rgba(255, 255, 255, 0.9)',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}
+            >
+              {"Match coin's OUTER edge to the "}
+            </Text>
+            <Animated.Text
+              style={[
+                {
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: currentColor,
+                  textAlign: 'center',
+                  textShadowColor: 'rgba(0, 0, 0, 0.9)',
+                  textShadowOffset: { width: 0, height: 2 },
+                  textShadowRadius: 4,
+                },
+                animatedTextPulseStyle,
+              ]}
+            >
+              {getColorName(currentColor)}
+            </Animated.Text>
+            <Text
+              style={{
+                fontSize: 16,
+                color: 'rgba(255, 255, 255, 0.9)',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}
+            >
+              {" circle"}
+            </Text>
+          </View>
+          
+          {/* Moved instruction text here - below Pinch to Zoom */}
+          <Text
+            style={{
+              fontSize: 15,
+              fontWeight: '700',
+              color: 'rgba(255, 255, 255, 0.85)',
+              textAlign: 'center',
+              textShadowColor: 'rgba(0, 0, 0, 0.7)',
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+              lineHeight: 21,
+              marginTop: 16,
+            }}
+          >
+            {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
+          </Text>
+        </Animated.View>
+      </View>
+
+      {/* Finger circle animations - hidden (showTutorial always false) */}
       {showTutorial && (
         <View
           style={{
@@ -912,98 +1021,9 @@ export default function ZoomCalibration({
             left: 0,
             right: 0,
             bottom: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
             pointerEvents: 'none',
           }}
         >
-          {/* Pinch tutorial text - between circle and bottom controls */}
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                top: SCREEN_HEIGHT * 0.33 + 260, // Below coin circle
-                alignItems: 'center',
-                paddingHorizontal: 40,
-              },
-              tutorialTextStyle,
-            ]}
-          >
-            <Text
-              style={{
-                fontSize: 22,
-                fontWeight: '700',
-                color: 'white',
-                textAlign: 'center',
-                marginBottom: 8,
-                textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                textShadowOffset: { width: 0, height: 2 },
-                textShadowRadius: 4,
-              }}
-            >
-              Pinch to Zoom
-            </Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  textAlign: 'center',
-                  textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 3,
-                }}
-              >
-                {"Match coin's OUTER edge to the "}
-              </Text>
-              <Animated.Text
-                style={[
-                  {
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: currentColor,
-                    textAlign: 'center',
-                    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                    textShadowOffset: { width: 0, height: 2 },
-                    textShadowRadius: 4,
-                  },
-                  animatedTextPulseStyle,
-                ]}
-              >
-                {getColorName(currentColor)}
-              </Animated.Text>
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  textAlign: 'center',
-                  textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 3,
-                }}
-              >
-                {" circle"}
-              </Text>
-            </View>
-            
-            {/* Moved instruction text here - below Pinch to Zoom */}
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: '700',
-                color: 'rgba(255, 255, 255, 0.85)',
-                textAlign: 'center',
-                textShadowColor: 'rgba(0, 0, 0, 0.7)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 4,
-                lineHeight: 21,
-                marginTop: 16,
-              }}
-            >
-              {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
-            </Text>
-          </Animated.View>
-
           {/* Animated finger indicators - positioned below coin circle */}
           <Animated.View
             style={[
