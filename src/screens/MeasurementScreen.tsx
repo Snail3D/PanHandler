@@ -1110,14 +1110,18 @@ export default function MeasurementScreen() {
         );
         
         // Use phone TILT to determine if looking at table or wall
-        // Beta close to 0° = phone flat/tilted down = looking at table
-        // Beta close to 90° = phone upright = looking at wall
+        // Must check BOTH beta and gamma to handle portrait AND landscape orientations
+        // Beta close to 0° = phone flat/tilted down in portrait
+        // Gamma close to 0° = phone flat/tilted down in landscape
         const absBeta = Math.abs(currentBeta);
-        const isLookingAtTable = absBeta < 45; // Less than 45° from horizontal = looking down at table
+        const absGamma = Math.abs(currentGamma);
+        const isLookingAtTable = absBeta < 45 && absGamma < 45; // BOTH axes flat = looking down at table
         
         console.log('📷 Photo captured - Phone tilt:', {
           beta: currentBeta.toFixed(1),
+          gamma: currentGamma.toFixed(1),
           absBeta: absBeta.toFixed(1),
+          absGamma: absGamma.toFixed(1),
           isLookingAtTable,
           decision: isLookingAtTable ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'
         });
