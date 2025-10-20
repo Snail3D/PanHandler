@@ -1130,6 +1130,9 @@ export default function MeasurementScreen() {
           setIsTransitioning(true);
           setMode('zoomCalibrate');
           
+          // Reset isCapturing since we're leaving camera mode
+          setIsCapturing(false);
+          
           // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
           // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
           // Write happens in background after UI transition is smooth
@@ -1164,6 +1167,9 @@ export default function MeasurementScreen() {
           
           // STAY in camera mode and show modal here
           // Don't transition to measurement yet - wait for user selection
+          
+          // IMPORTANT: Keep isCapturing = true to prevent double-capture while modal is open
+          // It will be reset when user selects from modal or cancels
           
           // Store pending photo
           setPendingPhotoUri(photo.uri);
@@ -1227,9 +1233,10 @@ export default function MeasurementScreen() {
       setIsCapturing(false);
       setIsHoldingShutter(false);
       setIsTransitioning(false);
-    } finally {
-      setIsCapturing(false);
     }
+    // NOTE: No finally block - isCapturing is reset conditionally:
+    // - Table photo: reset immediately (we leave camera mode)
+    // - Wall photo: stay true until user selects from modal (prevent double-capture)
   };
 
   const wasAutoCapture = alignmentStatus === 'good' && isStable;
@@ -1398,6 +1405,9 @@ export default function MeasurementScreen() {
   const handlePhotoTypeSelection = (type: PhotoType) => {
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
+    
+    // Reset isCapturing since user has made their selection
+    setIsCapturing(false);
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
@@ -2252,7 +2262,13 @@ export default function MeasurementScreen() {
         <PhotoTypeSelectionModal
           visible={showPhotoTypeModal}
           onSelect={handlePhotoTypeSelection}
-          onCancel={() => setShowPhotoTypeModal(false)}
+          onCancel={() => {
+            setShowPhotoTypeModal(false);
+            // Reset isCapturing so user can take another photo
+            setIsCapturing(false);
+            // Clear the pending photo since user cancelled
+            setPendingPhotoUri(null);
+          }}
           sessionColor={crosshairColor}
         />
         
