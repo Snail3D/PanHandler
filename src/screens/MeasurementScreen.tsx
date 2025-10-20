@@ -168,6 +168,7 @@ export default function MeasurementScreen() {
   const guidanceScale = useSharedValue(0.8);
   const lastGuidanceMessage = useRef<string | null>(null);
   const [accelerationVariance, setAccelerationVariance] = useState(0);
+  const [accelerationZ, setAccelerationZ] = useState(0); // Z-axis for orientation detection
   const [currentBeta, setCurrentBeta] = useState(0);
   const [currentGamma, setCurrentGamma] = useState(0);
   
