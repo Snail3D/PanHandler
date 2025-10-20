@@ -1,7 +1,7 @@
 # 🎯 PanHandler - Message for Ken (and Future Bots)
 
 **App Name:** PanHandler  
-**Current Version:** 2.5.5  
+**Current Version:** 2.5.6  
 **Type:** iOS Measurement & CAD Tool  
 **Status:** Alpha - Active Development  
 
@@ -407,7 +407,7 @@ You'll see warnings like:
 
 ---
 
-## 🎯 CURRENT STATE (v2.5.5)
+## 🎯 CURRENT STATE (v2.5.6)
 
 ### What's Working
 ✅ Camera with bubble level + auto-capture  
@@ -422,6 +422,7 @@ You'll see warnings like:
 ✅ **Intelligent imperial units** - Auto-selects inches/feet based on magnitude  
 ✅ Pan/zoom/rotate with lock after first measurement  
 ✅ **Blueprint recalibration pan/zoom lock** - Conditional locking based on measurements  
+✅ **Blueprint recalibration unit updates** - Measurements update to new unit (cm→km, etc.)  
 ✅ Email export with CAD data  
 ✅ Unit conversion (metric/imperial)  
 ✅ Menu swipe gestures  
@@ -432,11 +433,11 @@ You'll see warnings like:
 ✅ **Measurements update during recalibration** - No pixel display issue  
 ✅ **Supporter badge at bottom center** - No longer covers UI elements  
 
+### Recent Fixes (v2.5.6)
+- **Blueprint recalibration unit update fix** - Measurements now correctly update to new unit when recalibrating (e.g., cm→km works properly)
+
 ### Recent Fixes (v2.5.5)
-- **Blueprint recalibration measurement display fix** - Measurements now maintain proper units during recalibration (no pixel display)
-- Intelligent metric unit selection (mm → cm → m → km based on magnitude)
-- Blueprint recalibration pan/zoom lock (locks only when measurements exist)
-- Inches display precision (2 decimals for pure inches, whole numbers for feet+inches)
+- **Blueprint recalibration measurement display fix** - Measurements maintain proper units during recalibration (no pixel display)
 
 ### Recent Fixes (v2.5.0-2.5.4)
 - Landscape orientation detection (beta + gamma angles)
@@ -590,6 +591,7 @@ PanHandler is a precision tool with complex gesture handling and measurement log
 
 ## 📝 VERSION HISTORY QUICK REF
 
+- **v2.5.6** - Blueprint recalibration unit update fix (measurements update to new unit: cm→km, etc.)
 - **v2.5.5** - Blueprint recalibration measurement display fix (no pixel display during recalibration)
 - **v2.5.4** - Inches display precision (2 decimals verified)
 - **v2.5.3** - Blueprint recalibration pan/zoom lock (conditional based on measurements)

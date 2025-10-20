@@ -1576,8 +1576,11 @@ export default function DimensionOverlay({
   };
 
   // Helper function to recalculate measurement values after points are moved
-  const recalculateMeasurement = (measurement: Measurement): Measurement => {
+  const recalculateMeasurement = (measurement: Measurement, overrideCalibration?: typeof calibration): Measurement => {
     const { mode, points } = measurement;
+    
+    // Use override calibration if provided, otherwise use component state
+    const activeCalibration = overrideCalibration !== undefined ? overrideCalibration : calibration;
     
     if (mode === 'distance') {
       const value = calculateDistance(points[0], points[1]);
@@ -1600,9 +1603,9 @@ export default function DimensionOverlay({
         return { ...measurement, value, radius };
       }
       
-      const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
+      const radiusInUnits = radius / (activeCalibration?.pixelsPerUnit || 1);
       const diameter = radiusInUnits * 2;
-      const value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+      const value = `⌀ ${formatMeasurement(diameter, activeCalibration?.unit || 'mm', unitSystem, 2)}`;
       return { ...measurement, value, radius };
     } else if (mode === 'rectangle') {
       // Recalculate width and height from all 4 corners
@@ -1621,10 +1624,10 @@ export default function DimensionOverlay({
         return { ...measurement, value, width: widthDist, height: heightDist };
       }
       
-      const width = widthPx / (calibration?.pixelsPerUnit || 1);
-      const height = heightPx / (calibration?.pixelsPerUnit || 1);
-      const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
-      const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
+      const width = widthPx / (activeCalibration?.pixelsPerUnit || 1);
+      const height = heightPx / (activeCalibration?.pixelsPerUnit || 1);
+      const widthStr = formatMeasurement(width, activeCalibration?.unit || 'mm', unitSystem, 2);
+      const heightStr = formatMeasurement(height, activeCalibration?.unit || 'mm', unitSystem, 2);
       const value = `${widthStr} × ${heightStr}`;
       return { ...measurement, value, width, height };
     } else if (mode === 'freehand' && measurement.isClosed) {
@@ -1644,8 +1647,8 @@ export default function DimensionOverlay({
       if (isMapMode && mapScale) {
         perimeterStr = formatMapScaleDistance(perimeter);
       } else {
-        const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
-        perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
+        const perimeterInUnits = perimeter / (activeCalibration?.pixelsPerUnit || 1);
+        perimeterStr = formatMeasurement(perimeterInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
       }
       
       // ALWAYS clear area when points are moved - area is no longer accurate after manual editing
@@ -1687,11 +1690,11 @@ export default function DimensionOverlay({
         area = areaPixels * Math.pow(mapScale.realDistance / mapScale.screenDistance, 2);
         areaStr = formatMapScaleArea(area);
       } else {
-        const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
-        perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
-        const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
+        const perimeterInUnits = perimeter / (activeCalibration?.pixelsPerUnit || 1);
+        perimeterStr = formatMeasurement(perimeterInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
+        const pixelsPerUnit = activeCalibration?.pixelsPerUnit || 1;
         area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
-        areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+        areaStr = formatAreaMeasurement(area, activeCalibration?.unit || 'mm', unitSystem);
       }
       
       return { 
@@ -7385,7 +7388,9 @@ export default function DimensionOverlay({
           // Recalculate ALL existing measurements with new calibration
           if (measurements.length > 0) {
             console.log('🔄 Recalculating', measurements.length, 'measurements with new blueprint calibration');
-            const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m));
+            console.log('📐 New calibration unit:', newCalibration.unit, 'Old unit was:', calibration?.unit);
+            // Pass the NEW calibration directly to ensure it uses the new unit
+            const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m, newCalibration));
             setMeasurements(recalibratedMeasurements);
           }
           
