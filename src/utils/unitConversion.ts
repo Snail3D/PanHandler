@@ -107,7 +107,7 @@ export function formatMeasurement(
   }
   
   if (unit === 'ft') {
-    const totalInches = Math.round(value * 12); // Convert to total inches first
+    const totalInches = Math.round(value * 12); // Convert to total inches, round to whole
     const feet = Math.floor(totalInches / 12);
     const inches = totalInches % 12;
     
@@ -116,7 +116,7 @@ export function formatMeasurement(
       return `${feet}'`;
     }
     
-    // Show feet and inches
+    // Show feet and inches (whole numbers only)
     return `${feet}'${inches}"`;
   }
   
