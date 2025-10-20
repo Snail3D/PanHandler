@@ -1181,21 +1181,11 @@ export default function MeasurementScreen() {
           setPendingPhotoUri(photo.uri);
           
           // Small delay then show modal (stay in camera mode!)
+          // DON'T call setImageUri here - it causes massive re-render that breaks modal
+          // Instead, setImageUri is called in handlePhotoTypeSelection AFTER user picks
           setTimeout(() => {
             console.log('🔴 Setting showPhotoTypeModal to TRUE');
             setShowPhotoTypeModal(true);
-            
-            // Defer AsyncStorage write
-            setTimeout(() => {
-              // Clear old calibration to prevent auto-restore
-              setCoinCircle(null);
-              setCalibration(null);
-              setCompletedMeasurements([]);
-              setCurrentPoints([]);
-              
-              setImageUri(photo.uri, wasAutoCapture);
-              __DEV__ && console.log('✅ Deferred AsyncStorage write complete (wall photo)');
-            }, 200);
           }, 100);
         }
         
@@ -1427,6 +1417,13 @@ export default function MeasurementScreen() {
     setCurrentPhotoType(type);
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    // NOW write the pending photo to storage (was previously done before modal, causing re-render bug)
+    // pendingPhotoUri is set in the wall photo path (line 1181)
+    if (pendingPhotoUri) {
+      setImageUri(pendingPhotoUri, false); // false = not auto-captured since user had to choose
+      setPendingPhotoUri(null); // Clear pending
+    }
     
     // COIN: Go to calibration screen for coin calibration
     if (type === 'coin') {
