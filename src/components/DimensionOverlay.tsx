@@ -1630,36 +1630,55 @@ export default function DimensionOverlay({
       const heightStr = formatMeasurement(height, activeCalibration?.unit || 'mm', unitSystem, 2);
       const value = `${widthStr} × ${heightStr}`;
       return { ...measurement, value, width, height };
-    } else if (mode === 'freehand' && measurement.isClosed) {
-      // Recalculate perimeter for closed loops
-      let perimeter = 0;
-      for (let i = 0; i < points.length; i++) {
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        const segmentLength = Math.sqrt(
-          Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
-        );
-        perimeter += segmentLength;
+    } else if (mode === 'freehand') {
+      // Recalculate path length for freehand (both closed and open paths)
+      let totalLength = 0;
+      
+      if (measurement.isClosed) {
+        // Closed loop - connect back to start
+        for (let i = 0; i < points.length; i++) {
+          const p1 = points[i];
+          const p2 = points[(i + 1) % points.length];
+          const segmentLength = Math.sqrt(
+            Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)
+          );
+          totalLength += segmentLength;
+        }
+      } else {
+        // Open path - don't connect back to start
+        for (let i = 1; i < points.length; i++) {
+          const dx = points[i].x - points[i - 1].x;
+          const dy = points[i].y - points[i - 1].y;
+          totalLength += Math.sqrt(dx * dx + dy * dy);
+        }
       }
       
       // Map Mode: Apply scale conversion
-      let perimeterStr: string;
+      let lengthStr: string;
       if (isMapMode && mapScale) {
-        perimeterStr = formatMapScaleDistance(perimeter);
+        lengthStr = formatMapScaleDistance(totalLength);
       } else {
-        const perimeterInUnits = perimeter / (activeCalibration?.pixelsPerUnit || 1);
-        perimeterStr = formatMeasurement(perimeterInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
+        const lengthInUnits = totalLength / (activeCalibration?.pixelsPerUnit || 1);
+        lengthStr = formatMeasurement(lengthInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
       }
       
-      // ALWAYS clear area when points are moved - area is no longer accurate after manual editing
-      console.log('⚠️ Freehand shape edited - removing area from legend (perimeter still valid)');
-      return { 
-        ...measurement, 
-        perimeter: perimeterStr, 
-        value: perimeterStr, // Update value to show only perimeter
-        area: undefined, // Clear area - no longer accurate after editing
-        isClosed: true // Still marked as closed, just no area
-      };
+      // If closed loop, clear area (not accurate after recalibration)
+      if (measurement.isClosed) {
+        console.log('⚠️ Freehand closed loop recalibrated - removing area (perimeter still valid)');
+        return { 
+          ...measurement, 
+          perimeter: lengthStr, 
+          value: lengthStr,
+          area: undefined, // Clear area - no longer accurate after recalibration
+          isClosed: true
+        };
+      } else {
+        // Open path - just update the length
+        return { 
+          ...measurement, 
+          value: lengthStr
+        };
+      }
     } else if (mode === 'polygon') {
       // Recalculate perimeter and area for polygons
       let perimeter = 0;
