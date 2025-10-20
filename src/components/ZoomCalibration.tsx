@@ -182,7 +182,11 @@ export default function ZoomCalibration({
         setShowCoinSelector(true);
       }
     } else {
-      // No last selected coin - open selector immediately on first use
+      // No last selected coin - use Quarter as default AND open selector
+      const defaultCoin = getCoinByName('Quarter');
+      if (defaultCoin) {
+        setSelectedCoin(defaultCoin);
+      }
       setShowCoinSelector(true);
     }
   }, [lastSelectedCoin]);
