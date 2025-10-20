@@ -1400,15 +1400,17 @@ export default function MeasurementScreen() {
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
-    // NOW write the pending photo to storage (was previously done before modal, causing re-render bug)
-    // pendingPhotoUri is set in the wall photo path (line 1181)
-    if (pendingPhotoUri) {
-      setImageUri(pendingPhotoUri, false); // false = not auto-captured since user had to choose
-      setPendingPhotoUri(null); // Clear pending
-    }
+    // Store pending URI in local variable BEFORE clearing state
+    const photoUri = pendingPhotoUri;
     
     // COIN: Go to calibration screen for coin calibration
     if (type === 'coin') {
+      // Set captured photo in LOCAL state first (no MMKV blocking)
+      if (photoUri) {
+        setCapturedPhotoUri(photoUri);
+        setPendingPhotoUri(null); // Clear after using
+      }
+      
       setIsTransitioning(true);
       transitionBlackOverlay.value = withTiming(1, {
         duration: 150,
@@ -1417,6 +1419,13 @@ export default function MeasurementScreen() {
       
       setTimeout(() => {
         setMode('zoomCalibrate');
+        
+        // DEFER setImageUri until AFTER mode switch (prevent blocking)
+        setTimeout(() => {
+          if (photoUri) {
+            setImageUri(photoUri, false);
+          }
+        }, 50);
         
         transitionBlackOverlay.value = withTiming(0, {
           duration: 250,
@@ -1431,6 +1440,12 @@ export default function MeasurementScreen() {
     // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
     // The appropriate modal will be triggered there
     else {
+      // Set image URI for map/blueprint modes (they need it immediately)
+      if (photoUri) {
+        setImageUri(photoUri, false);
+        setPendingPhotoUri(null);
+      }
+      
       // DON'T use black transition for blueprint/map - causes lockup
       // Just switch modes directly
       setMode('measurement');
