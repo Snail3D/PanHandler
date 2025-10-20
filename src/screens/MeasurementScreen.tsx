@@ -1092,22 +1092,11 @@ export default function MeasurementScreen() {
       });
       
       if (photo?.uri) {
-        // Store in local state immediately (no AsyncStorage blocking!)
+        // Store in local state immediately (no MMKV blocking!)
         setCapturedPhotoUri(photo.uri);
         
-        // Detect orientation for storage (defer AsyncStorage write)
-        Image.getSize(
-          photo.uri, 
-          (width, height) => {
-            const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
-            setTimeout(() => {
-              setImageOrientation(orientation);
-            }, 300);
-          }, 
-          (error) => {
-            console.error('Error detecting orientation:', error);
-          }
-        );
+        // DON'T call setImageOrientation - it triggers MMKV write which blocks thread
+        // We don't persist orientation anyway, so no need to set it
         
         // Use phone TILT to determine if looking at table or wall
         // Must check BOTH beta and gamma to handle portrait AND landscape orientations
