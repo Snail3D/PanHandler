@@ -1675,6 +1675,15 @@ export default function DimensionOverlay({
     // Use override calibration if provided, otherwise use component state
     const activeCalibration = overrideCalibration !== undefined ? overrideCalibration : calibration;
     
+    // Determine if we're in map mode (verbal scale)
+    // When recalibrating with new verbal scale, use the override calibration's verbal scale
+    const isUsingMapMode = overrideCalibration?.calibrationType === 'verbal' 
+      ? true 
+      : isMapMode;
+    const activeMapScale = overrideCalibration?.calibrationType === 'verbal' && overrideCalibration.verbalScale
+      ? overrideCalibration.verbalScale
+      : mapScale;
+    
     if (mode === 'distance') {
       const value = calculateDistance(points[0], points[1]);
       return { ...measurement, value };
@@ -1689,7 +1698,7 @@ export default function DimensionOverlay({
       );
       
       // Map Mode: Apply scale conversion
-      if (isMapMode && mapScale) {
+      if (isUsingMapMode && activeMapScale) {
         const diameterPx = radius * 2;
         const diameterDist = convertToMapScale(diameterPx);
         const value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
@@ -1708,7 +1717,7 @@ export default function DimensionOverlay({
       const heightPx = Math.abs(p2.y - p0.y);
       
       // Map Mode: Apply scale conversion
-      if (isMapMode && mapScale) {
+      if (isUsingMapMode && activeMapScale) {
         const widthDist = convertToMapScale(widthPx);
         const heightDist = convertToMapScale(heightPx);
         const widthStr = formatMapScaleDistance(widthPx);
@@ -1748,7 +1757,7 @@ export default function DimensionOverlay({
       
       // Map Mode: Apply scale conversion
       let lengthStr: string;
-      if (isMapMode && mapScale) {
+      if (isUsingMapMode && activeMapScale) {
         lengthStr = formatMapScaleDistance(totalLength);
       } else {
         const lengthInUnits = totalLength / (activeCalibration?.pixelsPerUnit || 1);
@@ -1797,9 +1806,9 @@ export default function DimensionOverlay({
       let perimeterStr: string;
       let areaStr: string;
       let area: number;
-      if (isMapMode && mapScale) {
+      if (isUsingMapMode && activeMapScale) {
         perimeterStr = formatMapScaleDistance(perimeter);
-        area = areaPixels * Math.pow(mapScale.realDistance / mapScale.screenDistance, 2);
+        area = areaPixels * Math.pow(activeMapScale.realDistance / activeMapScale.screenDistance, 2);
         areaStr = formatMapScaleArea(area);
       } else {
         const perimeterInUnits = perimeter / (activeCalibration?.pixelsPerUnit || 1);
