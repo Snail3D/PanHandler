@@ -1479,6 +1479,13 @@ export default function MeasurementScreen() {
         
         // Defer AsyncStorage write to prevent UI blocking during import
         setTimeout(() => {
+          // Clear calibration data first to prevent auto-restore to measurement mode
+          setCoinCircle(null);
+          setCalibration(null);
+          setCompletedMeasurements([]);
+          setCurrentPoints([]);
+          
+          // Then set the new image URI
           setImageUri(asset.uri, false); // Background persist
           __DEV__ && console.log('✅ Deferred imported photo AsyncStorage write complete');
         }, 300);
