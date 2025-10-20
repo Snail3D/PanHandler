@@ -107,6 +107,7 @@ interface DimensionOverlayProps {
   onRegisterDoubleTapCallback?: (callback: () => void) => void; // Receives callback to switch to Measure mode
   onReset?: (recalibrateMode?: boolean) => void; // Called when "New Photo" button is pressed or "Recalibrate" button is pressed
   onMeasurementModeChange?: (isActive: boolean) => void; // Called when measurement mode changes
+  onPanZoomLockChange?: (shouldLock: boolean) => void; // Called when pan/zoom should be locked/unlocked
   skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
   skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
   skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
@@ -123,6 +124,7 @@ export default function DimensionOverlay({
   onRegisterDoubleTapCallback,
   onReset,
   onMeasurementModeChange,
+  onPanZoomLockChange,
   skipToMapMode = false,
   skipToBlueprintMode = false,
   skipToAerialMode = false,
@@ -3333,11 +3335,27 @@ export default function DimensionOverlay({
             // BLUEPRINT MODE: Reopen pin placement, keep measurements, recalculate with new calibration
             if (calibration?.calibrationType === 'blueprint') {
               console.log('📍 Recalibrating blueprint mode - keeping measurements');
+              
+              // CRITICAL: Lock pan/zoom if there are measurements to prevent them from appearing to move
+              // (measurements are stored in image coords, but displayed in screen coords that change with pan/zoom)
+              // If no measurements exist, allow pan/zoom for easier pin placement
+              const shouldLockPanZoom = measurements.length > 0;
+              if (shouldLockPanZoom) {
+                console.log('🔒 Locking pan/zoom - measurements exist and would appear to move');
+              } else {
+                console.log('🔓 Allowing pan/zoom - no measurements to worry about');
+              }
+              
+              // Notify parent to lock/unlock pan/zoom
+              if (onPanZoomLockChange) {
+                onPanZoomLockChange(shouldLockPanZoom);
+              }
+              
               // Clear current blueprint calibration
               setCalibration(null);
               setBlueprintPoints([]);
-              // Reset measurement states to allow pan/zoom
-              setMeasurementMode(false); // CRITICAL: Allow pan/zoom gestures
+              // Reset measurement states
+              setMeasurementMode(false);
               setIsPlacingBlueprint(false); // Not placing yet - just showing modal
               setMenuHidden(true); // Hide menu when modal appears
               
@@ -7377,6 +7395,12 @@ export default function DimensionOverlay({
             setBlueprintPoints([]);
             setIsMapMode(false);
             blueprintLineOpacity.value = 1; // Reset for next time
+            
+            // Unlock pan/zoom now that calibration is complete
+            if (onPanZoomLockChange) {
+              onPanZoomLockChange(false);
+              console.log('🔓 Unlocking pan/zoom - blueprint calibration complete');
+            }
           }, 400);
           
           // Success haptic
@@ -7402,6 +7426,12 @@ export default function DimensionOverlay({
             setBlueprintPoints([]);
             setIsMapMode(false);
             blueprintLineOpacity.value = 1; // Reset for next time
+            
+            // Unlock pan/zoom when dismissing (cancelled calibration)
+            if (onPanZoomLockChange) {
+              onPanZoomLockChange(false);
+              console.log('🔓 Unlocking pan/zoom - blueprint calibration cancelled');
+            }
           }, 300);
         }}
       />
