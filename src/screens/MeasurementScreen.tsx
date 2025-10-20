@@ -1427,14 +1427,17 @@ export default function MeasurementScreen() {
           }
         }, 50);
         
-        transitionBlackOverlay.value = withTiming(0, {
-          duration: 250,
-          easing: Easing.out(Easing.ease),
-        });
-        
+        // Wait longer before fading in to ensure ZoomCalibration is fully mounted
         setTimeout(() => {
-          setIsTransitioning(false);
-        }, 250);
+          transitionBlackOverlay.value = withTiming(0, {
+            duration: 250,
+            easing: Easing.out(Easing.ease),
+          });
+          
+          setTimeout(() => {
+            setIsTransitioning(false);
+          }, 250);
+        }, 200); // Wait 200ms for component to mount before fading in
       }, 150);
     }
     // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
