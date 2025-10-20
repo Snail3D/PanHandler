@@ -1241,7 +1241,10 @@ export default function MeasurementScreen() {
         })();
       }
     } catch (error) {
-      console.error('Error taking picture:', error);
+      // Silent catch - camera ref can become null during double-tap, this is expected
+      __DEV__ && console.log('⚠️ Photo capture interrupted:', error);
+      // Give user feedback that something went wrong
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       // Make sure we reset states on error
       setIsCapturing(false);
       setIsHoldingShutter(false);
