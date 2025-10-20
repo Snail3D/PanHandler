@@ -583,6 +583,10 @@ export default function MeasurementScreen() {
         // Track motion/acceleration stability
         if (data.acceleration) {
           const { x, y, z } = data.acceleration;
+          
+          // Store Z-axis for orientation detection
+          setAccelerationZ(z);
+          
           // Calculate total acceleration magnitude (movement intensity)
           const totalAcceleration = Math.sqrt(x * x + y * y + z * z);
           recentAccelerations.current.push(totalAcceleration);
@@ -603,9 +607,22 @@ export default function MeasurementScreen() {
         isVerticalMode.value = isVertical;
         
         // Check if orientation changed
+        // Use Z-axis gravity to reliably detect if phone is flat (looking down) or upright (looking at wall)
+        // When flat (camera down): Z ≈ -1g (gravity pulling down through screen)
+        // When upright (camera forward): Z ≈ 0g (gravity pulling down through bottom edge)
         const wasHorizontal = isHorizontal.value;
-        const nowHorizontal = absBeta < 45; // Calculate new horizontal state
+        const zAccel = data.acceleration?.z || 0;
+        const nowHorizontal = zAccel < -0.5; // If Z < -0.5g, phone is pointing down at table
         isHorizontal.value = nowHorizontal; // Update shared value
+        
+        // DEBUG: Log orientation detection
+        if (__DEV__ && wasHorizontal !== nowHorizontal) {
+          console.log('📱 Orientation changed:', {
+            absBeta: absBeta.toFixed(1),
+            nowHorizontal,
+            targetOpacity: nowHorizontal ? 1 : 0,
+          });
+        }
         
         // Smooth 500ms fade transition between "Look Down" and instructions
         if (wasHorizontal !== nowHorizontal) {
@@ -628,6 +645,15 @@ export default function MeasurementScreen() {
             duration: 400, // Smooth 400ms fade
             easing: Easing.inOut(Easing.ease),
           });
+          
+          // DEBUG: Log opacity changes
+          if (__DEV__) {
+            console.log('🎨 Crosshair opacity changing:', {
+              from: levelLinesOpacity.value.toFixed(2),
+              to: targetOpacity,
+              absBeta: absBeta.toFixed(1),
+            });
+          }
         }
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
