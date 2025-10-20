@@ -1742,6 +1742,39 @@ Thank you for helping us improve PanHandler!
                 </View>
               </ExpandableSection>
 
+              {/* Troubleshooting Section */}
+              <ExpandableSection
+                icon="warning"
+                title="🔧 Troubleshooting"
+                color="#FF9500"
+                delay={650}
+                scrollY={scrollY}
+                index={11}
+              >
+                <View style={{ marginLeft: 4 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    📸 Camera Issues
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                    <Text style={{ fontWeight: '600' }}>Photos not saving or app freezing?</Text> Your device storage may be full. Delete old photos and videos from your Photos app to free up space. iOS needs available storage to process new images.
+                  </Text>
+                  
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    ⚡ Performance Issues
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                    <Text style={{ fontWeight: '600' }}>App running slowly?</Text> Check your device storage. A full device can cause lag and freezing. Aim to keep at least 1-2 GB of free space.
+                  </Text>
+                  
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    🔄 App Restart
+                  </Text>
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
+                    <Text style={{ fontWeight: '600' }}>Still having issues?</Text> Force-quit the app (swipe up from app switcher) and reopen. If problems persist, delete and reinstall the app for a fresh start.
+                  </Text>
+                </View>
+              </ExpandableSection>
+
               {/* Accuracy Fun Fact Section */}
               <View style={{ marginBottom: 16, marginTop: 12 }}>
                 <Animated.View 
