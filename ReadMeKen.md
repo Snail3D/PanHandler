@@ -1,7 +1,7 @@
 # 🎯 PanHandler - Message for Ken (and Future Bots)
 
 **App Name:** PanHandler  
-**Current Version:** 2.5.6  
+**Current Version:** 2.5.9  
 **Type:** iOS Measurement & CAD Tool  
 **Status:** Alpha - Active Development  
 
