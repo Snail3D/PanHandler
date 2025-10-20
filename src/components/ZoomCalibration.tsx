@@ -519,6 +519,7 @@ export default function ZoomCalibration({
           
           {/* Coin name - floating beautifully inside, tappable to change */}
           <View
+            pointerEvents="box-none"
             style={{
               position: 'absolute',
               left: referenceCenterX - 120,
