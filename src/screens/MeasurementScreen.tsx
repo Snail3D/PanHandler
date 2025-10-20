@@ -913,7 +913,8 @@ export default function MeasurementScreen() {
 
   // Restore session on mount if there's a persisted image
   useEffect(() => {
-    if (currentImageUri && calibration && coinCircle) {
+    // Restore if we have an image AND calibration (any type: coin, blueprint, or verbal/map)
+    if (currentImageUri && calibration) {
       __DEV__ && console.log('📦 Restoring previous session');
       setMode('measurement');
       // Restore saved zoom state if available
