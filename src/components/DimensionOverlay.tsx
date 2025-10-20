@@ -1272,8 +1272,8 @@ export default function DimensionOverlay({
   const snapToNearbyPoint = (cursorX: number, cursorY: number, moveMode: boolean = false): { x: number, y: number, snapped: boolean } => {
     // Calculate snap distance in pixels based on calibration
     // Use very small threshold (0.5mm) when moving points for smooth, fluid movement
-    // Only snap when VERY close to another point
-    const SNAP_DISTANCE_MM = moveMode ? 0.5 : 1;
+    // Use 2mm for normal placement - only snap when cursor is very close (within a couple mm)
+    const SNAP_DISTANCE_MM = moveMode ? 0.5 : 2;
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
       : (moveMode ? 5 : 30); // fallback pixels if not calibrated (5px when moving, very tight)
@@ -3685,7 +3685,7 @@ export default function DimensionOverlay({
                       // FIRST POINT: Check if we should snap to an existing point (like distance lines do)
                       // This allows freehand to connect to polygons and other measurements
                       const screenPos = imageToScreen(imageX, imageY);
-                      const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use tight snap (1mm)
+                      const snapResult = snapToNearbyPoint(screenPos.x, screenPos.y, false); // Use 2mm snap threshold
                       
                       if (snapResult.snapped) {
                         // Snap to existing point - allows connecting to polygons
