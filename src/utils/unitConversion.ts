@@ -49,7 +49,7 @@ export function getDisplayUnit(
 
   if (unitSystem === 'metric') {
     // Metric: intelligently choose unit based on magnitude
-    if (valueInMm < 10) { // Less than 10mm (1cm)
+    if (valueInMm < 250) { // Less than 250mm (25cm) - stay in mm for precision
       return { value: valueInMm, unit: 'mm' };
     } else if (valueInMm < 1000) { // Less than 1000mm (1m)
       return { value: valueInMm / 10, unit: 'cm' };
@@ -87,7 +87,9 @@ export function formatMeasurement(
   
   // Metric units
   if (unit === 'mm') {
-    const roundedValue = Math.round(value * 2) / 2; // Round to nearest 0.5
+    // Round to nearest 0.5mm (true nearest, not round up at 0.25)
+    // 98.2 → 98.0, 98.3 → 98.5, 98.6 → 98.5, 98.8 → 99.0
+    const roundedValue = Math.round(value * 2) / 2;
     // Only show decimal if it's .5, hide .0
     if (roundedValue % 1 === 0) {
       return `${roundedValue.toFixed(0)} ${unit}`; // 49mm, 50mm
