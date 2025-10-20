@@ -1361,45 +1361,138 @@ export default function DimensionOverlay({
     
     const mapDistance = convertToMapScale(pixelDistance);
     
-    // ALWAYS use map scale's real unit (don't convert based on user preference)
-    // If user set map scale to miles, output should be in miles
-    if (mapScale.realUnit === "km") {
-      return `${mapDistance.toFixed(2)} km`;
-    } else if (mapScale.realUnit === "mi") {
-      return `${mapDistance.toFixed(2)} mi`;
-    } else if (mapScale.realUnit === "m") {
-      return `${mapDistance.toFixed(0)} m`;
-    } else { // ft
-      // Format as feet'inches"
-      const totalInches = Math.round(mapDistance * 12); // Convert to total inches first
-      const feet = Math.floor(totalInches / 12);
-      const inches = totalInches % 12;
-      
-      // If no inches, just show feet
-      if (inches === 0) {
-        return `${feet}'`;
+    // Convert based on user's unit system preference (metric vs imperial)
+    // Start with map scale's unit, then convert if needed
+    const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
+    const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
+    
+    // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
+    if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
+      if (mapScale.realUnit === "km") {
+        return `${mapDistance.toFixed(2)} km`;
+      } else if (mapScale.realUnit === "mi") {
+        return `${mapDistance.toFixed(2)} mi`;
+      } else if (mapScale.realUnit === "m") {
+        return `${mapDistance.toFixed(0)} m`;
+      } else { // ft
+        // Format as feet'inches"
+        const totalInches = Math.round(mapDistance * 12);
+        const feet = Math.floor(totalInches / 12);
+        const inches = totalInches % 12;
+        
+        if (inches === 0) {
+          return `${feet}'`;
+        }
+        return `${feet}'${inches}"`;
+      }
+    }
+    
+    // User wants metric, but map is imperial - convert to metric
+    if (unitSystem === 'metric' && isMapImperial) {
+      let meters = 0;
+      if (mapScale.realUnit === "mi") {
+        meters = mapDistance * 1609.34; // miles to meters
+      } else { // ft
+        meters = mapDistance * 0.3048; // feet to meters
       }
       
-      // Show feet and inches
-      return `${feet}'${inches}"`;
+      // Choose appropriate metric unit
+      if (meters < 1) {
+        return `${(meters * 100).toFixed(0)} cm`;
+      } else if (meters < 1000) {
+        return `${meters.toFixed(1)} m`;
+      } else {
+        return `${(meters / 1000).toFixed(2)} km`;
+      }
     }
+    
+    // User wants imperial, but map is metric - convert to imperial
+    if (unitSystem === 'imperial' && isMapMetric) {
+      let feet = 0;
+      if (mapScale.realUnit === "km") {
+        feet = mapDistance * 3280.84; // km to feet
+      } else { // m
+        feet = mapDistance * 3.28084; // meters to feet
+      }
+      
+      // Choose appropriate imperial unit
+      if (feet < 5280) {
+        // Format as feet'inches"
+        const totalInches = Math.round(feet * 12);
+        const feetPart = Math.floor(totalInches / 12);
+        const inches = totalInches % 12;
+        
+        if (inches === 0) {
+          return `${feetPart}'`;
+        }
+        return `${feetPart}'${inches}"`;
+      } else {
+        // Use miles
+        return `${(feet / 5280).toFixed(2)} mi`;
+      }
+    }
+    
+    // Fallback (shouldn't reach here)
+    return `${mapDistance.toFixed(2)} ${mapScale.realUnit}`;
   };
 
   // Helper: Format map scale area (for rectangles, circles, freehand)
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
     
-    // ALWAYS use map scale's real unit (don't convert based on user preference)
-    // If user set map scale to miles, output should be in square miles
-    if (mapScale.realUnit === 'km') {
-      return `${areaInMapUnits2.toFixed(2)} km²`;
-    } else if (mapScale.realUnit === 'mi') {
-      return `${areaInMapUnits2.toFixed(2)} mi²`;
-    } else if (mapScale.realUnit === 'm') {
-      return `${areaInMapUnits2.toFixed(0)} m²`;
-    } else { // ft
-      return `${areaInMapUnits2.toFixed(0)} ft²`;
+    // Convert based on user's unit system preference (metric vs imperial)
+    const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
+    const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
+    
+    // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
+    if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
+      if (mapScale.realUnit === 'km') {
+        return `${areaInMapUnits2.toFixed(2)} km²`;
+      } else if (mapScale.realUnit === 'mi') {
+        return `${areaInMapUnits2.toFixed(2)} mi²`;
+      } else if (mapScale.realUnit === 'm') {
+        return `${areaInMapUnits2.toFixed(0)} m²`;
+      } else { // ft
+        return `${areaInMapUnits2.toFixed(0)} ft²`;
+      }
     }
+    
+    // User wants metric, but map is imperial - convert to metric
+    if (unitSystem === 'metric' && isMapImperial) {
+      let m2 = 0;
+      if (mapScale.realUnit === "mi") {
+        m2 = areaInMapUnits2 * 2589988.11; // square miles to square meters
+      } else { // ft
+        m2 = areaInMapUnits2 * 0.092903; // square feet to square meters
+      }
+      
+      // Choose appropriate metric unit
+      if (m2 < 10000) {
+        return `${m2.toFixed(1)} m²`;
+      } else {
+        return `${(m2 / 1000000).toFixed(2)} km²`;
+      }
+    }
+    
+    // User wants imperial, but map is metric - convert to imperial
+    if (unitSystem === 'imperial' && isMapMetric) {
+      let ft2 = 0;
+      if (mapScale.realUnit === "km") {
+        ft2 = areaInMapUnits2 * 10763910.4; // square km to square feet
+      } else { // m
+        ft2 = areaInMapUnits2 * 10.7639; // square meters to square feet
+      }
+      
+      // Choose appropriate imperial unit
+      if (ft2 < 27878400) { // Less than 1 square mile
+        return `${ft2.toFixed(0)} ft²`;
+      } else {
+        return `${(ft2 / 27878400).toFixed(2)} mi²`;
+      }
+    }
+    
+    // Fallback (shouldn't reach here)
+    return `${areaInMapUnits2.toFixed(2)} ${mapScale.realUnit}²`;
   };
 
   // Calculate distance in pixels and convert to real units
