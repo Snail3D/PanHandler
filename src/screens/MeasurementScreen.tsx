@@ -1491,9 +1491,20 @@ export default function MeasurementScreen() {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         
-        // ⚠️ CRITICAL: Use local state first, defer AsyncStorage write
-        setCapturedPhotoUri(asset.uri); // Instant local state
-        await detectOrientation(asset.uri); // Already deferred inside
+        // ⚠️ CRITICAL: Clear calibration IMMEDIATELY before any mode switches
+        // This prevents old calibration from persisting into the new photo
+        console.log('🧹 Clearing calibration for new imported photo');
+        setCoinCircle(null);
+        setCalibration(null);
+        setCompletedMeasurements([]);
+        setCurrentPoints([]);
+        
+        // Set image URI immediately (this also clears calibration in Zustand)
+        setImageUri(asset.uri, false);
+        
+        // Use local state for immediate UI update
+        setCapturedPhotoUri(asset.uri);
+        await detectOrientation(asset.uri);
         
         // 🔍 SMART ROUTING: Detect if photo was taken with device camera or imported
         // Photos taken with camera → Known Scale Mode (blueprint)
@@ -1525,19 +1536,6 @@ export default function MeasurementScreen() {
           setPendingPhotoUri(asset.uri);
           setShowPhotoTypeModal(true);
         }
-        
-        // Defer AsyncStorage write to prevent UI blocking during import
-        setTimeout(() => {
-          // Clear calibration data first to prevent auto-restore to measurement mode
-          setCoinCircle(null);
-          setCalibration(null);
-          setCompletedMeasurements([]);
-          setCurrentPoints([]);
-          
-          // Then set the new image URI
-          setImageUri(asset.uri, false); // Background persist
-          __DEV__ && console.log('✅ Deferred imported photo AsyncStorage write complete');
-        }, 300);
       }
     } catch (error) {
       console.error('Error picking image:', error);
