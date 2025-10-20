@@ -48,8 +48,16 @@ export function getDisplayUnit(
   }
 
   if (unitSystem === 'metric') {
-    // Always use mm for metric
-    return { value: valueInMm, unit: 'mm' };
+    // Metric: intelligently choose unit based on magnitude
+    if (valueInMm < 10) { // Less than 10mm (1cm)
+      return { value: valueInMm, unit: 'mm' };
+    } else if (valueInMm < 1000) { // Less than 1000mm (1m)
+      return { value: valueInMm / 10, unit: 'cm' };
+    } else if (valueInMm < 1000000) { // Less than 1,000,000mm (1km)
+      return { value: valueInMm / 1000, unit: 'm' };
+    } else {
+      return { value: valueInMm / 1000000, unit: 'km' };
+    }
   } else {
     // Imperial: use inches for values less than 12 inches, feet otherwise
     const valueInInches = valueInMm / 25.4;
@@ -70,7 +78,7 @@ export function formatMeasurement(
 ): string {
   const { value, unit } = getDisplayUnit(valueInBaseUnit, baseUnit, unitSystem);
   
-  // Round to nearest 0.5mm for millimeters (metric)
+  // Metric units
   if (unit === 'mm') {
     const roundedValue = Math.round(value * 2) / 2; // Round to nearest 0.5
     // Only show decimal if it's .5, hide .0
@@ -81,12 +89,23 @@ export function formatMeasurement(
     }
   }
   
-  // For imperial inches, use 2 decimal places
+  if (unit === 'cm') {
+    return `${value.toFixed(1)} ${unit}`; // 49.5cm, 150.2cm
+  }
+  
+  if (unit === 'm') {
+    return `${value.toFixed(2)} ${unit}`; // 1.52m, 10.25m
+  }
+  
+  if (unit === 'km') {
+    return `${value.toFixed(3)} ${unit}`; // 1.523km
+  }
+  
+  // Imperial units
   if (unit === 'in') {
     return `${value.toFixed(2)} ${unit}`;
   }
   
-  // For imperial feet, format as feet'inches"
   if (unit === 'ft') {
     const totalInches = Math.round(value * 12); // Convert to total inches first
     const feet = Math.floor(totalInches / 12);
@@ -101,7 +120,7 @@ export function formatMeasurement(
     return `${feet}'${inches}"`;
   }
   
-  // For cm (if used), keep original decimals
+  // Fallback for miles or other units
   return `${value.toFixed(decimals)} ${unit}`;
 }
 
