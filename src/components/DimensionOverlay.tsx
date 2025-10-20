@@ -7382,16 +7382,25 @@ export default function DimensionOverlay({
             blueprintScale: { distance, unit }, // Store for display in badge
           };
           
-          // Store calibration
+          // Store calibration FIRST
           useStore.getState().setCalibration(newCalibration);
           
           // Recalculate ALL existing measurements with new calibration
+          // Force immediate update by triggering unit system ref reset
           if (measurements.length > 0) {
             console.log('🔄 Recalculating', measurements.length, 'measurements with new blueprint calibration');
             console.log('📐 New calibration unit:', newCalibration.unit, 'Old unit was:', calibration?.unit);
             // Pass the NEW calibration directly to ensure it uses the new unit
             const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m, newCalibration));
+            
+            // Update measurements immediately
             setMeasurements(recalibratedMeasurements);
+            
+            // Force unit system ref to null so the useEffect will recalculate display values
+            // This ensures the UI updates with the new calibration
+            prevUnitSystemRef.current = null;
+            
+            console.log('✅ Measurements recalculated and unit system ref reset to force display update');
           }
           
           // Show menu again and clean up after fade
