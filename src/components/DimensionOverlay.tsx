@@ -3696,16 +3696,16 @@ export default function DimensionOverlay({
                     // Minimum distance: 0.5 image pixels for smooth, fluid lines
                     if (distance > 0.5) {
                       // LASSO SNAP: Check if we're close to the starting point (to close the loop)
-                      if (prevPath.length >= 10) { // Need at least 10 points to make a meaningful loop
+                      // Need MANY points before allowing snap - prevents accidental tiny loops
+                      if (prevPath.length >= 30) { // 30 points = meaningful path before allowing closure
                         const firstPoint = prevPath[0];
                         const distToStart = Math.sqrt(
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
                         
                         // Snap threshold: Use PIXELS for universal, scale-independent behavior
-                        // This gives consistent touch experience whether measuring coins or maps
-                        // ~15-20 image pixels = easy to catch, not too sensitive
-                        const snapThresholdPixels = 18; // Sweet spot for catchability
+                        // Reduced from 18 to 12 pixels for more deliberate closure
+                        const snapThresholdPixels = 12; // Tighter for deliberate loop closing
                         
                         if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
