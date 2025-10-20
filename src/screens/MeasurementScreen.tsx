@@ -1495,9 +1495,36 @@ export default function MeasurementScreen() {
         setCapturedPhotoUri(asset.uri); // Instant local state
         await detectOrientation(asset.uri); // Already deferred inside
         
-        // Show photo type selection modal for all imported photos
-        setPendingPhotoUri(asset.uri);
-        setShowPhotoTypeModal(true);
+        // 🔍 SMART ROUTING: Detect if photo was taken with device camera or imported
+        // Photos taken with camera → Known Scale Mode (blueprint)
+        // Downloaded/imported photos → Map Mode (verbal scale)
+        const exif = asset.exif;
+        const isCameraPhoto = exif && (
+          exif.Make || // Device manufacturer (e.g., "Apple")
+          exif.Model || // Device model (e.g., "iPhone 14 Pro")
+          exif.Software || // iOS version
+          exif.DateTimeOriginal // Camera capture timestamp
+        );
+        
+        console.log('📸 EXIF detection:', { 
+          hasExif: !!exif, 
+          Make: exif?.Make, 
+          Model: exif?.Model,
+          isCameraPhoto 
+        });
+        
+        if (isCameraPhoto) {
+          // Photo was taken with this device's camera → Blueprint/Known Scale mode
+          console.log('✅ Detected camera photo → Auto-routing to Known Scale Mode');
+          setPendingPhotoUri(asset.uri);
+          // Auto-select blueprint mode (skip modal)
+          handlePhotoTypeSelection('blueprint');
+        } else {
+          // Photo was downloaded/imported → Show modal (default to Map mode)
+          console.log('📥 Detected imported/downloaded photo → Showing photo type modal');
+          setPendingPhotoUri(asset.uri);
+          setShowPhotoTypeModal(true);
+        }
         
         // Defer AsyncStorage write to prevent UI blocking during import
         setTimeout(() => {
