@@ -858,9 +858,7 @@ export default function MeasurementScreen() {
   }));
   
   // Don't rotate crosshair - keep it fixed
-  // Fade out when not horizontal (looking at wall)
   const crosshairContainerStyle = useAnimatedStyle(() => ({
-    opacity: levelLinesOpacity.value, // Fade with level lines
     transform: [
       { rotate: '0deg' } // No rotation in either mode
     ],
