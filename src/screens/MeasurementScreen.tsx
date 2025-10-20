@@ -297,11 +297,9 @@ export default function MeasurementScreen() {
       if (newMode === 'camera') {
         screenScale.value = 1; // Reset scale for camera
         
-        // Clear image state so camera shows up
-        setImageUri(null);
-        setCoinCircle(null);
-        setCalibration(null);
-        setImageOrientation(null);
+        // DON'T call Zustand setters - they trigger MMKV writes that block
+        // Session data isn't persisted anymore anyway
+        // setImageOrientation is already removed since we don't persist it
         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
         
         // Camera's useEffect will clear transitionBlackOverlay and handle fade-in
@@ -1298,18 +1296,17 @@ export default function MeasurementScreen() {
     setIsTransitioning(false);
     setIsHoldingShutter(false); // Reset hold state
     
-    // Clear calibration data
-    setCoinCircle(null);
-    setCalibration(null);
+    // DON'T call setCoinCircle/setCalibration/setImageUri - they trigger MMKV writes
+    // Since we're not persisting session data anymore, no need to clear it
+    // setSelectedCoin is local state, so it's fine
     setSelectedCoin(null);
     
     // IMPORTANT: Set mode to camera BEFORE clearing image
     // This prevents race condition with useEffect that watches imageUri
     setMode('camera');
     
-    // Clear BOTH local and persisted image states
+    // Clear local photo state only (no MMKV write)
     setCapturedPhotoUri(null);
-    setImageUri(null);
     
     __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
   };
@@ -1389,13 +1386,9 @@ export default function MeasurementScreen() {
   };
 
   const handleRetakePhoto = () => {
-    // Reset all states
+    // Reset all states (avoid MMKV-blocking Zustand setters)
     setIsCapturing(false);
     setIsTransitioning(false);
-    setImageUri(null);
-    setCoinCircle(null);
-    setCalibration(null);
-    setImageOrientation(null);
     setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
     setMode('camera');
   };
@@ -1480,15 +1473,11 @@ export default function MeasurementScreen() {
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         
-        // ⚠️ CRITICAL: Clear calibration IMMEDIATELY before any mode switches
-        // This prevents old calibration from persisting into the new photo
-        console.log('🧹 Clearing calibration for new imported photo');
-        setCoinCircle(null);
-        setCalibration(null);
+        // Clear old measurements/points for new photo (fast local setters)
         setCompletedMeasurements([]);
         setCurrentPoints([]);
         
-        // Set image URI immediately (this also clears calibration in Zustand)
+        // Set image URI (this will trigger ONE MMKV write, but it's necessary)
         setImageUri(asset.uri, false);
         
         // Use local state for immediate UI update
@@ -2376,19 +2365,12 @@ export default function MeasurementScreen() {
                       } else {
                         // Full reset: Clear everything and go to camera
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
-                        setMode('camera');
                         
-                        // ⚠️ CRITICAL: Defer ALL AsyncStorage writes to prevent New Photo freeze
-                        setTimeout(() => {
-                          setCompletedMeasurements([]);
-                          setCurrentPoints([]);
-                          setCoinCircle(null);
-                          setCalibration(null);
-                          setImageOrientation(null);
-                          setCapturedPhotoUri(null); // Clear local state too
-                          setImageUri(null);
-                          __DEV__ && console.log('✅ Deferred New Photo AsyncStorage writes complete');
-                        }, 300);
+                        // Clear local state
+                        setCapturedPhotoUri(null);
+                        
+                        // Switch to camera mode (no MMKV-blocking Zustand setters needed)
+                        setMode('camera');
                         
                         // Camera's useEffect will handle the fade in
                         setTimeout(() => {
