@@ -583,10 +583,6 @@ export default function MeasurementScreen() {
         // Track motion/acceleration stability
         if (data.acceleration) {
           const { x, y, z } = data.acceleration;
-          
-          // Store Z-axis for orientation detection
-          setAccelerationZ(z);
-          
           // Calculate total acceleration magnitude (movement intensity)
           const totalAcceleration = Math.sqrt(x * x + y * y + z * z);
           recentAccelerations.current.push(totalAcceleration);
@@ -607,12 +603,8 @@ export default function MeasurementScreen() {
         isVerticalMode.value = isVertical;
         
         // Check if orientation changed
-        // Use Z-axis gravity to reliably detect if phone is flat (looking down) or upright (looking at wall)
-        // When flat (camera down): Z ≈ -1g (gravity pulling down through screen)
-        // When upright (camera forward): Z ≈ 0g (gravity pulling down through bottom edge)
         const wasHorizontal = isHorizontal.value;
-        const zAccel = data.acceleration?.z || 0;
-        const nowHorizontal = zAccel < -0.5; // If Z < -0.5g, phone is pointing down at table
+        const nowHorizontal = absBeta < 45; // Calculate new horizontal state
         isHorizontal.value = nowHorizontal; // Update shared value
         
         // DEBUG: Log orientation detection
