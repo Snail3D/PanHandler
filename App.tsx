@@ -122,10 +122,10 @@ export default function App() {
         if (!isSpace) { // No haptic for spaces (like lifting fingers between words)
           if (isPunctuation) {
             // Punctuation gets a stronger tap (finishing a thought)
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          } else if (currentIndex % 2 === 0) {
+            // Every 2nd character gets a medium tap (natural typing rhythm)
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          } else if (currentIndex % 3 === 0) {
-            // Every 3rd character gets a light tap (balanced rhythm)
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }
         }
         
