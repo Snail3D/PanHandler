@@ -603,8 +603,17 @@ export default function MeasurementScreen() {
         isVerticalMode.value = isVertical;
         
         // Check if orientation changed
+        // Need to handle both portrait and landscape orientations
+        // In landscape, the axes are rotated, so we need to check gamma instead of beta
         const wasHorizontal = isHorizontal.value;
-        const nowHorizontal = absBeta < 45; // Calculate new horizontal state
+        
+        // Determine if phone is in landscape based on rotation (alpha)
+        // Also check gamma in addition to beta for landscape detection
+        const absGamma = Math.abs(gamma);
+        
+        // Looking down at table: small beta (portrait) OR small gamma (landscape)
+        // Looking at wall: large beta (portrait) OR large gamma (landscape)
+        const nowHorizontal = absBeta < 45 && absGamma < 45;
         isHorizontal.value = nowHorizontal; // Update shared value
         
         // DEBUG: Log orientation detection
