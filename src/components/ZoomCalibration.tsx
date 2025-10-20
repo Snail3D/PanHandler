@@ -142,18 +142,18 @@ export default function ZoomCalibration({
     // Calculate circumference for dash offset animation
     const circumference = 2 * Math.PI * referenceRadiusPixels;
     
-    // Animate dash offset to create spinning effect
+    // Animate dash offset to create spinning effect (slowed down to reduce heat)
     ringDashOffset.value = withRepeat(
-      withTiming(circumference, { duration: 4000, easing: Easing.linear }),
+      withTiming(circumference, { duration: 8000, easing: Easing.linear }), // 8s instead of 4s
       -1, // Infinite loop
       false
     );
     
-    // Sexy pulsing opacity - breathes in and out
+    // Sexy pulsing opacity - breathes in and out (slowed down to reduce heat)
     ringOpacity.value = withRepeat(
       withSequence(
-        withTiming(0.9, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) }),
-        withTiming(0.3, { duration: 1500, easing: Easing.bezier(0.4, 0, 0.2, 1) })
+        withTiming(0.9, { duration: 2500, easing: Easing.bezier(0.4, 0, 0.2, 1) }), // 2.5s instead of 1.5s
+        withTiming(0.3, { duration: 2500, easing: Easing.bezier(0.4, 0, 0.2, 1) })  // 2.5s instead of 1.5s
       ),
       -1, // Infinite pulse
       false
