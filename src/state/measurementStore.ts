@@ -324,17 +324,18 @@ const useStore = create<MeasurementStore>()(
         // panButtonTapCount: DON'T persist - resets each session
         // lastPanButtonTapTime: DON'T persist - resets each session
         // hasSeenPanTutorial: DON'T persist - resets each new photo session
-        // Persist current work session
-        currentImageUri: state.currentImageUri,
-        isAutoCaptured: state.isAutoCaptured, // Persist auto-capture flag
-        imageOrientation: state.imageOrientation,
-        calibration: state.calibration,
-        coinCircle: state.coinCircle,
-        measurements: state.measurements,
-        completedMeasurements: state.completedMeasurements,
-        currentPoints: state.currentPoints,
-        measurementMode: state.measurementMode,
-        savedZoomState: state.savedZoomState, // Persist zoom/pan state
+        
+        // ⚠️ DON'T PERSIST CURRENT WORK SESSION - causes slow startup
+        // currentImageUri: state.currentImageUri,
+        // isAutoCaptured: state.isAutoCaptured,
+        // imageOrientation: state.imageOrientation,
+        // calibration: state.calibration,
+        // coinCircle: state.coinCircle,
+        // measurements: state.measurements,
+        // completedMeasurements: state.completedMeasurements,
+        // currentPoints: state.currentPoints,
+        // measurementMode: state.measurementMode,
+        // savedZoomState: state.savedZoomState,
       }),
     }
   )
