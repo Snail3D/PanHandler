@@ -337,9 +337,8 @@ export default function MeasurementScreen() {
   
   // Determine if pan/zoom should be locked
   // Determine if pan/zoom should be locked
-  // Never lock - users should be able to pan/zoom/rotate at any time
-  // This allows adjusting view while placing measurements
-  const isPanZoomLocked = false; // Never lock - allow gestures always
+  // Controlled by DimensionOverlay (e.g., during blueprint recalibration with existing measurements)
+  const [isPanZoomLocked, setIsPanZoomLocked] = useState(false);
 
 
   // Helper to detect orientation based on image (for future use)
@@ -2320,6 +2319,9 @@ export default function MeasurementScreen() {
                   skipToMapMode={skipToMapMode}
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
+                  onPanZoomLockChange={(shouldLock) => {
+                    setIsPanZoomLocked(shouldLock);
+                  }}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
