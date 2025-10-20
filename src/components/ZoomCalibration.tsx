@@ -517,30 +517,56 @@ export default function ZoomCalibration({
             </Animated.View>
           )}
           
-          {/* Coin name - floating beautifully inside */}
+          {/* Coin name - floating beautifully inside, tappable to change */}
           <View
             style={{
               position: 'absolute',
               left: referenceCenterX - 120,
-              top: referenceCenterY - 30, // Moved up to make room for zoom
+              top: referenceCenterY - 40, // Moved up a bit more for tap hint
               width: 240,
               alignItems: 'center',
             }}
           >
-            <Text style={{ 
-              color: 'white', 
-              fontSize: 20, 
-              fontWeight: '700', 
-              textAlign: 'center', 
-              textShadowColor: 'rgba(0,0,0,0.6)', 
-              textShadowOffset: { width: 0, height: 2 }, 
-              textShadowRadius: 8,
-              letterSpacing: 0.3,
-            }}>
-              {selectedCoin.name}
-            </Text>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                setShowCoinSelector(true);
+              }}
+              style={({ pressed }) => ({
+                transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
+                alignItems: 'center',
+              })}
+            >
+              <Text style={{ 
+                color: 'white', 
+                fontSize: 20, 
+                fontWeight: '700', 
+                textAlign: 'center', 
+                textShadowColor: 'rgba(0,0,0,0.6)', 
+                textShadowOffset: { width: 0, height: 2 }, 
+                textShadowRadius: 8,
+                letterSpacing: 0.3,
+              }}>
+                {selectedCoin.name}
+              </Text>
+              
+              {/* Hint text */}
+              <Text style={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: 11,
+                fontWeight: '600',
+                textAlign: 'center',
+                marginTop: 4,
+                textShadowColor: 'rgba(0,0,0,0.6)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+                letterSpacing: 0.3,
+              }}>
+                (Tap to Change Coin)
+              </Text>
+            </Pressable>
             
-            {/* Zoom indicator below coin name */}
+            {/* Zoom indicator below coin name and hint */}
             <Text style={{
               color: 'rgba(255, 255, 255, 0.8)',
               fontSize: 14,
