@@ -4092,10 +4092,9 @@ export default function DimensionOverlay({
                 setTimeout(() => {
                   setShowBlueprintDistanceModal(true);
                 }, 100);
-              } else {
-                // Keep cursor visible for second point
-                setShowCursor(false);
               }
+              // After first point, keep cursor visible for second point
+              // (cursor stays visible, just give haptic feedback)
             }
             // For circle mode
             else if (mode === 'circle') {
