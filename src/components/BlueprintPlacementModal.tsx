@@ -34,7 +34,7 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 100, // High z-index to appear above other UI
+        zIndex: 10001, // Higher than menu (9999) and modals (10000)
       }} 
       pointerEvents="box-none"
     >

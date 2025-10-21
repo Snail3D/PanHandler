@@ -7432,6 +7432,7 @@ export default function DimensionOverlay({
           // User wants to place points for blueprint scale
           setShowMapScaleModal(false);
           setShowBlueprintPlacementModal(true);
+          setMenuHidden(true); // Hide menu when blueprint modal appears
         }}
         onDismiss={() => {
           // If dismissing without setting scale, turn off map mode
@@ -7455,17 +7456,19 @@ export default function DimensionOverlay({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }}
         onDismiss={() => {
-          // If user came from "Known Scale" mode (skipToBlueprintMode or skipToAerialMode),
+          // If user came from "Known Scale" button directly (skipToBlueprintMode or skipToAerialMode),
           // dismissing without placing points should reset to camera for fresh start
           if (skipToBlueprintMode || skipToAerialMode) {
             console.log('🔄 Known Scale dismissed without calibration - resetting to camera');
             handleReset(); // Go back to camera screen
           } else {
-            // Regular dismissal (from recalibration, etc.)
+            // Regular dismissal (from coin calibration → Map → Place Points, or recalibration)
+            // Just close modal and stay on measurement screen
+            console.log('📐 Blueprint modal dismissed - staying on measurement screen');
             setShowBlueprintPlacementModal(false);
             setBlueprintPoints([]);
-            setIsMapMode(false);
-            setMenuHidden(false); // Show menu again if user cancels
+            setIsMapMode(false); // Turn off map mode if it was on
+            setMenuHidden(false); // Show menu again
           }
         }}
       />
