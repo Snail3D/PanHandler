@@ -604,14 +604,96 @@ Thank you for helping us improve PanHandler!
                     }}
                     scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
                   >
+              {/* Video Course Section - NEW! */}
+              <ExpandableSection
+                icon="play-circle"
+                title="🎬 Video Course - Learn PanHandler!"
+                color="#FF2D55"
+                delay={0}
+                scrollY={scrollY}
+                index={0}
+              >
+                <View style={{ marginLeft: 4 }}>
+                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
+                    Watch our complete video tutorial series
+                  </Text>
+                  
+                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 16 }}>
+                    Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.
+                  </Text>
+                  
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      Linking.openURL('https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi');
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? 'rgba(255, 45, 85, 0.15)' : 'rgba(255, 45, 85, 0.1)',
+                      paddingVertical: 16,
+                      paddingHorizontal: 20,
+                      borderRadius: 16,
+                      borderWidth: 2,
+                      borderColor: 'rgba(255, 45, 85, 0.3)',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowColor: '#FF2D55',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 8,
+                    })}
+                  >
+                    <Ionicons name="logo-youtube" size={28} color="#FF2D55" style={{ marginRight: 12 }} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ 
+                        fontSize: 16, 
+                        fontWeight: '800', 
+                        color: '#FF2D55',
+                        marginBottom: 2,
+                      }}>
+                        Watch on YouTube
+                      </Text>
+                      <Text style={{ 
+                        fontSize: 12, 
+                        color: 'rgba(255, 45, 85, 0.7)',
+                        fontWeight: '600',
+                      }}>
+                        Full tutorial playlist
+                      </Text>
+                    </View>
+                    <Ionicons name="arrow-forward" size={20} color="#FF2D55" />
+                  </Pressable>
+                  
+                  <View style={{ 
+                    marginTop: 16, 
+                    padding: 12, 
+                    backgroundColor: 'rgba(52, 199, 89, 0.08)',
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(52, 199, 89, 0.2)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                      <Text style={{ fontSize: 16, marginRight: 8 }}>✨</Text>
+                      <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, flex: 1 }}>
+                        <Text style={{ fontWeight: '700' }}>Course includes:</Text>{'\n'}
+                        • Getting started tutorials{'\n'}
+                        • Advanced measurement techniques{'\n'}
+                        • Real-world workflow examples{'\n'}
+                        • Tips & tricks for best results
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </ExpandableSection>
+
               {/* Camera & Auto Level */}
               <ExpandableSection
                 icon="camera"
                 title="📸 Step 1: Take a Perfect Photo"
                 color="#34C759"
-                delay={0}
+                delay={50}
                 scrollY={scrollY}
-                index={0}
+                index={1}
               >
                 <View style={{ marginLeft: 4 }}>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
@@ -766,7 +848,7 @@ Thank you for helping us improve PanHandler!
                 color="#FF9500"
                 delay={100}
                 scrollY={scrollY}
-                index={1}
+                index={2}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After capturing your photo, calibrate using the reference coin to enable precise measurements.
@@ -816,7 +898,7 @@ Thank you for helping us improve PanHandler!
                 color="#AF52DE"
                 delay={200}
                 scrollY={scrollY}
-                index={2}
+                index={3}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Choose from multiple measurement types to capture all dimensions of your object.
@@ -1017,7 +1099,7 @@ Thank you for helping us improve PanHandler!
                 color="#FF3B30"
                 delay={300}
                 scrollY={scrollY}
-                index={3}
+                index={4}
               >
                 <View style={{ gap: 12 }}>
                   {/* Pan/Zoom */}
@@ -1147,7 +1229,7 @@ Thank you for helping us improve PanHandler!
                 color="#FF2D55"
                 delay={350}
                 scrollY={scrollY}
-                index={4}
+                index={5}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After placing measurements, you can move and edit them in Pan/Zoom mode.
@@ -1249,7 +1331,7 @@ Thank you for helping us improve PanHandler!
                 color="#5856D6"
                 delay={400}
                 scrollY={scrollY}
-                index={5}
+                index={6}
               >
                 {/* FREE badge */}
                 <View style={{ 
@@ -1349,7 +1431,7 @@ Thank you for helping us improve PanHandler!
                 color="#34C759"
                 delay={450}
                 scrollY={scrollY}
-                index={6}
+                index={7}
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 2 photos and a detailed measurement table.
@@ -1386,7 +1468,7 @@ Thank you for helping us improve PanHandler!
                 color="#FF9500"
                 delay={500}
                 scrollY={scrollY}
-                index={7}
+                index={8}
               >
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
                   Import to Any CAD Software
@@ -1483,7 +1565,7 @@ Thank you for helping us improve PanHandler!
                 color="#0066FF"
                 delay={550}
                 scrollY={scrollY}
-                index={9}
+                index={10}
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
