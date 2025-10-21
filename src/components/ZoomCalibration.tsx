@@ -624,17 +624,13 @@ export default function ZoomCalibration({
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
             {/* Single Row: LOCK IN centered with coin info on right */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', height: 72 }}>
-              {/* LOCK IN - centered, full width background */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 72, position: 'relative' }}>
+              {/* LOCK IN - centered in available space */}
               <Pressable
                 onPress={handleLockIn}
                 disabled={!selectedCoin}
                 style={({ pressed }) => ({
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
+                  flex: 1,
                   backgroundColor: !selectedCoin 
                     ? 'rgba(150, 150, 150, 0.4)'
                     : pressed ? `${currentColor}E6` : `${currentColor}F2`,
@@ -645,6 +641,7 @@ export default function ZoomCalibration({
                   borderColor: 'rgba(255, 255, 255, 0.4)',
                   transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                   opacity: !selectedCoin ? 0.5 : 1,
+                  height: 72,
                 })}
               >
                 {/* LOCK IN text */}
@@ -661,28 +658,25 @@ export default function ZoomCalibration({
                 </Text>
               </Pressable>
 
-              {/* Coin info on right - positioned absolutely with padding */}
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setShowCoinSelector(true);
-                  setSearchQuery('');
-                }}
-                style={({ pressed: coinPressed }) => ({
-                  position: 'absolute',
-                  right: 8,
-                  top: 8,
-                  bottom: 8,
-                  backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 16,
-                  paddingVertical: 6,
-                  paddingHorizontal: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 10,
-                  minWidth: 80,
-                })}
-              >
+              {/* Coin info on right - absolutely positioned OVER the button */}
+              <View style={{ position: 'absolute', right: 8, top: 8, bottom: 8, pointerEvents: 'box-none' }}>
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowCoinSelector(true);
+                    setSearchQuery('');
+                  }}
+                  style={({ pressed: coinPressed }) => ({
+                    backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
+                    borderRadius: 16,
+                    paddingVertical: 6,
+                    paddingHorizontal: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    minWidth: 80,
+                  })}
+                >
                 <CoinIcon size={28} color="#FF9500" />
                 {selectedCoin ? (
                   <>
@@ -715,7 +709,8 @@ export default function ZoomCalibration({
                     Tap to{'\n'}Select
                   </Text>
                 )}
-              </Pressable>
+                </Pressable>
+              </View>
             </View>
           </View>
         </BlurView>
