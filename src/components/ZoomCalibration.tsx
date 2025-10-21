@@ -1031,14 +1031,14 @@ export default function ZoomCalibration({
           {/* Moved instruction text here - below Pinch to Zoom */}
           <Text
             style={{
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: '700',
-              color: 'rgba(255, 255, 255, 0.85)',
+              color: 'rgba(255, 255, 255, 0.9)',
               textAlign: 'center',
               textShadowColor: 'rgba(0, 0, 0, 0.7)',
               textShadowOffset: { width: 0, height: 1 },
               textShadowRadius: 4,
-              lineHeight: 21,
+              lineHeight: 24,
               marginTop: 16,
             }}
           >
