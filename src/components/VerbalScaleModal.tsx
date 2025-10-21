@@ -105,9 +105,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
             }}>
               {/* Header */}
               <View style={{
-                paddingTop: 20,
-                paddingHorizontal: 20,
-                paddingBottom: 16,
+                paddingTop: 14,
+                paddingHorizontal: 16,
+                paddingBottom: 12,
                 borderBottomWidth: 0.5,
                 borderBottomColor: 'rgba(0, 0, 0, 0.08)',
               }}>
@@ -138,7 +138,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                         fill="none"
                       />
                     </Svg>
-                    <Text style={{ fontSize: 20, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
                       Map Scale
                     </Text>
                   </View>
@@ -160,8 +160,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                   </Pressable>
                 </View>
                 <Text style={{ 
-                  marginTop: 8, 
-                  fontSize: 14, 
+                  marginTop: 6, 
+                  fontSize: 13, 
                   color: 'rgba(0, 0, 0, 0.5)',
                   fontWeight: '500' 
                 }}>
@@ -171,12 +171,12 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
 
               {/* Content */}
               <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-                <View style={{ padding: 20 }}>
+                <View style={{ padding: 16 }}>
                   {/* Mode Selector */}
                   <View style={{ 
                     flexDirection: 'row', 
-                    marginBottom: 24,
-                    gap: 12,
+                    marginBottom: 16,
+                    gap: 10,
                   }}>
                     {/* Verbal Scale Button */}
                     <Pressable
@@ -189,8 +189,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                         backgroundColor: scaleMode === 'verbal' 
                           ? 'rgba(52, 199, 89, 0.2)' 
                           : 'rgba(255, 255, 255, 0.6)',
-                        borderRadius: 12,
-                        padding: 16,
+                        borderRadius: 10,
+                        padding: 12,
                         borderWidth: 2,
                         borderColor: scaleMode === 'verbal' 
                           ? 'rgba(52, 199, 89, 0.6)' 
@@ -200,9 +200,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     >
                       <Ionicons 
                         name="text-outline" 
-                        size={28} 
+                        size={24} 
                         color={scaleMode === 'verbal' ? '#2E7D32' : 'rgba(0, 0, 0, 0.4)'}
-                        style={{ marginBottom: 8 }}
+                        style={{ marginBottom: 6 }}
                       />
                       <Text style={{ 
                         fontSize: 14, 
@@ -233,8 +233,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                         backgroundColor: scaleMode === 'blueprint' 
                           ? 'rgba(52, 199, 89, 0.2)' 
                           : 'rgba(255, 255, 255, 0.6)',
-                        borderRadius: 12,
-                        padding: 16,
+                        borderRadius: 10,
+                        padding: 12,
                         borderWidth: 2,
                         borderColor: scaleMode === 'blueprint' 
                           ? 'rgba(52, 199, 89, 0.6)' 
@@ -244,9 +244,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     >
                       <Ionicons 
                         name="finger-print-outline" 
-                        size={28} 
+                        size={24} 
                         color={scaleMode === 'blueprint' ? '#2E7D32' : 'rgba(0, 0, 0, 0.4)'}
-                        style={{ marginBottom: 8 }}
+                        style={{ marginBottom: 6 }}
                       />
                       <Text style={{ 
                         fontSize: 14, 
@@ -273,8 +273,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                   <View style={{ 
                     flexDirection: 'row', 
                     alignItems: 'center', 
-                    marginBottom: 20,
-                    gap: 12,
+                    marginBottom: 14,
+                    gap: 10,
                   }}>
                     {/* Screen Distance */}
                     <View style={{ flex: 1 }}>
@@ -443,14 +443,14 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                   {isValid && (
                     <View style={{
                       backgroundColor: 'rgba(52, 199, 89, 0.15)',
-                      borderRadius: 14,
-                      padding: 16,
-                      marginBottom: 16,
+                      borderRadius: 12,
+                      padding: 12,
+                      marginBottom: 12,
                       borderWidth: 1,
                       borderColor: 'rgba(52, 199, 89, 0.3)',
                     }}>
                       <Text style={{
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: '700',
                         color: '#2E7D32',
                         textAlign: 'center',
@@ -468,9 +468,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     }}
                     style={{
                       backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 12,
-                      padding: 14,
-                      marginBottom: 12,
+                      borderRadius: 10,
+                      padding: 10,
+                      marginBottom: 10,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -479,10 +479,10 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Ionicons name="bulb-outline" size={18} color="rgba(0, 0, 0, 0.6)" />
+                      <Ionicons name="bulb-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
                       <Text style={{ 
-                        marginLeft: 8,
-                        fontSize: 14, 
+                        marginLeft: 6,
+                        fontSize: 13, 
                         fontWeight: '600', 
                         color: 'rgba(0, 0, 0, 0.75)' 
                       }}>
@@ -491,14 +491,14 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     </View>
                     <Ionicons 
                       name={showExamples ? "chevron-up" : "chevron-down"} 
-                      size={18} 
+                      size={16} 
                       color="rgba(0, 0, 0, 0.4)" 
                     />
                   </Pressable>
 
                   {/* Examples List */}
                   {showExamples && (
-                    <View style={{ marginBottom: 12 }}>
+                    <View style={{ marginBottom: 10 }}>
                       {[
                         { label: '📍 Hiking Map', screenDist: 1, screenUnit: 'cm' as const, realDist: 1, realUnit: 'km' as const },
                         { label: '🏙️ City Map', screenDist: 1, screenUnit: 'in' as const, realDist: 0.25, realUnit: 'mi' as const },
@@ -510,23 +510,23 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                           onPress={() => applyExample(example)}
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                            borderRadius: 10,
-                            padding: 12,
-                            marginBottom: 8,
+                            borderRadius: 8,
+                            padding: 10,
+                            marginBottom: 6,
                             borderWidth: 1,
                             borderColor: 'rgba(0, 0, 0, 0.06)',
                           }}
                         >
                           <Text style={{ 
-                            fontSize: 14, 
+                            fontSize: 13, 
                             fontWeight: '600', 
                             color: 'rgba(0, 0, 0, 0.8)',
-                            marginBottom: 3,
+                            marginBottom: 2,
                           }}>
                             {example.label}
                           </Text>
                           <Text style={{ 
-                            fontSize: 13, 
+                            fontSize: 12, 
                             color: 'rgba(0, 0, 0, 0.5)' 
                           }}>
                             {example.screenDist}{example.screenUnit} = {example.realDist}{example.realUnit}
@@ -538,18 +538,18 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                   
                   {/* Magnetic Declination Section */}
                   <View style={{
-                    marginTop: 20,
-                    padding: 16,
+                    marginTop: 12,
+                    padding: 12,
                     backgroundColor: 'rgba(100, 150, 255, 0.12)',
-                    borderRadius: 14,
+                    borderRadius: 12,
                     borderWidth: 1,
                     borderColor: 'rgba(100, 150, 255, 0.25)',
                   }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                      <Ionicons name="compass-outline" size={22} color="#0066FF" />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                      <Ionicons name="compass-outline" size={18} color="#0066FF" />
                       <Text style={{ 
-                        marginLeft: 8,
-                        fontSize: 16, 
+                        marginLeft: 6,
+                        fontSize: 14, 
                         fontWeight: '700', 
                         color: 'rgba(0, 0, 0, 0.85)' 
                       }}>
@@ -558,16 +558,16 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     </View>
                     
                     <Text style={{ 
-                      fontSize: 13, 
+                      fontSize: 12, 
                       color: 'rgba(0, 0, 0, 0.6)',
-                      marginBottom: 12,
-                      lineHeight: 18,
+                      marginBottom: 8,
+                      lineHeight: 16,
                     }}>
                       Set your magnetic declination to correct azimuth measurements for true north. Positive = East, Negative = West.
                     </Text>
                     
                     {/* Declination Input Row */}
-                    <View style={{ marginBottom: 12 }}>
+                    <View style={{ marginBottom: 8 }}>
                       {/* Manual Input */}
                       <TextInput
                         value={declinationInput}
@@ -577,11 +577,11 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                         onBlur={applyManualDeclination}
                         style={{
                           backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          borderRadius: 10,
+                          borderRadius: 8,
                           borderWidth: 1,
                           borderColor: 'rgba(0, 0, 0, 0.08)',
-                          padding: 12,
-                          fontSize: 15,
+                          padding: 10,
+                          fontSize: 14,
                           fontWeight: '600',
                           color: 'rgba(0, 0, 0, 0.85)',
                           textAlign: 'center',
@@ -592,16 +592,16 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     {/* Current Declination Display */}
                     <View style={{
                       backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 8,
-                      padding: 10,
+                      borderRadius: 6,
+                      padding: 8,
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}>
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
                         Current:
                       </Text>
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#0066FF' }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#0066FF' }}>
                         {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
                       </Text>
                     </View>
@@ -609,29 +609,29 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     {/* Map Orientation Reminder - only show if declination is set */}
                     {magneticDeclination !== 0 && (
                       <View style={{
-                        marginTop: 12,
-                        padding: 12,
+                        marginTop: 8,
+                        padding: 10,
                         backgroundColor: 'rgba(255, 180, 0, 0.15)',
-                        borderRadius: 10,
+                        borderRadius: 8,
                         borderWidth: 1,
                         borderColor: 'rgba(255, 180, 0, 0.3)',
                         flexDirection: 'row',
                         alignItems: 'flex-start',
                       }}>
-                        <Ionicons name="information-circle" size={20} color="#FF9500" style={{ marginRight: 8, marginTop: 2 }} />
+                        <Ionicons name="information-circle" size={16} color="#FF9500" style={{ marginRight: 6, marginTop: 1 }} />
                         <View style={{ flex: 1 }}>
                           <Text style={{ 
-                            fontSize: 12, 
+                            fontSize: 11, 
                             fontWeight: '700',
                             color: 'rgba(0, 0, 0, 0.85)',
-                            marginBottom: 4,
+                            marginBottom: 3,
                           }}>
                             Map Orientation Required
                           </Text>
                           <Text style={{ 
-                            fontSize: 11, 
+                            fontSize: 10, 
                             color: 'rgba(0, 0, 0, 0.65)',
-                            lineHeight: 16,
+                            lineHeight: 14,
                           }}>
                             Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements.
                           </Text>
@@ -712,8 +712,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
               {scaleMode === 'verbal' && isValid && (
                 <View style={{
                   paddingHorizontal: 16,
-                  paddingTop: 14,
-                  paddingBottom: 18,
+                  paddingTop: 10,
+                  paddingBottom: 14,
                   borderTopWidth: 0.5,
                   borderTopColor: 'rgba(0, 0, 0, 0.08)',
                   backgroundColor: 'rgba(255, 255, 255, 0.3)',
@@ -734,14 +734,14 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                       backgroundColor: pressed 
                         ? 'rgba(52, 199, 89, 0.9)' 
                         : 'rgba(52, 199, 89, 0.85)',
-                      borderRadius: 24,
-                      paddingVertical: 22,
+                      borderRadius: 20,
+                      paddingVertical: 18,
                       alignItems: 'center',
                       justifyContent: 'center',
                       shadowColor: '#34C759',
-                      shadowOffset: { width: 0, height: 8 },
+                      shadowOffset: { width: 0, height: 6 },
                       shadowOpacity: 0.4,
-                      shadowRadius: 24,
+                      shadowRadius: 20,
                       borderWidth: 2,
                       borderColor: 'rgba(255, 255, 255, 0.4)',
                       transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
@@ -750,7 +750,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     <Text style={{ 
                       color: '#FFFFFF', 
                       fontWeight: '900', 
-                      fontSize: 32,
+                      fontSize: 28,
                       textAlign: 'center',
                       letterSpacing: 2,
                       textShadowColor: 'rgba(0, 0, 0, 0.3)',
