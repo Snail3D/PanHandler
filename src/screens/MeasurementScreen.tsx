@@ -1059,12 +1059,24 @@ export default function MeasurementScreen() {
     
     const wasAutoCapture = alignmentStatus === 'good' && isStable;
     
+    // Declare safety timeout in function scope so catch can access it
+    let safetyTimeout: NodeJS.Timeout | null = null;
+    
     try {
       setIsCapturing(true);
+      
+      // SAFETY: Force reset isCapturing after 10 seconds in case of hang
+      // This prevents permanent lockup if something goes wrong
+      safetyTimeout = setTimeout(() => {
+        __DEV__ && console.error('⚠️ SAFETY: Force resetting isCapturing after 10s timeout');
+        setIsCapturing(false);
+        setIsTransitioning(false);
+      }, 10000);
       
       // Check camera permissions one more time
       if (!permission?.granted) {
         console.error('Camera permission not granted');
+        if (safetyTimeout) clearTimeout(safetyTimeout);
         setIsCapturing(false);
         return;
       }
@@ -1072,6 +1084,7 @@ export default function MeasurementScreen() {
       // ⚠️ CRITICAL: Check if camera ref exists
       if (!cameraRef.current) {
         console.error('Camera ref is null - camera not ready');
+        if (safetyTimeout) clearTimeout(safetyTimeout);
         setIsCapturing(false);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         return;
@@ -1124,6 +1137,9 @@ export default function MeasurementScreen() {
           // Phone looking down at table → Auto-proceed to coin calibration
           console.log('📷 Phone tilted down (table) → Auto coin calibration');
           
+          // Clear safety timeout - capture succeeded
+          if (safetyTimeout) clearTimeout(safetyTimeout);
+          
           // CRITICAL FIX: Set capturedPhotoUri + mode together so they batch in same render
           // This ensures displayImageUri is not null when ZoomCalibration mounts
           setCapturedPhotoUri(photo.uri);
@@ -1164,6 +1180,9 @@ export default function MeasurementScreen() {
         } else {
           // Phone upright (looking at wall) → Show photo type selection menu
           console.log('📷 Phone upright (wall) → Show photo type menu');
+          
+          // Clear safety timeout - capture succeeded
+          if (safetyTimeout) clearTimeout(safetyTimeout);
           
           // STAY in camera mode and show modal here
           // Don't transition to measurement yet - wait for user selection
@@ -1227,6 +1246,10 @@ export default function MeasurementScreen() {
     } catch (error) {
       // Silent catch - camera ref can become null during double-tap, this is expected
       __DEV__ && console.log('⚠️ Photo capture interrupted:', error);
+      
+      // CRITICAL: Clear safety timeout on error
+      if (safetyTimeout) clearTimeout(safetyTimeout);
+      
       // Give user feedback that something went wrong
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       // Make sure we reset states on error
@@ -1303,6 +1326,13 @@ export default function MeasurementScreen() {
     setIsCapturing(false);
     setIsTransitioning(false);
     setIsHoldingShutter(false); // Reset hold state
+    
+    // CRITICAL: Reset all animation values to prevent stuck overlays
+    // This fixes the "white screen" / "black screen" bugs after cancelling
+    transitionBlackOverlay.value = 0; // Clear any transition overlay
+    cameraOpacity.value = 0; // Will be animated in by camera mode useEffect
+    blackOverlayOpacity.value = 1; // Camera mode useEffect will fade this out
+    cameraFlashOpacity.value = 0; // Clear any lingering flash
     
     // DON'T call setCoinCircle/setCalibration/setImageUri - they trigger MMKV writes
     // Since we're not persisting session data anymore, no need to clear it
