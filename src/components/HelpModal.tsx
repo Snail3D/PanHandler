@@ -1243,18 +1243,6 @@ Thank you for helping us improve PanHandler!
                 index={6}
               >
                 {/* FREE badge */}
-                <View style={{ 
-                  backgroundColor: 'rgba(52,199,89,0.15)', 
-                  alignSelf: 'flex-start',
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  borderRadius: 22,
-                  marginBottom: 12,
-                }}>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#34C759' }}>
-                    ✓ FREE - 20 total exports (save/email)
-                  </Text>
-                </View>
 
                 <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 12 }}>
                   Export photos with measurements and detailed reports
