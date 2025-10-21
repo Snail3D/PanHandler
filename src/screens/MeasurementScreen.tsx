@@ -1088,12 +1088,25 @@ export default function MeasurementScreen() {
         );
       } else {
         // WALL PHOTO: Go directly to Known Scale Mode (skip modal)
-        setPendingPhotoUri(photo.uri);
-        // Small delay to ensure state is set before calling handler
+        // Use capturedPhotoUri for immediate UI update (like table photos)
+        setCapturedPhotoUri(photo.uri);
+        setMode('measurement');
+        setIsCapturing(false); // Reset immediately
+        
+        // Background MMKV write (non-blocking)
+        setTimeout(() => setImageUri(photo.uri, false), 200);
+        
+        // Show blueprint modal after a brief delay
         setTimeout(() => {
-          handlePhotoTypeSelection('blueprint'); // Auto-select Known Scale Mode
-        }, 50);
-        // isCapturing will be reset in handlePhotoTypeSelection
+          setSkipToBlueprintMode(true);
+        }, 100);
+        
+        // Simple fade animation
+        cameraOpacity.value = withTiming(0, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) });
+        screenScale.value = withSequence(
+          withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }),
+          withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) })
+        );
       }
       
       // Save to camera roll in background (non-blocking)
