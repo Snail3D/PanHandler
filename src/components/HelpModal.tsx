@@ -1323,7 +1323,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
-                    Set your email address in <Text style={{ fontWeight: '600', color: '#5856D6' }}>Settings</Text> below to skip typing it every time! ⚡
+                    Save your email address on your first email sendoff for faster future workflows! <Text style={{ fontWeight: '600', color: '#5856D6' }}>(Secure, stored locally and not shared)</Text>
                   </Text>
                 </View>
               </ExpandableSection>
