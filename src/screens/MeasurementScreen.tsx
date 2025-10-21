@@ -1408,6 +1408,11 @@ export default function MeasurementScreen() {
         setCompletedMeasurements([]);
         setCurrentPoints([]);
         
+        // CRITICAL: Clear any blueprint/map flags from previous photo imports
+        setSkipToBlueprintMode(false);
+        setSkipToMapMode(false);
+        setSkipToAerialMode(false);
+        
         // Set image URI (this will trigger ONE MMKV write, but it's necessary)
         setImageUri(asset.uri, false);
         
