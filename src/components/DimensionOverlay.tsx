@@ -7614,25 +7614,34 @@ export default function DimensionOverlay({
           });
         }}
         onDismiss={() => {
-          // Cancel - fade out and clean up
-          blueprintLineOpacity.value = withTiming(0, {
-            duration: 300,
-            easing: Easing.out(Easing.ease),
-          });
-          
-          setTimeout(() => {
-            setMenuHidden(false);
-            setShowBlueprintDistanceModal(false);
-            setBlueprintPoints([]);
-            setIsMapMode(false);
-            blueprintLineOpacity.value = 1; // Reset for next time
+          // If user came from "Known Scale" button directly and dismisses without entering distance,
+          // reset to camera for fresh start (same as dismissing placement modal)
+          if (skipToBlueprintMode || skipToAerialMode) {
+            console.log('🔄 Known Scale distance input dismissed without calibration - resetting to camera');
+            handleReset(); // Go back to camera screen
+          } else {
+            // Regular dismissal (from coin calibration path or recalibration)
+            // Cancel - fade out and clean up, stay on measurement screen
+            console.log('📐 Blueprint distance input dismissed - cleaning up');
+            blueprintLineOpacity.value = withTiming(0, {
+              duration: 300,
+              easing: Easing.out(Easing.ease),
+            });
             
-            // Unlock pan/zoom when dismissing (cancelled calibration)
-            if (onPanZoomLockChange) {
-              onPanZoomLockChange(false);
-              console.log('🔓 Unlocking pan/zoom - blueprint calibration cancelled');
-            }
-          }, 300);
+            setTimeout(() => {
+              setMenuHidden(false);
+              setShowBlueprintDistanceModal(false);
+              setBlueprintPoints([]);
+              setIsMapMode(false);
+              blueprintLineOpacity.value = 1; // Reset for next time
+              
+              // Unlock pan/zoom when dismissing (cancelled calibration)
+              if (onPanZoomLockChange) {
+                onPanZoomLockChange(false);
+                console.log('🔓 Unlocking pan/zoom - blueprint calibration cancelled');
+              }
+            }, 300);
+          }
         }}
       />
 
