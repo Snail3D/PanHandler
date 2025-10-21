@@ -62,34 +62,34 @@ export default function BattlingBotsModal({
   
   // 11 random conversation variations with Easter egg hints
   const conversations: BotMessage[][] = [
-    // Conversation 0: DONATION FATIGUE (NEW!)
+    // Conversation 0: DONATION FATIGUE + Badge Mention
     [
       { bot: 'left', text: "I know... everyone begs these days." },
       { bot: 'right', text: "Yeah. It's exhausting." },
       { bot: 'left', text: "But this guy actually built something." },
       { bot: 'right', text: "Months of work. No ads. No paywall." },
+      { bot: 'left', text: "Donate and you get a special badge!" },
+      { bot: 'right', text: "Plus we bug you WAY less often!" },
       { bot: 'left', shouldBackspace: true, meanText: "So mayb—", niceText: "...if ANY app deserves it, it's this one." },
-      { bot: 'right', text: "Can't argue with that." },
     ],
     
-    // Conversation 1: Left Egg = YouTube Chicken
+    // Conversation 1: Left Egg + Badge Benefits
     [
       { bot: 'left', text: "They've been using the app a lot..." },
       { bot: 'right', text: "Yeah! Should we ask for support?" },
+      { bot: 'left', text: "Donating gives you a badge AND..." },
+      { bot: 'right', text: "...we only show up every 40 sessions instead of 10!" },
       { bot: 'left', text: "Wait... can they SEE us??" },
       { bot: 'right', shouldBackspace: true, meanText: "No way, this is priv—", niceText: "...hold the left egg 3 seconds! Chicken surprise! 🐔" },
-      { bot: 'left', text: "Did you just spoil the secret?!" },
-      { bot: 'right', text: "They deserve it! They're awesome!" },
     ],
     
-    // Conversation 2: Right Egg = Shave and a Haircut
+    // Conversation 2: Right Egg + Less Nagging
     [
       { bot: 'left', text: "Is it weird to ask for help?" },
       { bot: 'right', text: "Nah! Snail built this solo!" },
       { bot: 'left', text: "True. Zero ads, zero subscription..." },
-      { bot: 'right', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg: Shave-and-a-haircut! 🎵" },
-      { bot: 'left', text: "That's... oddly specific." },
-      { bot: 'right', text: "It's CLASSIC! Try it!" },
+      { bot: 'right', text: "Donate = special badge + we annoy you 4x less!" },
+      { bot: 'left', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg: Shave-and-a-haircut! 🎵" },
     ],
     
     // Conversation 3: Shake to Toggle Menu
