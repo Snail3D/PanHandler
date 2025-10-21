@@ -7407,10 +7407,15 @@ export default function DimensionOverlay({
       <VerbalScaleModal
         visible={showMapScaleModal}
         onComplete={(scale) => {
+          // NUCLEAR OPTION: Clear ALL blueprint-related state first
+          setShowBlueprintPlacementModal(false);
+          setShowBlueprintDistanceModal(false);
+          setIsPlacingBlueprint(false);
+          setBlueprintPoints([]);
+          
           setMapScale(scale);
           setIsMapMode(true);
           setShowMapScaleModal(false);
-          setShowBlueprintPlacementModal(false); // Ensure blueprint modal is hidden
           
           // Create calibration from verbal scale
           // Convert screen measurement to pixels
