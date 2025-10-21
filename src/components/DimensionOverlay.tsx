@@ -6833,7 +6833,7 @@ export default function DimensionOverlay({
             <>
               <Pressable
                 onPress={handleExport}
-                
+                hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
                 style={{
                   flex: 1,
                   backgroundColor: true ? 'rgba(0, 122, 255, 0.85)' : 'rgba(128, 128, 128, 0.3)',
@@ -6850,7 +6850,7 @@ export default function DimensionOverlay({
               
               <Pressable
                 onPress={handleEmail}
-                
+                hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
                 style={{
                   flex: 1,
                   backgroundColor: true ? 'rgba(52, 199, 89, 0.85)' : 'rgba(128, 128, 128, 0.3)',
@@ -6875,6 +6875,7 @@ export default function DimensionOverlay({
                   handleReset();
                 }, 100);
               }}
+              hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
               style={{
                 flex: 1,
                 backgroundColor: 'rgba(255, 59, 48, 0.85)',
