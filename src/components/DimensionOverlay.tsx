@@ -5281,7 +5281,7 @@ export default function DimensionOverlay({
         ref={viewRef}
         collapsable={false}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-        pointerEvents="none"
+        pointerEvents="box-none"
       >
         {/* SVG overlay for drawing */}
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
