@@ -74,13 +74,11 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center' }}>
         <View style={{
-          position: 'absolute',
-          top: insets.top + 60,
-          bottom: insets.bottom + 60,
-          left: 20,
-          right: 20,
+          width: '90%',
+          maxWidth: 440,
+          maxHeight: '80%',
           borderRadius: 20,
           overflow: 'hidden',
           shadowColor: '#000',
@@ -537,106 +535,131 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     </View>
                   )}
                   
-                  {/* Magnetic Declination Section */}
-                  <View style={{
-                    marginTop: 12,
-                    padding: 12,
-                    backgroundColor: 'rgba(100, 150, 255, 0.12)',
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: 'rgba(100, 150, 255, 0.25)',
-                  }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                      <Ionicons name="compass-outline" size={18} color="#0066FF" />
-                      <Text style={{ 
-                        marginLeft: 6,
-                        fontSize: 14, 
-                        fontWeight: '700', 
-                        color: 'rgba(0, 0, 0, 0.85)' 
-                      }}>
-                        Magnetic Declination
-                      </Text>
-                    </View>
-                    
-                    <Text style={{ 
-                      fontSize: 12, 
-                      color: 'rgba(0, 0, 0, 0.6)',
-                      marginBottom: 8,
-                      lineHeight: 16,
-                    }}>
-                      Set your magnetic declination to correct azimuth measurements for true north. Positive = East, Negative = West.
-                    </Text>
-                    
-                    {/* Declination Input Row */}
-                    <View style={{ marginBottom: 8 }}>
-                      {/* Manual Input */}
-                      <TextInput
-                        value={declinationInput}
-                        onChangeText={setDeclinationInput}
-                        placeholder="0.0"
-                        keyboardType="numeric"
-                        onBlur={applyManualDeclination}
-                        style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                          borderRadius: 8,
-                          borderWidth: 1,
-                          borderColor: 'rgba(0, 0, 0, 0.08)',
-                          padding: 10,
-                          fontSize: 14,
-                          fontWeight: '600',
-                          color: 'rgba(0, 0, 0, 0.85)',
-                          textAlign: 'center',
-                        }}
-                      />
-                    </View>
-                    
-                    {/* Current Declination Display */}
-                    <View style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 6,
-                      padding: 8,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                      <Text style={{ fontSize: 12, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
-                        Current:
-                      </Text>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#0066FF' }}>
-                        {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
-                      </Text>
-                    </View>
-                    
-                    {/* Map Orientation Reminder - only show if declination is set */}
-                    {magneticDeclination !== 0 && (
-                      <View style={{
-                        marginTop: 8,
+                  {/* Magnetic Declination Section - Collapsible */}
+                  <View style={{ marginTop: 12 }}>
+                    <Pressable
+                      onPress={() => {
+                        setShowDeclinationHelp(!showDeclinationHelp);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
                         padding: 10,
-                        backgroundColor: 'rgba(255, 180, 0, 0.15)',
-                        borderRadius: 8,
+                        backgroundColor: 'rgba(100, 150, 255, 0.12)',
+                        borderRadius: 10,
                         borderWidth: 1,
-                        borderColor: 'rgba(255, 180, 0, 0.3)',
+                        borderColor: 'rgba(100, 150, 255, 0.25)',
                         flexDirection: 'row',
-                        alignItems: 'flex-start',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Ionicons name="compass-outline" size={16} color="#0066FF" />
+                        <Text style={{ 
+                          marginLeft: 6,
+                          fontSize: 13, 
+                          fontWeight: '700', 
+                          color: 'rgba(0, 0, 0, 0.85)' 
+                        }}>
+                          Magnetic Declination
+                        </Text>
+                      </View>
+                      <Ionicons 
+                        name={showDeclinationHelp ? "chevron-up" : "chevron-down"} 
+                        size={16} 
+                        color="rgba(0, 0, 0, 0.4)" 
+                      />
+                    </Pressable>
+
+                    {showDeclinationHelp && (
+                      <View style={{
+                        padding: 12,
+                        backgroundColor: 'rgba(100, 150, 255, 0.08)',
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: 'rgba(100, 150, 255, 0.2)',
+                        marginTop: 8,
                       }}>
-                        <Ionicons name="information-circle" size={16} color="#FF9500" style={{ marginRight: 6, marginTop: 1 }} />
-                        <View style={{ flex: 1 }}>
-                          <Text style={{ 
-                            fontSize: 11, 
-                            fontWeight: '700',
-                            color: 'rgba(0, 0, 0, 0.85)',
-                            marginBottom: 3,
-                          }}>
-                            Map Orientation Required
+                        <Text style={{ 
+                          fontSize: 11, 
+                          color: 'rgba(0, 0, 0, 0.6)',
+                          marginBottom: 10,
+                          lineHeight: 15,
+                        }}>
+                          Set your magnetic declination to correct azimuth measurements for true north. Positive = East, Negative = West.
+                        </Text>
+                        
+                        {/* Declination Input Row */}
+                        <View style={{ marginBottom: 8 }}>
+                          <TextInput
+                            value={declinationInput}
+                            onChangeText={setDeclinationInput}
+                            placeholder="0.0"
+                            keyboardType="numeric"
+                            onBlur={applyManualDeclination}
+                            style={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                              borderRadius: 8,
+                              borderWidth: 1,
+                              borderColor: 'rgba(0, 0, 0, 0.08)',
+                              padding: 10,
+                              fontSize: 14,
+                              fontWeight: '600',
+                              color: 'rgba(0, 0, 0, 0.85)',
+                              textAlign: 'center',
+                            }}
+                          />
+                        </View>
+                        
+                        {/* Current Declination Display */}
+                        <View style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                          borderRadius: 6,
+                          padding: 8,
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}>
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
+                            Current:
                           </Text>
-                          <Text style={{ 
-                            fontSize: 10, 
-                            color: 'rgba(0, 0, 0, 0.65)',
-                            lineHeight: 14,
-                          }}>
-                            Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements.
+                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#0066FF' }}>
+                            {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
                           </Text>
                         </View>
+                        
+                        {/* Map Orientation Reminder - only show if declination is set */}
+                        {magneticDeclination !== 0 && (
+                          <View style={{
+                            marginTop: 8,
+                            padding: 10,
+                            backgroundColor: 'rgba(255, 180, 0, 0.15)',
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: 'rgba(255, 180, 0, 0.3)',
+                            flexDirection: 'row',
+                            alignItems: 'flex-start',
+                          }}>
+                            <Ionicons name="information-circle" size={16} color="#FF9500" style={{ marginRight: 6, marginTop: 1 }} />
+                            <View style={{ flex: 1 }}>
+                              <Text style={{ 
+                                fontSize: 11, 
+                                fontWeight: '700',
+                                color: 'rgba(0, 0, 0, 0.85)',
+                                marginBottom: 3,
+                              }}>
+                                Map Orientation Required
+                              </Text>
+                              <Text style={{ 
+                                fontSize: 10, 
+                                color: 'rgba(0, 0, 0, 0.65)',
+                                lineHeight: 14,
+                              }}>
+                                Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements.
+                              </Text>
+                            </View>
+                          </View>
+                        )}
                       </View>
                     )}
                   </View>
