@@ -2369,7 +2369,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
-                    Hold the left egg for a surprise... or tap the right one to the rhythm 🐔🎵
+                    Hold the left egg for a surprise. Tap the right egg (how many times?) for another surprise. Oh, and by the way, look out for bot battles that might come up while you're using the app — they may reveal more Easter eggs ;)
                   </Text>
                 </Animated.View>
 
