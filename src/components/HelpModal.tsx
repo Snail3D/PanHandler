@@ -824,7 +824,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                     Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!{'\n\n'}
-                    <Text style={{ fontWeight: '600', color: '#AF52DE' }}>Pro Tip:</Text> Connect multiple lines by placing endpoints together to create triangles and polygons. Areas are automatically calculated and shown in the legend! 📐
+                    <Text style={{ fontWeight: '600', color: '#AF52DE' }}>Pro Tip:</Text> Connect multiple lines by placing endpoints together to create triangles and polygons. <Text style={{ fontWeight: '700' }}>Areas are automatically calculated and shown in the legend!</Text> 📐
                   </Text>
                 </View>
 
@@ -849,7 +849,7 @@ Thank you for helping us improve PanHandler!
                       <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke="#FF9500" strokeWidth="1" strokeLinecap="round" />
                     </Svg>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Angle Mode
+                      Angle Mode (azimuth in Map Mode)
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
