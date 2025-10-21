@@ -30,6 +30,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
   const [realDistance, setRealDistance] = useState('');
   const [realUnit, setRealUnit] = useState<'km' | 'mi' | 'm' | 'ft'>('km');
   const [showExamples, setShowExamples] = useState(false);
+  const [showDeclinationHelp, setShowDeclinationHelp] = useState(false);
   
   // Magnetic declination state
   const [declinationInput, setDeclinationInput] = useState(magneticDeclination.toString());
