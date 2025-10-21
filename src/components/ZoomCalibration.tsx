@@ -1042,7 +1042,7 @@ export default function ZoomCalibration({
               marginTop: 16,
             }}
           >
-            {"Make sure the right coin is selected.\nSelect the map icon for maps, blueprints or point to point scale measurements"}
+            {"Make sure the right coin is selected"}
           </Text>
         </Animated.View>
       </View>
