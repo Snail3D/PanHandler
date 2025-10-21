@@ -959,15 +959,6 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
                       Freehand Mode (Free Measure)
                     </Text>
-                    <View style={{ 
-                      backgroundColor: '#5856D6', 
-                      paddingHorizontal: 8, 
-                      paddingVertical: 3, 
-                      borderRadius: 6,
-                      marginLeft: 8,
-                    }}>
-                      <Text style={{ fontSize: 11, fontWeight: '700', color: 'white' }}>PRO</Text>
-                    </View>
                   </View>
                   
                   
