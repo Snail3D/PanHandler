@@ -111,6 +111,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
             backgroundColor: 'rgba(255, 255, 255, 0.5)',
             borderRadius: 32,
             padding: 28,
+            paddingBottom: 24,
             borderWidth: 1.5,
             borderColor: 'rgba(255, 255, 255, 0.4)',
           }}>
@@ -138,7 +139,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
             </View>
 
             {/* Options - Bigger, more spacing */}
-            <View style={{ gap: 14 }}>
+            <View style={{ gap: 16, marginBottom: 20 }}>
               {OPTIONS.map((option) => {
                 const IconComponent = option.icon;
                 return (
@@ -256,7 +257,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
                     fontWeight: '700',
                     color: 'rgba(0, 0, 0, 0.7)',
                   }}>
-                    Cancel
+                    Go Back
                   </Text>
                 </View>
               </BlurView>
