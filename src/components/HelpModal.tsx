@@ -641,6 +641,7 @@ Thank you for helping us improve PanHandler!
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.2,
                       shadowRadius: 8,
+                      marginBottom: 8,
                     })}
                   >
                     <Ionicons name="logo-youtube" size={28} color="#FF2D55" style={{ marginRight: 12 }} />
@@ -661,8 +662,12 @@ Thank you for helping us improve PanHandler!
                         Full tutorial playlist
                       </Text>
                     </View>
-                    <Ionicons name="arrow-forward" size={20} color="#FF2D55" />
                   </Pressable>
+                  
+                  {/* Arrow below button */}
+                  <View style={{ alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="arrow-down" size={20} color="#FF2D55" />
+                  </View>
                   
                   <View style={{ 
                     marginTop: 16, 
