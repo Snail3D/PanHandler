@@ -2185,11 +2185,11 @@ export default function DimensionOverlay({
       
       setMeasurements([...measurements, newMeasurement]);
       
-      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
-      // Require at least 4 lines (squares/rectangles) to prevent premature triangle snapping
-      if (mode === 'distance') {
-        detectAndMergePolygon([...measurements, newMeasurement]);
-      }
+      // 🔷 POLYGON AUTO-DETECTION: DISABLED - too aggressive, was snapping lines into polygons unintentionally
+      // Users should use the polygon/freehand mode if they want closed shapes
+      // if (mode === 'distance') {
+      //   detectAndMergePolygon([...measurements, newMeasurement]);
+      // }
       
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
