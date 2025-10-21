@@ -661,7 +661,7 @@ export default function ZoomCalibration({
                 </Text>
               </Pressable>
 
-              {/* Coin info on right - positioned absolutely */}
+              {/* Coin info on right - positioned absolutely with padding */}
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -670,36 +670,36 @@ export default function ZoomCalibration({
                 }}
                 style={({ pressed: coinPressed }) => ({
                   position: 'absolute',
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
+                  right: 8,
+                  top: 8,
+                  bottom: 8,
                   backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 20,
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: 16,
+                  paddingVertical: 6,
+                  paddingHorizontal: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
                   zIndex: 10,
-                  minWidth: 90,
+                  minWidth: 80,
                 })}
               >
-                <CoinIcon size={32} color="#FF9500" />
+                <CoinIcon size={28} color="#FF9500" />
                 {selectedCoin ? (
                   <>
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.9)', 
                       fontWeight: '700', 
-                      fontSize: 11,
+                      fontSize: 10,
                       textAlign: 'center',
-                      marginTop: 4,
+                      marginTop: 3,
                     }}>
                       {selectedCoin.name}
                     </Text>
                     <Text style={{ 
                       color: 'rgba(0, 0, 0, 0.5)', 
-                      fontSize: 9,
+                      fontSize: 8,
                       fontWeight: '600',
-                      marginTop: 2,
+                      marginTop: 1,
                     }}>
                       {selectedCoin.diameter}mm
                     </Text>
@@ -708,9 +708,9 @@ export default function ZoomCalibration({
                   <Text style={{ 
                     color: 'rgba(0, 0, 0, 0.7)', 
                     fontWeight: '700', 
-                    fontSize: 10,
+                    fontSize: 9,
                     textAlign: 'center',
-                    marginTop: 4,
+                    marginTop: 3,
                   }}>
                     Tap to{'\n'}Select
                   </Text>
