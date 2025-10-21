@@ -231,7 +231,7 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
             <Pressable
               onPress={handleCancel}
               style={({ pressed }) => ({
-                marginTop: 14, // Match gap between option cards
+                marginTop: 24, // More spacing above Cancel to match visual hierarchy
                 transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
               })}
             >
