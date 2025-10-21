@@ -78,7 +78,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
         <View style={{
           position: 'absolute',
           top: insets.top + 20,
-          bottom: 0,
+          bottom: insets.bottom + 20,
           left: 20,
           right: 20,
           borderRadius: 20,
@@ -734,8 +734,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                 </View>
               </ScrollView>
 
-              {/* LOCK IN Button - matches calibration screen (only for verbal mode) */}
-              {scaleMode === 'verbal' && isValid && (
+              {/* LOCK IN Button - Always visible, disabled when invalid */}
+              {scaleMode === 'verbal' && (
                 <View style={{
                   paddingHorizontal: 16,
                   paddingTop: 10,
@@ -746,6 +746,10 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                 }}>
                   <Pressable
                     onPress={() => {
+                      if (!isValid) {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                        return;
+                      }
                       // GoldenEye "Objective Complete" - doo-doo-doot! 🎯
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120);
@@ -757,24 +761,27 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                       handleContinue();
                     }}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed 
-                        ? 'rgba(52, 199, 89, 0.9)' 
-                        : 'rgba(52, 199, 89, 0.85)',
+                      backgroundColor: !isValid 
+                        ? 'rgba(150, 150, 150, 0.5)'
+                        : pressed 
+                          ? 'rgba(52, 199, 89, 0.9)' 
+                          : 'rgba(52, 199, 89, 0.85)',
                       borderRadius: 20,
                       paddingVertical: 18,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      shadowColor: '#34C759',
+                      shadowColor: isValid ? '#34C759' : '#888',
                       shadowOffset: { width: 0, height: 6 },
-                      shadowOpacity: 0.4,
+                      shadowOpacity: isValid ? 0.4 : 0.2,
                       shadowRadius: 20,
                       borderWidth: 2,
                       borderColor: 'rgba(255, 255, 255, 0.4)',
-                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                      transform: pressed && isValid ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                      opacity: isValid ? 1 : 0.6,
                     })}
                   >
                     <Text style={{ 
-                      color: '#FFFFFF', 
+                      color: isValid ? '#FFFFFF' : 'rgba(255, 255, 255, 0.6)', 
                       fontWeight: '900', 
                       fontSize: 28,
                       textAlign: 'center',
