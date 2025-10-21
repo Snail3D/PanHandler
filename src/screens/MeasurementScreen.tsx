@@ -126,6 +126,10 @@ export default function MeasurementScreen() {
   const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
   
+  // Opening quote - only on true app launch
+  const [showOpeningQuote, setShowOpeningQuote] = useState(false);
+  const hasShownOpeningQuote = useRef(false);
+  
   // Emergency reset - tap screen 5 times rapidly to force reset if stuck
   const emergencyTapCount = useRef(0);
   const emergencyTapTimer = useRef<NodeJS.Timeout | null>(null);
@@ -278,6 +282,18 @@ export default function MeasurementScreen() {
       setHasIncrementedSession(false);
     }
   }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
+  
+  // Show opening quote ONLY on app launch (camera mode with no image)
+  useEffect(() => {
+    if (!hasShownOpeningQuote.current && mode === 'camera' && !currentImageUri && !capturedPhotoUri) {
+      console.log('🎬 App launch - triggering opening quote');
+      hasShownOpeningQuote.current = true;
+      // Wait a moment for component to mount, then trigger quote
+      setTimeout(() => {
+        setShowOpeningQuote(true);
+      }, 500);
+    }
+  }, []); // Empty deps - only runs once on mount
   
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -2241,6 +2257,7 @@ export default function MeasurementScreen() {
                   skipToMapMode={skipToMapMode}
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
+                  shouldShowOpeningQuote={showOpeningQuote}
                   onPanZoomLockChange={(shouldLock) => {
                     setIsPanZoomLocked(shouldLock);
                   }}
