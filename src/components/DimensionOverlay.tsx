@@ -6174,7 +6174,7 @@ export default function DimensionOverlay({
                 }}>
                   {/* Left side: Hide labels toggle and Edit Labels mode - only show if there are measurements */}
                   {measurements.length > 0 && (
-                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                       {/* Hide/Show labels toggle */}
                       <Pressable
                         onPress={() => {
@@ -6212,18 +6212,18 @@ export default function DimensionOverlay({
                         }}
                       >
                         <View style={{
-                          width: 28,
-                          height: 28,
+                          width: 24,
+                          height: 24,
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}>
                           <Ionicons 
                             name={labelEditMode ? "pencil" : "pencil-outline"} 
-                            size={16} 
+                            size={14} 
                             color={labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.5)"} 
                           />
                         </View>
-                        <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 6 }}>
+                        <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 4 }}>
                           Edit labels
                         </Text>
                       </Pressable>
@@ -6237,7 +6237,6 @@ export default function DimensionOverlay({
                       onPressOut={stopUndoLongPress}
                       style={{
                         flexDirection: 'row',
-                        marginLeft: 140,
                         alignItems: 'center',
                         backgroundColor: 'rgba(255, 255, 255, 0.35)',
                         borderRadius: 8,
