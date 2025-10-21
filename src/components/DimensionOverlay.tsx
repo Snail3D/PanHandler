@@ -478,7 +478,7 @@ export default function DimensionOverlay({
   
   // Animated styles for quote overlay (must be after all state/ref hooks)
   const quoteBackgroundStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(0, 0, 0, ${quoteOpacity.value})`,
+    backgroundColor: `rgba(255, 255, 255, ${quoteOpacity.value})`, // White background for opening quote
   }));
   
   const quoteContentStyle = useAnimatedStyle(() => ({
@@ -7188,14 +7188,14 @@ export default function DimensionOverlay({
             >
               <Text
                 style={{
-                  color: '#FFFFFF',
+                  color: '#000000',
                   fontSize: 20,
                   fontWeight: '400',
                   textAlign: 'center',
                   lineHeight: 32,
-                  textShadowColor: 'rgba(255, 255, 255, 0.3)',
-                  textShadowOffset: { width: 0, height: 0 },
-                  textShadowRadius: 10,
+                  textShadowColor: 'rgba(0, 0, 0, 0.1)',
+                  textShadowOffset: { width: 0, height: 1 },
+                  textShadowRadius: 2,
                   fontFamily: 'System',
                   letterSpacing: 0.5,
                 }}
