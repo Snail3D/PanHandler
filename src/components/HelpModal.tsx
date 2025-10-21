@@ -1660,6 +1660,85 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
                     <Text style={{ fontWeight: '600' }}>Still having issues?</Text> Force-quit the app (swipe up from app switcher) and reopen. If problems persist, delete and reinstall the app for a fresh start.
                   </Text>
+                  
+                  {/* Send Bug Report Section */}
+                  <View style={{ marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 12 }}>
+                      🐛 Send Bug Report
+                    </Text>
+                    
+                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 12 }}>
+                      Having trouble? Our support team is here to help!
+                    </Text>
+                    
+                    <Pressable
+                      onPress={handleSupportEmail}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? '#FF2D1F' : '#FF3B30',
+                        borderRadius: 12,
+                        padding: 14,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        shadowColor: '#FF3B30',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 6,
+                      })}
+                    >
+                      <Ionicons name="mail" size={18} color="white" style={{ marginRight: 8 }} />
+                      <Text style={{ 
+                        fontSize: 15, 
+                        fontWeight: '700', 
+                        color: 'white',
+                      }}>
+                        Send Bug Report
+                      </Text>
+                    </Pressable>
+                    
+                    <View style={{
+                      marginTop: 12,
+                      padding: 10,
+                      backgroundColor: 'rgba(255, 59, 48, 0.08)',
+                      borderRadius: 10,
+                      borderLeftWidth: 3,
+                      borderLeftColor: '#FF3B30',
+                    }}>
+                      <Text style={{ fontSize: 12, color: '#3C3C43', lineHeight: 18, marginBottom: 6 }}>
+                        <Text style={{ fontWeight: '700' }}>What to include:</Text>
+                      </Text>
+                      <View style={{ gap: 4 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
+                            Description of the issue (e.g., "App freezes after calibration")
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
+                            Your device info (automatically included)
+                          </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
+                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
+                            Screenshots if helpful (we'll capture one for you!)
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    
+                    <Text style={{ 
+                      fontSize: 11, 
+                      color: 'rgba(0, 0, 0, 0.4)', 
+                      textAlign: 'center',
+                      marginTop: 8,
+                      fontStyle: 'italic',
+                    }}>
+                      We typically respond within 24 hours
+                    </Text>
+                  </View>
                 </View>
               </ExpandableSection>
 
@@ -1890,115 +1969,6 @@ Thank you for helping us improve PanHandler!
                 </Animated.View>
               </View>
 
-              {/* Need Help? Support Section */}
-              <View style={{ marginBottom: 20, marginTop: 12 }}>
-                <Animated.View 
-                  entering={FadeIn.delay(675)}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
-                    borderRadius: 20,
-                    padding: 20,
-                    shadowColor: '#FF3B30',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                    elevation: 4,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255, 59, 48, 0.2)',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                    <View style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: 'rgba(255, 59, 48, 0.15)',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: 12,
-                    }}>
-                      <Ionicons name="help-circle" size={24} color="#FF3B30" />
-                    </View>
-                    <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
-                      Need Help?
-                    </Text>
-                  </View>
-                  
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
-                    Having trouble? Our support team is here to help!
-                  </Text>
-                  
-                  <Pressable
-                    onPress={handleSupportEmail}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? '#FF2D1F' : '#FF3B30',
-                      borderRadius: 14,
-                      padding: 16,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      shadowColor: '#FF3B30',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                      elevation: 4,
-                    })}
-                  >
-                    <Ionicons name="mail" size={20} color="white" style={{ marginRight: 8 }} />
-                    <Text style={{ 
-                      fontSize: 16, 
-                      fontWeight: '700', 
-                      color: 'white',
-                      letterSpacing: 0.3,
-                    }}>
-                      Contact Support
-                    </Text>
-                  </Pressable>
-                  
-                  <View style={{
-                    marginTop: 16,
-                    padding: 12,
-                    backgroundColor: 'rgba(255, 59, 48, 0.08)',
-                    borderRadius: 12,
-                    borderLeftWidth: 3,
-                    borderLeftColor: '#FF3B30',
-                  }}>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 8 }}>
-                      <Text style={{ fontWeight: '700' }}>What to include:</Text>
-                    </Text>
-                    <View style={{ gap: 6 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
-                          Description of the issue (e.g., "App freezes after calibration")
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
-                          Your device info (automatically included)
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', flex: 1 }}>
-                          Screenshots if helpful (we'll capture one for you!)
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  
-                  <Text style={{ 
-                    fontSize: 12, 
-                    color: 'rgba(0, 0, 0, 0.4)', 
-                    textAlign: 'center',
-                    marginTop: 12,
-                    fontStyle: 'italic',
-                  }}>
-                    We typically respond within 24 hours
-                  </Text>
-                </Animated.View>
-              </View>
 
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
