@@ -2008,39 +2008,49 @@ Thank you for helping us improve PanHandler!
                     Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a slug on a mission to make CAD designing faster, easier, and accurate for everyone!
                   </Text>
 
-                  {/* Lightweight & Offline badges */}
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16, gap: 10 }}>
-                    <View style={{
-                      backgroundColor: 'rgba(52, 199, 89, 0.15)',
-                      borderRadius: 12,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
+                  {/* Buy Me a Coffee Button */}
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      Linking.openURL('https://buymeacoffee.com/Snail3D');
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? '#FFDD00' : '#FFDD00',
+                      borderRadius: 14,
+                      paddingVertical: 14,
+                      paddingHorizontal: 20,
                       flexDirection: 'row',
                       alignItems: 'center',
-                      borderWidth: 1,
-                      borderColor: 'rgba(52, 199, 89, 0.25)',
+                      justifyContent: 'center',
+                      shadowColor: '#FFDD00',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 8,
+                      elevation: 4,
+                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                      marginBottom: 16,
+                    })}
+                  >
+                    <Text style={{ fontSize: 24, marginRight: 8 }}>☕</Text>
+                    <Text style={{ 
+                      fontSize: 16, 
+                      fontWeight: '700', 
+                      color: '#000000',
+                      letterSpacing: 0.3,
                     }}>
-                      <Ionicons name="cloud-offline" size={16} color="#34C759" style={{ marginRight: 6 }} />
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#34C759' }}>
-                        Works Offline
-                      </Text>
-                    </View>
-                    <View style={{
-                      backgroundColor: 'rgba(0, 122, 255, 0.15)',
-                      borderRadius: 12,
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      borderWidth: 1,
-                      borderColor: 'rgba(0, 122, 255, 0.25)',
-                    }}>
-                      <Ionicons name="flash" size={16} color="#007AFF" style={{ marginRight: 6 }} />
-                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#007AFF' }}>
-                        Lightweight
-                      </Text>
-                    </View>
-                  </View>
+                      Buy Me a Coffee
+                    </Text>
+                  </Pressable>
+                  
+                  <Text style={{ 
+                    fontSize: 13, 
+                    color: '#8E8E93', 
+                    textAlign: 'center',
+                    lineHeight: 19,
+                    marginBottom: 20,
+                  }}>
+                    Enjoying PanHandler? Support development and help keep this app free for everyone! ☕
+                  </Text>
 
                   {/* Simple YouTube text link */}
                   <Pressable
