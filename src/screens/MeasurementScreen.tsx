@@ -1373,33 +1373,39 @@ export default function MeasurementScreen() {
         setCapturedPhotoUri(asset.uri);
         await detectOrientation(asset.uri);
         
-        // 🔍 SMART ROUTING: Detect if photo has drone EXIF data (altitude/GPS)
-        // Photos WITH drone data (altitude/GPS) → Known Scale Mode (skip modal)
-        // Photos WITHOUT drone data → Show modal
+        // 🔍 SMART ROUTING: Detect if photo was taken with a real camera (phone or drone)
+        // Photos taken with camera → Known Scale Mode (skip modal)
+        // Downloaded/screenshot images → Show modal
         const exif = asset.exif;
-        const hasDroneData = exif && (
-          exif.GPSAltitude !== undefined || // Has altitude data
-          exif.RelativeAltitude !== undefined || // DJI drones use this
-          (exif.GPSLatitude !== undefined && exif.GPSLongitude !== undefined) // Has GPS coordinates
+        
+        // Check for camera-specific EXIF that screenshots/downloads won't have
+        const isCameraPhoto = exif && (
+          exif.Make || // Camera manufacturer (e.g., "Apple", "DJI", "Canon")
+          exif.Model || // Camera model
+          exif.LensModel || // Lens info (only real cameras have this)
+          exif.FocalLength || // Focal length (only real cameras)
+          exif.GPSAltitude !== undefined || // Drone altitude
+          exif.RelativeAltitude !== undefined // DJI specific
         );
         
         console.log('📸 EXIF detection:', { 
           hasExif: !!exif, 
+          Make: exif?.Make,
+          Model: exif?.Model,
+          LensModel: exif?.LensModel,
+          FocalLength: exif?.FocalLength,
           GPSAltitude: exif?.GPSAltitude,
-          RelativeAltitude: exif?.RelativeAltitude,
-          GPSLatitude: exif?.GPSLatitude,
-          GPSLongitude: exif?.GPSLongitude,
-          hasDroneData 
+          isCameraPhoto 
         });
         
-        if (hasDroneData) {
-          // Photo has drone EXIF data → Auto-route to Known Scale Mode (skip modal)
-          console.log('✅ Detected drone photo with EXIF data → Auto-routing to Known Scale Mode');
+        if (isCameraPhoto) {
+          // Photo was taken with a real camera → Auto-route to Known Scale Mode
+          console.log('✅ Detected camera photo → Auto-routing to Known Scale Mode');
           setPendingPhotoUri(asset.uri);
           handlePhotoTypeSelection('blueprint');
         } else {
-          // Photo has no drone data → Show modal
-          console.log('📥 No drone EXIF data → Showing photo type modal');
+          // Photo is screenshot/download without camera data → Show modal
+          console.log('📥 No camera EXIF (screenshot/download) → Showing photo type modal');
           setPendingPhotoUri(asset.uri);
           setShowPhotoTypeModal(true);
         }
