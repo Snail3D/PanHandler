@@ -656,6 +656,10 @@ export default function DimensionOverlay({
       setShowBlueprintDistanceModal(false);
       setIsPlacingBlueprint(false);
       setBlueprintPoints([]);
+      // Reset the skip trigger refs so they can fire again for the new photo
+      hasTriggeredSkipToBlueprint.current = false;
+      hasTriggeredSkipToAerial.current = false;
+      hasTriggeredSkipToMap.current = false;
     }
   }, [sessionColor]);
   
