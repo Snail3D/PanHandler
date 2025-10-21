@@ -309,21 +309,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
         `Donor status: ${isDonor ? 'Supporter ❤️' : 'Non-donor'}`,
       ].join(' → ');
       
-      // Capture screenshot of modal (optional - try but don't block on failure)
-      let screenshotUri: string | undefined;
-      try {
-        if (modalContainerRef.current) {
-          screenshotUri = await captureRef(modalContainerRef, {
-            format: 'png',
-            quality: 0.8,
-            result: 'tmpfile',
-          });
-        }
-      } catch (captureError) {
-        console.log('Screenshot capture failed (non-blocking):', captureError);
-        // Continue without screenshot
-      }
-      
       // Pre-populated email body with template
       const emailBody = `
 Please describe your issue below:
@@ -344,9 +329,6 @@ Platform: ${Platform.OS} ${Platform.Version}
 SESSION ACTIVITY:
 Last Screen: Help Modal
 Session Flow: ${sessionLog}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Please attach any relevant screenshots if helpful.
 
 Thank you for helping us improve PanHandler!
       `.trim();
@@ -370,11 +352,6 @@ Thank you for helping us improve PanHandler!
         body: emailBody,
         isHtml: false,
       };
-      
-      // Add screenshot as attachment if available
-      if (screenshotUri) {
-        options.attachments = [screenshotUri];
-      }
       
       await MailComposer.composeAsync(options);
       
@@ -407,9 +384,10 @@ Thank you for helping us improve PanHandler!
   }));
 
   // Swipe gesture to close modal (left to right)
-  // Only activates on significant horizontal swipe, doesn't interfere with vertical scrolling
+  // Only activates on significant horizontal swipe, doesn't interfere with vertical scrolling or child touches
   const swipeGesture = Gesture.Pan()
     .activeOffsetX(50) // Only activate after 50px horizontal movement to the right
+    .enableTrackpadTwoFingerGesture(false) // Ensure native touches work
     .onEnd((event) => {
       // Check if swipe is left-to-right and crosses halfway
       if (event.translationX > 150 && event.velocityX > 0) {
@@ -1768,7 +1746,7 @@ Thank you for helping us improve PanHandler!
                         fontWeight: '700', 
                         color: 'white',
                       }}>
-                        Send Bug Report
+                        🐛 Send Bug Report
                       </Text>
                     </Pressable>
                     
@@ -1794,12 +1772,6 @@ Thank you for helping us improve PanHandler!
                           <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
                           <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
                             Your device info (automatically included)
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
-                            Screenshots if helpful (we'll capture one for you!)
                           </Text>
                         </View>
                       </View>
@@ -2204,9 +2176,11 @@ Thank you for helping us improve PanHandler!
                     </Text>
                     <Pressable
                       onPress={() => {
+                        console.log('[HelpModal] Email button pressed');
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                         setShowEmailModal(true);
                       }}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                       style={({ pressed }) => ({
                         backgroundColor: pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
                         borderRadius: 12,
