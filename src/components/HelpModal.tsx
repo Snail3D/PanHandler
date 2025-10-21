@@ -555,52 +555,38 @@ Thank you for helping us improve PanHandler!
                     Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.
                   </Text>
                   
+                  {/* Big Red YouTube Button */}
                   <Pressable
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       Linking.openURL('https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi');
                     }}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(255, 45, 85, 0.15)' : 'rgba(255, 45, 85, 0.1)',
-                      paddingVertical: 16,
-                      paddingHorizontal: 20,
+                      backgroundColor: pressed ? '#CC0000' : '#FF0000',
+                      paddingVertical: 20,
+                      paddingHorizontal: 24,
                       borderRadius: 16,
-                      borderWidth: 2,
-                      borderColor: 'rgba(255, 45, 85, 0.3)',
-                      flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      shadowColor: '#FF2D55',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 8,
-                      marginBottom: 8,
+                      shadowColor: '#FF0000',
+                      shadowOffset: { width: 0, height: 6 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 12,
+                      elevation: 8,
+                      marginBottom: 20,
+                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                     })}
                   >
-                    <Ionicons name="logo-youtube" size={28} color="#FF2D55" style={{ marginRight: 12 }} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ 
-                        fontSize: 16, 
-                        fontWeight: '800', 
-                        color: '#FF2D55',
-                        marginBottom: 2,
-                      }}>
-                        Watch on YouTube
-                      </Text>
-                      <Text style={{ 
-                        fontSize: 12, 
-                        color: 'rgba(255, 45, 85, 0.7)',
-                        fontWeight: '600',
-                      }}>
-                        Full tutorial playlist
-                      </Text>
-                    </View>
+                    <Text style={{ 
+                      fontSize: 18, 
+                      fontWeight: '800', 
+                      color: '#FFFFFF',
+                      letterSpacing: 0.5,
+                      textAlign: 'center',
+                    }}>
+                      PanHandler YouTube Course Here!
+                    </Text>
                   </Pressable>
-                  
-                  {/* Arrow below button */}
-                  <View style={{ alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="arrow-down" size={20} color="#FF2D55" />
-                  </View>
                   
                   <View style={{ 
                     marginTop: 16, 
