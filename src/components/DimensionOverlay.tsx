@@ -7407,11 +7407,19 @@ export default function DimensionOverlay({
       <VerbalScaleModal
         visible={showMapScaleModal}
         onComplete={(scale) => {
+          console.log('🚨🚨🚨 MAP SCALE LOCK IN - BEFORE:', {
+            showBlueprintPlacementModal,
+            showBlueprintDistanceModal,
+            isPlacingBlueprint
+          });
+          
           // NUCLEAR OPTION: Clear ALL blueprint-related state first
           setShowBlueprintPlacementModal(false);
           setShowBlueprintDistanceModal(false);
           setIsPlacingBlueprint(false);
           setBlueprintPoints([]);
+          
+          console.log('🚨🚨🚨 MAP SCALE LOCK IN - AFTER setting to false');
           
           setMapScale(scale);
           setIsMapMode(true);
@@ -7484,10 +7492,11 @@ export default function DimensionOverlay({
         }}
       />
 
-      {/* Blueprint/Aerial Placement Modal */}
+      {/* Blueprint/Aerial Placement Modal - Only render if actually visible AND map scale modal is not open */}
+      {showBlueprintPlacementModal && !showMapScaleModal && (
       <BlueprintPlacementModal
         key={`blueprint-${showBlueprintPlacementModal}-${showMapScaleModal}`}
-        visible={showBlueprintPlacementModal}
+        visible={true}
         mode={isAerialMode ? 'aerial' : 'blueprint'}
         onStartPlacement={() => {
           // User clicked "READY - PLACE PINS" button
@@ -7518,7 +7527,7 @@ export default function DimensionOverlay({
           }
         }}
       />
-
+      )}
 
 
       {/* Blueprint Points Visualization */}
