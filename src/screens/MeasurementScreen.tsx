@@ -1118,6 +1118,11 @@ export default function MeasurementScreen() {
         setMode('measurement');
         setIsCapturing(false); // Reset immediately
         
+        // Clear any blueprint/map flags from previous photos
+        setSkipToBlueprintMode(false);
+        setSkipToMapMode(false);
+        setSkipToAerialMode(false);
+        
         // Background MMKV write (non-blocking)
         setTimeout(() => setImageUri(photo.uri, false), 200);
         
