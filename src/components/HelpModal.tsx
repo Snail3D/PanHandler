@@ -190,7 +190,6 @@ const ExpandableSection = ({
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
-  const globalDownloads = useStore((s) => s.globalDownloads);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
   
   // Settings state
@@ -2359,32 +2358,8 @@ Thank you for helping us improve PanHandler!
                   </Text>
                 </Animated.View>
 
-                {/* Download Counter & Rating - Compact */}
+                {/* Rating - Compact */}
                 <View style={{ marginTop: 16 }}>
-                  {/* Heartfelt Message with Download Counter */}
-                  <AnimatedView
-                    entering={FadeIn.delay(750)}
-                    style={{
-                      marginBottom: 10,
-                      paddingVertical: 8,
-                      paddingHorizontal: 14,
-                      backgroundColor: 'rgba(255,105,180,0.12)',
-                      borderRadius: 12,
-                      borderWidth: 1.5,
-                      borderColor: 'rgba(255,105,180,0.25)',
-                    }}
-                  >
-                    <Text style={{ 
-                      fontSize: 13, 
-                      color: '#1C1C1E', 
-                      textAlign: 'center',
-                      lineHeight: 18,
-                      fontWeight: '600'
-                    }}>
-                      ❤️ {globalDownloads.toLocaleString()} people trust PanHandler
-                    </Text>
-                  </AnimatedView>
-
                   {/* Rating Section - Compact */}
                   <AnimatedView
                     entering={FadeIn.delay(800)}
