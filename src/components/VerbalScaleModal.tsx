@@ -77,8 +77,8 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
         <View style={{
           position: 'absolute',
-          top: insets.top + 40,
-          bottom: insets.bottom + 20,
+          top: insets.top + 20,
+          bottom: 0,
           left: 20,
           right: 20,
           borderRadius: 20,
