@@ -112,6 +112,7 @@ interface DimensionOverlayProps {
   skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
   skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
   shouldShowOpeningQuote?: boolean; // If true, show opening quote (controlled by parent)
+  onOpeningQuoteShown?: () => void; // Called after quote is triggered (so parent can reset flag)
 }
 
 export default function DimensionOverlay({ 
@@ -130,6 +131,7 @@ export default function DimensionOverlay({
   skipToBlueprintMode = false,
   skipToAerialMode = false,
   shouldShowOpeningQuote = false, // Default false - parent controls this
+  onOpeningQuoteShown, // Callback after quote shown
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -650,6 +652,10 @@ export default function DimensionOverlay({
     if (shouldShowOpeningQuote && !currentImageUri) {
       console.log('🎬 App launch - showing opening quote');
       showQuoteOverlay();
+      // Notify parent that quote was shown (so it can reset the flag)
+      if (onOpeningQuoteShown) {
+        onOpeningQuoteShown();
+      }
     }
   }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
