@@ -2263,6 +2263,10 @@ export default function MeasurementScreen() {
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
                   shouldShowOpeningQuote={showOpeningQuote}
+                  onOpeningQuoteShown={() => {
+                    // Reset flag after quote is shown so it doesn't show again
+                    setShowOpeningQuote(false);
+                  }}
                   onPanZoomLockChange={(shouldLock) => {
                     setIsPanZoomLocked(shouldLock);
                   }}
