@@ -291,6 +291,10 @@ export default function MeasurementScreen() {
       // Wait a moment for component to mount, then trigger quote
       setTimeout(() => {
         setShowOpeningQuote(true);
+        // Auto-reset after 1 second so subsequent DimensionOverlay mounts don't see it
+        setTimeout(() => {
+          setShowOpeningQuote(false);
+        }, 1000);
       }, 500);
     }
   }, []); // Empty deps - only runs once on mount

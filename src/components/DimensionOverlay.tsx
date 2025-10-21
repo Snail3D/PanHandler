@@ -646,11 +646,14 @@ export default function DimensionOverlay({
     }
   }, [skipToAerialMode]);
   
-  // Track if we've shown the initial quote
-  // Show opening quote ONLY when parent says so (on true app launch)
+  // Track if we've shown the opening quote (persists across remounts via parent)
+  const hasShownQuoteRef = useRef(false);
+  
+  // Show opening quote ONLY when parent says so AND we haven't shown it yet
   useEffect(() => {
-    if (shouldShowOpeningQuote && !currentImageUri) {
+    if (shouldShowOpeningQuote && !currentImageUri && !hasShownQuoteRef.current) {
       console.log('🎬 App launch - showing opening quote');
+      hasShownQuoteRef.current = true; // Mark as shown locally
       showQuoteOverlay();
       // Notify parent that quote was shown (so it can reset the flag)
       if (onOpeningQuoteShown) {
