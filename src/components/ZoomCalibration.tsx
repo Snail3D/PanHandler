@@ -623,20 +623,22 @@ export default function ZoomCalibration({
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
-            {/* Single Row: LOCK IN (75%) with coin info (25%) on right */}
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              {/* LOCK IN - 75% width */}
+            {/* Single Row: LOCK IN centered with coin info on right */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', height: 72 }}>
+              {/* LOCK IN - centered, full width background */}
               <Pressable
                 onPress={handleLockIn}
                 disabled={!selectedCoin}
                 style={({ pressed }) => ({
-                  flex: 3, // 75% width (3 of 4 columns)
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
                   backgroundColor: !selectedCoin 
                     ? 'rgba(150, 150, 150, 0.4)'
                     : pressed ? `${currentColor}E6` : `${currentColor}F2`,
                   borderRadius: 20,
-                  paddingVertical: 24, // Reduced from 28
-                  paddingHorizontal: 20,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: 2,
@@ -659,7 +661,7 @@ export default function ZoomCalibration({
                 </Text>
               </Pressable>
 
-              {/* Coin info on right - 25% width */}
+              {/* Coin info on right - positioned absolutely */}
               <Pressable
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -667,13 +669,18 @@ export default function ZoomCalibration({
                   setSearchQuery('');
                 }}
                 style={({ pressed: coinPressed }) => ({
-                  flex: 1, // 25% width (1 of 4 columns)
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
                   backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
                   borderRadius: 20,
-                  paddingVertical: 12,
-                  paddingHorizontal: 8,
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  zIndex: 10,
+                  minWidth: 90,
                 })}
               >
                 <CoinIcon size={32} color="#FF9500" />
