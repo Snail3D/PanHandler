@@ -5447,6 +5447,8 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
+          {/* Interactive labels wrapper - allows tapping labels while parent View has pointerEvents="none" for pan/zoom */}
+          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
 
           {/* Measurement labels for completed measurements with smart positioning */}
           {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
@@ -5749,6 +5751,8 @@ export default function DimensionOverlay({
             );
           })}
 
+          </View>
+          {/* End interactive labels wrapper */}
           {/* Label for current measurement in progress */}
           {currentPoints.length === requiredPoints && (() => {
             let screenX, screenY, value;
