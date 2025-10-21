@@ -1087,10 +1087,10 @@ export default function MeasurementScreen() {
           withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) })
         );
       } else {
-        // WALL PHOTO: Show modal immediately, keep isCapturing true until user selects
+        // WALL PHOTO: Go directly to Known Scale Mode (skip modal)
         setPendingPhotoUri(photo.uri);
-        setShowPhotoTypeModal(true);
-        // isCapturing stays true to prevent double-capture - reset in handlePhotoTypeSelection
+        handlePhotoTypeSelection('blueprint'); // Auto-select Known Scale Mode
+        // isCapturing will be reset in handlePhotoTypeSelection
       }
       
       // Save to camera roll in background (non-blocking)
