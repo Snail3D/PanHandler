@@ -7633,6 +7633,7 @@ export default function DimensionOverlay({
           setTimeout(() => {
             setMenuHidden(false);
             setShowBlueprintDistanceModal(false);
+            setShowBlueprintPlacementModal(false); // CRITICAL: Also close the placement modal
             setBlueprintPoints([]);
             setIsMapMode(false);
             blueprintLineOpacity.value = 1; // Reset for next time
