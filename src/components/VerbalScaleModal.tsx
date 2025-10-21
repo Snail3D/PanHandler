@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView } from 'react-native';
+import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -748,6 +748,11 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     onPress={() => {
                       if (!isValid) {
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                        Alert.alert(
+                          'Set Your Scale',
+                          'Please enter a valid scale value in the "In Reality" field to continue.',
+                          [{ text: 'OK', style: 'default' }]
+                        );
                         return;
                       }
                       // GoldenEye "Objective Complete" - doo-doo-doot! 🎯
