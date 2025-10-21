@@ -74,11 +74,13 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
         <View style={{
-          width: '90%',
-          maxWidth: 440,
-          maxHeight: '80%',
+          position: 'absolute',
+          top: insets.top + 40,
+          bottom: insets.bottom + 20,
+          left: 20,
+          right: 20,
           borderRadius: 20,
           overflow: 'hidden',
           shadowColor: '#000',
