@@ -554,34 +554,38 @@ Thank you for helping us improve PanHandler!
                     Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.
                   </Text>
                   
-                  {/* Big Red YouTube Button */}
+                  {/* Red Banner Button - Matches Play Icon Color */}
                   <Pressable
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       Linking.openURL('https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi');
                     }}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? '#CC0000' : '#FF0000',
-                      paddingVertical: 20,
-                      paddingHorizontal: 24,
-                      borderRadius: 16,
+                      backgroundColor: pressed ? '#E02847' : '#FF2D55',
+                      paddingVertical: 18,
+                      paddingHorizontal: 28,
+                      borderRadius: 20,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      shadowColor: '#FF0000',
-                      shadowOffset: { width: 0, height: 6 },
-                      shadowOpacity: 0.4,
-                      shadowRadius: 12,
-                      elevation: 8,
+                      shadowColor: '#FF2D55',
+                      shadowOffset: { width: 0, height: 8 },
+                      shadowOpacity: 0.35,
+                      shadowRadius: 16,
+                      elevation: 10,
                       marginBottom: 20,
+                      marginHorizontal: -4,
                       transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                     })}
                   >
                     <Text style={{ 
-                      fontSize: 18, 
+                      fontSize: 19, 
                       fontWeight: '800', 
                       color: '#FFFFFF',
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.3,
                       textAlign: 'center',
+                      textShadowColor: 'rgba(0, 0, 0, 0.2)',
+                      textShadowOffset: { width: 0, height: 1 },
+                      textShadowRadius: 2,
                     }}>
                       PanHandler YouTube Course Here!
                     </Text>
