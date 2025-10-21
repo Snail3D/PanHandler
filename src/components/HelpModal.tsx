@@ -859,7 +859,8 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                    Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!
+                    Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!{'\n\n'}
+                    <Text style={{ fontWeight: '600', color: '#AF52DE' }}>Pro Tip:</Text> Connect multiple lines by placing endpoints together to create triangles and polygons. Areas are automatically calculated and shown in the legend! 📐
                   </Text>
                 </View>
 
