@@ -5545,22 +5545,11 @@ export default function DimensionOverlay({
 
             // Render labels with adjusted positions
             return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle double-tap on label to open edit modal
-              const handleLabelPress = () => {
-                const now = Date.now();
-                const TAP_TIMEOUT = 300; // 300ms for double-tap detection
-                
-                if (labelTapState?.measurementId === measurement.id && (now - labelTapState.lastTapTime) < TAP_TIMEOUT) {
-                  // Second tap - open editor
-                  setLabelEditingMeasurementId(measurement.id);
-                  setShowLabelEditModal(true);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  setLabelTapState(null);
-                } else {
-                  // First tap - record time
-                  setLabelTapState({ measurementId: measurement.id, lastTapTime: now });
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
+              // Handle long press (3 seconds) on label to open edit modal  
+              const handleLabelLongPress = () => {
+                setLabelEditingMeasurementId(measurement.id);
+                setShowLabelEditModal(true);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               };
 
               return (
@@ -5572,8 +5561,8 @@ export default function DimensionOverlay({
                     top: screenY,
                     alignItems: 'center',
                   }}
-                  pointerEvents="auto"
-                  onPress={handleLabelPress}
+                  onLongPress={handleLabelLongPress}
+                  delayLongPress={3000}
                 >
                   {/* Small number badge */}
                   <View
@@ -5659,11 +5648,11 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
-            // Handle label tap to open edit modal
-            const handleRectLabelPress = () => {
+            // Handle long press (3 seconds) on label to open edit modal
+            const handleRectLabelLongPress = () => {
               setLabelEditingMeasurementId(measurement.id);
               setShowLabelEditModal(true);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             };
             
             return (
@@ -5675,8 +5664,8 @@ export default function DimensionOverlay({
                     left: minX - 70,
                     top: centerY - 15,
                   }}
-                  pointerEvents="auto"
-                  onPress={handleRectLabelPress}
+                  onLongPress={handleRectLabelLongPress}
+                  delayLongPress={3000}
                 >
                   <View
                     style={{
@@ -5704,8 +5693,8 @@ export default function DimensionOverlay({
                     left: centerX - 40,
                     top: minY - 35,
                   }}
-                  pointerEvents="auto"
-                  onPress={handleRectLabelPress}
+                  onLongPress={handleRectLabelLongPress}
+                  delayLongPress={3000}
                 >
                   <View
                     style={{
