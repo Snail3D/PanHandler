@@ -5863,6 +5863,8 @@ export default function DimensionOverlay({
                   }}
                   onLongPress={handleLabelLongPress}
                   delayLongPress={3000}
+                  hitSlop={20}
+                  pointerEvents="auto"
                 >
                   {/* Small number badge */}
                   <View
@@ -5966,6 +5968,8 @@ export default function DimensionOverlay({
                   }}
                   onLongPress={handleRectLabelLongPress}
                   delayLongPress={3000}
+                  hitSlop={20}
+                  pointerEvents="auto"
                 >
                   <View
                     style={{
@@ -5995,6 +5999,8 @@ export default function DimensionOverlay({
                   }}
                   onLongPress={handleRectLabelLongPress}
                   delayLongPress={3000}
+                  hitSlop={20}
+                  pointerEvents="auto"
                 >
                   <View
                     style={{
