@@ -12,6 +12,8 @@ import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
 import AlertModal from './AlertModal';
+import EmailPromptModal from './EmailPromptModal';
+import MagneticDeclinationModal from './MagneticDeclinationModal';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -193,10 +195,15 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   
   // Settings state
   const userEmail = useStore((s) => s.userEmail);
+  const setUserEmail = useStore((s) => s.setUserEmail);
   const defaultUnitSystem = useStore((s) => s.defaultUnitSystem);
   const setDefaultUnitSystem = useStore((s) => s.setDefaultUnitSystem);
   const magneticDeclination = useStore((s) => s.magneticDeclination);
   const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
+  
+  // Modal visibility state
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showDeclinationModal, setShowDeclinationModal] = useState(false);
   
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
@@ -2129,11 +2136,7 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        showAlert(
-                          'Change Email',
-                          'This feature is coming soon! For now, your email will be requested when sending reports.',
-                          'info'
-                        );
+                        setShowEmailModal(true);
                       }}
                       style={({ pressed }) => ({
                         backgroundColor: pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
@@ -2229,11 +2232,7 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        showAlert(
-                          'Magnetic Declination',
-                          'Enter your local magnetic declination in degrees. Positive for East, negative for West. Find your location\'s declination at ngdc.noaa.gov',
-                          'info'
-                        );
+                        setShowDeclinationModal(true);
                       }}
                       style={({ pressed }) => ({
                         backgroundColor: pressed ? 'rgba(88,86,214,0.15)' : 'rgba(88,86,214,0.08)',
@@ -2493,6 +2492,29 @@ Thank you for helping us improve PanHandler!
       message={alertConfig.message}
       type={alertConfig.type}
       onClose={closeAlert}
+    />
+
+    {/* Email Prompt Modal */}
+    <EmailPromptModal
+      visible={showEmailModal}
+      onComplete={(email) => {
+        if (email) {
+          setUserEmail(email);
+        }
+        setShowEmailModal(false);
+      }}
+      onDismiss={() => setShowEmailModal(false)}
+    />
+
+    {/* Magnetic Declination Modal */}
+    <MagneticDeclinationModal
+      visible={showDeclinationModal}
+      currentValue={magneticDeclination}
+      onComplete={(declination) => {
+        setMagneticDeclination(declination);
+        setShowDeclinationModal(false);
+      }}
+      onDismiss={() => setShowDeclinationModal(false)}
     />
     </>
   );
