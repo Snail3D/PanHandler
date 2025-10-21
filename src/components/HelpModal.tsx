@@ -1516,13 +1516,16 @@ Thank you for helping us improve PanHandler!
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      📐 <Text style={{ fontWeight: '600' }}>Blueprints & Floor Plans</Text> - Measure room dimensions and layout distances
+                      📐 <Text style={{ fontWeight: '600' }}>Blueprints & Floor Plans (Known Scale)</Text> - Measure room dimensions and layout distances
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
                       🏗️ <Text style={{ fontWeight: '600' }}>Engineering Drawings</Text> - Calculate component spacing and assembly dimensions
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
                       🗺️ <Text style={{ fontWeight: '600' }}>Topographic Maps</Text> - Measure trail distances and terrain features
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
+                      🚁 <Text style={{ fontWeight: '600' }}>Drone & Aerial Photos</Text> - Measure property boundaries and outdoor features from above
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
                       🏠 <Text style={{ fontWeight: '600' }}>Property & Real Estate</Text> - Calculate lot sizes and boundaries
