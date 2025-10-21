@@ -7455,10 +7455,18 @@ export default function DimensionOverlay({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }}
         onDismiss={() => {
-          setShowBlueprintPlacementModal(false);
-          setBlueprintPoints([]);
-          setIsMapMode(false);
-          setMenuHidden(false); // Show menu again if user cancels
+          // If user came from "Known Scale" mode (skipToBlueprintMode or skipToAerialMode),
+          // dismissing without placing points should reset to camera for fresh start
+          if (skipToBlueprintMode || skipToAerialMode) {
+            console.log('🔄 Known Scale dismissed without calibration - resetting to camera');
+            handleReset(); // Go back to camera screen
+          } else {
+            // Regular dismissal (from recalibration, etc.)
+            setShowBlueprintPlacementModal(false);
+            setBlueprintPoints([]);
+            setIsMapMode(false);
+            setMenuHidden(false); // Show menu again if user cancels
+          }
         }}
       />
 
