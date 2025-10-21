@@ -7486,9 +7486,11 @@ export default function DimensionOverlay({
           setMenuHidden(true); // Hide menu when blueprint modal appears
         }}
         onDismiss={() => {
-          // If dismissing without setting scale, turn off map mode
+          // If dismissing without setting scale, turn off map mode and clear blueprint modals
           setIsMapMode(false);
           setShowMapScaleModal(false);
+          setShowBlueprintPlacementModal(false);
+          setShowBlueprintDistanceModal(false);
         }}
       />
 
