@@ -6939,7 +6939,7 @@ export default function DimensionOverlay({
       {/* REMOVED: Old Pro upgrade modal - Now using donation-based BattlingBots in MeasurementScreen */}
 
       {/* Help Button - Positioned next to AUTO LEVEL badge */}
-      {coinCircle && !showLockedInAnimation && !isCapturing && (
+      {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => setShowHelpModal(true)}
           onLongPress={() => {
@@ -7410,6 +7410,7 @@ export default function DimensionOverlay({
           setMapScale(scale);
           setIsMapMode(true);
           setShowMapScaleModal(false);
+          setShowBlueprintPlacementModal(false); // Ensure blueprint modal is hidden
           
           // Create calibration from verbal scale
           // Convert screen measurement to pixels
