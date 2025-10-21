@@ -647,6 +647,18 @@ export default function DimensionOverlay({
     }
   }, [skipToAerialMode]);
   
+  // CRITICAL: Reset blueprint modal states when starting a new photo session
+  // sessionColor changes with each new photo, so we use it as a signal to reset
+  useEffect(() => {
+    if (sessionColor) {
+      console.log('📸 New photo detected (sessionColor changed) - resetting blueprint modal states');
+      setShowBlueprintPlacementModal(false);
+      setShowBlueprintDistanceModal(false);
+      setIsPlacingBlueprint(false);
+      setBlueprintPoints([]);
+    }
+  }, [sessionColor]);
+  
   // Track if we've shown the opening quote (persists across remounts via parent)
   const hasShownQuoteRef = useRef(false);
   
@@ -7460,6 +7472,12 @@ export default function DimensionOverlay({
           };
           
           setCalibration(newCalibration);
+          
+          // FAILSAFE: Ensure blueprint modals stay closed after setting verbal calibration
+          setTimeout(() => {
+            setShowBlueprintPlacementModal(false);
+            setShowBlueprintDistanceModal(false);
+          }, 100);
           
           // Recalculate ALL existing measurements with new calibration (same as blueprint recalibration)
           if (measurements.length > 0) {
