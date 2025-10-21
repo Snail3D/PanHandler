@@ -1060,19 +1060,6 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
 
-                  {/* Shake to Toggle */}
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 18, marginRight: 10 }}>📳</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Shake to Toggle Menu
-                      </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                        Shake your phone to instantly show/hide the control menu
-                      </Text>
-                    </View>
-                  </View>
-
                   {/* Menu Controls */}
                   <View
                     style={{
@@ -1093,9 +1080,6 @@ Thank you for helping us improve PanHandler!
                     <View style={{ gap: 8 }}>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Swipe right anywhere on menu</Text> to collapse it off-screen
-                      </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
-                        • <Text style={{ fontWeight: '600' }}>Shake your phone</Text> to toggle menu visibility
                       </Text>
                       <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Tap side tab</Text> to bring menu back
