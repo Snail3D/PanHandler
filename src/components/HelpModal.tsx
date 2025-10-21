@@ -1357,6 +1357,26 @@ Thank you for helping us improve PanHandler!
                     {'\u2022'} Transparent CAD canvas (50% opacity)
                   </Text>
                 </View>
+                
+                {/* Email Settings Reminder */}
+                <View style={{ 
+                  marginTop: 16, 
+                  backgroundColor: 'rgba(88,86,214,0.08)', 
+                  borderRadius: 12, 
+                  padding: 14, 
+                  borderWidth: 2, 
+                  borderColor: 'rgba(88,86,214,0.25)' 
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Text style={{ fontSize: 16, marginRight: 6 }}>⚡</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6' }}>
+                      Pro Tip: Lightning Fast Workflow
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    Set your email address in <Text style={{ fontWeight: '600', color: '#5856D6' }}>Settings</Text> below to skip typing it every time! ⚡
+                  </Text>
+                </View>
               </ExpandableSection>
 
               {/* CAD Import Tutorial - Expandable */}
