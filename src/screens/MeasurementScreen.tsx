@@ -1852,7 +1852,7 @@ export default function MeasurementScreen() {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     await pickImage();
                   }}
-                  hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                  hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
                   style={{ 
                     position: 'absolute', 
                     left: 32, 
