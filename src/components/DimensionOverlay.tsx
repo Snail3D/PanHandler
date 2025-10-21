@@ -6244,7 +6244,7 @@ export default function DimensionOverlay({
                         paddingHorizontal: 10,
                         borderWidth: 0.5,
                         borderColor: 'rgba(0, 0, 0, 0.08)',
-                        marginLeft: 36,
+                        marginLeft: 54,
                       }}
                     >
                       <View style={{ opacity: 0.6 }}>
