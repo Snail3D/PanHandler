@@ -183,64 +183,7 @@ const ExpandableSection = ({
 };
 
 // Comparison row component for Free vs Pro table
-const ComparisonRow = ({ 
-  feature, 
-  free, 
-  pro,
-  last = false,
-  isLastFree = false
-}: { 
-  feature: string; 
-  free: string; 
-  pro: string;
-  last?: boolean;
-  isLastFree?: boolean;
-}) => (
-  <View 
-    style={{ 
-      flexDirection: 'row', 
-      borderTopWidth: 1, 
-      borderTopColor: 'rgba(0,0,0,0.06)',
-      ...(isLastFree && {
-        shadowColor: '#FF3B30',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-        backgroundColor: 'rgba(255, 59, 48, 0.06)',
-      }),
-    }}
-  >
-    <View style={{ flex: 1, padding: 12 }}>
-      <Text style={{ fontSize: 14, color: '#1C1C1E' }}>{feature}</Text>
-    </View>
-    <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-      {free === '✗' ? (
-        <View style={{
-          width: 24,
-          height: 24,
-          borderRadius: 12,
-          backgroundColor: 'rgba(0, 0, 0, 0.15)',
-          borderWidth: 1,
-          borderColor: 'rgba(0, 0, 0, 0.25)',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <Text style={{ fontSize: 14, color: '#3C3C43', fontWeight: '600' }}>{free}</Text>
-        </View>
-      ) : (
-        <Text style={{ fontSize: 14, color: '#3C3C43' }}>{free}</Text>
-      )}
-    </View>
-    <View style={{ 
-      width: 70, 
-      padding: 12, 
-      alignItems: 'center',
-      backgroundColor: 'rgba(88, 86, 214, 0.15)',
-    }}>
-      <Text style={{ fontSize: 14, fontWeight: '600', color: '#5856D6' }}>{pro}</Text>
-    </View>
-  </View>
-);
+// Removed: ComparisonRow component - Free vs Pro system no longer exists
 
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
@@ -442,24 +385,7 @@ Thank you for helping us improve PanHandler!
   // Scroll position for Rolodex effect
   const scrollY = useSharedValue(0);
   
-  // Pulsing animation for "Upgrade to Pro" button text
-  const textPulse = useSharedValue(1);
-  
-  useEffect(() => {
-    // Gentle, slow pulsing animation - subtle opacity change
-    textPulse.value = withRepeat(
-      withTiming(0.7, {
-        duration: 2000, // 2 seconds to fade down
-        easing: Easing.inOut(Easing.ease),
-      }),
-      -1, // Infinite repeat
-      true // Reverse (fade back up)
-    );
-  }, []);
-  
-  const textPulseStyle = useAnimatedStyle(() => ({
-    opacity: textPulse.value,
-  }));
+  // Removed: Pulsing animation for "Upgrade to Pro" (Free vs Pro section removed)
   
   useEffect(() => {
     if (visible) {
@@ -1044,19 +970,6 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
                   
-                  {/* Pro Feature Notice */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(88, 86, 214, 0.08)', 
-                    borderRadius: 10, 
-                    padding: 12, 
-                    marginBottom: 12,
-                    borderWidth: 1,
-                    borderColor: 'rgba(88, 86, 214, 0.15)',
-                  }}>
-                    <Text style={{ fontSize: 13, color: '#5856D6', fontWeight: '600', textAlign: 'center' }}>
-                      This is a Pro-only feature. See "Free vs Pro" below for more details.
-                    </Text>
-                  </View>
                   
                   <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
                     Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
@@ -1656,100 +1569,6 @@ Thank you for helping us improve PanHandler!
                   </View>
                 </View>
               </ExpandableSection>
-
-              {/* Pro Features with Comparison Chart */}
-              <View style={{ marginBottom: 20, marginTop: 8 }}>
-                <Animated.View 
-                  entering={SlideInRight.delay(500).springify()}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.5)',
-                    borderRadius: 20,
-                    padding: 20,
-                    shadowColor: '#5856D6',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 14,
-                    elevation: 8,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.35)',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                    <View style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: 'rgba(88, 86, 214, 0.2)',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: 10,
-                      shadowColor: '#5856D6',
-                      shadowOffset: { width: 0, height: 0 },
-                      shadowOpacity: 0.4,
-                      shadowRadius: 8,
-                    }}>
-                      <Ionicons name="star" size={22} color="#5856D6" />
-                    </View>
-                    <Text style={{ fontSize: 19, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
-                      Free vs Pro
-                    </Text>
-                  </View>
-
-                  {/* Comparison Table */}
-                  <View style={{ 
-                    borderRadius: 14, 
-                    borderWidth: 1, 
-                    borderColor: 'rgba(0,0,0,0.08)',
-                    overflow: 'hidden',
-                  }}>
-                    {/* Header Row */}
-                    <View style={{ flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.02)' }}>
-                      <View style={{ flex: 1, padding: 12 }}>
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Feature</Text>
-                      </View>
-                      <View style={{ width: 70, padding: 12, alignItems: 'center' }}>
-                        <Text style={{ fontSize: 13, fontWeight: '600', color: '#8E8E93' }}>Free</Text>
-                      </View>
-                      <View style={{ width: 70, padding: 12, alignItems: 'center', backgroundColor: 'rgba(88, 86, 214, 0.15)' }}>
-                        <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>Pro</Text>
-                      </View>
-                    </View>
-
-                    {/* Feature Rows */}
-                    <ComparisonRow feature="Total Exports" free="∞" pro="∞" />
-                    <ComparisonRow feature="Measurements" free="∞" pro="∞" />
-                    <ComparisonRow feature="Freehand Tool" free="✗" pro="✓" isLastFree />
-                    <ComparisonRow feature="Coin Calibration" free="✓" pro="✓" />
-                    <ComparisonRow feature="CAD Canvas Photo" free="✓" pro="✓" last />
-                  </View>
-
-                  {/* Price & Actions - Condensed */}
-                  <View style={{ marginTop: 20, alignItems: 'center' }}>
-                    <Text style={{ 
-                      fontSize: 15, 
-                      color: '#8E8E93', 
-                      textAlign: 'center',
-                      lineHeight: 24,
-                      marginBottom: 12,
-                    }}>
-                      Make a one-time payment of{' '}
-                      <Text style={{ fontSize: 22, fontWeight: '800', color: '#1C1C1E' }}>$9.97</Text>
-                      {' '}and{' '}
-                      <AnimatedText style={[{ 
-                        fontSize: 17,
-                        fontWeight: '800', 
-                        color: '#5856D6',
-                      }, textPulseStyle]}>
-                        Upgrade to Pro
-                      </AnimatedText>
-                      {' '}or{' '}
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#5856D6' }}>
-                        Restore Purchase
-                      </Text>
-                    </Text>
-                  </View>
-                </Animated.View>
-              </View>
 
 
               {/* Pro Tips */}
