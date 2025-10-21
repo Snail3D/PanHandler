@@ -2101,53 +2101,6 @@ Thank you for helping us improve PanHandler!
                   </View>
                 </Animated.View>
               </View>
-
-              {/* Review Section - Moved above Easter Eggs */}
-              <View style={{ marginBottom: 12, marginTop: 8 }}>
-                <AnimatedView
-                  entering={FadeIn.delay(750)}
-                  style={{
-                    backgroundColor: 'rgba(88,86,214,0.08)',
-                    borderRadius: 16,
-                    padding: 18,
-                    shadowColor: '#5856D6',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 12,
-                    elevation: 4,
-                    borderWidth: 2,
-                    borderColor: 'rgba(88,86,214,0.2)',
-                  }}
-                >
-                  <Text style={{ 
-                    fontSize: 16, 
-                    color: '#1C1C1E', 
-                    textAlign: 'center',
-                    lineHeight: 22,
-                    fontWeight: '700',
-                    marginBottom: 8,
-                  }}>
-                    Do you like this app?
-                  </Text>
-                  
-                  {/* Stars */}
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-                    <Text style={{ fontSize: 32, letterSpacing: 4 }}>⭐⭐⭐⭐⭐</Text>
-                  </View>
-                  
-                  {/* Review message */}
-                  <Text style={{
-                    fontSize: 15,
-                    color: '#1C1C1E',
-                    textAlign: 'center',
-                    lineHeight: 22,
-                    fontWeight: '600',
-                  }}>
-                    Search for "PanHandler" on the App Store or Play Store to leave a review! 🙏
-                  </Text>
-                </AnimatedView>
-              </View>
-
               {/* Easter Egg Hints Section - Compact */}
               <View style={{ marginBottom: 12, marginTop: 8 }}>
                 <Animated.View 
