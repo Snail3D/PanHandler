@@ -1858,7 +1858,7 @@ export default function DimensionOverlay({
 
   // 🔷 POLYGON AUTO-DETECTION: Detect closed polygons from connected distance lines
   const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
-    const SNAP_TOLERANCE = 20; // pixels - how close endpoints need to be to snap
+    const SNAP_TOLERANCE = 30; // pixels - how close endpoints need to be to snap
     
     console.log('🔷 detectAndMergePolygon called with', allMeasurements.length, 'total measurements');
     
@@ -1873,7 +1873,13 @@ export default function DimensionOverlay({
       return;
     }
     
-    // Find all connected chains of lines
+    // Get the most recently added line (the one that might close the polygon)
+    const lastLine = distanceLines[distanceLines.length - 1];
+    const lastLineEnd = lastLine.points[1];
+    
+    console.log('🔷 Last line end point:', lastLineEnd);
+    
+    // Find all connected chains of lines that START from various points
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
       const chain: Measurement[] = [startLine];
       usedIds.add(startLine.id);
@@ -1928,30 +1934,34 @@ export default function DimensionOverlay({
       return chain;
     };
     
-    // Try to find closed polygons
-    for (const startLine of distanceLines) {
-      const usedIds = new Set<string>();
-      const chain = findConnectedChain(startLine, usedIds);
-      
-      console.log('🔷 Chain found:', chain.length, 'lines connected');
-      
-      if (chain.length < 3) continue; // Need at least 3 lines
-      
-      // Check if chain forms a closed loop
-      const firstPoint = chain[0].points[0];
-      const lastPoint = chain[chain.length - 1].points[1];
-      
-      const closingDistance = Math.sqrt(
-        Math.pow(lastPoint.x - firstPoint.x, 2) + 
-        Math.pow(lastPoint.y - firstPoint.y, 2)
-      );
-      
-      console.log('🔷 Closing distance:', closingDistance.toFixed(2), 'px (tolerance:', SNAP_TOLERANCE, 'px)');
-      console.log('🔷 First point:', firstPoint, 'Last point:', lastPoint);
-      
-      if (closingDistance < SNAP_TOLERANCE) {
-        // 🎉 FOUND A CLOSED POLYGON!
-        console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
+    // ONLY check if the chain that contains the LAST line closes
+    // This prevents premature snapping - only snaps when user explicitly closes back to start
+    const usedIds = new Set<string>();
+    const chain = findConnectedChain(lastLine, usedIds);
+    
+    console.log('🔷 Chain found from last line:', chain.length, 'lines connected');
+    
+    // Only proceed if we have at least 3 lines in the chain
+    if (chain.length < 3) {
+      console.log('🔷 Chain too short, need at least 3 lines');
+      return;
+    }
+    
+    // Check if THIS specific chain forms a closed loop
+    const firstPoint = chain[0].points[0];
+    const lastPoint = chain[chain.length - 1].points[1];
+    
+    const closingDistance = Math.sqrt(
+      Math.pow(lastPoint.x - firstPoint.x, 2) + 
+      Math.pow(lastPoint.y - firstPoint.y, 2)
+    );
+    
+    console.log('🔷 Closing distance:', closingDistance.toFixed(2), 'px (tolerance:', SNAP_TOLERANCE, 'px)');
+    console.log('🔷 First point:', firstPoint, 'Last point:', lastPoint);
+    
+    if (closingDistance < SNAP_TOLERANCE) {
+      // 🎉 FOUND A CLOSED POLYGON!
+      console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
         
         // Extract all unique points in order
         // For each line, add its start point (end point is the next line's start)
@@ -2185,11 +2195,11 @@ export default function DimensionOverlay({
       
       setMeasurements([...measurements, newMeasurement]);
       
-      // 🔷 POLYGON AUTO-DETECTION: DISABLED - too aggressive, was snapping lines into polygons unintentionally
-      // Users should use the polygon/freehand mode if they want closed shapes
-      // if (mode === 'distance') {
-      //   detectAndMergePolygon([...measurements, newMeasurement]);
-      // }
+      // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
+      // Require at least 4 lines (squares/rectangles) to prevent premature triangle snapping
+      if (mode === 'distance') {
+        detectAndMergePolygon([...measurements, newMeasurement]);
+      }
       
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
