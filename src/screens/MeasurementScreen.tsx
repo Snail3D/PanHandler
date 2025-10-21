@@ -259,8 +259,9 @@ export default function MeasurementScreen() {
       }
       
       // Check if we should trigger BattlingBots (after incrementing)
+      // Don't trigger until 10th session, then continue normal schedule
       const triggerInterval = isDonor ? 40 : 10;
-      const shouldTrigger = sessionCount % triggerInterval === 0;
+      const shouldTrigger = sessionCount >= 10 && sessionCount % triggerInterval === 0;
       
       if (shouldTrigger) {
         // Show after 2 second delay
