@@ -1531,7 +1531,7 @@ Thank you for helping us improve PanHandler!
                       📐 Known Scale (Blueprints)
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19, marginBottom: 4 }}>
-                      Best for: Blueprints, floor plans, engineering drawings
+                      Best for: Drone photos, blueprints, floor plans, engineering drawings
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       → Find the scale bar on your drawing{'\n'}
