@@ -442,6 +442,8 @@ export default function DimensionOverlay({
   const quoteOpacity = useSharedValue(0);
   const [quoteTapCount, setQuoteTapCount] = useState(0);
   const [quoteHapticFired, setQuoteHapticFired] = useState(false); // DEBUG: Visual indicator
+  const quoteTimeoutsRef = useRef<NodeJS.Timeout[]>([]); // Track typing timeouts
+  const isQuoteTypingRef = useRef(false); // Track typing state without causing re-renders
   
   // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
@@ -664,6 +666,7 @@ export default function DimensionOverlay({
     setQuoteTapCount(0);
     setShowQuote(true);
     setIsQuoteTyping(true);
+    isQuoteTypingRef.current = true; // Set ref to prevent premature cleanup
     
     // Smooth fade in with spring physics for buttery smoothness
     quoteOpacity.value = withSpring(1, {
@@ -680,6 +683,10 @@ export default function DimensionOverlay({
     
     if (!isQuoteTyping || !currentQuote) return;
     
+    // Clear any existing timeouts first
+    quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+    quoteTimeoutsRef.current = [];
+    
     // IMMEDIATE Heavy haptic at the very start
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     
@@ -688,13 +695,15 @@ export default function DimensionOverlay({
     const completeText = `${fullText}\n\n${authorText}`;
     
     const typingSpeed = 50;
-    const timeouts: NodeJS.Timeout[] = [];
     
     // Add haptics during typing - every 4th character
     setDisplayedText(completeText.substring(0, 1));
     
     for (let i = 1; i < completeText.length; i++) {
       const timeout = setTimeout(() => {
+        // Check if typing was cancelled
+        if (!isQuoteTypingRef.current) return;
+        
         setDisplayedText(completeText.substring(0, i + 1));
         
         // Haptic feedback every 4 characters (not too frequent, noticeable)
@@ -704,21 +713,30 @@ export default function DimensionOverlay({
         
         if (i === completeText.length - 1) {
           setIsQuoteTyping(false);
+          isQuoteTypingRef.current = false;
           setTimeout(() => {
             dismissQuote();
           }, 5000);
         }
       }, i * typingSpeed);
       
-      timeouts.push(timeout);
+      quoteTimeoutsRef.current.push(timeout);
     }
     
     return () => {
-      timeouts.forEach(timeout => clearTimeout(timeout));
+      // Only clear timeouts if typing was explicitly cancelled (not from re-render)
+      if (!isQuoteTypingRef.current) {
+        quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+        quoteTimeoutsRef.current = [];
+      }
     };
   }, [isQuoteTyping, currentQuote]);
   
   const dismissQuote = () => {
+    isQuoteTypingRef.current = false; // Stop typing
+    quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout)); // Clear all timeouts
+    quoteTimeoutsRef.current = [];
+    
     quoteOpacity.value = withTiming(0, { 
       duration: 500,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1) // Smooth deceleration
@@ -726,6 +744,7 @@ export default function DimensionOverlay({
       runOnJS(setShowQuote)(false);
       runOnJS(setCurrentQuote)(null);
       runOnJS(setDisplayedText)('');
+      runOnJS(setIsQuoteTyping)(false);
     });
   };
   
