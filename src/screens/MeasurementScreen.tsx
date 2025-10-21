@@ -126,6 +126,10 @@ export default function MeasurementScreen() {
   const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
   
+  // Emergency reset - tap screen 5 times rapidly to force reset if stuck
+  const emergencyTapCount = useRef(0);
+  const emergencyTapTimer = useRef<NodeJS.Timeout | null>(null);
+  
   // Accessibility & Performance Detection
   const [reduceMotion, setReduceMotion] = useState(false);
   const [isLowEndDevice, setIsLowEndDevice] = useState(false);
@@ -1038,228 +1042,84 @@ export default function MeasurementScreen() {
   }
 
   const takePicture = async () => {
-    // Prevent capture if camera isn't ready or already capturing
+    // Simple guard - don't capture if already capturing or camera not ready
     if (!cameraRef.current || isCapturing || mode !== 'camera') {
-      __DEV__ && console.log('⚠️ Skipping takePicture - camera not ready:', {
-        hasCameraRef: !!cameraRef.current,
-        isCapturing,
-        mode,
-        isCameraReady,
-      });
+      __DEV__ && console.log('⚠️ Skipping capture - not ready');
       return;
     }
     
-    // Warn if camera might not be fully ready but allow capture anyway
-    if (!isCameraReady) {
-      __DEV__ && console.log('⚠️ Camera not marked ready but attempting capture anyway');
-    }
-    
-    // Disable holding state to prevent double-capture
+    setIsCapturing(true);
     setIsHoldingShutter(false);
     
-    const wasAutoCapture = alignmentStatus === 'good' && isStable;
-    
-    // Declare safety timeout in function scope so catch can access it
-    let safetyTimeout: NodeJS.Timeout | null = null;
-    
     try {
-      setIsCapturing(true);
-      
-      // SAFETY: Force reset isCapturing after 10 seconds in case of hang
-      // This prevents permanent lockup if something goes wrong
-      safetyTimeout = setTimeout(() => {
-        __DEV__ && console.error('⚠️ SAFETY: Force resetting isCapturing after 10s timeout');
-        setIsCapturing(false);
-        setIsTransitioning(false);
-      }, 10000);
-      
-      // Check camera permissions one more time
-      if (!permission?.granted) {
-        console.error('Camera permission not granted');
-        if (safetyTimeout) clearTimeout(safetyTimeout);
-        setIsCapturing(false);
-        return;
-      }
-      
-      // ⚠️ CRITICAL: Check if camera ref exists
-      if (!cameraRef.current) {
-        console.error('Camera ref is null - camera not ready');
-        if (safetyTimeout) clearTimeout(safetyTimeout);
-        setIsCapturing(false);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        return;
-      }
-      
-      // Pleasant camera flash effect - MUST complete before transition
+      // Flash effect
       cameraFlashOpacity.value = 1;
-      cameraFlashOpacity.value = withTiming(0, {
-        duration: 100, // Quick 100ms flash
-        easing: Easing.out(Easing.ease),
-      });
+      cameraFlashOpacity.value = withTiming(0, { duration: 100, easing: Easing.out(Easing.ease) });
       
-      // Wait a tiny bit for camera to be fully ready
-      await new Promise(resolve => setTimeout(resolve, 50));
+      // Take photo
+      const photo = await cameraRef.current.takePictureAsync({ quality: 1, skipProcessing: false });
       
-      // Take photo (torch is controlled by enableTorch prop on CameraView)
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 1,
-        skipProcessing: false,
-      });
-      
-      if (photo?.uri) {
-        // Store in local state immediately (no MMKV blocking!)
-        setCapturedPhotoUri(photo.uri);
-        
-        // DON'T call setImageOrientation - it triggers MMKV write which blocks thread
-        // We don't persist orientation anyway, so no need to set it
-        
-        // Use phone TILT to determine if looking at table or wall
-        // Must check BOTH beta and gamma to handle portrait AND landscape orientations
-        // Beta close to 0° = phone flat/tilted down in portrait
-        // Gamma close to 0° = phone flat/tilted down in landscape
-        const absBeta = Math.abs(currentBeta);
-        const absGamma = Math.abs(currentGamma);
-        const isLookingAtTable = absBeta < 45 && absGamma < 45; // BOTH axes flat = looking down at table
-        
-        console.log('📷 Photo captured - Phone tilt:', {
-          beta: currentBeta.toFixed(1),
-          gamma: currentGamma.toFixed(1),
-          absBeta: absBeta.toFixed(1),
-          absGamma: absGamma.toFixed(1),
-          isLookingAtTable,
-          decision: isLookingAtTable ? 'AUTO COIN CALIBRATION (table)' : 'SHOW MENU (wall)'
-        });
-        
-        // DECISION: Use phone tilt, NOT photo orientation
-        // Phone tilted down (looking at table) → Auto coin calibration
-        // Phone upright (looking at wall) → Show menu
-        if (isLookingAtTable) {
-          // Phone looking down at table → Auto-proceed to coin calibration
-          console.log('📷 Phone tilted down (table) → Auto coin calibration');
-          
-          // Clear safety timeout - capture succeeded
-          if (safetyTimeout) clearTimeout(safetyTimeout);
-          
-          // CRITICAL FIX: Set capturedPhotoUri + mode together so they batch in same render
-          // This ensures displayImageUri is not null when ZoomCalibration mounts
-          setCapturedPhotoUri(photo.uri);
-          setIsTransitioning(true);
-          setMode('zoomCalibrate');
-          
-          // Reset isCapturing since we're leaving camera mode
-          setIsCapturing(false);
-          
-          // ⚠️ CRITICAL: Defer AsyncStorage write until AFTER transition completes
-          // Writing to AsyncStorage blocks UI thread for 100-10,000ms causing 10-second freeze
-          // Write happens in background after UI transition is smooth
-          // See: SESSION_COMPLETE_OCT18_IMAGE_UNMOUNTING_FIX.md
-          setTimeout(() => {
-            setImageUri(photo.uri, wasAutoCapture);
-            __DEV__ && console.log('✅ Deferred AsyncStorage write complete');
-          }, 200); // Write after transition animations complete
-          
-          // Start the visual transition AFTER mode switch
-          setTimeout(() => {
-            // Fade out camera opacity to reveal the photo underneath
-            cameraOpacity.value = withTiming(0, {
-              duration: 150, // Much faster fade (was 300ms)
-              easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-            });
-            
-            // Slight zoom morph for drama
-            screenScale.value = withSequence(
-              withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }), // Slight zoom in (reduced)
-              withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) }) // Settle
-            );
-            
-            // Unlock after full transition
-            setTimeout(() => {
-              setIsTransitioning(false);
-            }, 150); // Match the fade duration
-          }, 50); // Start animations quickly after flash
-        } else {
-          // Phone upright (looking at wall) → Show photo type selection menu
-          console.log('📷 Phone upright (wall) → Show photo type menu');
-          
-          // Clear safety timeout - capture succeeded
-          if (safetyTimeout) clearTimeout(safetyTimeout);
-          
-          // STAY in camera mode and show modal here
-          // Don't transition to measurement yet - wait for user selection
-          
-          // IMPORTANT: Keep isCapturing = true to prevent double-capture while modal is open
-          // It will be reset when user selects from modal or cancels
-          
-          // Store pending photo
-          setPendingPhotoUri(photo.uri);
-          
-          // Small delay then show modal (stay in camera mode!)
-          // DON'T call setImageUri here - it causes massive re-render that breaks modal
-          // Instead, setImageUri is called in handlePhotoTypeSelection AFTER user picks
-          setTimeout(() => {
-            console.log('🔴 Setting showPhotoTypeModal to TRUE');
-            setShowPhotoTypeModal(true);
-          }, 100);
-        }
-        
-        // Save to camera roll in background (non-blocking for UI)
-        (async () => {
-          try {
-            // Request media library permission if not granted
-            let canSave = mediaLibraryPermission?.granted || false;
-            if (!canSave) {
-              const { granted } = await requestMediaLibraryPermission();
-              canSave = granted;
-              if (!granted) {
-                __DEV__ && console.log('Media library permission not granted');
-                return;
-              }
-            }
-
-            if (canSave) {
-              let photoToSave = photo.uri;
-              
-              // Save photo to library
-              const asset = await MediaLibrary.createAssetAsync(photoToSave);
-              
-              // Always save to "PanHandler" album in background (non-blocking)
-              try {
-                // Get or create "PanHandler" album
-                let album = await MediaLibrary.getAlbumAsync('PanHandler');
-                if (album) {
-                  await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-                } else {
-                  album = await MediaLibrary.createAlbumAsync('PanHandler', asset, false);
-                }
-                
-                __DEV__ && console.log('✅ Photo saved to PanHandler album');
-              } catch (albumError) {
-                console.error('Failed to add to PanHandler album:', albumError);
-                __DEV__ && console.log('✅ Photo saved to camera roll only');
-              }
-            }
-          } catch (saveError) {
-            console.error('Failed to save to camera roll:', saveError);
-          }
-        })();
+      if (!photo?.uri) {
+        throw new Error('No photo URI returned');
       }
+      
+      // Determine if table or wall based on phone tilt
+      const absBeta = Math.abs(currentBeta);
+      const absGamma = Math.abs(currentGamma);
+      const isLookingAtTable = absBeta < 45 && absGamma < 45;
+      
+      __DEV__ && console.log('📷 Photo captured:', { isLookingAtTable, beta: currentBeta, gamma: currentGamma });
+      
+      if (isLookingAtTable) {
+        // TABLE PHOTO: Go directly to calibration
+        setCapturedPhotoUri(photo.uri);
+        setMode('zoomCalibrate');
+        setIsCapturing(false); // Reset since leaving camera mode
+        
+        // Deferred MMKV write in background
+        setTimeout(() => setImageUri(photo.uri, false), 200);
+        
+        // Simple fade animation
+        cameraOpacity.value = withTiming(0, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) });
+        screenScale.value = withSequence(
+          withTiming(1.03, { duration: 75, easing: Easing.out(Easing.cubic) }),
+          withTiming(1, { duration: 75, easing: Easing.bezier(0.4, 0.0, 0.2, 1) })
+        );
+      } else {
+        // WALL PHOTO: Show modal immediately, keep isCapturing true until user selects
+        setPendingPhotoUri(photo.uri);
+        setShowPhotoTypeModal(true);
+        // isCapturing stays true to prevent double-capture - reset in handlePhotoTypeSelection
+      }
+      
+      // Save to camera roll in background (non-blocking)
+      (async () => {
+        try {
+          if (mediaLibraryPermission?.granted || (await requestMediaLibraryPermission()).granted) {
+            const asset = await MediaLibrary.createAssetAsync(photo.uri);
+            try {
+              const album = await MediaLibrary.getAlbumAsync('PanHandler');
+              if (album) {
+                await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+              } else {
+                await MediaLibrary.createAlbumAsync('PanHandler', asset, false);
+              }
+            } catch (albumError) {
+              __DEV__ && console.log('Album save failed, saved to camera roll only');
+            }
+          }
+        } catch (error) {
+          console.error('Failed to save photo:', error);
+        }
+      })();
+      
     } catch (error) {
-      // Silent catch - camera ref can become null during double-tap, this is expected
-      __DEV__ && console.log('⚠️ Photo capture interrupted:', error);
-      
-      // CRITICAL: Clear safety timeout on error
-      if (safetyTimeout) clearTimeout(safetyTimeout);
-      
-      // Give user feedback that something went wrong
+      __DEV__ && console.error('Photo capture error:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      // Make sure we reset states on error
       setIsCapturing(false);
-      setIsHoldingShutter(false);
       setIsTransitioning(false);
+      setIsHoldingShutter(false);
     }
-    // NOTE: No finally block - isCapturing is reset conditionally:
-    // - Table photo: reset immediately (we leave camera mode)
-    // - Wall photo: stay true until user selects from modal (prevent double-capture)
   };
 
   const wasAutoCapture = alignmentStatus === 'good' && isStable;
