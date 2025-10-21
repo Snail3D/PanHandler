@@ -6209,10 +6209,6 @@ export default function DimensionOverlay({
                         style={{ 
                           flexDirection: 'row', 
                           alignItems: 'center',
-                          backgroundColor: labelEditMode ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
-                          paddingHorizontal: 8,
-                          paddingVertical: 4,
-                          borderRadius: 6,
                         }}
                       >
                         <View style={{
@@ -6228,7 +6224,7 @@ export default function DimensionOverlay({
                           />
                         </View>
                         <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 6 }}>
-                          {labelEditMode ? "Editing" : "Edit"}
+                          Edit labels
                         </Text>
                       </Pressable>
                     </View>
@@ -6241,6 +6237,7 @@ export default function DimensionOverlay({
                       onPressOut={stopUndoLongPress}
                       style={{
                         flexDirection: 'row',
+                        marginLeft: 140,
                         alignItems: 'center',
                         backgroundColor: 'rgba(255, 255, 255, 0.35)',
                         borderRadius: 8,
