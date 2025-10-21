@@ -5749,7 +5749,7 @@ export default function DimensionOverlay({
       </View>
 
           {/* Interactive labels wrapper - allows tapping labels while parent View has pointerEvents="none" for pan/zoom */}
-          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
+          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }} pointerEvents={labelEditMode ? "box-none" : "none"}>
 
           {/* Measurement labels for completed measurements with smart positioning */}
           {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
