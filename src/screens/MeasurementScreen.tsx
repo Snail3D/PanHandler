@@ -1093,6 +1093,11 @@ export default function MeasurementScreen() {
         setMode('zoomCalibrate');
         setIsCapturing(false); // Reset since leaving camera mode
         
+        // Clear any blueprint/map flags from previous photos
+        setSkipToBlueprintMode(false);
+        setSkipToMapMode(false);
+        setSkipToAerialMode(false);
+        
         // Deferred MMKV write in background
         setTimeout(() => setImageUri(photo.uri, false), 200);
         
