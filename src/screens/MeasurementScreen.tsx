@@ -1295,81 +1295,40 @@ export default function MeasurementScreen() {
   const handlePhotoTypeSelection = (type: PhotoType) => {
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
-    
-    // Reset isCapturing since user has made their selection
-    setIsCapturing(false);
+    setIsCapturing(false); // Reset since user made selection
     
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     
-    // Store pending URI in local variable BEFORE clearing state
     const photoUri = pendingPhotoUri;
     
-    // COIN: Go to calibration screen for coin calibration
     if (type === 'coin') {
-      // Set captured photo in LOCAL state first (no MMKV blocking)
+      // COIN: Go to calibration immediately
       if (photoUri) {
         setCapturedPhotoUri(photoUri);
-        setPendingPhotoUri(null); // Clear after using
+        setPendingPhotoUri(null);
       }
       
-      setIsTransitioning(true);
-      transitionBlackOverlay.value = withTiming(1, {
-        duration: 150,
-        easing: Easing.in(Easing.ease),
-      });
+      setMode('zoomCalibrate');
       
-      // SAFETY: Force clear black overlay after 2 seconds if animation doesn't complete
-      const safetyFadeIn = setTimeout(() => {
-        __DEV__ && console.warn('⚠️ SAFETY: Force clearing black overlay');
-        transitionBlackOverlay.value = 0;
-        setIsTransitioning(false);
-      }, 2000);
-      
+      // Background MMKV write
       setTimeout(() => {
-        setMode('zoomCalibrate');
-        
-        // DEFER setImageUri until AFTER mode switch (prevent blocking)
-        setTimeout(() => {
-          if (photoUri) {
-            setImageUri(photoUri, false);
-          }
-        }, 50);
-        
-        // Wait for ZoomCalibration to mount, then fade in
-        setTimeout(() => {
-          // Clear safety timeout - transition succeeded
-          clearTimeout(safetyFadeIn);
-          
-          // Force clear transitioning state to ensure component is interactive
-          setIsTransitioning(false);
-          
-          // Fade out black overlay
-          transitionBlackOverlay.value = withTiming(0, {
-            duration: 250,
-            easing: Easing.out(Easing.ease),
-          });
-        }, 200); // Wait 200ms for component to mount before fading in
-      }, 150);
-    }
-    // ALL OTHER TYPES: Skip calibration, go straight to measurement screen
-    // The appropriate modal will be triggered there
-    else {
-      // Set image URI for map/blueprint modes (they need it immediately)
+        if (photoUri) setImageUri(photoUri, false);
+      }, 100);
+      
+    } else {
+      // MAP/BLUEPRINT: Go to measurement
       if (photoUri) {
         setImageUri(photoUri, false);
         setPendingPhotoUri(null);
       }
       
-      // DON'T use black transition for blueprint/map - causes lockup
-      // Just switch modes directly
       setMode('measurement');
       
-      // Show the appropriate modal after a tiny delay to let measurement screen render
+      // Show appropriate modal
       setTimeout(() => {
         if (type === 'map') {
           setShowVerbalScaleModal(true);
         } else if (type === 'blueprint') {
-          // Show blueprint placement modal (handled by DimensionOverlay)
           setSkipToBlueprintMode(true);
         }
       }, 100);
