@@ -583,14 +583,17 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ 
                       fontSize: 19, 
                       fontWeight: '800', 
-                      color: '#FFFFFF',
+                      color: '#FF2D55',
                       letterSpacing: 0.3,
                       textAlign: 'center',
-                      textShadowColor: 'rgba(0, 0, 0, 0.2)',
-                      textShadowOffset: { width: 0, height: 1 },
-                      textShadowRadius: 2,
+                      textShadowColor: 'rgba(255, 255, 255, 0.9)',
+                      textShadowOffset: { width: 0, height: 0 },
+                      textShadowRadius: 4,
+                      textDecorationLine: 'underline',
+                      textDecorationColor: '#FF2D55',
+                      textDecorationStyle: 'solid',
                     }}>
-                      PanHandler YouTube Course Here!
+                      📹 PanHandler YouTube Course Here!
                     </Text>
                   </Pressable>
                   
