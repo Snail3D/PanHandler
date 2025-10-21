@@ -1139,7 +1139,7 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </View>
                     <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
-                      <Text style={{ fontWeight: '600' }}>One-click editing:</Text> Simply tap any measurement label (the colored badge or number) in Pan/Zoom mode to add or edit custom names
+                      <Text style={{ fontWeight: '600' }}>Enable "Edit labels" mode:</Text> Tap the "Edit labels" button in the legend, then tap any measurement label (the colored badge with numbers) to add or edit custom names
                     </Text>
                     <Text style={{ fontSize: 13, color: '#6E6E73', lineHeight: 19, fontStyle: 'italic' }}>
                       Labels appear on saved photos and in email reports
