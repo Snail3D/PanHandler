@@ -111,6 +111,7 @@ interface DimensionOverlayProps {
   skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
   skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
   skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
+  shouldShowOpeningQuote?: boolean; // If true, show opening quote (controlled by parent)
 }
 
 export default function DimensionOverlay({ 
@@ -128,6 +129,7 @@ export default function DimensionOverlay({
   skipToMapMode = false,
   skipToBlueprintMode = false,
   skipToAerialMode = false,
+  shouldShowOpeningQuote = false, // Default false - parent controls this
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -643,16 +645,13 @@ export default function DimensionOverlay({
   }, [skipToAerialMode]);
   
   // Track if we've shown the initial quote
-  const hasShownInitialQuote = useRef(false);
-  
-  // Show quote overlay ONLY on first app launch, never again
+  // Show opening quote ONLY when parent says so (on true app launch)
   useEffect(() => {
-    if (!hasShownInitialQuote.current && !currentImageUri) {
+    if (shouldShowOpeningQuote && !currentImageUri) {
       console.log('🎬 App launch - showing opening quote');
-      hasShownInitialQuote.current = true;
       showQuoteOverlay();
     }
-  }, []); // Empty deps - only run once on mount, never re-trigger
+  }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
   const showQuoteOverlay = () => {
     // IMMEDIATE haptic to test if this function is even called
