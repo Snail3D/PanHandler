@@ -1089,7 +1089,10 @@ export default function MeasurementScreen() {
       } else {
         // WALL PHOTO: Go directly to Known Scale Mode (skip modal)
         setPendingPhotoUri(photo.uri);
-        handlePhotoTypeSelection('blueprint'); // Auto-select Known Scale Mode
+        // Small delay to ensure state is set before calling handler
+        setTimeout(() => {
+          handlePhotoTypeSelection('blueprint'); // Auto-select Known Scale Mode
+        }, 50);
         // isCapturing will be reset in handlePhotoTypeSelection
       }
       
