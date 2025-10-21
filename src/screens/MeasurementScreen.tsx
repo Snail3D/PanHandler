@@ -1458,6 +1458,13 @@ export default function MeasurementScreen() {
         easing: Easing.in(Easing.ease),
       });
       
+      // SAFETY: Force clear black overlay after 2 seconds if animation doesn't complete
+      const safetyFadeIn = setTimeout(() => {
+        __DEV__ && console.warn('⚠️ SAFETY: Force clearing black overlay');
+        transitionBlackOverlay.value = 0;
+        setIsTransitioning(false);
+      }, 2000);
+      
       setTimeout(() => {
         setMode('zoomCalibrate');
         
@@ -1468,16 +1475,19 @@ export default function MeasurementScreen() {
           }
         }, 50);
         
-        // Wait longer before fading in to ensure ZoomCalibration is fully mounted
+        // Wait for ZoomCalibration to mount, then fade in
         setTimeout(() => {
+          // Clear safety timeout - transition succeeded
+          clearTimeout(safetyFadeIn);
+          
+          // Force clear transitioning state to ensure component is interactive
+          setIsTransitioning(false);
+          
+          // Fade out black overlay
           transitionBlackOverlay.value = withTiming(0, {
             duration: 250,
             easing: Easing.out(Easing.ease),
           });
-          
-          setTimeout(() => {
-            setIsTransitioning(false);
-          }, 250);
         }, 200); // Wait 200ms for component to mount before fading in
       }, 150);
     }
