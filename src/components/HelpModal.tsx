@@ -407,10 +407,9 @@ Thank you for helping us improve PanHandler!
   }));
 
   // Swipe gesture to close modal (left to right)
-  // Only activates on significant horizontal swipe to avoid blocking child touches
+  // Only activates on significant horizontal swipe, doesn't interfere with vertical scrolling
   const swipeGesture = Gesture.Pan()
-    .activeOffsetX([50, Number.MAX_SAFE_INTEGER]) // Only activate after 50px horizontal movement
-    .failOffsetY([-20, 20]) // Fail if vertical movement exceeds 20px
+    .activeOffsetX(50) // Only activate after 50px horizontal movement to the right
     .onEnd((event) => {
       // Check if swipe is left-to-right and crosses halfway
       if (event.translationX > 150 && event.velocityX > 0) {
