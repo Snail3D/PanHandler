@@ -2242,6 +2242,80 @@ Thank you for helping us improve PanHandler!
                 </Animated.View>
               </View>
 
+              {/* Review Section - Moved above Easter Eggs */}
+              <View style={{ marginBottom: 12, marginTop: 8 }}>
+                <AnimatedView
+                  entering={FadeIn.delay(750)}
+                  style={{
+                    backgroundColor: 'rgba(88,86,214,0.08)',
+                    borderRadius: 16,
+                    padding: 18,
+                    shadowColor: '#5856D6',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 12,
+                    elevation: 4,
+                    borderWidth: 2,
+                    borderColor: 'rgba(88,86,214,0.2)',
+                  }}
+                >
+                  <Text style={{ 
+                    fontSize: 16, 
+                    color: '#1C1C1E', 
+                    textAlign: 'center',
+                    lineHeight: 22,
+                    fontWeight: '700',
+                    marginBottom: 8,
+                  }}>
+                    Do you like this app?
+                  </Text>
+                  
+                  {/* Stars */}
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 12 }}>
+                    <Text style={{ fontSize: 26, letterSpacing: 3 }}>⭐⭐⭐⭐⭐</Text>
+                  </View>
+                  
+                  {/* Importance message */}
+                  <Text style={{
+                    fontSize: 13,
+                    color: '#3C3C43',
+                    textAlign: 'center',
+                    lineHeight: 19,
+                    marginBottom: 14,
+                    fontWeight: '500',
+                  }}>
+                    Reviews help us reach more people who need accurate measurements. Your feedback makes a real difference! 🙏
+                  </Text>
+                  
+                  {/* Review button */}
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      Linking.openURL('https://apps.apple.com/app/id6738328692?action=write-review');
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? 'rgba(88,86,214,0.2)' : 'rgba(88,86,214,0.12)',
+                      paddingVertical: 12,
+                      paddingHorizontal: 20,
+                      borderRadius: 14,
+                      borderWidth: 2,
+                      borderColor: 'rgba(88,86,214,0.3)',
+                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                    })}
+                  >
+                    <Text style={{ 
+                      color: '#5856D6', 
+                      fontSize: 15, 
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      letterSpacing: 0.2,
+                    }}>
+                      Leave a Review ⭐
+                    </Text>
+                  </Pressable>
+                </AnimatedView>
+              </View>
+
               {/* Easter Egg Hints Section - Compact */}
               <View style={{ marginBottom: 12, marginTop: 8 }}>
                 <Animated.View 
