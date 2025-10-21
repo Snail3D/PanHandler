@@ -339,7 +339,7 @@ Thank you for helping us improve PanHandler!
       if (!isAvailable) {
         showAlert(
           'Email Not Available',
-          'Please email us directly at mount3d.llc@gmail.com',
+          'Please email us directly at snailmail3d@gmail.com',
           'info'
         );
         return;
@@ -347,7 +347,7 @@ Thank you for helping us improve PanHandler!
       
       // Compose email with pre-populated fields
       const options: MailComposer.MailComposerOptions = {
-        recipients: ['mount3d.llc@gmail.com'],
+        recipients: ['snailmail3d@gmail.com'],
         subject: `[PanHandler ${appVersion}] Support Request`,
         body: emailBody,
         isHtml: false,
@@ -359,7 +359,7 @@ Thank you for helping us improve PanHandler!
       console.error('Error composing support email:', error);
       showAlert(
         'Error',
-        'Could not open email. Please email us at mount3d.llc@gmail.com',
+        'Could not open email. Please email us at snailmail3d@gmail.com',
         'error'
       );
     }
