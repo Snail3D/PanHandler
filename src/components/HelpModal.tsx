@@ -2009,38 +2009,37 @@ Thank you for helping us improve PanHandler!
                   </Text>
 
                   {/* Buy Me a Coffee Button */}
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      Linking.openURL('https://buymeacoffee.com/Snail3D');
-                    }}
-                    style={({ pressed }) => ({
-                      backgroundColor: pressed ? '#FFDD00' : '#FFDD00',
-                      borderRadius: 14,
-                      paddingVertical: 14,
-                      paddingHorizontal: 20,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      shadowColor: '#FFDD00',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                      elevation: 4,
-                      transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
-                      marginBottom: 16,
-                    })}
-                  >
-                    <Text style={{ fontSize: 24, marginRight: 8 }}>☕</Text>
-                    <Text style={{ 
-                      fontSize: 16, 
-                      fontWeight: '700', 
-                      color: '#000000',
-                      letterSpacing: 0.3,
-                    }}>
-                      Buy Me a Coffee
-                    </Text>
-                  </Pressable>
+                  <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                    <Text style={{ fontSize: 40, marginBottom: 8 }}>☕</Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        Linking.openURL('https://buymeacoffee.com/Snail3D');
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? '#FFDD00' : '#FFDD00',
+                        borderRadius: 14,
+                        paddingVertical: 14,
+                        paddingHorizontal: 24,
+                        shadowColor: '#FFDD00',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 8,
+                        elevation: 4,
+                        transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                      })}
+                    >
+                      <Text style={{ 
+                        fontSize: 16, 
+                        fontWeight: '700', 
+                        color: '#000000',
+                        letterSpacing: 0.3,
+                        textAlign: 'center',
+                      }}>
+                        Buy Me a Coffee
+                      </Text>
+                    </Pressable>
+                  </View>
                   
                   <Text style={{ 
                     fontSize: 13, 
