@@ -2076,7 +2076,6 @@ export default function DimensionOverlay({
         
         return; // Only merge one polygon at a time
       }
-    }
   };
 
   const placePoint = (x: number, y: number) => {
