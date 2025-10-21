@@ -1373,33 +1373,33 @@ export default function MeasurementScreen() {
         setCapturedPhotoUri(asset.uri);
         await detectOrientation(asset.uri);
         
-        // 🔍 SMART ROUTING: Detect if photo was taken with device camera or imported
-        // Photos taken with camera → Known Scale Mode (blueprint)
-        // Downloaded/imported photos → Map Mode (verbal scale)
+        // 🔍 SMART ROUTING: Detect if photo has drone EXIF data (altitude/GPS)
+        // Photos WITH drone data (altitude/GPS) → Known Scale Mode (skip modal)
+        // Photos WITHOUT drone data → Show modal
         const exif = asset.exif;
-        const isCameraPhoto = exif && (
-          exif.Make || // Device manufacturer (e.g., "Apple")
-          exif.Model || // Device model (e.g., "iPhone 14 Pro")
-          exif.Software || // iOS version
-          exif.DateTimeOriginal // Camera capture timestamp
+        const hasDroneData = exif && (
+          exif.GPSAltitude !== undefined || // Has altitude data
+          exif.RelativeAltitude !== undefined || // DJI drones use this
+          (exif.GPSLatitude !== undefined && exif.GPSLongitude !== undefined) // Has GPS coordinates
         );
         
         console.log('📸 EXIF detection:', { 
           hasExif: !!exif, 
-          Make: exif?.Make, 
-          Model: exif?.Model,
-          isCameraPhoto 
+          GPSAltitude: exif?.GPSAltitude,
+          RelativeAltitude: exif?.RelativeAltitude,
+          GPSLatitude: exif?.GPSLatitude,
+          GPSLongitude: exif?.GPSLongitude,
+          hasDroneData 
         });
         
-        if (isCameraPhoto) {
-          // Photo was taken with this device's camera → Blueprint/Known Scale mode
-          console.log('✅ Detected camera photo → Auto-routing to Known Scale Mode');
+        if (hasDroneData) {
+          // Photo has drone EXIF data → Auto-route to Known Scale Mode (skip modal)
+          console.log('✅ Detected drone photo with EXIF data → Auto-routing to Known Scale Mode');
           setPendingPhotoUri(asset.uri);
-          // Auto-select blueprint mode (skip modal)
           handlePhotoTypeSelection('blueprint');
         } else {
-          // Photo was downloaded/imported → Show modal (default to Map mode)
-          console.log('📥 Detected imported/downloaded photo → Showing photo type modal');
+          // Photo has no drone data → Show modal
+          console.log('📥 No drone EXIF data → Showing photo type modal');
           setPendingPhotoUri(asset.uri);
           setShowPhotoTypeModal(true);
         }
