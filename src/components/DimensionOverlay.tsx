@@ -5545,23 +5545,21 @@ export default function DimensionOverlay({
 
             // Render labels with adjusted positions
             return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle double-tap on label to open edit modal (only when NOT in measurement mode)
+              // Handle double-tap on label to open edit modal
               const handleLabelPress = () => {
-                if (!measurementMode) {
-                  const now = Date.now();
-                  const TAP_TIMEOUT = 300; // 300ms for double-tap detection
-                  
-                  if (labelTapState?.measurementId === measurement.id && (now - labelTapState.lastTapTime) < TAP_TIMEOUT) {
-                    // Second tap - open editor
-                    setLabelEditingMeasurementId(measurement.id);
-                    setShowLabelEditModal(true);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    setLabelTapState(null);
-                  } else {
-                    // First tap - record time
-                    setLabelTapState({ measurementId: measurement.id, lastTapTime: now });
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }
+                const now = Date.now();
+                const TAP_TIMEOUT = 300; // 300ms for double-tap detection
+                
+                if (labelTapState?.measurementId === measurement.id && (now - labelTapState.lastTapTime) < TAP_TIMEOUT) {
+                  // Second tap - open editor
+                  setLabelEditingMeasurementId(measurement.id);
+                  setShowLabelEditModal(true);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setLabelTapState(null);
+                } else {
+                  // First tap - record time
+                  setLabelTapState({ measurementId: measurement.id, lastTapTime: now });
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
               };
 
@@ -5574,7 +5572,7 @@ export default function DimensionOverlay({
                     top: screenY,
                     alignItems: 'center',
                   }}
-                  pointerEvents={measurementMode ? "none" : "auto"}
+                  pointerEvents="auto"
                   onPress={handleLabelPress}
                 >
                   {/* Small number badge */}
@@ -5661,13 +5659,11 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
-            // Handle label tap to open edit modal (only when NOT in measurement mode)
+            // Handle label tap to open edit modal
             const handleRectLabelPress = () => {
-              if (!measurementMode) {
-                setLabelEditingMeasurementId(measurement.id);
-                setShowLabelEditModal(true);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              }
+              setLabelEditingMeasurementId(measurement.id);
+              setShowLabelEditModal(true);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             };
             
             return (
@@ -5679,7 +5675,7 @@ export default function DimensionOverlay({
                     left: minX - 70,
                     top: centerY - 15,
                   }}
-                  pointerEvents={measurementMode ? "none" : "auto"}
+                  pointerEvents="auto"
                   onPress={handleRectLabelPress}
                 >
                   <View
@@ -5708,7 +5704,7 @@ export default function DimensionOverlay({
                     left: centerX - 40,
                     top: minY - 35,
                   }}
-                  pointerEvents={measurementMode ? "none" : "auto"}
+                  pointerEvents="auto"
                   onPress={handleRectLabelPress}
                 >
                   <View
