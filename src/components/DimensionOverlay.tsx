@@ -5447,297 +5447,6 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
-          {/* Interactive labels wrapper - allows tapping labels while parent View has pointerEvents="none" for pan/zoom */}
-          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
-
-          {/* Measurement labels for completed measurements with smart positioning */}
-          {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
-            // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
-            const labelData = measurements
-              .map((measurement, originalIdx) => ({ measurement, originalIdx }))
-              .filter(({ measurement }) => measurement.mode !== 'rectangle')
-              .map(({ measurement, originalIdx }) => {
-              const color = getMeasurementColor(originalIdx, measurement.mode);
-              let screenX = 0, screenY = 0;
-              if (measurement.mode === 'distance') {
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                screenX = (p0.x + p1.x) / 2;
-                screenY = (p0.y + p1.y) / 2 - 25; // Position slightly above the line
-              } else if (measurement.mode === 'angle') {
-                // In map mode, label at starting point (p0)
-                // In normal mode, label at vertex (p1)
-                const labelPoint = isMapMode ? measurement.points[0] : measurement.points[1];
-                const p1 = imageToScreen(labelPoint.x, labelPoint.y);
-                screenX = p1.x;
-                screenY = p1.y - 70;
-              } else if (measurement.mode === 'circle') {
-                // Label in center of circle
-                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                screenX = center.x;
-                screenY = center.y;
-              } else if (measurement.mode === 'rectangle') {
-                // Label at top center of rectangle
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                screenX = (p0.x + p1.x) / 2;
-                screenY = Math.min(p0.y, p1.y) - 40;
-              } else if (measurement.mode === 'freehand') {
-                // Label at centroid of freehand path
-                if (measurement.points && measurement.points.length > 0) {
-                  // Calculate centroid
-                  let sumX = 0, sumY = 0;
-                  measurement.points.forEach(p => {
-                    const screenPoint = imageToScreen(p.x, p.y);
-                    sumX += screenPoint.x;
-                    sumY += screenPoint.y;
-                  });
-                  screenX = sumX / measurement.points.length;
-                  screenY = sumY / measurement.points.length;
-                }
-              } else if (measurement.mode === 'polygon') {
-                // Label at centroid of polygon
-                if (measurement.points && measurement.points.length > 0) {
-                  // Calculate centroid
-                  let sumX = 0, sumY = 0;
-                  measurement.points.forEach(p => {
-                    const screenPoint = imageToScreen(p.x, p.y);
-                    sumX += screenPoint.x;
-                    sumY += screenPoint.y;
-                  });
-                  screenX = sumX / measurement.points.length;
-                  screenY = sumY / measurement.points.length;
-                }
-              }
-              return { measurement, idx: originalIdx, color, screenX, screenY };
-            });
-
-            // Smart label positioning algorithm to prevent overlaps
-            const LABEL_WIDTH = 120;
-            const LABEL_HEIGHT = 60; // badge + value height
-            const MIN_SEPARATION = 10;
-
-            // Detect and resolve overlaps
-            for (let i = 0; i < labelData.length; i++) {
-              for (let j = i + 1; j < labelData.length; j++) {
-                const label1 = labelData[i];
-                const label2 = labelData[j];
-
-                // Check if labels overlap horizontally
-                const xOverlap = Math.abs(label1.screenX - label2.screenX) < LABEL_WIDTH;
-                
-                if (xOverlap) {
-                  // Check if they overlap vertically
-                  const yDistance = Math.abs(label1.screenY - label2.screenY);
-                  
-                  if (yDistance < LABEL_HEIGHT + MIN_SEPARATION) {
-                    // Overlap detected! Adjust positions
-                    // Move the lower label down further
-                    if (label1.screenY < label2.screenY) {
-                      label2.screenY = label1.screenY + LABEL_HEIGHT + MIN_SEPARATION;
-                    } else {
-                      label1.screenY = label2.screenY + LABEL_HEIGHT + MIN_SEPARATION;
-                    }
-                  }
-                }
-              }
-            }
-
-            // Render labels with adjusted positions
-            return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle long press (3 seconds) on label to open edit modal  
-              const handleLabelLongPress = () => {
-                setLabelEditingMeasurementId(measurement.id);
-                setShowLabelEditModal(true);
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              };
-
-              return (
-                <Pressable
-                  key={measurement.id}
-                  style={{
-                    position: 'absolute',
-                    left: screenX - 60,
-                    top: screenY,
-                    alignItems: 'center',
-                  }}
-                  onLongPress={handleLabelLongPress}
-                  delayLongPress={3000}
-                >
-                  {/* Small number badge */}
-                  <View
-                    style={{
-                      backgroundColor: 'rgba(0,0,0,0.7)',
-                      width: 24,
-                      height: 24,
-                      borderRadius: 12,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginBottom: 4,
-                    }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-                      {idx + 1}
-                    </Text>
-                  </View>
-                  {/* Measurement value */}
-                  <View
-                    style={{
-                      backgroundColor: color.main,
-                      paddingHorizontal: 8,
-                      paddingVertical: 4,
-                      borderRadius: 6,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 1.5 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3,
-                      elevation: 4,
-                    }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-                      {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
-                      {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
-                        ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
-                        : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
-                      }
-                    </Text>
-                  </View>
-                  {/* Custom label text if present */}
-                  {measurement.label && (
-                    <View
-                      style={{
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        paddingHorizontal: 6,
-                        paddingVertical: 3,
-                        borderRadius: 4,
-                        marginTop: 4,
-                        maxWidth: 120,
-                      }}
-                    >
-                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
-                        {measurement.label}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            });
-          })()}
-
-          {/* Side labels for rectangles - Width on left, Height on top */}
-          {!hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
-            const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
-            
-            // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
-            // Use points[0] (top-left) and points[2] (bottom-right) for opposite corners
-            const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-            const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
-            
-            const minX = Math.min(p0.x, p2.x);
-            const maxX = Math.max(p0.x, p2.x);
-            const minY = Math.min(p0.y, p2.y);
-            const maxY = Math.max(p0.y, p2.y);
-            const centerY = (minY + maxY) / 2;
-            const centerX = (minX + maxX) / 2;
-            
-            // Calculate width and height using IMAGE coordinates from opposite corners
-            const widthPx = Math.abs(measurement.points[2].x - measurement.points[0].x);
-            const heightPx = Math.abs(measurement.points[2].y - measurement.points[0].y);
-            const widthValue = widthPx / (calibration?.pixelsPerUnit || 1);
-            const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
-            const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
-            const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
-            
-            // Handle long press (3 seconds) on label to open edit modal
-            const handleRectLabelLongPress = () => {
-              setLabelEditingMeasurementId(measurement.id);
-              setShowLabelEditModal(true);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            };
-            
-            return (
-              <React.Fragment key={`${measurement.id}-sides`}>
-                {/* Width label on left side (vertical dimension) */}
-                <Pressable
-                  style={{
-                    position: 'absolute',
-                    left: minX - 70,
-                    top: centerY - 15,
-                  }}
-                  onLongPress={handleRectLabelLongPress}
-                  delayLongPress={3000}
-                >
-                  <View
-                    style={{
-                      backgroundColor: color.main,
-                      paddingHorizontal: 6,
-                      paddingVertical: 3,
-                      borderRadius: 4,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 1.5 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 2,
-                      elevation: 3,
-                    }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
-                      H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
-                    </Text>
-                  </View>
-                </Pressable>
-                
-                {/* Length label on top side (horizontal dimension) */}
-                <Pressable
-                  style={{
-                    position: 'absolute',
-                    left: centerX - 40,
-                    top: minY - 35,
-                  }}
-                  onLongPress={handleRectLabelLongPress}
-                  delayLongPress={3000}
-                >
-                  <View
-                    style={{
-                      backgroundColor: color.main,
-                      paddingHorizontal: 6,
-                      paddingVertical: 3,
-                      borderRadius: 4,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 1.5 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 2,
-                      elevation: 3,
-                    }}
-                  >
-                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
-                      L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
-                    </Text>
-                  </View>
-                  {/* Custom label text for rectangle - appears below width line */}
-                  {measurement.label && (
-                    <View
-                      style={{
-                        backgroundColor: 'rgba(0,0,0,0.8)',
-                        paddingHorizontal: 6,
-                        paddingVertical: 3,
-                        borderRadius: 4,
-                        marginTop: 4,
-                        maxWidth: 100,
-                        alignSelf: 'center',
-                      }}
-                    >
-                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
-                        {measurement.label}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              </React.Fragment>
-            );
-          })}
-
-          </View>
-          {/* End interactive labels wrapper */}
           {/* Label for current measurement in progress */}
           {currentPoints.length === requiredPoints && (() => {
             let screenX, screenY, value;
@@ -6037,6 +5746,299 @@ export default function DimensionOverlay({
             </View>
           )}
       </View>
+
+          {/* Interactive labels wrapper - allows tapping labels while parent View has pointerEvents="none" for pan/zoom */}
+          <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="box-none">
+
+          {/* Measurement labels for completed measurements with smart positioning */}
+          {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
+            // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
+            const labelData = measurements
+              .map((measurement, originalIdx) => ({ measurement, originalIdx }))
+              .filter(({ measurement }) => measurement.mode !== 'rectangle')
+              .map(({ measurement, originalIdx }) => {
+              const color = getMeasurementColor(originalIdx, measurement.mode);
+              let screenX = 0, screenY = 0;
+              if (measurement.mode === 'distance') {
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                screenX = (p0.x + p1.x) / 2;
+                screenY = (p0.y + p1.y) / 2 - 25; // Position slightly above the line
+              } else if (measurement.mode === 'angle') {
+                // In map mode, label at starting point (p0)
+                // In normal mode, label at vertex (p1)
+                const labelPoint = isMapMode ? measurement.points[0] : measurement.points[1];
+                const p1 = imageToScreen(labelPoint.x, labelPoint.y);
+                screenX = p1.x;
+                screenY = p1.y - 70;
+              } else if (measurement.mode === 'circle') {
+                // Label in center of circle
+                const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                screenX = center.x;
+                screenY = center.y;
+              } else if (measurement.mode === 'rectangle') {
+                // Label at top center of rectangle
+                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
+                screenX = (p0.x + p1.x) / 2;
+                screenY = Math.min(p0.y, p1.y) - 40;
+              } else if (measurement.mode === 'freehand') {
+                // Label at centroid of freehand path
+                if (measurement.points && measurement.points.length > 0) {
+                  // Calculate centroid
+                  let sumX = 0, sumY = 0;
+                  measurement.points.forEach(p => {
+                    const screenPoint = imageToScreen(p.x, p.y);
+                    sumX += screenPoint.x;
+                    sumY += screenPoint.y;
+                  });
+                  screenX = sumX / measurement.points.length;
+                  screenY = sumY / measurement.points.length;
+                }
+              } else if (measurement.mode === 'polygon') {
+                // Label at centroid of polygon
+                if (measurement.points && measurement.points.length > 0) {
+                  // Calculate centroid
+                  let sumX = 0, sumY = 0;
+                  measurement.points.forEach(p => {
+                    const screenPoint = imageToScreen(p.x, p.y);
+                    sumX += screenPoint.x;
+                    sumY += screenPoint.y;
+                  });
+                  screenX = sumX / measurement.points.length;
+                  screenY = sumY / measurement.points.length;
+                }
+              }
+              return { measurement, idx: originalIdx, color, screenX, screenY };
+            });
+
+            // Smart label positioning algorithm to prevent overlaps
+            const LABEL_WIDTH = 120;
+            const LABEL_HEIGHT = 60; // badge + value height
+            const MIN_SEPARATION = 10;
+
+            // Detect and resolve overlaps
+            for (let i = 0; i < labelData.length; i++) {
+              for (let j = i + 1; j < labelData.length; j++) {
+                const label1 = labelData[i];
+                const label2 = labelData[j];
+
+                // Check if labels overlap horizontally
+                const xOverlap = Math.abs(label1.screenX - label2.screenX) < LABEL_WIDTH;
+                
+                if (xOverlap) {
+                  // Check if they overlap vertically
+                  const yDistance = Math.abs(label1.screenY - label2.screenY);
+                  
+                  if (yDistance < LABEL_HEIGHT + MIN_SEPARATION) {
+                    // Overlap detected! Adjust positions
+                    // Move the lower label down further
+                    if (label1.screenY < label2.screenY) {
+                      label2.screenY = label1.screenY + LABEL_HEIGHT + MIN_SEPARATION;
+                    } else {
+                      label1.screenY = label2.screenY + LABEL_HEIGHT + MIN_SEPARATION;
+                    }
+                  }
+                }
+              }
+            }
+
+            // Render labels with adjusted positions
+            return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
+              // Handle long press (3 seconds) on label to open edit modal  
+              const handleLabelLongPress = () => {
+                setLabelEditingMeasurementId(measurement.id);
+                setShowLabelEditModal(true);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              };
+
+              return (
+                <Pressable
+                  key={measurement.id}
+                  style={{
+                    position: 'absolute',
+                    left: screenX - 60,
+                    top: screenY,
+                    alignItems: 'center',
+                  }}
+                  onLongPress={handleLabelLongPress}
+                  delayLongPress={3000}
+                >
+                  {/* Small number badge */}
+                  <View
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.7)',
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                      {idx + 1}
+                    </Text>
+                  </View>
+                  {/* Measurement value */}
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1.5 },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 3,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+                      {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
+                      {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
+                        ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
+                        : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
+                      }
+                    </Text>
+                  </View>
+                  {/* Custom label text if present */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 120,
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              );
+            });
+          })()}
+
+          {/* Side labels for rectangles - Width on left, Height on top */}
+          {!hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
+            const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
+            
+            // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
+            // Use points[0] (top-left) and points[2] (bottom-right) for opposite corners
+            const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
+            const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
+            
+            const minX = Math.min(p0.x, p2.x);
+            const maxX = Math.max(p0.x, p2.x);
+            const minY = Math.min(p0.y, p2.y);
+            const maxY = Math.max(p0.y, p2.y);
+            const centerY = (minY + maxY) / 2;
+            const centerX = (minX + maxX) / 2;
+            
+            // Calculate width and height using IMAGE coordinates from opposite corners
+            const widthPx = Math.abs(measurement.points[2].x - measurement.points[0].x);
+            const heightPx = Math.abs(measurement.points[2].y - measurement.points[0].y);
+            const widthValue = widthPx / (calibration?.pixelsPerUnit || 1);
+            const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
+            const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
+            const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
+            
+            // Handle long press (3 seconds) on label to open edit modal
+            const handleRectLabelLongPress = () => {
+              setLabelEditingMeasurementId(measurement.id);
+              setShowLabelEditModal(true);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            };
+            
+            return (
+              <React.Fragment key={`${measurement.id}-sides`}>
+                {/* Width label on left side (vertical dimension) */}
+                <Pressable
+                  style={{
+                    position: 'absolute',
+                    left: minX - 70,
+                    top: centerY - 15,
+                  }}
+                  onLongPress={handleRectLabelLongPress}
+                  delayLongPress={3000}
+                >
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 6,
+                      paddingVertical: 3,
+                      borderRadius: 4,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1.5 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 2,
+                      elevation: 3,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
+                      H: {showCalculatorWords ? getCalculatorWord(heightLabel) : heightLabel}
+                    </Text>
+                  </View>
+                </Pressable>
+                
+                {/* Length label on top side (horizontal dimension) */}
+                <Pressable
+                  style={{
+                    position: 'absolute',
+                    left: centerX - 40,
+                    top: minY - 35,
+                  }}
+                  onLongPress={handleRectLabelLongPress}
+                  delayLongPress={3000}
+                >
+                  <View
+                    style={{
+                      backgroundColor: color.main,
+                      paddingHorizontal: 6,
+                      paddingVertical: 3,
+                      borderRadius: 4,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1.5 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 2,
+                      elevation: 3,
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
+                      L: {showCalculatorWords ? getCalculatorWord(widthLabel) : widthLabel}
+                    </Text>
+                  </View>
+                  {/* Custom label text for rectangle - appears below width line */}
+                  {measurement.label && (
+                    <View
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        paddingHorizontal: 6,
+                        paddingVertical: 3,
+                        borderRadius: 4,
+                        marginTop: 4,
+                        maxWidth: 100,
+                        alignSelf: 'center',
+                      }}
+                    >
+                      <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}>
+                        {measurement.label}
+                      </Text>
+                    </View>
+                  )}
+                </Pressable>
+              </React.Fragment>
+            );
+          })}
+
+          </View>
+          {/* End interactive labels wrapper */}
+
 
       {/* PanHandler Supporter Badge - Bottom Right Corner */}
       {isDonor && (
