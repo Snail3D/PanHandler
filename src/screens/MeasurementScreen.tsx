@@ -1220,8 +1220,9 @@ export default function MeasurementScreen() {
     // This prevents race condition with useEffect that watches imageUri
     setMode('camera');
     
-    // Clear local photo state only (no MMKV write)
+    // Clear both local AND Zustand photo state to prevent old photo showing
     setCapturedPhotoUri(null);
+    setImageUri(null, false); // Clear Zustand state (fast, no MMKV block since null)
     
     __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
   };
@@ -2284,8 +2285,9 @@ export default function MeasurementScreen() {
                         // Full reset: Clear everything and go to camera
                         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
                         
-                        // Clear local state
+                        // Clear both local AND Zustand state to prevent old photo showing
                         setCapturedPhotoUri(null);
+                        setImageUri(null, false); // Clear Zustand state
                         
                         // Switch to camera mode (no MMKV-blocking Zustand setters needed)
                         setMode('camera');
