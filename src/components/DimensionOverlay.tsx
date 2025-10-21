@@ -361,6 +361,7 @@ export default function DimensionOverlay({
   
   // Hide measurement labels toggle
   const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
+  const [labelEditMode, setLabelEditMode] = useState(false);
   
   // Easter egg: 7 rapid taps on Imperial button
   const [imperialTapCount, setImperialTapCount] = useState(0);
@@ -5845,11 +5846,13 @@ export default function DimensionOverlay({
 
             // Render labels with adjusted positions
             return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle long press (3 seconds) on label to open edit modal  
-              const handleLabelLongPress = () => {
-                setLabelEditingMeasurementId(measurement.id);
-                setShowLabelEditModal(true);
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              // Handle tap on label to open edit modal when in edit mode
+              const handleLabelPress = () => {
+                if (labelEditMode) {
+                  setLabelEditingMeasurementId(measurement.id);
+                  setShowLabelEditModal(true);
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                }
               };
 
               return (
@@ -5861,10 +5864,9 @@ export default function DimensionOverlay({
                     top: screenY,
                     alignItems: 'center',
                   }}
-                  onLongPress={handleLabelLongPress}
-                  delayLongPress={3000}
+                  onPress={handleLabelPress}
                   hitSlop={20}
-                  pointerEvents="auto"
+                  pointerEvents={labelEditMode ? "auto" : "none"}
                 >
                   {/* Small number badge */}
                   <View
@@ -5950,11 +5952,13 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
-            // Handle long press (3 seconds) on label to open edit modal
-            const handleRectLabelLongPress = () => {
-              setLabelEditingMeasurementId(measurement.id);
-              setShowLabelEditModal(true);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            // Handle tap on label to open edit modal when in edit mode
+            const handleRectLabelPress = () => {
+              if (labelEditMode) {
+                setLabelEditingMeasurementId(measurement.id);
+                setShowLabelEditModal(true);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }
             };
             
             return (
@@ -5966,10 +5970,9 @@ export default function DimensionOverlay({
                     left: minX - 70,
                     top: centerY - 15,
                   }}
-                  onLongPress={handleRectLabelLongPress}
-                  delayLongPress={3000}
+                  onPress={handleRectLabelPress}
                   hitSlop={20}
-                  pointerEvents="auto"
+                  pointerEvents={labelEditMode ? "auto" : "none"}
                 >
                   <View
                     style={{
@@ -5997,10 +6000,9 @@ export default function DimensionOverlay({
                     left: centerX - 40,
                     top: minY - 35,
                   }}
-                  onLongPress={handleRectLabelLongPress}
-                  delayLongPress={3000}
+                  onPress={handleRectLabelPress}
                   hitSlop={20}
-                  pointerEvents="auto"
+                  pointerEvents={labelEditMode ? "auto" : "none"}
                 >
                   <View
                     style={{
@@ -6164,31 +6166,66 @@ export default function DimensionOverlay({
                   marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16, 
                   position: 'relative' 
                 }}>
-                  {/* Left side: Hide labels toggle - only show if there are measurements */}
+                  {/* Left side: Hide labels toggle and Edit Labels mode - only show if there are measurements */}
                   {measurements.length > 0 && (
-                    <Pressable
-                      onPress={() => {
-                        setHideMeasurementLabels(!hideMeasurementLabels);
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      }}
-                      style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center' }}
-                    >
-                      <View style={{
-                        width: 28,
-                        height: 28,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                        <Ionicons 
-                          name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"} 
-                          size={16} 
-                          color="rgba(0, 0, 0, 0.5)" 
-                        />
-                      </View>
-                      <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
-                        {hideMeasurementLabels ? "Show labels" : "Hide labels"}
-                      </Text>
-                    </Pressable>
+                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      {/* Hide/Show labels toggle */}
+                      <Pressable
+                        onPress={() => {
+                          setHideMeasurementLabels(!hideMeasurementLabels);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }}
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        <View style={{
+                          width: 28,
+                          height: 28,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                          <Ionicons 
+                            name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"} 
+                            size={16} 
+                            color="rgba(0, 0, 0, 0.5)" 
+                          />
+                        </View>
+                        <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
+                          {hideMeasurementLabels ? "Show" : "Hide"}
+                        </Text>
+                      </Pressable>
+                      
+                      {/* Edit Labels mode toggle */}
+                      <Pressable
+                        onPress={() => {
+                          setLabelEditMode(!labelEditMode);
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }}
+                        style={{ 
+                          flexDirection: 'row', 
+                          alignItems: 'center',
+                          backgroundColor: labelEditMode ? 'rgba(0, 122, 255, 0.1)' : 'transparent',
+                          paddingHorizontal: 8,
+                          paddingVertical: 4,
+                          borderRadius: 6,
+                        }}
+                      >
+                        <View style={{
+                          width: 28,
+                          height: 28,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                          <Ionicons 
+                            name={labelEditMode ? "pencil" : "pencil-outline"} 
+                            size={16} 
+                            color={labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.5)"} 
+                          />
+                        </View>
+                        <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 6 }}>
+                          {labelEditMode ? "Editing" : "Edit"}
+                        </Text>
+                      </Pressable>
+                    </View>
                   )}
 
                   {/* Center: Undo button - only show if there are measurements or current points */}
