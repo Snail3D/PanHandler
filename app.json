@@ -29,9 +29,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "CAMERA"
       ]
     },
     "plugins": [
