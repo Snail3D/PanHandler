@@ -21,9 +21,6 @@
       "ios": {
         "resourceClass": "m-medium"
       },
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      },
       "autoIncrement": true
     }
   },
