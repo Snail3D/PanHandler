@@ -8,7 +8,7 @@
     "version": "5.1.0",
     "orientation": "default",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "icon": "./assets/pan-handler-logo.png",
     "splash": {
       "image": "./assets/pan-handler-logo.png",
