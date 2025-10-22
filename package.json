@@ -130,6 +130,7 @@
     "eslint-config-expo": "~9.2.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "pngquant-bin": "^9.0.0",
     "typescript": "~5.8.3"
   },
   "private": true,
