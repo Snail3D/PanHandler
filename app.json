@@ -9,9 +9,9 @@
     "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "icon": "./assets/snail-logo.png",
+    "icon": "./assets/pan-handler-logo.png",
     "splash": {
-      "image": "./assets/snail-logo.png",
+      "image": "./assets/pan-handler-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
