@@ -1907,15 +1907,12 @@ export default function CameraScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <View style={{ alignItems: 'center', justifyContent: 'center' }} pointerEvents="none">
-                  {/* Airplane on top */}
-                  <Ionicons name="airplane" size={20} color="white" style={{ marginBottom: 2 }} />
-                  {/* Map and Blueprint on bottom row */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -2 }} pointerEvents="none">
-                    <Ionicons name="map" size={18} color="white" style={{ marginRight: 4 }} />
-                    <Ionicons name="document-text" size={18} color="white" />
-                  </View>
-                </View>
+                {/* Airplane on top */}
+                <Ionicons name="airplane" size={20} color="white" style={{ position: 'absolute', top: 14 }} pointerEvents="none" />
+                {/* Map bottom-left */}
+                <Ionicons name="map" size={18} color="white" style={{ position: 'absolute', bottom: 12, left: 14 }} pointerEvents="none" />
+                {/* Blueprint bottom-right */}
+                <Ionicons name="document-text" size={18} color="white" style={{ position: 'absolute', bottom: 12, right: 14 }} pointerEvents="none" />
               </Pressable>
             </View>
 
