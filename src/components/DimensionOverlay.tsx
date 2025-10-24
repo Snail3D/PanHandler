@@ -26,6 +26,7 @@ import AlertModal from './AlertModal';
 import TypewriterText from './TypewriterText';
 import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
+import { getRandomChuckNorrisJoke } from '../utils/chuckNorrisJokes';
 import SnailIcon from './SnailIcon';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -286,6 +287,13 @@ export default function DimensionOverlay({
   // Lock zoom/pan/rotation when freehand drawing starts to prevent coordinate drift
   const freehandZoomLockRef = useRef<{ scale: number; translateX: number; translateY: number; rotation: number } | null>(null);
   const [isShowingSpeedWarning, setIsShowingSpeedWarning] = useState(false); // Track if showing "too fast" message to prevent flicker
+
+  // Chuck Norris Easter egg - Triple tap on Angle/Azimuth button
+  const [azimuthTaps, setAzimuthTaps] = useState<number[]>([]); // Track timestamps of taps
+  const azimuthTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [showChuckNorrisModal, setShowChuckNorrisModal] = useState(false);
+  const [currentChuckNorrisJoke, setCurrentChuckNorrisJoke] = useState('');
+  const chuckNorrisOpacity = useSharedValue(0);
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -505,7 +513,12 @@ export default function DimensionOverlay({
       { scale: menuFingerScale.value },
     ]
   }));
-  
+
+  // Chuck Norris modal animated style
+  const chuckNorrisAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: chuckNorrisOpacity.value,
+  }));
+
   // Show inspirational quote overlay
 
   // Clean up freehand state when switching away from freehand mode
@@ -6352,11 +6365,49 @@ export default function DimensionOverlay({
               {/* Angle */}
               <Pressable
                 onPress={() => {
-                  playModeHaptic('angle');
-                  setMode('angle');
-                  setCurrentPoints([]);
-                  setMeasurementMode(true);
-                  setModeColorIndex((prev) => prev + 1);
+                  // Easter egg: Triple tap to show Chuck Norris joke
+                  const now = Date.now();
+                  const newTaps = [...azimuthTaps, now].filter(t => now - t < 1000); // Keep only taps within last second
+                  setAzimuthTaps(newTaps);
+
+                  // Clear timeout
+                  if (azimuthTapTimeoutRef.current) {
+                    clearTimeout(azimuthTapTimeoutRef.current);
+                  }
+
+                  // Check for triple tap
+                  if (newTaps.length >= 3) {
+                    // Triple tap detected!
+                    setAzimuthTaps([]);
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                    // Show Chuck Norris modal
+                    const joke = getRandomChuckNorrisJoke();
+                    setCurrentChuckNorrisJoke(joke);
+                    setShowChuckNorrisModal(true);
+
+                    // Fade in
+                    chuckNorrisOpacity.value = withTiming(1, { duration: 400 });
+
+                    // Auto-dismiss after 4 seconds
+                    setTimeout(() => {
+                      chuckNorrisOpacity.value = withTiming(0, { duration: 400 }, () => {
+                        runOnJS(setShowChuckNorrisModal)(false);
+                      });
+                    }, 4000);
+                  } else {
+                    // Normal button behavior
+                    playModeHaptic('angle');
+                    setMode('angle');
+                    setCurrentPoints([]);
+                    setMeasurementMode(true);
+                    setModeColorIndex((prev) => prev + 1);
+
+                    // Reset taps after 1 second
+                    azimuthTapTimeoutRef.current = setTimeout(() => {
+                      setAzimuthTaps([]);
+                    }, 1000);
+                  }
                 }}
                 style={{
                   flex: 1,
@@ -6872,6 +6923,77 @@ export default function DimensionOverlay({
 
       {/* Help Modal */}
       <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+
+      {/* Chuck Norris Easter Egg Modal */}
+      {showChuckNorrisModal && (
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 9999,
+              pointerEvents: 'none', // Allow touches through
+            },
+            chuckNorrisAnimatedStyle,
+          ]}
+        >
+          <View
+            style={{
+              backgroundColor: '#DC143C', // Vibrant crimson red
+              borderRadius: 24,
+              padding: 36,
+              marginHorizontal: 30,
+              maxWidth: 380,
+              borderWidth: 3,
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              shadowColor: '#DC143C',
+              shadowOffset: { width: 0, height: 0 },
+              shadowOpacity: 0.6,
+              shadowRadius: 25,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 32,
+                textAlign: 'center',
+                marginBottom: 16,
+                letterSpacing: 4,
+              }}
+            >
+              🥷 🔥 🥋 ⚡ 🥷
+            </Text>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '700',
+                color: '#FFFFFF',
+                textAlign: 'center',
+                lineHeight: 26,
+                textShadowColor: 'rgba(0, 0, 0, 0.3)',
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 2,
+              }}
+            >
+              {currentChuckNorrisJoke}
+            </Text>
+            <Text
+              style={{
+                fontSize: 32,
+                textAlign: 'center',
+                marginTop: 16,
+                letterSpacing: 4,
+              }}
+            >
+              ⚡ 🥋 🔥 🥷 ⚡
+            </Text>
+          </View>
+        </Animated.View>
+      )}
       
       {/* Label Modal */}
       <LabelModal 
