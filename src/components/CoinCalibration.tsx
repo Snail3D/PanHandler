@@ -12,6 +12,14 @@ import useStore from '../state/measurementStore';
 import TouchOverlayFingerprints from './TouchOverlayFingerprints';
 import { extractDroneMetadata, DroneMetadata } from '../utils/droneEXIF';
 import { CoinIcon } from './CalibrationIcons';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleIconSize
+} from '../utils/deviceScale';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -533,9 +541,9 @@ export default function CoinCalibration({
           <View
             style={{
               position: 'absolute',
-              left: referenceCenterX - 120,
-              top: referenceCenterY - 40, // Moved up a bit more for tap hint
-              width: 240,
+              left: referenceCenterX - scaleSize(120),
+              top: referenceCenterY - scaleSize(40), // Moved up a bit more for tap hint
+              width: scaleSize(240),
               alignItems: 'center',
             }}
           >
@@ -547,48 +555,48 @@ export default function CoinCalibration({
               style={({ pressed }) => ({
                 transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
                 alignItems: 'center',
-                padding: 8, // Add padding for larger tap area
+                padding: scalePadding(8), // Add padding for larger tap area
               })}
             >
-              <Text style={{ 
-                color: 'white', 
-                fontSize: 20, 
-                fontWeight: '700', 
-                textAlign: 'center', 
-                textShadowColor: 'rgba(0,0,0,0.6)', 
-                textShadowOffset: { width: 0, height: 2 }, 
-                textShadowRadius: 8,
+              <Text style={{
+                color: 'white',
+                fontSize: scaleFontSize(20),
+                fontWeight: '700',
+                textAlign: 'center',
+                textShadowColor: 'rgba(0,0,0,0.6)',
+                textShadowOffset: { width: 0, height: scaleSize(2) },
+                textShadowRadius: scaleSize(8),
                 letterSpacing: 0.3,
               }}>
                 {selectedCoin.name}
               </Text>
-              
+
               {/* Hint text */}
               <Text style={{
                 color: 'rgba(255, 255, 255, 0.7)',
-                fontSize: 11,
+                fontSize: scaleFontSize(11),
                 fontWeight: '600',
                 textAlign: 'center',
-                marginTop: 4,
+                marginTop: scaleMargin(4),
                 textShadowColor: 'rgba(0,0,0,0.6)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
+                textShadowOffset: { width: 0, height: scaleSize(1) },
+                textShadowRadius: scaleSize(3),
                 letterSpacing: 0.3,
               }}>
                 (Tap to Change Coin)
               </Text>
             </Pressable>
-            
+
             {/* Zoom indicator below coin name and hint */}
             <Text style={{
               color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: 14,
+              fontSize: scaleFontSize(14),
               fontWeight: '700',
               textAlign: 'center',
-              marginTop: 8,
+              marginTop: scaleMargin(8),
               textShadowColor: 'rgba(0,0,0,0.6)',
-              textShadowOffset: { width: 0, height: 1 },
-              textShadowRadius: 4,
+              textShadowOffset: { width: 0, height: scaleSize(1) },
+              textShadowRadius: scaleSize(4),
               letterSpacing: 0.5,
             }}>
               {zoomScale.toFixed(2)}×
@@ -603,7 +611,7 @@ export default function CoinCalibration({
       <View
         style={{
           position: 'absolute',
-          bottom: insets.bottom + 40,
+          bottom: insets.bottom + scaleSize(40),
           left: SCREEN_WIDTH * 0.10,
           right: SCREEN_WIDTH * 0.10,
         }}
@@ -612,23 +620,23 @@ export default function CoinCalibration({
           intensity={35}
           tint="light"
           style={{
-            borderRadius: 28,
+            borderRadius: scaleBorderRadius(28),
             overflow: 'hidden',
             shadowColor: currentColor,
-            shadowOffset: { width: 0, height: 8 },
+            shadowOffset: { width: 0, height: scaleSize(8) },
             shadowOpacity: 0.3,
-            shadowRadius: 20,
+            shadowRadius: scaleSize(20),
           }}
         >
           <View style={{
             backgroundColor: 'rgba(255, 255, 255, 0.45)',
-            borderRadius: 28,
-            padding: 14, // Reduced from 20
-            borderWidth: 1,
+            borderRadius: scaleBorderRadius(28),
+            padding: scalePadding(14), // Reduced from 20
+            borderWidth: scaleSize(1),
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
             {/* Single Row: LOCK IN centered */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 72 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: scaleSize(72) }}>
               {/* LOCK IN - centered */}
               <Pressable
                 onPress={handleLockIn}
@@ -638,25 +646,25 @@ export default function CoinCalibration({
                   backgroundColor: !selectedCoin
                     ? 'rgba(150, 150, 150, 0.4)'
                     : pressed ? `${currentColor}E6` : `${currentColor}F2`,
-                  borderRadius: 20,
+                  borderRadius: scaleBorderRadius(20),
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderWidth: 2,
+                  borderWidth: scaleSize(2),
                   borderColor: 'rgba(255, 255, 255, 0.4)',
                   transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                   opacity: !selectedCoin ? 0.5 : 1,
-                  height: 72,
+                  height: scaleSize(72),
                 })}
               >
                 {/* LOCK IN text */}
                 <Text style={{
                   color: !selectedCoin ? '#FFFFFF' : currentColor,
                   fontWeight: '900',
-                  fontSize: 48,
+                  fontSize: scaleFontSize(48),
                   letterSpacing: 2,
                   textShadowColor: 'rgba(0, 0, 0, 0.3)',
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 4,
+                  textShadowOffset: { width: 0, height: scaleSize(2) },
+                  textShadowRadius: scaleSize(4),
                 }}>
                   LOCK IN
                 </Text>
@@ -672,7 +680,7 @@ export default function CoinCalibration({
           style={[
             {
               position: 'absolute',
-              top: insets.top + 16,
+              top: insets.top + scaleSize(16),
               left: SCREEN_WIDTH * 0.10,
               right: SCREEN_WIDTH * 0.10,
               zIndex: 1000,
@@ -684,50 +692,50 @@ export default function CoinCalibration({
             intensity={35}
             tint="light"
             style={{
-              borderRadius: 24,
+              borderRadius: scaleBorderRadius(24),
               overflow: 'hidden',
               shadowColor: currentColor,
-              shadowOffset: { width: 0, height: 8 },
+              shadowOffset: { width: 0, height: scaleSize(8) },
               shadowOpacity: 0.3,
-              shadowRadius: 20,
+              shadowRadius: scaleSize(20),
             }}
           >
             <View style={{
               backgroundColor: 'rgba(255, 255, 255, 0.5)',
-              borderRadius: 24,
-              padding: 20,
-              borderWidth: 1,
+              borderRadius: scaleBorderRadius(24),
+              padding: scalePadding(20),
+              borderWidth: scaleSize(1),
               borderColor: 'rgba(255, 255, 255, 0.35)',
             }}>
               {/* Title */}
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginBottom: 12,
+                marginBottom: scaleMargin(12),
               }}>
-                <Text style={{ fontSize: 20, marginRight: 8 }}>🪙</Text>
+                <Text style={{ fontSize: scaleFontSize(20), marginRight: scaleMargin(8) }}>🪙</Text>
                 <Text style={{
                   color: 'rgba(0, 0, 0, 0.85)',
                   fontWeight: '700',
-                  fontSize: 16,
+                  fontSize: scaleFontSize(16),
                 }}>
                   Select Reference Coin
                 </Text>
               </View>
-              
+
               {/* Search Bar */}
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                borderRadius: 12,
-                paddingHorizontal: 14,
-                paddingVertical: 10,
-                borderWidth: 1,
+                borderRadius: scaleBorderRadius(12),
+                paddingHorizontal: scalePadding(14),
+                paddingVertical: scalePadding(10),
+                borderWidth: scaleSize(1),
                 borderColor: 'rgba(0, 0, 0, 0.06)',
-                marginBottom: searchResults.length > 0 ? 12 : 0,
+                marginBottom: searchResults.length > 0 ? scaleMargin(12) : 0,
               }}>
-                <Ionicons name="search" size={16} color="rgba(0, 0, 0, 0.35)" />
+                <Ionicons name="search" size={scaleIconSize(16)} color="rgba(0, 0, 0, 0.35)" />
                 <TextInput
                   value={searchQuery}
                   onChangeText={setSearchQuery}
@@ -735,30 +743,30 @@ export default function CoinCalibration({
                   placeholderTextColor="rgba(0, 0, 0, 0.3)"
                   style={{
                     flex: 1,
-                    marginLeft: 10,
-                    fontSize: 14,
+                    marginLeft: scaleMargin(10),
+                    fontSize: scaleFontSize(14),
                     color: 'rgba(0, 0, 0, 0.85)',
                     fontWeight: '500',
                   }}
                   autoFocus={true}
                 />
                 {searchQuery.length > 0 && (
-                  <Pressable 
+                  <Pressable
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       setSearchQuery('');
                     }}
-                    style={{ padding: 4 }}
+                    style={{ padding: scalePadding(4) }}
                   >
-                    <Ionicons name="close-circle" size={16} color="rgba(0, 0, 0, 0.35)" />
+                    <Ionicons name="close-circle" size={scaleIconSize(16)} color="rgba(0, 0, 0, 0.35)" />
                   </Pressable>
                 )}
               </View>
 
               {/* Search Results */}
               {searchResults.length > 0 && (
-                <ScrollView 
-                  style={{ maxHeight: 280 }}
+                <ScrollView
+                  style={{ maxHeight: scaleSize(280) }}
                   showsVerticalScrollIndicator={false}
                 >
                   {searchResults.slice(0, 5).map((coin, index) => (
@@ -773,36 +781,36 @@ export default function CoinCalibration({
                         setShowCoinSelector(false); // Close selector
                       }}
                       style={({ pressed }) => ({
-                        paddingVertical: 18,
-                        paddingHorizontal: 16,
-                        marginBottom: 6,
-                        borderRadius: 10,
-                        backgroundColor: pressed 
-                          ? 'rgba(0, 0, 0, 0.12)' 
-                          : index % 2 === 0 
+                        paddingVertical: scalePadding(18),
+                        paddingHorizontal: scalePadding(16),
+                        marginBottom: scaleMargin(6),
+                        borderRadius: scaleBorderRadius(10),
+                        backgroundColor: pressed
+                          ? 'rgba(0, 0, 0, 0.12)'
+                          : index % 2 === 0
                             ? 'rgba(255, 255, 255, 0.85)'
                             : 'rgba(240, 240, 245, 0.85)',
-                        borderWidth: 1,
+                        borderWidth: scaleSize(1),
                         borderColor: 'rgba(0, 0, 0, 0.06)',
                         shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 1 },
+                        shadowOffset: { width: 0, height: scaleSize(1) },
                         shadowOpacity: 0.05,
-                        shadowRadius: 2,
+                        shadowRadius: scaleSize(2),
                         elevation: 1,
                       })}
                     >
-                      <Text style={{ 
+                      <Text style={{
                         color: 'rgba(0, 0, 0, 0.95)',
                         fontWeight: '700',
-                        fontSize: 16,
-                        marginBottom: 4,
+                        fontSize: scaleFontSize(16),
+                        marginBottom: scaleMargin(4),
                         textAlign: 'center',
                       }}>
                         {coin.name}
                       </Text>
-                      <Text style={{ 
+                      <Text style={{
                         color: 'rgba(0, 0, 0, 0.6)',
-                        fontSize: 13,
+                        fontSize: scaleFontSize(13),
                         fontWeight: '600',
                         textAlign: 'center',
                       }}>
@@ -821,15 +829,15 @@ export default function CoinCalibration({
       <View
         style={{
           position: 'absolute',
-          left: 20,
-          top: SCREEN_HEIGHT / 2 - 40, // Adjusted for bigger size
+          left: scaleSize(20),
+          top: SCREEN_HEIGHT / 2 - scaleSize(40), // Adjusted for bigger size
         }}
       >
         <BlurView
           intensity={30}
           tint="light"
           style={{
-            borderRadius: 40,
+            borderRadius: scaleBorderRadius(40),
             overflow: 'hidden',
           }}
         >
@@ -837,17 +845,17 @@ export default function CoinCalibration({
             onPress={onCancel}
             style={({ pressed }) => ({
               backgroundColor: 'rgba(255, 255, 255, 0.35)',
-              width: 80, // 2× bigger (was 48)
-              height: 80, // 2× bigger (was 48)
-              borderRadius: 40, // 2× bigger (was 24)
+              width: scaleSize(80), // 2× bigger (was 48)
+              height: scaleSize(80), // 2× bigger (was 48)
+              borderRadius: scaleBorderRadius(40), // 2× bigger (was 24)
               alignItems: 'center',
               justifyContent: 'center',
               opacity: pressed ? 0.7 : 1,
-              borderWidth: 1,
+              borderWidth: scaleSize(1),
               borderColor: 'rgba(255, 255, 255, 0.25)',
             })}
           >
-            <Ionicons name="arrow-back" size={72} color="rgba(0, 0, 0, 0.7)" />
+            <Ionicons name="arrow-back" size={scaleIconSize(72)} color="rgba(0, 0, 0, 0.7)" />
           </Pressable>
         </BlurView>
       </View>
@@ -857,15 +865,15 @@ export default function CoinCalibration({
         <View
           style={{
             position: 'absolute',
-            top: insets.top + 16,
-            right: 24,
+            top: insets.top + scaleSize(16),
+            right: scaleSize(24),
           }}
         >
           <BlurView
             intensity={30}
             tint="light"
             style={{
-              borderRadius: 20,
+              borderRadius: scaleBorderRadius(20),
               overflow: 'hidden',
             }}
           >
@@ -876,21 +884,21 @@ export default function CoinCalibration({
               }}
               style={({ pressed }) => ({
                 backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                width: 48,
-                height: 48,
-                borderRadius: 24,
+                width: scaleSize(48),
+                height: scaleSize(48),
+                borderRadius: scaleBorderRadius(24),
                 alignItems: 'center',
                 justifyContent: 'center',
                 opacity: pressed ? 0.7 : 1,
-                borderWidth: 1,
+                borderWidth: scaleSize(1),
                 borderColor: 'rgba(255, 255, 255, 0.3)',
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
+                shadowOffset: { width: 0, height: scaleSize(2) },
                 shadowOpacity: 0.15,
-                shadowRadius: 4,
+                shadowRadius: scaleSize(4),
               })}
             >
-              <Ionicons name="help-circle-outline" size={28} color="rgba(0, 0, 0, 0.7)" />
+              <Ionicons name="help-circle-outline" size={scaleIconSize(28)} color="rgba(0, 0, 0, 0.7)" />
             </Pressable>
           </BlurView>
         </View>
@@ -914,23 +922,23 @@ export default function CoinCalibration({
           style={[
             {
               position: 'absolute',
-              top: SCREEN_HEIGHT * 0.33 + 208, // Moved up 20% (was 260, now 208)
+              top: SCREEN_HEIGHT * 0.33 + scaleSize(208), // Moved up 20% (was 260, now 208)
               alignItems: 'center',
-              paddingHorizontal: 40,
+              paddingHorizontal: scalePadding(40),
             },
             tutorialTextStyle,
           ]}
         >
           <Text
             style={{
-              fontSize: 22,
+              fontSize: scaleFontSize(22),
               fontWeight: '700',
               color: 'white',
               textAlign: 'center',
-              marginBottom: 8,
+              marginBottom: scaleMargin(8),
               textShadowColor: 'rgba(0, 0, 0, 0.8)',
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 4,
+              textShadowOffset: { width: 0, height: scaleSize(2) },
+              textShadowRadius: scaleSize(4),
             }}
           >
             Pinch to Zoom
@@ -938,12 +946,12 @@ export default function CoinCalibration({
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: scaleFontSize(16),
                 color: 'rgba(255, 255, 255, 0.9)',
                 textAlign: 'center',
                 textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
+                textShadowOffset: { width: 0, height: scaleSize(1) },
+                textShadowRadius: scaleSize(3),
               }}
             >
               {"Match coin's OUTER edge to the "}
@@ -951,13 +959,13 @@ export default function CoinCalibration({
             <Animated.Text
               style={[
                 {
-                  fontSize: 16,
+                  fontSize: scaleFontSize(16),
                   fontWeight: '700',
                   color: currentColor,
                   textAlign: 'center',
                   textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 4,
+                  textShadowOffset: { width: 0, height: scaleSize(2) },
+                  textShadowRadius: scaleSize(4),
                 },
                 animatedTextPulseStyle,
               ]}
@@ -966,30 +974,30 @@ export default function CoinCalibration({
             </Animated.Text>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: scaleFontSize(16),
                 color: 'rgba(255, 255, 255, 0.9)',
                 textAlign: 'center',
                 textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 3,
+                textShadowOffset: { width: 0, height: scaleSize(1) },
+                textShadowRadius: scaleSize(3),
               }}
             >
               {" circle"}
             </Text>
           </View>
-          
+
           {/* Moved instruction text here - below Pinch to Zoom */}
           <Text
             style={{
-              fontSize: 18,
+              fontSize: scaleFontSize(18),
               fontWeight: '700',
               color: 'rgba(255, 255, 255, 0.9)',
               textAlign: 'center',
               textShadowColor: 'rgba(0, 0, 0, 0.7)',
-              textShadowOffset: { width: 0, height: 1 },
-              textShadowRadius: 4,
-              lineHeight: 24,
-              marginTop: 16,
+              textShadowOffset: { width: 0, height: scaleSize(1) },
+              textShadowRadius: scaleSize(4),
+              lineHeight: scaleSize(24),
+              marginTop: scaleMargin(16),
             }}
           >
             {"Make sure the right coin is selected"}
@@ -1014,11 +1022,11 @@ export default function CoinCalibration({
             style={[
               {
                 position: 'absolute',
-                width: 50,
-                height: 50,
-                borderRadius: 25,
+                width: scaleSize(50),
+                height: scaleSize(50),
+                borderRadius: scaleBorderRadius(25),
                 backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                borderWidth: 3,
+                borderWidth: scaleSize(3),
                 borderColor: 'rgba(255, 255, 255, 0.8)',
               },
               leftFingerStyle,
@@ -1028,11 +1036,11 @@ export default function CoinCalibration({
             style={[
               {
                 position: 'absolute',
-                width: 50,
-                height: 50,
-                borderRadius: 25,
+                width: scaleSize(50),
+                height: scaleSize(50),
+                borderRadius: scaleBorderRadius(25),
                 backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                borderWidth: 3,
+                borderWidth: scaleSize(3),
                 borderColor: 'rgba(255, 255, 255, 0.8)',
               },
               rightFingerStyle,
