@@ -688,15 +688,15 @@ export default function DimensionOverlay({
   }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
   const showQuoteOverlay = () => {
-    // Get random quote
+    // CACHE BUST: Quote shows immediately - no typing v5.4.0
     const quote = getRandomQuote();
     const fullText = `"${quote.text}"`;
     const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
 
     setCurrentQuote(quote);
-    setDisplayedText(completeText); // Show full text immediately - no typing
     setShowQuote(true);
+    setDisplayedText(completeText); // Show full text immediately - no typing
     setIsQuoteTyping(false); // No typing animation
     isQuoteTypingRef.current = false;
 
