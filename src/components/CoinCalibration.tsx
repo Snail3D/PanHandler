@@ -26,7 +26,7 @@ const VIBRANT_COLORS = [
   '#06B6D4', // Cyan
 ];
 
-interface ZoomCalibrationProps {
+interface CoinCalibrationProps {
   imageUri: string;
   sessionColor?: { main: string; glow: string }; // Optional session color from camera for visual continuity
   onComplete: (calibrationData: {
@@ -50,13 +50,17 @@ interface ZoomCalibrationProps {
   onHelp?: () => void;
 }
 
-export default function ZoomCalibration({
+// ═══════════════════════════════════════════════════════════════
+// COIN CALIBRATION SCREEN - Zoom and align coin for scale reference
+// User pinches/zooms to fit the coin into the calibration circle
+// ═══════════════════════════════════════════════════════════════
+export default function CoinCalibration({
   imageUri,
   sessionColor,
   onComplete,
   onCancel,
   onHelp,
-}: ZoomCalibrationProps) {
+}: CoinCalibrationProps) {
   const insets = useSafeAreaInsets();
   const hasSeenPinchTutorial = useStore((s) => s.hasSeenPinchTutorial);
   const setHasSeenPinchTutorial = useStore((s) => s.setHasSeenPinchTutorial);

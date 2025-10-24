@@ -8,7 +8,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runO
 import * as Haptics from "expo-haptics";
 import { Audio } from 'expo-av';
 // import * as StoreReview from 'expo-store-review'; // Temporarily disabled - native module not loaded
-import MeasurementScreen from "./src/screens/MeasurementScreen";
+import CameraScreen from "./src/screens/CameraScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
 // import RatingPromptModal from "./src/components/RatingPromptModal"; // Temporarily disabled
 import useStore from "./src/state/measurementStore";
@@ -57,13 +57,16 @@ export default function App() {
     configureAudioSession();
   }, []);
   
-  // Intro screen state
+  // ═══════════════════════════════════════════════════════════════
+  // OPENING QUOTE SCREEN (shows on app launch/foreground with typing animation)
+  // This is the MAIN quote screen - handles typing effect with haptics
+  // ═══════════════════════════════════════════════════════════════
   const [showIntro, setShowIntro] = useState(true);
   const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
   const [displayedText, setDisplayedText] = useState('');
   const introOpacity = useSharedValue(0);
   const appOpacity = useSharedValue(0);
-  
+
   // Track typing/animation state for cleanup
   const [typeIntervalId, setTypeIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [holdTimeoutId, setHoldTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -243,8 +246,12 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
+        {/* ═══════════════════════════════════════════════════════════════
+            OPENING QUOTE SCREEN - White background with typing animation
+            This shows on app launch and when returning from background
+            Tap anywhere to skip the typing and proceed to camera
+            ═══════════════════════════════════════════════════════════════ */}
         {showIntro && (
-          // Intro Screen - White background with black text (positioned absolutely during transition)
           <Animated.View
             style={[
               {
@@ -291,7 +298,7 @@ export default function App() {
         {/* Main App - Fades in gracefully after intro */}
         <Animated.View style={[{ flex: 1 }, appAnimatedStyle]}>
           <NavigationContainer>
-            <MeasurementScreen />
+            <CameraScreen />
             <StatusBar style="auto" />
           </NavigationContainer>
         </Animated.View>
