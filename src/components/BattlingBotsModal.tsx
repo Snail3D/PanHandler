@@ -5,6 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleIconSize,
+  scaleGap
+} from '../utils/deviceScale';
 
 interface BattlingBotsModalProps {
   visible: boolean;
@@ -502,59 +511,59 @@ export default function BattlingBotsModal({
       statusBarTranslucent
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: scalePadding(20) }}>
           <View
             style={{
-              borderRadius: 24,
+              borderRadius: scaleBorderRadius(24),
               width: '100%',
-              maxWidth: 380,
+              maxWidth: scaleSize(380),
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderWidth: 1,
+              borderWidth: scaleSize(1),
               borderColor: 'rgba(255, 255, 255, 0.4)',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 10 },
+              shadowOffset: { width: 0, height: scaleSize(10) },
               shadowOpacity: 0.4,
-              shadowRadius: 30,
+              shadowRadius: scaleSize(30),
               elevation: 20,
             }}
           >
             <View>
               {stage === 'negotiation' ? (
                 // Negotiation Stage
-                <ScrollView 
+                <ScrollView
                   ref={scrollViewRef}
-                  style={{ maxHeight: 500 }}
-                  contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+                  style={{ maxHeight: scaleSize(500) }}
+                  contentContainerStyle={{ padding: scalePadding(24), paddingBottom: scalePadding(40) }}
                   showsVerticalScrollIndicator={false}
                 >
                   {/* Title */}
-                  <View style={{ alignItems: 'center', marginBottom: 24 }}>
-                    <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-                      <Ionicons name="chatbubbles" size={28} color="#3B82F6" />
+                  <View style={{ alignItems: 'center', marginBottom: scaleMargin(24) }}>
+                    <View style={{ flexDirection: 'row', gap: scaleGap(12), alignItems: 'center' }}>
+                      <Ionicons name="chatbubbles" size={scaleIconSize(28)} color="#3B82F6" />
                       <Text style={{
-                        fontSize: 24,
+                        fontSize: scaleFontSize(24),
                         fontWeight: '800',
                         color: '#1C1C1E',
                       }}>
                         Behind the Scenes
                       </Text>
-                      <Ionicons name="chatbubbles" size={28} color="#F59E0B" />
+                      <Ionicons name="chatbubbles" size={scaleIconSize(28)} color="#F59E0B" />
                     </View>
                     {/* Skip Animation Button (Testing) */}
                     {conversationIndex !== undefined && (
                       <Pressable
                         onPress={skipToEnd}
                         style={({ pressed }) => ({
-                          marginTop: 12,
+                          marginTop: scaleMargin(12),
                           backgroundColor: pressed ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
-                          paddingHorizontal: 16,
-                          paddingVertical: 8,
-                          borderRadius: 8,
-                          borderWidth: 1,
+                          paddingHorizontal: scalePadding(16),
+                          paddingVertical: scalePadding(8),
+                          borderRadius: scaleBorderRadius(8),
+                          borderWidth: scaleSize(1),
                           borderColor: 'rgba(139, 92, 246, 0.3)',
                         })}
                       >
-                        <Text style={{ color: '#8B5CF6', fontSize: 13, fontWeight: '600' }}>
+                        <Text style={{ color: '#8B5CF6', fontSize: scaleFontSize(13), fontWeight: '600' }}>
                           ⚡ Skip Animation
                         </Text>
                       </Pressable>
@@ -562,55 +571,55 @@ export default function BattlingBotsModal({
                   </View>
 
                   {/* Split screen with bots */}
-                  <View style={{ 
-                    flexDirection: 'row', 
-                    minHeight: 320,
-                    borderRadius: 16,
+                  <View style={{
+                    flexDirection: 'row',
+                    minHeight: scaleSize(320),
+                    borderRadius: scaleBorderRadius(16),
                     overflow: 'hidden',
                     backgroundColor: 'rgba(0, 0, 0, 0.05)',
                   }}>
                     {/* Left Bot - Beggar Bot */}
-                    <View style={{ 
-                      flex: 1, 
-                      padding: 16,
-                      borderRightWidth: 1,
+                    <View style={{
+                      flex: 1,
+                      padding: scalePadding(16),
+                      borderRightWidth: scaleSize(1),
                       borderRightColor: 'rgba(0, 0, 0, 0.1)',
                     }}>
                       {/* Bot Avatar */}
                       <View style={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: 25,
+                        width: scaleSize(50),
+                        height: scaleSize(50),
+                        borderRadius: scaleBorderRadius(25),
                         backgroundColor: `${getBotColor('left')}20`,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        marginBottom: 8,
+                        marginBottom: scaleMargin(8),
                       }}>
-                        <Ionicons name="hand-left" size={28} color={getBotColor('left')} />
+                        <Ionicons name="hand-left" size={scaleIconSize(28)} color={getBotColor('left')} />
                       </View>
                       <Text style={{
-                        fontSize: 12,
+                        fontSize: scaleFontSize(12),
                         fontWeight: '700',
                         color: getBotColor('left'),
-                        marginBottom: 12,
+                        marginBottom: scaleMargin(12),
                       }}>
                         {getBotName('left')}
                       </Text>
 
                       {/* Messages */}
-                      <View style={{ gap: 10 }}>
+                      <View style={{ gap: scaleGap(10) }}>
                         {messages
                           .filter(m => m.bot === 'left')
                           .map((msg, i) => (
                             <View key={i} style={{
                               backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                              padding: 10,
-                              borderRadius: 12,
-                              borderLeftWidth: 3,
+                              padding: scalePadding(10),
+                              borderRadius: scaleBorderRadius(12),
+                              borderLeftWidth: scaleSize(3),
                               borderLeftColor: getBotColor('left'),
                             }}>
                               <Text style={{
-                                fontSize: 13,
+                                fontSize: scaleFontSize(13),
                                 color: '#1C1C1E',
                                 fontWeight: '500',
                               }}>
@@ -618,18 +627,18 @@ export default function BattlingBotsModal({
                               </Text>
                             </View>
                           ))}
-                        
+
                         {/* Current typing message */}
                         {isTyping && script[currentMessageIndex]?.bot === 'left' && (
                           <View style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                            padding: 10,
-                            borderRadius: 12,
-                            borderLeftWidth: 3,
+                            padding: scalePadding(10),
+                            borderRadius: scaleBorderRadius(12),
+                            borderLeftWidth: scaleSize(3),
                             borderLeftColor: getBotColor('left'),
                           }}>
                             <Text style={{
-                              fontSize: 13,
+                              fontSize: scaleFontSize(13),
                               color: '#1C1C1E',
                               fontWeight: '500',
                             }}>
@@ -642,45 +651,45 @@ export default function BattlingBotsModal({
                     </View>
 
                     {/* Right Bot - Panhandler Bot */}
-                    <View style={{ 
-                      flex: 1, 
-                      padding: 16,
+                    <View style={{
+                      flex: 1,
+                      padding: scalePadding(16),
                     }}>
                       {/* Bot Avatar */}
                       <View style={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: 25,
+                        width: scaleSize(50),
+                        height: scaleSize(50),
+                        borderRadius: scaleBorderRadius(25),
                         backgroundColor: `${getBotColor('right')}20`,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        marginBottom: 8,
+                        marginBottom: scaleMargin(8),
                       }}>
-                        <Ionicons name="hand-right" size={28} color={getBotColor('right')} />
+                        <Ionicons name="hand-right" size={scaleIconSize(28)} color={getBotColor('right')} />
                       </View>
                       <Text style={{
-                        fontSize: 12,
+                        fontSize: scaleFontSize(12),
                         fontWeight: '700',
                         color: getBotColor('right'),
-                        marginBottom: 12,
+                        marginBottom: scaleMargin(12),
                       }}>
                         {getBotName('right')}
                       </Text>
 
                       {/* Messages */}
-                      <View style={{ gap: 10 }}>
+                      <View style={{ gap: scaleGap(10) }}>
                         {messages
                           .filter(m => m.bot === 'right')
                           .map((msg, i) => (
                             <View key={i} style={{
                               backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                              padding: 10,
-                              borderRadius: 12,
-                              borderLeftWidth: 3,
+                              padding: scalePadding(10),
+                              borderRadius: scaleBorderRadius(12),
+                              borderLeftWidth: scaleSize(3),
                               borderLeftColor: getBotColor('right'),
                             }}>
                               <Text style={{
-                                fontSize: 13,
+                                fontSize: scaleFontSize(13),
                                 color: '#1C1C1E',
                                 fontWeight: '500',
                               }}>
@@ -688,18 +697,18 @@ export default function BattlingBotsModal({
                               </Text>
                             </View>
                           ))}
-                        
+
                         {/* Current typing message */}
                         {isTyping && script[currentMessageIndex]?.bot === 'right' && (
                           <View style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                            padding: 10,
-                            borderRadius: 12,
-                            borderLeftWidth: 3,
+                            padding: scalePadding(10),
+                            borderRadius: scaleBorderRadius(12),
+                            borderLeftWidth: scaleSize(3),
                             borderLeftColor: getBotColor('right'),
                           }}>
                             <Text style={{
-                              fontSize: 13,
+                              fontSize: scaleFontSize(13),
                               color: '#1C1C1E',
                               fontWeight: '500',
                             }}>
@@ -714,22 +723,22 @@ export default function BattlingBotsModal({
                 </ScrollView>
               ) : (
                 // Offer Stage
-                <Animated.View style={[{ padding: 28 }, offerStyle]}>
+                <Animated.View style={[{ padding: scalePadding(28) }, offerStyle]}>
                   {/* Title */}
-                  <View style={{ alignItems: 'center', marginBottom: 24 }}>
+                  <View style={{ alignItems: 'center', marginBottom: scaleMargin(24) }}>
                     <Text style={{
-                      fontSize: 32,
+                      fontSize: scaleFontSize(32),
                       fontWeight: '800',
                       color: '#1C1C1E',
-                      marginBottom: 6,
+                      marginBottom: scaleMargin(6),
                     }}>
                       Support Snail
                     </Text>
                     <Text style={{
-                      fontSize: 15,
+                      fontSize: scaleFontSize(15),
                       color: '#8E8E93',
                       textAlign: 'center',
-                      lineHeight: 22,
+                      lineHeight: scaleSize(22),
                       fontWeight: '500',
                     }}>
                       PanHandler is a passion project.{'\n'}
@@ -738,16 +747,16 @@ export default function BattlingBotsModal({
                   </View>
 
                   {/* Feature List */}
-                  <View style={{ 
+                  <View style={{
                     backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                    borderRadius: 16,
-                    padding: 18,
-                    marginBottom: 24,
-                    gap: 12,
+                    borderRadius: scaleBorderRadius(16),
+                    padding: scalePadding(18),
+                    marginBottom: scaleMargin(24),
+                    gap: scaleGap(12),
                   }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleGap(8), marginBottom: scaleMargin(4) }}>
                       <Text style={{
-                        fontSize: 17,
+                        fontSize: scaleFontSize(17),
                         fontWeight: '700',
                         color: '#1C1C1E',
                       }}>
@@ -761,9 +770,9 @@ export default function BattlingBotsModal({
                       'Made by @realsnail3d',
                       'Hundreds of hours of work!',
                     ].map((feature, i) => (
-                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                        <Ionicons name="checkmark-circle" size={20} color="#10B981" />
-                        <Text style={{ fontSize: 14, color: '#3C3C43', fontWeight: '600', flex: 1 }}>
+                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: scaleGap(10) }}>
+                        <Ionicons name="checkmark-circle" size={scaleIconSize(20)} color="#10B981" />
+                        <Text style={{ fontSize: scaleFontSize(14), color: '#3C3C43', fontWeight: '600', flex: 1 }}>
                           {feature}
                         </Text>
                       </View>
@@ -775,25 +784,25 @@ export default function BattlingBotsModal({
                     onPress={handleSupport}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? '#059669' : '#10B981',
-                      borderRadius: 16,
-                      padding: 20,
-                      marginBottom: 24, // Increased from 16 for more space
+                      borderRadius: scaleBorderRadius(16),
+                      padding: scalePadding(20),
+                      marginBottom: scaleMargin(24), // Increased from 16 for more space
                       alignItems: 'center',
                       justifyContent: 'center', // Center content
                       shadowColor: '#10B981',
-                      shadowOffset: { width: 0, height: 6 },
+                      shadowOffset: { width: 0, height: scaleSize(6) },
                       shadowOpacity: 0.4,
-                      shadowRadius: 12,
+                      shadowRadius: scaleSize(12),
                       elevation: 8,
-                      borderWidth: 2,
+                      borderWidth: scaleSize(2),
                       borderColor: '#34D399',
                     })}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                      <Ionicons name="cafe" size={24} color="rgba(0, 0, 0, 0.75)" />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleGap(10) }}>
+                      <Ionicons name="cafe" size={scaleIconSize(24)} color="rgba(0, 0, 0, 0.75)" />
                       <Text style={{
                         color: 'rgba(0, 0, 0, 0.85)',
-                        fontSize: 19,
+                        fontSize: scaleFontSize(19),
                         fontWeight: '800',
                         letterSpacing: 0.3,
                       }}>
@@ -807,15 +816,15 @@ export default function BattlingBotsModal({
                     onPress={handleClose}
                     style={({ pressed }) => ({
                       backgroundColor: pressed ? 'rgba(120,120,128,0.16)' : 'rgba(120,120,128,0.08)',
-                      paddingVertical: 16,
-                      borderRadius: 14,
-                      borderWidth: 1,
+                      paddingVertical: scalePadding(16),
+                      borderRadius: scaleBorderRadius(14),
+                      borderWidth: scaleSize(1),
                       borderColor: 'rgba(120,120,128,0.2)',
                     })}
                   >
                     <Text style={{
                       color: '#6B7280',
-                      fontSize: 17,
+                      fontSize: scaleFontSize(17),
                       fontWeight: '600',
                       textAlign: 'center',
                     }}>

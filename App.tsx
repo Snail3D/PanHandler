@@ -12,6 +12,7 @@ import CameraScreen from "./src/screens/CameraScreen";
 import { getRandomQuote } from "./src/utils/makerQuotes";
 // import RatingPromptModal from "./src/components/RatingPromptModal"; // Temporarily disabled
 import useStore from "./src/state/measurementStore";
+import { scaleFontSize, scalePadding, scaleSize } from "./src/utils/deviceScale";
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -204,10 +205,10 @@ export default function App() {
               <Text
                 style={{
                   color: '#000000',
-                  fontSize: 22,
+                  fontSize: scaleFontSize(22),
                   fontWeight: '400',
                   textAlign: 'center',
-                  lineHeight: 34,
+                  lineHeight: scaleSize(34),
                   fontFamily: 'System',
                   letterSpacing: 0.5,
                 }}
