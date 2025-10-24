@@ -3391,18 +3391,18 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name={stepBrothersMode ? "thumbs-up" : "checkmark-circle"} size={16} color="white" />
-            <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
+            <Ionicons name={stepBrothersMode ? "thumbs-up" : "checkmark-circle"} size={scaleIconSize(16)} color="white" />
+            <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', marginLeft: scaleMargin(4) }}>
               {stepBrothersMode ? "YEP!" : "Calibrated"}
             </Text>
           </View>
-          <Text style={{ 
-            color: 'rgba(255, 255, 255, 0.85)', 
-            fontSize: 9, 
-            fontWeight: '500', 
-            marginTop: 2 
+          <Text style={{
+            color: 'rgba(255, 255, 255, 0.85)',
+            fontSize: scaleFontSize(9),
+            fontWeight: '500',
+            marginTop: scaleMargin(2)
           }}>
-            {stepBrothersMode 
+            {stepBrothersMode
               ? "Best friends? 🤝"
               : calibration?.calibrationType === 'blueprint' && calibration.blueprintScale
               ? `${calibration.blueprintScale.distance}${calibration.blueprintScale.unit} between points`
@@ -3417,30 +3417,30 @@ export default function DimensionOverlay({
           </Text>
           {/* Show "Verbal scale" and "Locked in" when map scale is locked in (regardless of current mode) */}
           {!stepBrothersMode && mapScale && coinCircle && (
-            <View style={{ marginTop: 4, alignItems: 'center' }}>
-              <Text style={{ 
-                color: 'rgba(255, 255, 255, 0.75)', 
-                fontSize: 8, 
+            <View style={{ marginTop: scaleMargin(4), alignItems: 'center' }}>
+              <Text style={{
+                color: 'rgba(255, 255, 255, 0.75)',
+                fontSize: scaleFontSize(8),
                 fontWeight: '600',
                 letterSpacing: 0.3
               }}>
                 Verbal scale
               </Text>
-              <Text style={{ 
-                color: 'rgba(255, 255, 255, 0.9)', 
-                fontSize: 9, 
+              <Text style={{
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: scaleFontSize(9),
                 fontWeight: '700',
                 letterSpacing: 0.2,
-                marginTop: 1
+                marginTop: scaleMargin(1)
               }}>
                 {mapScale.screenDistance}{mapScale.screenUnit} = {mapScale.realDistance}{mapScale.realUnit}
               </Text>
-              <Text style={{ 
-                color: 'rgba(255, 255, 255, 0.75)', 
-                fontSize: 8, 
+              <Text style={{
+                color: 'rgba(255, 255, 255, 0.75)',
+                fontSize: scaleFontSize(8),
                 fontWeight: '600',
                 letterSpacing: 0.3,
-                marginTop: 1
+                marginTop: scaleMargin(1)
               }}>
                 Locked in
               </Text>
@@ -3554,8 +3554,8 @@ export default function DimensionOverlay({
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="refresh-outline" size={14} color="white" />
-            <Text style={{ color: 'white', fontSize: 11, fontWeight: '600', marginLeft: 4 }}>
+            <Ionicons name="refresh-outline" size={scaleIconSize(14)} color="white" />
+            <Text style={{ color: 'white', fontSize: scaleFontSize(11), fontWeight: '600', marginLeft: scaleMargin(4) }}>
               Recalibrate
             </Text>
           </View>
@@ -3579,30 +3579,30 @@ export default function DimensionOverlay({
             <Pressable
               onPress={toggleMenuFromTab}
               style={{
-                width: 44,
-                height: 80,
+                width: scaleSize(44),
+                height: scaleSize(80),
                 backgroundColor: sessionColor ? sessionColor.main : 'rgba(128, 128, 128, 0.5)',
-                borderTopLeftRadius: tabSide === 'right' ? 16 : 0,
-                borderBottomLeftRadius: tabSide === 'right' ? 16 : 0,
-                borderTopRightRadius: tabSide === 'left' ? 16 : 0,
-                borderBottomRightRadius: tabSide === 'left' ? 16 : 0,
+                borderTopLeftRadius: tabSide === 'right' ? scaleBorderRadius(16) : 0,
+                borderBottomLeftRadius: tabSide === 'right' ? scaleBorderRadius(16) : 0,
+                borderTopRightRadius: tabSide === 'left' ? scaleBorderRadius(16) : 0,
+                borderBottomRightRadius: tabSide === 'left' ? scaleBorderRadius(16) : 0,
                 justifyContent: 'center',
                 alignItems: 'center',
                 shadowColor: sessionColor ? sessionColor.main : '#000',
-                shadowOffset: { width: tabSide === 'right' ? -2 : 2, height: 0 },
+                shadowOffset: { width: tabSide === 'right' ? scaleSize(-2) : scaleSize(2), height: 0 },
                 shadowOpacity: sessionColor ? 0.4 : 0.1,
-                shadowRadius: sessionColor ? 8 : 4,
+                shadowRadius: sessionColor ? scaleSize(8) : scaleSize(4),
                 elevation: 4,
-                borderWidth: 1,
+                borderWidth: scaleSize(1),
                 borderColor: sessionColor ? 'rgba(255, 255, 255, 0.3)' : 'rgba(128, 128, 128, 0.3)',
                 [tabSide === 'right' ? 'borderRightWidth' : 'borderLeftWidth']: 0,
               }}
             >
               <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons 
-                  name={tabSide === 'right' ? 'chevron-back' : 'chevron-forward'} 
-                  size={20} 
-                  color="rgba(255, 255, 255, 0.8)" 
+                <Ionicons
+                  name={tabSide === 'right' ? 'chevron-back' : 'chevron-forward'}
+                  size={scaleIconSize(20)}
+                  color="rgba(255, 255, 255, 0.8)"
                 />
               </View>
             </Pressable>
@@ -4810,17 +4810,17 @@ export default function DimensionOverlay({
                 <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
-              <View style={{ 
-                position: 'absolute', 
-                top: -35, 
-                left: 0, 
-                right: 0, 
-                backgroundColor: cursorColor, 
-                paddingHorizontal: 12, 
-                paddingVertical: 4, 
-                borderRadius: 12 
+              <View style={{
+                position: 'absolute',
+                top: scaleMargin(-35),
+                left: 0,
+                right: 0,
+                backgroundColor: cursorColor,
+                paddingHorizontal: scalePadding(12),
+                paddingVertical: scalePadding(4),
+                borderRadius: scaleBorderRadius(12)
               }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: 'bold', textAlign: 'center' }}>
                   {label}
                 </Text>
               </View>
@@ -4876,8 +4876,8 @@ export default function DimensionOverlay({
                 <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
-              <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+              <View style={{ position: 'absolute', top: scaleMargin(-35), left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: scalePadding(12), paddingVertical: scalePadding(4), borderRadius: scaleBorderRadius(12) }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: 'bold', textAlign: 'center' }}>
                   {blueprintPoints.length === 0 && 'Place first point'}
                   {blueprintPoints.length === 1 && 'Place second point'}
                 </Text>
@@ -4942,8 +4942,8 @@ export default function DimensionOverlay({
                 <Circle cx={50} cy={50} r={2.5} fill="#FFFF00" opacity={0.3} />
                 <Circle cx={50} cy={50} r={1} fill="#FFFF00" opacity={1} />
               </Svg>
-              <View style={{ position: 'absolute', top: -35, left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
+              <View style={{ position: 'absolute', top: scaleMargin(-35), left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: scalePadding(12), paddingVertical: scalePadding(4), borderRadius: scaleBorderRadius(12) }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: 'bold', textAlign: 'center' }}>
                   {mode === 'distance' && currentPoints.length === 0 && 'Point 1'}
                   {mode === 'distance' && currentPoints.length === 1 && 'Point 2'}
                   {mode === 'angle' && currentPoints.length === 0 && (isMapMode ? 'Start location' : 'Point 1')}
@@ -5381,13 +5381,13 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: SCREEN_HEIGHT / 2 - 100,
-                left: SCREEN_WIDTH / 2 - 80,
-                width: 160,
+                top: SCREEN_HEIGHT / 2 - scaleSize(100),
+                left: SCREEN_WIDTH / 2 - scaleSize(80),
+                width: scaleSize(160),
                 backgroundColor: '#00FF41',
-                paddingVertical: 12,
-                paddingHorizontal: 20,
-                borderRadius: 16,
+                paddingVertical: scalePadding(12),
+                paddingHorizontal: scalePadding(20),
+                borderRadius: scaleBorderRadius(16),
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
@@ -5396,7 +5396,7 @@ export default function DimensionOverlay({
               }}
               pointerEvents="none"
             >
-              <Text style={{ color: '#000', fontSize: 20, fontWeight: 'bold', textAlign: 'center' }}>
+              <Text style={{ color: '#000', fontSize: scaleFontSize(20), fontWeight: 'bold', textAlign: 'center' }}>
                 ✓ Locked In!
               </Text>
             </View>
@@ -5451,9 +5451,9 @@ export default function DimensionOverlay({
                   left: screenX,
                   top: screenY,
                   backgroundColor: nextColor.main,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 8,
+                  paddingHorizontal: scalePadding(12),
+                  paddingVertical: scalePadding(6),
+                  borderRadius: scaleBorderRadius(8),
                   shadowColor: '#000',
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.25,
@@ -5462,7 +5462,7 @@ export default function DimensionOverlay({
                 }}
                 pointerEvents="none"
               >
-                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: scaleFontSize(16) }}>
                   {value}
                 </Text>
               </View>
@@ -5474,8 +5474,8 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + 16,
-                left: 12,
+                top: insets.top + scaleMargin(16),
+                left: scaleMargin(12),
               }}
               pointerEvents="none"
             >
@@ -5483,13 +5483,13 @@ export default function DimensionOverlay({
               <View
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  paddingHorizontal: 10,
-                  paddingVertical: 5,
-                  borderRadius: 6,
-                  marginBottom: 4,
+                  paddingHorizontal: scalePadding(10),
+                  paddingVertical: scalePadding(5),
+                  borderRadius: scaleBorderRadius(6),
+                  marginBottom: scaleMargin(4),
                 }}
               >
-                <Text style={{ color: 'white', fontSize: 13, fontWeight: '600' }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(13), fontWeight: '600' }}>
                   {currentLabel || 'PanHandler Measurements'}
                 </Text>
               </View>
@@ -5498,32 +5498,32 @@ export default function DimensionOverlay({
               {calibration && coinCircle && (
                 <View
                   style={{
-                    backgroundColor: coinCircle.coinName.startsWith('Auto:') 
+                    backgroundColor: coinCircle.coinName.startsWith('Auto:')
                       ? 'rgba(0, 200, 255, 0.15)' // Cyan tint for drone
                       : 'rgba(0, 0, 0, 0.7)', // Black for coin
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 5,
+                    paddingHorizontal: scalePadding(8),
+                    paddingVertical: scalePadding(4),
+                    borderRadius: scaleBorderRadius(5),
                     borderWidth: coinCircle.coinName.startsWith('Auto:') ? 1 : 0,
                     borderColor: 'rgba(0, 200, 255, 0.3)',
                   }}
                 >
                   {coinCircle.coinName.startsWith('Auto:') ? (
                     <>
-                      <Text style={{ color: '#00D4FF', fontSize: 11, fontWeight: '700' }}>
+                      <Text style={{ color: '#00D4FF', fontSize: scaleFontSize(11), fontWeight: '700' }}>
                         🚁 {coinCircle.coinName.replace('Auto: ', '')}
                       </Text>
-                      <Text style={{ color: '#A0E0FF', fontSize: 9, fontWeight: '500' }}>
+                      <Text style={{ color: '#A0E0FF', fontSize: scaleFontSize(9), fontWeight: '500' }}>
                         Auto-calibrated from altitude
                       </Text>
                     </>
                   ) : (
                     <>
-                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                      <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
                         {coinCircle.coinName}
                       </Text>
-                      <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                        {unitSystem === 'imperial' 
+                      <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
+                        {unitSystem === 'imperial'
                           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
                           : `${coinCircle.coinDiameter.toFixed(2)}mm`}
                       </Text>
@@ -5539,18 +5539,18 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: (currentLabel || isCapturing) ? insets.top + 16 + 80 : insets.top + 16,
-                left: 12,
+                top: (currentLabel || isCapturing) ? insets.top + scaleMargin(16) + scaleSize(80) : insets.top + scaleMargin(16),
+                left: scaleMargin(12),
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                paddingHorizontal: 6,
-                paddingVertical: 4,
-                borderRadius: 4,
+                paddingHorizontal: scalePadding(6),
+                paddingVertical: scalePadding(4),
+                borderRadius: scaleBorderRadius(4),
               }}
               pointerEvents={isCapturing ? 'none' : 'box-none'}
             >
               {/* Header with collapse/expand button */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : 4, paddingBottom: legendCollapsed ? 0 : 4, borderBottomWidth: legendCollapsed ? 0 : 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
-                <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', opacity: 0.7 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: legendCollapsed ? 0 : scaleMargin(4), paddingBottom: legendCollapsed ? 0 : scalePadding(4), borderBottomWidth: legendCollapsed ? 0 : 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '700', opacity: 0.7 }}>
                   LEGEND
                 </Text>
                 {/* Collapse/Expand button - only visible when NOT capturing */}
@@ -5561,18 +5561,18 @@ export default function DimensionOverlay({
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }}
                     style={{
-                      marginLeft: 8,
-                      paddingHorizontal: 4,
-                      paddingVertical: 2,
+                      marginLeft: scaleMargin(8),
+                      paddingHorizontal: scalePadding(4),
+                      paddingVertical: scalePadding(2),
                     }}
                   >
-                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '700' }}>
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(10), fontWeight: '700' }}>
                       {legendCollapsed ? '+' : '−'}
                     </Text>
         </Pressable>
       )}
               </View>
-              
+
               {/* Measurement items - hidden when collapsed (except during capture) */}
               {(!legendCollapsed || isCapturing) && measurements.map((measurement, idx) => {
                 const color = getMeasurementColor(idx, measurement.mode);
@@ -5582,25 +5582,25 @@ export default function DimensionOverlay({
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      marginVertical: 1,
+                      marginVertical: scaleMargin(1),
                     }}
                   >
                     {/* Line number */}
-                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600', marginRight: 3 }}>
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', marginRight: scaleMargin(3) }}>
                       {idx + 1}.
                     </Text>
                     {/* Color indicator */}
                     <View
                       style={{
-                        width: 12,
-                        height: 8,
+                        width: scaleSize(12),
+                        height: scaleSize(8),
                         backgroundColor: color.main,
-                        borderRadius: 2,
-                        marginRight: 4,
+                        borderRadius: scaleBorderRadius(2),
+                        marginRight: scaleMargin(4),
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
-                    <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Recalculate display value based on current unit system
                         let displayValue = measurement.value;
@@ -5663,7 +5663,7 @@ export default function DimensionOverlay({
                     </Text>
                     {/* Label text if present */}
                     {measurement.label && (
-                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 7, fontWeight: '500', fontStyle: 'italic', marginTop: 4 }}>
+                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: scaleFontSize(7), fontWeight: '500', fontStyle: 'italic', marginTop: scaleMargin(4) }}>
                         {measurement.label}
                       </Text>
                     )}
@@ -5678,7 +5678,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                bottom: insets.bottom + 20,
+                bottom: insets.bottom + scaleMargin(20),
                 left: 0,
                 right: 0,
                 alignItems: 'center',
@@ -5688,12 +5688,12 @@ export default function DimensionOverlay({
               <View
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 6,
+                  paddingHorizontal: scalePadding(12),
+                  paddingVertical: scalePadding(6),
+                  borderRadius: scaleBorderRadius(6),
                 }}
               >
-                <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '500' }}>
+                <Text style={{ color: '#FFFFFF', fontSize: scaleFontSize(10), fontWeight: '500' }}>
                   Made with PanHandler
                 </Text>
               </View>
@@ -6011,12 +6011,12 @@ export default function DimensionOverlay({
         <View
           style={{
             position: 'absolute',
-            bottom: insets.bottom + 16, // Bottom safe area + padding
-            right: 16,
+            bottom: insets.bottom + scaleMargin(16), // Bottom safe area + padding
+            right: scaleMargin(16),
             backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
-            paddingHorizontal: 8,
-            paddingVertical: 6,
-            borderRadius: 8,
+            paddingHorizontal: scalePadding(8),
+            paddingVertical: scalePadding(6),
+            borderRadius: scaleBorderRadius(8),
             alignItems: 'center',
             zIndex: 31,
             shadowColor: '#FF1493',
@@ -6028,20 +6028,20 @@ export default function DimensionOverlay({
             borderColor: 'rgba(255, 255, 255, 0.3)',
           }}
         >
-          <View style={{ alignItems: 'center', gap: 1 }}>
-            <Text style={{ fontSize: 12 }}>❤️</Text>
-            <Text style={{ 
-              color: 'white', 
-              fontSize: 8, 
+          <View style={{ alignItems: 'center', gap: scaleGap(1) }}>
+            <Text style={{ fontSize: scaleFontSize(12) }}>❤️</Text>
+            <Text style={{
+              color: 'white',
+              fontSize: scaleFontSize(8),
               fontWeight: '700',
               letterSpacing: 0.3,
               textAlign: 'center',
             }}>
               PanHandler
             </Text>
-            <Text style={{ 
-              color: 'white', 
-              fontSize: 8, 
+            <Text style={{
+              color: 'white',
+              fontSize: scaleFontSize(8),
               fontWeight: '700',
               letterSpacing: 0.3,
               textAlign: 'center',
@@ -6058,19 +6058,19 @@ export default function DimensionOverlay({
           onPress={handleAutoLevelTap}
           style={{
             position: 'absolute',
-            top: insets.top + 16, // Normal position (donor badge moved to bottom)
-            right: 12,
+            top: insets.top + scaleMargin(16), // Normal position (donor badge moved to bottom)
+            right: scaleMargin(12),
             backgroundColor: 'rgba(76, 175, 80, 0.9)', // Softer Material Design green
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 6,
+            paddingHorizontal: scalePadding(8),
+            paddingVertical: scalePadding(4),
+            borderRadius: scaleBorderRadius(6),
             flexDirection: 'row',
             alignItems: 'center',
             zIndex: 30,
           }}
         >
-          <Ionicons name="flash" size={12} color="white" />
-          <Text style={{ color: 'white', fontSize: 8, fontWeight: '700', marginLeft: 3 }}>
+          <Ionicons name="flash" size={scaleIconSize(12)} color="white" />
+          <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '700', marginLeft: scaleMargin(3) }}>
             AUTO LEVEL
           </Text>
         </Pressable>
@@ -6082,13 +6082,13 @@ export default function DimensionOverlay({
           <Animated.View
             pointerEvents="auto"
             style={[
-              { 
+              {
                 position: 'absolute',
                 left: 0,
                 right: 0,
                 zIndex: 9999, // Super high priority
-                bottom: insets.bottom + 16,
-                paddingHorizontal: 24,
+                bottom: insets.bottom + scaleMargin(16),
+                paddingHorizontal: scalePadding(24),
               },
               menuAnimatedStyle
             ]}
@@ -6097,7 +6097,7 @@ export default function DimensionOverlay({
               intensity={35}
               tint="light"
               style={{
-                borderRadius: 20,
+                borderRadius: scaleBorderRadius(20),
                 overflow: 'hidden',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 6 },
@@ -6108,21 +6108,21 @@ export default function DimensionOverlay({
             >
               <View style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                borderRadius: 20,
-                paddingHorizontal: 10,
-                paddingTop: 10,
-                paddingBottom: 10,
+                borderRadius: scaleBorderRadius(20),
+                paddingHorizontal: scalePadding(10),
+                paddingTop: scalePadding(10),
+                paddingBottom: scalePadding(10),
                 borderWidth: 1,
                 borderColor: 'rgba(255, 255, 255, 0.35)',
               }}>
-                
+
                 {/* Header with undo button and hide menu on same line */}
                 <View style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16,
-                  paddingHorizontal: 4,
+                  marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? scaleMargin(8) : scaleMargin(16),
+                  paddingHorizontal: scalePadding(4),
                 }}>
                   {/* Left: Hide labels toggle - only show if there are measurements */}
                   {measurements.length > 0 ? (
@@ -6134,23 +6134,23 @@ export default function DimensionOverlay({
                       style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
                       <View style={{
-                        width: 28,
-                        height: 28,
+                        width: scaleSize(28),
+                        height: scaleSize(28),
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>
                         <Ionicons
                           name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"}
-                          size={16}
+                          size={scaleIconSize(16)}
                           color="rgba(0, 0, 0, 0.5)"
                         />
                       </View>
-                      <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
+                      <Text style={{ fontSize: scaleFontSize(12), color: 'rgba(0, 0, 0, 0.4)', marginLeft: scaleMargin(6) }}>
                         {hideMeasurementLabels ? "Show" : "Hide"}
                       </Text>
                     </Pressable>
                   ) : (
-                    <View style={{ width: 70 }} />
+                    <View style={{ width: scaleSize(70) }} />
                   )}
 
                   {/* Center: Edit Labels mode toggle - only show if there are measurements */}
@@ -6166,18 +6166,18 @@ export default function DimensionOverlay({
                       }}
                     >
                       <View style={{
-                        width: 24,
-                        height: 24,
+                        width: scaleSize(24),
+                        height: scaleSize(24),
                         justifyContent: 'center',
                         alignItems: 'center',
                       }}>
                         <Ionicons
                           name={labelEditMode ? "pencil" : "pencil-outline"}
-                          size={14}
+                          size={scaleIconSize(14)}
                           color={labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.5)"}
                         />
                       </View>
-                      <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 4 }}>
+                      <Text style={{ fontSize: scaleFontSize(12), color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: scaleMargin(4) }}>
                         Edit labels
                       </Text>
                     </Pressable>
@@ -6194,21 +6194,21 @@ export default function DimensionOverlay({
                         flexDirection: 'row',
                         alignItems: 'center',
                         backgroundColor: 'rgba(255, 255, 255, 0.35)',
-                        borderRadius: 8,
-                        paddingVertical: 5,
-                        paddingHorizontal: 10,
+                        borderRadius: scaleBorderRadius(8),
+                        paddingVertical: scalePadding(5),
+                        paddingHorizontal: scalePadding(10),
                         borderWidth: 0.5,
                         borderColor: 'rgba(0, 0, 0, 0.08)',
                       }}
                     >
                       <View style={{ opacity: 0.6 }}>
-                        <SnailIcon size={16} color="#1C1C1E" />
+                        <SnailIcon size={scaleIconSize(16)} color="#1C1C1E" />
                       </View>
                       <Text style={{
                         color: 'rgba(0, 0, 0, 0.6)',
                         fontWeight: '600',
-                        fontSize: 14,
-                        marginLeft: 5,
+                        fontSize: scaleFontSize(14),
+                        marginLeft: scaleMargin(5),
                       }}>
                         {measurements.length > 0
                           ? `Undo (${measurements.length})`
@@ -6216,12 +6216,12 @@ export default function DimensionOverlay({
                       </Text>
                     </Pressable>
                   ) : (
-                    <View style={{ width: 90 }} />
+                    <View style={{ width: scaleSize(90) }} />
                   )}
                 </View>
 
           {/* Mode Toggle: Edit/Move vs Measure */}
-          <View style={{ flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+          <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
             <Pressable
               onPress={(event) => {
                 setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BUTTON', mode: 'PRESS' });
@@ -6229,7 +6229,7 @@ export default function DimensionOverlay({
                 setShowCursor(false);
                 setSelectedMeasurementId(null);
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                
+
                 // Create fingerprint at touch location
                 const { pageX, pageY } = event.nativeEvent;
                 createMenuFingerprint(pageX, pageY);
@@ -6240,21 +6240,21 @@ export default function DimensionOverlay({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
-                paddingVertical: 6,
-                borderRadius: 7.5,
+                paddingVertical: scalePadding(6),
+                borderRadius: scaleBorderRadius(7.5),
                 backgroundColor: !measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons 
+                <Ionicons
                   name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
-                  size={14} 
-                  color={!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'} 
+                  size={scaleIconSize(14)}
+                  color={!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'}
                 />
                 <Text style={{
-                  marginLeft: 4,
+                  marginLeft: scaleMargin(4),
                   fontWeight: '600',
-                  fontSize: 12,
+                  fontSize: scaleFontSize(12),
                   color: !measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   {isPanZoomLocked ? 'Edit' : 'Pan'}
@@ -6277,21 +6277,21 @@ export default function DimensionOverlay({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
                 flex: 1,
-                paddingVertical: 6,
-                borderRadius: 7.5,
+                paddingVertical: scalePadding(6),
+                borderRadius: scaleBorderRadius(7.5),
                 backgroundColor: measurementMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons 
-                  name="create-outline" 
-                  size={14} 
-                  color={measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'} 
+                <Ionicons
+                  name="create-outline"
+                  size={scaleIconSize(14)}
+                  color={measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'}
                 />
                 <Text style={{
-                  marginLeft: 4,
+                  marginLeft: scaleMargin(4),
                   fontWeight: '600',
-                  fontSize: 12,
+                  fontSize: scaleFontSize(12),
                   color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Measure
@@ -6302,8 +6302,8 @@ export default function DimensionOverlay({
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
           <GestureDetector gesture={modeSwitchGesture}>
-            <Animated.View style={[{ marginBottom: 8 }, modeSwipeAnimatedStyle]}>
-              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <Animated.View style={[{ marginBottom: scaleMargin(8) }, modeSwipeAnimatedStyle]}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={(event) => {
@@ -6317,9 +6317,9 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(6),
+                  paddingHorizontal: scalePadding(2),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                   shadowColor: mode === 'rectangle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
@@ -6329,16 +6329,16 @@ export default function DimensionOverlay({
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons 
-                    name="square-outline" 
-                    size={20} 
-                    color={mode === 'rectangle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
+                  <Ionicons
+                    name="square-outline"
+                    size={scaleIconSize(20)}
+                    color={mode === 'rectangle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'}
                   />
                   <Text style={{
-                    marginTop: 2,
+                    marginTop: scaleMargin(2),
                     textAlign: 'center',
                     fontWeight: '700',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: mode === 'rectangle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
                     textShadowColor: mode === 'rectangle' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
