@@ -173,12 +173,15 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
                 transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
               })}
             >
-              <Text style={{ 
-                color: '#FFFFFF', 
-                fontWeight: '800', 
-                fontSize: 15,
+              <Text style={{
+                color: 'rgba(80, 80, 80, 1)', // Dark gray instead of white
+                fontWeight: '800',
+                fontSize: 18, // 20% bigger (was 15, now 15 * 1.2 = 18)
                 letterSpacing: 0.5,
-                textAlign: 'center', // Center the text
+                textAlign: 'center',
+                textShadowColor: 'rgba(255, 255, 255, 0.8)', // White shadow
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 2,
               }}>
                 PLACE PINS
               </Text>

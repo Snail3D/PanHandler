@@ -710,7 +710,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
             </View>
           </BlurView>
         </View>
-      </View>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
