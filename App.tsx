@@ -121,14 +121,14 @@ export default function App() {
         const char = completeText[currentIndex];
         const isPunctuation = /[.,!?;:]/.test(char);
         const isSpace = char === ' ';
-        
+
         if (!isSpace) { // No haptic for spaces (like lifting fingers between words)
           if (isPunctuation) {
             // Punctuation gets a stronger tap (finishing a thought)
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-          } else if (currentIndex % 2 === 0) {
-            // Every 2nd character gets a medium tap (natural typing rhythm)
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } else if (currentIndex % 4 === 0) {
+            // Every 4th character gets a light tap (reduced frequency to prevent locking)
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }
         }
         
