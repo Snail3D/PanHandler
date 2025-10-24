@@ -327,7 +327,16 @@ export default function DimensionOverlay({
   const fingerOpacity = useSharedValue(0);
   const fingerScale = useSharedValue(1);
   const fingerRotation = useSharedValue(0);
-  
+
+  // Animated style for evaporation effect
+  const evaporationStyle = useAnimatedStyle(() => ({
+    opacity: fingerOpacity.value,
+    transform: [
+      { scale: fingerScale.value },
+      { rotate: `${fingerRotation.value}deg` }
+    ]
+  }));
+
   // Menu button fingerprints (session color)
   const [menuFingerTouches, setMenuFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
   const menuFingerOpacity = useSharedValue(0);
@@ -5018,16 +5027,7 @@ export default function DimensionOverlay({
       {(() => {
         // Use session color for ALL fingerprints (universal approach)
         const fingerColor = sessionColor ? sessionColor.main : '#3B82F6'; // Fallback to blue
-        
-        // Animated style for evaporation effect
-        const evaporationStyle = useAnimatedStyle(() => ({
-          opacity: fingerOpacity.value,
-          transform: [
-            { scale: fingerScale.value },
-            { rotate: `${fingerRotation.value}deg` }
-          ]
-        }));
-        
+
         return fingerTouches.map((touch) => {
           // Size based on pressure (subtle variation: 85% to 115% of base size)
           const pressureScale = 0.85 + (touch.pressure * 0.3);

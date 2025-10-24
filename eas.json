@@ -9,19 +9,40 @@
       "distribution": "internal",
       "ios": {
         "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
         "resourceClass": "m-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
       }
     },
     "production": {
       "ios": {
         "resourceClass": "m-medium"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
+        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
+      }
     }
   },
   "submit": {
