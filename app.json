@@ -6,7 +6,7 @@
     "projectId": "2698e824-55c8-4e16-af52-f59bde50cdd9",
     "scheme": "panhandler",
     "version": "5.6.0",
-    "orientation": "default",
+    "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
     "icon": "./assets/icon.png",
@@ -18,11 +18,19 @@
     "description": "PanHandler - Precise CAD measurements from photos. Use coins for calibration, measure distances, angles, areas, and export to CAD software.",
     "ios": {
       "supportsTablet": true,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.snail.panhandler",
       "infoPlist": {
         "NSCameraUsageDescription": "PanHandler needs camera access to take reference photos for measurements.",
         "NSPhotoLibraryUsageDescription": "PanHandler needs photo library access to save measurements and export images.",
-        "NSPhotoLibraryAddUsageDescription": "PanHandler needs permission to save measurement images to your photo library."
+        "NSPhotoLibraryAddUsageDescription": "PanHandler needs permission to save measurement images to your photo library.",
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown"
+        ]
       }
     },
     "android": {
@@ -30,13 +38,14 @@
       "package": "com.snail.panhandler",
       "permissions": [
         "CAMERA"
-      ]
+      ],
+      "screenOrientation": "portrait"
     },
     "plugins": [
       [
         "expo-screen-orientation",
         {
-          "initialOrientation": "DEFAULT"
+          "initialOrientation": "PORTRAIT"
         }
       ]
     ],
