@@ -256,6 +256,8 @@ export default function CameraScreen() {
   
   // Trigger BattlingBots when entering measurement screen (not on app mount)
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
     if (mode === 'measurement' && currentImageUri) {
       // Increment session count ONCE when reaching measurement screen
       // This prevents blocking the camera → calibration transition
@@ -263,26 +265,31 @@ export default function CameraScreen() {
         incrementSessionCount();
         setHasIncrementedSession(true);
       }
-      
+
       // Check if we should trigger BattlingBots (after incrementing)
       // Don't trigger until 10th session, then continue normal schedule
       const triggerInterval = isDonor ? 40 : 10;
       const shouldTrigger = sessionCount >= 10 && sessionCount % triggerInterval === 0;
-      
+
       if (shouldTrigger) {
         // Show after 2 second delay
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setShowBattlingBots(true);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           console.log(`🤖 BattlingBots triggered at session ${sessionCount} on measurement screen`);
         }, 2000);
       }
     }
-    
+
     // Reset flag when returning to camera (for next session)
     if (mode === 'camera') {
       setHasIncrementedSession(false);
     }
+
+    return () => {
+      // CRITICAL: Clear timeout to prevent memory leak
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
 
   // NOTE: Opening quote is handled by App.tsx (the main intro screen with typing animation)
@@ -489,20 +496,23 @@ export default function CameraScreen() {
       reminderTextOpacity.value = 0;
       return;
     }
-    
+
     // Animation durations - shorter for reduce motion, instant for extreme cases
     const fadeDuration = reduceMotion ? 150 : 500;
     const holdDuration = reduceMotion ? 2000 : 2500;
-    
+
+    // Track all timers for cleanup (CRITICAL: prevents memory leak)
+    const timers: NodeJS.Timeout[] = [];
+
     // Phase 1: Show initial instructions for 10 seconds
     instructionalTextOpacity.value = withTiming(1, { duration: reduceMotion ? 100 : 300 });
-    
-    const timer1 = setTimeout(() => {
+
+    timers.push(setTimeout(() => {
       // Fade out initial text
       instructionalTextOpacity.value = withTiming(0, { duration: fadeDuration });
-      setTimeout(() => {
+      timers.push(setTimeout(() => {
         setShowInstructionalText(false);
-        
+
         // Phase 2: Show encouragement for 3 seconds (10-13s mark)
         setShowEncouragementText(true);
         encouragementTextOpacity.value = withSequence(
@@ -510,29 +520,30 @@ export default function CameraScreen() {
           withTiming(1, { duration: holdDuration }),
           withTiming(0, { duration: fadeDuration })
         );
-        
-        setTimeout(() => {
+
+        timers.push(setTimeout(() => {
           setShowEncouragementText(false);
-          
+
           // Phase 3: Show reminder 2 seconds later (15-18s mark)
-          setTimeout(() => {
+          timers.push(setTimeout(() => {
             setShowReminderText(true);
             reminderTextOpacity.value = withSequence(
               withTiming(1, { duration: fadeDuration }),
               withTiming(1, { duration: holdDuration }),
               withTiming(0, { duration: fadeDuration })
             );
-            
-            setTimeout(() => {
+
+            timers.push(setTimeout(() => {
               setShowReminderText(false);
-            }, fadeDuration + holdDuration + fadeDuration);
-          }, 2000);
-        }, fadeDuration + holdDuration + fadeDuration);
-      }, fadeDuration);
-    }, 10000);
-    
+            }, fadeDuration + holdDuration + fadeDuration));
+          }, 2000));
+        }, fadeDuration + holdDuration + fadeDuration));
+      }, fadeDuration));
+    }, 10000));
+
     return () => {
-      clearTimeout(timer1);
+      // CRITICAL: Clear all pending timers to prevent memory leak
+      timers.forEach(timer => clearTimeout(timer));
     };
   }, [mode, isCapturing]);
   
@@ -548,6 +559,9 @@ export default function CameraScreen() {
     // Normal devices: 16ms (60fps) - buttery smooth like real bubble level
     const updateInterval = isLowEndDevice ? 50 : 16;
     DeviceMotion.setUpdateInterval(updateInterval);
+
+    // Track haptic timers for cleanup (CRITICAL: prevents memory leak)
+    const hapticTimers: NodeJS.Timeout[] = [];
 
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
@@ -740,33 +754,45 @@ export default function CameraScreen() {
         } else if (status === 'warning') {
           // Getting warmer / YELLOW = Medium speed tapping (tap.tap.tap.tap.tap)
           if (status !== lastHapticRef.current) {
+            // Clear any previous haptic timers to prevent accumulation
+            hapticTimers.forEach(timer => clearTimeout(timer));
+            hapticTimers.length = 0;
+
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             // Create burst pattern for warning
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160));
             lastHapticRef.current = status;
           }
         } else if (status === 'good') {
           // HOT! / GREEN = Fast rapid tapping then SNAP! (taptaptaptaptap...SNAP!)
           if (status !== lastHapticRef.current) {
+            // Clear any previous haptic timers to prevent accumulation
+            hapticTimers.forEach(timer => clearTimeout(timer));
+            hapticTimers.length = 0;
+
             // Rapid fire taps
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 40);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 240);
-            setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 280);
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 40));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 80));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 120));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 160));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 200));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 240));
+            hapticTimers.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 280));
             // Success notification will come when photo is taken
-            setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 320);
+            hapticTimers.push(setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 320));
             lastHapticRef.current = status;
           }
         }
       }
     });
 
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      // CRITICAL: Clear all pending haptic timers to prevent memory leak
+      hapticTimers.forEach(timer => clearTimeout(timer));
+    };
   }, [mode]);
 
   // Auto-capture when holding shutter button and lines align
@@ -811,21 +837,25 @@ export default function CameraScreen() {
   
   // Adaptive guidance system - determine PRIMARY issue and show appropriate message
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
     // Only show guidance in camera mode, not capturing
     if (mode !== 'camera' || isCapturing) {
       if (guidanceMessage) {
         guidanceOpacity.value = withTiming(0, { duration: 300 });
-        setTimeout(() => setGuidanceMessage(null), 300);
+        timeoutId = setTimeout(() => setGuidanceMessage(null), 300);
       }
-      return;
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+      };
     }
-    
+
     // Calculate severity scores (0-1 scale)
     const motionSeverity = Math.min(accelerationVariance / 0.15, 1);
     const tiltSeverity = Math.min(tiltAngle / 25, 1);
-    
+
     let newMessage: string | null = null;
-    
+
     // Priority 1: Too much motion
     if (motionSeverity > 0.6) {
       newMessage = "Hold still";
@@ -834,7 +864,7 @@ export default function CameraScreen() {
     else if (tiltSeverity > 0.4 && tiltAngle > 5) {
       const absBeta = Math.abs(currentBeta);
       const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
-      
+
       if (targetOrientation === 'horizontal') {
         if (currentBeta > 5) newMessage = "Tilt backward";
         else if (currentBeta < -5) newMessage = "Tilt forward";
@@ -858,20 +888,25 @@ export default function CameraScreen() {
     else if (alignmentStatus === 'good' && !isStable && motionSeverity > 0.2) {
       newMessage = "Hold that";
     }
-    
+
     // Update message if changed
     if (newMessage !== lastGuidanceMessage.current) {
       lastGuidanceMessage.current = newMessage;
-      
+
       if (newMessage) {
         setGuidanceMessage(newMessage);
         guidanceOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
         guidanceScale.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
       } else {
         guidanceOpacity.value = withTiming(0, { duration: 300 });
-        setTimeout(() => setGuidanceMessage(null), 300);
+        timeoutId = setTimeout(() => setGuidanceMessage(null), 300);
       }
     }
+
+    return () => {
+      // CRITICAL: Clear timeout to prevent memory leak
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma]);
   
   // Animated style for guidance text
@@ -951,13 +986,15 @@ export default function CameraScreen() {
 
   // Cinematic fade-in when entering camera mode
   useEffect(() => {
+    const timers: NodeJS.Timeout[] = [];
+
     if (mode === 'camera') {
       // Reset states immediately
       setIsCapturing(false);
       setIsTransitioning(false);
       setIsHoldingShutter(false); // Reset hold state so user must press again
       setIsCameraReady(false); // Camera not ready yet
-      
+
       cameraOpacity.value = 0;
       blackOverlayOpacity.value = 1;
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
@@ -965,9 +1002,9 @@ export default function CameraScreen() {
       instructionsOpacity.value = 1; // Reset instructions to visible (hold fade)
       instructionsDisplayOpacity.value = 1; // Start with instructions visible
       lookDownOpacity.value = 0; // Start with "Look Down" hidden
-      
+
       // Faster fade-in (reduced from 1.5s to 0.6s)
-      setTimeout(() => {
+      timers.push(setTimeout(() => {
         cameraOpacity.value = withTiming(1, {
           duration: 600, // Faster 0.6 second fade
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
@@ -976,13 +1013,13 @@ export default function CameraScreen() {
           duration: 600,
           easing: Easing.bezier(0.4, 0.0, 0.2, 1),
         });
-        
+
         // Camera is ready after fade-in completes
-        setTimeout(() => {
+        timers.push(setTimeout(() => {
           setIsCameraReady(true);
           __DEV__ && console.log('📷 Camera is ready for capture');
-        }, 700); // Wait for fade + a bit extra for camera to fully initialize
-      }, 150); // Reduced delay from 300ms to 150ms
+        }, 700)); // Wait for fade + a bit extra for camera to fully initialize
+      }, 150)); // Reduced delay from 300ms to 150ms
     } else {
       // Not in camera mode, camera not ready
       setIsCameraReady(false);
@@ -990,6 +1027,11 @@ export default function CameraScreen() {
       // This prevents 60fps sensor updates during transitions, reducing CPU load
       DeviceMotion.removeAllListeners();
     }
+
+    return () => {
+      // CRITICAL: Clear all pending timers to prevent memory leak
+      timers.forEach(timer => clearTimeout(timer));
+    };
   }, [mode]);
 
   const cameraAnimatedStyle = useAnimatedStyle(() => ({
