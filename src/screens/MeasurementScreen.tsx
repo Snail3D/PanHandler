@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -282,23 +282,36 @@ export default function MeasurementScreen() {
       setHasIncrementedSession(false);
     }
   }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
-  
-  // Show opening quote ONLY on app launch (camera mode with no image)
+
+  // Show opening quote on app foreground (every time app comes back from background)
   useEffect(() => {
-    if (!hasShownOpeningQuote.current && mode === 'camera' && !currentImageUri && !capturedPhotoUri) {
-      console.log('🎬 App launch - triggering opening quote');
-      hasShownOpeningQuote.current = true;
-      // Wait a moment for component to mount, then trigger quote
-      setTimeout(() => {
-        setShowOpeningQuote(true);
-        // Auto-reset after 1 second so subsequent DimensionOverlay mounts don't see it
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        // App came to foreground - show quote
+        console.log('🎬 App foreground - triggering opening quote');
         setTimeout(() => {
-          setShowOpeningQuote(false);
-        }, 1000);
-      }, 500);
-    }
-  }, []); // Empty deps - only runs once on mount
-  
+          setShowOpeningQuote(true);
+          // Auto-reset after 1 second so DimensionOverlay can consume it
+          setTimeout(() => {
+            setShowOpeningQuote(false);
+          }, 1000);
+        }, 300);
+      }
+    });
+
+    // Also show on initial mount
+    setTimeout(() => {
+      setShowOpeningQuote(true);
+      setTimeout(() => {
+        setShowOpeningQuote(false);
+      }, 1000);
+    }, 500);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []); // Empty deps - set up listener once
+
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
     setIsTransitioning(true); // Lock out interactions
