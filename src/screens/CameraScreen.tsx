@@ -1892,7 +1892,7 @@ export default function CameraScreen() {
               }}
             >
               <View style={{ alignItems: 'center', pointerEvents: 'box-none' }}>
-                {/* Photo Library Button - Same size as shutter (80x80) */}
+                {/* Photo Library Button - 20% smaller than shutter, map/drone icon */}
                 <Pressable
                   onPress={async () => {
                     console.log('📸 Photo library button pressed');
@@ -1902,17 +1902,17 @@ export default function CameraScreen() {
                   hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
                   style={{
                     position: 'absolute',
-                    right: 32,
-                    bottom: 0,
-                    width: 80,
-                    height: 80,
-                    borderRadius: 40,
+                    right: 100,
+                    bottom: 8,
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
                     backgroundColor: 'rgba(31, 41, 55, 0.8)',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Ionicons name="images-outline" size={36} color="white" />
+                  <Ionicons name="map-outline" size={28} color="white" />
                 </Pressable>
 
                 {/* Instructional Text Sequence - Positioned halfway between crosshairs and bottom */}
