@@ -623,15 +623,15 @@ export default function ZoomCalibration({
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.35)',
           }}>
-            {/* Single Row: LOCK IN centered with coin info on right */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 72, position: 'relative' }}>
-              {/* LOCK IN - centered in available space */}
+            {/* Single Row: LOCK IN centered */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: 72 }}>
+              {/* LOCK IN - centered */}
               <Pressable
                 onPress={handleLockIn}
                 disabled={!selectedCoin}
                 style={({ pressed }) => ({
                   flex: 1,
-                  backgroundColor: !selectedCoin 
+                  backgroundColor: !selectedCoin
                     ? 'rgba(150, 150, 150, 0.4)'
                     : pressed ? `${currentColor}E6` : `${currentColor}F2`,
                   borderRadius: 20,
@@ -645,9 +645,9 @@ export default function ZoomCalibration({
                 })}
               >
                 {/* LOCK IN text */}
-                <Text style={{ 
+                <Text style={{
                   color: !selectedCoin ? '#FFFFFF' : currentColor,
-                  fontWeight: '900', 
+                  fontWeight: '900',
                   fontSize: 48,
                   letterSpacing: 2,
                   textShadowColor: 'rgba(0, 0, 0, 0.3)',
@@ -657,60 +657,6 @@ export default function ZoomCalibration({
                   LOCK IN
                 </Text>
               </Pressable>
-
-              {/* Coin info on right - absolutely positioned OVER the button */}
-              <View style={{ position: 'absolute', right: 8, top: 8, bottom: 8, pointerEvents: 'box-none' }}>
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setShowCoinSelector(true);
-                    setSearchQuery('');
-                  }}
-                  style={({ pressed: coinPressed }) => ({
-                    backgroundColor: coinPressed ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.7)',
-                    borderRadius: 16,
-                    paddingVertical: 6,
-                    paddingHorizontal: 10,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100%',
-                    minWidth: 80,
-                  })}
-                >
-                <CoinIcon size={28} color="#FF9500" />
-                {selectedCoin ? (
-                  <>
-                    <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.9)', 
-                      fontWeight: '700', 
-                      fontSize: 10,
-                      textAlign: 'center',
-                      marginTop: 3,
-                    }}>
-                      {selectedCoin.name}
-                    </Text>
-                    <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.5)', 
-                      fontSize: 8,
-                      fontWeight: '600',
-                      marginTop: 1,
-                    }}>
-                      {selectedCoin.diameter}mm
-                    </Text>
-                  </>
-                ) : (
-                  <Text style={{ 
-                    color: 'rgba(0, 0, 0, 0.7)', 
-                    fontWeight: '700', 
-                    fontSize: 9,
-                    textAlign: 'center',
-                    marginTop: 3,
-                  }}>
-                    Tap to{'\n'}Select
-                  </Text>
-                )}
-                </Pressable>
-              </View>
             </View>
           </View>
         </BlurView>
@@ -959,12 +905,12 @@ export default function ZoomCalibration({
           pointerEvents: 'none',
         }}
       >
-        {/* Instruction text - between circle and bottom controls */}
+        {/* Instruction text - between circle and bottom controls - moved up 20% closer to circle */}
         <Animated.View
           style={[
             {
               position: 'absolute',
-              top: SCREEN_HEIGHT * 0.33 + 260, // Below coin circle
+              top: SCREEN_HEIGHT * 0.33 + 208, // Moved up 20% (was 260, now 208)
               alignItems: 'center',
               paddingHorizontal: 40,
             },
