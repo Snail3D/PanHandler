@@ -6047,73 +6047,76 @@ export default function DimensionOverlay({
               }}>
                 
                 {/* Header with undo button and hide menu on same line */}
-                <View style={{ 
-                  flexDirection: 'row', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16, 
-                  position: 'relative' 
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: (measurements.length > 0 || currentPoints.length > 0) ? 8 : 16,
+                  paddingHorizontal: 4,
                 }}>
-                  {/* Left side: Hide labels toggle and Edit Labels mode - only show if there are measurements */}
-                  {measurements.length > 0 && (
-                    <View style={{ position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                      {/* Hide/Show labels toggle */}
-                      <Pressable
-                        onPress={() => {
-                          setHideMeasurementLabels(!hideMeasurementLabels);
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }}
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
-                        <View style={{
-                          width: 28,
-                          height: 28,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                          <Ionicons 
-                            name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"} 
-                            size={16} 
-                            color="rgba(0, 0, 0, 0.5)" 
-                          />
-                        </View>
-                        <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
-                          {hideMeasurementLabels ? "Show" : "Hide"}
-                        </Text>
-                      </Pressable>
-                      
-                      {/* Edit Labels mode toggle */}
-                      <Pressable
-                        onPress={() => {
-                          setLabelEditMode(!labelEditMode);
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        }}
-                        style={{ 
-                          flexDirection: 'row', 
-                          alignItems: 'center',
-                        }}
-                      >
-                        <View style={{
-                          width: 24,
-                          height: 24,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                          <Ionicons 
-                            name={labelEditMode ? "pencil" : "pencil-outline"} 
-                            size={14} 
-                            color={labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.5)"} 
-                          />
-                        </View>
-                        <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 4 }}>
-                          Edit labels
-                        </Text>
-                      </Pressable>
-                    </View>
+                  {/* Left: Hide labels toggle - only show if there are measurements */}
+                  {measurements.length > 0 ? (
+                    <Pressable
+                      onPress={() => {
+                        setHideMeasurementLabels(!hideMeasurementLabels);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <View style={{
+                        width: 28,
+                        height: 28,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                        <Ionicons
+                          name={hideMeasurementLabels ? "eye-off-outline" : "eye-outline"}
+                          size={16}
+                          color="rgba(0, 0, 0, 0.5)"
+                        />
+                      </View>
+                      <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginLeft: 6 }}>
+                        {hideMeasurementLabels ? "Show" : "Hide"}
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <View style={{ width: 70 }} />
                   )}
 
-                  {/* Center: Undo button - only show if there are measurements or current points */}
-                  {(measurements.length > 0 || currentPoints.length > 0) && (
+                  {/* Center: Edit Labels mode toggle - only show if there are measurements */}
+                  {measurements.length > 0 ? (
+                    <Pressable
+                      onPress={() => {
+                        setLabelEditMode(!labelEditMode);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <View style={{
+                        width: 24,
+                        height: 24,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                        <Ionicons
+                          name={labelEditMode ? "pencil" : "pencil-outline"}
+                          size={14}
+                          color={labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.5)"}
+                        />
+                      </View>
+                      <Text style={{ fontSize: 12, color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: 4 }}>
+                        Edit labels
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <View style={{ flex: 1 }} />
+                  )}
+
+                  {/* Right: Undo button - only show if there are measurements or current points */}
+                  {(measurements.length > 0 || currentPoints.length > 0) ? (
                     <Pressable
                       onPressIn={startUndoLongPress}
                       onPressOut={stopUndoLongPress}
@@ -6126,7 +6129,6 @@ export default function DimensionOverlay({
                         paddingHorizontal: 10,
                         borderWidth: 0.5,
                         borderColor: 'rgba(0, 0, 0, 0.08)',
-                        marginLeft: 54,
                       }}
                     >
                       <View style={{ opacity: 0.6 }}>
@@ -6138,30 +6140,14 @@ export default function DimensionOverlay({
                         fontSize: 14,
                         marginLeft: 5,
                       }}>
-                        {measurements.length > 0 
-                          ? `Undo (${measurements.length})` 
+                        {measurements.length > 0
+                          ? `Undo (${measurements.length})`
                           : 'Clear'}
                       </Text>
                     </Pressable>
+                  ) : (
+                    <View style={{ width: 90 }} />
                   )}
-                  
-                  {/* Right side: Hide menu text and button - positioned absolutely */}
-                  <View style={{ position: 'absolute', right: 0, flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 12, color: 'rgba(0, 0, 0, 0.4)', marginRight: 6 }}>
-                      Hide menu
-                    </Text>
-                    <Pressable
-                      onPress={collapseMenu}
-                      style={{
-                        width: 28,
-                        height: 28,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Ionicons name="chevron-forward" size={16} color="rgba(0, 0, 0, 0.5)" />
-                    </Pressable>
-                  </View>
                 </View>
 
           {/* Mode Toggle: Edit/Move vs Measure */}
@@ -6735,7 +6721,7 @@ export default function DimensionOverlay({
                     })()
                   : measurements.length > 0
                   ? '✏️ Edit Mode: Tap any measurement to select • Tap trash icon to delete'
-                  : '💡 Pinch to zoom • Drag to pan • Switch to Measure to begin'
+                  : '👉👉👉 Swipe to Close Menu'
                 }
               </Text>
             </View>
