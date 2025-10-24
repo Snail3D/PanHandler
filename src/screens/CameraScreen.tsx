@@ -1887,6 +1887,7 @@ export default function CameraScreen() {
                 left: 66,
                 zIndex: 26,
               }}
+              pointerEvents="box-none"
             >
               <Pressable
                 onPress={async () => {
@@ -1894,6 +1895,7 @@ export default function CameraScreen() {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   await pickImage();
                 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 style={{
                   width: 64,
                   height: 64,
@@ -1903,9 +1905,11 @@ export default function CameraScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="airplane" size={20} color="white" style={{ position: 'absolute', top: 14 }} pointerEvents="none" />
-                <Ionicons name="map" size={18} color="white" style={{ position: 'absolute', bottom: 12, left: 14 }} pointerEvents="none" />
-                <Ionicons name="document-text" size={18} color="white" style={{ position: 'absolute', bottom: 12, right: 14 }} pointerEvents="none" />
+                <View pointerEvents="none" style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                  <Ionicons name="airplane" size={20} color="white" style={{ position: 'absolute', top: 14 }} />
+                  <Ionicons name="map" size={18} color="white" style={{ position: 'absolute', bottom: 12, left: 14 }} />
+                  <Ionicons name="document-text" size={18} color="white" style={{ position: 'absolute', bottom: 12, right: 14 }} />
+                </View>
               </Pressable>
             </View>
 
