@@ -58,27 +58,15 @@ export default function App() {
   }, []);
   
   // ═══════════════════════════════════════════════════════════════
-  // OPENING QUOTE SCREEN (simple fade in/out, no typing, no haptics)
+  // OPENING QUOTE SCREEN (simple fade in/out, tap to skip)
   // ═══════════════════════════════════════════════════════════════
   const [showIntro, setShowIntro] = useState(true);
   const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
   const introOpacity = useSharedValue(0);
   const appOpacity = useSharedValue(0);
 
-  // Track display timeout for cleanup
-  const displayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Track taps for double-tap to skip
-  const lastTapTime = useRef<number>(0);
-
-  // Function to gracefully skip intro (called on double-tap)
+  // Function to skip intro (called on tap)
   const skipIntro = () => {
-    // Clear any pending timeout
-    if (displayTimeoutRef.current) {
-      clearTimeout(displayTimeoutRef.current);
-      displayTimeoutRef.current = null;
-    }
-
     // Fade out intro and fade in app
     introOpacity.value = withTiming(0, {
       duration: 600,
@@ -93,62 +81,16 @@ export default function App() {
     }));
   };
 
-  // Handle tap - double-tap to skip
-  const handleTap = () => {
-    const now = Date.now();
-    const timeSinceLastTap = now - lastTapTime.current;
-
-    if (timeSinceLastTap < 500) {
-      // Double tap detected!
-      skipIntro();
-    }
-
-    lastTapTime.current = now;
-  };
-
-  // Simple fade in/out with calculated display time
+  // Simple fade in, tap to continue
   useEffect(() => {
     const quote = getRandomQuote();
     setIntroQuote(quote);
-
-    // Calculate comfortable reading time based on text length
-    // Average reading speed: ~250 words per minute = ~4 words per second
-    const fullText = `"${quote.text}" - ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
-    const wordCount = fullText.split(/\s+/).length;
-    const readingTimeSeconds = Math.max(3, Math.min(8, wordCount / 4)); // Min 3s, max 8s
-    const displayTime = readingTimeSeconds * 1000;
 
     // Fade in
     introOpacity.value = withDelay(300, withTiming(1, {
       duration: 800,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }));
-
-    // Auto-fade out after calculated reading time
-    displayTimeoutRef.current = setTimeout(() => {
-      introOpacity.value = withTiming(0, {
-        duration: 1000,
-        easing: Easing.bezier(0.4, 0.0, 0.2, 1)
-      }, () => {
-        runOnJS(setShowIntro)(false);
-      });
-
-      // Fade in the main app
-      appOpacity.value = withDelay(200, withTiming(1, {
-        duration: 1200,
-        easing: Easing.bezier(0.25, 0.1, 0.25, 1)
-      }));
-
-      displayTimeoutRef.current = null;
-    }, displayTime);
-
-    // Cleanup
-    return () => {
-      if (displayTimeoutRef.current) {
-        clearTimeout(displayTimeoutRef.current);
-        displayTimeoutRef.current = null;
-      }
-    };
   }, []);
   
   const introAnimatedStyle = useAnimatedStyle(() => ({
@@ -251,7 +193,7 @@ export default function App() {
             ]}
           >
             <Pressable
-              onPress={handleTap}
+              onPress={skipIntro}
               style={{
                 flex: 1,
                 width: '100%',
