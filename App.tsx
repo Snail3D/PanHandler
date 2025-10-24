@@ -102,37 +102,49 @@ export default function App() {
   useEffect(() => {
     const quote = getRandomQuote();
     setIntroQuote(quote);
-    
+
     // Fade in the intro screen
-    introOpacity.value = withDelay(300, withTiming(1, { 
+    introOpacity.value = withDelay(300, withTiming(1, {
       duration: 800,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }));
-    
+
     // Type out the quote text
     const fullText = `"${quote.text}"`;
     const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
-    
+
     let currentIndex = 0;
     const typingSpeed = 25; // Fast typing for intro
+    let isCleanedUp = false; // Track if cleanup has been called
+    let lastHapticIndex = -10; // Track last haptic to prevent excessive calls
 
     const intervalId = setInterval(() => {
+      // CRITICAL: Check if cleanup has been called
+      if (isCleanedUp) {
+        return;
+      }
+
       if (currentIndex < completeText.length) {
-        setDisplayedText(completeText.substring(0, currentIndex + 1));
+        // PERFORMANCE: Use functional update to avoid causing re-render storms
+        setDisplayedText(prev => completeText.substring(0, currentIndex + 1));
 
         // Natural typing haptics - varied intensity like real keystrokes
         const char = completeText[currentIndex];
         const isPunctuation = /[.,!?;:]/.test(char);
         const isSpace = char === ' ';
 
-        if (!isSpace) { // No haptic for spaces (like lifting fingers between words)
+        // CRITICAL FIX: Drastically reduce haptic frequency to prevent promise pileup
+        // Only trigger if at least 10 characters since last haptic
+        if (!isSpace && (currentIndex - lastHapticIndex) >= 10) {
           if (isPunctuation) {
-            // Punctuation gets a stronger tap (finishing a thought)
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          } else if (currentIndex % 4 === 0) {
-            // Every 4th character gets a light tap (reduced frequency to prevent locking)
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            // Fire and forget - don't wait for promise
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+            lastHapticIndex = currentIndex;
+          } else if (currentIndex % 15 === 0) {
+            // Reduced from every 8th to every 15th character
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            lastHapticIndex = currentIndex;
           }
         }
 
@@ -146,6 +158,11 @@ export default function App() {
 
         // Hold for 2 seconds after typing, then cross-fade
         const timeoutId = setTimeout(() => {
+          // CRITICAL: Check if cleanup has been called
+          if (isCleanedUp) {
+            return;
+          }
+
           // Fade out intro and fade in app simultaneously
           introOpacity.value = withTiming(0, {
             duration: 1000,
@@ -172,6 +189,8 @@ export default function App() {
 
     // CRITICAL: Cleanup function to prevent memory leaks
     return () => {
+      isCleanedUp = true; // Mark as cleaned up to prevent further execution
+
       if (typeIntervalRef.current) {
         clearInterval(typeIntervalRef.current);
         typeIntervalRef.current = null;
