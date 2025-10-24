@@ -193,48 +193,16 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
   
-  // Easter egg: "Shave and a haircut" rhythm to open YouTube link
-  // User taps: "shave-and-a-hair-cut" (5 taps with correct rhythm)
-  // App responds: "two-bits!" (strong haptic response) then opens link
+  // Easter egg: 7 taps on right egg to open YouTube link
   const [eggTaps, setEggTaps] = useState<number[]>([]); // Array of tap timestamps
   const eggTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // "Shave and a haircut" rhythm pattern (in milliseconds between taps)
-  // tap - tap - taptap - tap
-  // The pattern is: short, short, veryshort, short
-  const SHAVE_HAIRCUT_PATTERN = [
-    { min: 100, max: 400 },   // 1st gap: "shave"
-    { min: 100, max: 400 },   // 2nd gap: "and"
-    { min: 50, max: 200 },    // 3rd gap: quick "a-hair" (fast double tap)
-    { min: 100, max: 400 },   // 4th gap: "cut"
-    // 5th tap completes it, then we respond with "two-bits!" haptic and open link!
-  ];
-  
-  const checkShaveAndHaircutPattern = (taps: number[]) => {
-    if (taps.length !== 5) return false;
-    
-    // Check gaps between taps
-    for (let i = 0; i < 4; i++) {
-      const gap = taps[i + 1] - taps[i];
-      const pattern = SHAVE_HAIRCUT_PATTERN[i];
-      
-      if (gap < pattern.min || gap > pattern.max) {
-        return false;
-      }
-    }
-    
-    return true;
-  };
-  
-  const playTwoBitsResponse = () => {
-    // Wait a beat before responding (classic "shave and a haircut" pause)
+
+  const playSuccessResponse = () => {
+    // Success haptic sequence
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setTimeout(() => {
-      // Play "dun-dun" haptic response with strong impact
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      setTimeout(() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      }, 350); // Longer gap between the two hits for dramatic effect
-    }, 1000); // 1 second pause before responding - the classic wait!
+    }, 200);
   };
   
   // Left egg: Long-press to open YouTube link
@@ -2174,41 +2142,41 @@ Thank you for helping us improve PanHandler!
                       Hidden Surprises
                     </Text>
                     
-                    {/* Right egg - Shave and a haircut rhythm to open YouTube */}
+                    {/* Right egg - 7 taps to open YouTube */}
                     <Pressable
                       onPress={() => {
                         const now = Date.now();
-                        
+
                         // Clear timeout if exists
                         if (eggTapTimeoutRef.current) {
                           clearTimeout(eggTapTimeoutRef.current);
                         }
-                        
+
                         // Add new tap to array
                         const newTaps = [...eggTaps, now];
-                        
-                        // Keep only last 5 taps
-                        const recentTaps = newTaps.slice(-5);
+
+                        // Keep only last 7 taps
+                        const recentTaps = newTaps.slice(-7);
                         setEggTaps(recentTaps);
-                        
+
                         // Light haptic for each tap
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        
-                        // Check if we have 5 taps and they match the pattern
-                        if (recentTaps.length === 5 && checkShaveAndHaircutPattern(recentTaps)) {
-                          // SUCCESS! Play "two bits" response (with dramatic pause)
-                          playTwoBitsResponse();
-                          
+
+                        // Check if we have 7 taps
+                        if (recentTaps.length === 7) {
+                          // SUCCESS! Play success response
+                          playSuccessResponse();
+
                           // Clear taps
                           setEggTaps([]);
-                          
-                          // Open YouTube link after haptic response completes (1000ms pause + 350ms gap + buffer)
+
+                          // Open YouTube link after haptic response
                           setTimeout(() => {
                             Linking.openURL('https://youtu.be/rog8ou-ZepE?si=aVfNZf_i24xay02P');
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                          }, 1500);
+                          }, 400);
                         }
-                        
+
                         // Reset after 2 seconds of no taps
                         eggTapTimeoutRef.current = setTimeout(() => {
                           setEggTaps([]);

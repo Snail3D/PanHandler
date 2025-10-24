@@ -89,7 +89,7 @@ export default function BattlingBotsModal({
       { bot: 'right', text: "Nah! Snail built this solo!" },
       { bot: 'left', text: "True. Zero ads, zero subscription..." },
       { bot: 'right', text: "Donate = special badge + we annoy you 4x less!" },
-      { bot: 'left', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg: Shave-and-a-haircut! 🎵" },
+      { bot: 'left', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg 7 times! 🎵" },
     ],
     
     // Conversation 3: Shake to Toggle Menu
@@ -202,7 +202,7 @@ export default function BattlingBotsModal({
       { bot: 'left', text: "They actually helped. Unlike most people." },
       { bot: 'right', text: "Most people ghost us completely." },
       { bot: 'left', text: "Not them. They're real ones." },
-      { bot: 'right', shouldBackspace: true, meanText: "That's why we wait—", niceText: "...right egg: Shave-and-a-haircut! 🎵" },
+      { bot: 'right', shouldBackspace: true, meanText: "That's why we wait—", niceText: "...tap right egg 7 times! 🎵" },
     ],
     
     // Donor Conversation 4: First-Time + Imperial

@@ -16,16 +16,16 @@ Updated ALL conversations to give **ACCURATE, SPECIFIC** hints about the actual 
 - "...hold the left egg 3 seconds! Chicken surprise! 🐔"
 - "...hold left egg 3 seconds. Trust me!"
 
-### 2. 🎵 **Right Egg = Shave and a Haircut → YouTube**
+### 2. 🎵 **Right Egg = 7 Taps → YouTube**
 **Location**: Help Modal, right egg (🥚)
-**How**: Tap the rhythm "Shave and a haircut" (5 taps in specific timing)
+**How**: Tap 7 times
 **What Happens**:
-- Responds with "two bits" haptic pattern
+- Responds with success haptic pattern
 - Opens YouTube link: `https://youtu.be/rog8ou-ZepE`
 
 **Bot Hints Now Say**:
-- "...tap right egg: Shave-and-a-haircut! 🎵"
-- "...right egg: Shave-and-a-haircut! 🎵"
+- "...tap right egg 7 times! 🎵"
+- "...tap right egg 7 times! 🎵"
 
 ### 3. 📳 **Shake = Toggle Menu**
 **Location**: Measurement screen (when calibrated)
@@ -61,7 +61,7 @@ Updated ALL conversations to give **ACCURATE, SPECIFIC** hints about the actual 
 ### Non-Donor (11 conversations):
 1. **Donation Fatigue** - Acknowledges burnout, no hint
 2. **Left Egg = Chicken** - "hold the left egg 3 seconds! Chicken surprise! 🐔"
-3. **Right Egg = Rhythm** - "tap right egg: Shave-and-a-haircut! 🎵"
+3. **Right Egg = 7 Taps** - "tap right egg 7 times! 🎵"
 4. **Shake = Menu** - "shake to toggle the menu!"
 5. **Imperial = Star Wars** - "tap Imperial 7x for Star Wars! ⭐"
 6. **Tetris** - "fill the screen with measurements! Tetris! 🎮"
@@ -74,7 +74,7 @@ Updated ALL conversations to give **ACCURATE, SPECIFIC** hints about the actual 
 ### Donor (5 conversations):
 1. **Badge + Tetris** - "fill screen with measurements! Tetris! 🎮"
 2. **Coffee + Chicken** - "hold left egg 3 seconds! Chicken! 🐔"
-3. **Badge + Rhythm** - "right egg: Shave-and-a-haircut! 🎵"
+3. **Badge + 7 Taps** - "tap right egg 7 times! 🎵"
 4. **First-Time + Imperial** - "tap Imperial 7x for Star Wars! ⭐"
 5. **Grateful + Shake** - "shake to toggle the menu! 📳"
 
@@ -87,7 +87,7 @@ Updated ALL conversations to give **ACCURATE, SPECIFIC** hints about the actual 
 - Generic, unhelpful hints
 
 ### After ✅:
-- **"tap right egg: Shave-and-a-haircut! 🎵"** (specific!)
+- **"tap right egg 7 times! 🎵"** (specific!)
 - **"shake to toggle the menu!"** (clear purpose!)
 - **"hold left egg 3 seconds! Chicken! 🐔"** (exact timing!)
 - **"tap Imperial 7x for Star Wars! ⭐"** (real Easter egg!)
