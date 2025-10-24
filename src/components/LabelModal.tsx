@@ -646,9 +646,9 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                 </View>
 
                 {/* Content */}
-                <View style={{ paddingHorizontal: 20, paddingVertical: 18 }}>
+                <View style={{ paddingHorizontal: 20, paddingVertical: 18, paddingBottom: 10 }}>
                   {/* Input Field */}
-                  <View style={{ marginBottom: 6 }}>
+                  <View style={{ marginBottom: 4 }}>
                     <Text style={{ 
                       color: '#48484A', 
                       fontSize: 13, 
@@ -706,7 +706,7 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                 <View style={{
                   paddingHorizontal: 20,
                   paddingBottom: 12,
-                  paddingTop: 0,
+                  paddingTop: 8,
                   alignItems: 'center',
                 }}>
                   <View style={{ flexDirection: 'row', gap: 12, width: '100%', maxWidth: 280, alignItems: 'center', justifyContent: 'center' }}>
