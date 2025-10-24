@@ -688,29 +688,18 @@ export default function DimensionOverlay({
   }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
   const showQuoteOverlay = () => {
-    // CACHE BUST v5.4.1: Quote shows immediately - set state in correct order
+    // CACHE BUST v5.4.2: INSTANT appearance - no animation at all for testing
     const quote = getRandomQuote();
-    const fullText = `"${quote.text}"`;
-    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
-    const completeText = `${fullText}\n\n${authorText}`;
 
-    console.log('🎬 v5.4.1 IMMEDIATE QUOTE:', completeText);
-
-    // Set all state together in one batch
     setCurrentQuote(quote);
     setIsQuoteTyping(false);
     isQuoteTypingRef.current = false;
-    setDisplayedText(completeText); // Full text set BEFORE showing modal
+    setShowQuote(true);
 
-    // Show modal and fade in AFTER text is set
-    setTimeout(() => {
-      setShowQuote(true);
-      quoteOpacity.value = withSpring(1, {
-        damping: 20,
-        stiffness: 90,
-        mass: 0.5,
-      });
-    }, 50);
+    // INSTANT opacity - no animation
+    quoteOpacity.value = 1;
+
+    console.log('🎬 v5.4.2 INSTANT QUOTE - NO ANIMATION');
   };
 
   const dismissQuote = () => {
