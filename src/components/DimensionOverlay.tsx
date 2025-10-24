@@ -447,18 +447,13 @@ export default function DimensionOverlay({
   
   // Mode swipe animation for finger tracking
   const modeSwipeOffset = useSharedValue(0);
-  
-  // Inspirational quote overlay state
+
+  // Inspirational quote overlay state - v5.4.2 SIMPLIFIED
   const [showQuote, setShowQuote] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
-  const [displayedText, setDisplayedText] = useState('');
-  const [isQuoteTyping, setIsQuoteTyping] = useState(false);
   const quoteOpacity = useSharedValue(0);
-  const [quoteTapCount, setQuoteTapCount] = useState(0);
-  const [quoteHapticFired, setQuoteHapticFired] = useState(false); // DEBUG: Visual indicator
-  const quoteTimeoutsRef = useRef<NodeJS.Timeout[]>([]); // Track typing timeouts
-  const isQuoteTypingRef = useRef(false); // Track typing state without causing re-renders
-  
+  // REMOVED: displayedText, isQuoteTyping, quoteTapCount, quoteHapticFired, quoteTimeoutsRef, isQuoteTypingRef - NOT NEEDED
+
   // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -692,8 +687,6 @@ export default function DimensionOverlay({
     const quote = getRandomQuote();
 
     setCurrentQuote(quote);
-    setIsQuoteTyping(false);
-    isQuoteTypingRef.current = false;
     setShowQuote(true);
 
     // INSTANT opacity - no animation
@@ -710,7 +703,6 @@ export default function DimensionOverlay({
     }, () => {
       runOnJS(setShowQuote)(false);
       runOnJS(setCurrentQuote)(null);
-      runOnJS(setDisplayedText)('');
     });
   };
 
