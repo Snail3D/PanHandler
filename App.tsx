@@ -58,32 +58,28 @@ export default function App() {
   }, []);
   
   // ═══════════════════════════════════════════════════════════════
-  // OPENING QUOTE SCREEN (shows on app launch/foreground with typing animation)
-  // This is the MAIN quote screen - handles typing effect with haptics
+  // OPENING QUOTE SCREEN (simple fade in/out, no typing, no haptics)
   // ═══════════════════════════════════════════════════════════════
   const [showIntro, setShowIntro] = useState(true);
   const [introQuote, setIntroQuote] = useState<{text: string, author: string, year?: string} | null>(null);
-  const [displayedText, setDisplayedText] = useState('');
   const introOpacity = useSharedValue(0);
   const appOpacity = useSharedValue(0);
 
-  // Track typing/animation state for cleanup using refs to avoid stale closures
-  const typeIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Track display timeout for cleanup
+  const displayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Function to gracefully skip intro
+  // Track taps for double-tap to skip
+  const lastTapTime = useRef<number>(0);
+
+  // Function to gracefully skip intro (called on double-tap)
   const skipIntro = () => {
-    // CRITICAL: Clear any active intervals/timeouts
-    if (typeIntervalRef.current) {
-      clearInterval(typeIntervalRef.current);
-      typeIntervalRef.current = null;
-    }
-    if (holdTimeoutRef.current) {
-      clearTimeout(holdTimeoutRef.current);
-      holdTimeoutRef.current = null;
+    // Clear any pending timeout
+    if (displayTimeoutRef.current) {
+      clearTimeout(displayTimeoutRef.current);
+      displayTimeoutRef.current = null;
     }
 
-    // Fade out intro and fade in app immediately
+    // Fade out intro and fade in app
     introOpacity.value = withTiming(0, {
       duration: 600,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
@@ -91,116 +87,69 @@ export default function App() {
       runOnJS(setShowIntro)(false);
     });
 
-    // Graceful fade-in for the main app
     appOpacity.value = withDelay(100, withTiming(1, {
       duration: 800,
       easing: Easing.bezier(0.25, 0.1, 0.25, 1)
     }));
   };
-  
-  // Get random quote on mount
+
+  // Handle tap - double-tap to skip
+  const handleTap = () => {
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapTime.current;
+
+    if (timeSinceLastTap < 500) {
+      // Double tap detected!
+      skipIntro();
+    }
+
+    lastTapTime.current = now;
+  };
+
+  // Simple fade in/out with calculated display time
   useEffect(() => {
     const quote = getRandomQuote();
     setIntroQuote(quote);
 
-    // Fade in the intro screen
+    // Calculate comfortable reading time based on text length
+    // Average reading speed: ~250 words per minute = ~4 words per second
+    const fullText = `"${quote.text}" - ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    const wordCount = fullText.split(/\s+/).length;
+    const readingTimeSeconds = Math.max(3, Math.min(8, wordCount / 4)); // Min 3s, max 8s
+    const displayTime = readingTimeSeconds * 1000;
+
+    // Fade in
     introOpacity.value = withDelay(300, withTiming(1, {
       duration: 800,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }));
 
-    // Type out the quote text
-    const fullText = `"${quote.text}"`;
-    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
-    const completeText = `${fullText}\n\n${authorText}`;
+    // Auto-fade out after calculated reading time
+    displayTimeoutRef.current = setTimeout(() => {
+      introOpacity.value = withTiming(0, {
+        duration: 1000,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1)
+      }, () => {
+        runOnJS(setShowIntro)(false);
+      });
 
-    let currentIndex = 0;
-    const typingSpeed = 25; // Fast typing for intro
-    let isCleanedUp = false; // Track if cleanup has been called
-    let lastHapticIndex = -10; // Track last haptic to prevent excessive calls
+      // Fade in the main app
+      appOpacity.value = withDelay(200, withTiming(1, {
+        duration: 1200,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1)
+      }));
 
-    const intervalId = setInterval(() => {
-      // CRITICAL: Check if cleanup has been called
-      if (isCleanedUp) {
-        return;
-      }
+      displayTimeoutRef.current = null;
+    }, displayTime);
 
-      if (currentIndex < completeText.length) {
-        // PERFORMANCE: Use functional update to avoid causing re-render storms
-        setDisplayedText(prev => completeText.substring(0, currentIndex + 1));
-
-        // Natural typing haptics - varied intensity like real keystrokes
-        const char = completeText[currentIndex];
-        const isPunctuation = /[.,!?;:]/.test(char);
-        const isSpace = char === ' ';
-
-        // CRITICAL FIX: Drastically reduce haptic frequency to prevent promise pileup
-        // Only trigger if at least 10 characters since last haptic
-        if (!isSpace && (currentIndex - lastHapticIndex) >= 10) {
-          if (isPunctuation) {
-            // Fire and forget - don't wait for promise
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-            lastHapticIndex = currentIndex;
-          } else if (currentIndex % 15 === 0) {
-            // Reduced from every 8th to every 15th character
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-            lastHapticIndex = currentIndex;
-          }
-        }
-
-        currentIndex++;
-      } else {
-        // Clear the interval when typing is done
-        if (typeIntervalRef.current) {
-          clearInterval(typeIntervalRef.current);
-          typeIntervalRef.current = null;
-        }
-
-        // Hold for 2 seconds after typing, then cross-fade
-        const timeoutId = setTimeout(() => {
-          // CRITICAL: Check if cleanup has been called
-          if (isCleanedUp) {
-            return;
-          }
-
-          // Fade out intro and fade in app simultaneously
-          introOpacity.value = withTiming(0, {
-            duration: 1000,
-            easing: Easing.bezier(0.4, 0.0, 0.2, 1)
-          }, () => {
-            runOnJS(setShowIntro)(false);
-          });
-
-          // Graceful fade-in for the main app
-          appOpacity.value = withDelay(200, withTiming(1, {
-            duration: 1200,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1) // Smoother, more gradual
-          }));
-
-          // Clear the timeout ref
-          holdTimeoutRef.current = null;
-        }, 2000);
-
-        holdTimeoutRef.current = timeoutId;
-      }
-    }, typingSpeed);
-
-    typeIntervalRef.current = intervalId;
-
-    // CRITICAL: Cleanup function to prevent memory leaks
+    // Cleanup
     return () => {
-      isCleanedUp = true; // Mark as cleaned up to prevent further execution
-
-      if (typeIntervalRef.current) {
-        clearInterval(typeIntervalRef.current);
-        typeIntervalRef.current = null;
-      }
-      if (holdTimeoutRef.current) {
-        clearTimeout(holdTimeoutRef.current);
-        holdTimeoutRef.current = null;
+      if (displayTimeoutRef.current) {
+        clearTimeout(displayTimeoutRef.current);
+        displayTimeoutRef.current = null;
       }
     };
-  }, []); // Empty deps is correct - only run once on mount
+  }, []);
   
   const introAnimatedStyle = useAnimatedStyle(() => ({
     opacity: introOpacity.value,
@@ -302,7 +251,7 @@ export default function App() {
             ]}
           >
             <Pressable
-              onPress={skipIntro}
+              onPress={handleTap}
               style={{
                 flex: 1,
                 width: '100%',
@@ -321,7 +270,7 @@ export default function App() {
                   letterSpacing: 0.5,
                 }}
               >
-                {displayedText}
+                {introQuote ? `"${introQuote.text}"\n\n- ${introQuote.author}${introQuote.year ? `, ${introQuote.year}` : ''}` : ''}
               </Text>
             </Pressable>
           </Animated.View>
