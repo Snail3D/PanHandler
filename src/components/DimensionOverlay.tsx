@@ -694,6 +694,8 @@ export default function DimensionOverlay({
     const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
     const completeText = `${fullText}\n\n${authorText}`;
 
+    console.log('🎬 SHOWING QUOTE IMMEDIATELY (v5.4.0):', completeText.substring(0, 50));
+
     setCurrentQuote(quote);
     setShowQuote(true);
     setDisplayedText(completeText); // Show full text immediately - no typing
