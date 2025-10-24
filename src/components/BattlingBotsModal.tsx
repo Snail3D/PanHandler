@@ -101,14 +101,14 @@ export default function BattlingBotsModal({
       { bot: 'left', shouldBackspace: true, meanText: "Exactly! So mayb—", niceText: "...tap right egg 7 times! 🎵" },
     ],
     
-    // Conversation 3: Shake to Toggle Menu
+    // Conversation 3: App Quality
     [
       { bot: 'left', text: "Snail spent MONTHS building this..." },
       { bot: 'right', text: "Yeah. Hundreds of hours." },
       { bot: 'left', text: "All his free time, really." },
-      { bot: 'right', text: "And he made it free! Oh—shake to toggle the menu!" },
-      { bot: 'left', text: "Why did you add that last part?!" },
-      { bot: 'right', text: "Because it's useful! 🤷" },
+      { bot: 'right', text: "And he made it free! No ads, no paywall!" },
+      { bot: 'left', text: "That's actually really rare nowadays." },
+      { bot: 'right', text: "Right? Worth supporting! 🤷" },
     ],
     
     // Conversation 4: Imperial Button = Star Wars
@@ -145,8 +145,8 @@ export default function BattlingBotsModal({
     [
       { bot: 'left', text: "Should we pitch the donation?" },
       { bot: 'right', text: "Yeah! But casually." },
-      { bot: 'left', text: "There are like... FIVE secrets..." },
-      { bot: 'right', text: "Left egg, right egg, shake, Imperial, Tetris!" },
+      { bot: 'left', text: "There are like... FOUR secrets..." },
+      { bot: 'right', text: "Left egg, right egg, Imperial, Tetris!" },
       { bot: 'left', text: "DUDE! You're spoiling EVERYTHING!" },
       { bot: 'right', shouldBackspace: true, meanText: "Sorry, I jus—", niceText: "...but seriously, support Snail! 💙" },
     ],
@@ -158,7 +158,7 @@ export default function BattlingBotsModal({
       { bot: 'left', text: "But some people actually need it." },
       { bot: 'right', text: "Yeah. Like solo devs who work for free." },
       { bot: 'left', text: "Snail spent months on this. Zero income." },
-      { bot: 'right', shouldBackspace: true, meanText: "So mayb—", niceText: "...shake your phone to hide the menu! 📳" },
+      { bot: 'right', shouldBackspace: true, meanText: "So mayb—", niceText: "...maybe this time it's worth it? 💙" },
     ],
     
     // Conversation 9: Imperial March Easter Egg
@@ -224,14 +224,14 @@ export default function BattlingBotsModal({
       { bot: 'right', shouldBackspace: true, meanText: "We won't bug them for 40—", niceText: "...tap Imperial 7x for Star Wars! ⭐" },
     ],
     
-    // Donor Conversation 5: Grateful + Shake
+    // Donor Conversation 5: Grateful + Appreciation
     [
       { bot: 'left', text: "They're back! Badge and all!" },
       { bot: 'right', text: "They supported Snail before." },
       { bot: 'left', text: "Should we even ask again?" },
       { bot: 'right', text: "It's been 40 sessions... months!" },
       { bot: 'left', text: "True. Time keeps going." },
-      { bot: 'right', shouldBackspace: true, meanText: "Gentle ask th—", niceText: "...shake to toggle the menu! 📳" },
+      { bot: 'right', shouldBackspace: true, meanText: "Gentle as—", niceText: "...we appreciate them so much! 💙" },
     ],
   ];
   
