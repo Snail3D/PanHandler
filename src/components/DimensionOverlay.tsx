@@ -6806,17 +6806,20 @@ export default function DimensionOverlay({
           {/* Tip */}
           {/* Helper instructions - always show based on mode */}
           {currentPoints.length === 0 && (
-            <View style={{ 
+            <View style={{
               backgroundColor: measurementMode ? 'rgba(240, 253, 244, 1)' : selectedMeasurementId ? 'rgba(250, 245, 255, 1)' : 'rgba(239, 246, 255, 1)',
               borderRadius: 8,
               paddingHorizontal: 12,
               paddingVertical: 8,
               marginBottom: 12
             }}>
-              <Text style={{ 
-                color: measurementMode ? 'rgba(22, 101, 52, 1)' : selectedMeasurementId ? 'rgba(107, 33, 168, 1)' : 'rgba(30, 64, 175, 1)',
-                fontSize: 12,
-                textAlign: 'center'
+              <Text style={{
+                color: isPlacingBlueprint ? 'rgba(100, 100, 100, 1)' : measurementMode ? 'rgba(22, 101, 52, 1)' : selectedMeasurementId ? 'rgba(107, 33, 168, 1)' : 'rgba(30, 64, 175, 1)',
+                fontSize: isPlacingBlueprint ? 14.4 : 12, // 20% bigger when placing blueprint (12 * 1.2 = 14.4)
+                textAlign: 'center',
+                textShadowColor: isPlacingBlueprint ? 'rgba(255, 255, 255, 0.8)' : undefined,
+                textShadowOffset: isPlacingBlueprint ? { width: 0, height: 1 } : undefined,
+                textShadowRadius: isPlacingBlueprint ? 2 : undefined,
               }}>
                 {isPlacingBlueprint
                   ? blueprintPoints.length === 0
