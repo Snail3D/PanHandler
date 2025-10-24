@@ -6362,9 +6362,9 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(6),
+                  paddingHorizontal: scalePadding(2),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                   shadowColor: mode === 'circle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
@@ -6374,16 +6374,16 @@ export default function DimensionOverlay({
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons 
-                    name="ellipse-outline" 
-                    size={20} 
-                    color={mode === 'circle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
+                  <Ionicons
+                    name="ellipse-outline"
+                    size={scaleIconSize(20)}
+                    color={mode === 'circle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'}
                   />
                   <Text style={{
-                    marginTop: 2,
+                    marginTop: scaleMargin(2),
                     textAlign: 'center',
                     fontWeight: '700',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: mode === 'circle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
                     textShadowColor: mode === 'circle' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
@@ -6443,9 +6443,9 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(6),
+                  paddingHorizontal: scalePadding(2),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                   shadowColor: mode === 'angle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
@@ -6456,7 +6456,7 @@ export default function DimensionOverlay({
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                   {/* Custom angle icon */}
-                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                  <Svg width={scaleIconSize(20)} height={scaleIconSize(20)} viewBox="0 0 16 16">
                     <Line x1="3" y1="13" x2="13" y2="3" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
                     <Line x1="3" y1="13" x2="13" y2="13" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" strokeLinecap="round" />
                     <Path d="M 7 13 A 5.66 5.66 0 0 1 6 8" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.3" fill="none" />
@@ -6464,10 +6464,10 @@ export default function DimensionOverlay({
                     <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke={mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1" strokeLinecap="round" />
                   </Svg>
                   <Text style={{
-                    marginTop: 2,
+                    marginTop: scaleMargin(2),
                     textAlign: 'center',
                     fontWeight: '700',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: mode === 'angle' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
                     textShadowColor: mode === 'angle' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
@@ -6528,9 +6528,9 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(6),
+                  paddingHorizontal: scalePadding(2),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                   shadowColor: mode === 'distance' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
@@ -6540,16 +6540,16 @@ export default function DimensionOverlay({
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Svg width={20} height={20} viewBox="0 0 16 16">
+                  <Svg width={scaleIconSize(20)} height={scaleIconSize(20)} viewBox="0 0 16 16">
                     <Line x1="3" y1="8" x2="13" y2="8" stroke={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} strokeWidth="1.5" />
                     <Circle cx="3" cy="8" r="2" fill={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} />
                     <Circle cx="13" cy="8" r="2" fill={mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} />
                   </Svg>
                   <Text style={{
-                    marginTop: 2,
+                    marginTop: scaleMargin(2),
                     textAlign: 'center',
                     fontWeight: '700',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: mode === 'distance' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
                     textShadowColor: mode === 'distance' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
@@ -6573,7 +6573,7 @@ export default function DimensionOverlay({
                     setModeColorIndex((prev) => prev + 1);
                     return;
                   }
-                  
+
                   // Check if trial is exhausted and offer dismissed
                   if (freehandTrialUsed >= freehandTrialLimit && freehandOfferDismissed) {
                     // Show Pro modal
@@ -6581,7 +6581,7 @@ export default function DimensionOverlay({
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
-                  
+
                   // Check if trial is exhausted but offer not yet dismissed
                   if (freehandTrialUsed >= freehandTrialLimit && !freehandOfferDismissed) {
                     // Show special offer modal
@@ -6589,7 +6589,7 @@ export default function DimensionOverlay({
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
-                  
+
                   // User still has free tries - activate freehand
                   playModeHaptic('freehand');
                   setMode('freehand');
@@ -6600,9 +6600,9 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 6,
-                  paddingHorizontal: 2,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(6),
+                  paddingHorizontal: scalePadding(2),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
                   shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
@@ -6612,20 +6612,20 @@ export default function DimensionOverlay({
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Svg width={20} height={20} viewBox="0 0 16 16">
-                    <Path 
-                      d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7" 
-                      stroke={mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'} 
+                  <Svg width={scaleIconSize(20)} height={scaleIconSize(20)} viewBox="0 0 16 16">
+                    <Path
+                      d="M 2 8 Q 4 6, 6 8 T 10 8 Q 12 9, 14 7"
+                      stroke={mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)'}
                       strokeWidth="2" 
                       fill="none" 
                       strokeLinecap="round"
                     />
                   </Svg>
                   <Text style={{
-                    marginTop: 2,
+                    marginTop: scaleMargin(2),
                     textAlign: 'center',
                     fontWeight: '700',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: mode === 'freehand' ? getCurrentModeColor().main : 'rgba(0, 0, 0, 0.45)',
                     textShadowColor: mode === 'freehand' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
@@ -6640,9 +6640,9 @@ export default function DimensionOverlay({
           </GestureDetector>
 
           {/* Unit System and Map Mode Row */}
-          <View style={{ flexDirection: 'row', marginBottom: 8, gap: 6 }}>
+          <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), gap: scaleGap(6) }}>
             {/* Unit System Toggle: Metric vs Imperial - Compact */}
-            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: 9, padding: 1.5 }}>
+            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
               <Pressable
                 onPress={() => {
                   setUnitSystem('metric');
@@ -6650,15 +6650,15 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(5),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: unitSystem === 'metric' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Metric
@@ -6672,8 +6672,8 @@ export default function DimensionOverlay({
                 }}
                 style={{
                   flex: 1,
-                  paddingVertical: 5,
-                  borderRadius: 7.5,
+                  paddingVertical: scalePadding(5),
+                  borderRadius: scaleBorderRadius(7.5),
                   backgroundColor: unitSystem === 'imperial' ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
                 }}
               >
