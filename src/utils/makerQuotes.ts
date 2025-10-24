@@ -29,14 +29,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "The day science begins to study non-physical phenomena, it will make more progress in one decade than in all the previous centuries.", author: "Nikola Tesla" },
   { text: "Be alone, that is the secret of invention; be alone, that is when ideas are born.", author: "Nikola Tesla" },
   { text: "The scientific man does not aim at an immediate result.", author: "Nikola Tesla" },
-  
-  // Benjamin Franklin
-  { text: "Tell me and I forget, teach me and I may remember, involve me and I learn.", author: "Benjamin Franklin", year: "1750" },
-  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-  { text: "Either write something worth reading or do something worth writing.", author: "Benjamin Franklin" },
-  { text: "Energy and persistence conquer all things.", author: "Benjamin Franklin" },
-  { text: "Without continual growth and progress, such words as improvement, achievement, and success have no meaning.", author: "Benjamin Franklin" },
-  
+
   // Wright Brothers
   { text: "It is possible to fly without motors, but not without knowledge and skill.", author: "Wilbur Wright", year: "1901" },
   { text: "The desire to fly is an idea handed down to us by our ancestors who looked enviously on the birds.", author: "Wilbur Wright" },
@@ -46,14 +39,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Before anything else, preparation is the key to success.", author: "Alexander Graham Bell" },
   { text: "When one door closes, another opens; but we often look so long and so regretfully upon the closed door that we do not see the one which has opened for us.", author: "Alexander Graham Bell" },
   { text: "The inventor looks upon the world and is not contented with things as they are.", author: "Alexander Graham Bell" },
-  
-  // Henry Ford
-  { text: "Whether you think you can, or you think you can't – you're right.", author: "Henry Ford", year: "1947" },
-  { text: "Failure is simply the opportunity to begin again, this time more intelligently.", author: "Henry Ford" },
-  { text: "Quality means doing it right when no one is looking.", author: "Henry Ford" },
-  { text: "Coming together is a beginning; keeping together is progress; working together is success.", author: "Henry Ford" },
-  { text: "Anyone who stops learning is old, whether at twenty or eighty.", author: "Henry Ford" },
-  
+
   // Marie Curie
   { text: "Nothing in life is to be feared, it is only to be understood.", author: "Marie Curie", year: "1920" },
   { text: "I was taught that the way of progress was neither swift nor easy.", author: "Marie Curie" },
@@ -110,11 +96,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Chance favors the prepared mind.", author: "Louis Pasteur", year: "1854" },
   { text: "Science knows no country, because knowledge belongs to humanity.", author: "Louis Pasteur" },
   { text: "Let me tell you the secret that has led me to my goal: my strength lies solely in my tenacity.", author: "Louis Pasteur" },
-  
-  // Charles Darwin
-  { text: "It is not the strongest of the species that survives, nor the most intelligent that survives. It is the one that is most adaptable to change.", author: "Charles Darwin", year: "1859" },
-  { text: "A man who dares to waste one hour of time has not discovered the value of life.", author: "Charles Darwin" },
-  
+
   // Albert Einstein
   { text: "Imagination is more important than knowledge.", author: "Albert Einstein", year: "1929" },
   { text: "The important thing is not to stop questioning.", author: "Albert Einstein" },
@@ -226,7 +208,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Take nothing on its looks; take everything on evidence.", author: "Charles Dickens", year: "1861" },
   
   // More historical figures
-  { text: "Well done is better than well said.", author: "Benjamin Franklin", year: "1737" },
   { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
   { text: "In the beginner's mind there are many possibilities, in the expert's mind there are few.", author: "Shunryu Suzuki", year: "1970" },
   { text: "The creation of something new is not accomplished by the intellect but by the play instinct.", author: "Carl Jung", year: "1921" },
@@ -304,41 +285,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Most persons are so absorbed in the contemplation of the outside world that they are wholly oblivious to what is passing on within themselves.", author: "Nikola Tesla" },
   { text: "The gift of mental power comes from God, and if we concentrate our minds on that truth, we become in tune with this great power.", author: "Nikola Tesla" },
   { text: "Alpha waves in the human brain are between 6 and 8 hertz. The wave frequency of the human cavity resonates between 6 and 8 hertz.", author: "Nikola Tesla" },
-  
-  // Additional Benjamin Franklin
-  { text: "By failing to prepare, you are preparing to fail.", author: "Benjamin Franklin" },
-  { text: "Diligence is the mother of good luck.", author: "Benjamin Franklin" },
-  { text: "Never confuse motion with action.", author: "Benjamin Franklin" },
-  { text: "If you would not be forgotten, as soon as you are dead and rotten, either write things worth reading, or do things worth writing.", author: "Benjamin Franklin" },
-  { text: "Do not fear mistakes. You will know failure. Continue to reach out.", author: "Benjamin Franklin" },
-  { text: "Lost time is never found again.", author: "Benjamin Franklin" },
-  { text: "In this world nothing can be said to be certain, except death and taxes.", author: "Benjamin Franklin", year: "1789" },
-  { text: "I didn't fail the test. I just found 100 ways to do it wrong.", author: "Benjamin Franklin" },
-  { text: "Early to bed and early to rise makes a man healthy, wealthy and wise.", author: "Benjamin Franklin", year: "1735" },
-  { text: "Hide not your talents. They for use were made.", author: "Benjamin Franklin" },
-  { text: "Beware of little expenses. A small leak will sink a great ship.", author: "Benjamin Franklin" },
-  { text: "When you're finished changing, you're finished.", author: "Benjamin Franklin" },
-  { text: "Time is money.", author: "Benjamin Franklin", year: "1748" },
-  { text: "Wealth is not his that has it, but his that enjoys it.", author: "Benjamin Franklin" },
-  { text: "Genius without education is like silver in the mine.", author: "Benjamin Franklin" },
-  
-  // Additional Henry Ford
-  { text: "Nothing is particularly hard if you divide it into small jobs.", author: "Henry Ford" },
-  { text: "Obstacles are those frightful things you see when you take your eyes off your goal.", author: "Henry Ford" },
-  { text: "Don't find fault, find a remedy.", author: "Henry Ford" },
-  { text: "If everyone is moving forward together, then success takes care of itself.", author: "Henry Ford" },
-  { text: "Vision without execution is just hallucination.", author: "Henry Ford" },
-  { text: "The only real mistake is the one from which we learn nothing.", author: "Henry Ford" },
-  { text: "You can't build a reputation on what you are going to do.", author: "Henry Ford" },
-  { text: "Most people spend more time and energy going around problems than in trying to solve them.", author: "Henry Ford" },
-  { text: "Thinking is the hardest work there is, which is probably the reason why so few engage in it.", author: "Henry Ford" },
-  { text: "Life is a series of experiences, each one of which makes us bigger.", author: "Henry Ford" },
-  { text: "When everything seems to be going against you, remember that the airplane takes off against the wind, not with it.", author: "Henry Ford" },
-  { text: "The whole secret of a successful life is to find out what is one's destiny to do, and then do it.", author: "Henry Ford" },
-  { text: "There is no man living who isn't capable of doing more than he thinks he can do.", author: "Henry Ford" },
-  { text: "Even a mistake may turn out to be the one thing necessary to a worthwhile achievement.", author: "Henry Ford" },
-  { text: "A business that makes nothing but money is a poor business.", author: "Henry Ford" },
-  
+
   // Additional Marie Curie
   { text: "I am among those who think that science has great beauty.", author: "Marie Curie" },
   { text: "We must have perseverance and above all confidence in ourselves.", author: "Marie Curie" },
@@ -508,18 +455,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "To know how to wonder and question is the first step of the mind toward discovery.", author: "Louis Pasteur" },
   { text: "Work cures everything.", author: "Louis Pasteur" },
   
-  // More Charles Darwin
-  { text: "In the long history of humankind, those who learned to collaborate and improvise most effectively have prevailed.", author: "Charles Darwin" },
-  { text: "It is not the strongest species that survive, nor the most intelligent, but the most responsive to change.", author: "Charles Darwin" },
-  { text: "Ignorance more frequently begets confidence than does knowledge.", author: "Charles Darwin", year: "1871" },
-  { text: "A mathematician is a blind man in a dark room looking for a black cat which isn't there.", author: "Charles Darwin" },
-  { text: "An American monkey, after getting drunk on brandy, would never touch it again, and thus is much wiser than most men.", author: "Charles Darwin" },
-  { text: "The very essence of instinct is that it's followed independently of reason.", author: "Charles Darwin" },
-  { text: "If I had my life to live over again, I would have made a rule to read some poetry and listen to some music at least once every week.", author: "Charles Darwin" },
-  { text: "The highest possible stage in moral culture is when we recognize that we ought to control our thoughts.", author: "Charles Darwin" },
-  { text: "False facts are highly injurious to the progress of science.", author: "Charles Darwin" },
-  { text: "We must, however, acknowledge, as it seems to me, that man with all his noble qualities still bears in his bodily frame the indelible stamp of his lowly origin.", author: "Charles Darwin", year: "1871" },
-  
+
   // More George Washington Carver
   { text: "It is not the style of clothes one wears, neither the kind of automobile one drives, nor the amount of money one has in the bank, that counts.", author: "George Washington Carver" },
   { text: "How far you go in life depends on your being tender with the young, compassionate with the aged, sympathetic with the striving and tolerant of the weak and strong.", author: "George Washington Carver" },
@@ -769,8 +705,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "The laws of nature are but the mathematical thoughts of God.", author: "Euclid", year: "300 BC" },
   { text: "Mathematics is the door and key to the sciences.", author: "Roger Bacon", year: "1267" },
   { text: "The authority of those who teach is often an obstacle to those who want to learn.", author: "Marcus Tullius Cicero", year: "50 BC" },
-  { text: "In wine there is wisdom, in beer there is freedom, in water there is bacteria.", author: "Benjamin Franklin" },
-  
+
   // Nicolaus Copernicus
   { text: "To know that we know what we know, and to know that we do not know what we do not know, that is true knowledge.", author: "Nicolaus Copernicus", year: "1543" },
   { text: "Mathematics is written for mathematicians.", author: "Nicolaus Copernicus" },
@@ -967,24 +902,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Think like a wise man but communicate in the language of the people.", author: "William Butler Yeats" },
   { text: "There are no strangers here; Only friends you haven't yet met.", author: "William Butler Yeats" },
   { text: "The world is full of magic things, patiently waiting for our senses to grow sharper.", author: "William Butler Yeats" },
-  
-  // Mark Twain
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain", year: "1897" },
-  { text: "Twenty years from now you will be more disappointed by the things that you didn't do than by the ones you did do.", author: "Mark Twain" },
-  { text: "It ain't what you don't know that gets you into trouble. It's what you know for sure that just ain't so.", author: "Mark Twain" },
-  { text: "Continuous improvement is better than delayed perfection.", author: "Mark Twain" },
-  { text: "The man who does not read has no advantage over the man who cannot read.", author: "Mark Twain" },
-  { text: "I have never let my schooling interfere with my education.", author: "Mark Twain" },
-  { text: "Courage is resistance to fear, mastery of fear, not absence of fear.", author: "Mark Twain", year: "1894" },
-  { text: "To succeed in life, you need two things: ignorance and confidence.", author: "Mark Twain" },
-  { text: "Keep away from people who try to belittle your ambitions. Small people always do that, but the really great make you feel that you, too, can become great.", author: "Mark Twain" },
-  { text: "The two most important days in your life are the day you are born and the day you find out why.", author: "Mark Twain" },
-  { text: "If you tell the truth, you don't have to remember anything.", author: "Mark Twain" },
-  { text: "Kindness is the language which the deaf can hear and the blind can see.", author: "Mark Twain" },
-  { text: "A person who won't read has no advantage over one who can't read.", author: "Mark Twain" },
-  { text: "Good friends, good books, and a sleepy conscience: this is the ideal life.", author: "Mark Twain" },
-  { text: "The fear of death follows from the fear of life. A man who lives fully is prepared to die at any time.", author: "Mark Twain" },
-  
+
   // Ralph Waldo Emerson
   { text: "Do not go where the path may lead, go instead where there is no path and leave a trail.", author: "Ralph Waldo Emerson", year: "1841" },
   { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
@@ -1065,18 +983,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "All truth passes through three stages. First, it is ridiculed. Second, it is violently opposed. Third, it is accepted as being self-evident.", author: "Arthur Schopenhauer" },
   { text: "To find out your real opinion of someone, judge the impression you have when you first see a letter from them.", author: "Arthur Schopenhauer" },
   
-  // Voltaire
-  { text: "Judge a man by his questions rather than by his answers.", author: "Voltaire", year: "1764" },
-  { text: "Common sense is not so common.", author: "Voltaire", year: "1764" },
-  { text: "Doubt is an uncomfortable condition, but certainty is a ridiculous one.", author: "Voltaire" },
-  { text: "Perfect is the enemy of good.", author: "Voltaire", year: "1770" },
-  { text: "Every man is guilty of all the good he did not do.", author: "Voltaire" },
-  { text: "Appreciation is a wonderful thing. It makes what is excellent in others belong to us as well.", author: "Voltaire" },
-  { text: "Life is a shipwreck, but we must not forget to sing in the lifeboats.", author: "Voltaire" },
-  { text: "It is dangerous to be right in matters on which the established authorities are wrong.", author: "Voltaire", year: "1733" },
-  { text: "Prejudices are what fools use for reason.", author: "Voltaire" },
-  { text: "If you want to converse with me, define your terms.", author: "Voltaire" },
-  
+
   // Jean-Jacques Rousseau
   { text: "Man is born free, and everywhere he is in chains.", author: "Jean-Jacques Rousseau", year: "1762" },
   { text: "Patience is bitter, but its fruit is sweet.", author: "Jean-Jacques Rousseau" },
@@ -1159,9 +1066,8 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Experience does not err. Only your judgments err by expecting from her what is not in her power.", author: "Leonardo da Vinci" },
   { text: "In rivers, the water that you touch is the last of what has passed and the first of that which comes; so with present time.", author: "Leonardo da Vinci" },
   { text: "While I thought that I was learning how to live, I have been learning how to die.", author: "Leonardo da Vinci" },
-  
+
   // More quotes from various makers
-  { text: "An investment in knowledge always pays the best interest.", author: "Benjamin Franklin" },
   { text: "I think and think for months and years. Ninety-nine times, the conclusion is false. The hundredth time I am right.", author: "Albert Einstein" },
   
   // Additional Wright Brothers
@@ -1231,31 +1137,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "All religions, arts and sciences are branches of the same tree.", author: "Albert Einstein", year: "1937" },
   { text: "Imagination is everything. It is the preview of life's coming attractions.", author: "Albert Einstein" },
   { text: "The world is a dangerous place to live; not because of the people who are evil, but because of the people who don't do anything about it.", author: "Albert Einstein" },
-  
-  // More Franklin wisdom
-  { text: "Dost thou love life? Then do not squander time, for that is the stuff life is made of.", author: "Benjamin Franklin", year: "1746" },
-  { text: "Without freedom of thought, there can be no such thing as wisdom.", author: "Benjamin Franklin", year: "1722" },
-  { text: "Whatever is begun in anger, ends in shame.", author: "Benjamin Franklin" },
-  { text: "Glass, china, and reputation are easily cracked, and never well mended.", author: "Benjamin Franklin", year: "1750" },
-  { text: "Who is rich? He that is content. Who is that? Nobody.", author: "Benjamin Franklin", year: "1758" },
-  { text: "Three may keep a secret, if two of them are dead.", author: "Benjamin Franklin", year: "1735" },
-  { text: "Life's tragedy is that we get old too soon and wise too late.", author: "Benjamin Franklin" },
-  { text: "He that can have patience can have what he will.", author: "Benjamin Franklin", year: "1736" },
-  { text: "Distrust and caution are the parents of security.", author: "Benjamin Franklin", year: "1733" },
-  { text: "The Constitution only guarantees the American people the right to pursue happiness. You have to catch it yourself.", author: "Benjamin Franklin", year: "1787" },
-  
-  // More Ford quotes
-  { text: "My best friend is the one who brings out the best in me.", author: "Henry Ford" },
-  { text: "It has been my observation that most people get ahead during the time that others waste.", author: "Henry Ford" },
-  { text: "Chop your own wood and it will warm you twice.", author: "Henry Ford" },
-  { text: "You say I started out with practically nothing, but that isn't correct. We all start with all there is.", author: "Henry Ford" },
-  { text: "An idealist is a person who helps other people to be prosperous.", author: "Henry Ford" },
-  { text: "The man who will use his skill and constructive imagination to see how much he can give for a dollar, instead of how little he can give for a dollar, is bound to succeed.", author: "Henry Ford" },
-  { text: "Time and money spent in helping men to do more for themselves is far better than mere giving.", author: "Henry Ford" },
-  { text: "As we advance in life we learn the limits of our abilities.", author: "Henry Ford" },
-  { text: "One of the greatest discoveries a man makes is to find he can do what he was afraid he couldn't do.", author: "Henry Ford" },
-  { text: "Before everything else, getting ready is the secret of success.", author: "Henry Ford" },
-  
+
   // More Curie insights
   { text: "In science, we must be interested in things, not in persons.", author: "Marie Curie" },
   { text: "I am one of those who think like Nobel, that humanity will draw more good than evil from new discoveries.", author: "Marie Curie", year: "1921" },
@@ -1370,7 +1252,6 @@ export const makerQuotes: MakerQuote[] = [
   // More historical engineering wisdom
   { text: "The desire to know is natural to good men.", author: "Leonardo da Vinci" },
   { text: "Talent is a gift, but character is a choice.", author: "John C. Maxwell", year: "1993" },
-  { text: "If you think you can do a thing or think you can't do a thing, you're right.", author: "Henry Ford" },
   { text: "The mediocre teacher tells. The good teacher explains. The superior teacher demonstrates. The great teacher inspires.", author: "William Arthur Ward", year: "1970" },
   
   // More Emerson
@@ -1830,17 +1711,7 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Like buried treasures, the outposts of the universe have beckoned to the adventurous.", author: "George Ellery Hale", year: "1922" },
   { text: "Starlight is the fossil record of the universe.", author: "George Ellery Hale", year: "1928" },
   
-  // Charles Darwin (Naturalist)
-  { text: "It is not the strongest of the species that survives, nor the most intelligent, but the one most responsive to change.", author: "Charles Darwin", year: "1859" },
-  { text: "A man who dares to waste one hour of time has not discovered the value of life.", author: "Charles Darwin", year: "1870" },
-  { text: "Ignorance more frequently begets confidence than does knowledge.", author: "Charles Darwin", year: "1871" },
-  { text: "In the long history of humankind those who learned to collaborate and improvise most effectively have prevailed.", author: "Charles Darwin", year: "1859" },
-  { text: "The love for all living creatures is the most noble attribute of man.", author: "Charles Darwin", year: "1871" },
-  
-  // Alfred Russel Wallace (Naturalist)
-  { text: "Every species has come into existence coincident both in space and time with a pre-existing closely allied species.", author: "Alfred Russel Wallace", year: "1855" },
-  { text: "The truth is born into this world only with pangs and tribulations.", author: "Alfred Russel Wallace", year: "1908" },
-  
+
   // Gregor Mendel (Geneticist)
   { text: "The value and utility of any experiment are determined by the fitness of the material to the purpose for which it is used.", author: "Gregor Mendel", year: "1866" },
   { text: "My scientific studies have afforded me great gratification.", author: "Gregor Mendel", year: "1865" },
@@ -1851,39 +1722,7 @@ export const makerQuotes: MakerQuote[] = [
   
   // Hermann Muller (Geneticist)
   { text: "The gene as the basis of life.", author: "Hermann Muller", year: "1927" },
-  
-  // Lynn Margulis (Evolutionary Biologist)
-  { text: "Life did not take over the globe by combat, but by networking.", author: "Lynn Margulis", year: "1986" },
-  { text: "The atmosphere is made up of gasses that come from living things.", author: "Lynn Margulis", year: "1981" },
-  
-  // Stephen Jay Gould (Paleontologist)
-  { text: "The most erroneous stories are those we think we know best - and therefore never scrutinize or question.", author: "Stephen Jay Gould", year: "1989" },
-  { text: "Details are all that matters; God dwells in these and you never get to see Him if you don't struggle to get them right.", author: "Stephen Jay Gould", year: "1991" },
-  { text: "Science is an integral part of culture. It's not this foreign thing, done by an arcane priesthood.", author: "Stephen Jay Gould", year: "1989" },
-  
-  // Ernst Mayr (Evolutionary Biologist)
-  { text: "Theory helps us to bear our ignorance of facts.", author: "Ernst Mayr", year: "1985" },
-  
-  // Julian Huxley (Evolutionary Biologist)
-  { text: "The human species can, if it wishes, transcend itself.", author: "Julian Huxley", year: "1957" },
-  { text: "Operationally, God is beginning to resemble not a ruler but the last fading smile of a cosmic Cheshire cat.", author: "Julian Huxley", year: "1957" },
-  
-  // Ernst Haeckel (Biologist)
-  { text: "Ontogeny recapitulates phylogeny.", author: "Ernst Haeckel", year: "1866" },
-  { text: "Politics is applied biology.", author: "Ernst Haeckel", year: "1900" },
-  
-  // Konrad Lorenz (Ethologist)
-  { text: "Truth in science can be defined as the working hypothesis best suited to open the way to the next better one.", author: "Konrad Lorenz", year: "1973" },
-  { text: "Every man gets a narrower and narrower field of knowledge in which he must be an expert in order to compete with other people.", author: "Konrad Lorenz", year: "1980" },
-  
-  // Niko Tinbergen (Ethologist)
-  { text: "The experimental study of behavior is certainly one of the most difficult tasks in science.", author: "Niko Tinbergen", year: "1963" },
-  { text: "Watching animals has taught me more about how to be human than all the books I have ever read.", author: "Niko Tinbergen", year: "1973" },
-  
-  // Karl von Frisch (Ethologist)
-  { text: "The bee's life is like a magic well; the more you draw from it, the more it fills with water.", author: "Karl von Frisch", year: "1953" },
-  { text: "In a bee colony the worker bees do all the work.", author: "Karl von Frisch", year: "1950" },
-  
+
   // Jane Goodall (Primatologist)
   { text: "What you do makes a difference, and you have to decide what kind of difference you want to make.", author: "Jane Goodall", year: "1986" },
   { text: "The greatest danger to our future is apathy.", author: "Jane Goodall", year: "1990" },
@@ -1972,7 +1811,6 @@ export const makerQuotes: MakerQuote[] = [
   { text: "Patience is the companion of wisdom.", author: "Saint Augustine", year: "400" },
   { text: "Small deeds done are better than great deeds planned.", author: "Peter Marshall", year: "1948" },
   { text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu", year: "500 BC" },
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain", year: "1900" },
   { text: "Well begun is half done.", author: "Aristotle", year: "350 BC" },
   { text: "Practice makes perfect.", author: "Ancient Proverb" },
   { text: "Experience is the teacher of all things.", author: "Julius Caesar", year: "50 BC" },
@@ -1986,10 +1824,7 @@ export const makerQuotes: MakerQuote[] = [
   // Additional Engineering, Science & Maker Quotes (Pre-1995)
   
   // Workshop & Craftsmanship Wisdom
-  { text: "The bitterness of poor quality remains long after the sweetness of low price is forgotten.", author: "Benjamin Franklin", year: "1750" },
   { text: "Give me six hours to chop down a tree and I will spend the first four sharpening the axe.", author: "Abraham Lincoln", year: "1860" },
-  { text: "By failing to prepare, you are preparing to fail.", author: "Benjamin Franklin", year: "1750" },
-  { text: "Quality means doing it right when no one is looking.", author: "Henry Ford", year: "1920" },
   { text: "If you don't have time to do it right, when will you have time to do it over?", author: "John Wooden", year: "1970" },
   { text: "Striving for perfection is the greatest stopper there is. It's your excuse to yourself for not doing anything.", author: "John Updike", year: "1985" },
   { text: "Have no fear of perfection - you'll never reach it.", author: "Salvador Dalí", year: "1955" },
