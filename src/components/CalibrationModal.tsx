@@ -6,6 +6,14 @@ import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
 import { CoinReference, getCoinByName, searchCoins } from '../utils/coinReferences';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleIconSize
+} from '../utils/deviceScale';
 
 interface CalibrationModalProps {
   visible: boolean;
@@ -51,45 +59,45 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
         <View style={{
           position: 'absolute',
-          top: insets.top + 60,
-          left: 20,
-          right: 20,
-          maxHeight: selectedCoin ? 520 : 440,
-          borderRadius: 20,
+          top: insets.top + scaleSize(60),
+          left: scaleSize(20),
+          right: scaleSize(20),
+          maxHeight: selectedCoin ? scaleSize(520) : scaleSize(440),
+          borderRadius: scaleBorderRadius(20),
           overflow: 'hidden',
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: 12 },
+          shadowOffset: { width: 0, height: scaleSize(12) },
           shadowOpacity: 0.4,
-          shadowRadius: 24,
+          shadowRadius: scaleSize(24),
         }}>
           <BlurView
             intensity={40}
             tint="light"
             style={{
               flex: 1,
-              borderRadius: 20,
+              borderRadius: scaleBorderRadius(20),
               overflow: 'hidden',
             }}
           >
             <View style={{
               flex: 1,
               backgroundColor: 'rgba(255, 255, 255, 0.45)',
-              borderRadius: 20,
-              borderWidth: 1,
+              borderRadius: scaleBorderRadius(20),
+              borderWidth: scaleSize(1),
               borderColor: 'rgba(255, 255, 255, 0.4)',
             }}>
               {/* Header */}
               <View style={{
-                paddingTop: 20,
-                paddingHorizontal: 20,
-                paddingBottom: 16,
-                borderBottomWidth: 0.5,
+                paddingTop: scalePadding(20),
+                paddingHorizontal: scalePadding(20),
+                paddingBottom: scalePadding(16),
+                borderBottomWidth: scaleSize(0.5),
                 borderBottomColor: 'rgba(0, 0, 0, 0.08)',
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 24, marginRight: 10 }}>🪙</Text>
-                    <Text style={{ fontSize: 20, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
+                    <Text style={{ fontSize: scaleFontSize(24), marginRight: scaleMargin(10) }}>🪙</Text>
+                    <Text style={{ fontSize: scaleFontSize(20), fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
                       Select Reference Coin
                     </Text>
                   </View>
@@ -99,15 +107,15 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                       onDismiss();
                     }}
                     style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
+                      width: scaleSize(32),
+                      height: scaleSize(32),
+                      borderRadius: scaleBorderRadius(16),
                       backgroundColor: 'rgba(0, 0, 0, 0.08)',
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}
                   >
-                    <Ionicons name="close" size={18} color="rgba(0, 0, 0, 0.6)" />
+                    <Ionicons name="close" size={scaleIconSize(18)} color="rgba(0, 0, 0, 0.6)" />
                   </Pressable>
                 </View>
               </View>
@@ -117,53 +125,53 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                 {/* Selected Coin */}
                 {selectedCoin && (
                   <View style={{
-                    marginHorizontal: 16,
-                    marginTop: 14,
-                    marginBottom: 12,
+                    marginHorizontal: scaleMargin(16),
+                    marginTop: scaleMargin(14),
+                    marginBottom: scaleMargin(12),
                     backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 1,
+                    borderRadius: scaleBorderRadius(14),
+                    padding: scalePadding(14),
+                    borderWidth: scaleSize(1),
                     borderColor: 'rgba(76, 175, 80, 0.3)',
                     shadowColor: '#4CAF50',
-                    shadowOffset: { width: 0, height: 2 },
+                    shadowOffset: { width: 0, height: scaleSize(2) },
                     shadowOpacity: 0.15,
-                    shadowRadius: 8,
+                    shadowRadius: scaleSize(8),
                   }}>
                     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                      <View style={{ 
-                        flexDirection: 'row', 
+                      <View style={{
+                        flexDirection: 'row',
                         alignItems: 'center',
-                        marginBottom: 6,
+                        marginBottom: scaleMargin(6),
                       }}>
                         <View style={{
                           backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                          paddingHorizontal: 8,
-                          paddingVertical: 3,
-                          borderRadius: 6,
+                          paddingHorizontal: scalePadding(8),
+                          paddingVertical: scalePadding(3),
+                          borderRadius: scaleBorderRadius(6),
                         }}>
-                          <Text style={{ 
-                            color: '#2E7D32', 
-                            fontSize: 10, 
-                            fontWeight: '700', 
-                            letterSpacing: 0.5 
+                          <Text style={{
+                            color: '#2E7D32',
+                            fontSize: scaleFontSize(10),
+                            fontWeight: '700',
+                            letterSpacing: 0.5
                           }}>
                             SELECTED
                           </Text>
                         </View>
                       </View>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.9)', 
-                        fontWeight: '700', 
-                        fontSize: 17,
-                        marginBottom: 4,
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.9)',
+                        fontWeight: '700',
+                        fontSize: scaleFontSize(17),
+                        marginBottom: scaleMargin(4),
                         textAlign: 'center',
                       }}>
                         {selectedCoin.name}
                       </Text>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.55)', 
-                        fontSize: 14, 
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.55)',
+                        fontSize: scaleFontSize(14),
                         fontWeight: '500',
                         textAlign: 'center',
                       }}>
@@ -174,14 +182,14 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                           setSelectedCoin(null);
                         }}
-                        style={{ 
-                          padding: 8,
+                        style={{
+                          padding: scalePadding(8),
                           backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                          borderRadius: 20,
-                          marginTop: 8,
+                          borderRadius: scaleBorderRadius(20),
+                          marginTop: scaleMargin(8),
                         }}
                       >
-                        <Ionicons name="close-circle" size={22} color="rgba(0, 0, 0, 0.4)" />
+                        <Ionicons name="close-circle" size={scaleIconSize(22)} color="rgba(0, 0, 0, 0.4)" />
                       </Pressable>
                     </View>
                   </View>
@@ -189,19 +197,19 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
 
                 {/* Search Bar */}
                 <View style={{
-                  marginHorizontal: 16,
-                  marginTop: selectedCoin ? 0 : 14,
-                  marginBottom: 12,
+                  marginHorizontal: scaleMargin(16),
+                  marginTop: selectedCoin ? 0 : scaleMargin(14),
+                  marginBottom: scaleMargin(12),
                   flexDirection: 'row',
                   alignItems: 'center',
                   backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                  borderRadius: 12,
-                  paddingHorizontal: 14,
-                  paddingVertical: 12,
-                  borderWidth: 1,
+                  borderRadius: scaleBorderRadius(12),
+                  paddingHorizontal: scalePadding(14),
+                  paddingVertical: scalePadding(12),
+                  borderWidth: scaleSize(1),
                   borderColor: 'rgba(0, 0, 0, 0.06)',
                 }}>
-                  <Ionicons name="search" size={18} color="rgba(0, 0, 0, 0.35)" />
+                  <Ionicons name="search" size={scaleIconSize(18)} color="rgba(0, 0, 0, 0.35)" />
                   <TextInput
                     value={searchQuery}
                     onChangeText={setSearchQuery}
@@ -209,30 +217,30 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                     placeholderTextColor="rgba(0, 0, 0, 0.3)"
                     style={{
                       flex: 1,
-                      marginLeft: 10,
-                      fontSize: 15,
+                      marginLeft: scaleMargin(10),
+                      fontSize: scaleFontSize(15),
                       color: 'rgba(0, 0, 0, 0.85)',
                       fontWeight: '500',
                     }}
                     autoFocus={!selectedCoin}
                   />
                   {searchQuery.length > 0 && (
-                    <Pressable 
+                    <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setSearchQuery('');
                       }}
-                      style={{ padding: 4 }}
+                      style={{ padding: scalePadding(4) }}
                     >
-                      <Ionicons name="close-circle" size={18} color="rgba(0, 0, 0, 0.35)" />
+                      <Ionicons name="close-circle" size={scaleIconSize(18)} color="rgba(0, 0, 0, 0.35)" />
                     </Pressable>
                   )}
                 </View>
 
                 {/* Search Results */}
-                <ScrollView 
-                  style={{ flex: 1 }} 
-                  contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 12 }}
+                <ScrollView
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{ paddingHorizontal: scalePadding(16), paddingBottom: scalePadding(12) }}
                   showsVerticalScrollIndicator={false}
                 >
                   {searchResults.length > 0 ? (
@@ -246,31 +254,31 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                           setSearchQuery('');
                         }}
                         style={({ pressed }) => ({
-                          paddingVertical: 16,
-                          paddingHorizontal: 14,
-                          marginBottom: 12,
-                          borderRadius: 12,
-                          backgroundColor: pressed 
-                            ? 'rgba(255, 255, 255, 0.9)' 
+                          paddingVertical: scalePadding(16),
+                          paddingHorizontal: scalePadding(14),
+                          marginBottom: scaleMargin(12),
+                          borderRadius: scaleBorderRadius(12),
+                          backgroundColor: pressed
+                            ? 'rgba(255, 255, 255, 0.9)'
                             : 'rgba(255, 255, 255, 0.6)',
-                          borderWidth: 1,
-                          borderColor: pressed 
-                            ? 'rgba(0, 0, 0, 0.12)' 
+                          borderWidth: scaleSize(1),
+                          borderColor: pressed
+                            ? 'rgba(0, 0, 0, 0.12)'
                             : 'rgba(0, 0, 0, 0.06)',
                         })}
                       >
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.85)', 
-                          fontWeight: '600', 
-                          fontSize: 15,
-                          marginBottom: 3,
+                        <Text style={{
+                          color: 'rgba(0, 0, 0, 0.85)',
+                          fontWeight: '600',
+                          fontSize: scaleFontSize(15),
+                          marginBottom: scaleMargin(3),
                           textAlign: 'center',
                         }}>
                           {coin.name}
                         </Text>
-                        <Text style={{ 
-                          color: 'rgba(0, 0, 0, 0.5)', 
-                          fontSize: 13, 
+                        <Text style={{
+                          color: 'rgba(0, 0, 0, 0.5)',
+                          fontSize: scaleFontSize(13),
                           fontWeight: '500',
                           textAlign: 'center',
                         }}>
@@ -279,58 +287,58 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                       </Pressable>
                     ))
                   ) : searchQuery.length > 0 ? (
-                    <View style={{ paddingVertical: 32, alignItems: 'center' }}>
+                    <View style={{ paddingVertical: scalePadding(32), alignItems: 'center' }}>
                       <View style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 28,
+                        width: scaleSize(56),
+                        height: scaleSize(56),
+                        borderRadius: scaleBorderRadius(28),
                         backgroundColor: 'rgba(0, 0, 0, 0.04)',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        marginBottom: 12,
+                        marginBottom: scaleMargin(12),
                       }}>
-                        <Ionicons name="search-outline" size={28} color="rgba(0, 0, 0, 0.25)" />
+                        <Ionicons name="search-outline" size={scaleIconSize(28)} color="rgba(0, 0, 0, 0.25)" />
                       </View>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.5)', 
-                        fontSize: 15, 
-                        fontWeight: '600' 
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.5)',
+                        fontSize: scaleFontSize(15),
+                        fontWeight: '600'
                       }}>
                         No coins found
                       </Text>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.35)', 
-                        fontSize: 13, 
-                        marginTop: 4,
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.35)',
+                        fontSize: scaleFontSize(13),
+                        marginTop: scaleMargin(4),
                         textAlign: 'center',
                       }}>
                         Try a different search term
                       </Text>
                     </View>
                   ) : !selectedCoin ? (
-                    <View style={{ paddingVertical: 32, alignItems: 'center' }}>
+                    <View style={{ paddingVertical: scalePadding(32), alignItems: 'center' }}>
                       <View style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 28,
+                        width: scaleSize(56),
+                        height: scaleSize(56),
+                        borderRadius: scaleBorderRadius(28),
                         backgroundColor: 'rgba(0, 0, 0, 0.04)',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        marginBottom: 12,
+                        marginBottom: scaleMargin(12),
                       }}>
-                        <Ionicons name="search" size={28} color="rgba(0, 0, 0, 0.25)" />
+                        <Ionicons name="search" size={scaleIconSize(28)} color="rgba(0, 0, 0, 0.25)" />
                       </View>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.5)', 
-                        fontSize: 15, 
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.5)',
+                        fontSize: scaleFontSize(15),
                         fontWeight: '600',
-                        marginBottom: 6,
+                        marginBottom: scaleMargin(6),
                       }}>
                         Find your coin
                       </Text>
-                      <Text style={{ 
-                        color: 'rgba(0, 0, 0, 0.35)', 
-                        fontSize: 13,
+                      <Text style={{
+                        color: 'rgba(0, 0, 0, 0.35)',
+                        fontSize: scaleFontSize(13),
                         textAlign: 'center',
                       }}>
                         Try "penny", "nickel", or "quarter"
@@ -343,10 +351,10 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
               {/* Continue Button */}
               {selectedCoin && (
                 <View style={{
-                  paddingHorizontal: 16,
-                  paddingTop: 14,
-                  paddingBottom: 18,
-                  borderTopWidth: 0.5,
+                  paddingHorizontal: scalePadding(16),
+                  paddingTop: scalePadding(14),
+                  paddingBottom: scalePadding(18),
+                  borderTopWidth: scaleSize(0.5),
                   borderTopColor: 'rgba(0, 0, 0, 0.08)',
                   backgroundColor: 'rgba(255, 255, 255, 0.3)',
                 }}>
@@ -356,26 +364,26 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                       handleContinue();
                     }}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed 
-                        ? 'rgba(255, 255, 255, 0.9)' 
+                      backgroundColor: pressed
+                        ? 'rgba(255, 255, 255, 0.9)'
                         : 'rgba(255, 255, 255, 0.7)',
-                      borderRadius: 14,
-                      paddingVertical: 18,
+                      borderRadius: scaleBorderRadius(14),
+                      paddingVertical: scalePadding(18),
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderWidth: 1,
+                      borderWidth: scaleSize(1),
                       borderColor: 'rgba(0, 0, 0, 0.1)',
                       shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 4 },
+                      shadowOffset: { width: 0, height: scaleSize(4) },
                       shadowOpacity: 0.1,
-                      shadowRadius: 12,
+                      shadowRadius: scaleSize(12),
                     })}
                   >
-                    <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.8)', 
-                      fontWeight: '700', 
-                      fontSize: 22,
+                    <Text style={{
+                      color: 'rgba(0, 0, 0, 0.8)',
+                      fontWeight: '700',
+                      fontSize: scaleFontSize(22),
                       textAlign: 'center',
                     }}>
                       CONTINUE
@@ -387,18 +395,18 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
               {/* Map Scale Option */}
               {onMapScale && !selectedCoin && (
                 <View style={{
-                  paddingHorizontal: 16,
-                  paddingTop: 14,
-                  paddingBottom: 18,
-                  borderTopWidth: 0.5,
+                  paddingHorizontal: scalePadding(16),
+                  paddingTop: scalePadding(14),
+                  paddingBottom: scalePadding(18),
+                  borderTopWidth: scaleSize(0.5),
                   borderTopColor: 'rgba(0, 0, 0, 0.08)',
                   backgroundColor: 'rgba(255, 255, 255, 0.3)',
                 }}>
                   <Text style={{
-                    fontSize: 13,
+                    fontSize: scaleFontSize(13),
                     color: 'rgba(0, 0, 0, 0.5)',
                     textAlign: 'center',
-                    marginBottom: 10,
+                    marginBottom: scaleMargin(10),
                     fontWeight: '500',
                   }}>
                     — or —
@@ -409,23 +417,23 @@ export default function CalibrationModal({ visible, onComplete, onDismiss, onMap
                       onMapScale();
                     }}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed 
-                        ? 'rgba(100, 150, 255, 0.15)' 
+                      backgroundColor: pressed
+                        ? 'rgba(100, 150, 255, 0.15)'
                         : 'rgba(100, 150, 255, 0.1)',
-                      borderRadius: 14,
-                      paddingVertical: 14,
+                      borderRadius: scaleBorderRadius(14),
+                      paddingVertical: scalePadding(14),
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderWidth: 1,
+                      borderWidth: scaleSize(1),
                       borderColor: 'rgba(100, 150, 255, 0.3)',
                     })}
                   >
-                    <Text style={{ fontSize: 18, marginRight: 8 }}>🗺️</Text>
-                    <Text style={{ 
-                      color: 'rgba(0, 0, 0, 0.75)', 
-                      fontWeight: '600', 
-                      fontSize: 15,
+                    <Text style={{ fontSize: scaleFontSize(18), marginRight: scaleMargin(8) }}>🗺️</Text>
+                    <Text style={{
+                      color: 'rgba(0, 0, 0, 0.75)',
+                      fontWeight: '600',
+                      fontSize: scaleFontSize(15),
                     }}>
                       Use Map Scale Instead
                     </Text>
