@@ -30,6 +30,15 @@ import DiagnosticScreen from './DiagnosticScreen';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 import BlueprintPlacementModal from '../components/BlueprintPlacementModal';
 import BlueprintDistanceModal from '../components/BlueprintDistanceModal';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleGap,
+  scaleIconSize
+} from '../utils/deviceScale';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 type ScreenMode = 'camera' | 'zoomCalibrate' | 'measurement';
@@ -1086,14 +1095,14 @@ export default function CameraScreen() {
 
   if (!permission.granted) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', paddingHorizontal: 24 }}>
-        <Ionicons name="camera-outline" size={64} color="white" />
-        <Text style={{ color: 'white', fontSize: 20, textAlign: 'center', marginTop: 16, marginBottom: 24 }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', paddingHorizontal: scalePadding(24) }}>
+        <Ionicons name="camera-outline" size={scaleIconSize(64)} color="white" />
+        <Text style={{ color: 'white', fontSize: scaleFontSize(20), textAlign: 'center', marginTop: scaleMargin(16), marginBottom: scaleMargin(24) }}>
           Camera access is needed to take measurement photos
         </Text>
         <Pressable
           onPress={requestPermission}
-          style={{ backgroundColor: '#3B82F6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 9999 }}
+          style={{ backgroundColor: '#3B82F6', paddingHorizontal: scalePadding(24), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(9999) }}
         >
           <Text style={{ color: 'white', fontWeight: '600' }}>Grant Permission</Text>
         </Pressable>
@@ -1525,19 +1534,19 @@ export default function CameraScreen() {
                 autofocus="off"
               >
               {/* Top controls */}
-            <View 
-              style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                right: 0, 
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
                 zIndex: 10,
-                paddingTop: insets.top + 16 
+                paddingTop: insets.top + scaleMargin(16)
               }}
             >
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 24 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: scalePadding(24) }}>
                   {/* Original Controls - Right Side */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleGap(12) }}>
                     <Pressable
                       onPress={() => {
                         // Only open modal if it wasn't a long press
@@ -1559,21 +1568,21 @@ export default function CameraScreen() {
                         setShowEmailResetModal(true);
                       }}
                       delayLongPress={800}
-                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                      style={{ width: scaleSize(40), height: scaleSize(40), alignItems: 'center', justifyContent: 'center' }}
                     >
-                      <Ionicons name="help-circle-outline" size={28} color="white" />
+                      <Ionicons name="help-circle-outline" size={scaleIconSize(28)} color="white" />
                     </Pressable>
                     <Pressable
                       onPress={() => {
                         setFlashEnabled(!flashEnabled);
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       }}
-                      style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
+                      style={{ width: scaleSize(40), height: scaleSize(40), alignItems: 'center', justifyContent: 'center' }}
                     >
-                      <Ionicons 
-                        name={flashEnabled ? "flash" : "flash-off"} 
-                        size={26} 
-                        color={flashEnabled ? "#FFD700" : "white"} 
+                      <Ionicons
+                        name={flashEnabled ? "flash" : "flash-off"}
+                        size={scaleIconSize(26)}
+                        color={flashEnabled ? "#FFD700" : "white"}
                       />
                     </Pressable>
                   </View>
@@ -1698,16 +1707,16 @@ export default function CameraScreen() {
 
             {/* Crosshairs overlay - center of screen */}
             {/* Always visible - bubble level for alignment */}
-            <Animated.View 
+            <Animated.View
               style={[
                 {
                   position: 'absolute',
                   top: '50%',
                   left: '50%',
-                  width: 120, // 20% bigger (was 100)
-                  height: 120,
-                  marginLeft: -60, // Center it
-                  marginTop: -60,
+                  width: scaleSize(120), // 20% bigger (was 100)
+                  height: scaleSize(120),
+                  marginLeft: -scaleSize(60), // Center it
+                  marginTop: -scaleSize(60),
                 },
                 crosshairContainerStyle,
               ]}
@@ -1747,9 +1756,9 @@ export default function CameraScreen() {
                 style={[
                   {
                     position: 'absolute',
-                    width: 14,
-                    height: 14,
-                    borderRadius: 7,
+                    width: scaleSize(14),
+                    height: scaleSize(14),
+                    borderRadius: scaleBorderRadius(7),
                   },
                   bubbleStyle,
                 ]}
@@ -1762,37 +1771,37 @@ export default function CameraScreen() {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    borderRadius: 7,
+                    borderRadius: scaleBorderRadius(7),
                     backgroundColor: bubbleColor.main, // Solid session color
                     opacity: 0.95,
                   }}
                 />
-                
+
                 {/* Subtle inner highlight */}
                 <View
                   style={{
                     position: 'absolute',
-                    top: 3,
-                    left: 3,
-                    width: 5,
-                    height: 5,
-                    borderRadius: 2.5,
+                    top: scaleSize(3),
+                    left: scaleSize(3),
+                    width: scaleSize(5),
+                    height: scaleSize(5),
+                    borderRadius: scaleBorderRadius(2.5),
                     backgroundColor: 'rgba(255, 255, 255, 0.4)', // Subtle white highlight
                   }}
                 />
               </Animated.View>
               )}
-              
+
               {/* Center dot - morphs when bubble crosses */}
               <Animated.View
                 style={[
                   {
                     position: 'absolute',
-                    top: 57, // Center in 120px container
-                    left: 57,
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
+                    top: scaleSize(57), // Center in 120px container
+                    left: scaleSize(57),
+                    width: scaleSize(6),
+                    height: scaleSize(6),
+                    borderRadius: scaleBorderRadius(3),
                   },
                   centerDotStyle,
                 ]}
@@ -1806,17 +1815,17 @@ export default function CameraScreen() {
                 const opacity = lookDownOpacity.value;
                 return {
                   position: 'absolute',
-                  bottom: insets.bottom + 150, // Same position as instructions (above shutter)
-                  left: 24,
-                  right: 24,
+                  bottom: insets.bottom + scaleSize(150), // Same position as instructions (above shutter)
+                  left: scalePadding(24),
+                  right: scalePadding(24),
                   alignItems: 'center',
                   opacity: opacity,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', textAlign: 'center' }}>
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(20), paddingVertical: scalePadding(14), borderRadius: scaleBorderRadius(12) }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(14), fontWeight: '600', textAlign: 'center' }}>
                   Aim down for auto level/capture
                 </Text>
               </View>
@@ -1830,26 +1839,26 @@ export default function CameraScreen() {
                 const holdOpacity = instructionsOpacity.value;
                 return {
                   position: 'absolute',
-                  bottom: insets.bottom + 150, // Above shutter button
-                  left: 24,
-                  right: 24,
+                  bottom: insets.bottom + scaleSize(150), // Above shutter button
+                  left: scalePadding(24),
+                  right: scalePadding(24),
                   alignItems: 'center',
                   opacity: displayOpacity * holdOpacity, // Combine both fade effects
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12 }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
+              <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(16), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(12) }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
                   1. Place coin in center
                 </Text>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
                   2. Line up the lines
                 </Text>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600', textAlign: 'center', lineHeight: 18 }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
                   3. Tap to capture
                 </Text>
-                <Text style={{ color: 'white', fontSize: 10, fontWeight: '500', textAlign: 'center', lineHeight: 16, opacity: 0.8 }}>
+                <Text style={{ color: 'white', fontSize: scaleFontSize(10), fontWeight: '500', textAlign: 'center', lineHeight: scaleSize(16), opacity: 0.8 }}>
                   (hold for auto capture)
                 </Text>
               </View>
@@ -1864,20 +1873,20 @@ export default function CameraScreen() {
                   position: 'absolute',
                   top: '50%',
                   left: '50%',
-                  width: 25,
-                  height: 25,
-                  marginLeft: -12.5,
-                  marginTop: -12.5,
+                  width: scaleSize(25),
+                  height: scaleSize(25),
+                  marginLeft: -scaleSize(12.5),
+                  marginTop: -scaleSize(12.5),
                   opacity: horizontal ? 0.8 : 0,
                   pointerEvents: 'none',
                 };
               })()}
             >
-              <View style={{ 
-                width: 25, 
-                height: 25, 
-                borderRadius: 12.5,
-                borderWidth: 2,
+              <View style={{
+                width: scaleSize(25),
+                height: scaleSize(25),
+                borderRadius: scaleBorderRadius(12.5),
+                borderWidth: scaleSize(2),
                 borderColor: 'rgba(59, 130, 246, 0.9)',
                 backgroundColor: 'transparent',
               }} />
@@ -1889,10 +1898,10 @@ export default function CameraScreen() {
                 style={[
                   {
                     position: 'absolute',
-                    left: 24,
-                    right: 24,
+                    left: scalePadding(24),
+                    right: scalePadding(24),
                     top: '50%',
-                    marginTop: 100, // Just below the crosshairs
+                    marginTop: scaleMargin(100), // Just below the crosshairs
                     alignItems: 'center',
                     justifyContent: 'center',
                     zIndex: 15,
@@ -1904,7 +1913,7 @@ export default function CameraScreen() {
                   onPress={() => {
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     setAutoCaptureEnabled(true);
-                    
+
                     // Fade out button after 2.5 seconds
                     setTimeout(() => {
                       autoCaptureButtonOpacity.value = withTiming(0, { duration: 800 });
@@ -1912,30 +1921,30 @@ export default function CameraScreen() {
                     }, 2500);
                   }}
                   style={({ pressed }) => ({
-                    backgroundColor: pressed 
-                      ? 'rgba(255, 255, 255, 0.25)' 
+                    backgroundColor: pressed
+                      ? 'rgba(255, 255, 255, 0.25)'
                       : 'rgba(255, 255, 255, 0.15)',
-                    paddingVertical: 20,
-                    paddingHorizontal: 32,
-                    borderRadius: 16,
-                    borderWidth: 2,
+                    paddingVertical: scalePadding(20),
+                    paddingHorizontal: scalePadding(32),
+                    borderRadius: scaleBorderRadius(16),
+                    borderWidth: scaleSize(2),
                     borderColor: 'rgba(255, 255, 255, 0.4)',
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowOffset: { width: 0, height: scaleSize(4) },
                     shadowOpacity: 0.3,
-                    shadowRadius: 12,
+                    shadowRadius: scaleSize(12),
                   })}
                 >
                   <Text
                     style={{
                       color: 'white',
-                      fontSize: 20,
+                      fontSize: scaleFontSize(20),
                       fontWeight: '700',
                       textAlign: 'center',
                       letterSpacing: 0.5,
                       textShadowColor: 'rgba(0, 0, 0, 0.5)',
-                      textShadowOffset: { width: 0, height: 2 },
-                      textShadowRadius: 4,
+                      textShadowOffset: { width: 0, height: scaleSize(2) },
+                      textShadowRadius: scaleSize(4),
                     }}
                   >
                     Tap to Begin Auto Capture
@@ -1948,8 +1957,8 @@ export default function CameraScreen() {
             <View
               style={{
                 position: 'absolute',
-                bottom: insets.bottom + 40,
-                left: 66,
+                bottom: insets.bottom + scaleSize(40),
+                left: scaleSize(66),
                 zIndex: 26,
               }}
               pointerEvents="box-none"
@@ -1960,20 +1969,20 @@ export default function CameraScreen() {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   await pickImage();
                 }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                hitSlop={{ top: scaleSize(10), bottom: scaleSize(10), left: scaleSize(10), right: scaleSize(10) }}
                 style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 32,
+                  width: scaleSize(64),
+                  height: scaleSize(64),
+                  borderRadius: scaleBorderRadius(32),
                   backgroundColor: 'rgba(31, 41, 55, 0.8)',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 <View pointerEvents="none" style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name="airplane" size={20} color="white" style={{ position: 'absolute', top: 14 }} />
-                  <Ionicons name="map" size={18} color="white" style={{ position: 'absolute', bottom: 12, left: 14 }} />
-                  <Ionicons name="document-text" size={18} color="white" style={{ position: 'absolute', bottom: 12, right: 14 }} />
+                  <Ionicons name="airplane" size={scaleIconSize(20)} color="white" style={{ position: 'absolute', top: scaleSize(14) }} />
+                  <Ionicons name="map" size={scaleIconSize(18)} color="white" style={{ position: 'absolute', bottom: scaleSize(12), left: scaleSize(14) }} />
+                  <Ionicons name="document-text" size={scaleIconSize(18)} color="white" style={{ position: 'absolute', bottom: scaleSize(12), right: scaleSize(14) }} />
                 </View>
               </Pressable>
             </View>
@@ -1986,7 +1995,7 @@ export default function CameraScreen() {
                 left: 0,
                 right: 0,
                 zIndex: 25,
-                paddingBottom: insets.bottom + 40,
+                paddingBottom: insets.bottom + scaleSize(40),
                 pointerEvents: 'box-none'
               }}
             >
@@ -2003,7 +2012,7 @@ export default function CameraScreen() {
                       top: SCREEN_HEIGHT / 2 + (SCREEN_HEIGHT / 4),
                       alignItems: 'center',
                       justifyContent: 'center',
-                      paddingHorizontal: 32,
+                      paddingHorizontal: scalePadding(32),
                     }}
                     pointerEvents="none"
                   >
@@ -2013,13 +2022,13 @@ export default function CameraScreen() {
                         style={[
                           {
                             color: 'white',
-                            fontSize: 18,
+                            fontSize: scaleFontSize(18),
                             fontWeight: '700',
                             textAlign: 'center',
-                            lineHeight: 26,
+                            lineHeight: scaleSize(26),
                             textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                            textShadowOffset: { width: 0, height: 2 },
-                            textShadowRadius: 6,
+                            textShadowOffset: { width: 0, height: scaleSize(2) },
+                            textShadowRadius: scaleSize(6),
                           },
                           instructionalTextAnimatedStyle,
                         ]}
@@ -2034,13 +2043,13 @@ export default function CameraScreen() {
                         style={[
                           {
                             color: 'white',
-                            fontSize: 18,
+                            fontSize: scaleFontSize(18),
                             fontWeight: '700',
                             textAlign: 'center',
-                            lineHeight: 26,
+                            lineHeight: scaleSize(26),
                             textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                            textShadowOffset: { width: 0, height: 2 },
-                            textShadowRadius: 6,
+                            textShadowOffset: { width: 0, height: scaleSize(2) },
+                            textShadowRadius: scaleSize(6),
                           },
                           encouragementTextAnimatedStyle,
                         ]}
@@ -2048,20 +2057,20 @@ export default function CameraScreen() {
                         Focus, keep this level, you got this!
                       </Animated.Text>
                     )}
-                    
+
                     {/* Phase 3: Reminder (15-18s) */}
                     {showReminderText && (
                       <Animated.Text
                         style={[
                           {
                             color: 'white',
-                            fontSize: 18,
+                            fontSize: scaleFontSize(18),
                             fontWeight: '700',
                             textAlign: 'center',
-                            lineHeight: 26,
+                            lineHeight: scaleSize(26),
                             textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                            textShadowOffset: { width: 0, height: 2 },
-                            textShadowRadius: 6,
+                            textShadowOffset: { width: 0, height: scaleSize(2) },
+                            textShadowRadius: scaleSize(6),
                           },
                           reminderTextAnimatedStyle,
                         ]}
@@ -2069,18 +2078,18 @@ export default function CameraScreen() {
                         Remember to hold still and center the ball in the middle
                       </Animated.Text>
                     )}
-                    
+
                     {/* "Capturing..." always visible during capture */}
                     {isCapturing && (
                       <Text
                         style={{
                           color: 'white',
-                          fontSize: 18,
+                          fontSize: scaleFontSize(18),
                           fontWeight: '700',
                           textAlign: 'center',
                           textShadowColor: 'rgba(0, 0, 0, 0.9)',
-                          textShadowOffset: { width: 0, height: 2 },
-                          textShadowRadius: 6,
+                          textShadowOffset: { width: 0, height: scaleSize(2) },
+                          textShadowRadius: scaleSize(6),
                         }}
                       >
                         Capturing...
@@ -2098,7 +2107,7 @@ export default function CameraScreen() {
             <View
               style={{
                 position: 'absolute',
-                bottom: insets.bottom + 40,
+                bottom: insets.bottom + scaleSize(40),
                 left: 0,
                 right: 0,
                 alignItems: 'center',
@@ -2111,13 +2120,13 @@ export default function CameraScreen() {
                   // Capture orientation at press start to maintain consistent behavior
                   const orientationAtPress = isHorizontal.value;
                   holdStartTimeRef.current = Date.now();
-                  
+
                   // Only enable hold mode if in horizontal orientation
                   if (orientationAtPress) {
                     // Horizontal mode: Start holding - enable auto-capture mode
                     setIsHoldingShutter(true);
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    
+
                     // Fade out instructions when user starts holding
                     instructionsOpacity.value = withTiming(0, {
                       duration: 400,
@@ -2134,7 +2143,7 @@ export default function CameraScreen() {
                   const wasHolding = isHoldingShutter;
                   setIsHoldingShutter(false);
                   holdStartTimeRef.current = 0;
-                  
+
                   // Only fade instructions back in if we're still in camera mode and not capturing
                   if (mode === 'camera' && !isCapturing) {
                     instructionsOpacity.value = withTiming(1, {
@@ -2142,7 +2151,7 @@ export default function CameraScreen() {
                       easing: Easing.in(Easing.ease),
                     });
                   }
-                  
+
                   __DEV__ && console.log('📸 Shutter released:', {
                     holdDuration,
                     wasHolding,
@@ -2151,7 +2160,7 @@ export default function CameraScreen() {
                     hasCameraRef: !!cameraRef.current,
                     isCameraReady,
                   });
-                  
+
                   // Quick tap - capture in both orientations
                   // Longer threshold (500ms) for better UX - user doesn't have to be super quick
                   if (holdDuration < 500 && !isCapturing) {
@@ -2164,29 +2173,29 @@ export default function CameraScreen() {
                   }
                 }}
                 style={({ pressed }) => ({
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
-                  backgroundColor: pressed 
+                  width: scaleSize(80),
+                  height: scaleSize(80),
+                  borderRadius: scaleBorderRadius(40),
+                  backgroundColor: pressed
                     ? `${shutterColor.main}CC`  // 80% opacity when pressed
                     : `${shutterColor.main}E6`, // 90% opacity normally
-                  borderWidth: 5,
+                  borderWidth: scaleSize(5),
                   borderColor: isHoldingShutter ? crosshairColor.main : shutterColor.glow, // Show crosshair color when holding (visual feedback)
                   alignItems: 'center',
                   justifyContent: 'center',
                   shadowColor: shutterColor.main,
-                  shadowOffset: { width: 0, height: 4 },
+                  shadowOffset: { width: 0, height: scaleSize(4) },
                   shadowOpacity: 0.6,
-                  shadowRadius: 12,
+                  shadowRadius: scaleSize(12),
                   elevation: 10,
                 })}
               >
                 <View style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
+                  width: scaleSize(60),
+                  height: scaleSize(60),
+                  borderRadius: scaleBorderRadius(30),
                   backgroundColor: isHoldingShutter ? crosshairColor.glow : shutterColor.glow, // Show crosshair color when holding
-                  borderWidth: 3,
+                  borderWidth: scaleSize(3),
                   borderColor: '#333',
                 }} />
               </Pressable>
