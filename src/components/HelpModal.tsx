@@ -316,8 +316,8 @@ Thank you for helping us improve PanHandler!
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
           <View
             style={{
               flex: 1,
@@ -328,10 +328,10 @@ Thank you for helping us improve PanHandler!
               overflow: 'hidden',
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.2,
+              shadowOpacity: 0.3,
               shadowRadius: 20,
               elevation: 16,
-              backgroundColor: '#F5F5F7',
+              backgroundColor: '#E8E8ED',
             }}
           >
             {/* Header */}
@@ -340,7 +340,7 @@ Thank you for helping us improve PanHandler!
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
                 overflow: 'hidden',
-                backgroundColor: 'rgba(255,255,255,0.95)',
+                backgroundColor: 'rgba(255,255,255,0.92)',
               }}
             >
               <View
@@ -428,11 +428,11 @@ Thank you for helping us improve PanHandler!
             </View>
 
             {/* Content with background */}
-            <View style={{ flex: 1, backgroundColor: 'rgba(245,245,247,0.95)' }}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)' }}>
               <View
                 ref={modalContainerRef}
                 collapsable={false}
-                style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}
+                style={{ flex: 1, backgroundColor: 'rgba(248,248,250,0.7)', borderWidth: 1, borderColor: 'rgba(200,200,210,0.4)' }}
               >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
