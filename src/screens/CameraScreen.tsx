@@ -1900,15 +1900,15 @@ export default function CameraScreen() {
                     await pickImage();
                   }}
                   hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
-                  style={{ 
-                    position: 'absolute', 
-                    left: 32, 
-                    bottom: 0, 
-                    width: 80, 
-                    height: 80, 
-                    borderRadius: 40, 
-                    backgroundColor: 'rgba(31, 41, 55, 0.8)', 
-                    alignItems: 'center', 
+                  style={{
+                    position: 'absolute',
+                    right: 32,
+                    bottom: 0,
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    backgroundColor: 'rgba(31, 41, 55, 0.8)',
+                    alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
