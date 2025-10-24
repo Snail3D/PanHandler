@@ -1884,12 +1884,8 @@ export default function CameraScreen() {
               style={{
                 position: 'absolute',
                 bottom: insets.bottom + 40,
-                left: 0,
-                right: 0,
-                alignItems: 'flex-start',
-                paddingLeft: 66,
+                left: 66,
                 zIndex: 26,
-                pointerEvents: 'box-none'
               }}
             >
               <Pressable
@@ -1907,11 +1903,8 @@ export default function CameraScreen() {
                   justifyContent: 'center',
                 }}
               >
-                {/* Airplane on top */}
                 <Ionicons name="airplane" size={20} color="white" style={{ position: 'absolute', top: 14 }} pointerEvents="none" />
-                {/* Map bottom-left */}
                 <Ionicons name="map" size={18} color="white" style={{ position: 'absolute', bottom: 12, left: 14 }} pointerEvents="none" />
-                {/* Blueprint bottom-right */}
                 <Ionicons name="document-text" size={18} color="white" style={{ position: 'absolute', bottom: 12, right: 14 }} pointerEvents="none" />
               </Pressable>
             </View>
