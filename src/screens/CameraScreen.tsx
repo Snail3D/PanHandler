@@ -16,7 +16,7 @@ import { BlurView } from 'expo-blur';
 import { Svg, Path } from 'react-native-svg';
 import useStore from '../state/measurementStore';
 import VerbalScaleModal from '../components/VerbalScaleModal';
-import ZoomCalibration from '../components/ZoomCalibration';
+import CoinCalibration from '../components/CoinCalibration';
 import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
@@ -99,7 +99,11 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
   }
 }
 
-export default function MeasurementScreen() {
+// ═══════════════════════════════════════════════════════════════
+// CAMERA SCREEN - Main screen with camera view and measurement overlay
+// This is the primary screen of the app after the opening quote (App.tsx)
+// ═══════════════════════════════════════════════════════════════
+export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
   const [mode, setMode] = useState<ScreenMode>('camera');
@@ -125,11 +129,9 @@ export default function MeasurementScreen() {
   const [skipToBlueprintMode, setSkipToBlueprintMode] = useState(false); // Track if user selected blueprint photo type
   const [skipToAerialMode, setSkipToAerialMode] = useState(false); // Track if user selected aerial photo type
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
-  
-  // Opening quote - only on true app launch
-  const [showOpeningQuote, setShowOpeningQuote] = useState(false);
-  const hasShownOpeningQuote = useRef(false);
-  
+
+  // NOTE: Opening quote removed - now handled by App.tsx
+
   // Emergency reset - tap screen 5 times rapidly to force reset if stuck
   const emergencyTapCount = useRef(0);
   const emergencyTapTimer = useRef<NodeJS.Timeout | null>(null);
@@ -283,34 +285,8 @@ export default function MeasurementScreen() {
     }
   }, [mode, hasIncrementedSession]); // Trigger when mode changes or flag updates
 
-  // Show opening quote on app foreground (every time app comes back from background)
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      if (nextAppState === 'active') {
-        // App came to foreground - show quote
-        console.log('🎬 App foreground - triggering opening quote');
-        setTimeout(() => {
-          setShowOpeningQuote(true);
-          // Auto-reset after 1 second so DimensionOverlay can consume it
-          setTimeout(() => {
-            setShowOpeningQuote(false);
-          }, 1000);
-        }, 300);
-      }
-    });
-
-    // Also show on initial mount
-    setTimeout(() => {
-      setShowOpeningQuote(true);
-      setTimeout(() => {
-        setShowOpeningQuote(false);
-      }, 1000);
-    }, 500);
-
-    return () => {
-      subscription.remove();
-    };
-  }, []); // Empty deps - set up listener once
+  // NOTE: Opening quote is handled by App.tsx (the main intro screen with typing animation)
+  // No need for duplicate quote system here - App.tsx handles it on launch/foreground
 
   // Smooth mode transition helper - fade out, change mode, fade in WITH liquid morph
   const smoothTransitionToMode = (newMode: ScreenMode, delay: number = 1500) => {
@@ -2218,9 +2194,9 @@ export default function MeasurementScreen() {
     <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, screenTransitionStyle]}>
       {displayImageUri && (
         <>
-          {/* Zoom Calibration Mode */}
+          {/* Coin Calibration Mode - Zoom and align coin for scale */}
           {mode === 'zoomCalibrate' && (
-            <ZoomCalibration
+            <CoinCalibration
               key={displayImageUri}
               imageUri={displayImageUri}
               sessionColor={crosshairColor}
@@ -2289,11 +2265,6 @@ export default function MeasurementScreen() {
                   skipToMapMode={skipToMapMode}
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
-                  shouldShowOpeningQuote={showOpeningQuote}
-                  onOpeningQuoteShown={() => {
-                    // Reset flag after quote is shown so it doesn't show again
-                    setShowOpeningQuote(false);
-                  }}
                   onPanZoomLockChange={(shouldLock) => {
                     setIsPanZoomLocked(shouldLock);
                   }}

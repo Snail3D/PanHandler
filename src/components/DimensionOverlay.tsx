@@ -111,13 +111,12 @@ interface DimensionOverlayProps {
   skipToMapMode?: boolean; // If true, open map scale modal immediately on mount (from calibration screen's "Map Scale" button)
   skipToBlueprintMode?: boolean; // If true, open blueprint placement modal immediately on mount
   skipToAerialMode?: boolean; // If true, open aerial placement modal (blueprint with aerial language) immediately on mount
-  shouldShowOpeningQuote?: boolean; // If true, show opening quote (controlled by parent)
-  onOpeningQuoteShown?: () => void; // Called after quote is triggered (so parent can reset flag)
+  // NOTE: Opening quote removed from here - now handled by App.tsx
 }
 
-export default function DimensionOverlay({ 
-  zoomScale = 1, 
-  zoomTranslateX = 0, 
+export default function DimensionOverlay({
+  zoomScale = 1,
+  zoomTranslateX = 0,
   zoomTranslateY = 0,
   zoomRotation = 0,
   viewRef: externalViewRef,
@@ -130,8 +129,6 @@ export default function DimensionOverlay({
   skipToMapMode = false,
   skipToBlueprintMode = false,
   skipToAerialMode = false,
-  shouldShowOpeningQuote = false, // Default false - parent controls this
-  onOpeningQuoteShown, // Callback after quote shown
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
@@ -448,11 +445,7 @@ export default function DimensionOverlay({
   // Mode swipe animation for finger tracking
   const modeSwipeOffset = useSharedValue(0);
 
-  // Inspirational quote overlay state - v5.4.2 SIMPLIFIED
-  const [showQuote, setShowQuote] = useState(false);
-  const [currentQuote, setCurrentQuote] = useState<{text: string, author: string, year?: string} | null>(null);
-  const quoteOpacity = useSharedValue(0);
-  // REMOVED: displayedText, isQuoteTyping, quoteTapCount, quoteHapticFired, quoteTimeoutsRef, isQuoteTypingRef - NOT NEEDED
+  // NOTE: Opening quote state removed - now handled by App.tsx
 
   // Toast notification state (for save success)
   const [showToast, setShowToast] = useState(false);
@@ -484,16 +477,9 @@ export default function DimensionOverlay({
       setMeasurementMode(false); // Keep in pan mode but locked
     }
   }, []); // Only run on mount
-  
-  // Animated styles for quote overlay (must be after all state/ref hooks)
-  const quoteBackgroundStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(255, 255, 255, ${quoteOpacity.value})`, // White background for opening quote
-  }));
-  
-  const quoteContentStyle = useAnimatedStyle(() => ({
-    opacity: quoteOpacity.value,
-  }));
-  
+
+  // NOTE: Quote animated styles removed - now handled by App.tsx
+
   // Animated style for toast notification
   const toastAnimatedStyle = useAnimatedStyle(() => ({
     opacity: toastOpacity.value,
@@ -666,51 +652,9 @@ export default function DimensionOverlay({
       hasTriggeredSkipToMap.current = false;
     }
   }, [sessionColor]);
-  
-  // Track if we've shown the opening quote (persists across remounts via parent)
-  const hasShownQuoteRef = useRef(false);
-  
-  // Show opening quote when parent triggers it (can show multiple times now)
-  useEffect(() => {
-    if (shouldShowOpeningQuote && !currentImageUri) {
-      console.log('🎬 Showing opening quote');
-      showQuoteOverlay();
-      // Notify parent that quote was shown (so it can reset the flag)
-      if (onOpeningQuoteShown) {
-        onOpeningQuoteShown();
-      }
-    }
-  }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
-  const showQuoteOverlay = () => {
-    // CACHE BUST v5.4.2: INSTANT appearance - no animation at all for testing
-    const quote = getRandomQuote();
-
-    setCurrentQuote(quote);
-    setShowQuote(true);
-
-    // INSTANT opacity - no animation
-    quoteOpacity.value = 1;
-
-    console.log('🎬 v5.4.2 INSTANT QUOTE - NO ANIMATION');
-  };
-
-  const dismissQuote = () => {
-    // Smooth fade out animation
-    quoteOpacity.value = withTiming(0, {
-      duration: 400,
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
-    }, () => {
-      runOnJS(setShowQuote)(false);
-      runOnJS(setCurrentQuote)(null);
-    });
-  };
-
-  const handleQuoteTap = () => {
-    // Dismiss on any tap - graceful fade out
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    dismissQuote();
-  };
+  // NOTE: Opening quote system removed - now handled by App.tsx
+  // All quote-related state, functions, and UI removed to avoid conflicts
 
   // Toast notification functions
   const showToastNotification = (message: string) => {
@@ -7149,60 +7093,9 @@ export default function DimensionOverlay({
           </Text>
         </Animated.View>
       )}
-      
-      {/* Inspirational Quote Overlay */}
-      <Modal
-        visible={showQuote}
-        transparent
-        animationType="none"
-        onRequestClose={dismissQuote}
-      >
-        <Animated.View
-          style={[
-            {
-              flex: 1,
-            },
-            quoteBackgroundStyle
-          ]}
-        >
-          <Pressable
-            onPress={handleQuoteTap}
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: 40,
-            }}
-          >
-            <Animated.View
-              style={[
-                {
-                  maxWidth: 600,
-                },
-                quoteContentStyle
-              ]}
-            >
-              <Text
-                style={{
-                  color: '#000000',
-                  fontSize: 20,
-                  fontWeight: '400',
-                  textAlign: 'center',
-                  lineHeight: 32,
-                  textShadowColor: 'rgba(0, 0, 0, 0.1)',
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 2,
-                  fontFamily: 'System',
-                  letterSpacing: 0.5,
-                }}
-              >
-                {currentQuote ? `"${currentQuote.text}"\n\n- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}` : ''}
-              </Text>
-            </Animated.View>
-          </Pressable>
-        </Animated.View>
-      </Modal>
-      
+
+      {/* NOTE: Opening quote Modal removed - now handled by App.tsx */}
+
       {/* Tetris Easter Egg Overlay - Static version */}
       <Modal
         visible={showTetris}
