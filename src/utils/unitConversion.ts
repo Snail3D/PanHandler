@@ -47,31 +47,53 @@ export function getDisplayUnit(
     valueInMm = valueInBaseUnit * 304.8;
   }
 
+  // Determine the scale level of the baseUnit to maintain equivalent conversions
+  // Large scale: km <-> mi
+  // Medium scale: m <-> ft
+  // Small scale: mm/cm <-> in
+  const isLargeScale = baseUnit === 'km' || baseUnit === 'mi';
+  const isMediumScale = baseUnit === 'm' || baseUnit === 'ft';
+
   if (unitSystem === 'metric') {
-    // Metric: intelligently choose unit based on magnitude
-    if (valueInMm < 250) { // Less than 250mm (25cm) - stay in mm for precision
-      return { value: valueInMm, unit: 'mm' };
-    } else if (valueInMm < 1000) { // Less than 1000mm (1m)
-      return { value: valueInMm / 10, unit: 'cm' };
-    } else if (valueInMm < 1000000) { // Less than 1,000,000mm (1km)
+    // When switching to metric, maintain the scale level
+    if (isLargeScale) {
+      // Always use km for large scale (maps, long distances)
+      return { value: valueInMm / 1000000, unit: 'km' };
+    } else if (isMediumScale) {
+      // Always use meters for medium scale
       return { value: valueInMm / 1000, unit: 'm' };
     } else {
-      return { value: valueInMm / 1000000, unit: 'km' };
+      // Small scale: intelligently choose mm/cm based on magnitude
+      if (valueInMm < 250) {
+        return { value: valueInMm, unit: 'mm' };
+      } else if (valueInMm < 1000) {
+        return { value: valueInMm / 10, unit: 'cm' };
+      } else if (valueInMm < 1000000) {
+        return { value: valueInMm / 1000, unit: 'm' };
+      } else {
+        return { value: valueInMm / 1000000, unit: 'km' };
+      }
     }
   } else {
-    // Imperial: intelligently choose unit based on magnitude (inches → feet → miles)
-    const valueInInches = valueInMm / 25.4;
-    
-    if (valueInInches < 12) {
-      // Less than 1 foot → show inches
-      return { value: valueInInches, unit: 'in' };
-    } else if (valueInInches < 63360) {
-      // Less than 1 mile (63,360 inches) → show feet
-      return { value: valueInInches / 12, unit: 'ft' };
+    // When switching to imperial, maintain the scale level
+    if (isLargeScale) {
+      // Always use miles for large scale
+      return { value: valueInMm / 1609344, unit: 'mi' };
+    } else if (isMediumScale) {
+      // Always use feet for medium scale
+      return { value: valueInMm / 304.8, unit: 'ft' };
     } else {
-      // 1 mile or more → show miles
-      const valueInMiles = valueInMm / 1609344;
-      return { value: valueInMiles, unit: 'mi' };
+      // Small scale: intelligently choose in/ft based on magnitude
+      const valueInInches = valueInMm / 25.4;
+
+      if (valueInInches < 12) {
+        return { value: valueInInches, unit: 'in' };
+      } else if (valueInInches < 63360) {
+        return { value: valueInInches / 12, unit: 'ft' };
+      } else {
+        const valueInMiles = valueInMm / 1609344;
+        return { value: valueInMiles, unit: 'mi' };
+      }
     }
   }
 }

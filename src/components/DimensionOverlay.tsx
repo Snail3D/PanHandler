@@ -1634,23 +1634,27 @@ export default function DimensionOverlay({
       const p2 = points[2]; // bottom-right
       const widthPx = Math.abs(p2.x - p0.x);
       const heightPx = Math.abs(p2.y - p0.y);
-      
+
       // Map Mode: Apply scale conversion
       if (isUsingMapMode && activeMapScale) {
         const widthDist = convertToMapScale(widthPx);
         const heightDist = convertToMapScale(heightPx);
         const widthStr = formatMapScaleDistance(widthPx);
         const heightStr = formatMapScaleDistance(heightPx);
-        const value = `${widthStr} × ${heightStr}`;
-        return { ...measurement, value, width: widthDist, height: heightDist };
+        const areaDist2 = widthDist * heightDist;
+        const areaStr = formatMapScaleArea(areaDist2);
+        const value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
+        return { ...measurement, value, width: widthDist, height: heightDist, area: areaDist2 };
       }
-      
+
       const width = widthPx / (activeCalibration?.pixelsPerUnit || 1);
       const height = heightPx / (activeCalibration?.pixelsPerUnit || 1);
       const widthStr = formatMeasurement(width, activeCalibration?.unit || 'mm', unitSystem, 2);
       const heightStr = formatMeasurement(height, activeCalibration?.unit || 'mm', unitSystem, 2);
-      const value = `${widthStr} × ${heightStr}`;
-      return { ...measurement, value, width, height };
+      const area = width * height;
+      const areaStr = formatAreaMeasurement(area, activeCalibration?.unit || 'mm', unitSystem);
+      const value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
+      return { ...measurement, value, width, height, area };
     } else if (mode === 'freehand') {
       // Recalculate path length for freehand (both closed and open paths)
       let totalLength = 0;
@@ -5635,10 +5639,9 @@ export default function DimensionOverlay({
 
           {/* Measurement labels for completed measurements with smart positioning */}
           {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
-            // Calculate initial positions for all labels, EXCLUDING rectangles (they have side labels only)
+            // Calculate initial positions for all labels
             const labelData = measurements
               .map((measurement, originalIdx) => ({ measurement, originalIdx }))
-              .filter(({ measurement }) => measurement.mode !== 'rectangle')
               .map(({ measurement, originalIdx }) => {
               const color = getMeasurementColor(originalIdx, measurement.mode);
               let screenX = 0, screenY = 0;
