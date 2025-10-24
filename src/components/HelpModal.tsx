@@ -12,10 +12,10 @@ import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
 import AlertModal from './AlertModal';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
   withDelay,
   withSequence,
   withTiming,
@@ -25,6 +25,15 @@ import Animated, {
   SlideInRight
 } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleIconSize,
+  scaleGap
+} from '../utils/deviceScale';
 
 interface HelpModalProps {
   visible: boolean;
@@ -89,7 +98,7 @@ const ExpandableSection = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, { marginBottom: 14, zIndex: expanded ? 999 : 0 }]}>
+    <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14), zIndex: expanded ? 999 : 0 }]}>
       <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -97,13 +106,13 @@ const ExpandableSection = ({
         }}
         style={{
           backgroundColor: 'rgba(255,255,255,0.5)',
-          borderRadius: 20,
+          borderRadius: scaleBorderRadius(20),
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.2,
-          shadowRadius: 12,
+          shadowRadius: scaleSize(12),
           elevation: expanded ? 999 : 6,
-          borderWidth: 1,
+          borderWidth: scaleSize(1),
           borderColor: 'rgba(255,255,255,0.35)',
         }}
       >
@@ -112,11 +121,11 @@ const ExpandableSection = ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 18,
+            padding: scalePadding(18),
           }}
         >
           <Text style={{
-            fontSize: 17,
+            fontSize: scaleFontSize(17),
             fontWeight: '700',
             color: '#1C1C1E',
             textAlign: 'center',
@@ -124,13 +133,13 @@ const ExpandableSection = ({
           }}>
             {title}
           </Text>
-          <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: 18 }]}>
-            <Ionicons name="chevron-down" size={24} color={color} />
+          <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: scalePadding(18) }]}>
+            <Ionicons name="chevron-down" size={scaleIconSize(24)} color={color} />
           </AnimatedView>
         </View>
-        
+
         <AnimatedView style={contentAnimatedStyle}>
-          <View style={{ paddingHorizontal: 18, paddingBottom: 18 }}>
+          <View style={{ paddingHorizontal: scalePadding(18), paddingBottom: scalePadding(18) }}>
             {children}
           </View>
         </AnimatedView>
@@ -321,15 +330,15 @@ Thank you for helping us improve PanHandler!
           <View
             style={{
               flex: 1,
-              marginTop: insets.top + 20,
-              marginHorizontal: 16,
-              marginBottom: insets.bottom + 20,
-              borderRadius: 20,
+              marginTop: insets.top + scaleSize(20),
+              marginHorizontal: scaleMargin(16),
+              marginBottom: insets.bottom + scaleSize(20),
+              borderRadius: scaleBorderRadius(20),
               overflow: 'hidden',
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 6 },
+              shadowOffset: { width: 0, height: scaleSize(6) },
               shadowOpacity: 0.3,
-              shadowRadius: 20,
+              shadowRadius: scaleSize(20),
               elevation: 16,
               backgroundColor: '#E8E8ED',
             }}
@@ -337,55 +346,55 @@ Thank you for helping us improve PanHandler!
             {/* Header */}
             <View
               style={{
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: scaleBorderRadius(20),
+                borderTopRightRadius: scaleBorderRadius(20),
                 overflow: 'hidden',
                 backgroundColor: 'rgba(255,255,255,0.92)',
               }}
             >
               <View
                 style={{
-                  paddingTop: 24,
-                  paddingBottom: 20,
-                  paddingHorizontal: 24,
+                  paddingTop: scalePadding(24),
+                  paddingBottom: scalePadding(20),
+                  paddingHorizontal: scalePadding(24),
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   backgroundColor: 'rgba(255,255,255,0.5)',
-                  borderBottomWidth: 1,
+                  borderBottomWidth: scaleSize(1),
                   borderBottomColor: 'rgba(0,0,0,0.08)',
                 }}
               >
                 <Animated.View style={[{ flexDirection: 'row', alignItems: 'center' }, headerAnimatedStyle]}>
                   <View style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
+                    width: scaleSize(48),
+                    height: scaleSize(48),
+                    borderRadius: scaleBorderRadius(24),
                     backgroundColor: 'rgba(0,122,255,0.15)',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginRight: 14,
+                    marginRight: scaleMargin(14),
                     shadowColor: '#007AFF',
                     shadowOffset: { width: 0, height: 0 },
                     shadowOpacity: 0.4,
-                    shadowRadius: 10,
+                    shadowRadius: scaleSize(10),
                   }}>
-                    <Ionicons name="help-circle" size={28} color="#007AFF" />
+                    <Ionicons name="help-circle" size={scaleIconSize(28)} color="#007AFF" />
                   </View>
                   <View>
-                    <Text style={{ 
-                      color: '#1C1C1E', 
-                      fontSize: 24, 
+                    <Text style={{
+                      color: '#1C1C1E',
+                      fontSize: scaleFontSize(24),
                       fontWeight: '700',
                       letterSpacing: -0.5,
                     }}>
                       Guide
                     </Text>
-                    <Text style={{ 
-                      color: '#8E8E93', 
-                      fontSize: 13, 
+                    <Text style={{
+                      color: '#8E8E93',
+                      fontSize: scaleFontSize(13),
                       fontWeight: '600',
-                      marginTop: -2,
+                      marginTop: scaleMargin(-2),
                     }}>
                       By CAD pros, for CAD pros
                     </Text>
@@ -414,15 +423,15 @@ Thank you for helping us improve PanHandler!
                   }}
                   delayLongPress={800}
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
+                    width: scaleSize(44),
+                    height: scaleSize(44),
+                    borderRadius: scaleBorderRadius(22),
                     backgroundColor: 'rgba(120,120,128,0.16)',
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                 >
-                  <Ionicons name="close" size={24} color="#3C3C43" />
+                  <Ionicons name="close" size={scaleIconSize(24)} color="#3C3C43" />
                 </Pressable>
               </View>
             </View>
@@ -432,12 +441,12 @@ Thank you for helping us improve PanHandler!
               <View
                 ref={modalContainerRef}
                 collapsable={false}
-                style={{ flex: 1, backgroundColor: 'rgba(248,248,250,0.7)', borderWidth: 1, borderColor: 'rgba(200,200,210,0.4)' }}
+                style={{ flex: 1, backgroundColor: 'rgba(248,248,250,0.7)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
                     style={{ flex: 1 }}
-                    contentContainerStyle={{ padding: 20 }}
+                    contentContainerStyle={{ padding: scalePadding(20) }}
                     showsVerticalScrollIndicator={false}
                     scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
                   >
