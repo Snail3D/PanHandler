@@ -62,12 +62,11 @@ export default function AlertModal({
       onRequestClose={handleCancel}
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-        <Pressable 
+        <Pressable
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
           onPress={handleCancel}
         >
-          <Pressable
-            onPress={(e) => e.stopPropagation()}
+          <View
             style={{
               borderRadius: 20,
               width: '100%',
@@ -182,7 +181,7 @@ export default function AlertModal({
                 </View>
               </View>
             </BlurView>
-          </Pressable>
+          </View>
         </Pressable>
       </BlurView>
     </Modal>
