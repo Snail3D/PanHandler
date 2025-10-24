@@ -675,11 +675,10 @@ export default function DimensionOverlay({
   // Track if we've shown the opening quote (persists across remounts via parent)
   const hasShownQuoteRef = useRef(false);
   
-  // Show opening quote ONLY when parent says so AND we haven't shown it yet
+  // Show opening quote when parent triggers it (can show multiple times now)
   useEffect(() => {
-    if (shouldShowOpeningQuote && !currentImageUri && !hasShownQuoteRef.current) {
-      console.log('🎬 App launch - showing opening quote');
-      hasShownQuoteRef.current = true; // Mark as shown locally
+    if (shouldShowOpeningQuote && !currentImageUri) {
+      console.log('🎬 Showing opening quote');
       showQuoteOverlay();
       // Notify parent that quote was shown (so it can reset the flag)
       if (onOpeningQuoteShown) {
@@ -689,107 +688,44 @@ export default function DimensionOverlay({
   }, [shouldShowOpeningQuote]); // Trigger when parent sets this to true
 
   const showQuoteOverlay = () => {
-    // IMMEDIATE haptic to test if this function is even called
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400);
-    
+    // Get random quote
     const quote = getRandomQuote();
+    const fullText = `"${quote.text}"`;
+    const authorText = `- ${quote.author}${quote.year ? `, ${quote.year}` : ''}`;
+    const completeText = `${fullText}\n\n${authorText}`;
+
     setCurrentQuote(quote);
-    setDisplayedText('');
-    setQuoteTapCount(0);
+    setDisplayedText(completeText); // Show full text immediately - no typing
     setShowQuote(true);
-    setIsQuoteTyping(true);
-    isQuoteTypingRef.current = true; // Set ref to prevent premature cleanup
-    
-    // Smooth fade in with spring physics for buttery smoothness
+    setIsQuoteTyping(false); // No typing animation
+    isQuoteTypingRef.current = false;
+
+    // Smooth fade in with spring physics
     quoteOpacity.value = withSpring(1, {
       damping: 20,
       stiffness: 90,
       mass: 0.5,
     });
   };
-  
-  // Quote typing effect with haptics (separate useEffect like BattlingBotsModal)
-  useEffect(() => {
-    // FIRE IMMEDIATELY to test if this useEffect EVER runs
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
-    if (!isQuoteTyping || !currentQuote) return;
-    
-    // Clear any existing timeouts first
-    quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
-    quoteTimeoutsRef.current = [];
-    
-    // IMMEDIATE Heavy haptic at the very start
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
-    const fullText = `"${currentQuote.text}"`;
-    const authorText = `- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}`;
-    const completeText = `${fullText}\n\n${authorText}`;
-    
-    const typingSpeed = 50;
-    
-    // Add haptics during typing - every 4th character
-    setDisplayedText(completeText.substring(0, 1));
-    
-    for (let i = 1; i < completeText.length; i++) {
-      const timeout = setTimeout(() => {
-        // Check if typing was cancelled
-        if (!isQuoteTypingRef.current) return;
-        
-        setDisplayedText(completeText.substring(0, i + 1));
-        
-        // Haptic feedback every 4 characters (not too frequent, noticeable)
-        if (i % 4 === 0) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        }
-        
-        if (i === completeText.length - 1) {
-          setIsQuoteTyping(false);
-          isQuoteTypingRef.current = false;
-          setTimeout(() => {
-            dismissQuote();
-          }, 5000);
-        }
-      }, i * typingSpeed);
-      
-      quoteTimeoutsRef.current.push(timeout);
-    }
-    
-    return () => {
-      // Only clear timeouts if typing was explicitly cancelled (not from re-render)
-      if (!isQuoteTypingRef.current) {
-        quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
-        quoteTimeoutsRef.current = [];
-      }
-    };
-  }, [isQuoteTyping, currentQuote]);
-  
+
   const dismissQuote = () => {
-    isQuoteTypingRef.current = false; // Stop typing
-    quoteTimeoutsRef.current.forEach(timeout => clearTimeout(timeout)); // Clear all timeouts
-    quoteTimeoutsRef.current = [];
-    
-    quoteOpacity.value = withTiming(0, { 
-      duration: 500,
-      easing: Easing.bezier(0.4, 0.0, 0.2, 1) // Smooth deceleration
+    // Smooth fade out animation
+    quoteOpacity.value = withTiming(0, {
+      duration: 400,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }, () => {
       runOnJS(setShowQuote)(false);
       runOnJS(setCurrentQuote)(null);
       runOnJS(setDisplayedText)('');
-      runOnJS(setIsQuoteTyping)(false);
     });
   };
-  
+
   const handleQuoteTap = () => {
-    setQuoteTapCount(prev => prev + 1);
-    if (quoteTapCount >= 2) {
-      // User tapped 3+ times, dismiss immediately
-      dismissQuote();
-    }
+    // Dismiss on any tap - graceful fade out
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    dismissQuote();
   };
-  
+
   // Toast notification functions
   const showToastNotification = (message: string) => {
     setToastMessage(message);
