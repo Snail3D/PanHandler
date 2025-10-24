@@ -7725,12 +7725,12 @@ export default function DimensionOverlay({
         }}
       />
 
-      {/* Pan Tutorial Overlay - Shows on first load after calibration */}
+      {/* Pan Tutorial Overlay - Shows on first load after calibration - moved down 10% */}
       {showPanTutorial && (
         <Animated.View
           style={[{
             position: 'absolute',
-            top: SCREEN_HEIGHT / 2 - 120,
+            top: SCREEN_HEIGHT / 2 - 40, // Moved down 10% (was -120, now -40)
             left: 40,
             right: 40,
             alignItems: 'center',
