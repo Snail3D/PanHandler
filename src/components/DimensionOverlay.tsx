@@ -2690,6 +2690,14 @@ export default function DimensionOverlay({
             if (email && email.trim()) {
               emailToUse = email.trim();
               setUserEmail(emailToUse);
+              // Show confirmation that email was saved
+              setTimeout(() => {
+                showAlert(
+                  'Email Saved',
+                  'Your email has been saved for future reports. Tip: You can reset it anytime by long-pressing the Help (?) button.',
+                  'success'
+                );
+              }, 500);
             }
             setShowEmailPromptModal(false);
             resolve();

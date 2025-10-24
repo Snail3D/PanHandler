@@ -29,6 +29,7 @@ import useStore from '../state/measurementStore';
 interface HelpModalProps {
   visible: boolean;
   onClose: () => void;
+  onEmailReset?: () => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -141,10 +142,11 @@ const ExpandableSection = ({
 // Comparison row component for Free vs Pro table
 // Removed: ComparisonRow component - Free vs Pro system no longer exists
 
-export default function HelpModal({ visible, onClose }: HelpModalProps) {
+export default function HelpModal({ visible, onClose, onEmailReset }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
+  const setUserEmail = useStore((s) => s.setUserEmail);
   
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
@@ -311,7 +313,7 @@ Thank you for helping us improve PanHandler!
       transparent={true}
       onRequestClose={onClose}
     >
-      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' }}>
           <View
             style={{
@@ -326,16 +328,16 @@ Thank you for helping us improve PanHandler!
               shadowOpacity: 0.2,
               shadowRadius: 20,
               elevation: 16,
+              backgroundColor: '#F5F5F7',
             }}
           >
-            {/* Translucent Header with Blur */}
-            <BlurView 
-              intensity={35} 
-              tint="light"
+            {/* Header */}
+            <View
               style={{
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
                 overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255,0.95)',
               }}
             >
               <View
@@ -391,6 +393,14 @@ Thank you for helping us improve PanHandler!
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     onClose();
                   }}
+                  onLongPress={() => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    setUserEmail(null);
+                    if (onEmailReset) {
+                      onEmailReset();
+                    }
+                    showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending a support email.', 'success');
+                  }}
                   style={{
                     width: 44,
                     height: 44,
@@ -403,11 +413,11 @@ Thank you for helping us improve PanHandler!
                   <Ionicons name="close" size={24} color="#3C3C43" />
                 </Pressable>
               </View>
-            </BlurView>
+            </View>
 
-            {/* Content with glassmorphism background */}
-            <BlurView intensity={35} tint="light" style={{ flex: 1 }}>
-              <View 
+            {/* Content with background */}
+            <View style={{ flex: 1, backgroundColor: 'rgba(245,245,247,0.95)' }}>
+              <View
                 ref={modalContainerRef}
                 collapsable={false}
                 style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.5)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' }}
@@ -2172,16 +2182,15 @@ Thank you for helping us improve PanHandler!
             </Animated.ScrollView>
                 </GestureDetector>
               </View>
-            </BlurView>
+            </View>
 
-            {/* Translucent Footer with Blur - Now empty/minimal */}
-            <BlurView 
-              intensity={100} 
-              tint="light"
+            {/* Footer */}
+            <View
               style={{
                 borderBottomLeftRadius: 32,
                 borderBottomRightRadius: 32,
                 overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255,0.85)',
               }}
             >
               <View
@@ -2195,10 +2204,10 @@ Thank you for helping us improve PanHandler!
               >
                 {/* Footer is now minimal - content moved to ScrollView */}
               </View>
-            </BlurView>
+            </View>
           </View>
         </View>
-      </BlurView>
+      </View>
     </Modal>
 
     {/* Custom Alert Modal - Outside main modal for proper z-index */}

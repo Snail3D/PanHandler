@@ -21,6 +21,7 @@ import DimensionOverlay from '../components/DimensionOverlay';
 import ZoomableImage from '../components/ZoomableImageV2';
 import HelpModal from '../components/HelpModal';
 import BattlingBotsModal from '../components/BattlingBotsModal';
+import AlertModal from '../components/AlertModal';
 import TypewriterText from '../components/TypewriterText';
 import TouchOverlayFingerprints from '../components/TouchOverlayFingerprints';
 import { CoinReference } from '../utils/coinReferences';
@@ -249,10 +250,14 @@ export default function CameraScreen() {
   const lastDonationSession = useStore((s) => s.lastDonationSession);
   const isFirstTimeDonor = useStore((s) => s.isFirstTimeDonor);
   const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
-  
-  // BattlingBots donation modal state  
+  const setUserEmail = useStore((s) => s.setUserEmail);
+
+  // BattlingBots donation modal state
   const [showBattlingBots, setShowBattlingBots] = useState(false);
   const [hasIncrementedSession, setHasIncrementedSession] = useState(false);
+
+  // Email reset confirmation modal
+  const [showEmailResetModal, setShowEmailResetModal] = useState(false);
   
   // Trigger BattlingBots when entering measurement screen (not on app mount)
   useEffect(() => {
@@ -1536,6 +1541,12 @@ export default function CameraScreen() {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setShowHelpModal(true);
                       }}
+                      onLongPress={() => {
+                        __DEV__ && console.log('🔵 Help button long-pressed - resetting email');
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        setUserEmail(null);
+                        setShowEmailResetModal(true);
+                      }}
                       style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Ionicons name="help-circle-outline" size={28} color="white" />
@@ -2234,9 +2245,13 @@ export default function CameraScreen() {
           }}
           sessionColor={crosshairColor}
         />
-        
+
         {/* Help Modal - needs to be here for camera mode */}
-        <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+        <HelpModal
+          visible={showHelpModal}
+          onClose={() => setShowHelpModal(false)}
+          onEmailReset={() => setShowEmailResetModal(true)}
+        />
       </View>
     );
   }
@@ -2401,8 +2416,21 @@ export default function CameraScreen() {
       )}
 
       {/* Help Modal */}
-      <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
-      
+      <HelpModal
+        visible={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+        onEmailReset={() => setShowEmailResetModal(true)}
+      />
+
+      {/* Email Reset Confirmation Modal */}
+      <AlertModal
+        visible={showEmailResetModal}
+        title="Email Reset"
+        message="Your saved email has been cleared successfully. Tip: You can reset your email anytime by long-pressing the Help (?) button."
+        type="success"
+        onClose={() => setShowEmailResetModal(false)}
+      />
+
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
       
