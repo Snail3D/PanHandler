@@ -1892,27 +1892,33 @@ export default function CameraScreen() {
               }}
             >
               <View style={{ alignItems: 'center', pointerEvents: 'box-none' }}>
-                {/* Photo Library Button - 20% smaller than shutter, map/drone icon */}
+                {/* Photo Library Button - 20% smaller than shutter, map/drone/blueprint icons */}
                 <Pressable
                   onPress={async () => {
                     console.log('📸 Photo library button pressed');
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     await pickImage();
                   }}
-                  hitSlop={{ top: 40, bottom: 40, left: 40, right: 40 }}
+                  hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   style={{
                     position: 'absolute',
-                    right: 100,
-                    bottom: 8,
+                    right: 66,
+                    bottom: 0,
                     width: 64,
                     height: 64,
                     borderRadius: 32,
                     backgroundColor: 'rgba(31, 41, 55, 0.8)',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    zIndex: 30
                   }}
+                  pointerEvents="auto"
                 >
-                  <Ionicons name="map-outline" size={28} color="white" />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="map" size={20} color="white" style={{ marginRight: -4 }} />
+                    <Ionicons name="airplane" size={18} color="white" style={{ marginTop: -8, marginRight: -4 }} />
+                    <Ionicons name="document-text" size={18} color="white" />
+                  </View>
                 </Pressable>
 
                 {/* Instructional Text Sequence - Positioned halfway between crosshairs and bottom */}
