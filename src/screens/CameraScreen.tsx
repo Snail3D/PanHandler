@@ -1892,7 +1892,7 @@ export default function CameraScreen() {
               }}
             >
               <View style={{ alignItems: 'center', pointerEvents: 'box-none' }}>
-                {/* Photo Library Button - 20% smaller than shutter, map/drone/blueprint icons */}
+                {/* Photo Library Button - Triangle icon layout: airplane top, map/blueprint bottom */}
                 <Pressable
                   onPress={async () => {
                     console.log('📸 Photo library button pressed');
@@ -1901,9 +1901,9 @@ export default function CameraScreen() {
                   }}
                   hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   style={{
-                    position: 'absolute',
-                    right: 66,
-                    bottom: 0,
+                    position: 'relative',
+                    marginRight: 'auto',
+                    marginLeft: 66,
                     width: 64,
                     height: 64,
                     borderRadius: 32,
@@ -1914,10 +1914,14 @@ export default function CameraScreen() {
                   }}
                   pointerEvents="auto"
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <Ionicons name="map" size={20} color="white" style={{ marginRight: -4 }} />
-                    <Ionicons name="airplane" size={18} color="white" style={{ marginTop: -8, marginRight: -4 }} />
-                    <Ionicons name="document-text" size={18} color="white" />
+                  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Airplane on top */}
+                    <Ionicons name="airplane" size={20} color="white" style={{ marginBottom: 2 }} />
+                    {/* Map and Blueprint on bottom row */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -2 }}>
+                      <Ionicons name="map" size={18} color="white" style={{ marginRight: 4 }} />
+                      <Ionicons name="document-text" size={18} color="white" />
+                    </View>
                   </View>
                 </Pressable>
 
