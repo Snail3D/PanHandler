@@ -7215,7 +7215,7 @@ export default function DimensionOverlay({
                   letterSpacing: 0.5,
                 }}
               >
-                {displayedText}
+                {currentQuote ? `"${currentQuote.text}"\n\n- ${currentQuote.author}${currentQuote.year ? `, ${currentQuote.year}` : ''}` : ''}
               </Text>
             </Animated.View>
           </Pressable>
