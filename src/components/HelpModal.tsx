@@ -35,35 +35,31 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
-// Expandable section component with GLOWING VIBRANT AESTHETIC + Rolodex effect
-const ExpandableSection = ({ 
-  title, 
-  icon, 
-  color, 
-  children, 
-  delay = 0,
-  scrollY,
-  index = 0
-}: { 
-  title: string; 
-  icon: string; 
-  color: string; 
-  children: React.ReactNode; 
+// Expandable section component with GLOWING VIBRANT AESTHETIC
+const ExpandableSection = ({
+  title,
+  icon,
+  color,
+  children,
+  delay = 0
+}: {
+  title: string;
+  icon: string;
+  color: string;
+  children: React.ReactNode;
   delay?: number;
-  scrollY?: Animated.SharedValue<number>;
-  index?: number;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const heightValue = useSharedValue(0);
   const rotateValue = useSharedValue(0);
   const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
-  
+
   useEffect(() => {
     scale.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 150 }));
     opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
   }, [delay]);
-  
+
   useEffect(() => {
     if (expanded) {
       heightValue.value = withSpring(1, { damping: 20, stiffness: 120 });
@@ -73,28 +69,9 @@ const ExpandableSection = ({
       rotateValue.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     }
   }, [expanded]);
-  
-  // Rolodex effect: slight horizontal shift based on scroll position
+
+  // Simple fade and scale animation (Rolodex effect removed)
   const animatedStyle = useAnimatedStyle(() => {
-    const offsetPerSection = 150; // How much scroll creates one cycle
-    const maxShift = 8; // Maximum pixels to shift left/right
-    
-    if (scrollY) {
-      // Calculate shift for this specific section based on its index
-      const sectionOffset = index * 80; // Stagger effect between sections
-      const scrollProgress = (scrollY.value + sectionOffset) / offsetPerSection;
-      const shift = Math.sin(scrollProgress) * maxShift;
-      
-      return {
-        transform: [
-          { scale: scale.value },
-          { translateX: shift }
-        ],
-        opacity: opacity.value,
-        zIndex: 0, // Base z-index for non-expanded sections
-      };
-    }
-    
     return {
       transform: [{ scale: scale.value }],
       opacity: opacity.value,
@@ -319,11 +296,8 @@ Thank you for helping us improve PanHandler!
     }
   };
 
-  // Scroll position for Rolodex effect
-  const scrollY = useSharedValue(0);
-  
   // Removed: Pulsing animation for "Upgrade to Pro" (Free vs Pro section removed)
-  
+
   useEffect(() => {
     if (visible) {
       headerScale.value = withSequence(
@@ -464,10 +438,6 @@ Thank you for helping us improve PanHandler!
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: 20 }}
                     showsVerticalScrollIndicator={false}
-                    onScroll={(event) => {
-                      'worklet';
-                      scrollY.value = event.nativeEvent.contentOffset.y;
-                    }}
                     scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
                   >
               {/* Video Course Section - NEW! */}
@@ -476,8 +446,7 @@ Thank you for helping us improve PanHandler!
                 title="🎬 Video Course - Learn PanHandler!"
                 color="#FF2D55"
                 delay={0}
-                scrollY={scrollY}
-                index={0}
+
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
@@ -556,8 +525,8 @@ Thank you for helping us improve PanHandler!
                 title="📸 Step 1: Take a Perfect Photo"
                 color="#34C759"
                 delay={50}
-                scrollY={scrollY}
-                index={1}
+
+
               >
                 <View style={{ marginLeft: 4 }}>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
@@ -711,8 +680,8 @@ Thank you for helping us improve PanHandler!
                 title="🪙 Step 2: Calibrate with Coin"
                 color="#FF9500"
                 delay={100}
-                scrollY={scrollY}
-                index={2}
+
+
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After capturing your photo, calibrate using the reference coin to enable precise measurements.
@@ -761,8 +730,8 @@ Thank you for helping us improve PanHandler!
                 title="📏 Step 3: Place Measurements"
                 color="#AF52DE"
                 delay={200}
-                scrollY={scrollY}
-                index={3}
+
+
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Choose from multiple measurement types to capture all dimensions of your object.
@@ -941,8 +910,8 @@ Thank you for helping us improve PanHandler!
                 title="🎮 Navigation & Controls"
                 color="#FF3B30"
                 delay={300}
-                scrollY={scrollY}
-                index={4}
+
+
               >
                 <View style={{ gap: 12 }}>
                   {/* Pan/Zoom */}
@@ -1055,8 +1024,8 @@ Thank you for helping us improve PanHandler!
                 title="✏️ Move & Edit Measurements"
                 color="#FF2D55"
                 delay={350}
-                scrollY={scrollY}
-                index={5}
+
+
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   After placing measurements, you can move and edit them in Pan/Zoom mode.
@@ -1157,8 +1126,8 @@ Thank you for helping us improve PanHandler!
                 title="💾 Save & Share"
                 color="#5856D6"
                 delay={400}
-                scrollY={scrollY}
-                index={6}
+
+
               >
                 {/* FREE badge */}
 
@@ -1245,8 +1214,8 @@ Thank you for helping us improve PanHandler!
                 icon="mail"
                 color="#34C759"
                 delay={450}
-                scrollY={scrollY}
-                index={7}
+
+
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
                   Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 2 photos and a detailed measurement table.
@@ -1305,8 +1274,8 @@ Thank you for helping us improve PanHandler!
                 icon="construct"
                 color="#FF9500"
                 delay={500}
-                scrollY={scrollY}
-                index={8}
+
+
               >
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
                   Import to Any CAD Software
@@ -1402,8 +1371,8 @@ Thank you for helping us improve PanHandler!
                 title="Map Mode"
                 color="#0066FF"
                 delay={550}
-                scrollY={scrollY}
-                index={10}
+
+
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
@@ -1554,8 +1523,8 @@ Thank you for helping us improve PanHandler!
                 title="💡 Pro Tips"
                 color="#00C7BE"
                 delay={600}
-                scrollY={scrollY}
-                index={10}
+
+
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
@@ -1631,8 +1600,8 @@ Thank you for helping us improve PanHandler!
                 title="🔧 Troubleshooting"
                 color="#FF9500"
                 delay={650}
-                scrollY={scrollY}
-                index={11}
+
+
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
