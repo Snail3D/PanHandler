@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS, Easing } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
@@ -67,26 +67,32 @@ export default function App() {
   const introOpacity = useSharedValue(0);
   const appOpacity = useSharedValue(0);
 
-  // Track typing/animation state for cleanup
-  const [typeIntervalId, setTypeIntervalId] = useState<NodeJS.Timeout | null>(null);
-  const [holdTimeoutId, setHoldTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  
+  // Track typing/animation state for cleanup using refs to avoid stale closures
+  const typeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Function to gracefully skip intro
   const skipIntro = () => {
-    // Clear any active intervals/timeouts
-    if (typeIntervalId) clearInterval(typeIntervalId);
-    if (holdTimeoutId) clearTimeout(holdTimeoutId);
-    
+    // CRITICAL: Clear any active intervals/timeouts
+    if (typeIntervalRef.current) {
+      clearInterval(typeIntervalRef.current);
+      typeIntervalRef.current = null;
+    }
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+      holdTimeoutRef.current = null;
+    }
+
     // Fade out intro and fade in app immediately
-    introOpacity.value = withTiming(0, { 
+    introOpacity.value = withTiming(0, {
       duration: 600,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }, () => {
       runOnJS(setShowIntro)(false);
     });
-    
+
     // Graceful fade-in for the main app
-    appOpacity.value = withDelay(100, withTiming(1, { 
+    appOpacity.value = withDelay(100, withTiming(1, {
       duration: 800,
       easing: Easing.bezier(0.25, 0.1, 0.25, 1)
     }));
@@ -110,13 +116,11 @@ export default function App() {
     
     let currentIndex = 0;
     const typingSpeed = 25; // Fast typing for intro
-    let localIntervalId: NodeJS.Timeout | null = null;
-    let localTimeoutId: NodeJS.Timeout | null = null;
-    
-    localIntervalId = setInterval(() => {
+
+    const intervalId = setInterval(() => {
       if (currentIndex < completeText.length) {
         setDisplayedText(completeText.substring(0, currentIndex + 1));
-        
+
         // Natural typing haptics - varied intensity like real keystrokes
         const char = completeText[currentIndex];
         const isPunctuation = /[.,!?;:]/.test(char);
@@ -131,42 +135,51 @@ export default function App() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }
         }
-        
+
         currentIndex++;
       } else {
-        if (localIntervalId) {
-          clearInterval(localIntervalId);
-          localIntervalId = null;
+        // Clear the interval when typing is done
+        if (typeIntervalRef.current) {
+          clearInterval(typeIntervalRef.current);
+          typeIntervalRef.current = null;
         }
-        setTypeIntervalId(null);
-        
+
         // Hold for 2 seconds after typing, then cross-fade
-        localTimeoutId = setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           // Fade out intro and fade in app simultaneously
-          introOpacity.value = withTiming(0, { 
+          introOpacity.value = withTiming(0, {
             duration: 1000,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1)
           }, () => {
             runOnJS(setShowIntro)(false);
           });
-          
+
           // Graceful fade-in for the main app
-          appOpacity.value = withDelay(200, withTiming(1, { 
+          appOpacity.value = withDelay(200, withTiming(1, {
             duration: 1200,
             easing: Easing.bezier(0.25, 0.1, 0.25, 1) // Smoother, more gradual
           }));
+
+          // Clear the timeout ref
+          holdTimeoutRef.current = null;
         }, 2000);
-        
-        setHoldTimeoutId(localTimeoutId);
+
+        holdTimeoutRef.current = timeoutId;
       }
     }, typingSpeed);
-    
-    setTypeIntervalId(localIntervalId);
-    
-    // Cleanup function - use local variables to avoid stale closures
+
+    typeIntervalRef.current = intervalId;
+
+    // CRITICAL: Cleanup function to prevent memory leaks
     return () => {
-      if (localIntervalId) clearInterval(localIntervalId);
-      if (localTimeoutId) clearTimeout(localTimeoutId);
+      if (typeIntervalRef.current) {
+        clearInterval(typeIntervalRef.current);
+        typeIntervalRef.current = null;
+      }
+      if (holdTimeoutRef.current) {
+        clearTimeout(holdTimeoutRef.current);
+        holdTimeoutRef.current = null;
+      }
     };
   }, []); // Empty deps is correct - only run once on mount
   

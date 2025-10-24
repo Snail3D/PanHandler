@@ -294,6 +294,29 @@ export default function DimensionOverlay({
   const [showChuckNorrisModal, setShowChuckNorrisModal] = useState(false);
   const [currentChuckNorrisJoke, setCurrentChuckNorrisJoke] = useState('');
   const chuckNorrisOpacity = useSharedValue(0);
+
+  // CRITICAL: Track ALL haptic timers to prevent memory leaks
+  const hapticTimersRef = useRef<NodeJS.Timeout[]>([]);
+
+  // Helper function to schedule haptic with cleanup tracking
+  const scheduleHaptic = (callback: () => void, delay: number) => {
+    const timer = setTimeout(callback, delay);
+    hapticTimersRef.current.push(timer);
+    return timer;
+  };
+
+  // Clear all pending haptic timers
+  const clearAllHapticTimers = () => {
+    hapticTimersRef.current.forEach(timer => clearTimeout(timer));
+    hapticTimersRef.current = [];
+  };
+
+  // Cleanup haptic timers when component unmounts or navigates away
+  useEffect(() => {
+    return () => {
+      clearAllHapticTimers();
+    };
+  }, []);
   
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
@@ -724,33 +747,33 @@ export default function DimensionOverlay({
       case 'distance':
         // Sonic Spin Dash - Quick ascending buzz (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 40);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 40);
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
         break;
       case 'angle':
         // Street Fighter Hadouken - Charge then release (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
-        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 120); // Extra punch!
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100);
+        scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 120); // Extra punch!
         break;
       case 'circle':
         // Pac-Man wakka - Quick oscillating (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 60); // Upgraded
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120); // Upgraded
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 60); // Upgraded
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 120); // Upgraded
         break;
       case 'rectangle':
         // Tetris rotate - Solid mechanical click (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 50); // Upgraded from Light
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100); // Extra thump!
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 50); // Upgraded from Light
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 100); // Extra thump!
         break;
       case 'freehand':
         // Mario Paint - Creative bounce (BEEFED UP!)
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Upgraded from Light
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 70); // Upgraded
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 140); // Upgraded
-        setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 210); // Upgraded
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 70); // Upgraded
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 140); // Upgraded
+        scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 210); // Upgraded
         break;
     }
   };
@@ -763,22 +786,22 @@ export default function DimensionOverlay({
     if (calibratedTapTimeoutRef.current) {
       clearTimeout(calibratedTapTimeoutRef.current);
     }
-    
+
     const newCount = calibratedTapCount + 1;
     setCalibrateTapCount(newCount);
-    
+
     if (newCount >= 5) {
       // Activate Easter eggs! Step Brothers + Calculator words
       // Stronger haptic feedback
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
-      
+      scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 100);
+
       setShowCalculatorWords(true);
       setStepBrothersMode(true); // "YEP!" mode
       setCalibrateTapCount(0);
-      
+
       // Auto-dismiss after 5 seconds
-      setTimeout(() => {
+      scheduleHaptic(() => {
         setShowCalculatorWords(false);
         setStepBrothersMode(false);
       }, 5000);
@@ -796,44 +819,44 @@ export default function DimensionOverlay({
     if (autoLevelTapTimeoutRef.current) {
       clearTimeout(autoLevelTapTimeoutRef.current);
     }
-    
+
     const newCount = autoLevelTapCount + 1;
     setAutoLevelTapCount(newCount);
-    
+
     if (newCount >= 7) {
       // HAPTIC RICKROLL SEQUENCE! 🎵 (BEEFED UP!)
       // Mimics the iconic rhythm and feel of that famous song
       setAutoLevelTapCount(0);
-      
+
       // Intro beats (iconic piano notes) - BEEFED UP!
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // Upgraded from Medium
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 200); // Upgraded from Light
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 550); // Upgraded
-      
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 200); // Upgraded from Light
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 400); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 550); // Upgraded
+
       // First phrase rhythm (4 beats) - MORE PUNCH!
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 800);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1000); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1350); // Upgraded
-      
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 800);
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1000); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1350); // Upgraded
+
       // Second phrase rhythm (4 beats) - KEEP IT STRONG!
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1600);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1800); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1950); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2100); // Upgraded
-      
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1600);
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1800); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 1950); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2100); // Upgraded
+
       // Third phrase rhythm (4 beats) - CLIMAX!
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2400);
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2600); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2800); // Upgraded
-      setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2950); // Upgraded
-      
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2400);
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2600); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 2800); // Upgraded
+      scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 2950); // Upgraded
+
       // Final beat + SUCCESS! - DOUBLE IMPACT!
-      setTimeout(() => {
+      scheduleHaptic(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
-        
+        scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
+
         // NOW open the video! 😂
         const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
         Linking.openURL(youtubeUrl).catch(err => {
@@ -841,7 +864,7 @@ export default function DimensionOverlay({
           console.error('Failed to open URL:', err);
         });
       }, 3200);
-      
+
     } else {
       // Reset counter after 2 seconds of no taps
       autoLevelTapTimeoutRef.current = setTimeout(() => {
