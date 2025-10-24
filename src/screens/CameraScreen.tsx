@@ -1879,13 +1879,17 @@ export default function CameraScreen() {
               </Animated.View>
             )}
 
-            {/* Add Photos Button - Separate container like shutter */}
+            {/* Add Photos Button - Positioned like shutter button */}
             <View
               style={{
                 position: 'absolute',
                 bottom: insets.bottom + 40,
-                left: 100,
+                left: 0,
+                right: 0,
+                alignItems: 'flex-start',
+                paddingLeft: 66,
                 zIndex: 26,
+                pointerEvents: 'box-none'
               }}
             >
               <Pressable
