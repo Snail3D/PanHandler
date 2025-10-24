@@ -2033,7 +2033,7 @@ export default function DimensionOverlay({
         const p1 = completedPoints[1];
         const widthPx = Math.abs(p1.x - p0.x);
         const heightPx = Math.abs(p1.y - p0.y);
-        
+
         // Map Mode: Apply scale conversion
         if (isMapMode && mapScale) {
           const widthDist = convertToMapScale(widthPx);
@@ -2042,21 +2042,25 @@ export default function DimensionOverlay({
           height = heightDist;
           const widthStr = formatMapScaleDistance(widthPx);
           const heightStr = formatMapScaleDistance(heightPx);
-          value = `${widthStr} × ${heightStr}`;
+          const areaDist2 = widthDist * heightDist;
+          const areaStr = formatMapScaleArea(areaDist2);
+          value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         } else {
           width = widthPx / (calibration?.pixelsPerUnit || 1);
           height = heightPx / (calibration?.pixelsPerUnit || 1);
           const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
           const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
-          value = `${widthStr} × ${heightStr}`;
+          const area = width * height;
+          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+          value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         }
-        
+
         // Calculate all 4 corners from the 2 opposite corners
         const minX = Math.min(p0.x, p1.x);
         const maxX = Math.max(p0.x, p1.x);
         const minY = Math.min(p0.y, p1.y);
         const maxY = Math.max(p0.y, p1.y);
-        
+
         // Store all 4 corners: top-left, top-right, bottom-right, bottom-left
         completedPoints = [
           { x: minX, y: minY, id: Date.now().toString() + '-0' },        // top-left
@@ -2067,6 +2071,11 @@ export default function DimensionOverlay({
       }
       
       // Save as completed measurement
+      let area: number | undefined;
+      if (mode === 'rectangle' && width !== undefined && height !== undefined) {
+        area = width * height;
+      }
+
       const newMeasurement: Measurement = {
         id: Date.now().toString(),
         points: completedPoints.map(p => ({ x: p.x, y: p.y })),
@@ -2077,6 +2086,7 @@ export default function DimensionOverlay({
         ...(radius !== undefined && { radius }),
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
+        ...(area !== undefined && { area }),
       };
       
       console.log('📏 Created measurement:', {
