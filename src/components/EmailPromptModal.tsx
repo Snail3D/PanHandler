@@ -57,9 +57,9 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
               <View style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}>
                 {/* Header */}
                 <View style={{
-                  paddingTop: 24,
-                  paddingHorizontal: 24,
-                  paddingBottom: 20,
+                  paddingTop: 18,
+                  paddingHorizontal: 20,
+                  paddingBottom: 14,
                   borderBottomWidth: 1,
                   borderBottomColor: 'rgba(0,0,0,0.08)',
                 }}>
@@ -81,17 +81,17 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                         <Ionicons name="mail" size={24} color="#34C759" />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ 
-                          fontSize: 22, 
+                        <Text style={{
+                          fontSize: 22,
                           fontWeight: '700',
                           color: '#1C1C1E',
                           letterSpacing: -0.5,
                         }}>
                           Email Address
                         </Text>
-                        <Text style={{ 
-                          color: '#8E8E93', 
-                          fontSize: 13, 
+                        <Text style={{
+                          color: '#8E8E93',
+                          fontSize: 13,
                           fontWeight: '500',
                           marginTop: -2,
                         }}>
@@ -99,7 +99,7 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                         </Text>
                       </View>
                     </View>
-                    <Pressable 
+                    <Pressable
                       onPress={handleCancel}
                       style={{
                         width: 40,
@@ -116,22 +116,22 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                 </View>
 
                 {/* Content */}
-                <View style={{ paddingHorizontal: 24, paddingVertical: 24 }}>
+                <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 14 }}>
                   {/* Security note */}
                   <View style={{
                     backgroundColor: 'rgba(52,199,89,0.12)',
                     borderRadius: 14,
-                    padding: 14,
-                    marginBottom: 16,
+                    padding: 12,
+                    marginBottom: 14,
                     borderWidth: 2,
                     borderColor: 'rgba(52,199,89,0.25)',
                   }}>
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="lock-closed" size={18} color="#34C759" style={{ marginTop: 2, marginRight: 8 }} />
-                      <Text style={{ 
+                      <Ionicons name="lock-closed" size={18} color="#34C759" style={{ marginTop: 1, marginRight: 8 }} />
+                      <Text style={{
                         flex: 1,
-                        color: '#2E7D32', 
-                        fontSize: 13, 
+                        color: '#2E7D32',
+                        fontSize: 13,
                         fontWeight: '600',
                         lineHeight: 18,
                       }}>
@@ -141,12 +141,12 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                   </View>
 
                   {/* Input Field */}
-                  <View style={{ marginBottom: 8 }}>
-                    <Text style={{ 
-                      color: '#3C3C43', 
-                      fontSize: 14, 
-                      fontWeight: '600', 
-                      marginBottom: 10,
+                  <View style={{ marginBottom: 0 }}>
+                    <Text style={{
+                      color: '#3C3C43',
+                      fontSize: 14,
+                      fontWeight: '600',
+                      marginBottom: 8,
                     }}>
                       Your email address
                     </Text>
@@ -191,9 +191,9 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
 
                 {/* Footer Buttons */}
                 <View style={{
-                  paddingHorizontal: 24,
-                  paddingBottom: 24,
-                  paddingTop: 8,
+                  paddingHorizontal: 20,
+                  paddingBottom: 20,
+                  paddingTop: 14,
                   alignItems: 'center',
                 }}>
                   <View style={{ flexDirection: 'row', gap: 20, width: '100%', maxWidth: 320, alignItems: 'center', justifyContent: 'center' }}>
