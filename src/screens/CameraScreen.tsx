@@ -2039,6 +2039,7 @@ export default function CameraScreen() {
                 alignItems: 'center',
                 zIndex: 20,
               }}
+              pointerEvents="box-none"
             >
               <Pressable
                 onPressIn={() => {
