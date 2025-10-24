@@ -1,5 +1,5 @@
-// DimensionOverlay v2.3 - TEMP: Fingerprints disabled for cache workaround
-// CACHE BUST v4.0 - Static Tetris - Force Bundle Refresh
+// DimensionOverlay v5.4.0 - QUOTE IMMEDIATE - NO TYPING ANIMATION
+// CACHE BUST v5.4.0 - Quote shows immediately, tap to dismiss
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
