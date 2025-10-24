@@ -1879,51 +1879,56 @@ export default function CameraScreen() {
               </Animated.View>
             )}
 
+            {/* Add Photos Button - Separate container like shutter */}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: insets.bottom + 40,
+                left: 100,
+                zIndex: 26,
+              }}
+            >
+              <Pressable
+                onPress={async () => {
+                  console.log('📸 Photo library button pressed');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  await pickImage();
+                }}
+                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 32,
+                  backgroundColor: 'rgba(31, 41, 55, 0.8)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  {/* Airplane on top */}
+                  <Ionicons name="airplane" size={20} color="white" style={{ marginBottom: 2 }} />
+                  {/* Map and Blueprint on bottom row */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -2 }}>
+                    <Ionicons name="map" size={18} color="white" style={{ marginRight: 4 }} />
+                    <Ionicons name="document-text" size={18} color="white" />
+                  </View>
+                </View>
+              </Pressable>
+            </View>
+
             {/* Bottom controls */}
-            <View 
-              style={{ 
-                position: 'absolute', 
-                bottom: 0, 
-                left: 0, 
-                right: 0, 
+            <View
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
                 zIndex: 25,
                 paddingBottom: insets.bottom + 40,
                 pointerEvents: 'box-none'
               }}
             >
               <View style={{ alignItems: 'center', pointerEvents: 'box-none' }}>
-                {/* Photo Library Button - Triangle icon layout: airplane top, map/blueprint bottom */}
-                <Pressable
-                  onPress={async () => {
-                    console.log('📸 Photo library button pressed');
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    await pickImage();
-                  }}
-                  hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                  style={{
-                    position: 'absolute',
-                    left: 32,
-                    bottom: 0,
-                    width: 64,
-                    height: 64,
-                    borderRadius: 32,
-                    backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 30
-                  }}
-                  pointerEvents="auto"
-                >
-                  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                    {/* Airplane on top */}
-                    <Ionicons name="airplane" size={20} color="white" style={{ marginBottom: 2 }} />
-                    {/* Map and Blueprint on bottom row */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: -2 }}>
-                      <Ionicons name="map" size={18} color="white" style={{ marginRight: 4 }} />
-                      <Ionicons name="document-text" size={18} color="white" />
-                    </View>
-                  </View>
-                </Pressable>
 
                 {/* Instructional Text Sequence - Positioned halfway between crosshairs and bottom */}
                 {!isCapturing && (
