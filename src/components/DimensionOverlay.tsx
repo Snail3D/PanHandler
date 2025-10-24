@@ -330,6 +330,7 @@ export default function DimensionOverlay({
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
   const [hasShownAnimation, setHasShownAnimation] = useState(false); // Always start false - only show animation on first calibration
+  const lockInTimersRef = useRef<NodeJS.Timeout[]>([]); // Track lock-in animation timers for cleanup
   const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
   
   // Reset animation flag when image changes (new photo = new session)
@@ -2176,18 +2177,22 @@ export default function DimensionOverlay({
     if (coinCircle && !hasShownAnimation) {
       setShowLockedInAnimation(true);
       setHasShownAnimation(true);
-      
+
+      // Clear any existing lock-in timers
+      lockInTimersRef.current.forEach(timer => clearTimeout(timer));
+      lockInTimersRef.current = [];
+
       // Double haptic feedback for "Locked In!"
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).then(() => {
-        setTimeout(() => {
+        lockInTimersRef.current.push(setTimeout(() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        }, 100);
+        }, 100));
       });
-      
+
       // Green blink animation (3 blinks)
       lockInOpacity.value = 0;
       lockInScale.value = 1;
-      
+
       const blink = () => {
         lockInOpacity.value = withTiming(1, { duration: 150 }, () => {
           lockInOpacity.value = withTiming(0, { duration: 150 });
@@ -2196,23 +2201,27 @@ export default function DimensionOverlay({
           lockInScale.value = withTiming(1, { duration: 150 });
         });
       };
-      
+
       blink();
-      setTimeout(blink, 350);
-      setTimeout(blink, 700);
-      
+      lockInTimersRef.current.push(setTimeout(blink, 350));
+      lockInTimersRef.current.push(setTimeout(blink, 700));
+
       // Auto-hide animation after blinking (if not dismissed by pan)
-      setTimeout(() => {
+      lockInTimersRef.current.push(setTimeout(() => {
         setShowLockedInAnimation(false);
-      }, 1200);
+        lockInTimersRef.current = []; // Clear after completion
+      }, 1200));
     }
   }, [coinCircle, hasShownAnimation]);
   
-  // Cleanup undo long-press timers on unmount
+  // Cleanup undo long-press timers and lock-in animation timers on unmount
   useEffect(() => {
     return () => {
       if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
       if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
+      // Clear lock-in animation timers
+      lockInTimersRef.current.forEach(timer => clearTimeout(timer));
+      lockInTimersRef.current = [];
     };
   }, []);
   
@@ -2864,12 +2873,12 @@ export default function DimensionOverlay({
     
     // Call parent's reset callback to return to camera mode
     onReset?.();
-    
+
     // Camera shutter haptic: da-da-da-da! 📸
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 240);
+    scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 80);
+    scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+    scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 240);
   };
 
   const hasAnyMeasurements = measurements.length > 0 || currentPoints.length > 0;
@@ -3626,8 +3635,8 @@ export default function DimensionOverlay({
               console.log('⚠️ Blocking measurement - no map scale set');
               // Triple haptic warning to make it VERY obvious
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 100);
-              setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 200);
+              scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 100);
+              scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 200);
               showAlert(
                 'Set Map Scale First',
                 'Tap the Map button in the menu to set your map scale before measuring.',
@@ -3668,14 +3677,14 @@ export default function DimensionOverlay({
               if (freehandActivationTimerRef.current) {
                 clearTimeout(freehandActivationTimerRef.current);
               }
-              
+
               // 🌟 Samus Charge Beam - Progressive power build-up (RESTORED!)
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // 0.0s - Initial press
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
-              setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
-              
+              scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 300);   // 0.3s
+              scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 600);  // 0.6s
+              scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 900);  // 0.9s
+              scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 1200);  // 1.2s
+
               freehandActivationTimerRef.current = setTimeout(() => {
                 // 1.5s - FULLY CHARGED! Ready to fire! 🔥
                 setIsDrawingFreehand(true);
@@ -6701,9 +6710,9 @@ export default function DimensionOverlay({
                     setIsMapMode(true);
                     // Dora "We did it!" - Triumphant celebratory sequence! 🗺️
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 80);
-                    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
-                    setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
+                    scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 80);
+                    scheduleHaptic(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 160);
+                    scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
                   } else {
                     // No scale yet - show modal to set scale
                     console.log('📋 No scale - showing modal');

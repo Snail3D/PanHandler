@@ -177,6 +177,7 @@ export default function HelpModal({ visible, onClose, onEmailReset }: HelpModalP
   
   // Left egg: Long-press to open YouTube link
   const leftEggPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const leftEggNestedTimers = useRef<NodeJS.Timeout[]>([]); // Track all nested timers
   const [leftEggPressing, setLeftEggPressing] = useState(false);
   
   // Alert modal state
@@ -299,6 +300,24 @@ Thank you for helping us improve PanHandler!
       );
     }
   }, [visible]);
+
+  // CRITICAL: Cleanup all timers when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clear easter egg timers
+      if (eggTapTimeoutRef.current) {
+        clearTimeout(eggTapTimeoutRef.current);
+        eggTapTimeoutRef.current = null;
+      }
+      if (leftEggPressTimer.current) {
+        clearTimeout(leftEggPressTimer.current);
+        leftEggPressTimer.current = null;
+      }
+      // Clear all nested timers
+      leftEggNestedTimers.current.forEach(timer => clearTimeout(timer));
+      leftEggNestedTimers.current = [];
+    };
+  }, []);
   
   const headerAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: headerScale.value }],
@@ -2064,37 +2083,42 @@ Thank you for helping us improve PanHandler!
                         setLeftEggPressing(true);
                         // Start haptic pattern: Bawk bawk bagawk!
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Bawk
-                        
+
                         leftEggPressTimer.current = setTimeout(() => {
+                          // Track all nested timers to prevent leaks
                           // Bawk (200ms)
-                          setTimeout(() => {
+                          leftEggNestedTimers.current.push(setTimeout(() => {
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                          }, 200);
-                          
+                          }, 200));
+
                           // Bawk (400ms)
-                          setTimeout(() => {
+                          leftEggNestedTimers.current.push(setTimeout(() => {
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                          }, 400);
-                          
+                          }, 400));
+
                           // Bagawk! (stronger final one at 600ms)
-                          setTimeout(() => {
+                          leftEggNestedTimers.current.push(setTimeout(() => {
                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                          }, 600);
-                          
+                          }, 600));
+
                           // Open YouTube link after 3 seconds
-                          setTimeout(() => {
+                          leftEggNestedTimers.current.push(setTimeout(() => {
                             Linking.openURL('https://youtube.com/shorts/r93XNgWN4ss?si=FEoWQBI6E_-9fuRW');
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setLeftEggPressing(false);
-                          }, 3000);
+                            leftEggNestedTimers.current = []; // Clear tracked timers after completion
+                          }, 3000));
                         }, 0);
                       }}
                       onPressOut={() => {
-                        // Cancel if released early
+                        // Cancel if released early - clear ALL timers
                         if (leftEggPressTimer.current) {
                           clearTimeout(leftEggPressTimer.current);
                           leftEggPressTimer.current = null;
                         }
+                        // CRITICAL: Clear all nested timers to prevent memory leaks
+                        leftEggNestedTimers.current.forEach(timer => clearTimeout(timer));
+                        leftEggNestedTimers.current = [];
                         setLeftEggPressing(false);
                       }}
                       style={{
