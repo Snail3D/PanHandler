@@ -258,7 +258,10 @@ export default function CameraScreen() {
 
   // Email reset confirmation modal
   const [showEmailResetModal, setShowEmailResetModal] = useState(false);
-  
+
+  // Track if help button was long-pressed to prevent modal opening
+  const helpLongPressedRef = useRef(false);
+
   // Trigger BattlingBots when entering measurement screen (not on app mount)
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
@@ -1537,16 +1540,25 @@ export default function CameraScreen() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                     <Pressable
                       onPress={() => {
-                        __DEV__ && console.log('🔵 Help button pressed in camera screen');
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setShowHelpModal(true);
+                        // Only open modal if it wasn't a long press
+                        if (!helpLongPressedRef.current) {
+                          __DEV__ && console.log('🔵 Help button pressed in camera screen');
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          setShowHelpModal(true);
+                        }
+                        // Reset flag after short delay
+                        setTimeout(() => {
+                          helpLongPressedRef.current = false;
+                        }, 100);
                       }}
                       onLongPress={() => {
                         __DEV__ && console.log('🔵 Help button long-pressed - resetting email');
+                        helpLongPressedRef.current = true;
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                         setUserEmail(null);
                         setShowEmailResetModal(true);
                       }}
+                      delayLongPress={800}
                       style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Ionicons name="help-circle-outline" size={28} color="white" />
