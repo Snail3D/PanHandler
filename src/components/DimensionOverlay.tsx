@@ -2306,18 +2306,18 @@ export default function DimensionOverlay({
     if (measurements.length === 0) {
       return;
     }
-    
+
     // Only recalculate if unit system actually changed
     if (prevUnitSystemRef.current === unitSystem) {
       return;
     }
-    
+
     console.log('🔄 Unit system changed, recalculating all measurements...');
     prevUnitSystemRef.current = unitSystem;
-    
+
     const updatedMeasurements = measurements.map(m => {
       let newValue = m.value;
-      let width, height, radius, newPerimeter;
+      let width, height, radius, area, newPerimeter;
       
       if (m.mode === 'distance') {
         newValue = calculateDistance(m.points[0], m.points[1]);
@@ -2332,13 +2332,16 @@ export default function DimensionOverlay({
         const diameter = radius * 2;
         newValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
       } else if (m.mode === 'rectangle') {
-        const widthPx = Math.abs(m.points[1].x - m.points[0].x);
-        const heightPx = Math.abs(m.points[1].y - m.points[0].y);
+        // Use opposite corners (points[0] and points[2]) for correct width/height
+        const widthPx = Math.abs(m.points[2].x - m.points[0].x);
+        const heightPx = Math.abs(m.points[2].y - m.points[0].y);
         width = widthPx / (calibration?.pixelsPerUnit || 1);
         height = heightPx / (calibration?.pixelsPerUnit || 1);
         const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
         const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
-        newValue = `${widthStr} × ${heightStr}`;
+        const area = width * height;
+        const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+        newValue = `${widthStr} × ${heightStr} (A: ${areaStr})`;
       } else if (m.mode === 'freehand') {
         // Recalculate freehand path length
         let totalLength = 0;
@@ -2420,6 +2423,7 @@ export default function DimensionOverlay({
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
         ...(radius !== undefined && { radius }),
+        ...(area !== undefined && { area }),
       };
     });
     
