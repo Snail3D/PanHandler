@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView, Alert } from 'react-native';
+import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -74,7 +74,11 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)' }}>
         <View style={{
           position: 'absolute',
           top: insets.top + 20,
@@ -440,103 +444,6 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                     </View>
                   </View>
 
-                  {/* Live Preview */}
-                  {isValid && (
-                    <View style={{
-                      backgroundColor: 'rgba(52, 199, 89, 0.15)',
-                      borderRadius: 12,
-                      padding: 12,
-                      marginBottom: 12,
-                      borderWidth: 1,
-                      borderColor: 'rgba(52, 199, 89, 0.3)',
-                    }}>
-                      <Text style={{
-                        fontSize: 18,
-                        fontWeight: '700',
-                        color: '#2E7D32',
-                        textAlign: 'center',
-                      }}>
-                        {screenDistance}{screenUnit} = {realDistance}{realUnit}
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Examples Section */}
-                  <Pressable
-                    onPress={() => {
-                      setShowExamples(!showExamples);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
-                      borderRadius: 10,
-                      padding: 10,
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderWidth: 1,
-                      borderColor: 'rgba(0, 0, 0, 0.06)',
-                    }}
-                  >
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Ionicons name="bulb-outline" size={16} color="rgba(0, 0, 0, 0.6)" />
-                      <Text style={{ 
-                        marginLeft: 6,
-                        fontSize: 13, 
-                        fontWeight: '600', 
-                        color: 'rgba(0, 0, 0, 0.75)' 
-                      }}>
-                        Common Examples
-                      </Text>
-                    </View>
-                    <Ionicons 
-                      name={showExamples ? "chevron-up" : "chevron-down"} 
-                      size={16} 
-                      color="rgba(0, 0, 0, 0.4)" 
-                    />
-                  </Pressable>
-
-                  {/* Examples List */}
-                  {showExamples && (
-                    <View style={{ marginBottom: 10 }}>
-                      {[
-                        { label: '📍 Hiking Map', screenDist: 1, screenUnit: 'cm' as const, realDist: 1, realUnit: 'km' as const },
-                        { label: '🏙️ City Map', screenDist: 1, screenUnit: 'in' as const, realDist: 0.25, realUnit: 'mi' as const },
-                        { label: '📐 Blueprint', screenDist: 1, screenUnit: 'in' as const, realDist: 10, realUnit: 'ft' as const },
-                        { label: '🗺️ USGS Topo', screenDist: 1, screenUnit: 'in' as const, realDist: 0.38, realUnit: 'mi' as const },
-                      ].map((example, idx) => (
-                        <Pressable
-                          key={idx}
-                          onPress={() => applyExample(example)}
-                          style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                            borderRadius: 8,
-                            padding: 10,
-                            marginBottom: 6,
-                            borderWidth: 1,
-                            borderColor: 'rgba(0, 0, 0, 0.06)',
-                          }}
-                        >
-                          <Text style={{ 
-                            fontSize: 13, 
-                            fontWeight: '600', 
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            marginBottom: 2,
-                          }}>
-                            {example.label}
-                          </Text>
-                          <Text style={{ 
-                            fontSize: 12, 
-                            color: 'rgba(0, 0, 0, 0.5)' 
-                          }}>
-                            {example.screenDist}{example.screenUnit} = {example.realDist}{example.realUnit}
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                  )}
-                  
                   {/* Magnetic Declination Section - Collapsible */}
                   <View style={{ marginTop: 12 }}>
                     <Pressable
@@ -804,6 +711,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
           </BlurView>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
