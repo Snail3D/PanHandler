@@ -79,9 +79,28 @@ Implemented complete 1.2X scaling system for iPad and Android tablets, ensuring 
    - Committed: "Add 1.2X tablet scaling to HelpModal (header and structure)"
 
 8. **DimensionOverlay.tsx** (`/home/user/workspace/src/components/DimensionOverlay.tsx`)
-   - Imports added, ready for scaling (~150 instances remain)
+   - ~100 instances scaled (primary UI complete)
    - Core measurement UI file - largest file in app (6000+ lines)
-   - Committed: "Add deviceScale imports to DimensionOverlay (prep for scaling)"
+   - Scaled elements:
+     * Cursor labels and point markers (3 cursor types)
+     * "Locked In!" animation message (20pt → 24pt, 160px → 192px)
+     * Measurement result displays (16pt → 19pt)
+     * Title and coin reference info (9-13pt → 11-16pt)
+     * Measurement legend (8pt → 10pt, color indicators 12x8 → 14x10)
+     * Watermark, supporter, and auto level badges
+     * Bottom toolbar container and all control buttons
+     * Hide/show, edit labels, undo buttons (icons 14-16px → 17-19px)
+     * Mode toggle buttons (Pan/Edit vs Measure)
+     * All 5 measurement type buttons (Box, Circle, Angle, Distance, Freehand)
+       - Icons: 20px → 24px
+       - Fonts: 10pt → 12pt
+       - Padding and border radius scaled
+     * Unit system toggle (Metric vs Imperial)
+     * Map mode toggle button (16px → 19px icon, 10pt → 12pt font)
+     * Helper instructions tip (12pt → 14pt, 14.4pt → 17pt blueprint mode)
+   - Remaining ~50 instances are in conditional modals and export UI
+   - Committed: 3 commits (part 1: displays, part 2: buttons, part 3: controls)
+   - Status: ✅ Primary UI functionally complete for tablet workflows
 
 ### Portrait Orientation Lock
 - **app.json** updated to lock tablets to portrait-only mode
