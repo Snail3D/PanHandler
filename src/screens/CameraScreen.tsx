@@ -1898,7 +1898,6 @@ export default function CameraScreen() {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   await pickImage();
                 }}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
                 style={{
                   width: 64,
                   height: 64,
