@@ -6680,7 +6680,7 @@ export default function DimensionOverlay({
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <Text style={{
                     fontWeight: '600',
-                    fontSize: 10,
+                    fontSize: scaleFontSize(10),
                     color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
                     Imperial
@@ -6718,17 +6718,17 @@ export default function DimensionOverlay({
               }}
               style={{
                 flex: 1,
-                paddingVertical: 5,
-                borderRadius: 9,
+                paddingVertical: scalePadding(5),
+                borderRadius: scaleBorderRadius(9),
                 backgroundColor: isMapMode ? 'rgba(100, 150, 255, 0.25)' : 'rgba(120, 120, 128, 0.18)',
                 borderWidth: isMapMode ? 1.5 : 0,
                 borderColor: isMapMode ? 'rgba(100, 150, 255, 0.5)' : 'transparent',
-                paddingHorizontal: 8,
+                paddingHorizontal: scalePadding(8),
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Map icon - folded map with panels */}
-                <Svg width={16} height={16} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
+                <Svg width={scaleIconSize(16)} height={scaleIconSize(16)} viewBox="0 0 24 24" style={{ marginRight: scaleMargin(4) }}>
                   {/* Three vertical panels of a folded map */}
                   <Path
                     d="M3 4 L8 2 L8 22 L3 20 Z"
@@ -6754,7 +6754,7 @@ export default function DimensionOverlay({
                 </Svg>
                 <Text style={{
                   fontWeight: '600',
-                  fontSize: 10,
+                  fontSize: scaleFontSize(10),
                   color: isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
                   Map
@@ -6768,14 +6768,14 @@ export default function DimensionOverlay({
           {currentPoints.length === 0 && (
             <View style={{
               backgroundColor: measurementMode ? 'rgba(240, 253, 244, 1)' : selectedMeasurementId ? 'rgba(250, 245, 255, 1)' : 'rgba(239, 246, 255, 1)',
-              borderRadius: 8,
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              marginBottom: 12
+              borderRadius: scaleBorderRadius(8),
+              paddingHorizontal: scalePadding(12),
+              paddingVertical: scalePadding(8),
+              marginBottom: scaleMargin(12)
             }}>
               <Text style={{
                 color: isPlacingBlueprint ? 'rgba(100, 100, 100, 1)' : measurementMode ? 'rgba(22, 101, 52, 1)' : selectedMeasurementId ? 'rgba(107, 33, 168, 1)' : 'rgba(30, 64, 175, 1)',
-                fontSize: isPlacingBlueprint ? 14.4 : 12, // 20% bigger when placing blueprint (12 * 1.2 = 14.4)
+                fontSize: isPlacingBlueprint ? scaleFontSize(14.4) : scaleFontSize(12), // 20% bigger when placing blueprint (12 * 1.2 = 14.4)
                 textAlign: 'center',
                 textShadowColor: isPlacingBlueprint ? 'rgba(255, 255, 255, 0.8)' : undefined,
                 textShadowOffset: isPlacingBlueprint ? { width: 0, height: 1 } : undefined,
