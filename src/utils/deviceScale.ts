@@ -28,10 +28,10 @@ export const isTablet = (): boolean => {
 /**
  * Get scale factor for tablet devices
  * Phone: 1.0x
- * Tablet: 1.3x (30% larger as requested)
+ * Tablet: 1.2x (20% larger for optimal tablet experience)
  */
 export const getDeviceScale = (): number => {
-  return isTablet() ? 1.3 : 1.0;
+  return isTablet() ? 1.2 : 1.0;
 };
 
 /**
