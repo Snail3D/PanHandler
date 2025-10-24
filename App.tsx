@@ -187,7 +187,7 @@ export default function App() {
                 backgroundColor: '#FFFFFF',
                 justifyContent: 'center',
                 alignItems: 'center',
-                paddingHorizontal: 40,
+                paddingHorizontal: scalePadding(40),
                 zIndex: 1000,
               },
               introAnimatedStyle
