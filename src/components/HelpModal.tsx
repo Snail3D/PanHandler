@@ -1325,6 +1325,9 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
                     Save your email address on your first email sendoff for faster future workflows! <Text style={{ fontWeight: '600', color: '#5856D6' }}>(Secure, stored locally and not shared)</Text>
                   </Text>
+                  <Text style={{ fontSize: 13, color: '#8E8E93', lineHeight: 19, marginTop: 8, fontStyle: 'italic' }}>
+                    💡 <Text style={{ fontWeight: '600' }}>Dev Tip:</Text> Long-press this help button (?) to clear your saved email for testing.
+                  </Text>
                 </View>
               </ExpandableSection>
 
