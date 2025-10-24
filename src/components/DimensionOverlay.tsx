@@ -28,6 +28,15 @@ import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 import { getRandomChuckNorrisJoke } from '../utils/chuckNorrisJokes';
 import SnailIcon from './SnailIcon';
+import {
+  scaleFontSize,
+  scalePadding,
+  scaleMargin,
+  scaleSize,
+  scaleBorderRadius,
+  scaleIconSize,
+  scaleGap
+} from '../utils/deviceScale';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
