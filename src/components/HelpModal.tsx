@@ -147,7 +147,10 @@ export default function HelpModal({ visible, onClose, onEmailReset }: HelpModalP
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
   const setUserEmail = useStore((s) => s.setUserEmail);
-  
+
+  // Track if close button was long-pressed to prevent modal closing
+  const closeLongPressedRef = useRef(false);
+
   // Ref for capturing modal content as screenshot
   const modalContentRef = useRef<ScrollView>(null);
   
@@ -390,10 +393,18 @@ Thank you for helping us improve PanHandler!
                 </Animated.View>
                 <Pressable
                   onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onClose();
+                    // Only close modal if it wasn't a long press
+                    if (!closeLongPressedRef.current) {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      onClose();
+                    }
+                    // Reset flag after short delay
+                    setTimeout(() => {
+                      closeLongPressedRef.current = false;
+                    }, 100);
                   }}
                   onLongPress={() => {
+                    closeLongPressedRef.current = true;
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     setUserEmail(null);
                     if (onEmailReset) {
@@ -401,6 +412,7 @@ Thank you for helping us improve PanHandler!
                     }
                     showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending a support email.', 'success');
                   }}
+                  delayLongPress={800}
                   style={{
                     width: 44,
                     height: 44,
