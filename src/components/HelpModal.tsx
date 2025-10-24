@@ -52,11 +52,10 @@ const ExpandableSection = ({
   const [expanded, setExpanded] = useState(false);
   const heightValue = useSharedValue(0);
   const rotateValue = useSharedValue(0);
-  const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    scale.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 150 }));
+    // Simple fade in only - no scale animation to prevent jerky scrolling
     opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
   }, [delay]);
 
@@ -70,10 +69,9 @@ const ExpandableSection = ({
     }
   }, [expanded]);
 
-  // Simple fade and scale animation (Rolodex effect removed)
+  // Simple fade animation only (no scale to prevent jerky scrolling)
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ scale: scale.value }],
       opacity: opacity.value,
       zIndex: 0,
     };
@@ -112,39 +110,20 @@ const ExpandableSection = ({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             padding: 18,
           }}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: `${color}20`,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 14,
-                shadowColor: color,
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.5,
-                shadowRadius: 8,
-              }}
-            >
-              <Ionicons name={icon as any} size={24} color={color} />
-            </View>
-            <Text style={{ 
-              fontSize: 17, 
-              fontWeight: '700', 
-              color: '#1C1C1E', 
-              flex: 1,
-              letterSpacing: -0.3,
-            }}>
-              {title}
-            </Text>
-          </View>
-          <AnimatedView style={chevronAnimatedStyle}>
+          <Text style={{
+            fontSize: 17,
+            fontWeight: '700',
+            color: '#1C1C1E',
+            textAlign: 'center',
+            letterSpacing: -0.3,
+          }}>
+            {title}
+          </Text>
+          <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: 18 }]}>
             <Ionicons name="chevron-down" size={24} color={color} />
           </AnimatedView>
         </View>
