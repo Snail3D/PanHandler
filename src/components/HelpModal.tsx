@@ -616,21 +616,9 @@ Thank you for helping us improve PanHandler!
                           <Text style={{ fontWeight: '600' }}>Auto-Capture Toggle</Text> - Not a fan of hands-free? Just flip the switch and use the shutter button instead!
                         </Text>
                       </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 14, marginRight: 6 }}>👆</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
-                          <Text style={{ fontWeight: '600' }}>Tap-to-Focus</Text> - Tap anywhere on the preview to focus the camera. Perfect for close-ups or tricky lighting!
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 14, marginRight: 6 }}>🎨</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
-                          <Text style={{ fontWeight: '600' }}>Vibrant Bubble</Text> - The bubble level gets a random color each session (blue, purple, pink, cyan, green, amber, or red). Smooth physics, orientation-aware, and oh-so-satisfying!
-                        </Text>
-                      </View>
                     </View>
                   </View>
-                  
+
                   {/* Auto-Leveled Album Feature */}
                   <View style={{
                     marginTop: 12,
