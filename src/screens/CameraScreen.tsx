@@ -1901,9 +1901,9 @@ export default function CameraScreen() {
                   }}
                   hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   style={{
-                    position: 'relative',
-                    marginRight: 'auto',
-                    marginLeft: 66,
+                    position: 'absolute',
+                    left: 32,
+                    bottom: 0,
                     width: 64,
                     height: 64,
                     borderRadius: 32,
