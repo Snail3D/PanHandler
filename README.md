@@ -1,268 +1,416 @@
-# 📐 PanHandler - Professional Measurements from Your Pocket
+# 📐 PanHandler
 
-**Version:** Alpha v1.65  
-**Status:** Production Ready 🚀  
-**Platform:** iOS (Expo SDK 53, React Native 0.76.7)
+> Transform your iPhone into a precision measurement tool — no hardware needed, just a coin.
+
+<p align="center">
+  <strong>Professional measurements • CAD-ready exports • Free forever</strong><br>
+  <em>Built for makers, builders, and creators everywhere</em>
+</p>
 
 ---
 
 ## 🎯 What is PanHandler?
 
-PanHandler transforms your iPhone into a precision measurement tool. Using coin-based calibration and advanced computer vision, it delivers professional-grade measurements for CAD work, construction, design, and engineering.
+PanHandler turns your iPhone camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, and more with CAD-level precision — perfect for construction, design, engineering, and everyday projects.
 
-**No hardware needed.** Just a coin and your phone.
+**No expensive laser tools. No subscriptions. Just your phone and a coin.**
 
 ---
 
-## ✨ Features
+## ✨ Features at a Glance
 
-### 📐 Measurement Tools
-- **Distance** - Linear measurements between two points
-- **Angle** - Three-point angle measurements with azimuth bearing mode
-- **Circle** - Radius, diameter, area, circumference
-- **Rectangle** - Dimensions and area (length × width)
-- **Freehand** - Trace irregular shapes with ultra-precise lasso mode (Pro)
-  - **NEW in v1.65**: Smooth, fluid lines with 0.3mm snap precision
+### 📏 Measurement Tools
+
+| Tool | Description | Perfect For |
+|------|-------------|-------------|
+| **📐 Distance** | Measure straight-line distances between two points | Room dimensions, furniture sizing, material lengths |
+| **📐 Angle** | Three-point angle measurements with azimuth bearing | Corner angles, slopes, directional bearings |
+| **⭕ Circle** | Radius, diameter, area, and circumference | Pipes, vents, circular objects, curved surfaces |
+| **▭ Rectangle** | Length, width, and area calculations | Walls, windows, doors, frames, boxes |
+| **〰️ Freehand** | Trace custom paths and irregular shapes | Wire routing, curved edges, complex contours |
 
 ### 🪙 Smart Calibration
-- **Coin Calibration** - Use any common coin (50+ supported)
-- **Map Scale** - Measure from maps, blueprints, drawings
-- **Auto-Level Capture** - Hold level to auto-capture perfectly straight photos
-- **Auto-Leveled Album** - Auto-captured photos saved to dedicated album
-- **Remembers** - Last coin used for quick setup
-- **Accurate** - Professional-grade precision
 
-### 🎨 Beautiful Design
-- Watery glassmorphic UI
-- Dynamic color-coded measurements
-- Haptic feedback throughout
-- Gesture-based controls
-- Dark/light adaptive
+- **650+ Coins Supported** — From 130+ countries worldwide, every continent covered
+- **Map Scale Mode** — Measure directly from blueprints, maps, and drawings
+- **Auto-Level Capture** — Hold your phone level and it auto-captures perfectly straight photos
+- **Precision Lock-In** — Professional-grade accuracy for CAD workflows
+- **One-Time Setup** — Calibration remembered for future sessions
 
-### 💾 Professional Export
-- **Email** - Measurements + annotated photo
-- **Save to Photos** - With measurements burned in
-- **CAD Export** - DXF format (Pro)
-- **Labels** - Custom names for measurements
+### 🎨 Beautiful Interface
+
+- **Glassmorphic UI** — Smooth, modern, watery design aesthetic
+- **Color-Coded Measurements** — Each measurement type has its own vibrant color
+- **Haptic Feedback** — Satisfying tactile responses throughout the app
+- **Smart Snapping** — Measurements auto-snap to horizontal/vertical for perfect alignment
+- **Gesture Controls** — Pan, pinch-zoom, and tap with intuitive interactions
+
+### 💾 Export Options
+
+- **📧 Email Reports** — Send measurements with annotated photos
+- **📸 Save to Photos** — Export images with measurements burned in
+- **📐 CAD Export** — DXF format for professional workflows
+- **🏷️ Custom Labels** — Name your measurements for clarity
 
 ---
 
-## 🚀 Quick Start
+## 🚀 How to Use PanHandler
 
-1. **Take a photo** of what you want to measure
-2. **Select a coin** for calibration
-3. **Zoom** until the coin matches the circle on screen
-4. **Lock in** - you're calibrated!
-5. **Tap** to place measurement points
-6. **Export** via email, photos, or CAD
+### Step 1: 📸 Take a Perfect Photo
+
+**Position matters for accuracy:**
+
+- **Hold camera perpendicular (90°)** to your subject
+  - Flat surfaces: Look straight down
+  - Vertical surfaces: Face directly at walls/objects
+- **Distance matters:**
+  - Closer = Better detail (but fit everything in frame)
+  - Farther = Less detail (but wider coverage)
+- **Use the bubble level** — Green circle shows when phone is level
+- **Auto-capture enabled?** — Hold level for 2 seconds to auto-snap
+- **Tap shutter button** to capture manually
+- **Import existing photos** via "Add Photos" button
+
+---
+
+### Step 2: 🪙 Calibrate with a Coin
+
+**Set your scale for accurate measurements:**
+
+1. **Search for your coin** — 650+ coins from 130+ countries
+2. **Place the coin** in your photo (or nearby on the surface)
+3. **Zoom and position** the calibration circle
+4. **Align edges perfectly** — Match the outer circle edge to the coin
+5. **Tap "Lock In Calibration"** when ready
+
+💡 **Pro Tip:** Made a mistake? Tap the red **Recalibrate** button below the calibration badge to start over!
+
+---
+
+### Step 3: 📏 Place Measurements
+
+**Choose your measurement type and start measuring:**
+
+#### 📐 Distance Mode
+- Tap to place two points
+- Get instant distance measurement
+- **Pro Tip:** Connect multiple lines to create triangles and polygons — **areas are automatically calculated!**
+
+#### 📐 Angle Mode
+- Place first endpoint → vertex (corner) → second endpoint
+- See angle in degrees
+- In Map Mode, this becomes **Azimuth Mode** for directional bearings
+
+#### ⭕ Circle Mode
+- Tap center point
+- Tap edge to define radius
+- Get diameter, circumference, and **area automatically**
+
+#### ▭ Rectangle Mode
+- Tap two opposite corners
+- Get length, width, and **area automatically**
+- Edges snap to perfect horizontal/vertical lines
+
+#### 〰️ Freehand Mode
+- Draw custom paths for any shape
+- Perfect for wire paths, curved edges, or irregular contours
+- **🎯 Lasso Mode:** Close the loop by ending near your start point — get **perimeter and area!**
+
+---
+
+### Step 4: 📤 Export Your Work
+
+**Share your measurements professionally:**
+
+- **Email** — Send annotated photos with all measurements
+- **Save to Photos** — Export high-quality images with measurements
+- **CAD Export (DXF)** — Import into AutoCAD, Fusion 360, SolidWorks, etc.
+- **Custom Labels** — Tap "Edit Labels" to name measurements before exporting
+
+---
+
+## 🎓 Tips & Tricks
+
+### 📸 Getting the Best Photos
+
+- **Lighting is key** — Use natural light when possible
+- **Avoid shadows** — They can distort measurements
+- **Keep phone steady** — Use the bubble level for perfect alignment
+- **Zoom calibration** — If initial photo is too far, you can zoom during calibration!
+
+### 🎯 Measurement Accuracy
+
+- **Tap-to-Focus** — Tap screen to auto-focus camera before capture
+- **Sub-pixel precision** — Crosshair cursor snaps to exact pixel locations
+- **Multi-measurement workflows** — Place multiple measurements on same photo
+- **Pan & Edit Modes:**
+  - **Pan Mode** — Navigate around your photo
+  - **Measure Mode** — Place new measurements
+  - **Edit Mode** — Adjust existing measurement points
+
+### 🗺️ Map Mode
+
+Want to measure from maps, blueprints, or technical drawings?
+
+1. Import your map/blueprint photo
+2. In calibration, tap **"Map Mode"**
+3. Enter the scale (e.g., "1:100" or "1 inch = 10 feet")
+4. Measure directly on the drawing!
+
+---
+
+## 🎬 Learn with Video Tutorials
+
+Watch our complete video course on YouTube!
+
+**[📹 PanHandler YouTube Course](https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi)**
+
+**Course includes:**
+- Getting started tutorials
+- Advanced measurement techniques
+- Real-world workflow examples
+- Tips & tricks for best results
 
 ---
 
 ## 💰 Pricing
 
-### Free Forever 🎉
+### 🎉 Free Forever
+
+That's right — **completely free, forever.**
+
 - ✅ Unlimited measurements
 - ✅ Unlimited exports
-- ✅ Coin calibration
-- ✅ Distance, Angle, Circle, Rectangle tools
-- ✅ Freehand tool
-- ✅ CAD export (DXF)
-- ✅ Map mode
-- ✅ Zoom calibration upgrades
-- ✅ All features included - no subscriptions, no in-app purchases
+- ✅ All measurement tools (Distance, Angle, Circle, Rectangle, Freehand)
+- ✅ Coin + Map calibration
+- ✅ CAD export (DXF format)
+- ✅ Email reports with photos
+- ✅ All features included
+
+**No subscriptions. No in-app purchases. No hidden fees.**
 
 ---
 
-## 🎓 How It Works
+## 🏆 Why Choose PanHandler?
 
-### The Math
-```
-1. User zooms image to match coin to reference circle
-2. App calculates: pixelsPerMM = (circleDiameter / zoomScale) / coinDiameterMM
-3. For any measurement: realWorldDistance = pixelDistance / pixelsPerMM
-```
+### vs. Tape Measures
+- ✅ Faster and more accurate
+- ✅ Digital records you can share
+- ✅ Measure from photos anytime
 
-### Why It's Accurate
-- Coin diameter is precisely known (standardized minting)
-- Zoom calibration captures exact image scale
-- Sub-pixel precision cursor for placement
-- Mathematical verification at every step
+### vs. Laser Measuring Tools
+- ✅ Free vs. $50-$200
+- ✅ No extra device to carry
+- ✅ Measure multiple dimensions from one photo
 
----
-
-## 🏗️ Technical Stack
-
-- **Platform:** React Native 0.76.7 (iOS optimized)
-- **Framework:** Expo SDK 53
-- **State:** Zustand + AsyncStorage
-- **Gestures:** react-native-gesture-handler
-- **Animations:** react-native-reanimated v3
-- **Styling:** NativeWind (Tailwind for RN)
+### vs. Other Measurement Apps
+- ✅ Real calibration (not guessing)
+- ✅ CAD-ready DXF exports
+- ✅ Professional precision
+- ✅ Beautiful, intuitive interface
 
 ---
 
 ## 📱 Use Cases
 
 ### 🏗️ Construction & Contractors
-- Room dimensions
-- Material quantities
-- Layout verification
-- Quick estimates
+- Room dimensions and layout verification
+- Material quantity calculations
+- Quick on-site estimates
+- Client documentation
 
-### 🎨 Interior Design
-- Furniture sizing
-- Space planning
-- Decoration placement
-- Client presentations
-
-### 📐 Engineering & Architecture  
+### 🎨 Interior Design & Architecture
+- Furniture sizing and space planning
 - Blueprint measurements
-- Component sizing
+- Decoration placement
 - Field verification
-- CAD import/export
 
-### 🛒 E-commerce
-- Product dimensions
-- Packaging sizes
-- Shipping calculations
-- Listing accuracy
+### 📦 E-commerce & Shipping
+- Product dimensions for listings
+- Packaging size calculations
+- Shipping cost estimates
+- Accurate product photos
 
 ### 🏡 Real Estate
 - Property measurements
+- Room dimensions for listings
 - Lot sizes
-- Room dimensions
-- Listing photos
+- Professional listing photos
+
+### 🛠️ DIY & Home Improvement
+- Project planning
+- Material shopping
+- Renovation measurements
+- Furniture builds
 
 ---
 
-## 📚 Documentation
+## 🏗️ Technical Details
 
-- **[ALPHA_RELEASE_v1.0.md](./ALPHA_RELEASE_v1.0.md)** - Complete release notes
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical deep-dive, formulas, code structure
-- **[CHANGELOG.md](./CHANGELOG.md)** - Version history
-- **[APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)** - Launch checklist
+### How It Works
+
+**The Math Behind the Magic:**
+
+```
+1. User zooms image to match coin to reference circle
+2. App calculates: pixelsPerMM = (circleDiameter / zoomScale) / coinDiameterMM
+3. For any measurement: realWorldDistance = pixelDistance / pixelsPerMM
+```
+
+**Why It's Accurate:**
+- Coin diameters are precisely known (standardized minting)
+- Zoom calibration captures exact image scale
+- Sub-pixel precision cursor for point placement
+- Mathematical verification at every step
+
+### Tech Stack
+
+- **Platform:** React Native 0.76.7 (iOS optimized)
+- **Framework:** Expo SDK 53
+- **State Management:** Zustand + AsyncStorage
+- **Gestures:** react-native-gesture-handler
+- **Animations:** react-native-reanimated v3
+- **Styling:** NativeWind (Tailwind CSS for React Native)
+
+### Project Structure
+
+```
+src/
+├── components/
+│   ├── CalibrationModal.tsx         # Coin selection UI
+│   ├── CoinCalibration.tsx          # Zoom calibration
+│   ├── DimensionOverlay.tsx         # Main measurement UI (6000+ lines)
+│   ├── HelpModal.tsx                # Comprehensive in-app guide
+│   └── BattlingBotsModal.tsx        # Easter egg hints
+├── screens/
+│   ├── MeasurementScreen.tsx        # Main container
+│   └── CameraScreen.tsx             # Photo capture + bubble level
+├── state/
+│   └── measurementStore.ts          # Zustand store (persistent)
+├── utils/
+│   ├── coinReferences.ts            # 650+ coin database
+│   ├── unitConversion.ts            # Metric/Imperial conversions
+│   ├── deviceScale.ts               # 1.2X tablet scaling
+│   └── chuckNorrisJokes.ts          # Easter egg content
+└── types/
+    └── measurement.ts               # TypeScript types
+```
+
+---
+
+## 🎮 Easter Eggs
+
+PanHandler has a few fun hidden surprises! Can you find them all?
+
+**Hints:**
+- Something about snails... 🐌
+- Music lovers, pay attention to the help screen... 🎵
+- Chuck Norris doesn't measure things... ⚡
+
+Want more hints? Look for the "Battling Bots" modal (long-press the left egg 7 times)!
 
 ---
 
 ## 🔧 Development
 
 ### Setup
+
 ```bash
 # Install dependencies
 bun install
 
-# Start development (auto-managed by Vibecode)
+# Start development server (auto-managed by Vibecode)
 # Server runs on port 8081
 
 # Type checking
 bun tsc --noEmit
 ```
 
-### Project Structure
-```
-src/
-├── components/
-│   ├── ZoomCalibration.tsx      # Coin calibration (combined)
-│   ├── DimensionOverlay.tsx     # Main measurement UI
-│   ├── HelpModal.tsx            # Comprehensive guide
-│   └── ...
-├── screens/
-│   ├── MeasurementScreen.tsx    # Main container
-│   └── CameraScreen.tsx         # Photo capture
-├── state/
-│   └── measurementStore.ts      # Zustand store
-├── utils/
-│   ├── coinReferences.ts        # 50+ coins
-│   └── unitConversion.ts        # Metric/Imperial
-└── types/
-    └── measurement.ts           # TypeScript types
-```
+### Development Notes
+
+- All timer/subscription cleanup is critical to prevent memory leaks
+- React Native Pressable fires both `onPress` and `onLongPress` events
+- `useAnimatedStyle` hooks must be defined at top level (never conditionally)
+- Tablet support: 1.2X scaling on iPad/Android tablets (automatic detection)
+
+---
+
+## 📚 Documentation
+
+- **[CLAUDE.md](./CLAUDE.md)** — Recent session changes, bug fixes, features
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Technical deep-dive, formulas, code structure
+- **[CHANGELOG.md](./CHANGELOG.md)** — Version history
+- **[APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)** — App Store launch checklist
 
 ---
 
 ## 🎯 Roadmap
 
-### Alpha v1.0 (Current)
-- [x] Core measurement tools
-- [x] Coin calibration
-- [x] Map scale mode
-- [x] Export system
-- [x] Help system
-- [x] Pro features
+### ✅ Alpha v1.65 (Current)
+- Core measurement tools complete
+- Coin + map calibration
+- Export system (Email, Photos, DXF)
+- Comprehensive help system
+- Tablet support (1.2X scaling)
+- Easter eggs implemented
 
-### Beta (Next)
-- [ ] App Store submission
-- [ ] TestFlight beta testing
-- [ ] User feedback iteration
-- [ ] Performance optimization
-- [ ] App Store assets
+### 🔜 Beta (Next)
+- App Store submission
+- TestFlight beta testing
+- User feedback iteration
+- Performance optimization
+- Marketing assets
 
-### Future
-- [ ] Apple Watch calibration
-- [ ] Batch measurements
-- [ ] Measurement templates
-- [ ] Cloud sync (optional)
-- [ ] AR mode (iOS 17+)
-
----
-
-## 🌟 Why PanHandler?
-
-### ✅ Advantages
-- **No hardware** - Just need a coin
-- **Offline-first** - Works anywhere
-- **Lightweight** - Minimal storage
-- **One-time purchase** - No subscriptions
-- **Professional accuracy** - CAD-ready
-- **Beautiful UX** - Fluid, modern design
-
-### 🎯 vs Alternatives
-- **vs Tape Measures** - Faster, more accurate, digital records
-- **vs Laser Tools** - $10 vs $50-200, no extra device
-- **vs Other Apps** - Actual calibration (not guessing), CAD export
-
----
-
-## 📊 Market Potential
-
-**Target Markets:**
-- Construction (10M+ professionals in US)
-- Interior Design (2M+ professionals)
-- E-commerce sellers (5M+ in US)
-- DIY enthusiasts (50M+ active)
-
-**Revenue Projections:**
-- Conservative: $24K/year
-- Moderate: $180K/year  
-- Optimistic: $957K/year
-
-See [ALPHA_RELEASE_v1.0.md](./ALPHA_RELEASE_v1.0.md) for detailed analysis.
+### 🚀 Future Ideas
+- Apple Watch calibration
+- Batch measurements
+- Measurement templates
+- Cloud sync (optional)
+- AR mode (iOS 17+)
 
 ---
 
 ## 👨‍💻 Credits
 
-**Created by:** Snail (3D Designer)  
-**Mission:** Make CAD designing faster, easier, and more accurate for everyone  
-**YouTube:** [@realsnail3d](https://youtube.com/@realsnail3d)
+**Created by:** [Snail](https://youtube.com/@realsnail3d) (3D Designer)
+**Mission:** Make CAD designing faster, easier, and more accurate for everyone
 
-**Development:** Ken (AI Agent at Vibecode)  
-**Partnership:** October 2025
+**Development Partner:** Ken (AI Agent at Vibecode)
+**Launch:** October 2025
 
 ---
 
 ## 📄 License
 
-Proprietary - All rights reserved
+Proprietary — All rights reserved
 
 ---
 
 ## 🚀 Status
 
-**This is Alpha v1.0. This is production-ready. Ship it.** 🔥
+**Version:** Alpha v1.65+
+**Status:** Production Ready 🔥
+**Platform:** iOS (iPhone + iPad)
 
-For launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)
+**This is production-ready. Ship it.**
+
+For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)
 
 ---
 
-**Made with ❤️ for makers, builders, and creators everywhere.**
+<p align="center">
+  <strong>Made with ❤️ for makers, builders, and creators everywhere.</strong><br>
+  <em>Measure anything. Anytime. Anywhere.</em>
+</p>
+
+---
+
+## 💬 Support & Feedback
+
+- **YouTube:** [@realsnail3d](https://youtube.com/@realsnail3d)
+- **Email:** Long-press the Help (?) button in the app to reset your saved email
+- **Bug Reports:** Found an issue? Let us know!
+
+---
+
+**📐 PanHandler — Professional measurements from your pocket.**
