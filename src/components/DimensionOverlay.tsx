@@ -1404,31 +1404,80 @@ export default function DimensionOverlay({
   // Helper: Format map scale area (for rectangles, circles, freehand)
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
-    
+
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
-    
+
+    // Helper to format acres with K/M suffixes
+    const formatAcres = (acres: number): string => {
+      if (acres >= 1000000) {
+        return `${(acres / 1000000).toFixed(2)}M ac`;
+      } else if (acres >= 1000) {
+        return `${(acres / 1000).toFixed(2)}K ac`;
+      } else if (acres >= 100) {
+        return `${Math.round(acres)} ac`;
+      } else {
+        return `${acres.toFixed(2)} ac`;
+      }
+    };
+
+    // Helper to format km² with K/M suffixes
+    const formatKm2 = (km2: number): string => {
+      if (km2 >= 1000000) {
+        return `${(km2 / 1000000).toFixed(2)}M km²`;
+      } else if (km2 >= 1000) {
+        return `${(km2 / 1000).toFixed(2)}K km²`;
+      } else {
+        return `${km2.toFixed(2)} km²`;
+      }
+    };
+
+    // Helper to format mi² with K/M suffixes
+    const formatMi2 = (mi2: number): string => {
+      if (mi2 >= 1000000) {
+        return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+      } else if (mi2 >= 1000) {
+        return `${(mi2 / 1000).toFixed(2)}K mi²`;
+      } else {
+        return `${mi2.toFixed(2)} mi²`;
+      }
+    };
+
+    // Helper to format m² with K/M suffixes
+    const formatM2 = (m2: number): string => {
+      if (m2 >= 1000000) {
+        return `${(m2 / 1000000).toFixed(2)}M m²`;
+      } else if (m2 >= 1000) {
+        return `${(m2 / 1000).toFixed(2)}K m²`;
+      } else {
+        return `${m2.toFixed(0)} m²`;
+      }
+    };
+
+    // Helper to format ft² with K/M suffixes
+    const formatFt2 = (ft2: number): string => {
+      if (ft2 >= 1000000) {
+        return `${(ft2 / 1000000).toFixed(2)}M ft²`;
+      } else if (ft2 >= 1000) {
+        return `${(ft2 / 1000).toFixed(2)}K ft²`;
+      } else {
+        return `${ft2.toFixed(0)} ft²`;
+      }
+    };
+
     // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
     if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
       if (mapScale.realUnit === 'km') {
-        // No hectares for km² - it's intuitive enough
-        return `${areaInMapUnits2.toFixed(2)} km²`;
+        return formatKm2(areaInMapUnits2);
       } else if (mapScale.realUnit === 'mi') {
         const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
-        const acreStr = acres >= 100
-          ? `${Math.round(acres)} ac`
-          : `${acres.toFixed(2)} ac`;
-        return `${areaInMapUnits2.toFixed(2)} mi² (${acreStr})`;
+        return `${formatMi2(areaInMapUnits2)} (${formatAcres(acres)})`;
       } else if (mapScale.realUnit === 'm') {
-        // No hectares for m² - it's intuitive enough
-        return `${areaInMapUnits2.toFixed(0)} m²`;
+        return formatM2(areaInMapUnits2);
       } else { // ft
         const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
-        const acreStr = acres >= 100
-          ? `${Math.round(acres)} ac`
-          : `${acres.toFixed(2)} ac`;
-        return `${areaInMapUnits2.toFixed(0)} ft² (${acreStr})`;
+        return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
       }
     }
     
@@ -1443,11 +1492,10 @@ export default function DimensionOverlay({
 
       // Choose appropriate metric unit
       if (m2 < 10000) {
-        return `${m2.toFixed(1)} m²`;
+        return formatM2(m2);
       } else {
         const km2 = m2 / 1000000;
-        // No hectares - km² is intuitive enough
-        return `${km2.toFixed(2)} km²`;
+        return formatKm2(km2);
       }
     }
 
@@ -1463,17 +1511,11 @@ export default function DimensionOverlay({
       // Choose appropriate imperial unit
       if (ft2 < 27878400) { // Less than 1 square mile
         const acres = ft2 / 43560;
-        const acreStr = acres >= 100
-          ? `${Math.round(acres)} ac`
-          : `${acres.toFixed(2)} ac`;
-        return `${ft2.toFixed(0)} ft² (${acreStr})`;
+        return `${formatFt2(ft2)} (${formatAcres(acres)})`;
       } else {
         const mi2 = ft2 / 27878400;
         const acres = mi2 * 640;
-        const acreStr = acres >= 100
-          ? `${Math.round(acres)} ac`
-          : `${acres.toFixed(2)} ac`;
-        return `${mi2.toFixed(2)} mi² (${acreStr})`;
+        return `${formatMi2(mi2)} (${formatAcres(acres)})`;
       }
     }
     
