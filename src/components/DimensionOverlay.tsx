@@ -5735,10 +5735,50 @@ export default function DimensionOverlay({
 
                             displayValue = `⌀ ${displayDist.toFixed(2)} ${displayUnit}`;
 
-                            // Calculate area
+                            // Calculate area in the correct units
                             const radiusDist = displayDist / 2;
                             const areaDist2 = Math.PI * radiusDist * radiusDist;
-                            const areaStr = `${areaDist2.toFixed(2)} ${displayUnit}²`;
+
+                            // Format area with proper scaling (K, M suffixes for large values)
+                            let areaStr: string;
+                            if (displayUnit === 'mi') {
+                              // Convert to acres for imperial
+                              const acres = areaDist2 * 640; // 1 mi² = 640 acres
+                              if (acres >= 1000000) {
+                                areaStr = `${(acres / 1000000).toFixed(2)}M ac`;
+                              } else if (acres >= 1000) {
+                                areaStr = `${(acres / 1000).toFixed(2)}K ac`;
+                              } else {
+                                areaStr = `${acres.toFixed(2)} ac`;
+                              }
+                            } else if (displayUnit === 'ft') {
+                              // Keep in ft² for small areas
+                              if (areaDist2 >= 1000000) {
+                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M ft²`;
+                              } else if (areaDist2 >= 1000) {
+                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K ft²`;
+                              } else {
+                                areaStr = `${areaDist2.toFixed(2)} ft²`;
+                              }
+                            } else if (displayUnit === 'km') {
+                              // Keep in km² for metric
+                              if (areaDist2 >= 1000000) {
+                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M km²`;
+                              } else if (areaDist2 >= 1000) {
+                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K km²`;
+                              } else {
+                                areaStr = `${areaDist2.toFixed(2)} km²`;
+                              }
+                            } else {
+                              // m - keep in m²
+                              if (areaDist2 >= 1000000) {
+                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M m²`;
+                              } else if (areaDist2 >= 1000) {
+                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K m²`;
+                              } else {
+                                areaStr = `${areaDist2.toFixed(2)} m²`;
+                              }
+                            }
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
