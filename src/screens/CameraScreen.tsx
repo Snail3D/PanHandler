@@ -24,6 +24,7 @@ import BattlingBotsModal from '../components/BattlingBotsModal';
 import AlertModal from '../components/AlertModal';
 import TypewriterText from '../components/TypewriterText';
 import TouchOverlayFingerprints from '../components/TouchOverlayFingerprints';
+import DroneIcon from '../components/DroneIcon';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
@@ -1980,7 +1981,9 @@ export default function CameraScreen() {
                 }}
               >
                 <View pointerEvents="none" style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                  <Ionicons name="airplane" size={scaleIconSize(20)} color="white" style={{ position: 'absolute', top: scaleSize(14) }} />
+                  <View style={{ position: 'absolute', top: scaleSize(14) }}>
+                    <DroneIcon size={scaleIconSize(20)} color="white" />
+                  </View>
                   <Ionicons name="map" size={scaleIconSize(18)} color="white" style={{ position: 'absolute', bottom: scaleSize(12), left: scaleSize(14) }} />
                   <Ionicons name="document-text" size={scaleIconSize(18)} color="white" style={{ position: 'absolute', bottom: scaleSize(12), right: scaleSize(14) }} />
                 </View>
