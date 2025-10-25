@@ -5692,107 +5692,35 @@ export default function DimensionOverlay({
                           // Recalculate circle diameter and area
                           // measurement.radius is stored in PIXELS, convert to real units
 
-                          // IMPORTANT: Use the measurement's ORIGINAL calibration mode, not the current mode
-                          // This prevents incorrect conversions when switching between coin and map mode
+                          // IMPORTANT: Only use map scale if BOTH:
+                          // 1. We're currently in map mode (isMapMode)
+                          // 2. The measurement was created in map mode (calibrationMode === 'map')
+                          // This prevents incorrect conversions when switching modes
                           const wasCreatedInMapMode = measurement.calibrationMode === 'map';
 
-                          // Map Mode: Apply scale conversion ONLY if measurement was created in map mode
-                          if (wasCreatedInMapMode && measurement.mapScaleData) {
-                            // Use the original map scale data that was stored with the measurement
-                            const originalMapScale = measurement.mapScaleData;
+                          // Map Mode: Apply scale conversion
+                          if (isMapMode && mapScale && wasCreatedInMapMode) {
                             const diameterPx = measurement.radius * 2;
-
-                            // Convert using the ORIGINAL map scale
-                            const screenDistCm = originalMapScale.screenUnit === 'cm'
-                              ? originalMapScale.screenDistance
-                              : originalMapScale.screenDistance * 2.54;
-                            const realDistKm = originalMapScale.realUnit === 'km'
-                              ? originalMapScale.realDistance
-                              : originalMapScale.realUnit === 'mi'
-                              ? originalMapScale.realDistance * 1.60934
-                              : originalMapScale.realUnit === 'm'
-                              ? originalMapScale.realDistance / 1000
-                              : originalMapScale.realDistance * 0.0003048;
-                            const scale = realDistKm / (screenDistCm / 100000);
-                            const diameterDistKm = (diameterPx / 100) * scale;
-
-                            // Format in the original real unit
-                            let displayDist: number;
-                            let displayUnit: string;
-                            if (originalMapScale.realUnit === 'km') {
-                              displayDist = diameterDistKm;
-                              displayUnit = 'km';
-                            } else if (originalMapScale.realUnit === 'mi') {
-                              displayDist = diameterDistKm / 1.60934;
-                              displayUnit = 'mi';
-                            } else if (originalMapScale.realUnit === 'm') {
-                              displayDist = diameterDistKm * 1000;
-                              displayUnit = 'm';
-                            } else {
-                              displayDist = diameterDistKm * 3280.84;
-                              displayUnit = 'ft';
-                            }
-
-                            displayValue = `⌀ ${displayDist.toFixed(2)} ${displayUnit}`;
-
-                            // Calculate area in the correct units
-                            const radiusDist = displayDist / 2;
+                            const diameterDist = convertToMapScale(diameterPx);
+                            displayValue = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+                            // Calculate area in map units
+                            const radiusDist = diameterDist / 2;
                             const areaDist2 = Math.PI * radiusDist * radiusDist;
-
-                            // Format area with proper scaling (K, M suffixes for large values)
-                            let areaStr: string;
-                            if (displayUnit === 'mi') {
-                              // Convert to acres for imperial
-                              const acres = areaDist2 * 640; // 1 mi² = 640 acres
-                              if (acres >= 1000000) {
-                                areaStr = `${(acres / 1000000).toFixed(2)}M ac`;
-                              } else if (acres >= 1000) {
-                                areaStr = `${(acres / 1000).toFixed(2)}K ac`;
-                              } else {
-                                areaStr = `${acres.toFixed(2)} ac`;
-                              }
-                            } else if (displayUnit === 'ft') {
-                              // Keep in ft² for small areas
-                              if (areaDist2 >= 1000000) {
-                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M ft²`;
-                              } else if (areaDist2 >= 1000) {
-                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K ft²`;
-                              } else {
-                                areaStr = `${areaDist2.toFixed(2)} ft²`;
-                              }
-                            } else if (displayUnit === 'km') {
-                              // Keep in km² for metric
-                              if (areaDist2 >= 1000000) {
-                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M km²`;
-                              } else if (areaDist2 >= 1000) {
-                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K km²`;
-                              } else {
-                                areaStr = `${areaDist2.toFixed(2)} km²`;
-                              }
-                            } else {
-                              // m - keep in m²
-                              if (areaDist2 >= 1000000) {
-                                areaStr = `${(areaDist2 / 1000000).toFixed(2)}M m²`;
-                              } else if (areaDist2 >= 1000) {
-                                areaStr = `${(areaDist2 / 1000).toFixed(2)}K m²`;
-                              } else {
-                                areaStr = `${areaDist2.toFixed(2)} m²`;
-                              }
-                            }
+                            const areaStr = formatMapScaleArea(areaDist2);
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
-                              // Convert depth to map scale unit
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, originalMapScale.realUnit);
+                              // Convert depth to map scale unit (km, mi, m, or ft)
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = `${volumeInMapUnits.toFixed(2)} ${displayUnit}³`;
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
                             return `${displayValue} (A: ${areaStr})`;
                           }
 
-                          // Coin calibration mode
+                          // Coin calibration mode (or showing map measurement in coin mode)
                           const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
                           const diameter = radiusInUnits * 2;
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
@@ -5813,11 +5741,13 @@ export default function DimensionOverlay({
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
 
-                          // IMPORTANT: Use the measurement's ORIGINAL calibration mode, not the current mode
+                          // IMPORTANT: Only use map scale if BOTH:
+                          // 1. We're currently in map mode (isMapMode)
+                          // 2. The measurement was created in map mode (calibrationMode === 'map')
                           const wasCreatedInMapMode = measurement.calibrationMode === 'map';
 
-                          // Map Mode: Apply scale conversion ONLY if measurement was created in map mode
-                          if (wasCreatedInMapMode && measurement.mapScaleData) {
+                          // Map Mode: Apply scale conversion
+                          if (isMapMode && mapScale && wasCreatedInMapMode) {
                             // measurement.width and measurement.height are already in map units
                             const widthStr = formatMapValue(measurement.width);
                             const heightStr = formatMapValue(measurement.height);
@@ -5828,9 +5758,9 @@ export default function DimensionOverlay({
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
                               // Convert depth to map scale unit (km, mi, m, or ft)
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, measurement.mapScaleData.realUnit);
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, measurement.mapScaleData.realUnit, unitSystem);
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
