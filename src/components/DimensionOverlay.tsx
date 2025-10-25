@@ -15,7 +15,7 @@ import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
 import { BlurView } from 'expo-blur';
 import useStore, { CompletedMeasurement } from '../state/measurementStore';
-import { formatMeasurement, formatAreaMeasurement, formatVolumeMeasurement } from '../utils/unitConversion';
+import { formatMeasurement, formatAreaMeasurement, formatVolumeMeasurement, convertUnit } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
 import BlueprintPlacementModal from './BlueprintPlacementModal';
@@ -5679,8 +5679,10 @@ export default function DimensionOverlay({
 
                           // Add volume if depth is present
                           if (measurement.depth !== undefined && measurement.depthUnit) {
-                            const volume = area * measurement.depth;
-                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            // Convert depth to the same base unit as area (calibration unit)
+                            const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
+                            const volume = area * depthInBaseUnit;
+                            const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
                             return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                           }
 
@@ -5708,8 +5710,10 @@ export default function DimensionOverlay({
 
                           // Add volume if depth is present
                           if (measurement.depth !== undefined && measurement.depthUnit) {
-                            const volume = area * measurement.depth;
-                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            // Convert depth to the same base unit as area (calibration unit)
+                            const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
+                            const volume = area * depthInBaseUnit;
+                            const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
                             return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                           }
 
@@ -5721,8 +5725,10 @@ export default function DimensionOverlay({
 
                           // Add volume if depth is present
                           if (measurement.depth !== undefined && measurement.depthUnit && measurement.area !== undefined) {
-                            const volume = measurement.area * measurement.depth;
-                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            // Convert depth to the same base unit as area (calibration unit)
+                            const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
+                            const volume = measurement.area * depthInBaseUnit;
+                            const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
                             // Replace closing paren with | V: volume)
                             displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
                           }

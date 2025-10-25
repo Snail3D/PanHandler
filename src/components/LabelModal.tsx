@@ -606,8 +606,8 @@ export default function LabelModal({
       onRequestClose={handleCancel}
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-        <Pressable 
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
+        <Pressable
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24, paddingBottom: '20%' }}
           onPress={handleCancel}
         >
           <Pressable 
