@@ -5892,7 +5892,7 @@ export default function DimensionOverlay({
           })()}
 
           {/* Side labels for rectangles - Width on left, Height on top */}
-          {!hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
+          {!hideMeasurementsForCapture && !hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
             const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
             
             // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
