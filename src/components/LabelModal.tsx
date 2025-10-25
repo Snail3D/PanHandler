@@ -510,17 +510,37 @@ const getShapeTitle = (measurementMode?: string) => {
 
 interface LabelModalProps {
   visible: boolean;
-  onComplete: (label: string | null) => void;
+  onComplete: (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => void;
   onDismiss: () => void;
   initialValue?: string | null;
+  initialDepth?: number;
+  initialDepthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi';
+  hasArea?: boolean; // Whether this measurement has an area (can add depth for volume)
   isMapMode?: boolean;
   measurementMode?: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand' | 'polygon';
   actionType?: 'save' | 'email'; // To show different button text/icon
+  unitSystem?: 'metric' | 'imperial'; // For smart depth unit defaults
 }
 
-export default function LabelModal({ visible, onComplete, onDismiss, initialValue, isMapMode = false, measurementMode, actionType = 'save' }: LabelModalProps) {
+export default function LabelModal({
+  visible,
+  onComplete,
+  onDismiss,
+  initialValue,
+  initialDepth,
+  initialDepthUnit,
+  hasArea = false,
+  isMapMode = false,
+  measurementMode,
+  actionType = 'save',
+  unitSystem = 'metric'
+}: LabelModalProps) {
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
+  const [depth, setDepth] = useState('');
+  const [depthUnit, setDepthUnit] = useState<'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'>(
+    initialDepthUnit || (unitSystem === 'metric' ? 'cm' : 'in')
+  );
 
   // Generate a new random example whenever modal becomes visible
   useEffect(() => {
@@ -528,32 +548,53 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
       const example1 = getRandomExample(isMapMode, measurementMode);
       const example2 = getRandomExample(isMapMode, measurementMode);
       setPlaceholder(`e.g., ${example1}, ${example2}...`);
-      
-      // Pre-fill with initial value if provided
+
+      // Pre-fill with initial values if provided
       if (initialValue) {
         setLabel(initialValue);
       }
+      if (initialDepth !== undefined) {
+        setDepth(initialDepth.toString());
+      }
+      if (initialDepthUnit) {
+        setDepthUnit(initialDepthUnit);
+      }
     }
-  }, [visible, initialValue, isMapMode, measurementMode]);
+  }, [visible, initialValue, initialDepth, initialDepthUnit, isMapMode, measurementMode]);
 
   const handleContinue = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Keyboard.dismiss();
-    onComplete(label.trim() || null);
+
+    const depthNum = parseFloat(depth);
+    const data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' } = {
+      label: label.trim() || null,
+    };
+
+    // Only include depth if hasArea and depth is valid
+    if (hasArea && !isNaN(depthNum) && depthNum > 0) {
+      data.depth = depthNum;
+      data.depthUnit = depthUnit;
+    }
+
+    onComplete(data);
     setLabel(''); // Reset for next time
+    setDepth('');
   };
 
   const handleSkip = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Keyboard.dismiss();
-    onComplete(null);
+    onComplete({ label: null });
     setLabel(''); // Reset for next time
+    setDepth('');
   };
 
   const handleCancel = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Keyboard.dismiss();
     setLabel('');
+    setDepth('');
     onDismiss();
   };
 
@@ -693,13 +734,92 @@ export default function LabelModal({ visible, onComplete, onDismiss, initialValu
                     </View>
                   </View>
 
-                  <Text style={{ 
-                    color: '#6E6E73', 
+                  <Text style={{
+                    color: '#6E6E73',
                     fontSize: 11,
                     fontWeight: '500',
                   }}>
                     This label will appear in emails and saved photos
                   </Text>
+
+                  {/* Depth Input - Only show if measurement has area */}
+                  {hasArea && (
+                    <View style={{ marginTop: 16 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                        <Ionicons name="cube-outline" size={16} color="#5856D6" style={{ marginRight: 6 }} />
+                        <Text style={{
+                          color: '#48484A',
+                          fontSize: 13,
+                          fontWeight: '600',
+                        }}>
+                          Add Depth for Volume (Optional)
+                        </Text>
+                      </View>
+
+                      <View style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        borderRadius: 12,
+                        borderWidth: 1,
+                        borderColor: 'rgba(0, 0, 0, 0.06)',
+                        overflow: 'hidden',
+                      }}>
+                        <TextInput
+                          value={depth}
+                          onChangeText={setDepth}
+                          placeholder="e.g., 5"
+                          placeholderTextColor="#8E8E93"
+                          keyboardType="numeric"
+                          style={{
+                            padding: 12,
+                            fontSize: 16,
+                            fontWeight: '600',
+                            color: 'rgba(0, 0, 0, 0.85)',
+                            textAlign: 'center',
+                          }}
+                        />
+                        {/* Unit Toggle */}
+                        <View style={{
+                          flexDirection: 'row',
+                          padding: 4,
+                          backgroundColor: 'rgba(120, 120, 128, 0.12)',
+                        }}>
+                          {(unitSystem === 'metric' ? ['mm', 'cm', 'm'] : ['in', 'ft']).map((unit) => (
+                            <Pressable
+                              key={unit}
+                              onPress={() => {
+                                setDepthUnit(unit as any);
+                                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                              }}
+                              style={{
+                                flex: 1,
+                                paddingVertical: 6,
+                                borderRadius: 6,
+                                backgroundColor: depthUnit === unit ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+                              }}
+                            >
+                              <Text style={{
+                                textAlign: 'center',
+                                fontSize: 12,
+                                fontWeight: '600',
+                                color: depthUnit === unit ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.45)',
+                              }}>
+                                {unit}
+                              </Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      </View>
+
+                      <Text style={{
+                        color: '#6E6E73',
+                        fontSize: 10,
+                        fontWeight: '500',
+                        marginTop: 6,
+                      }}>
+                        Volume will be calculated and displayed in legend
+                      </Text>
+                    </View>
+                  )}
                 </View>
 
                 {/* Footer Buttons */}
