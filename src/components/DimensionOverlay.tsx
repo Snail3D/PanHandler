@@ -2126,8 +2126,11 @@ export default function DimensionOverlay({
           Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
         );
 
+        // Determine if we're effectively in map mode (either Map button OR verbal scale)
+        const effectivelyInMapMode = (isMapMode || calibration?.calibrationType === 'verbal') && mapScale;
+
         // Map Mode: Apply scale conversion
-        if (isMapMode && mapScale) {
+        if (effectivelyInMapMode) {
           const diameterPx = radius * 2;
           value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
         } else {
@@ -2143,8 +2146,11 @@ export default function DimensionOverlay({
         const widthPx = Math.abs(p1.x - p0.x);
         const heightPx = Math.abs(p1.y - p0.y);
 
+        // Determine if we're effectively in map mode (either Map button OR verbal scale)
+        const effectivelyInMapMode = (isMapMode || calibration?.calibrationType === 'verbal') && mapScale;
+
         // Map Mode: Apply scale conversion
-        if (isMapMode && mapScale) {
+        if (effectivelyInMapMode) {
           const widthDist = convertToMapScale(widthPx);
           const heightDist = convertToMapScale(heightPx);
           width = widthDist;
@@ -2178,20 +2184,23 @@ export default function DimensionOverlay({
           { x: minX, y: maxY, id: Date.now().toString() + '-3' },        // bottom-left
         ];
       }
-      
+
       // Save as completed measurement
       let area: number | undefined;
       if (mode === 'rectangle' && width !== undefined && height !== undefined) {
         area = width * height;
       }
 
+      // Determine effective map mode for storing calibrationMode
+      const effectivelyInMapMode = (isMapMode || calibration?.calibrationType === 'verbal') && mapScale;
+
       const newMeasurement: Measurement = {
         id: Date.now().toString(),
         points: completedPoints.map(p => ({ x: p.x, y: p.y })),
         value,
         mode,
-        calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
-        ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
+        calibrationMode: effectivelyInMapMode ? 'map' : 'coin', // Store which calibration was used
+        ...(effectivelyInMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
         ...(radius !== undefined && { radius }),
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
