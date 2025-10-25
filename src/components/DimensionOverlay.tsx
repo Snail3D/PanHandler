@@ -2126,9 +2126,6 @@ export default function DimensionOverlay({
           Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
         );
 
-        console.log('🔵 Circle created - radius in pixels:', radius.toFixed(2));
-        console.log('🔵 Calibration:', calibration ? `${calibration.pixelsPerUnit} px/${calibration.unit}` : 'NULL/UNDEFINED');
-
         // Map Mode: Apply scale conversion
         if (isMapMode && mapScale) {
           const diameterPx = radius * 2;
@@ -2137,8 +2134,6 @@ export default function DimensionOverlay({
           // Convert radius in pixels to diameter in mm/inches
           const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
           const diameter = radiusInUnits * 2;
-          console.log('🔵 Radius in units:', radiusInUnits.toFixed(2), calibration?.unit || 'mm');
-          console.log('🔵 Diameter:', diameter.toFixed(2), calibration?.unit || 'mm');
           value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
         }
       } else {
@@ -5697,35 +5692,69 @@ export default function DimensionOverlay({
                           // Recalculate circle diameter and area
                           // measurement.radius is stored in PIXELS, convert to real units
 
-                          console.log(`🔵 Rendering circle ${measurement.id} - radius in pixels:`, measurement.radius.toFixed(2));
-                          console.log('🔵 Calibration at render:', calibration ? `${calibration.pixelsPerUnit} px/${calibration.unit}` : 'NULL/UNDEFINED');
+                          // IMPORTANT: Use the measurement's ORIGINAL calibration mode, not the current mode
+                          // This prevents incorrect conversions when switching between coin and map mode
+                          const wasCreatedInMapMode = measurement.calibrationMode === 'map';
 
-                          // Map Mode: Apply scale conversion
-                          if (isMapMode && mapScale) {
+                          // Map Mode: Apply scale conversion ONLY if measurement was created in map mode
+                          if (wasCreatedInMapMode && measurement.mapScaleData) {
+                            // Use the original map scale data that was stored with the measurement
+                            const originalMapScale = measurement.mapScaleData;
                             const diameterPx = measurement.radius * 2;
-                            const diameterDist = convertToMapScale(diameterPx);
-                            displayValue = `⌀ ${formatMapScaleDistance(diameterPx)}`;
-                            // Calculate area in map units
-                            const radiusDist = diameterDist / 2;
+
+                            // Convert using the ORIGINAL map scale
+                            const screenDistCm = originalMapScale.screenUnit === 'cm'
+                              ? originalMapScale.screenDistance
+                              : originalMapScale.screenDistance * 2.54;
+                            const realDistKm = originalMapScale.realUnit === 'km'
+                              ? originalMapScale.realDistance
+                              : originalMapScale.realUnit === 'mi'
+                              ? originalMapScale.realDistance * 1.60934
+                              : originalMapScale.realUnit === 'm'
+                              ? originalMapScale.realDistance / 1000
+                              : originalMapScale.realDistance * 0.0003048;
+                            const scale = realDistKm / (screenDistCm / 100000);
+                            const diameterDistKm = (diameterPx / 100) * scale;
+
+                            // Format in the original real unit
+                            let displayDist: number;
+                            let displayUnit: string;
+                            if (originalMapScale.realUnit === 'km') {
+                              displayDist = diameterDistKm;
+                              displayUnit = 'km';
+                            } else if (originalMapScale.realUnit === 'mi') {
+                              displayDist = diameterDistKm / 1.60934;
+                              displayUnit = 'mi';
+                            } else if (originalMapScale.realUnit === 'm') {
+                              displayDist = diameterDistKm * 1000;
+                              displayUnit = 'm';
+                            } else {
+                              displayDist = diameterDistKm * 3280.84;
+                              displayUnit = 'ft';
+                            }
+
+                            displayValue = `⌀ ${displayDist.toFixed(2)} ${displayUnit}`;
+
+                            // Calculate area
+                            const radiusDist = displayDist / 2;
                             const areaDist2 = Math.PI * radiusDist * radiusDist;
-                            const areaStr = formatMapScaleArea(areaDist2);
+                            const areaStr = `${areaDist2.toFixed(2)} ${displayUnit}²`;
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
-                              // Convert depth to map scale unit (km, mi, m, or ft)
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
+                              // Convert depth to map scale unit
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, originalMapScale.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
+                              const volumeStr = `${volumeInMapUnits.toFixed(2)} ${displayUnit}³`;
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
                             return `${displayValue} (A: ${areaStr})`;
                           }
 
+                          // Coin calibration mode
                           const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
                           const diameter = radiusInUnits * 2;
-                          console.log('🔵 Rendered radius in units:', radiusInUnits.toFixed(2), calibration?.unit || 'mm');
-                          console.log('🔵 Rendered diameter:', diameter.toFixed(2), calibration?.unit || 'mm');
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
@@ -5743,9 +5772,12 @@ export default function DimensionOverlay({
 
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
-                          
-                          // Map Mode: Apply scale conversion
-                          if (isMapMode && mapScale) {
+
+                          // IMPORTANT: Use the measurement's ORIGINAL calibration mode, not the current mode
+                          const wasCreatedInMapMode = measurement.calibrationMode === 'map';
+
+                          // Map Mode: Apply scale conversion ONLY if measurement was created in map mode
+                          if (wasCreatedInMapMode && measurement.mapScaleData) {
                             // measurement.width and measurement.height are already in map units
                             const widthStr = formatMapValue(measurement.width);
                             const heightStr = formatMapValue(measurement.height);
@@ -5756,15 +5788,16 @@ export default function DimensionOverlay({
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
                               // Convert depth to map scale unit (km, mi, m, or ft)
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, measurement.mapScaleData.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, measurement.mapScaleData.realUnit, unitSystem);
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
                             return `${displayValue} (A: ${areaStr})`;
                           }
-                          
+
+                          // Coin calibration mode
                           const widthStr = formatMeasurement(measurement.width, calibration?.unit || 'mm', unitSystem, 2);
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
