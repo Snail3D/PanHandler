@@ -1770,7 +1770,6 @@ export const makerQuotes: MakerQuote[] = [
   
   // Walter Alvarez (Geologist)
   { text: "In geology the impacts of meteors have been considered of major significance.", author: "Walter Alvarez", year: "1980" },
-  { text: "The dinosaurs disappeared about 66 million years ago, at exactly the same time as a 10-kilometer asteroid or comet hit the Earth.", author: "Walter Alvarez", year: "1980" },
   
   // Claude Allegre (Geochemist)
   { text: "Science is the belief in the ignorance of experts.", author: "Claude Allegre", year: "1992" },
