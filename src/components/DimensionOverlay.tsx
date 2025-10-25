@@ -15,7 +15,7 @@ import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
 import { BlurView } from 'expo-blur';
 import useStore, { CompletedMeasurement } from '../state/measurementStore';
-import { formatMeasurement, formatAreaMeasurement } from '../utils/unitConversion';
+import { formatMeasurement, formatAreaMeasurement, formatVolumeMeasurement } from '../utils/unitConversion';
 import HelpModal from './HelpModal';
 import VerbalScaleModal from './VerbalScaleModal';
 import BlueprintPlacementModal from './BlueprintPlacementModal';
@@ -2922,43 +2922,48 @@ export default function DimensionOverlay({
   const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
   
   // Handle label modal completion
-  const handleLabelComplete = (label: string | null) => {
+  const handleLabelComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
     setShowLabelModal(false);
-    
+
     // Remember the label for this session
-    setCurrentLabel(label);
-    
+    setCurrentLabel(data.label);
+
     if (pendingAction === 'save') {
-      performSave(label);
+      performSave(data.label);
     } else if (pendingAction === 'email') {
-      performEmail(label);
+      performEmail(data.label);
     }
-    
+
     setPendingAction(null);
   };
-  
+
   const handleLabelDismiss = () => {
     setShowLabelModal(false);
     setPendingAction(null);
   };
-  
+
   // Handle label editing for existing measurements (double-tap feature)
-  const handleLabelEditComplete = (label: string | null) => {
+  const handleLabelEditComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
     setShowLabelEditModal(false);
-    
+
     if (labelEditingMeasurementId) {
-      // Update the measurement with the new label
+      // Update the measurement with the new label and depth (if provided)
       const updatedMeasurements = measurements.map(m => {
         if (m.id === labelEditingMeasurementId) {
-          return { ...m, label };
+          return {
+            ...m,
+            label: data.label,
+            depth: data.depth,
+            depthUnit: data.depthUnit
+          };
         }
         return m;
       });
       setMeasurements(updatedMeasurements);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      console.log('✅ Label updated for measurement:', labelEditingMeasurementId);
+      console.log('✅ Label and depth updated for measurement:', labelEditingMeasurementId);
     }
-    
+
     setLabelEditingMeasurementId(null);
   };
   
@@ -5671,7 +5676,16 @@ export default function DimensionOverlay({
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+
+                          // Add volume if depth is present
+                          if (measurement.depth !== undefined && measurement.depthUnit) {
+                            const volume = area * measurement.depth;
+                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                          }
+
                           return `${displayValue} (A: ${areaStr})`;
+
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
                           
@@ -5691,10 +5705,29 @@ export default function DimensionOverlay({
                           displayValue = `${widthStr} × ${heightStr}`;
                           const area = measurement.width * measurement.height;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+
+                          // Add volume if depth is present
+                          if (measurement.depth !== undefined && measurement.depthUnit) {
+                            const volume = area * measurement.depth;
+                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                          }
+
                           return `${displayValue} (A: ${areaStr})`;
+
                         } else if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter && measurement.area !== undefined) {
                           // Show perimeter and area for closed freehand loops and polygons
-                          return measurement.value; // Already formatted as "perimeter (A: area)"
+                          let displayStr = measurement.value; // Already formatted as "perimeter (A: area)"
+
+                          // Add volume if depth is present
+                          if (measurement.depth !== undefined && measurement.depthUnit && measurement.area !== undefined) {
+                            const volume = measurement.area * measurement.depth;
+                            const volumeStr = formatVolumeMeasurement(volume, measurement.depthUnit, unitSystem);
+                            // Replace closing paren with | V: volume)
+                            displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
+                          }
+
+                          return displayStr;
                         }
                         
                         return displayValue;
@@ -7077,13 +7110,22 @@ export default function DimensionOverlay({
       />
       
       {/* Label Edit Modal - for editing existing measurement labels via double-tap */}
-      <LabelModal 
-        visible={showLabelEditModal} 
+      <LabelModal
+        visible={showLabelEditModal}
         onComplete={handleLabelEditComplete}
         onDismiss={handleLabelEditDismiss}
         initialValue={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.label : null}
+        initialDepth={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.depth : undefined}
+        initialDepthUnit={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.depthUnit : undefined}
+        hasArea={labelEditingMeasurementId ? (() => {
+          const m = measurements.find(m => m.id === labelEditingMeasurementId);
+          if (!m) return false;
+          // Has area if: rectangle, circle, or closed polygon/freehand
+          return m.mode === 'rectangle' || m.mode === 'circle' || (m.mode === 'polygon' && m.area !== undefined) || (m.mode === 'freehand' && m.isClosed && m.area !== undefined);
+        })() : false}
         isMapMode={isMapMode}
         measurementMode={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.mode : undefined}
+        unitSystem={unitSystem}
       />
       
       {/* Email Prompt Modal */}

@@ -239,3 +239,68 @@ export function formatAreaMeasurement(
 export function getDefaultCalibrationUnit(unitSystem: UnitSystem): 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' {
   return unitSystem === 'metric' ? 'mm' : 'in';
 }
+
+// Format volume measurement with appropriate unit
+export function formatVolumeMeasurement(
+  volumeInBaseUnit: number, // volume in cubic units of baseUnit
+  baseUnit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi',
+  unitSystem: UnitSystem
+): string {
+  // First convert to mm³ (base volume unit)
+  let volumeInMm3: number;
+  if (baseUnit === 'mm') {
+    volumeInMm3 = volumeInBaseUnit;
+  } else if (baseUnit === 'cm') {
+    volumeInMm3 = volumeInBaseUnit * 1000; // 1cm³ = 1000mm³
+  } else if (baseUnit === 'm') {
+    volumeInMm3 = volumeInBaseUnit * 1000000000; // 1m³ = 1,000,000,000mm³
+  } else if (baseUnit === 'km') {
+    volumeInMm3 = volumeInBaseUnit * 1e18; // 1km³ = 1e18mm³
+  } else if (baseUnit === 'in') {
+    volumeInMm3 = volumeInBaseUnit * 16387.064; // 1in³ = 16387.064mm³
+  } else if (baseUnit === 'mi') {
+    volumeInMm3 = volumeInBaseUnit * 4.168e15; // 1mi³ = huge mm³
+  } else {
+    volumeInMm3 = volumeInBaseUnit * 28316846.592; // 1ft³ = 28316846.592mm³
+  }
+
+  if (unitSystem === 'metric') {
+    // Convert to liters (1L = 1,000,000 mm³ = 1000 cm³)
+    const liters = volumeInMm3 / 1000000;
+
+    if (liters < 1) {
+      // Show in milliliters (mL)
+      const milliliters = liters * 1000;
+      return `${milliliters.toFixed(0)} mL`;
+    } else if (liters < 1000) {
+      // Show in liters
+      return `${liters.toFixed(2)} L`;
+    } else {
+      // Show in cubic meters with liters in parentheses
+      const m3 = liters / 1000;
+      return `${m3.toFixed(2)} m³ (${liters.toFixed(0)} L)`;
+    }
+  } else {
+    // Imperial: convert to fluid ounces first
+    const fluidOunces = volumeInMm3 / 29573.529; // 1 fl oz = 29573.529 mm³
+
+    if (fluidOunces < 32) {
+      // Show in fluid ounces
+      return `${fluidOunces.toFixed(1)} fl oz`;
+    } else if (fluidOunces < 128) {
+      // Show in quarts (32 fl oz = 1 qt)
+      const quarts = fluidOunces / 32;
+      return `${quarts.toFixed(2)} qt`;
+    } else {
+      // Show in gallons (128 fl oz = 1 gal)
+      const gallons = fluidOunces / 128;
+      if (gallons < 1000) {
+        return `${gallons.toFixed(2)} gal`;
+      } else {
+        // Very large volumes - show cubic feet with gallons in parentheses
+        const cubicFeet = volumeInMm3 / 28316846.592;
+        return `${cubicFeet.toFixed(2)} ft³ (${gallons.toFixed(0)} gal)`;
+      }
+    }
+  }
+}

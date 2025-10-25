@@ -61,13 +61,15 @@ export interface CompletedMeasurement {
   calibrationMode?: 'coin' | 'map'; // Track which calibration mode was used when creating this measurement
   mapScaleData?: {screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'}; // Store map scale if created in map mode
   radius?: number; // For circles
-  width?: number;  // For rectangles  
+  width?: number;  // For rectangles
   height?: number; // For rectangles
   totalLength?: number; // For freehand - total path length
   area?: number; // For closed non-intersecting freehand loops (lasso mode)
   isClosed?: boolean; // For freehand - indicates if it's a closed loop
   perimeter?: string; // For closed freehand loops - just the perimeter for inline display
   label?: string | null; // Optional text label for the measurement
+  depth?: number; // For volume calculations (stored in base unit)
+  depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'; // Unit used when entering depth
 }
 
 export type AppOrientation = 'PORTRAIT' | 'LANDSCAPE' | null;
