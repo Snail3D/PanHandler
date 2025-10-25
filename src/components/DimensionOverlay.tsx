@@ -5668,6 +5668,16 @@ export default function DimensionOverlay({
                             const radiusDist = diameterDist / 2;
                             const areaDist2 = Math.PI * radiusDist * radiusDist;
                             const areaStr = formatMapScaleArea(areaDist2);
+
+                            // Add volume if depth is present
+                            if (measurement.depth !== undefined && measurement.depthUnit) {
+                              // Convert depth to map scale unit (km, mi, m, or ft)
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
+                              const volumeInMapUnits = areaDist2 * depthInMapUnit;
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
+                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                            }
+
                             return `${displayValue} (A: ${areaStr})`;
                           }
                           
@@ -5699,6 +5709,16 @@ export default function DimensionOverlay({
                             displayValue = `${widthStr} × ${heightStr}`;
                             const areaDist2 = measurement.width * measurement.height;
                             const areaStr = formatMapScaleArea(areaDist2);
+
+                            // Add volume if depth is present
+                            if (measurement.depth !== undefined && measurement.depthUnit) {
+                              // Convert depth to map scale unit (km, mi, m, or ft)
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
+                              const volumeInMapUnits = areaDist2 * depthInMapUnit;
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
+                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                            }
+
                             return `${displayValue} (A: ${areaStr})`;
                           }
                           
