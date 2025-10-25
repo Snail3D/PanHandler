@@ -14,6 +14,8 @@ export interface Measurement {
   width?: number;  // For rectangles
   height?: number; // For rectangles
   totalLength?: number; // For freehand paths
+  depth?: number; // For volume calculations (stored in base unit)
+  depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'; // Unit used when entering depth
 }
 
 export interface MeasurementData {
