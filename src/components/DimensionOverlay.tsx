@@ -2122,10 +2122,13 @@ export default function DimensionOverlay({
       } else if (mode === 'circle') {
         // Calculate radius (in pixels) and convert to diameter
         radius = Math.sqrt(
-          Math.pow(completedPoints[1].x - completedPoints[0].x, 2) + 
+          Math.pow(completedPoints[1].x - completedPoints[0].x, 2) +
           Math.pow(completedPoints[1].y - completedPoints[0].y, 2)
         );
-        
+
+        console.log('🔵 Circle created - radius in pixels:', radius.toFixed(2));
+        console.log('🔵 Calibration:', calibration ? `${calibration.pixelsPerUnit} px/${calibration.unit}` : 'NULL/UNDEFINED');
+
         // Map Mode: Apply scale conversion
         if (isMapMode && mapScale) {
           const diameterPx = radius * 2;
@@ -2134,6 +2137,8 @@ export default function DimensionOverlay({
           // Convert radius in pixels to diameter in mm/inches
           const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
           const diameter = radiusInUnits * 2;
+          console.log('🔵 Radius in units:', radiusInUnits.toFixed(2), calibration?.unit || 'mm');
+          console.log('🔵 Diameter:', diameter.toFixed(2), calibration?.unit || 'mm');
           value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
         }
       } else {
@@ -5691,7 +5696,10 @@ export default function DimensionOverlay({
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
                           // Recalculate circle diameter and area
                           // measurement.radius is stored in PIXELS, convert to real units
-                          
+
+                          console.log(`🔵 Rendering circle ${measurement.id} - radius in pixels:`, measurement.radius.toFixed(2));
+                          console.log('🔵 Calibration at render:', calibration ? `${calibration.pixelsPerUnit} px/${calibration.unit}` : 'NULL/UNDEFINED');
+
                           // Map Mode: Apply scale conversion
                           if (isMapMode && mapScale) {
                             const diameterPx = measurement.radius * 2;
@@ -5713,9 +5721,11 @@ export default function DimensionOverlay({
 
                             return `${displayValue} (A: ${areaStr})`;
                           }
-                          
+
                           const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
                           const diameter = radiusInUnits * 2;
+                          console.log('🔵 Rendered radius in units:', radiusInUnits.toFixed(2), calibration?.unit || 'mm');
+                          console.log('🔵 Rendered diameter:', diameter.toFixed(2), calibration?.unit || 'mm');
                           displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
