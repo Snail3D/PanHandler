@@ -5508,12 +5508,23 @@ export default function DimensionOverlay({
               screenX = p0.x + 10;
               screenY = p0.y - 40;
               const radius = Math.sqrt(
-                Math.pow(currentPoints[1].x - currentPoints[0].x, 2) + 
+                Math.pow(currentPoints[1].x - currentPoints[0].x, 2) +
                 Math.pow(currentPoints[1].y - currentPoints[0].y, 2)
               );
-              const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
-              const diameter = radiusInUnits * 2;
-              value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+
+              // Check if we're effectively in map mode
+              const effectivelyInMapMode = (isMapMode || calibration?.calibrationType === 'verbal') && mapScale;
+
+              if (effectivelyInMapMode) {
+                // Map mode: use map scale conversion
+                const diameterPx = radius * 2;
+                value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+              } else {
+                // Coin mode: use pixelsPerUnit
+                const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
+                const diameter = radiusInUnits * 2;
+                value = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+              }
             } else if (mode === 'rectangle' && currentPoints.length >= 2) {
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
