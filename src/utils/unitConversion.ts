@@ -270,9 +270,30 @@ export function formatVolumeMeasurement(
       // Show in liters
       return `${liters.toFixed(2)} L`;
     } else {
-      // Show in cubic meters with liters in parentheses
+      // Show in cubic meters with liters in parentheses (with K/M suffixes)
       const m3 = liters / 1000;
-      return `${m3.toFixed(2)} m³ (${liters.toFixed(0)} L)`;
+
+      // Format m³ with K/M suffixes
+      let m3Str: string;
+      if (m3 >= 1000000) {
+        m3Str = `${(m3 / 1000000).toFixed(2)}M m³`;
+      } else if (m3 >= 1000) {
+        m3Str = `${(m3 / 1000).toFixed(2)}K m³`;
+      } else {
+        m3Str = `${m3.toFixed(2)} m³`;
+      }
+
+      // Format liters with K/M suffixes
+      let litersStr: string;
+      if (liters >= 1000000) {
+        litersStr = `${(liters / 1000000).toFixed(2)}M L`;
+      } else if (liters >= 1000) {
+        litersStr = `${(liters / 1000).toFixed(2)}K L`;
+      } else {
+        litersStr = `${liters.toFixed(0)} L`;
+      }
+
+      return `${m3Str} (${litersStr})`;
     }
   } else {
     // Imperial: convert to fluid ounces first
@@ -288,12 +309,34 @@ export function formatVolumeMeasurement(
     } else {
       // Show in gallons (128 fl oz = 1 gal)
       const gallons = fluidOunces / 128;
+
       if (gallons < 1000) {
         return `${gallons.toFixed(2)} gal`;
       } else {
-        // Very large volumes - show cubic feet with gallons in parentheses
+        // Very large volumes - show cubic feet with gallons in parentheses (with K/M suffixes)
         const cubicFeet = volumeInMm3 / 28316846.592;
-        return `${cubicFeet.toFixed(2)} ft³ (${gallons.toFixed(0)} gal)`;
+
+        // Format ft³ with K/M suffixes
+        let ft3Str: string;
+        if (cubicFeet >= 1000000) {
+          ft3Str = `${(cubicFeet / 1000000).toFixed(2)}M ft³`;
+        } else if (cubicFeet >= 1000) {
+          ft3Str = `${(cubicFeet / 1000).toFixed(2)}K ft³`;
+        } else {
+          ft3Str = `${cubicFeet.toFixed(2)} ft³`;
+        }
+
+        // Format gallons with K/M suffixes
+        let gallonsStr: string;
+        if (gallons >= 1000000) {
+          gallonsStr = `${(gallons / 1000000).toFixed(2)}M gal`;
+        } else if (gallons >= 1000) {
+          gallonsStr = `${(gallons / 1000).toFixed(2)}K gal`;
+        } else {
+          gallonsStr = `${gallons.toFixed(0)} gal`;
+        }
+
+        return `${ft3Str} (${gallonsStr})`;
       }
     }
   }
