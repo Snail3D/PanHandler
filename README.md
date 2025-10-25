@@ -60,18 +60,16 @@ PanHandler transforms your iPhone into a precision measurement tool. Using coin-
 
 ## 💰 Pricing
 
-### Free Forever
+### Free Forever 🎉
 - ✅ Unlimited measurements
-- ✅ Unlimited exports  
+- ✅ Unlimited exports
 - ✅ Coin calibration
 - ✅ Distance, Angle, Circle, Rectangle tools
-- ✅ Map mode
-
-### Pro ($9.97 one-time)
 - ✅ Freehand tool
 - ✅ CAD export (DXF)
+- ✅ Map mode
 - ✅ Zoom calibration upgrades
-- ✅ Lifetime access - no subscription
+- ✅ All features included - no subscriptions, no in-app purchases
 
 ---
 
