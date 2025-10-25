@@ -1412,13 +1412,29 @@ export default function DimensionOverlay({
     // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
     if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
       if (mapScale.realUnit === 'km') {
-        return `${areaInMapUnits2.toFixed(2)} km²`;
+        const hectares = areaInMapUnits2 * 100; // 1 km² = 100 hectares
+        const hectareStr = hectares >= 100
+          ? `${Math.round(hectares)} ha`
+          : `${hectares.toFixed(2)} ha`;
+        return `${areaInMapUnits2.toFixed(2)} km² (${hectareStr})`;
       } else if (mapScale.realUnit === 'mi') {
-        return `${areaInMapUnits2.toFixed(2)} mi²`;
+        const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
+        const acreStr = acres >= 100
+          ? `${Math.round(acres)} ac`
+          : `${acres.toFixed(2)} ac`;
+        return `${areaInMapUnits2.toFixed(2)} mi² (${acreStr})`;
       } else if (mapScale.realUnit === 'm') {
-        return `${areaInMapUnits2.toFixed(0)} m²`;
+        const hectares = areaInMapUnits2 / 10000; // 1 hectare = 10,000 m²
+        const hectareStr = hectares >= 100
+          ? `${Math.round(hectares)} ha`
+          : `${hectares.toFixed(2)} ha`;
+        return `${areaInMapUnits2.toFixed(0)} m² (${hectareStr})`;
       } else { // ft
-        return `${areaInMapUnits2.toFixed(0)} ft²`;
+        const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
+        const acreStr = acres >= 100
+          ? `${Math.round(acres)} ac`
+          : `${acres.toFixed(2)} ac`;
+        return `${areaInMapUnits2.toFixed(0)} ft² (${acreStr})`;
       }
     }
     
@@ -1430,15 +1446,20 @@ export default function DimensionOverlay({
       } else { // ft
         m2 = areaInMapUnits2 * 0.092903; // square feet to square meters
       }
-      
+
       // Choose appropriate metric unit
       if (m2 < 10000) {
         return `${m2.toFixed(1)} m²`;
       } else {
-        return `${(m2 / 1000000).toFixed(2)} km²`;
+        const km2 = m2 / 1000000;
+        const hectares = m2 / 10000; // 1 hectare = 10,000 m²
+        const hectareStr = hectares >= 100
+          ? `${Math.round(hectares)} ha`
+          : `${hectares.toFixed(2)} ha`;
+        return `${km2.toFixed(2)} km² (${hectareStr})`;
       }
     }
-    
+
     // User wants imperial, but map is metric - convert to imperial
     if (unitSystem === 'imperial' && isMapMetric) {
       let ft2 = 0;
@@ -1447,12 +1468,21 @@ export default function DimensionOverlay({
       } else { // m
         ft2 = areaInMapUnits2 * 10.7639; // square meters to square feet
       }
-      
+
       // Choose appropriate imperial unit
       if (ft2 < 27878400) { // Less than 1 square mile
-        return `${ft2.toFixed(0)} ft²`;
+        const acres = ft2 / 43560;
+        const acreStr = acres >= 100
+          ? `${Math.round(acres)} ac`
+          : `${acres.toFixed(2)} ac`;
+        return `${ft2.toFixed(0)} ft² (${acreStr})`;
       } else {
-        return `${(ft2 / 27878400).toFixed(2)} mi²`;
+        const mi2 = ft2 / 27878400;
+        const acres = mi2 * 640;
+        const acreStr = acres >= 100
+          ? `${Math.round(acres)} ac`
+          : `${acres.toFixed(2)} ac`;
+        return `${mi2.toFixed(2)} mi² (${acreStr})`;
       }
     }
     

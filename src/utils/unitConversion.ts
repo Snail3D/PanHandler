@@ -207,7 +207,14 @@ export function formatAreaMeasurement(
       return `${valueInCm2.toFixed(1)} cm²`;
     } else {
       const valueInM2 = areaInMm2 / 1000000;
-      return `${valueInM2.toFixed(2)} m²`;
+      const hectares = valueInM2 / 10000; // 1 hectare = 10,000 m²
+
+      // If < 100 hectares, show 2 decimals; otherwise round to whole number
+      const hectareStr = hectares >= 100
+        ? `${Math.round(hectares)} ha`
+        : `${hectares.toFixed(2)} ha`;
+
+      return `${valueInM2.toFixed(2)} m² (${hectareStr})`;
     }
   } else {
     // Imperial: use in² for small areas, ft² for large
@@ -216,7 +223,14 @@ export function formatAreaMeasurement(
       return `${valueInIn2.toFixed(2)} in²`;
     } else {
       const valueInFt2 = valueInIn2 / 144;
-      return `${valueInFt2.toFixed(2)} ft²`;
+      const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
+
+      // If < 100 acres, show 2 decimals; otherwise round to whole number
+      const acreStr = acres >= 100
+        ? `${Math.round(acres)} ac`
+        : `${acres.toFixed(2)} ac`;
+
+      return `${valueInFt2.toFixed(2)} ft² (${acreStr})`;
     }
   }
 }
