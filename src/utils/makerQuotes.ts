@@ -1767,10 +1767,7 @@ export const makerQuotes: MakerQuote[] = [
   // Harry Hess (Geologist)
   { text: "The sea floor is spreading.", author: "Harry Hess", year: "1962" },
   { text: "Geology is the study of pressure and time.", author: "Harry Hess", year: "1960" },
-  
-  // Walter Alvarez (Geologist)
-  { text: "In geology the impacts of meteors have been considered of major significance.", author: "Walter Alvarez", year: "1980" },
-  
+
   // Claude Allegre (Geochemist)
   { text: "Science is the belief in the ignorance of experts.", author: "Claude Allegre", year: "1992" },
   { text: "Doubt is not a pleasant condition, but certainty is absurd.", author: "Claude Allegre", year: "1987" },
