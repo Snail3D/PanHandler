@@ -607,7 +607,7 @@ export default function LabelModal({
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
         <Pressable
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24, paddingBottom: '20%' }}
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24, paddingBottom: '35%' }}
           onPress={handleCancel}
         >
           <Pressable 
