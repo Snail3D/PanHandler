@@ -207,14 +207,8 @@ export function formatAreaMeasurement(
       return `${valueInCm2.toFixed(1)} cm²`;
     } else {
       const valueInM2 = areaInMm2 / 1000000;
-      const hectares = valueInM2 / 10000; // 1 hectare = 10,000 m²
-
-      // If < 100 hectares, show 2 decimals; otherwise round to whole number
-      const hectareStr = hectares >= 100
-        ? `${Math.round(hectares)} ha`
-        : `${hectares.toFixed(2)} ha`;
-
-      return `${valueInM2.toFixed(2)} m² (${hectareStr})`;
+      // No hectares - m² is intuitive enough
+      return `${valueInM2.toFixed(2)} m²`;
     }
   } else {
     // Imperial: use in² for small areas, ft² for large
