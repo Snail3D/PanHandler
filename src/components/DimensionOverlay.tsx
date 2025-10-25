@@ -6284,8 +6284,8 @@ export default function DimensionOverlay({
                     <View style={{ width: scaleSize(70) }} />
                   )}
 
-                  {/* Center: Edit Labels mode toggle - only show if there are measurements */}
-                  {measurements.length > 0 ? (
+                  {/* Center: Edit Labels mode toggle - only show if there are measurements AND in Edit/Pan mode */}
+                  {measurements.length > 0 && !measurementMode ? (
                     <Pressable
                       onPress={() => {
                         setLabelEditMode(!labelEditMode);
