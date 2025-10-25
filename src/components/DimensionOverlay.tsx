@@ -1412,11 +1412,8 @@ export default function DimensionOverlay({
     // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
     if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
       if (mapScale.realUnit === 'km') {
-        const hectares = areaInMapUnits2 * 100; // 1 km² = 100 hectares
-        const hectareStr = hectares >= 100
-          ? `${Math.round(hectares)} ha`
-          : `${hectares.toFixed(2)} ha`;
-        return `${areaInMapUnits2.toFixed(2)} km² (${hectareStr})`;
+        // No hectares for km² - it's intuitive enough
+        return `${areaInMapUnits2.toFixed(2)} km²`;
       } else if (mapScale.realUnit === 'mi') {
         const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
         const acreStr = acres >= 100
@@ -1424,11 +1421,8 @@ export default function DimensionOverlay({
           : `${acres.toFixed(2)} ac`;
         return `${areaInMapUnits2.toFixed(2)} mi² (${acreStr})`;
       } else if (mapScale.realUnit === 'm') {
-        const hectares = areaInMapUnits2 / 10000; // 1 hectare = 10,000 m²
-        const hectareStr = hectares >= 100
-          ? `${Math.round(hectares)} ha`
-          : `${hectares.toFixed(2)} ha`;
-        return `${areaInMapUnits2.toFixed(0)} m² (${hectareStr})`;
+        // No hectares for m² - it's intuitive enough
+        return `${areaInMapUnits2.toFixed(0)} m²`;
       } else { // ft
         const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
         const acreStr = acres >= 100
@@ -1452,11 +1446,8 @@ export default function DimensionOverlay({
         return `${m2.toFixed(1)} m²`;
       } else {
         const km2 = m2 / 1000000;
-        const hectares = m2 / 10000; // 1 hectare = 10,000 m²
-        const hectareStr = hectares >= 100
-          ? `${Math.round(hectares)} ha`
-          : `${hectares.toFixed(2)} ha`;
-        return `${km2.toFixed(2)} km² (${hectareStr})`;
+        // No hectares - km² is intuitive enough
+        return `${km2.toFixed(2)} km²`;
       }
     }
 
