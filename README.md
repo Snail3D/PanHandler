@@ -355,11 +355,16 @@ bun tsc --noEmit
   - Prevents parsing errors that treated "K" as the unit instead of the suffix
   - Circle with 1580 km diameter now shows `A: 1.96M km²` instead of incorrect `A: 1821.5 cm²`
   - Works for both K (thousands) and M (millions) suffixes
-- **Fixed rectangle and all map mode measurements not converting units**
-  - Rectangle dimensions now convert when switching unit systems (e.g., `100 mi` → `160.93 km`)
-  - Rectangle areas now convert properly (e.g., `5000 mi²` → `12.95K km²`)
-  - All map mode measurements (distances, perimeters, areas) respect user's unit system preference
-  - Fixes issue where measurements stayed in calibration's original units
+- **Fixed rectangle dimensions not converting with Known Scale calibrations**
+  - Rectangle dimensions now convert when switching unit systems (e.g., `565 mi` → `909.26 km`)
+  - Fixed `formatMapValue()` to respect user's unit system preference
+  - Works for all measurement types with Known Scale calibrations (e.g., "200mi between points")
+- **Fixed rectangle areas not converting (formatBlueprintArea issue) - THE BIG FIX**
+  - Rectangle areas now convert properly: `146.73K mi²` → `380.21K km²` ✅
+  - Root cause: Known Scale calibrations use blueprint code path, not map mode path
+  - Added `currentUnitSystem` parameter to `formatBlueprintArea()` with conversion logic
+  - Both dimensions AND areas now respect user's unit preference
+  - Example: `659.06 km × 576.60 km (A: 380.21K km²)` instead of showing mi²/acres
 - **Fixed regex parsing for circle diameter with feet symbols**
   - Corrected pattern to only match letters for units, not digits
   - Prevents `⌀ 172'` from being parsed as diameter=17, unit="2"
