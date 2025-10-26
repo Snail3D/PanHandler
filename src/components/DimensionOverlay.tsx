@@ -6057,8 +6057,53 @@ export default function DimensionOverlay({
                               };
                               const hectares = area / 10000; // 1 hectare = 10,000 m²
                               areaStr = `${formatM2(area)} (${formatHectares(hectares)})`;
+                            } else if (unit === 'in') {
+                              // Format in² with K suffix and acres
+                              const formatIn2 = (in2: number): string => {
+                                if (in2 >= 1000000) return `${(in2 / 1000000).toFixed(2)}M in²`;
+                                else if (in2 >= 1000) return `${(in2 / 1000).toFixed(2)}K in²`;
+                                else return `${in2.toFixed(2)} in²`;
+                              };
+                              const formatAcres = (acres: number): string => {
+                                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                                else if (acres >= 100) return `${Math.round(acres)} ac`;
+                                else return `${acres.toFixed(2)} ac`;
+                              };
+                              const acres = area / 6272640; // 1 acre = 6,272,640 in²
+                              areaStr = `${formatIn2(area)} (${formatAcres(acres)})`;
+                            } else if (unit === 'cm') {
+                              // Format cm² with K suffix and hectares
+                              const formatCm2 = (cm2: number): string => {
+                                if (cm2 >= 1000000) return `${(cm2 / 1000000).toFixed(2)}M cm²`;
+                                else if (cm2 >= 1000) return `${(cm2 / 1000).toFixed(2)}K cm²`;
+                                else return `${cm2.toFixed(2)} cm²`;
+                              };
+                              const formatHectares = (hectares: number): string => {
+                                if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
+                                else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
+                                else if (hectares >= 100) return `${Math.round(hectares)} ha`;
+                                else return `${hectares.toFixed(2)} ha`;
+                              };
+                              const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
+                              areaStr = `${formatCm2(area)} (${formatHectares(hectares)})`;
+                            } else if (unit === 'mm') {
+                              // Format mm² with K suffix and hectares
+                              const formatMm2 = (mm2: number): string => {
+                                if (mm2 >= 1000000) return `${(mm2 / 1000000).toFixed(2)}M mm²`;
+                                else if (mm2 >= 1000) return `${(mm2 / 1000).toFixed(2)}K mm²`;
+                                else return `${mm2.toFixed(2)} mm²`;
+                              };
+                              const formatHectares = (hectares: number): string => {
+                                if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
+                                else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
+                                else if (hectares >= 100) return `${Math.round(hectares)} ha`;
+                                else return `${hectares.toFixed(2)} ha`;
+                              };
+                              const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
+                              areaStr = `${formatMm2(area)} (${formatHectares(hectares)})`;
                             } else {
-                              // Small unit - use regular area formatter
+                              // Unknown unit - use regular area formatter
                               areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
                             }
 
