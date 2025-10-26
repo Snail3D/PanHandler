@@ -1463,6 +1463,9 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number, currentUnitSystem: 'metric' | 'imperial'): string => {
     if (!mapScale) return '';
 
+    // DEBUG: Show what we're receiving
+    const debugPrefix = `[${currentUnitSystem}/${mapScale.realUnit}] `;
+
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
@@ -6244,7 +6247,7 @@ export default function DimensionOverlay({
                             const heightStr = formatMapValue(measurement.height);
                             displayValue = `${widthStr} × ${heightStr}`;
                             const areaDist2 = measurement.width * measurement.height;
-                            const areaStr = formatMapScaleArea(areaDist2, unitSystem);
+                            const areaStr = formatMapScaleArea(areaDist2, unitSystem) + ` [US:${unitSystem}]`; // DEBUG
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
