@@ -6393,8 +6393,12 @@ export default function DimensionOverlay({
                         }
 
                         // For other measurement types, use stored value
-                        // For freehand/polygon with area, show full value (perimeter ⊞ area), not just perimeter
-                        return showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value;
+                        // For freehand/polygon, show only perimeter on photo (area stays in legend)
+                        if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter) {
+                          return showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter;
+                        } else {
+                          return showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value;
+                        }
                       })()}
                     </Text>
                   </View>
