@@ -1534,19 +1534,39 @@ export default function DimensionOverlay({
       return formatArea(area, 'km²');
     } else if (unit === 'ft') {
       const acres = area / 43560; // 1 acre = 43,560 ft²
-      return `${formatArea(area, 'ft²')} (${formatAcres(acres)})`;
+      // Only show acres if >= 0.01 ac (435.6 ft²)
+      if (acres >= 0.01) {
+        return `${formatArea(area, 'ft²')} (${formatAcres(acres)})`;
+      }
+      return formatArea(area, 'ft²');
     } else if (unit === 'm') {
       const hectares = area / 10000; // 1 hectare = 10,000 m²
-      return `${formatArea(area, 'm²')} (${formatHectares(hectares)})`;
+      // Only show hectares if >= 0.01 ha (100 m²)
+      if (hectares >= 0.01) {
+        return `${formatArea(area, 'm²')} (${formatHectares(hectares)})`;
+      }
+      return formatArea(area, 'm²');
     } else if (unit === 'in') {
       const acres = area / 6272640; // 1 acre = 6,272,640 in²
-      return `${formatArea(area, 'in²')} (${formatAcres(acres)})`;
+      // Only show acres if >= 0.01 ac (62,726.4 in²)
+      if (acres >= 0.01) {
+        return `${formatArea(area, 'in²')} (${formatAcres(acres)})`;
+      }
+      return formatArea(area, 'in²');
     } else if (unit === 'cm') {
       const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
-      return `${formatArea(area, 'cm²')} (${formatHectares(hectares)})`;
+      // Only show hectares if >= 0.01 ha (1,000,000 cm²)
+      if (area >= 1000000) {
+        return `${formatArea(area, 'cm²')} (${formatHectares(hectares)})`;
+      }
+      return formatArea(area, 'cm²'); // No hectares for tiny areas
     } else if (unit === 'mm') {
       const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
-      return `${formatArea(area, 'mm²')} (${formatHectares(hectares)})`;
+      // Only show hectares if >= 0.01 ha (100,000,000 mm²)
+      if (area >= 100000000) {
+        return `${formatArea(area, 'mm²')} (${formatHectares(hectares)})`;
+      }
+      return formatArea(area, 'mm²'); // No hectares for tiny areas
     } else {
       // Unknown unit - fallback to formatAreaMeasurement
       return formatAreaMeasurement(area, unit as any, currentUnitSystem);

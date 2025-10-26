@@ -12,6 +12,7 @@
 2. ✅ Fix rectangle dimensions not converting to metric in Known Scale mode
 3. ✅ Fix rectangle areas not converting (formatBlueprintArea issue)
 4. ✅ Version consolidation at 7.5.0
+5. ✅ Fix misleading hectare/acre display for small areas (< 0.01 ha/ac)
 
 ---
 
@@ -86,7 +87,29 @@ if (unit === 'mi') {
 - ✅ Both dimensions AND areas respect user's unit preference
 - ✅ Works for all blueprint calibrations with large units (mi/km)
 
-### 4. All v7.5.0 Fixes from Previous Session
+### 4. Hectare/Acre Display Threshold Fix (v7.5.0)
+
+**Problem:** Small areas showed misleading conversions:
+- Example: `⌀ 65 mm (A: 3.32K mm² (0.00 ha))` ❌
+- Should be: `⌀ 65 mm (A: 3.32K mm²)` ✅
+
+**Root Cause:**
+The `formatBlueprintArea` function always showed hectare/acre conversions, even for tiny areas where the converted value was essentially zero (0.00).
+
+**Solution:**
+Added threshold checks for all units - only show hectares/acres when >= 0.01:
+- ft²: Show acres only if >= 0.01 ac (435.6 ft²)
+- m²: Show hectares only if >= 0.01 ha (100 m²)
+- in²: Show acres only if >= 0.01 ac (62,726.4 in²)
+- cm²: Show hectares only if >= 0.01 ha (1,000,000 cm²)
+- mm²: Show hectares only if >= 0.01 ha (100,000,000 mm²)
+
+**Results:**
+- ✅ Small measurements no longer show "0.00 ha" or "0.00 ac"
+- ✅ Large measurements still show conversions when meaningful
+- ✅ Example: `⌀ 65 mm (A: 3.32K mm²)` (no hectares displayed)
+
+### 5. All v7.5.0 Fixes from Previous Session
 
 - ✅ Fixed circle area calculations for Known Scale mode (blueprint calibrations)
 - ✅ Fixed regex parsing for circle diameter with feet symbols
@@ -100,6 +123,8 @@ if (unit === 'mi') {
 - `src/components/DimensionOverlay.tsx`
   - Circle diameter parsing fix for K/M suffixes (line 6044-6071)
   - formatMapValue rewrite to respect unitSystem (line 1305-1379)
+  - formatBlueprintArea enhancement with unitSystem parameter
+  - Hectare/acre threshold checks (lines 1535-1565)
 - `package.json` - Version at 7.5.0
 - `app.json` - Version at 7.5.0
 - `README.md` - Updated roadmap with all v7.5.0 fixes
@@ -147,6 +172,7 @@ All changes tested and verified working:
 - ✅ Rectangle dimensions convert in map mode
 - ✅ Rectangle areas convert in map mode
 - ✅ All measurement types respect unitSystem preference
+- ✅ Small areas (< 0.01 ha/ac) no longer show misleading "0.00" conversions
 
 ---
 
