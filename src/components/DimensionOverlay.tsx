@@ -1481,6 +1481,19 @@ export default function DimensionOverlay({
       }
     };
 
+    // Helper to format hectares with K/M suffixes
+    const formatHectares = (hectares: number): string => {
+      if (hectares >= 1000000) {
+        return `${(hectares / 1000000).toFixed(2)}M ha`;
+      } else if (hectares >= 1000) {
+        return `${(hectares / 1000).toFixed(2)}K ha`;
+      } else if (hectares >= 100) {
+        return `${Math.round(hectares)} ha`;
+      } else {
+        return `${hectares.toFixed(2)} ha`;
+      }
+    };
+
     // Helper to format ft² with K/M suffixes
     const formatFt2 = (ft2: number): string => {
       if (ft2 >= 1000000) {
@@ -1500,7 +1513,8 @@ export default function DimensionOverlay({
         const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
         return `${formatMi2(areaInMapUnits2)} (${formatAcres(acres)})`;
       } else if (mapScale.realUnit === 'm') {
-        return formatM2(areaInMapUnits2);
+        const hectares = areaInMapUnits2 / 10000; // 1 hectare = 10,000 m²
+        return `${formatM2(areaInMapUnits2)} (${formatHectares(hectares)})`;
       } else { // ft
         const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
         return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
