@@ -6087,65 +6087,14 @@ export default function DimensionOverlay({
                                 areaStr = formatM2(area);
                               }
                             } else if (unit === 'in') {
-                              // Format in² with K suffix and acres
-                              const formatIn2 = (in2: number): string => {
-                                if (in2 >= 1000000) return `${(in2 / 1000000).toFixed(2)}M in²`;
-                                else if (in2 >= 1000) return `${(in2 / 1000).toFixed(2)}K in²`;
-                                else return `${in2.toFixed(2)} in²`;
-                              };
-                              const formatAcres = (acres: number): string => {
-                                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
-                                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
-                                else if (acres >= 100) return `${Math.round(acres)} ac`;
-                                else return `${acres.toFixed(2)} ac`;
-                              };
-                              const acres = area / 6272640; // 1 acre = 6,272,640 in²
-                              // Only show acres if >= 0.01 ac
-                              if (acres >= 0.01) {
-                                areaStr = `${formatIn2(area)} (${formatAcres(acres)})`;
-                              } else {
-                                areaStr = formatIn2(area);
-                              }
+                              // Use formatAreaMeasurement for intelligent unit scaling
+                              areaStr = formatAreaMeasurement(area, 'in', unitSystem);
                             } else if (unit === 'cm') {
-                              // Format cm² with K suffix and hectares
-                              const formatCm2 = (cm2: number): string => {
-                                if (cm2 >= 1000000) return `${(cm2 / 1000000).toFixed(2)}M cm²`;
-                                else if (cm2 >= 1000) return `${(cm2 / 1000).toFixed(2)}K cm²`;
-                                else return `${cm2.toFixed(2)} cm²`;
-                              };
-                              const formatHectares = (hectares: number): string => {
-                                if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
-                                else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
-                                else if (hectares >= 100) return `${Math.round(hectares)} ha`;
-                                else return `${hectares.toFixed(2)} ha`;
-                              };
-                              const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
-                              // Only show hectares if >= 0.01 ha (1,000,000 cm²)
-                              if (hectares >= 0.01) {
-                                areaStr = `${formatCm2(area)} (${formatHectares(hectares)})`;
-                              } else {
-                                areaStr = formatCm2(area);
-                              }
+                              // Use formatAreaMeasurement for intelligent unit scaling
+                              areaStr = formatAreaMeasurement(area, 'cm', unitSystem);
                             } else if (unit === 'mm') {
-                              // Format mm² with K suffix and hectares
-                              const formatMm2 = (mm2: number): string => {
-                                if (mm2 >= 1000000) return `${(mm2 / 1000000).toFixed(2)}M mm²`;
-                                else if (mm2 >= 1000) return `${(mm2 / 1000).toFixed(2)}K mm²`;
-                                else return `${mm2.toFixed(2)} mm²`;
-                              };
-                              const formatHectares = (hectares: number): string => {
-                                if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
-                                else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
-                                else if (hectares >= 100) return `${Math.round(hectares)} ha`;
-                                else return `${hectares.toFixed(2)} ha`;
-                              };
-                              const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
-                              // Only show hectares if >= 0.01 ha (100,000,000 mm²)
-                              if (hectares >= 0.01) {
-                                areaStr = `${formatMm2(area)} (${formatHectares(hectares)})`;
-                              } else {
-                                areaStr = formatMm2(area);
-                              }
+                              // Use formatAreaMeasurement for intelligent unit scaling
+                              areaStr = formatAreaMeasurement(area, 'mm', unitSystem);
                             } else {
                               // Unknown unit - use regular area formatter
                               areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
