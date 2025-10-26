@@ -345,7 +345,21 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.0.2 (Current)
+### ✅ v7.5.0 (Current)
+- **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
+  - Circles now correctly display area in mi²/km² instead of ft²/cm²
+  - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
+  - Metric: `⌀ 769.71 km (A: 465.32K km²)` ✅
+- **Fixed regex parsing for circle diameter units**
+  - Corrected pattern to only match letters for units, not digits
+  - Prevents `⌀ 172'` from being parsed as diameter=17, unit="2"
+- **Fixed freehand volume display in legend**
+  - Volume now displays correctly for closed freehand loops
+  - Format: `perimeter ⊞ area | V: volume`
+  - Works for both metric (m³, L) and imperial (ft³, gal)
+- All v7.0.x features included
+
+### ✅ v7.0.2 (Previous)
 - Fixed circle area calculations in Known Scale mode
 - Circles with large diameters (e.g., 461.57 mi) now show correct areas
 - Removed backwards conversion logic from legend rendering
@@ -408,7 +422,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.0.2
+**Version:** v7.5.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
