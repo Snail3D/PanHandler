@@ -1,382 +1,397 @@
-# Payment Integration Checklist
+# Payment Integration Checklist for v2.0
 
 ## Overview
-This document tracks all payment/upgrade touchpoints in PanHandler that need to be wired up to a real payment provider (App Store In-App Purchase, Google Play Billing, RevenueCat, etc.) before launch.
-
-**Status:** 🔴 Mock implementation (shows alerts)  
-**Required for Launch:** ✅ Must be completed before App Store/Play Store submission
+This document outlines everything needed to integrate in-app purchases for the Pro upgrade feature in PanHandler.
 
 ---
 
-## Payment Provider Options
+## Current Payment Touchpoints in the App
 
-### Recommended: RevenueCat
-- ✅ Cross-platform (iOS + Android)
-- ✅ Handles App Store + Play Store billing
-- ✅ Subscription management
-- ✅ Purchase restoration
-- ✅ Analytics dashboard
-- **Library:** `react-native-purchases`
+### 1. **Special Offer Banner** (Session 50-52)
+- **File**: `src/screens/MeasurementScreen.tsx`
+- **Triggers**: Sessions 50, 51, 52 for free users
+- **Prices**: $6.97 → $5.97 → $4.97
+- **Action**: Tap banner to dismiss (needs upgrade button)
 
-### Alternative: Native Implementation
-- iOS: `expo-in-app-purchases` or `react-native-iap`
-- Android: Same libraries support both platforms
-- More manual work, but no RevenueCat fees
+### 2. **Pro Modal in Control Menu**
+- **File**: `src/components/DimensionOverlay.tsx` (lines ~5566-5700)
+- **Trigger**: Tap "Tap for Pro Features" footer
+- **Price**: $9.97 (regular price)
+- **Action**: Currently shows comparison chart only
 
----
+### 3. **Freehand Tool Paywall**
+- **File**: `src/components/DimensionOverlay.tsx`
+- **Trigger**: Trying to use Freehand tool as free user
+- **Shows**: Pro modal with comparison chart
 
-## 1. Pro Upgrade Buttons
-
-### Location 1: Inline Pro Modal (DimensionOverlay.tsx)
-**File:** `/src/components/DimensionOverlay.tsx`  
-**Lines:** ~5026-5035  
-**Current Code:**
-```typescript
-<Pressable
-  onPress={() => {
-    setShowProModal(false);
-    Alert.alert('Pro Upgrade', 'Payment integration would go here. For now, tap the footer 5 times fast to unlock!');
-  }}
-  style={...}
->
-  <Text>Purchase Pro</Text>
-</Pressable>
-```
-
-**Needs to be:**
-```typescript
-<Pressable
-  onPress={async () => {
-    setShowProModal(false);
-    try {
-      // RevenueCat example:
-      const purchaseResult = await Purchases.purchaseProduct('pro_lifetime');
-      if (purchaseResult.customerInfo.entitlements.active['pro'] !== undefined) {
-        setIsProUser(true);
-        Alert.alert('Success!', 'You are now a Pro user!');
-      }
-    } catch (error) {
-      if (!error.userCancelled) {
-        Alert.alert('Purchase Failed', error.message);
-      }
-    }
-  }}
->
-  <Text>Purchase Pro</Text>
-</Pressable>
-```
-
-**SKU/Product ID:** `pro_lifetime` (or your chosen ID)  
-**Price:** $9.97 one-time purchase
+### 4. **Help Modal Easter Egg**
+- **File**: `src/components/HelpModal.tsx` (lines ~2124-2164)
+- **Trigger**: Tap right egg emoji 10 times
+- **Action**: Toggle Pro/Free for testing (keep this for testing!)
 
 ---
 
-### Location 2: PaywallModal Component
-**File:** `/src/components/PaywallModal.tsx`  
-**Lines:** ~195-208  
-**Current Code:**
-```typescript
-<Pressable
-  onPress={handleUpgrade}
-  style={...}
->
-  <Text>Purchase Pro</Text>
-</Pressable>
+## Store Setup Requirements
+
+### Apple App Store (iOS)
+- [ ] **Apple Developer Account** ($99/year)
+- [ ] **App Store Connect** setup
+- [ ] **In-App Purchase Products** created:
+  - Product ID: `com.panhandler.pro` (or similar)
+  - Type: Non-Consumable (one-time purchase)
+  - Pricing tiers:
+    - Regular: $9.97
+    - Special Offer 1: $6.97
+    - Special Offer 2: $5.97
+    - Special Offer 3: $4.97
+- [ ] **Bank/Tax info** configured
+- [ ] **Test users** created for sandbox testing
+
+### Google Play Store (Android)
+- [ ] **Google Play Console** account ($25 one-time)
+- [ ] **In-App Products** created:
+  - Product ID: `pro_upgrade` (or similar)
+  - Type: Managed Product (one-time)
+  - Pricing: Same as iOS
+- [ ] **Merchant account** linked
+- [ ] **Test users** added for testing
+
+---
+
+## Recommended Library: React Native IAP
+
+### Installation
+```bash
+bun add react-native-iap
 ```
 
-**Handler (lines 55-58):**
+### Why React Native IAP?
+- Unified API for iOS and Android
+- Active maintenance and community support
+- Handles receipt validation
+- Works with Expo (via custom dev client if needed)
+- Good TypeScript support
+
+### Documentation
+- GitHub: https://github.com/dooboolab/react-native-iap
+- Docs: https://react-native-iap.dooboolab.com/
+
+---
+
+## Implementation Plan
+
+### Phase 1: Setup (Before coding)
+1. Create in-app purchase products in App Store Connect
+2. Create in-app products in Google Play Console
+3. Set up test accounts on both platforms
+4. Install `react-native-iap` package
+
+### Phase 2: Core Purchase Flow
+**File to create**: `src/api/purchases.ts`
+
 ```typescript
-const handleUpgrade = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  onUpgrade();
+import * as RNIap from 'react-native-iap';
+
+// Product IDs (match store configuration)
+export const PRODUCT_IDS = {
+  PRO_REGULAR: 'com.panhandler.pro',
+  PRO_OFFER_1: 'com.panhandler.pro.offer1', // $6.97
+  PRO_OFFER_2: 'com.panhandler.pro.offer2', // $5.97
+  PRO_OFFER_3: 'com.panhandler.pro.offer3', // $4.97
+};
+
+// Initialize IAP connection
+export const initializeIAP = async () => {
+  try {
+    await RNIap.initConnection();
+    // Get available products
+    const products = await RNIap.getProducts(Object.values(PRODUCT_IDS));
+    return products;
+  } catch (error) {
+    console.error('IAP initialization error:', error);
+  }
+};
+
+// Purchase product
+export const purchaseProduct = async (productId: string) => {
+  try {
+    const purchase = await RNIap.requestPurchase({ sku: productId });
+    // Handle successful purchase
+    return purchase;
+  } catch (error) {
+    console.error('Purchase error:', error);
+    throw error;
+  }
+};
+
+// Restore purchases (for users who reinstall)
+export const restorePurchases = async () => {
+  try {
+    const purchases = await RNIap.getAvailablePurchases();
+    return purchases;
+  } catch (error) {
+    console.error('Restore error:', error);
+  }
 };
 ```
 
-**Needs to be:**
-Same RevenueCat integration as above, or pass through to parent component that handles purchase.
+### Phase 3: Wire Up UI Components
 
-**Called from:** Help Modal when user taps "Upgrade to Pro" text
+#### Special Offer Banner (`src/screens/MeasurementScreen.tsx`)
+- Add "Get Pro Now" button to banner
+- Button triggers purchase with appropriate product ID based on session
+- Show loading state during purchase
+- Update `isProUser` on success
 
----
+#### Pro Modal (`src/components/DimensionOverlay.tsx`)
+- Replace placeholder "Upgrade" button with real purchase button
+- Trigger `purchaseProduct(PRODUCT_IDS.PRO_REGULAR)`
+- Handle success/error states
+- Show "Restore Purchases" option for reinstalls
 
-### Location 3: Help Modal Pro Section
-**File:** `/src/components/HelpModal.tsx`  
-**Lines:** ~1135-1145  
-**Current Code:**
+#### Store State (`src/state/measurementStore.ts`)
+- Already has `isProUser` boolean ✅
+- Add: `purchaseReceipt` (string | null) for validation
+- Add: `purchaseDate` (string | null) for tracking
+
+### Phase 4: Receipt Validation (CRITICAL for security)
+
+**Option A: Server-side validation (Recommended)**
+- Set up backend API to validate receipts with Apple/Google
+- Prevents hacking/piracy
+- More secure but requires server
+
+**Option B: Client-side validation (Quick but less secure)**
+- Use `react-native-iap` built-in validation
+- Easier to implement
+- Less secure (can be bypassed)
+
+### Phase 5: Testing
+
+**File to create**: `src/utils/testPurchases.ts`
+
 ```typescript
-<AnimatedText style={[{ 
-  fontSize: 17,
-  fontWeight: '800', 
-  color: '#5856D6',
-}, textPulseStyle]}>
-  Upgrade to Pro
-</AnimatedText>
-```
-
-**Action:** This is text, but when PaywallModal's `onUpgrade` is called, it triggers the purchase flow.
-
-**Parent component needs to handle:** Setting `setShowProModal(true)` → PaywallModal → Purchase
-
----
-
-## 2. Restore Purchase Buttons
-
-### Location 1: Inline Pro Modal
-**File:** `/src/components/DimensionOverlay.tsx`  
-**Lines:** ~5037-5045  
-**Current Code:**
-```typescript
-<Pressable
-  onPress={() => {
-    Alert.alert('Restore Purchase', 'Checking for previous purchases...\n\nThis would connect to your payment provider (App Store, Google Play, etc.)');
-  }}
-  style={...}
->
-  <Text>Restore Purchase</Text>
-</Pressable>
-```
-
-**Needs to be:**
-```typescript
-<Pressable
-  onPress={async () => {
-    try {
-      // RevenueCat example:
-      const customerInfo = await Purchases.restorePurchases();
-      if (customerInfo.entitlements.active['pro'] !== undefined) {
-        setIsProUser(true);
-        Alert.alert('Restored!', 'Your Pro purchase has been restored!');
-      } else {
-        Alert.alert('No Purchase Found', 'We could not find a previous Pro purchase for this account.');
-      }
-    } catch (error) {
-      Alert.alert('Restore Failed', error.message);
-    }
-  }}
->
-  <Text>Restore Purchase</Text>
-</Pressable>
-```
-
----
-
-### Location 2: PaywallModal Component
-**File:** `/src/components/PaywallModal.tsx`  
-**Lines:** ~221-241  
-**Current Code:**
-```typescript
-<Pressable
-  onPress={() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }}
-  style={...}
->
-  <Text>Restore Purchase</Text>
-</Pressable>
-```
-
-**Needs to be:**
-Same restore logic as above.
-
----
-
-## 3. Pro Status Check on App Launch
-
-### Location: App.tsx or Root Component
-**File:** `/App.tsx` or `/src/state/measurementStore.ts`  
-**Current:** `isProUser: false` (hardcoded)
-
-**Needs to be:**
-```typescript
-useEffect(() => {
-  const checkProStatus = async () => {
-    try {
-      // RevenueCat example:
-      const customerInfo = await Purchases.getCustomerInfo();
-      const isPro = customerInfo.entitlements.active['pro'] !== undefined;
-      setIsProUser(isPro);
-    } catch (error) {
-      console.log('Error checking Pro status:', error);
-      setIsProUser(false);
-    }
-  };
+// Test script for purchase flow
+export const testPurchaseFlow = async () => {
+  console.log('🧪 Testing IAP Flow...');
   
-  checkProStatus();
-}, []);
-```
-
-**Important:** Check on every app launch to handle:
-- Purchase on one device, restore on another
-- Subscription renewals (if you add subscriptions later)
-- Family Sharing (if enabled)
-
----
-
-## 4. Freehand Tool Access Control
-
-### Location: Freehand Button Press
-**File:** `/src/components/DimensionOverlay.tsx`  
-**Lines:** ~4611-4624  
-**Current Logic:**
-```typescript
-onPress={() => {
-  if (!isProUser) {
-    setShowProModal(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    return;
+  // 1. Initialize
+  const products = await initializeIAP();
+  console.log('✅ Products loaded:', products);
+  
+  // 2. Test purchase (sandbox)
+  try {
+    const purchase = await purchaseProduct(PRODUCT_IDS.PRO_REGULAR);
+    console.log('✅ Purchase successful:', purchase);
+  } catch (error) {
+    console.log('❌ Purchase failed:', error);
   }
-  // Activate freehand...
-}}
+  
+  // 3. Test restore
+  const restored = await restorePurchases();
+  console.log('✅ Restored purchases:', restored);
+};
 ```
 
-**Status:** ✅ Already wired up to `isProUser` state  
-**Action needed:** Ensure `isProUser` is properly set after purchase (see #3 above)
-
----
-
-## 5. Easter Egg: Footer Tap to Unlock (FOR TESTING ONLY)
-
-### Location: Footer in DimensionOverlay
-**File:** `/src/components/DimensionOverlay.tsx`  
-**Search for:** "Tap 5 times fast"
-
-**Current:** Allows developers to unlock Pro without payment  
-**Before Launch:** 🔴 **MUST REMOVE** or disable in production builds
-
-**Recommendation:**
-```typescript
-// Only enable in development
-if (__DEV__) {
-  // Show tap counter, unlock after 5 taps
-}
-```
-
----
-
-## 6. Product Configuration
-
-### App Store Connect (iOS)
-1. Create In-App Purchase
-2. Type: **Non-Consumable** (one-time purchase)
-3. Product ID: `pro_lifetime` (or your choice)
-4. Price: **$9.97 USD**
-5. Display Name: "PanHandler Pro"
-6. Description: "Unlock the Freehand measurement tool and all future Pro features"
-
-### Google Play Console (Android)
-1. Create In-App Product
-2. Product ID: `pro_lifetime` (must match iOS)
-3. Type: **One-time**
-4. Price: **$9.97 USD**
-5. Title: "PanHandler Pro"
-6. Description: Same as iOS
-
----
-
-## 7. RevenueCat Configuration (if using)
-
-### Entitlements
-- Create entitlement: **"pro"**
-- Attach product: `pro_lifetime`
-- Type: Non-subscription
-
-### Products
-- iOS: `pro_lifetime` (from App Store Connect)
-- Android: `pro_lifetime` (from Google Play Console)
-
-### API Keys
-Add to `.env`:
-```
-EXPO_PUBLIC_REVENUECAT_IOS_KEY=your_ios_key
-EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=your_android_key
-```
-
----
-
-## 8. State Management
-
-### Current Implementation
-**File:** `/src/state/measurementStore.ts`  
-**State:** `isProUser: boolean`
-
-**Needs persistence:** ✅ Already persisted via AsyncStorage
-
-**After successful purchase:**
-```typescript
-setIsProUser(true);
-```
-
-**After restore or app launch check:**
-```typescript
-const isPro = // check with payment provider
-setIsProUser(isPro);
+**Add test button in Help Modal (dev only)**:
+```tsx
+{__DEV__ && (
+  <Pressable onPress={testPurchaseFlow}>
+    <Text>🧪 Test IAP Flow</Text>
+  </Pressable>
+)}
 ```
 
 ---
 
 ## Testing Checklist
 
-### Before Launch
-- [ ] Test purchase flow on real iOS device (sandbox)
-- [ ] Test purchase flow on real Android device (sandbox)
-- [ ] Test restore purchase (after reinstalling app)
-- [ ] Test "Maybe Later" → doesn't charge user
-- [ ] Test canceling purchase mid-flow
-- [ ] Test offline behavior (graceful degradation)
-- [ ] Test family sharing (if enabled)
-- [ ] Verify Pro features unlock after purchase
-- [ ] Verify free features still work without purchase
-- [ ] **REMOVE/DISABLE easter egg unlock**
+### iOS Testing
+- [ ] Test purchase with sandbox account
+- [ ] Test "Cancel" flow
+- [ ] Test "Payment Failed" flow
+- [ ] Test "Restore Purchases"
+- [ ] Test purchase on real device (not simulator)
+- [ ] Verify receipt validation
+- [ ] Test interrupted purchase (app crash during purchase)
 
-### Sandbox Testing
-**iOS:** Create sandbox test accounts in App Store Connect  
-**Android:** Add test email addresses in Google Play Console
+### Android Testing
+- [ ] Test purchase with test account
+- [ ] Test "Cancel" flow
+- [ ] Test "Payment Failed" flow
+- [ ] Test "Restore Purchases"
+- [ ] Test on real device
+- [ ] Verify receipt validation
+- [ ] Test interrupted purchase
 
----
-
-## Code Locations Summary
-
-| Feature | File | Line(s) | Status |
-|---------|------|---------|--------|
-| Purchase Button (Inline Modal) | `DimensionOverlay.tsx` | ~5026-5035 | 🔴 Mock |
-| Purchase Button (PaywallModal) | `PaywallModal.tsx` | ~195-208 | 🔴 Mock |
-| Restore Button (Inline Modal) | `DimensionOverlay.tsx` | ~5037-5045 | 🔴 Mock |
-| Restore Button (PaywallModal) | `PaywallModal.tsx` | ~221-241 | 🔴 Mock |
-| Pro Status Check | `App.tsx` | N/A | 🔴 Missing |
-| Freehand Access Control | `DimensionOverlay.tsx` | ~4611-4624 | ✅ Ready |
-| Easter Egg Unlock | `DimensionOverlay.tsx` | TBD | ⚠️ Remove |
+### Cross-Platform Testing
+- [ ] Purchase on iOS, reinstall on iOS → restore works
+- [ ] Purchase on Android, reinstall on Android → restore works
+- [ ] Verify free users can't access Freehand tool
+- [ ] Verify Pro users CAN access Freehand tool
+- [ ] Test all 4 price points (regular + 3 special offers)
+- [ ] Verify special offer expires after session 52
 
 ---
 
-## Recommended Implementation Order
+## Edge Cases to Handle
 
-1. **Set up payment provider** (RevenueCat or native)
-2. **Create products** in App Store Connect + Play Console
-3. **Add Pro status check** on app launch
-4. **Wire up Purchase buttons** (both locations)
-5. **Wire up Restore buttons** (both locations)
-6. **Test thoroughly** in sandbox
-7. **Remove easter egg** unlock
-8. **Submit for review**
+1. **Purchase interrupted** (app crashes mid-purchase)
+   - Handle pending transactions on app restart
+   - Use `finishTransaction()` properly
+
+2. **User reinstalls app**
+   - Provide "Restore Purchases" button
+   - Check for existing purchases on app launch
+
+3. **Refund requested**
+   - Listen for refund events
+   - Revoke Pro access if refunded
+
+4. **Network errors**
+   - Show user-friendly error messages
+   - Retry logic for failed requests
+
+5. **Multiple devices**
+   - Same Apple/Google account = Pro on all devices
+   - Receipt validation ensures this works
+
+6. **Subscription vs One-Time**
+   - Current plan: One-time purchase (Non-Consumable)
+   - Consider subscription model for recurring revenue?
 
 ---
 
-## Helpful Resources
+## Store Submission Requirements
 
-### RevenueCat
-- Docs: https://docs.revenuecat.com/docs/reactnative
-- Setup Guide: https://www.revenuecat.com/docs/getting-started
-- Sample Code: https://github.com/RevenueCat/react-native-purchases
+### App Store (iOS)
+- [ ] App privacy policy URL (required for IAP)
+- [ ] Screenshots showing Pro features
+- [ ] Clear description of what Pro includes
+- [ ] Pricing visible in app listing
 
-### Native Implementation
-- `react-native-iap`: https://github.com/dooboolab/react-native-iap
-- Expo IAP: https://docs.expo.dev/versions/latest/sdk/in-app-purchases/
-
-### App Store Guidelines
-- In-App Purchase: https://developer.apple.com/app-store/review/guidelines/#in-app-purchase
+### Google Play (Android)
+- [ ] Same as iOS
+- [ ] Content rating (adjust for app type)
+- [ ] Proper permissions in AndroidManifest.xml
 
 ---
 
-**Last Updated:** October 14, 2025  
-**Status:** Payment integration pending  
-**Estimated Time:** 4-8 hours (with RevenueCat)
+## Revenue Tracking (Optional but Recommended)
+
+### Analytics to Track
+- Number of free users
+- Conversion rate (free → Pro)
+- Which price point converts best
+- Average time to purchase
+- Special offer effectiveness
+
+### Tools
+- RevenueCat (recommended - handles IAP + analytics)
+- Mixpanel
+- Firebase Analytics
+- Custom backend
+
+---
+
+## Security Considerations
+
+1. **Never store product IDs as strings in plain sight**
+   - Use environment variables or secure config
+
+2. **Always validate receipts**
+   - Server-side validation preferred
+   - Prevents "Lucky Patcher" style hacks
+
+3. **Obfuscate Pro checks**
+   - Don't just check `isProUser` boolean
+   - Cross-reference with receipt validation
+
+4. **Handle jailbroken/rooted devices**
+   - Consider using `jail-monkey` package to detect
+   - Decide policy for modified devices
+
+---
+
+## Code Locations to Update for v2.0
+
+### Files to Create
+- [ ] `src/api/purchases.ts` - IAP logic
+- [ ] `src/utils/testPurchases.ts` - Test script
+- [ ] `src/components/PurchaseButton.tsx` - Reusable purchase button component
+
+### Files to Modify
+- [ ] `src/screens/MeasurementScreen.tsx` - Add purchase button to special offer banner
+- [ ] `src/components/DimensionOverlay.tsx` - Wire up Pro modal purchase button
+- [ ] `src/state/measurementStore.ts` - Add purchase receipt tracking
+- [ ] `App.tsx` - Initialize IAP on app launch, check for restored purchases
+- [ ] `app.json` - Add IAP permissions/config if needed
+
+### Files to Test
+- [ ] All payment flows work in sandbox
+- [ ] Error handling works correctly
+- [ ] Loading states look good
+- [ ] Success/failure messages are clear
+
+---
+
+## Launch Day Checklist
+
+- [ ] Switch from sandbox to production mode
+- [ ] Verify products are live in both stores
+- [ ] Test one real purchase (refund immediately after)
+- [ ] Monitor error logs closely
+- [ ] Have "Restore Purchases" support ready
+- [ ] Customer support plan for payment issues
+
+---
+
+## Future Enhancements (Post v2.0)
+
+- [ ] Subscription model (monthly/yearly)
+- [ ] Family Sharing support (iOS)
+- [ ] Promotional codes
+- [ ] Limited-time sales
+- [ ] Referral program
+- [ ] Gift purchases
+
+---
+
+## Questions to Answer Before Implementation
+
+1. **Single product or multiple?**
+   - Option A: 1 product, dynamic pricing client-side (easier)
+   - Option B: 4 products (regular + 3 offers) - (more complex, more control)
+
+2. **Server-side validation?**
+   - Do we need a backend for receipt validation?
+   - Or use third-party service like RevenueCat?
+
+3. **Subscription vs One-Time?**
+   - Current plan: One-time ($4.97-$9.97)
+   - Alternative: Monthly ($2.99/mo) or Yearly ($19.99/yr)
+
+4. **Free trial?**
+   - Offer 7-day free trial before charging?
+
+5. **Family Sharing?**
+   - Allow purchases to be shared across family group?
+
+---
+
+## Contact Info for Support
+
+- Apple Developer Support: https://developer.apple.com/contact/
+- Google Play Support: https://support.google.com/googleplay/android-developer/
+- React Native IAP Discord: [Link in their GitHub]
+
+---
+
+## Notes
+
+- Current app is 100% client-side (no backend)
+- May need simple backend for receipt validation
+- Consider Firebase for easy backend setup
+- Or use RevenueCat (handles everything but costs money)
+
+**Status**: Ready for implementation when payment setup is complete! 🚀
