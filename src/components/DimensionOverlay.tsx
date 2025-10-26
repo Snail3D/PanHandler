@@ -1305,45 +1305,77 @@ export default function DimensionOverlay({
   const formatMapValue = (valueInMapUnits: number): string => {
     if (!mapScale) return '';
 
-    // Format based on map's real unit (NO conversion - keep in calibration's unit system)
-    // This ensures area calculations work correctly in the legend
-    if (mapScale.realUnit === 'km') {
-      // Add K/M suffixes for large values
-      if (valueInMapUnits >= 1000000) {
-        return `${(valueInMapUnits / 1000000).toFixed(2)}M km`;
-      } else if (valueInMapUnits >= 1000) {
-        return `${(valueInMapUnits / 1000).toFixed(2)}K km`;
+    // Convert based on user's unit system preference (metric vs imperial)
+    const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
+    const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
+
+    // Helper to format with K/M suffixes
+    const formatWithSuffix = (value: number, unit: string): string => {
+      if (value >= 1000000) {
+        return `${(value / 1000000).toFixed(2)}M ${unit}`;
+      } else if (value >= 1000) {
+        return `${(value / 1000).toFixed(2)}K ${unit}`;
+      } else if (unit === 'km' || unit === 'mi') {
+        return `${value.toFixed(2)} ${unit}`;
       } else {
-        return `${valueInMapUnits.toFixed(2)} km`;
+        return `${value.toFixed(0)} ${unit}`;
       }
-    } else if (mapScale.realUnit === 'mi') {
-      // Add K/M suffixes for large values
-      if (valueInMapUnits >= 1000000) {
-        return `${(valueInMapUnits / 1000000).toFixed(2)}M mi`;
-      } else if (valueInMapUnits >= 1000) {
-        return `${(valueInMapUnits / 1000).toFixed(2)}K mi`;
-      } else {
-        return `${valueInMapUnits.toFixed(2)} mi`;
+    };
+
+    // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
+    if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
+      return formatWithSuffix(valueInMapUnits, mapScale.realUnit);
+    }
+
+    // User wants metric, but map is imperial - convert to metric
+    if (unitSystem === 'metric' && isMapImperial) {
+      let meters = 0;
+      if (mapScale.realUnit === "mi") {
+        meters = valueInMapUnits * 1609.34; // miles to meters
+      } else { // ft
+        meters = valueInMapUnits * 0.3048; // feet to meters
       }
-    } else if (mapScale.realUnit === 'm') {
-      // Add K/M suffixes for large values
-      if (valueInMapUnits >= 1000000) {
-        return `${(valueInMapUnits / 1000000).toFixed(2)}M m`;
-      } else if (valueInMapUnits >= 1000) {
-        return `${(valueInMapUnits / 1000).toFixed(2)}K m`;
+
+      // Choose appropriate metric unit
+      if (meters < 1) {
+        return `${(meters * 100).toFixed(0)} cm`;
+      } else if (meters < 1000) {
+        return `${meters.toFixed(1)} m`;
       } else {
-        return `${valueInMapUnits.toFixed(0)} m`;
-      }
-    } else { // ft
-      // Add K/M suffixes for large values
-      if (valueInMapUnits >= 1000000) {
-        return `${(valueInMapUnits / 1000000).toFixed(2)}M ft`;
-      } else if (valueInMapUnits >= 1000) {
-        return `${(valueInMapUnits / 1000).toFixed(2)}K ft`;
-      } else {
-        return `${valueInMapUnits.toFixed(0)} ft`;
+        const km = meters / 1000;
+        return formatWithSuffix(km, 'km');
       }
     }
+
+    // User wants imperial, but map is metric - convert to imperial
+    if (unitSystem === 'imperial' && isMapMetric) {
+      let feet = 0;
+      if (mapScale.realUnit === "km") {
+        feet = valueInMapUnits * 3280.84; // km to feet
+      } else { // m
+        feet = valueInMapUnits * 3.28084; // meters to feet
+      }
+
+      // Choose appropriate imperial unit
+      if (feet < 5280) {
+        // Format as feet'inches"
+        const totalInches = Math.round(feet * 12);
+        const feetPart = Math.floor(totalInches / 12);
+        const inches = totalInches % 12;
+
+        if (inches === 0) {
+          return `${feetPart}'`;
+        }
+        return `${feetPart}'${inches}"`;
+      } else {
+        // Use miles
+        const miles = feet / 5280;
+        return formatWithSuffix(miles, 'mi');
+      }
+    }
+
+    // Fallback (shouldn't reach here)
+    return formatWithSuffix(valueInMapUnits, mapScale.realUnit);
   };
 
   // Helper: Format map scale distance (for lines, perimeters)
