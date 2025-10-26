@@ -5702,7 +5702,7 @@ export default function DimensionOverlay({
                     <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Recalculate display value based on current unit system
-                        let displayValue = '';  // Start with empty string for circles/rectangles that need recalc
+                        let displayValue = measurement.value;
 
                         if (measurement.mode === 'distance') {
                           // Recalculate distance in current units
