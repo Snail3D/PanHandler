@@ -1410,6 +1410,12 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
 
+    console.log('🔍 formatMapScaleArea called:', {
+      areaInMapUnits2,
+      realUnit: mapScale.realUnit,
+      unitSystem,
+    });
+
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
@@ -5754,6 +5760,10 @@ export default function DimensionOverlay({
                                 diameterInMapUnit = diameterDisplay * 0.3048; // ft to m
                               } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'm') {
                                 diameterInMapUnit = diameterDisplay * 3.28084; // m to ft
+                              } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'mi') {
+                                diameterInMapUnit = diameterDisplay * 5280; // mi to ft
+                              } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'ft') {
+                                diameterInMapUnit = diameterDisplay / 5280; // ft to mi
                               }
 
                               // Calculate area in the map's base unit
