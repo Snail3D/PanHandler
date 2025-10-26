@@ -5780,14 +5780,34 @@ export default function DimensionOverlay({
 
                           // Coin calibration mode OR coin measurement viewed in map mode
                           // Use stored diameter, calculate area from it
-                          displayValue = measurement.value; // e.g., "⌀ 46.7 mm" or "⌀ 833.83 m"
+                          displayValue = measurement.value;
 
                           // Parse diameter value and unit from stored string
-                          const diameterMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
-                          if (diameterMatch) {
-                            const diameter = parseFloat(diameterMatch[1]);
-                            const unit = diameterMatch[2]; // 'mm', 'in', etc.
+                          // Handle both word units and symbol units for feet and inches
+                          const feetInchesMatch = measurement.value.match(/([\d.]+).([\d]+)./);
+                          const feetOnlyMatch = measurement.value.match(/([\d.]+).$/);
+                          const standardMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
 
+                          let diameter: number | undefined;
+                          let unit: string | undefined;
+
+                          if (feetInchesMatch && feetInchesMatch[2]) {
+                            // Feet and inches format
+                            const feet = parseFloat(feetInchesMatch[1]);
+                            const inches = parseFloat(feetInchesMatch[2]);
+                            diameter = feet + (inches / 12);
+                            unit = 'ft';
+                          } else if (feetOnlyMatch && measurement.value.includes("'")) {
+                            // Feet only format
+                            diameter = parseFloat(feetOnlyMatch[1]);
+                            unit = 'ft';
+                          } else if (standardMatch) {
+                            // Standard format with word units
+                            diameter = parseFloat(standardMatch[1]);
+                            unit = standardMatch[2];
+                          }
+
+                          if (diameter !== undefined && unit !== undefined) {
                             // Calculate area in the same unit as the diameter
                             const radius = diameter / 2;
                             const area = Math.PI * radius * radius;
