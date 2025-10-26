@@ -2513,7 +2513,7 @@ export default function DimensionOverlay({
           const dy = m.points[i].y - m.points[i - 1].y;
           totalLength += Math.sqrt(dx * dx + dy * dy);
         }
-        
+
         // Map Mode: Apply scale conversion
         let perimeterStr: string;
         if (isMapMode && mapScale) {
@@ -2522,9 +2522,11 @@ export default function DimensionOverlay({
           const physicalLength = totalLength / (calibration?.pixelsPerUnit || 1);
           perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
         }
-        
+
+        // Always update perimeter for on-photo labels
+        newPerimeter = perimeterStr;
+
         // If it has area (closed non-intersecting loop), recalculate area display
-        let newPerimeter;
         if (m.area !== undefined) {
           // Map Mode: Apply scale conversion for area
           let areaStr: string;
@@ -2596,7 +2598,6 @@ export default function DimensionOverlay({
             }
           }
           newValue = `${perimeterStr} ⊞ ${areaStr}`;
-          newPerimeter = perimeterStr; // Store perimeter separately for inline display
         } else {
           newValue = perimeterStr;
         }
