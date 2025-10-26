@@ -1655,23 +1655,25 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={handleSupportEmail}
                       style={({ pressed }) => ({
-                        backgroundColor: pressed ? '#FF2D1F' : '#FF3B30',
+                        backgroundColor: pressed ? '#F2F2F7' : 'white',
                         borderRadius: 12,
                         padding: 14,
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        shadowColor: '#FF3B30',
+                        shadowColor: '#000',
                         shadowOffset: { width: 0, height: 3 },
-                        shadowOpacity: 0.3,
+                        shadowOpacity: 0.1,
                         shadowRadius: 6,
+                        borderWidth: 1,
+                        borderColor: 'rgba(0,0,0,0.1)',
                       })}
                     >
-                      <Ionicons name="mail" size={18} color="white" style={{ marginRight: 8 }} />
-                      <Text style={{ 
-                        fontSize: 15, 
-                        fontWeight: '700', 
-                        color: 'white',
+                      <Ionicons name="mail" size={18} color="#1C1C1E" style={{ marginRight: 8 }} />
+                      <Text style={{
+                        fontSize: 15,
+                        fontWeight: '700',
+                        color: '#1C1C1E',
                       }}>
                         🐛 Send Bug Report
                       </Text>
