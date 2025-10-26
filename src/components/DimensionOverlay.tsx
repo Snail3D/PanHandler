@@ -1474,12 +1474,16 @@ export default function DimensionOverlay({
 
     // Imperial mode - show mi² and acres
     const formatMi2 = (mi2: number): string => {
-      if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+      if (mi2 >= 1000000000000) return `${(mi2 / 1000000000000).toFixed(2)}T mi²`;
+      else if (mi2 >= 1000000000) return `${(mi2 / 1000000000).toFixed(2)}B mi²`;
+      else if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
       else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
       else return `${mi2.toFixed(2)} mi²`;
     };
     const formatAcres = (acres: number): string => {
-      if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+      if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
+      else if (acres >= 1000000000) return `${(acres / 1000000000).toFixed(2)}B ac`;
+      else if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
       else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
       else if (acres >= 100) return `${Math.round(acres)} ac`;
       else return `${acres.toFixed(2)} ac`;
@@ -1500,22 +1504,28 @@ export default function DimensionOverlay({
     // For large-scale units (mi, km, ft, m), use custom logic with acres/hectares
     // Helper functions for formatting
     const formatAcres = (acres: number): string => {
-      if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+      if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
+      else if (acres >= 1000000000) return `${(acres / 1000000000).toFixed(2)}B ac`;
+      else if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
       else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
       else if (acres >= 100) return `${Math.round(acres)} ac`;
       else return `${acres.toFixed(2)} ac`;
     };
 
     const formatHectares = (hectares: number): string => {
-      if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
+      if (hectares >= 1000000000000) return `${(hectares / 1000000000000).toFixed(2)}T ha`;
+      else if (hectares >= 1000000000) return `${(hectares / 1000000000).toFixed(2)}B ha`;
+      else if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
       else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
       else if (hectares >= 100) return `${Math.round(hectares)} ha`;
       else return `${hectares.toFixed(2)} ha`;
     };
 
-    // Format the area value with K/M suffixes
+    // Format the area value with K/M/B/T suffixes
     const formatArea = (val: number, unitStr: string): string => {
-      if (val >= 1000000) return `${(val / 1000000).toFixed(2)}M ${unitStr}`;
+      if (val >= 1000000000000) return `${(val / 1000000000000).toFixed(2)}T ${unitStr}`;
+      else if (val >= 1000000000) return `${(val / 1000000000).toFixed(2)}B ${unitStr}`;
+      else if (val >= 1000000) return `${(val / 1000000).toFixed(2)}M ${unitStr}`;
       else if (val >= 1000) return `${(val / 1000).toFixed(2)}K ${unitStr}`;
       else return `${val.toFixed(2)} ${unitStr}`;
     };
