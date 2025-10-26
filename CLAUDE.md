@@ -12,7 +12,10 @@
 2. ✅ Update legend format (label before dimensions)
 3. ✅ Fix label edit mode interaction
 4. ✅ Remove white borders when labels not editable
-5. ✅ Version bump to 7.0.0
+5. ✅ Add K/M suffixes for large numbers
+6. ✅ Implement multi-line legend wrapping
+7. ✅ Fix acres display for circles
+8. ✅ Version bump to 7.0.0
 
 ---
 
@@ -49,13 +52,41 @@
   - Applied to both center labels and rectangle side labels
   - Cleaner UI when in Measure mode
 
-### 5. Version Bump to 7.0.0
+### 5. K/M Suffixes for Large Numbers
+- **Updated all measurement formatting** (`unitConversion.ts`)
+  - **Distances:** `475,010 mi` → `475.01K mi`, `1,500,000 km` → `1.50M km`
+  - **Areas (Imperial):** `49,404,127,244,061 ft²` → `49.40M ft²`, `113,416,270 ac` → `113.42M ac`
+  - **Areas (Metric):** Large m² values get K/M suffixes
+  - **Volumes:** Already had K/M suffixes, maintained
+  - All large numbers show with 2 decimal places
+  - Makes measurements readable and prevents UI overflow
+
+### 6. Multi-Line Legend Wrapping
+- **Enhanced legend layout** (`DimensionOverlay.tsx:5684-5718`)
+  - Added `maxWidth` constraint: `window.width - 120px`
+  - Changed text style from `flexShrink: 1` to `flex: 1`
+  - Added `numberOfLines={2}` to allow 2-line wrapping
+  - Changed `alignItems` from `'center'` to `'flex-start'`
+  - Added `marginTop` to color indicator for alignment
+  - Long entries now wrap gracefully instead of running off screen
+
+### 7. Circle Acres Display Fixed
+- **Fixed diameter parsing for imperial circles** (`DimensionOverlay.tsx:5785-5831`)
+  - Updated regex patterns to handle feet symbols (`'`) and inch symbols (`"`)
+  - Three parsing modes:
+    - Feet + inches: `"29'6""` → 29.5 feet
+    - Feet only: `"114'"` → 114 feet
+    - Standard units: `"46.7 mm"` → 46.7 mm
+  - Now correctly calculates area and displays acres
+  - Example: `⌀ 114'` → `(A: 10.21K ft² (0.23 ac))`
+
+### 8. Version Bump to 7.0.0
 - Updated `package.json` version: `6.0.0` → `7.0.0`
 - Updated `app.json` version: `6.0.0` → `7.0.0`
 - Updated `README.md` roadmap and status sections
 - Clear version milestone for developers
 
-### 6. expo-av Fix
+### 9. expo-av Fix
 - Reverted from `expo-audio` back to `expo-av@~15.1.4`
 - Fixed native module resolution error
 - Updated `App.tsx` to use correct Audio API
@@ -64,7 +95,8 @@
 
 ## Files Modified
 
-- `DimensionOverlay.tsx` - Rectangle labeling improvements, legend format, edit mode fixes
+- `src/utils/unitConversion.ts` - K/M suffixes for distances, areas, acres
+- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing
 - `App.tsx` - expo-av import fix
 - `package.json` - Version bump to 7.0.0
 - `app.json` - Version bump to 7.0.0
