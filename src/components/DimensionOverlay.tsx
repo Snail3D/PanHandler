@@ -5702,8 +5702,8 @@ export default function DimensionOverlay({
                     <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600' }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Recalculate display value based on current unit system
-                        let displayValue = measurement.value;
-                        
+                        let displayValue = '';  // Start with empty string for circles/rectangles that need recalc
+
                         if (measurement.mode === 'distance') {
                           // Recalculate distance in current units
                           displayValue = calculateDistance(measurement.points[0], measurement.points[1]);
@@ -5714,8 +5714,12 @@ export default function DimensionOverlay({
                           // Recalculate circle diameter and area
                           // measurement.radius is stored in PIXELS, convert to real units
 
+                          // Check if we're effectively in map mode (Map button OR verbal scale)
+                          const effectivelyInMapMode = isMapMode || calibration?.calibrationType === 'verbal';
+                          const effectiveMapScale = mapScale || calibration?.verbalScale;
+
                           // Map Mode: Apply scale conversion if currently in map mode
-                          if (isMapMode && mapScale) {
+                          if (effectivelyInMapMode && effectiveMapScale) {
                             const diameterPx = measurement.radius * 2;
                             const diameterDist = convertToMapScale(diameterPx);
                             displayValue = `⌀ ${formatMapValue(diameterDist)}`;
@@ -5725,11 +5729,11 @@ export default function DimensionOverlay({
                             const areaStr = formatMapScaleArea(areaDist2);
 
                             // Add volume if depth is present
-                            if (measurement.depth !== undefined && measurement.depthUnit) {
+                            if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
                               // Convert depth to map scale unit (km, mi, m, or ft)
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, effectiveMapScale.realUnit, unitSystem);
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
