@@ -345,18 +345,50 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.6.0 (Current)
+### ✅ v7.5.0 (Current)
 - **Intelligent area unit scaling for small measurements**
   - Areas now automatically scale to the most readable unit (e.g., `3.32K mm²` → `33.2 cm²`)
   - Lowered mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) for better readability
   - Small areas < 1000 mm² (10 cm²) stay in mm² for precision (e.g., `785 mm²`)
   - Imperial areas only show acres when >= 0.01 ac (no more "0.00 ac" on drink cans!)
   - Updated both legend rendering and formatBlueprintArea to use intelligent scaling
+  - On-photo circle labels now recalculate area when switching unit systems
   - Large-scale units (mi, km, ft, m) still use custom logic with acres/hectares
   - Works for all small-scale calibrations (mm, cm, in)
-- All v7.5.0 features included
+- **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
+  - Circles now correctly display area in mi²/km² instead of ft²/cm²
+  - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
+  - Metric: `⌀ 769.71 km (A: 465.32K km²)` ✅
+- **Fixed circle area parsing for K/M suffixes when switching units**
+  - Regex now correctly parses diameter values with K/M suffixes (e.g., `⌀ 1.58K km`)
+  - Prevents parsing errors that treated "K" as the unit instead of the suffix
+  - Circle with 1580 km diameter now shows `A: 1.96M km²` instead of incorrect `A: 1821.5 cm²`
+  - Works for both K (thousands) and M (millions) suffixes
+- **Fixed rectangle dimensions not converting with Known Scale calibrations**
+  - Rectangle dimensions now convert when switching unit systems (e.g., `565 mi` → `909.26 km`)
+  - Fixed `formatMapValue()` to respect user's unit system preference
+  - Works for all measurement types with Known Scale calibrations (e.g., "200mi between points")
+- **Fixed rectangle areas not converting (formatBlueprintArea issue) - THE BIG FIX**
+  - Rectangle areas now convert properly: `146.73K mi²` → `380.21K km²` ✅
+  - Root cause: Known Scale calibrations use blueprint code path, not map mode path
+  - Added `currentUnitSystem` parameter to `formatBlueprintArea()` with conversion logic
+  - Both dimensions AND areas now respect user's unit preference
+  - Example: `659.06 km × 576.60 km (A: 380.21K km²)` instead of showing mi²/acres
+- **Fixed regex parsing for circle diameter with feet symbols**
+  - Corrected pattern to only match letters for units, not digits
+  - Prevents `⌀ 172'` from being parsed as diameter=17, unit="2"
+- **Fixed freehand volume display in legend**
+  - Volume now displays correctly for closed freehand loops
+  - Format: `perimeter ⊞ area | V: volume`
+  - Works for both metric (m³, L) and imperial (ft³, gal)
+- **Fixed misleading hectare/acre display for small areas**
+  - Areas < 0.01 ha/ac no longer show "0.00" conversions
+  - Example: `⌀ 65 mm (A: 32.7 cm²)` instead of `(A: 3.27K mm² (0.00 ha))`
+  - Applies to all units: ft², m², in², cm², mm²
+  - Large areas still show conversions when meaningful (>= 0.01 ha/ac)
+- All v7.4.x features included
 
-### ✅ v7.5.0 (Previous)
+### ✅ v7.4.0 (Previous)
 - **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
   - Circles now correctly display area in mi²/km² instead of ft²/cm²
   - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
@@ -453,7 +485,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.6.0
+**Version:** v7.5.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
