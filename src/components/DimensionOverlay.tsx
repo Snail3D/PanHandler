@@ -1491,6 +1491,13 @@ export default function DimensionOverlay({
   // Helper: Format area for blueprint/coin calibration mode with acres/hectares
   // This handles ALL units: mi, km, ft, m, in, cm, mm
   const formatBlueprintArea = (area: number, unit: string, currentUnitSystem: 'metric' | 'imperial'): string => {
+    // For small-scale units (mm, cm, in), use formatAreaMeasurement for intelligent unit scaling
+    // This converts 3320 mm² → 33.2 cm² automatically
+    if (unit === 'mm' || unit === 'cm' || unit === 'in') {
+      return formatAreaMeasurement(area, unit as any, currentUnitSystem);
+    }
+
+    // For large-scale units (mi, km, ft, m), use custom logic with acres/hectares
     // Helper functions for formatting
     const formatAcres = (acres: number): string => {
       if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
@@ -1546,27 +1553,6 @@ export default function DimensionOverlay({
         return `${formatArea(area, 'm²')} (${formatHectares(hectares)})`;
       }
       return formatArea(area, 'm²');
-    } else if (unit === 'in') {
-      const acres = area / 6272640; // 1 acre = 6,272,640 in²
-      // Only show acres if >= 0.01 ac (62,726.4 in²)
-      if (acres >= 0.01) {
-        return `${formatArea(area, 'in²')} (${formatAcres(acres)})`;
-      }
-      return formatArea(area, 'in²');
-    } else if (unit === 'cm') {
-      const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
-      // Only show hectares if >= 0.01 ha (1,000,000 cm²)
-      if (area >= 1000000) {
-        return `${formatArea(area, 'cm²')} (${formatHectares(hectares)})`;
-      }
-      return formatArea(area, 'cm²'); // No hectares for tiny areas
-    } else if (unit === 'mm') {
-      const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
-      // Only show hectares if >= 0.01 ha (100,000,000 mm²)
-      if (area >= 100000000) {
-        return `${formatArea(area, 'mm²')} (${formatHectares(hectares)})`;
-      }
-      return formatArea(area, 'mm²'); // No hectares for tiny areas
     } else {
       // Unknown unit - fallback to formatAreaMeasurement
       return formatAreaMeasurement(area, unit as any, currentUnitSystem);

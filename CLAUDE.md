@@ -1,10 +1,42 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.5.0
+**Version:** 7.6.0
 **Status:** Complete ✅
 
 ---
+
+## 📝 Session Goals
+
+1. ✅ Fix area display to use intelligent unit scaling (3.32K mm² → 33.2 cm²)
+2. ✅ Lower threshold for mm²→cm² conversion from 10000 to 1000
+
+---
+
+## Changes Made This Session
+
+### 1. Intelligent Area Unit Scaling (v7.6.0)
+
+**Problem:** Small area measurements showed awkward formatting:
+- Example: `⌀ 65 mm (A: 3.32K mm²)` ❌
+- Should be: `⌀ 65 mm (A: 33.2 cm²)` ✅
+
+**Root Cause:**
+The `formatBlueprintArea` function had a simple `formatArea` helper that just added K/M suffixes without intelligently switching units based on magnitude. For example, `3320 mm²` became `3.32K mm²` instead of the more readable `33.2 cm²`.
+
+**Solution:**
+1. Updated `formatBlueprintArea` to use `formatAreaMeasurement` for small-scale units (mm, cm, in) which provides intelligent unit scaling (`DimensionOverlay.tsx:1493-1498`)
+2. Lowered the mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) in `formatAreaMeasurement` (`unitConversion.ts:212`)
+
+**Results:**
+- ✅ Areas >= 1000 mm² now display in cm² (e.g., `3320 mm²` → `33.2 cm²`)
+- ✅ Small areas < 1000 mm² stay in mm² for precision (e.g., `785 mm²`)
+- ✅ Large-scale units (mi, km, ft, m) still use custom logic with acres/hectares
+- ✅ More readable area measurements across all scales
+
+---
+
+## Previous Session (v7.5.0)
 
 ## 📝 Session Goals
 
@@ -16,7 +48,7 @@
 
 ---
 
-## Changes Made This Session
+## Changes Made in v7.5.0
 
 ### 1. Circle Area Calculation Fix for K/M Suffixes (v7.5.0)
 

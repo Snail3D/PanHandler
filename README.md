@@ -345,7 +345,16 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.5.0 (Current)
+### ✅ v7.6.0 (Current)
+- **Intelligent area unit scaling for small measurements**
+  - Areas now automatically scale to the most readable unit (e.g., `3.32K mm²` → `33.2 cm²`)
+  - Lowered mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) for better readability
+  - Small areas < 1000 mm² stay in mm² for precision (e.g., `785 mm²`)
+  - Large-scale units (mi, km, ft, m) still use custom logic with acres/hectares
+  - Works for all small-scale calibrations (mm, cm, in)
+- All v7.5.0 features included
+
+### ✅ v7.5.0 (Previous)
 - **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
   - Circles now correctly display area in mi²/km² instead of ft²/cm²
   - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
@@ -442,7 +451,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.0
+**Version:** v7.6.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
