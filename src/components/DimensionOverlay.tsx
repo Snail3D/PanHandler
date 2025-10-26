@@ -6004,9 +6004,9 @@ export default function DimensionOverlay({
 
             // Render labels with adjusted positions
             return labelData.map(({ measurement, idx, color, screenX, screenY }) => {
-              // Handle tap on label to open edit modal when in edit mode
+              // Handle tap on label to open edit modal when in edit mode AND not in measurement mode
               const handleLabelPress = () => {
-                if (labelEditMode) {
+                if (labelEditMode && !measurementMode) {
                   setLabelEditingMeasurementId(measurement.id);
                   setShowLabelEditModal(true);
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -6024,7 +6024,7 @@ export default function DimensionOverlay({
                   }}
                   onPress={handleLabelPress}
                   hitSlop={20}
-                  pointerEvents={labelEditMode ? "auto" : "none"}
+                  pointerEvents={labelEditMode && !measurementMode ? "auto" : "none"}
                 >
                   {/* Small number badge */}
                   <View
@@ -6112,15 +6112,15 @@ export default function DimensionOverlay({
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
             
-            // Handle tap on label to open edit modal when in edit mode
+            // Handle tap on label to open edit modal when in edit mode AND not in measurement mode
             const handleRectLabelPress = () => {
-              if (labelEditMode) {
+              if (labelEditMode && !measurementMode) {
                 setLabelEditingMeasurementId(measurement.id);
                 setShowLabelEditModal(true);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               }
             };
-            
+
             return (
               <React.Fragment key={`${measurement.id}-sides`}>
                 {/* Width label on left side (vertical dimension) */}
@@ -6132,7 +6132,7 @@ export default function DimensionOverlay({
                   }}
                   onPress={handleRectLabelPress}
                   hitSlop={20}
-                  pointerEvents={labelEditMode ? "auto" : "none"}
+                  pointerEvents={labelEditMode && !measurementMode ? "auto" : "none"}
                 >
                   <View
                     style={{
@@ -6154,7 +6154,7 @@ export default function DimensionOverlay({
                     </Text>
                   </View>
                 </Pressable>
-                
+
                 {/* Length label on top side (horizontal dimension) */}
                 <Pressable
                   style={{
@@ -6164,7 +6164,7 @@ export default function DimensionOverlay({
                   }}
                   onPress={handleRectLabelPress}
                   hitSlop={20}
-                  pointerEvents={labelEditMode ? "auto" : "none"}
+                  pointerEvents={labelEditMode && !measurementMode ? "auto" : "none"}
                 >
                   <View
                     style={{
