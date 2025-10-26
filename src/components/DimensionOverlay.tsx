@@ -1463,9 +1463,22 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
 
+    console.log('formatMapScaleArea DEBUG:', {
+      areaInMapUnits2,
+      unitSystem,
+      mapScaleRealUnit: mapScale.realUnit
+    });
+
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
+
+    console.log('formatMapScaleArea LOGIC:', {
+      isMapMetric,
+      isMapImperial,
+      matchCondition: (unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial),
+      convertCondition: unitSystem === 'metric' && isMapImperial
+    });
 
     // Helper to format acres with K/M suffixes
     const formatAcres = (acres: number): string => {
