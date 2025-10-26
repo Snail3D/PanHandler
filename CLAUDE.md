@@ -10,6 +10,7 @@
 
 1. ✅ Fix area display to use intelligent unit scaling (3.32K mm² → 33.2 cm²)
 2. ✅ Lower threshold for mm²→cm² conversion from 10000 to 1000
+3. ✅ Fix imperial areas showing "0.00 ac" for small measurements
 
 ---
 
@@ -18,21 +19,25 @@
 ### 1. Intelligent Area Unit Scaling (v7.6.0)
 
 **Problem:** Small area measurements showed awkward formatting:
-- Example: `⌀ 65 mm (A: 3.32K mm²)` ❌
-- Should be: `⌀ 65 mm (A: 33.2 cm²)` ✅
+- Metric: `⌀ 65 mm (A: 3.32K mm²)` ❌ → Should be: `⌀ 65 mm (A: 33.2 cm²)` ✅
+- Imperial: `⌀ 2.45 in (A: 4.71 in² (0.00 ac))` ❌ → Should be: `⌀ 2.45 in (A: 4.71 in²)` ✅
 
 **Root Cause:**
-The `formatBlueprintArea` function had a simple `formatArea` helper that just added K/M suffixes without intelligently switching units based on magnitude. For example, `3320 mm²` became `3.32K mm²` instead of the more readable `33.2 cm²`.
+1. The legend rendering code had inline formatters that just added K/M suffixes without intelligently switching units
+2. `formatAreaMeasurement` always showed acres for imperial, even for tiny areas like drink cans
 
 **Solution:**
-1. Updated `formatBlueprintArea` to use `formatAreaMeasurement` for small-scale units (mm, cm, in) which provides intelligent unit scaling (`DimensionOverlay.tsx:1493-1498`)
-2. Lowered the mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) in `formatAreaMeasurement` (`unitConversion.ts:212`)
+1. Updated legend rendering inline formatters to use `formatAreaMeasurement` for small-scale units (mm, cm, in) (`DimensionOverlay.tsx:6089-6097`)
+2. Updated `formatBlueprintArea` to use `formatAreaMeasurement` for small-scale units (`DimensionOverlay.tsx:1493-1498`)
+3. Lowered the mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) (`unitConversion.ts:212`)
+4. Added 0.01 ac threshold check for imperial areas - only show acres when >= 0.01 ac (`unitConversion.ts:261-275`)
 
 **Results:**
-- ✅ Areas >= 1000 mm² now display in cm² (e.g., `3320 mm²` → `33.2 cm²`)
-- ✅ Small areas < 1000 mm² stay in mm² for precision (e.g., `785 mm²`)
+- ✅ Metric areas >= 1000 mm² now display in cm² (e.g., `3320 mm²` → `33.2 cm²`)
+- ✅ Small metric areas < 1000 mm² stay in mm² for precision (e.g., `785 mm²`)
+- ✅ Imperial areas only show acres when >= 0.01 ac (e.g., `4.71 in²` without "(0.00 ac)")
 - ✅ Large-scale units (mi, km, ft, m) still use custom logic with acres/hectares
-- ✅ More readable area measurements across all scales
+- ✅ More readable area measurements across all scales and unit systems
 
 ---
 
