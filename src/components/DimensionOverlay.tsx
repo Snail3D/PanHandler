@@ -5747,23 +5747,31 @@ export default function DimensionOverlay({
 
                           // Coin calibration mode - use stored diameter, calculate area
                           // The stored diameter value is correct, just need to add area for legend
-                          displayValue = measurement.value; // e.g., "⌀ 17.5 mm"
+                          displayValue = measurement.value; // e.g., "⌀ 20 mm"
 
-                          // Calculate area from radius in pixels
-                          const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
-                          const area = Math.PI * radiusInUnits * radiusInUnits;
-                          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+                          // Extract diameter from the stored value to calculate area
+                          // Parse the numeric value from the stored diameter string
+                          const diameterMatch = measurement.value.match(/[\d.]+/);
+                          if (diameterMatch) {
+                            const diameter = parseFloat(diameterMatch[0]);
+                            const radius = diameter / 2;
+                            const area = Math.PI * radius * radius;
+                            const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
 
-                          // Add volume if depth is present
-                          if (measurement.depth !== undefined && measurement.depthUnit) {
-                            // Convert depth to the same base unit as area (calibration unit)
-                            const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
-                            const volume = area * depthInBaseUnit;
-                            const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
-                            return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                            // Add volume if depth is present
+                            if (measurement.depth !== undefined && measurement.depthUnit) {
+                              // Convert depth to the same base unit as area (calibration unit)
+                              const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
+                              const volume = area * depthInBaseUnit;
+                              const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
+                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                            }
+
+                            return `${displayValue} (A: ${areaStr})`;
                           }
 
-                          return `${displayValue} (A: ${areaStr})`;
+                          // Fallback if we can't parse the diameter
+                          return displayValue;
 
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
