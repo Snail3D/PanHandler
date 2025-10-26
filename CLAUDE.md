@@ -1,7 +1,7 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.6.0
+**Version:** 7.5.0
 **Status:** Complete ✅
 
 ---
@@ -16,7 +16,7 @@
 
 ## Changes Made This Session
 
-### 1. Intelligent Area Unit Scaling (v7.6.0)
+### 1. Intelligent Area Unit Scaling (v7.5.0)
 
 **Problem:** Small area measurements showed awkward formatting:
 - Metric: `⌀ 65 mm (A: 3.32K mm²)` ❌ → Should be: `⌀ 65 mm (A: 33.2 cm²)` ✅
@@ -41,7 +41,7 @@
 
 ---
 
-## Previous Session (v7.5.0)
+## Previous Session (v7.4.0)
 
 ## 📝 Session Goals
 
