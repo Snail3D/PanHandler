@@ -5938,7 +5938,7 @@ export default function DimensionOverlay({
 
                         } else if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter && measurement.area !== undefined) {
                           // Show perimeter and area for closed freehand loops and polygons
-                          let displayStr = measurement.value; // Already formatted as "perimeter (A: area)"
+                          let displayStr = measurement.value; // Already formatted as "perimeter ⊞ area" or "perimeter (A: area)"
 
                           // Add volume if depth is present
                           if (measurement.depth !== undefined && measurement.depthUnit && measurement.area !== undefined) {
@@ -5946,8 +5946,8 @@ export default function DimensionOverlay({
                             const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
                             const volume = measurement.area * depthInBaseUnit;
                             const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
-                            // Replace closing paren with | V: volume)
-                            displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
+                            // Append volume - works for both "perimeter ⊞ area" and "perimeter (A: area)" formats
+                            displayStr = `${displayStr} | V: ${volumeStr}`;
                           }
 
                           return addLabelPrefix(displayStr);
