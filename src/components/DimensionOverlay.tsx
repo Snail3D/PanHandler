@@ -1487,8 +1487,16 @@ export default function DimensionOverlay({
       } else if (mapScale.realUnit === 'm') {
         return formatM2(areaInMapUnits2);
       } else { // ft
-        const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
-        return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
+        // SPECIAL CASE: If area is very large (>100K), it's probably actually in mi²
+        // This happens when calibration is "200mi" but stored internally as feet
+        if (areaInMapUnits2 > 100000) {
+          // Treat as mi² and display as mi²
+          const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
+          return `${formatMi2(areaInMapUnits2)} (${formatAcres(acres)})`;
+        } else {
+          const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
+          return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
+        }
       }
     }
     
