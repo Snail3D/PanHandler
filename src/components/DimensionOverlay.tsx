@@ -6365,10 +6365,40 @@ export default function DimensionOverlay({
                   >
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
                       {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
-                      {(measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter
-                        ? (showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter)
-                        : (showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value)
-                      }
+                      {(() => {
+                        // For circles, recalculate display value with area based on current unit system
+                        if (measurement.mode === 'circle' && measurement.radius !== undefined) {
+                          const displayValue = measurement.value; // e.g., "⌀ 64.5 mm"
+
+                          // Parse diameter and unit from stored value
+                          const standardMatch = displayValue.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
+                          if (standardMatch) {
+                            let diameter = parseFloat(standardMatch[1]);
+                            const suffix = standardMatch[2]; // 'K', 'M', or undefined
+                            const unit = standardMatch[3]; // 'km', 'mi', 'ft', 'm', 'mm', 'cm', 'in'
+
+                            // Apply K/M multiplier
+                            if (suffix === 'K') diameter = diameter * 1000;
+                            else if (suffix === 'M') diameter = diameter * 1000000;
+
+                            // Calculate area
+                            const radius = diameter / 2;
+                            const area = Math.PI * radius * radius;
+
+                            // Format area using intelligent scaling
+                            const areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
+
+                            return `${displayValue} (A: ${areaStr})`;
+                          }
+                        }
+
+                        // For other measurement types, use stored value
+                        if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter) {
+                          return showCalculatorWords ? getCalculatorWord(measurement.perimeter) : measurement.perimeter;
+                        } else {
+                          return showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value;
+                        }
+                      })()}
                     </Text>
                   </View>
                   {/* Custom label text if present */}
