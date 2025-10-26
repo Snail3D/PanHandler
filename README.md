@@ -337,10 +337,9 @@ bun tsc --noEmit
 
 ## 📚 Documentation
 
-- **[CLAUDE.md](./CLAUDE.md)** — Recent session changes, bug fixes, features
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Technical deep-dive, formulas, code structure
-- **[CHANGELOG.md](./CHANGELOG.md)** — Version history
-- **[APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)** — App Store launch checklist
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** — Developer guide: architecture, setup, debugging, formulas
+- **[CLAUDE.md](./CLAUDE.md)** — Current session notes (resets each session)
+- **[/archive/](./archive/)** — Historical docs and session notes
 
 ---
 
