@@ -472,7 +472,7 @@ Thank you for helping us improve PanHandler!
               {/* Video Course Section - NEW! */}
               <ExpandableSection
                 icon="play-circle"
-                title="🎬 Video Course - Learn PanHandler!"
+                title="🎬 Video Courses"
                 color="#FF2D55"
                 delay={0}
 
