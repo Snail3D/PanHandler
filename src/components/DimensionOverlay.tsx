@@ -6366,30 +6366,10 @@ export default function DimensionOverlay({
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
                       {/* For closed freehand loops and polygons, show only perimeter on label (area is in legend) */}
                       {(() => {
-                        // For circles, recalculate display value with area based on current unit system
-                        if (measurement.mode === 'circle' && measurement.radius !== undefined) {
-                          const displayValue = measurement.value; // e.g., "⌀ 64.5 mm"
-
-                          // Parse diameter and unit from stored value
-                          const standardMatch = displayValue.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
-                          if (standardMatch) {
-                            let diameter = parseFloat(standardMatch[1]);
-                            const suffix = standardMatch[2]; // 'K', 'M', or undefined
-                            const unit = standardMatch[3]; // 'km', 'mi', 'ft', 'm', 'mm', 'cm', 'in'
-
-                            // Apply K/M multiplier
-                            if (suffix === 'K') diameter = diameter * 1000;
-                            else if (suffix === 'M') diameter = diameter * 1000000;
-
-                            // Calculate area
-                            const radius = diameter / 2;
-                            const area = Math.PI * radius * radius;
-
-                            // Format area using intelligent scaling
-                            const areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
-
-                            return `${displayValue} (A: ${areaStr})`;
-                          }
+                        // For circles, just show the diameter on the floating label
+                        // (area is shown in the legend only to avoid clutter)
+                        if (measurement.mode === 'circle') {
+                          return showCalculatorWords ? getCalculatorWord(measurement.value) : measurement.value;
                         }
 
                         // For other measurement types, use stored value
