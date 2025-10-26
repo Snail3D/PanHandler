@@ -5816,10 +5816,9 @@ export default function DimensionOverlay({
 
                           // Parse diameter value and unit from stored string
                           // Handle both word units and symbol units for feet and inches
-                          const feetInchesMatch = measurement.value.match(/([\d.]+).([\d]+)./);
-                          const feetOnlyMatch = measurement.value.match(/([\d.]+).$/);
-                          const standardMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
-
+                          const feetInchesMatch = measurement.value.match(/([\d.]+)'([\d]+)"/);
+                          const feetOnlyMatch = measurement.value.match(/([\d.]+)'$/);
+                          const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/); // Only match letters for unit, not digits
                           let diameter: number | undefined;
                           let unit: string | undefined;
 
