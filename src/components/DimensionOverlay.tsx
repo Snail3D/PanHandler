@@ -5711,59 +5711,57 @@ export default function DimensionOverlay({
                           // Recalculate angle
                           displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
-                          // For circles in map mode, use the stored value which was calculated correctly
-                          // Recalculating with convertToMapScale() in the legend was causing double conversion
+                          // For circles in map mode, use the stored diameter value (it's correct)
+                          // but we still need to calculate area for the legend display
 
-                          // Check if this measurement has a stored value (it should)
-                          if (measurement.value && measurement.value.includes('⌀')) {
-                            // Just use the stored value - it's already correct
-                            displayValue = measurement.value;
-                          } else {
-                            // Fallback: recalculate (shouldn't normally reach here)
-                            // Check if we're effectively in map mode (Map button OR verbal scale)
-                            const effectivelyInMapMode = isMapMode || calibration?.calibrationType === 'verbal';
-                            const effectiveMapScale = mapScale || calibration?.verbalScale;
+                          // Check if we're effectively in map mode (Map button OR verbal scale)
+                          const effectivelyInMapMode = isMapMode || calibration?.calibrationType === 'verbal';
+                          const effectiveMapScale = mapScale || calibration?.verbalScale;
 
-                            // Map Mode: Apply scale conversion if currently in map mode
-                            if (effectivelyInMapMode && effectiveMapScale) {
-                              const diameterPx = measurement.radius * 2;
-                              const diameterDist = convertToMapScale(diameterPx);
-                              displayValue = `⌀ ${formatMapValue(diameterDist)}`;
-                              // Calculate area in map units
-                              const radiusDist = diameterDist / 2;
-                              const areaDist2 = Math.PI * radiusDist * radiusDist;
-                              const areaStr = formatMapScaleArea(areaDist2);
+                          // Map Mode: Use stored diameter, calculate area
+                          if (effectivelyInMapMode && effectiveMapScale) {
+                            // Use the stored diameter value (it's correct)
+                            const storedDiameter = measurement.value; // e.g., "⌀ 4.484 km"
 
-                              // Add volume if depth is present
-                              if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
-                                // Convert depth to map scale unit (km, mi, m, or ft)
-                                const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
-                                const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                                const volumeStr = formatVolumeMeasurement(volumeInMapUnits, effectiveMapScale.realUnit, unitSystem);
-                                return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
-                              }
+                            // Calculate area from radius in pixels
+                            const diameterPx = measurement.radius * 2;
+                            const diameterDist = convertToMapScale(diameterPx);
+                            const radiusDist = diameterDist / 2;
+                            const areaDist2 = Math.PI * radiusDist * radiusDist;
+                            const areaStr = formatMapScaleArea(areaDist2);
 
-                              return `${displayValue} (A: ${areaStr})`;
-                            }
-
-                            // Coin calibration mode (or showing map measurement in coin mode)
-                            const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
-                            const diameter = radiusInUnits * 2;
-                            displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
-                            const area = Math.PI * radiusInUnits * radiusInUnits;
-                            const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+                            // Use stored diameter with calculated area
+                            displayValue = storedDiameter;
 
                             // Add volume if depth is present
-                            if (measurement.depth !== undefined && measurement.depthUnit) {
-                              // Convert depth to the same base unit as area (calibration unit)
-                              const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
-                              const volume = area * depthInBaseUnit;
-                              const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
+                            if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
+                              // Convert depth to map scale unit (km, mi, m, or ft)
+                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
+                              const volumeInMapUnits = areaDist2 * depthInMapUnit;
+                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, effectiveMapScale.realUnit, unitSystem);
                               return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
                             }
 
                             return `${displayValue} (A: ${areaStr})`;
                           }
+
+                          // Coin calibration mode
+                          const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
+                          const diameter = radiusInUnits * 2;
+                          displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
+                          const area = Math.PI * radiusInUnits * radiusInUnits;
+                          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+
+                          // Add volume if depth is present
+                          if (measurement.depth !== undefined && measurement.depthUnit) {
+                            // Convert depth to the same base unit as area (calibration unit)
+                            const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
+                            const volume = area * depthInBaseUnit;
+                            const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
+                            return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                          }
+
+                          return `${displayValue} (A: ${areaStr})`;
 
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
