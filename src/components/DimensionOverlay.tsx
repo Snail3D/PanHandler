@@ -5844,8 +5844,36 @@ export default function DimensionOverlay({
                             const radius = diameter / 2;
                             const area = Math.PI * radius * radius;
 
-                            // Format area in the detected unit
-                            const areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
+                            // For large units (mi, km), format with K/M suffixes and acres
+                            // For small units (mm, cm, in, m, ft), use regular area formatter
+                            let areaStr: string;
+                            if (unit === 'mi') {
+                              // Format mi² with acres
+                              const formatMi2 = (mi2: number): string => {
+                                if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                                else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                                else return `${mi2.toFixed(2)} mi²`;
+                              };
+                              const formatAcres = (acres: number): string => {
+                                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                                else if (acres >= 100) return `${Math.round(acres)} ac`;
+                                else return `${acres.toFixed(2)} ac`;
+                              };
+                              const acres = area * 640; // 1 mi² = 640 acres
+                              areaStr = `${formatMi2(area)} (${formatAcres(acres)})`;
+                            } else if (unit === 'km') {
+                              // Format km²
+                              const formatKm2 = (km2: number): string => {
+                                if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                                else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                                else return `${km2.toFixed(2)} km²`;
+                              };
+                              areaStr = formatKm2(area);
+                            } else {
+                              // Small unit - use regular area formatter
+                              areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
+                            }
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
@@ -7880,15 +7908,15 @@ export default function DimensionOverlay({
             duration: 400,
             easing: Easing.out(Easing.ease),
           });
-          
+
           // Calculate pixel distance between the two points
           const dx = blueprintPoints[1].x - blueprintPoints[0].x;
           const dy = blueprintPoints[1].y - blueprintPoints[0].y;
           const pixelDistance = Math.sqrt(dx * dx + dy * dy);
-          
+
           // Calculate pixels per unit
           const pixelsPerUnit = pixelDistance / distance;
-          
+
           // Create calibration object
           const newCalibration = {
             pixelsPerUnit,
@@ -7897,7 +7925,7 @@ export default function DimensionOverlay({
             calibrationType: 'blueprint' as const,
             blueprintScale: { distance, unit }, // Store for display in badge
           };
-          
+
           // Store calibration FIRST
           useStore.getState().setCalibration(newCalibration);
           
