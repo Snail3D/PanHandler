@@ -372,6 +372,11 @@ bun tsc --noEmit
   - Volume now displays correctly for closed freehand loops
   - Format: `perimeter ⊞ area | V: volume`
   - Works for both metric (m³, L) and imperial (ft³, gal)
+- **Fixed misleading hectare/acre display for small areas**
+  - Areas < 0.01 ha/ac no longer show "0.00" conversions
+  - Example: `⌀ 65 mm (A: 3.32K mm²)` instead of `(A: 3.32K mm² (0.00 ha))`
+  - Applies to all units: ft², m², in², cm², mm²
+  - Large areas still show conversions when meaningful (>= 0.01 ha/ac)
 - All v7.0.x features included
 
 ### ✅ v7.0.2 (Previous)
