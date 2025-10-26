@@ -6054,8 +6054,8 @@ export default function DimensionOverlay({
                       shadowOpacity: 0.25,
                       shadowRadius: 3,
                       elevation: 4,
-                      borderWidth: labelEditMode ? 3 : 0,
-                      borderColor: labelEditMode ? '#FFFFFF' : 'transparent',
+                      borderWidth: (labelEditMode && !measurementMode) ? 3 : 0,
+                      borderColor: (labelEditMode && !measurementMode) ? '#FFFFFF' : 'transparent',
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
@@ -6145,8 +6145,8 @@ export default function DimensionOverlay({
                       shadowOpacity: 0.2,
                       shadowRadius: 2,
                       elevation: 3,
-                      borderWidth: labelEditMode ? 2 : 0,
-                      borderColor: labelEditMode ? '#FFFFFF' : 'transparent',
+                      borderWidth: (labelEditMode && !measurementMode) ? 2 : 0,
+                      borderColor: (labelEditMode && !measurementMode) ? '#FFFFFF' : 'transparent',
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
@@ -6177,8 +6177,8 @@ export default function DimensionOverlay({
                       shadowOpacity: 0.2,
                       shadowRadius: 2,
                       elevation: 3,
-                      borderWidth: labelEditMode ? 2 : 0,
-                      borderColor: labelEditMode ? '#FFFFFF' : 'transparent',
+                      borderWidth: (labelEditMode && !measurementMode) ? 2 : 0,
+                      borderColor: (labelEditMode && !measurementMode) ? '#FFFFFF' : 'transparent',
                     }}
                   >
                     <Text style={{ color: 'white', fontSize: 8, fontWeight: '600' }}>
