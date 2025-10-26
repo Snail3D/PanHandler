@@ -9,8 +9,9 @@
 ## 📝 Session Goals
 
 1. ✅ Fix circle area calculations for large km/mi diameters with K/M suffixes
-2. ✅ Fix rectangle dimensions not converting to metric in map mode
-3. ✅ Version consolidation at 7.5.0
+2. ✅ Fix rectangle dimensions not converting to metric in Known Scale mode
+3. ✅ Fix rectangle areas not converting (formatBlueprintArea issue)
+4. ✅ Version consolidation at 7.5.0
 
 ---
 
@@ -23,80 +24,69 @@
 - Should be: `⌀ 1.58K km (A: 1.96M km²)` ✅
 
 **Root Cause:**
-The `formatMeasurement` function adds K/M suffixes to large values (e.g., `1580 km` → `1.58K km`), but the circle area calculation regex didn't handle these suffixes:
-
-```typescript
-// OLD REGEX - Treated "K" as the unit!
-const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/);
-// Parsed "⌀ 1.58K km" as:
-//   - diameter = 1.58 ❌
-//   - unit = "K" ❌ (not "km"!)
-```
-
-This caused two problems:
-1. Diameter was only 1.58 instead of 1580 (missing 1000x multiplier)
-2. Unit was "K" which fell through to `formatAreaMeasurement('K')` → defaulted to small metric units (cm²)
+The `formatMeasurement` function adds K/M suffixes to large values (e.g., `1580 km` → `1.58K km`), but the circle area calculation regex didn't handle these suffixes.
 
 **Solution:**
 Updated regex to capture optional K/M suffix and apply multiplier (`DimensionOverlay.tsx:6044-6071`)
 
-```typescript
-// NEW REGEX - Captures optional K/M suffix
-const standardMatch = measurement.value.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
-// Parses "⌀ 1.58K km" as:
-//   - diameter = 1.58
-//   - suffix = "K"
-//   - unit = "km"
-
-// Then apply multiplier:
-if (suffix === 'K') {
-  diameter = diameter * 1000; // 1.58 → 1580 ✅
-} else if (suffix === 'M') {
-  diameter = diameter * 1000000;
-}
-```
-
 **Results:**
 - ✅ Metric: `⌀ 1.58K km (A: 1.96M km²)` (was: `A: 1821.5 cm²`)
-- ✅ Imperial: `⌀ 982.43 mi (A: 761.50K mi² (487.36M ac))` (already worked)
+- ✅ Imperial: `⌀ 982.43 mi (A: 761.50K mi² (487.36M ac))`
 - ✅ Small values still work: `⌀ 172' (A: 23.24K ft² (0.53 ac))`
 
-### 2. Rectangle Unit Conversion Fix in Map Mode (v7.5.0)
+### 2. Rectangle Dimension Conversion Fix (v7.5.0)
 
-**Problem:** When switching from Imperial to Metric in map mode (e.g., "200mi between points"), rectangles still showed dimensions and area in miles:
-- Example: `100 mi × 50 mi (A: 5000 mi² (3.2M ac))` ❌
-- Should be: `160.93 km × 80.47 km (A: 12.95K km²)` ✅
+**Problem:** Rectangle dimensions showed in miles instead of converting to km
+- Example: `565 mi × 488 mi` ❌
+- Should be: `909.26 km × 785.27 km` ✅
 
 **Root Cause:**
-The `formatMapValue` function intentionally did NOT convert units - it kept values in the map's original calibration unit (comment: "NO conversion - keep in calibration's unit system"). This was inconsistent with user expectations.
+The `formatMapValue` function didn't convert units based on unitSystem preference.
 
 **Solution:**
 Rewrote `formatMapValue` to respect `unitSystem` preference (`DimensionOverlay.tsx:1305-1379`)
 
+**Results:**
+- ✅ Rectangle dimensions convert: `565 mi` → `909.26 km`
+- ✅ Works for all measurement types in Known Scale mode
+
+### 3. Rectangle Area Conversion Fix - THE BIG ONE (v7.5.0)
+
+**Problem:** Rectangle areas STILL showed mi²/acres even after dimensions converted to km:
+- Example: `659.06 km × 576.60 km (A: 146.73K mi² (93.90M ac))` ❌
+- Should be: `659.06 km × 576.60 km (A: 380.21K km²)` ✅
+
+**Root Cause Found After Extensive Debugging:**
+Known Scale calibrations (e.g., "200mi between points") are NOT map mode - they're blueprint calibrations with large units. The code path was:
+1. `isMapMode` was FALSE (because it's Known Scale, not Map button mode)
+2. Rectangle fell through to coin calibration path
+3. Called `formatBlueprintArea()` which didn't respect `unitSystem`
+4. Always showed area in the calibration unit (mi²) regardless of user preference
+
+**Why Polygons Worked But Rectangles Didn't:**
+- Polygons use stored `measurement.value` which gets updated by useEffect when unitSystem changes
+- Rectangles recalculate on render, so they need conversion logic in the formatting functions
+
+**Solution:**
+Added `currentUnitSystem` parameter to `formatBlueprintArea()` and conversion logic:
 ```typescript
-// NEW - Converts based on unitSystem
-const formatMapValue = (valueInMapUnits: number): string => {
-  const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
-  const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
-
-  // If systems match, use as-is
-  if ((unitSystem === 'metric' && isMapMetric) ||
-      (unitSystem === 'imperial' && isMapImperial)) {
-    return formatWithSuffix(valueInMapUnits, mapScale.realUnit);
+if (unit === 'mi') {
+  if (currentUnitSystem === 'metric') {
+    const km2 = area * 2.59; // Convert mi² to km²
+    return formatArea(km2, 'km²');
   }
-
-  // Otherwise convert: mi→km, km→mi, etc.
-  // ...conversion logic...
+  // Otherwise show mi² with acres
+  const acres = area * 640;
+  return `${formatArea(area, 'mi²')} (${formatAcres(acres)})`;
 }
 ```
 
 **Results:**
-- ✅ Rectangle dimensions convert: `100 mi` → `160.93 km`
-- ✅ Rectangle areas convert via `formatMapScaleArea`: `5000 mi²` → `12.95K km²`
-- ✅ Works for all measurement types in map mode
-- ✅ K/M suffix support maintained
+- ✅ Rectangle areas now convert: `146.73K mi²` → `380.21K km²`
+- ✅ Both dimensions AND areas respect user's unit preference
+- ✅ Works for all blueprint calibrations with large units (mi/km)
 
-### 3. All v7.5.0 Fixes from Previous Session
+### 4. All v7.5.0 Fixes from Previous Session
 
 - ✅ Fixed circle area calculations for Known Scale mode (blueprint calibrations)
 - ✅ Fixed regex parsing for circle diameter with feet symbols
