@@ -5704,7 +5704,7 @@ export default function DimensionOverlay({
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
-                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600' }}>
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flex: 1 }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Recalculate display value based on current unit system
                         let displayValue = measurement.value;
@@ -5868,16 +5868,14 @@ export default function DimensionOverlay({
 
                           return displayStr;
                         }
-                        
+
+                        // Add label prefix if present
+                        if (measurement.label) {
+                          return `${measurement.label} - ${displayValue}`;
+                        }
                         return displayValue;
                       })()}
                     </Text>
-                    {/* Label text if present */}
-                    {measurement.label && (
-                      <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: scaleFontSize(7), fontWeight: '500', fontStyle: 'italic', marginTop: scaleMargin(4) }}>
-                        {measurement.label}
-                      </Text>
-                    )}
                   </View>
                 );
               })}
@@ -5917,9 +5915,10 @@ export default function DimensionOverlay({
 
           {/* Measurement labels for completed measurements with smart positioning */}
           {!hideMeasurementsForCapture && !hideMeasurementLabels && (() => {
-            // Calculate initial positions for all labels
+            // Calculate initial positions for all labels (excluding rectangles - they have side labels instead)
             const labelData = measurements
               .map((measurement, originalIdx) => ({ measurement, originalIdx }))
+              .filter(({ measurement }) => measurement.mode !== 'rectangle') // Exclude rectangles from center labels
               .map(({ measurement, originalIdx }) => {
               const color = getMeasurementColor(originalIdx, measurement.mode);
               let screenX = 0, screenY = 0;
@@ -5940,12 +5939,6 @@ export default function DimensionOverlay({
                 const center = imageToScreen(measurement.points[0].x, measurement.points[0].y);
                 screenX = center.x;
                 screenY = center.y;
-              } else if (measurement.mode === 'rectangle') {
-                // Label at top center of rectangle
-                const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
-                const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-                screenX = (p0.x + p1.x) / 2;
-                screenY = Math.min(p0.y, p1.y) - 40;
               } else if (measurement.mode === 'freehand') {
                 // Label at centroid of freehand path
                 if (measurement.points && measurement.points.length > 0) {
