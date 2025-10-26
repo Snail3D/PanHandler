@@ -351,6 +351,7 @@ bun tsc --noEmit
 - Fixed label edit mode interaction
 - K/M suffixes for large numbers (distances, areas, volumes)
 - Multi-line wrapping for long legend entries
+- Fixed circle area display for imperial map calibrations
 - Enhanced UI polish and consistency
 - All v6.0 features included
 
