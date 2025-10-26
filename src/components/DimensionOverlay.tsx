@@ -5713,7 +5713,6 @@ export default function DimensionOverlay({
                         fontWeight: '600',
                         flex: 1,
                       }}
-                      numberOfLines={3}
                     >
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Helper function to add label prefix
