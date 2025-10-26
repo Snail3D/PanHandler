@@ -5686,7 +5686,7 @@ export default function DimensionOverlay({
                     key={`legend-${measurement.id}`}
                     style={{
                       flexDirection: 'row',
-                      alignItems: 'flex-start',
+                      alignItems: 'center',
                       marginVertical: scaleMargin(1),
                     }}
                   >
@@ -5702,18 +5702,10 @@ export default function DimensionOverlay({
                         backgroundColor: color.main,
                         borderRadius: scaleBorderRadius(2),
                         marginRight: scaleMargin(4),
-                        marginTop: scaleMargin(2),
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
-                    <Text
-                      style={{
-                        color: 'white',
-                        fontSize: scaleFontSize(8),
-                        fontWeight: '600',
-                        flex: 1,
-                      }}
-                    >
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flexShrink: 1 }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Helper function to add label prefix
                         const addLabelPrefix = (value: string) => {
