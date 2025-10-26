@@ -5714,14 +5714,8 @@ export default function DimensionOverlay({
                           // Recalculate circle diameter and area
                           // measurement.radius is stored in PIXELS, convert to real units
 
-                          // IMPORTANT: Only use map scale if BOTH:
-                          // 1. We're currently in map mode (isMapMode)
-                          // 2. The measurement was created in map mode (calibrationMode === 'map')
-                          // This prevents incorrect conversions when switching modes
-                          const wasCreatedInMapMode = measurement.calibrationMode === 'map';
-
-                          // Map Mode: Apply scale conversion
-                          if (isMapMode && mapScale && wasCreatedInMapMode) {
+                          // Map Mode: Apply scale conversion if currently in map mode
+                          if (isMapMode && mapScale) {
                             const diameterPx = measurement.radius * 2;
                             const diameterDist = convertToMapScale(diameterPx);
                             displayValue = `⌀ ${formatMapValue(diameterDist)}`;
