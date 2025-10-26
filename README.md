@@ -345,7 +345,14 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ Alpha v1.65 (Current)
+### ✅ v7.0 (Current)
+- Improved rectangle labeling system
+- Labels now show before dimensions in legend
+- Fixed label edit mode interaction
+- Enhanced UI polish and consistency
+- All v6.0 features included
+
+### ✅ v6.0 (Previous)
 - Core measurement tools complete
 - Coin + map calibration
 - Export system (Email, Photos, DXF)
@@ -387,7 +394,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** Alpha v1.65+
+**Version:** v7.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
