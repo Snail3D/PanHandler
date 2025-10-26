@@ -349,7 +349,9 @@ bun tsc --noEmit
 - **Intelligent area unit scaling for small measurements**
   - Areas now automatically scale to the most readable unit (e.g., `3.32K mm²` → `33.2 cm²`)
   - Lowered mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) for better readability
-  - Small areas < 1000 mm² stay in mm² for precision (e.g., `785 mm²`)
+  - Small areas < 1000 mm² (10 cm²) stay in mm² for precision (e.g., `785 mm²`)
+  - Imperial areas only show acres when >= 0.01 ac (no more "0.00 ac" on drink cans!)
+  - Updated both legend rendering and formatBlueprintArea to use intelligent scaling
   - Large-scale units (mi, km, ft, m) still use custom logic with acres/hectares
   - Works for all small-scale calibrations (mm, cm, in)
 - All v7.5.0 features included

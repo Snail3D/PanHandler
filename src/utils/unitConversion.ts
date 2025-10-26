@@ -231,7 +231,7 @@ export function formatAreaMeasurement(
       }
     }
   } else {
-    // Imperial: use in² for small areas, ft² for large, always show acres
+    // Imperial: use in² for small areas, ft² for large, show acres only when meaningful
     const valueInIn2 = areaInMm2 / 645.16;
     const valueInFt2 = valueInIn2 / 144;
     const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
@@ -259,9 +259,19 @@ export function formatAreaMeasurement(
     }
 
     if (valueInIn2 < 144) { // Less than 1ft²
-      return `${valueInIn2.toFixed(2)} in² (${acreStr})`;
+      // Only show acres if >= 0.01 ac (435.6 ft² = 62,726 in²)
+      if (acres >= 0.01) {
+        return `${valueInIn2.toFixed(2)} in² (${acreStr})`;
+      } else {
+        return `${valueInIn2.toFixed(2)} in²`;
+      }
     } else {
-      return `${ft2Str} (${acreStr})`;
+      // Only show acres if >= 0.01 ac
+      if (acres >= 0.01) {
+        return `${ft2Str} (${acreStr})`;
+      } else {
+        return ft2Str;
+      }
     }
   }
 }
