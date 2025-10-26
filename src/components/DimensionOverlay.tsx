@@ -5706,6 +5706,11 @@ export default function DimensionOverlay({
                     {/* Measurement value with area for circles and rectangles */}
                     <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flexShrink: 1 }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
+                        // Helper function to add label prefix
+                        const addLabelPrefix = (value: string) => {
+                          return measurement.label ? `${measurement.label} - ${value}` : value;
+                        };
+
                         // Recalculate display value based on current unit system
                         let displayValue = measurement.value;
 
@@ -5763,14 +5768,14 @@ export default function DimensionOverlay({
                                 const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
                                 const volume = area * depthInMapUnit;
                                 const volumeStr = formatVolumeMeasurement(volume, effectiveMapScale.realUnit, unitSystem);
-                                return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                                return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
                               }
 
-                              return `${displayValue} (A: ${areaStr})`;
+                              return addLabelPrefix(`${displayValue} (A: ${areaStr})`);
                             }
 
                             // Fallback if parsing fails
-                            return displayValue;
+                            return addLabelPrefix(displayValue);
                           }
 
                           // Coin calibration mode OR coin measurement viewed in map mode
@@ -5796,14 +5801,14 @@ export default function DimensionOverlay({
                               const depthInSameUnit = convertUnit(measurement.depth, measurement.depthUnit, unit as any);
                               const volume = area * depthInSameUnit;
                               const volumeStr = formatVolumeMeasurement(volume, unit as any, unitSystem);
-                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                              return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
                             }
 
-                            return `${displayValue} (A: ${areaStr})`;
+                            return addLabelPrefix(`${displayValue} (A: ${areaStr})`);
                           }
 
                           // Fallback if parsing fails
-                          return displayValue;
+                          return addLabelPrefix(displayValue);
 
                         } else if (measurement.mode === 'rectangle' && measurement.width !== undefined && measurement.height !== undefined) {
                           // Recalculate rectangle dimensions and area
@@ -5828,10 +5833,10 @@ export default function DimensionOverlay({
                               const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, mapScale.realUnit);
                               const volumeInMapUnits = areaDist2 * depthInMapUnit;
                               const volumeStr = formatVolumeMeasurement(volumeInMapUnits, mapScale.realUnit, unitSystem);
-                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                              return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
                             }
 
-                            return `${displayValue} (A: ${areaStr})`;
+                            return addLabelPrefix(`${displayValue} (A: ${areaStr})`);
                           }
 
                           // Coin calibration mode
@@ -5847,10 +5852,10 @@ export default function DimensionOverlay({
                             const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
                             const volume = area * depthInBaseUnit;
                             const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
-                            return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                            return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
                           }
 
-                          return `${displayValue} (A: ${areaStr})`;
+                          return addLabelPrefix(`${displayValue} (A: ${areaStr})`);
 
                         } else if ((measurement.mode === 'freehand' || measurement.mode === 'polygon') && measurement.perimeter && measurement.area !== undefined) {
                           // Show perimeter and area for closed freehand loops and polygons
@@ -5866,14 +5871,11 @@ export default function DimensionOverlay({
                             displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
                           }
 
-                          return displayStr;
+                          return addLabelPrefix(displayStr);
                         }
 
-                        // Add label prefix if present
-                        if (measurement.label) {
-                          return `${measurement.label} - ${displayValue}`;
-                        }
-                        return displayValue;
+                        // Add label prefix for any remaining cases (distance, angle, etc.)
+                        return addLabelPrefix(displayValue);
                       })()}
                     </Text>
                   </View>
