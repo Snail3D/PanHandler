@@ -129,30 +129,44 @@ export function formatMeasurement(
   }
   
   if (unit === 'km') {
-    return `${value.toFixed(3)} ${unit}`; // 1.523km
+    // Add K/M suffixes for large values
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(2)}M km`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(2)}K km`;
+    } else {
+      return `${value.toFixed(2)} km`;
+    }
   }
-  
+
   // Imperial units
   if (unit === 'in') {
     return `${value.toFixed(2)} ${unit}`;
   }
-  
+
   if (unit === 'ft') {
     const totalInches = Math.round(value * 12); // Convert to total inches, round to whole
     const feet = Math.floor(totalInches / 12);
     const inches = totalInches % 12;
-    
+
     // If no inches, just show feet
     if (inches === 0) {
       return `${feet}'`;
     }
-    
+
     // Show feet and inches (whole numbers only)
     return `${feet}'${inches}"`;
   }
-  
+
   if (unit === 'mi') {
-    return `${value.toFixed(2)} ${unit}`; // 1.52 mi, 10.25 mi
+    // Add K/M suffixes for large values
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(2)}M mi`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(2)}K mi`;
+    } else {
+      return `${value.toFixed(2)} mi`;
+    }
   }
   
   // Fallback for other units
@@ -207,8 +221,14 @@ export function formatAreaMeasurement(
       return `${valueInCm2.toFixed(1)} cm²`;
     } else {
       const valueInM2 = areaInMm2 / 1000000;
-      // No hectares - m² is intuitive enough
-      return `${valueInM2.toFixed(2)} m²`;
+      // Format m² with K/M suffixes
+      if (valueInM2 >= 1000000) {
+        return `${(valueInM2 / 1000000).toFixed(2)}M m²`;
+      } else if (valueInM2 >= 1000) {
+        return `${(valueInM2 / 1000).toFixed(2)}K m²`;
+      } else {
+        return `${valueInM2.toFixed(2)} m²`;
+      }
     }
   } else {
     // Imperial: use in² for small areas, ft² for large, always show acres
@@ -216,15 +236,32 @@ export function formatAreaMeasurement(
     const valueInFt2 = valueInIn2 / 144;
     const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
 
-    // Format acres
-    const acreStr = acres >= 100
-      ? `${Math.round(acres)} ac`
-      : `${acres.toFixed(2)} ac`;
+    // Format ft² with K/M suffixes
+    let ft2Str: string;
+    if (valueInFt2 >= 1000000) {
+      ft2Str = `${(valueInFt2 / 1000000).toFixed(2)}M ft²`;
+    } else if (valueInFt2 >= 1000) {
+      ft2Str = `${(valueInFt2 / 1000).toFixed(2)}K ft²`;
+    } else {
+      ft2Str = `${valueInFt2.toFixed(2)} ft²`;
+    }
+
+    // Format acres with K/M suffixes
+    let acreStr: string;
+    if (acres >= 1000000) {
+      acreStr = `${(acres / 1000000).toFixed(2)}M ac`;
+    } else if (acres >= 1000) {
+      acreStr = `${(acres / 1000).toFixed(2)}K ac`;
+    } else if (acres >= 100) {
+      acreStr = `${Math.round(acres)} ac`;
+    } else {
+      acreStr = `${acres.toFixed(2)} ac`;
+    }
 
     if (valueInIn2 < 144) { // Less than 1ft²
       return `${valueInIn2.toFixed(2)} in² (${acreStr})`;
     } else {
-      return `${valueInFt2.toFixed(2)} ft² (${acreStr})`;
+      return `${ft2Str} (${acreStr})`;
     }
   }
 }
