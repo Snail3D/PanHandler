@@ -6074,7 +6074,12 @@ export default function DimensionOverlay({
                                 else return `${acres.toFixed(2)} ac`;
                               };
                               const acres = area / 43560; // 1 acre = 43,560 ft²
-                              areaStr = `${formatFt2(area)} (${formatAcres(acres)})`;
+                              // Only show acres if >= 0.01 ac
+                              if (acres >= 0.01) {
+                                areaStr = `${formatFt2(area)} (${formatAcres(acres)})`;
+                              } else {
+                                areaStr = formatFt2(area);
+                              }
                             } else if (unit === 'm') {
                               // Format m² with K suffix and hectares
                               const formatM2 = (m2: number): string => {
@@ -6089,7 +6094,12 @@ export default function DimensionOverlay({
                                 else return `${hectares.toFixed(2)} ha`;
                               };
                               const hectares = area / 10000; // 1 hectare = 10,000 m²
-                              areaStr = `${formatM2(area)} (${formatHectares(hectares)})`;
+                              // Only show hectares if >= 0.01 ha
+                              if (hectares >= 0.01) {
+                                areaStr = `${formatM2(area)} (${formatHectares(hectares)})`;
+                              } else {
+                                areaStr = formatM2(area);
+                              }
                             } else if (unit === 'in') {
                               // Format in² with K suffix and acres
                               const formatIn2 = (in2: number): string => {
@@ -6104,7 +6114,12 @@ export default function DimensionOverlay({
                                 else return `${acres.toFixed(2)} ac`;
                               };
                               const acres = area / 6272640; // 1 acre = 6,272,640 in²
-                              areaStr = `${formatIn2(area)} (${formatAcres(acres)})`;
+                              // Only show acres if >= 0.01 ac
+                              if (acres >= 0.01) {
+                                areaStr = `${formatIn2(area)} (${formatAcres(acres)})`;
+                              } else {
+                                areaStr = formatIn2(area);
+                              }
                             } else if (unit === 'cm') {
                               // Format cm² with K suffix and hectares
                               const formatCm2 = (cm2: number): string => {
@@ -6119,7 +6134,12 @@ export default function DimensionOverlay({
                                 else return `${hectares.toFixed(2)} ha`;
                               };
                               const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
-                              areaStr = `${formatCm2(area)} (${formatHectares(hectares)})`;
+                              // Only show hectares if >= 0.01 ha (1,000,000 cm²)
+                              if (hectares >= 0.01) {
+                                areaStr = `${formatCm2(area)} (${formatHectares(hectares)})`;
+                              } else {
+                                areaStr = formatCm2(area);
+                              }
                             } else if (unit === 'mm') {
                               // Format mm² with K suffix and hectares
                               const formatMm2 = (mm2: number): string => {
@@ -6134,7 +6154,12 @@ export default function DimensionOverlay({
                                 else return `${hectares.toFixed(2)} ha`;
                               };
                               const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
-                              areaStr = `${formatMm2(area)} (${formatHectares(hectares)})`;
+                              // Only show hectares if >= 0.01 ha (100,000,000 mm²)
+                              if (hectares >= 0.01) {
+                                areaStr = `${formatMm2(area)} (${formatHectares(hectares)})`;
+                              } else {
+                                areaStr = formatMm2(area);
+                              }
                             } else {
                               // Unknown unit - use regular area formatter
                               areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
