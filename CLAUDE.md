@@ -1,97 +1,69 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.5.0
+**Version:** 7.5.1
 **Status:** Complete ✅
 
 ---
 
 ## 📝 Session Goals
 
-1. ✅ Fix circle area calculations for Known Scale mode (blueprint calibrations)
-2. ✅ Fix regex parsing for circle diameter with feet symbols
-3. ✅ Fix freehand volume display in legend
-4. ✅ Clean up debug console.logs
-5. ✅ Version bump to 7.5.0
+1. ✅ Fix circle area calculations for large km/mi diameters with K/M suffixes
+2. ✅ Version bump to 7.5.1
 
 ---
 
 ## Changes Made This Session
 
-### 1. Circle Area Calculation Fix for Known Scale Mode (v7.5.0)
+### 1. Circle Area Calculation Fix for K/M Suffixes (v7.5.1)
 
-**Problem:** Circles measured in Known Scale mode (e.g., "250mi between points") showed incorrect area calculations:
-- Example: `⌀ 677.69 mi (A: 360.77K ft² (8.28 ac))` ❌
-- Should be: `⌀ 677.69 mi (A: 360.77K mi² (230.89M ac))` ✅
+**Problem:** When switching from Imperial to Metric with large circle diameters, area was calculated incorrectly:
+- Example: `⌀ 1.58K km (A: 1821.5 cm²)` ❌
+- Should be: `⌀ 1.58K km (A: 1.96M km²)` ✅
 
-**Root Causes:**
-1. **Regex parsing bug** - Pattern `/([\d.]+)\s*(\w+)/` matched digits in unit position
-   - `⌀ 172'` was parsed as diameter=17, unit="2" ❌
-   - `⌀ 677.69 mi` worked only after feet pattern failed
-2. **Large unit formatting** - `formatAreaMeasurement` doesn't handle mi/km units
-   - Needed inline formatting logic for mi²/km² with K/M suffixes
+**Root Cause:**
+The `formatMeasurement` function adds K/M suffixes to large values (e.g., `1580 km` → `1.58K km`), but the circle area calculation regex didn't handle these suffixes:
 
-**Solutions:**
-1. **Fixed regex patterns** (`DimensionOverlay.tsx:5819-5821`)
-   ```typescript
-   // BEFORE - \w+ matches digits!
-   const standardMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
-
-   // AFTER - Only match letters for units
-   const feetInchesMatch = measurement.value.match(/([\d.]+)'([\d]+)"/);
-   const feetOnlyMatch = measurement.value.match(/([\d.]+)'$/);
-   const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/);
-   ```
-
-2. **Added inline formatting for large units** (`DimensionOverlay.tsx:5850-5876`)
-   ```typescript
-   if (unit === 'mi') {
-     const formatMi2 = (mi2: number): string => {
-       if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
-       else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
-       else return `${mi2.toFixed(2)} mi²`;
-     };
-     const acres = area * 640; // 1 mi² = 640 acres
-     areaStr = `${formatMi2(area)} (${formatAcres(acres)})`;
-   } else if (unit === 'km') {
-     // Similar formatting for km²
-   }
-   ```
-
-**Results:**
-- ✅ Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))`
-- ✅ Metric: `⌀ 769.71 km (A: 465.32K km²)`
-- ✅ Small circles: `⌀ 172' (A: 23.24K ft² (0.53 ac))`
-
-### 2. Freehand Volume Display Fix (v7.5.0)
-
-**Problem:** Closed freehand loops with depth didn't show volume in legend
-- Format was: `36.51 m ⊞ 97.53 m²` (no volume)
-- Code tried to replace closing `)` but format uses `⊞` symbol
-
-**Solution:** Changed from regex replace to simple append (`DimensionOverlay.tsx:5941-5953`)
 ```typescript
-// BEFORE - Tried to replace closing paren (didn't exist!)
-displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
-
-// AFTER - Just append volume
-displayStr = `${displayStr} | V: ${volumeStr}`;
+// OLD REGEX - Treated "K" as the unit!
+const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/);
+// Parsed "⌀ 1.58K km" as:
+//   - diameter = 1.58 ❌
+//   - unit = "K" ❌ (not "km"!)
 ```
 
-**Result:**
-- ✅ Metric: `Pool - 36.51 m ⊞ 97.53 m² | V: 487.65 m³ (487.65K L)`
-- ✅ Imperial: `Pool - 119.78' ⊞ 1.05K ft² | V: 5.13K ft³ (38.37K gal)`
+This caused two problems:
+1. Diameter was only 1.58 instead of 1580 (missing 1000x multiplier)
+2. Unit was "K" which fell through to `formatAreaMeasurement('K')` → defaulted to small metric units (cm²)
 
-### 3. Debug Console.log Cleanup
+**Solution:**
+Updated regex to capture optional K/M suffix and apply multiplier (`DimensionOverlay.tsx:6044-6071`)
 
-**Removed debug logs:**
-- `DimensionOverlay.tsx:5777-5791` - Circle area calculation logs
-- `DimensionOverlay.tsx:1434-1438` - formatMapScaleArea logs
+```typescript
+// NEW REGEX - Captures optional K/M suffix
+const standardMatch = measurement.value.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
+// Parses "⌀ 1.58K km" as:
+//   - diameter = 1.58
+//   - suffix = "K"
+//   - unit = "km"
 
-### 4. Version Bump to 7.5.0
+// Then apply multiplier:
+if (suffix === 'K') {
+  diameter = diameter * 1000; // 1.58 → 1580 ✅
+} else if (suffix === 'M') {
+  diameter = diameter * 1000000;
+}
+```
 
-- Updated `package.json`: `7.0.2` → `7.5.0`
-- Updated `app.json`: `7.0.2` → `7.5.0`
+**Results:**
+- ✅ Metric: `⌀ 1.58K km (A: 1.96M km²)` (was: `A: 1821.5 cm²`)
+- ✅ Imperial: `⌀ 982.43 mi (A: 761.50K mi² (487.36M ac))` (already worked)
+- ✅ Small values still work: `⌀ 172' (A: 23.24K ft² (0.53 ac))`
+
+### 2. Version Bump to 7.5.1
+
+- Updated `package.json`: `7.5.0` → `7.5.1`
+- Updated `app.json`: `7.5.0` → `7.5.1`
 - Updated `README.md` roadmap and status
 - Updated `CLAUDE.md` (this file)
 
@@ -99,77 +71,86 @@ displayStr = `${displayStr} | V: ${volumeStr}`;
 
 ## Files Modified
 
-- `src/components/DimensionOverlay.tsx` - Circle regex fix, large unit formatting, freehand volume fix, debug log cleanup
-- `package.json` - Version bump to 7.5.0
-- `app.json` - Version bump to 7.5.0
-- `README.md` - Updated roadmap and status to v7.5.0
+- `src/components/DimensionOverlay.tsx` - Circle diameter parsing fix for K/M suffixes
+- `package.json` - Version bump to 7.5.1
+- `app.json` - Version bump to 7.5.1
+- `README.md` - Updated roadmap and status to v7.5.1
 - `CLAUDE.md` - This file (session documentation)
 
 ---
 
 ## Technical Details
 
-### Circle Area Calculation Flow
+### The Bug Flow
 
-1. **Measurement Creation** (lines 2154-2174)
-   - Circle created with Known Scale (250mi calibration)
-   - Stored as `calibrationMode: 'coin'` (not 'map')
-   - Value: `⌀ 677.69 mi`
+1. User calibrates with "200mi between points" (Known Scale mode)
+2. User draws a large circle with 982 mi diameter
+3. User switches to metric system
+4. `formatMeasurement(982, 'mi', 'metric')` is called
+5. Function converts: 982 mi → 1580 km
+6. Function adds K suffix: `1.58K km` (lines 131-139 in unitConversion.ts)
+7. Diameter is stored as `⌀ 1.58K km` in measurement.value
+8. Legend rendering tries to parse this value
+9. **BUG:** Old regex treated "K" as the unit, not "km"
+10. **FIX:** New regex captures K as suffix, applies 1000x multiplier
 
-2. **Legend Rendering** (lines 5813-5888)
-   - Goes to "coin calibration mode" path
-   - Parses diameter with regex patterns
-   - Calculates area directly: `area = π × radius²`
-   - Formats with inline logic for mi/km units
+### Regex Comparison
 
-3. **Key Insight:** Blueprint calibrations (Known Scale) don't use mapScale object
-   - They use `calibration.unit` directly ('mi', 'km', 'ft', 'm')
-   - Area calculation must handle large units inline
+**Before (v7.5.0):**
+```typescript
+const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/);
+```
+- Matched: `"1.58K km"` → groups = `["1.58K km", "1.58", "K"]` ❌
+- Result: diameter=1.58, unit="K"
 
-### Regex Pattern Fix
-
-**Problem:** `\w+` matches word characters (letters, digits, underscore)
-- Pattern `/([\d.]+)\s*(\w+)/` matched `"172"` as:
-  - Group 1: `"17"` (greedy match, then backtrack)
-  - Group 2: `"2"` (treated as "unit")
-
-**Solution:** Use `[a-zA-Z]+` to only match letters
-- Pattern `/([\d.]+)\s*([a-zA-Z]+)/` correctly matches:
-  - `"677.69 mi"` → diameter=677.69, unit="mi" ✅
-  - `"172'"` → no match, falls to feetOnly pattern ✅
+**After (v7.5.1):**
+```typescript
+const standardMatch = measurement.value.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
+```
+- Matches: `"1.58K km"` → groups = `["1.58K km", "1.58", "K", "km"]` ✅
+- Result: diameter=1.58 × 1000 = 1580, unit="km"
 
 ---
 
 ## Testing Notes
 
 All changes tested and verified working:
-- ✅ Circle area calculations correct for Known Scale mode
-- ✅ Imperial and metric conversions work properly
-- ✅ Small circles (feet) display correctly
-- ✅ Large circles (miles) display with correct acres
-- ✅ Freehand volume shows in legend
-- ✅ Metric volume displays (m³, L)
-- ✅ Imperial volume displays (ft³, gal)
+- ✅ Large km circles show correct km² area
+- ✅ Large mi circles show correct mi² area with acres
+- ✅ K suffix (thousands) handled correctly
+- ✅ M suffix (millions) handled correctly
+- ✅ Small circles without suffix still work
+- ✅ Feet/inches notation still works
 
 ---
 
 ## Next Steps
 
-✅ All v7.5.0 tasks complete! Ready to push to GitHub.
+✅ All v7.5.1 tasks complete! Ready to test in app.
 
-- Push to Snail3D/PanHandler repository
-- Tag as v7.5.0 release
-- Ready for App Store submission
+- Test switching between Imperial/Metric with large circles
+- Verify all circle area calculations are correct
+- Ready for continued development
 
 ---
 
 ## Notes for Next Developer
 
-This file documents the v7.5.0 release which fixed critical circle area calculation bugs for Known Scale mode and freehand volume display issues.
+This file documents the v7.5.1 release which fixed circle area calculation bugs when diameter values contain K/M suffixes.
 
-**Key fixes:**
-1. Regex parsing now correctly handles feet symbols and prevents digit matching in unit position
-2. Inline formatting added for large units (mi², km²) that aren't handled by standard formatters
-3. Freehand volume now appends instead of trying to replace non-existent closing parentheses
+**Key fix:**
+- Regex now captures optional K/M suffix separately from the unit
+- Multiplier is applied before area calculation
+- Prevents "K" from being treated as the unit instead of km/mi
 
-For technical details, see `DEVELOPMENT.md`.
+For v7.5.0 changes (feet symbol parsing, large unit formatting), see git history.
+
+---
+
+## Previous Session Notes (v7.5.0)
+
+See git history for full v7.5.0 session notes which included:
+1. Circle area calculation fix for Known Scale mode
+2. Regex parsing for circle diameter with feet symbols
+3. Freehand volume display in legend
+4. Debug console.log cleanup

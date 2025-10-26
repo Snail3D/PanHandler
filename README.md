@@ -345,7 +345,14 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.5.0 (Current)
+### ✅ v7.5.1 (Current)
+- **Fixed circle area calculation for large km/mi diameters in metric mode**
+  - Regex now correctly parses K/M suffixes in diameter values (e.g., `⌀ 1.58K km`)
+  - Prevents parsing errors that treated "K" as the unit instead of the suffix
+  - Circle with 1580 km diameter now shows `A: 1.96M km²` instead of incorrect `A: 1821.5 cm²`
+  - Works for both K (thousands) and M (millions) suffixes
+
+### ✅ v7.5.0 (Previous)
 - **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
   - Circles now correctly display area in mi²/km² instead of ft²/cm²
   - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
@@ -422,7 +429,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.0
+**Version:** v7.5.1
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 

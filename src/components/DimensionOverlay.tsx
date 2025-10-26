@@ -6041,7 +6041,8 @@ export default function DimensionOverlay({
                           // Handle both word units and symbol units for feet and inches
                           const feetInchesMatch = measurement.value.match(/([\d.]+)'([\d]+)"/);
                           const feetOnlyMatch = measurement.value.match(/([\d.]+)'$/);
-                          const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/); // Only match letters for unit, not digits
+                          // Match numbers with optional K/M suffix, then unit: "1.58K km" or "2.5 mi"
+                          const standardMatch = measurement.value.match(/([\d.]+)([KM])?\s*([a-zA-Z]+)/);
                           let diameter: number | undefined;
                           let unit: string | undefined;
 
@@ -6056,9 +6057,17 @@ export default function DimensionOverlay({
                             diameter = parseFloat(feetOnlyMatch[1]);
                             unit = 'ft';
                           } else if (standardMatch) {
-                            // Standard format with word units
+                            // Standard format with word units and optional K/M suffix
                             diameter = parseFloat(standardMatch[1]);
-                            unit = standardMatch[2];
+                            const suffix = standardMatch[2]; // 'K', 'M', or undefined
+                            unit = standardMatch[3]; // 'km', 'mi', 'ft', 'm', etc.
+
+                            // Apply K/M multiplier
+                            if (suffix === 'K') {
+                              diameter = diameter * 1000;
+                            } else if (suffix === 'M') {
+                              diameter = diameter * 1000000;
+                            }
                           }
 
                           if (diameter !== undefined && unit !== undefined) {
