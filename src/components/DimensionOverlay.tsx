@@ -1431,12 +1431,6 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number): string => {
     if (!mapScale) return '';
 
-    console.log('🔍 formatMapScaleArea called:', {
-      areaInMapUnits2,
-      realUnit: mapScale.realUnit,
-      unitSystem,
-    });
-
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
@@ -5774,24 +5768,12 @@ export default function DimensionOverlay({
                               // No conversion needed - diameter is already in the correct unit (map's realUnit)
                               // Example: If calibration is 250mi, realUnit='mi', diameter shows as "461.57 mi"
                               // We calculate area directly in mi²
-                              console.log('🔍 Circle area calculation (no conversion):', {
-                                diameter: diameterDisplay,
-                                unit: unitDisplay,
-                                realUnit: effectiveMapScale.realUnit,
-                              });
 
                               // Calculate area directly in the displayed unit
                               const radius = diameterDisplay / 2;
                               const area = Math.PI * radius * radius;
 
-                              console.log('🔍 Circle area result:', {
-                                radius,
-                                area: area.toFixed(2),
-                                unit: `${unitDisplay}²`,
-                              });
-
                               // Format area using map scale formatter
-                              // Pass the area and the unit it's in
                               const areaStr = formatMapScaleArea(area);
 
                               // Add volume if depth is present

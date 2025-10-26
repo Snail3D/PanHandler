@@ -1,208 +1,175 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.0.2
-**Status:** In Progress
+**Version:** 7.5.0
+**Status:** Complete ✅
 
 ---
 
 ## 📝 Session Goals
 
-1. ✅ Improve rectangle labeling system
-2. ✅ Update legend format (label before dimensions)
-3. ✅ Fix label edit mode interaction
-4. ✅ Remove white borders when labels not editable
-5. ✅ Add K/M suffixes for large numbers
-6. ✅ Implement multi-line legend wrapping
-7. ✅ Fix acres display for circles
-8. ✅ Version bump to 7.0.0
-9. ✅ Fix circle area unit mismatch for imperial map calibrations (v7.0.1)
-10. ✅ Fix circle area calculation bug in Known Scale mode (v7.0.2)
+1. ✅ Fix circle area calculations for Known Scale mode (blueprint calibrations)
+2. ✅ Fix regex parsing for circle diameter with feet symbols
+3. ✅ Fix freehand volume display in legend
+4. ✅ Clean up debug console.logs
+5. ✅ Version bump to 7.5.0
 
 ---
 
 ## Changes Made This Session
 
-### 10. Circle Area Calculation Bug Fix (v7.0.2)
+### 1. Circle Area Calculation Fix for Known Scale Mode (v7.5.0)
+
 **Problem:** Circles measured in Known Scale mode (e.g., "250mi between points") showed incorrect area calculations:
-- Example: Circle with ⌀ 461.57 mi displayed as `(A: 167.34K ft² (3.84 ac))`
-- Should be: `(A: 167.34K mi² (107.10M ac))`
+- Example: `⌀ 677.69 mi (A: 360.77K ft² (8.28 ac))` ❌
+- Should be: `⌀ 677.69 mi (A: 360.77K mi² (230.89M ac))` ✅
 
-**Root Cause:** The v7.0.1 fix removed unit conversions from `formatMapValue`, which was correct. But the legend rendering code (lines 5775-5803) still had conversion logic that was now backwards. It tried to convert the diameter from the display unit back to the "map's base unit", which was no longer needed.
+**Root Causes:**
+1. **Regex parsing bug** - Pattern `/([\d.]+)\s*(\w+)/` matched digits in unit position
+   - `⌀ 172'` was parsed as diameter=17, unit="2" ❌
+   - `⌀ 677.69 mi` worked only after feet pattern failed
+2. **Large unit formatting** - `formatAreaMeasurement` doesn't handle mi/km units
+   - Needed inline formatting logic for mi²/km² with K/M suffixes
 
-**Solution:**
-- **Removed diameter conversion logic** (`DimensionOverlay.tsx:5781-5803`)
-  - Diameter is already in the correct unit (calibration's realUnit) thanks to v7.0.1 fix
-  - Calculate area directly in the displayed unit (e.g., mi²) without any conversion
-  - Example: `⌀ 461.57 mi` → area = π × (230.785)² = `167,343.7 mi²`
-- **Removed "special case" hack** (`DimensionOverlay.tsx:1510-1513`)
-  - Deleted logic that tried to guess if large ft² values were actually mi²
-  - This was a workaround for the bug we just fixed
-  - Now ft² stays as ft², mi² stays as mi²
+**Solutions:**
+1. **Fixed regex patterns** (`DimensionOverlay.tsx:5819-5821`)
+   ```typescript
+   // BEFORE - \w+ matches digits!
+   const standardMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
 
-**Technical Details:**
+   // AFTER - Only match letters for units
+   const feetInchesMatch = measurement.value.match(/([\d.]+)'([\d]+)"/);
+   const feetOnlyMatch = measurement.value.match(/([\d.]+)'$/);
+   const standardMatch = measurement.value.match(/([\d.]+)\s*([a-zA-Z]+)/);
+   ```
+
+2. **Added inline formatting for large units** (`DimensionOverlay.tsx:5850-5876`)
+   ```typescript
+   if (unit === 'mi') {
+     const formatMi2 = (mi2: number): string => {
+       if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+       else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+       else return `${mi2.toFixed(2)} mi²`;
+     };
+     const acres = area * 640; // 1 mi² = 640 acres
+     areaStr = `${formatMi2(area)} (${formatAcres(acres)})`;
+   } else if (unit === 'km') {
+     // Similar formatting for km²
+   }
+   ```
+
+**Results:**
+- ✅ Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))`
+- ✅ Metric: `⌀ 769.71 km (A: 465.32K km²)`
+- ✅ Small circles: `⌀ 172' (A: 23.24K ft² (0.53 ac))`
+
+### 2. Freehand Volume Display Fix (v7.5.0)
+
+**Problem:** Closed freehand loops with depth didn't show volume in legend
+- Format was: `36.51 m ⊞ 97.53 m²` (no volume)
+- Code tried to replace closing `)` but format uses `⊞` symbol
+
+**Solution:** Changed from regex replace to simple append (`DimensionOverlay.tsx:5941-5953`)
 ```typescript
-// BEFORE (v7.0.1) - Had conversion logic that was now backwards
-if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'mi') {
-  diameterInMapUnit = diameterDisplay * 5280; // Convert mi to ft
-}
-const area = Math.PI * (diameterInMapUnit / 2) ** 2; // Area in ft²!
+// BEFORE - Tried to replace closing paren (didn't exist!)
+displayStr = displayStr.replace(/\)$/, ` | V: ${volumeStr})`);
 
-// AFTER (v7.0.2) - No conversion, calculate directly
-const radius = diameterDisplay / 2; // Diameter is already in correct unit (mi)
-const area = Math.PI * radius * radius; // Area in mi²
+// AFTER - Just append volume
+displayStr = `${displayStr} | V: ${volumeStr}`;
 ```
 
 **Result:**
-- Imperial map calibrations (250mi) now show: `⌀ 461.57 mi (A: 167.34K mi² (107.10M ac))` ✅
-- Metric map calibrations (250km) show: `⌀ 742.83 km (A: 433.30K km²)` ✅
-- All area calculations are now correct for Known Scale mode
+- ✅ Metric: `Pool - 36.51 m ⊞ 97.53 m² | V: 487.65 m³ (487.65K L)`
+- ✅ Imperial: `Pool - 119.78' ⊞ 1.05K ft² | V: 5.13K ft³ (38.37K gal)`
 
-### 9. Circle Area Unit Mismatch Fix (v7.0.1)
-- **Fixed `formatMapValue` function** (`DimensionOverlay.tsx:1305-1347`)
-  - Removed unit system conversion logic
-  - Now keeps measurements in calibration's original unit system
-  - Imperial calibrations (250mi) now correctly show diameter and area in miles/feet
-  - Metric calibrations (250km) correctly show diameter and area in km/meters
-  - Added K/M suffixes to all map value formatting
-  - Example: Imperial calibration now shows `⌀ 1.10K mi (A: 3.80M ft²)` instead of mixing km and cm²
+### 3. Debug Console.log Cleanup
 
-### 1. Rectangle Labeling System Improvements
-- **Removed center labels for rectangles** (`DimensionOverlay.tsx:5918-5924`)
-  - Rectangles no longer show large center label with full dimensions
-  - Only side labels (L: and H:) remain on rectangle edges
-  - Other measurement types (circles, distances, angles, etc.) still show center labels
-  - Cleaner visualization with no duplicate labeling
+**Removed debug logs:**
+- `DimensionOverlay.tsx:5777-5791` - Circle area calculation logs
+- `DimensionOverlay.tsx:1434-1438` - formatMapScaleArea logs
 
-### 2. Legend Format Updated
-- **Changed label position in legend** (`DimensionOverlay.tsx:5709-5878`)
-  - Created `addLabelPrefix()` helper function to wrap all display values
-  - Updated all return statements to use helper function
-  - Format changed from: `29'9" × 19'6" (A: 579.85 ft²) Patio`
-  - Format changed to: `Patio - 29'9" × 19'6" (A: 579.85 ft²)`
-  - Label now appears BEFORE dimensions with dash separator
-  - More intuitive and easier to scan
+### 4. Version Bump to 7.5.0
 
-### 3. Label Edit Mode Interaction Fixed
-- **Added measurement mode check** (`DimensionOverlay.tsx:6009, 6117`)
-  - Labels only editable when BOTH conditions met:
-    - `labelEditMode === true` (Edit Labels button active)
-    - `measurementMode === false` (Edit mode, not Measure mode)
-  - Prevents accidental label edits when placing measurements
-  - Updated `pointerEvents` prop to reflect interaction state
-
-### 4. White Border Display Fixed
-- **Conditional border styling** (`DimensionOverlay.tsx:6057-6058, 6148-6149`)
-  - White border only shows when `labelEditMode && !measurementMode`
-  - No visual indicator when labels aren't editable
-  - Applied to both center labels and rectangle side labels
-  - Cleaner UI when in Measure mode
-
-### 5. K/M Suffixes for Large Numbers
-- **Updated all measurement formatting** (`unitConversion.ts`)
-  - **Distances:** `475,010 mi` → `475.01K mi`, `1,500,000 km` → `1.50M km`
-  - **Areas (Imperial):** `49,404,127,244,061 ft²` → `49.40M ft²`, `113,416,270 ac` → `113.42M ac`
-  - **Areas (Metric):** Large m² values get K/M suffixes
-  - **Volumes:** Already had K/M suffixes, maintained
-  - All large numbers show with 2 decimal places
-  - Makes measurements readable and prevents UI overflow
-
-### 6. Multi-Line Legend Wrapping
-- **Enhanced legend layout** (`DimensionOverlay.tsx:5684-5718`)
-  - Added `maxWidth` constraint: `window.width - 120px`
-  - Changed text style from `flexShrink: 1` to `flex: 1`
-  - Added `numberOfLines={2}` to allow 2-line wrapping
-  - Changed `alignItems` from `'center'` to `'flex-start'`
-  - Added `marginTop` to color indicator for alignment
-  - Long entries now wrap gracefully instead of running off screen
-
-### 7. Circle Acres Display Fixed
-- **Fixed diameter parsing for imperial circles** (`DimensionOverlay.tsx:5785-5831`)
-  - Updated regex patterns to handle feet symbols (`'`) and inch symbols (`"`)
-  - Three parsing modes:
-    - Feet + inches: `"29'6""` → 29.5 feet
-    - Feet only: `"114'"` → 114 feet
-    - Standard units: `"46.7 mm"` → 46.7 mm
-  - Now correctly calculates area and displays acres
-  - Example: `⌀ 114'` → `(A: 10.21K ft² (0.23 ac))`
-
-### 8. Version Bump to 7.0.0
-- Updated `package.json` version: `6.0.0` → `7.0.0`
-- Updated `app.json` version: `6.0.0` → `7.0.0`
-- Updated `README.md` roadmap and status sections
-- Clear version milestone for developers
-
-### 9. expo-av Fix
-- Reverted from `expo-audio` back to `expo-av@~15.1.4`
-- Fixed native module resolution error
-- Updated `App.tsx` to use correct Audio API
+- Updated `package.json`: `7.0.2` → `7.5.0`
+- Updated `app.json`: `7.0.2` → `7.5.0`
+- Updated `README.md` roadmap and status
+- Updated `CLAUDE.md` (this file)
 
 ---
 
 ## Files Modified
 
-- `src/utils/unitConversion.ts` - K/M suffixes for distances, areas, acres
-- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing, formatMapValue fix, circle area calculation fix
-- `App.tsx` - expo-av import fix
-- `package.json` - Version bump to 7.0.0
-- `app.json` - Version bump to 7.0.0
-- `README.md` - Updated roadmap and status to v7.0, added circle fix note
+- `src/components/DimensionOverlay.tsx` - Circle regex fix, large unit formatting, freehand volume fix, debug log cleanup
+- `package.json` - Version bump to 7.5.0
+- `app.json` - Version bump to 7.5.0
+- `README.md` - Updated roadmap and status to v7.5.0
 - `CLAUDE.md` - This file (session documentation)
 
 ---
 
 ## Technical Details
 
-### Label Prefix Helper Function
-```typescript
-const addLabelPrefix = (value: string) => {
-  return measurement.label ? `${measurement.label} - ${value}` : value;
-};
-```
-This helper wraps all measurement display values in the legend, ensuring consistent label formatting across all measurement types (distance, angle, circle, rectangle, freehand, polygon).
+### Circle Area Calculation Flow
 
-### Edit Mode Logic
-Labels are now interactive only when:
-```typescript
-labelEditMode && !measurementMode
-```
-This prevents accidental label edits during measurement placement.
+1. **Measurement Creation** (lines 2154-2174)
+   - Circle created with Known Scale (250mi calibration)
+   - Stored as `calibrationMode: 'coin'` (not 'map')
+   - Value: `⌀ 677.69 mi`
 
-### formatMapValue Fix (v7.0.1)
-The `formatMapValue` function was incorrectly converting between unit systems based on user preference. This caused circles measured with imperial map calibrations (e.g., 250mi between points) to display diameters in km when the unit toggle was switched to metric, but the area calculation code expected imperial units, resulting in incorrect area displays with mixed units (km diameter but cm² area).
+2. **Legend Rendering** (lines 5813-5888)
+   - Goes to "coin calibration mode" path
+   - Parses diameter with regex patterns
+   - Calculates area directly: `area = π × radius²`
+   - Formats with inline logic for mi/km units
 
-**Solution:** Removed unit system conversion from `formatMapValue`. Now values always stay in the calibration's original unit system:
-- Imperial calibration (mi/ft) → always displays in mi/ft
-- Metric calibration (km/m) → always displays in km/m
+3. **Key Insight:** Blueprint calibrations (Known Scale) don't use mapScale object
+   - They use `calibration.unit` directly ('mi', 'km', 'ft', 'm')
+   - Area calculation must handle large units inline
 
-This ensures the legend's area calculation code can correctly parse the unit and calculate area in the matching unit system.
+### Regex Pattern Fix
+
+**Problem:** `\w+` matches word characters (letters, digits, underscore)
+- Pattern `/([\d.]+)\s*(\w+)/` matched `"172"` as:
+  - Group 1: `"17"` (greedy match, then backtrack)
+  - Group 2: `"2"` (treated as "unit")
+
+**Solution:** Use `[a-zA-Z]+` to only match letters
+- Pattern `/([\d.]+)\s*([a-zA-Z]+)/` correctly matches:
+  - `"677.69 mi"` → diameter=677.69, unit="mi" ✅
+  - `"172'"` → no match, falls to feetOnly pattern ✅
 
 ---
 
 ## Testing Notes
 
 All changes tested and verified working:
-- ✅ Rectangle center labels removed
-- ✅ Legend shows labels before dimensions
-- ✅ Labels only editable in Edit mode
-- ✅ White borders only show when editable
-- ✅ No accidental label edits during measurement
+- ✅ Circle area calculations correct for Known Scale mode
+- ✅ Imperial and metric conversions work properly
+- ✅ Small circles (feet) display correctly
+- ✅ Large circles (miles) display with correct acres
+- ✅ Freehand volume shows in legend
+- ✅ Metric volume displays (m³, L)
+- ✅ Imperial volume displays (ft³, gal)
 
 ---
 
 ## Next Steps
 
-✅ All v7.0 tasks complete! Changes committed to git and pushed to GitHub.
+✅ All v7.5.0 tasks complete! Ready to push to GitHub.
 
-Ready for:
-- App Store submission
-- TestFlight beta testing
-- User feedback
+- Push to Snail3D/PanHandler repository
+- Tag as v7.5.0 release
+- Ready for App Store submission
 
 ---
 
 ## Notes for Next Developer
 
-This file gets archived at the end of each session. Check `/archive/sessions/` for historical context.
+This file documents the v7.5.0 release which fixed critical circle area calculation bugs for Known Scale mode and freehand volume display issues.
+
+**Key fixes:**
+1. Regex parsing now correctly handles feet symbols and prevents digit matching in unit position
+2. Inline formatting added for large units (mi², km²) that aren't handled by standard formatters
+3. Freehand volume now appends instead of trying to replace non-existent closing parentheses
 
 For technical details, see `DEVELOPMENT.md`.
