@@ -349,6 +349,8 @@ bun tsc --noEmit
 - Improved rectangle labeling system
 - Labels now show before dimensions in legend
 - Fixed label edit mode interaction
+- K/M suffixes for large numbers (distances, areas, volumes)
+- Multi-line wrapping for long legend entries
 - Enhanced UI polish and consistency
 - All v6.0 features included
 
