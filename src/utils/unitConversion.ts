@@ -209,14 +209,14 @@ export function formatAreaMeasurement(
 
   if (unitSystem === 'metric') {
     // Use mm² for small areas, cm² for medium, m² for large
-    if (areaInMm2 < 10000) { // Less than 100cm²
+    if (areaInMm2 < 1000) { // Less than 10cm² - keep in mm² for precision
       const roundedValue = Math.round(areaInMm2 * 2) / 2; // Round to nearest 0.5
       if (roundedValue % 1 === 0) {
         return `${roundedValue.toFixed(0)} mm²`;
       } else {
         return `${roundedValue.toFixed(1)} mm²`;
       }
-    } else if (areaInMm2 < 1000000) { // Less than 1m²
+    } else if (areaInMm2 < 1000000) { // Less than 1m² - use cm²
       const valueInCm2 = areaInMm2 / 100;
       return `${valueInCm2.toFixed(1)} cm²`;
     } else {
