@@ -5745,10 +5745,12 @@ export default function DimensionOverlay({
                             return `${displayValue} (A: ${areaStr})`;
                           }
 
-                          // Coin calibration mode
+                          // Coin calibration mode - use stored diameter, calculate area
+                          // The stored diameter value is correct, just need to add area for legend
+                          displayValue = measurement.value; // e.g., "⌀ 17.5 mm"
+
+                          // Calculate area from radius in pixels
                           const radiusInUnits = measurement.radius / (calibration?.pixelsPerUnit || 1);
-                          const diameter = radiusInUnits * 2;
-                          displayValue = `⌀ ${formatMeasurement(diameter, calibration?.unit || 'mm', unitSystem, 2)}`;
                           const area = Math.PI * radiusInUnits * radiusInUnits;
                           const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
 
