@@ -1045,7 +1045,7 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  After placing measurements, you can move and edit them in Pan/Zoom mode.
+                  After placing measurements, you can move and edit them while in Edit mode.
                 </Text>
                 
                 <View style={{ gap: 12 }}>
@@ -1557,7 +1557,7 @@ Thank you for helping us improve PanHandler!
                     🎯 <Text style={{ fontWeight: '600' }}>Use cursor guide</Text> - Measurement cursor appears above your finger for precise placement
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points in Pan/Zoom mode
+                    ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points while in Edit mode
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
