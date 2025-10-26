@@ -345,7 +345,18 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.0 (Current)
+### ✅ v7.0.2 (Current)
+- Fixed circle area calculations in Known Scale mode
+- Circles with large diameters (e.g., 461.57 mi) now show correct areas
+- Removed backwards conversion logic from legend rendering
+- All v7.0.1 and v7.0.0 features included
+
+### ✅ v7.0.1 (Previous)
+- Fixed circle area unit mismatch for imperial map calibrations
+- Map calibrations now keep values in original unit system
+- All v7.0.0 features included
+
+### ✅ v7.0.0 (Previous)
 - Improved rectangle labeling system
 - Labels now show before dimensions in legend
 - Fixed label edit mode interaction
@@ -397,7 +408,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.0
+**Version:** v7.0.2
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 

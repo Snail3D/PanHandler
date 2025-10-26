@@ -1508,16 +1508,8 @@ export default function DimensionOverlay({
       } else if (mapScale.realUnit === 'm') {
         return formatM2(areaInMapUnits2);
       } else { // ft
-        // SPECIAL CASE: If area is very large (>100K), it's probably actually in mi²
-        // This happens when calibration is "200mi" but stored internally as feet
-        if (areaInMapUnits2 > 100000) {
-          // Treat as mi² and display as mi²
-          const acres = areaInMapUnits2 * 640; // 1 mi² = 640 acres
-          return `${formatMi2(areaInMapUnits2)} (${formatAcres(acres)})`;
-        } else {
-          const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
-          return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
-        }
+        const acres = areaInMapUnits2 / 43560; // 1 acre = 43,560 ft²
+        return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
       }
     }
     
@@ -5778,44 +5770,28 @@ export default function DimensionOverlay({
                               const diameterDisplay = parseFloat(diameterMatch[1]);
                               const unitDisplay = diameterMatch[2]; // 'km', 'mi', 'm', 'ft'
 
-                              // Convert diameter back to map's base unit if needed
-                              // (e.g., if showing 1.29 mi but map base is km, convert to km)
-                              let diameterInMapUnit = diameterDisplay;
-                              console.log('🔍 Circle diameter conversion:', {
-                                diameterDisplay,
-                                unitDisplay,
+                              // After v7.0.1 fix, formatMapValue keeps values in calibration's original unit
+                              // No conversion needed - diameter is already in the correct unit (map's realUnit)
+                              // Example: If calibration is 250mi, realUnit='mi', diameter shows as "461.57 mi"
+                              // We calculate area directly in mi²
+                              console.log('🔍 Circle area calculation (no conversion):', {
+                                diameter: diameterDisplay,
+                                unit: unitDisplay,
                                 realUnit: effectiveMapScale.realUnit,
-                                beforeConversion: diameterInMapUnit,
                               });
 
-                              if (effectiveMapScale.realUnit === 'km' && unitDisplay === 'mi') {
-                                diameterInMapUnit = diameterDisplay * 1.60934; // mi to km
-                              } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'km') {
-                                diameterInMapUnit = diameterDisplay * 0.621371; // km to mi
-                              } else if (effectiveMapScale.realUnit === 'm' && unitDisplay === 'ft') {
-                                diameterInMapUnit = diameterDisplay * 0.3048; // ft to m
-                              } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'm') {
-                                diameterInMapUnit = diameterDisplay * 3.28084; // m to ft
-                              } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'mi') {
-                                diameterInMapUnit = diameterDisplay * 5280; // mi to ft
-                                console.log('✅ Converting mi to ft:', diameterDisplay, '→', diameterInMapUnit);
-                              } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'ft') {
-                                diameterInMapUnit = diameterDisplay / 5280; // ft to mi
-                              }
-
-                              console.log('🔍 After conversion:', diameterInMapUnit);
-
-                              // Calculate area in the map's base unit
-                              const radius = diameterInMapUnit / 2;
+                              // Calculate area directly in the displayed unit
+                              const radius = diameterDisplay / 2;
                               const area = Math.PI * radius * radius;
 
-                              console.log('🔍 Circle area calculation:', {
+                              console.log('🔍 Circle area result:', {
                                 radius,
-                                area,
-                                areaInBillions: (area / 1e9).toFixed(2) + 'B',
+                                area: area.toFixed(2),
+                                unit: `${unitDisplay}²`,
                               });
 
-                              // Format area using map scale formatter (expects base unit)
+                              // Format area using map scale formatter
+                              // Pass the area and the unit it's in
                               const areaStr = formatMapScaleArea(area);
 
                               // Add volume if depth is present

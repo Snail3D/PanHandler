@@ -1,7 +1,7 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.0.1
+**Version:** 7.0.2
 **Status:** In Progress
 
 ---
@@ -16,11 +16,47 @@
 6. ✅ Implement multi-line legend wrapping
 7. ✅ Fix acres display for circles
 8. ✅ Version bump to 7.0.0
-9. ✅ Fix circle area unit mismatch for imperial map calibrations
+9. ✅ Fix circle area unit mismatch for imperial map calibrations (v7.0.1)
+10. ✅ Fix circle area calculation bug in Known Scale mode (v7.0.2)
 
 ---
 
 ## Changes Made This Session
+
+### 10. Circle Area Calculation Bug Fix (v7.0.2)
+**Problem:** Circles measured in Known Scale mode (e.g., "250mi between points") showed incorrect area calculations:
+- Example: Circle with ⌀ 461.57 mi displayed as `(A: 167.34K ft² (3.84 ac))`
+- Should be: `(A: 167.34K mi² (107.10M ac))`
+
+**Root Cause:** The v7.0.1 fix removed unit conversions from `formatMapValue`, which was correct. But the legend rendering code (lines 5775-5803) still had conversion logic that was now backwards. It tried to convert the diameter from the display unit back to the "map's base unit", which was no longer needed.
+
+**Solution:**
+- **Removed diameter conversion logic** (`DimensionOverlay.tsx:5781-5803`)
+  - Diameter is already in the correct unit (calibration's realUnit) thanks to v7.0.1 fix
+  - Calculate area directly in the displayed unit (e.g., mi²) without any conversion
+  - Example: `⌀ 461.57 mi` → area = π × (230.785)² = `167,343.7 mi²`
+- **Removed "special case" hack** (`DimensionOverlay.tsx:1510-1513`)
+  - Deleted logic that tried to guess if large ft² values were actually mi²
+  - This was a workaround for the bug we just fixed
+  - Now ft² stays as ft², mi² stays as mi²
+
+**Technical Details:**
+```typescript
+// BEFORE (v7.0.1) - Had conversion logic that was now backwards
+if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'mi') {
+  diameterInMapUnit = diameterDisplay * 5280; // Convert mi to ft
+}
+const area = Math.PI * (diameterInMapUnit / 2) ** 2; // Area in ft²!
+
+// AFTER (v7.0.2) - No conversion, calculate directly
+const radius = diameterDisplay / 2; // Diameter is already in correct unit (mi)
+const area = Math.PI * radius * radius; // Area in mi²
+```
+
+**Result:**
+- Imperial map calibrations (250mi) now show: `⌀ 461.57 mi (A: 167.34K mi² (107.10M ac))` ✅
+- Metric map calibrations (250km) show: `⌀ 742.83 km (A: 433.30K km²)` ✅
+- All area calculations are now correct for Known Scale mode
 
 ### 9. Circle Area Unit Mismatch Fix (v7.0.1)
 - **Fixed `formatMapValue` function** (`DimensionOverlay.tsx:1305-1347`)
@@ -106,7 +142,7 @@
 ## Files Modified
 
 - `src/utils/unitConversion.ts` - K/M suffixes for distances, areas, acres
-- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing, formatMapValue fix
+- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing, formatMapValue fix, circle area calculation fix
 - `App.tsx` - expo-av import fix
 - `package.json` - Version bump to 7.0.0
 - `app.json` - Version bump to 7.0.0
