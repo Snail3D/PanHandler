@@ -5752,6 +5752,13 @@ export default function DimensionOverlay({
                               // Convert diameter back to map's base unit if needed
                               // (e.g., if showing 1.29 mi but map base is km, convert to km)
                               let diameterInMapUnit = diameterDisplay;
+                              console.log('🔍 Circle diameter conversion:', {
+                                diameterDisplay,
+                                unitDisplay,
+                                realUnit: effectiveMapScale.realUnit,
+                                beforeConversion: diameterInMapUnit,
+                              });
+
                               if (effectiveMapScale.realUnit === 'km' && unitDisplay === 'mi') {
                                 diameterInMapUnit = diameterDisplay * 1.60934; // mi to km
                               } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'km') {
@@ -5762,13 +5769,22 @@ export default function DimensionOverlay({
                                 diameterInMapUnit = diameterDisplay * 3.28084; // m to ft
                               } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'mi') {
                                 diameterInMapUnit = diameterDisplay * 5280; // mi to ft
+                                console.log('✅ Converting mi to ft:', diameterDisplay, '→', diameterInMapUnit);
                               } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'ft') {
                                 diameterInMapUnit = diameterDisplay / 5280; // ft to mi
                               }
 
+                              console.log('🔍 After conversion:', diameterInMapUnit);
+
                               // Calculate area in the map's base unit
                               const radius = diameterInMapUnit / 2;
                               const area = Math.PI * radius * radius;
+
+                              console.log('🔍 Circle area calculation:', {
+                                radius,
+                                area,
+                                areaInBillions: (area / 1e9).toFixed(2) + 'B',
+                              });
 
                               // Format area using map scale formatter (expects base unit)
                               const areaStr = formatMapScaleArea(area);
