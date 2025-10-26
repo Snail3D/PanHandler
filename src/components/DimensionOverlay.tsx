@@ -6001,7 +6001,8 @@ export default function DimensionOverlay({
                             const area = Math.PI * radius * radius;
 
                             // For large units (mi, km), format with K/M suffixes and acres
-                            // For small units (mm, cm, in, m, ft), use regular area formatter
+                            // For medium units (ft, m), show with K suffix and acres/hectares
+                            // For small units (mm, cm, in), use regular area formatter
                             let areaStr: string;
                             if (unit === 'mi') {
                               // Format mi² with acres
@@ -6026,6 +6027,36 @@ export default function DimensionOverlay({
                                 else return `${km2.toFixed(2)} km²`;
                               };
                               areaStr = formatKm2(area);
+                            } else if (unit === 'ft') {
+                              // Format ft² with K suffix and acres
+                              const formatFt2 = (ft2: number): string => {
+                                if (ft2 >= 1000000) return `${(ft2 / 1000000).toFixed(2)}M ft²`;
+                                else if (ft2 >= 1000) return `${(ft2 / 1000).toFixed(2)}K ft²`;
+                                else return `${ft2.toFixed(2)} ft²`;
+                              };
+                              const formatAcres = (acres: number): string => {
+                                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                                else if (acres >= 100) return `${Math.round(acres)} ac`;
+                                else return `${acres.toFixed(2)} ac`;
+                              };
+                              const acres = area / 43560; // 1 acre = 43,560 ft²
+                              areaStr = `${formatFt2(area)} (${formatAcres(acres)})`;
+                            } else if (unit === 'm') {
+                              // Format m² with K suffix and hectares
+                              const formatM2 = (m2: number): string => {
+                                if (m2 >= 1000000) return `${(m2 / 1000000).toFixed(2)}M m²`;
+                                else if (m2 >= 1000) return `${(m2 / 1000).toFixed(2)}K m²`;
+                                else return `${m2.toFixed(2)} m²`;
+                              };
+                              const formatHectares = (hectares: number): string => {
+                                if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
+                                else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
+                                else if (hectares >= 100) return `${Math.round(hectares)} ha`;
+                                else return `${hectares.toFixed(2)} ha`;
+                              };
+                              const hectares = area / 10000; // 1 hectare = 10,000 m²
+                              areaStr = `${formatM2(area)} (${formatHectares(hectares)})`;
                             } else {
                               // Small unit - use regular area formatter
                               areaStr = formatAreaMeasurement(area, unit as any, unitSystem);
