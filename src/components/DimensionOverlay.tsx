@@ -5711,15 +5711,18 @@ export default function DimensionOverlay({
                           // Recalculate angle
                           displayValue = calculateAngle(measurement.points[0], measurement.points[1], measurement.points[2]);
                         } else if (measurement.mode === 'circle' && measurement.radius !== undefined) {
-                          // For circles in map mode, use the stored diameter value (it's correct)
-                          // but we still need to calculate area for the legend display
+                          // For circles, use the stored diameter value (it's correct)
+                          // Just need to add area for the legend display
 
                           // Check if we're effectively in map mode (Map button OR verbal scale)
                           const effectivelyInMapMode = isMapMode || calibration?.calibrationType === 'verbal';
                           const effectiveMapScale = mapScale || calibration?.verbalScale;
 
-                          // Map Mode: Use stored diameter, calculate area from it
-                          if (effectivelyInMapMode && effectiveMapScale) {
+                          // Check if measurement was created in map mode
+                          const wasCreatedInMapMode = measurement.calibrationMode === 'map';
+
+                          // ONLY apply map mode area calculation if BOTH currently in map mode AND was created in map mode
+                          if (effectivelyInMapMode && effectiveMapScale && wasCreatedInMapMode) {
                             // Use the stored diameter value (it's correct)
                             displayValue = measurement.value; // e.g., "⌀ 3.010 km" or "⌀ 1.29 mi"
 
@@ -5765,9 +5768,9 @@ export default function DimensionOverlay({
                             return displayValue;
                           }
 
-                          // Coin calibration mode - use stored diameter, calculate area from it
-                          // The stored diameter value is correct, just need to add area for legend
-                          displayValue = measurement.value; // e.g., "⌀ 46.7 mm" or "⌀ 1.84 in"
+                          // Coin calibration mode OR coin measurement viewed in map mode
+                          // Use stored diameter, calculate area from it
+                          displayValue = measurement.value; // e.g., "⌀ 46.7 mm" or "⌀ 833.83 m"
 
                           // Parse diameter value and unit from stored string
                           const diameterMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
