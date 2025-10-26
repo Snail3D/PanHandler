@@ -5645,6 +5645,7 @@ export default function DimensionOverlay({
                 position: 'absolute',
                 top: (currentLabel || isCapturing) ? insets.top + scaleMargin(16) + scaleSize(80) : insets.top + scaleMargin(16),
                 left: scaleMargin(12),
+                maxWidth: Dimensions.get('window').width - scaleMargin(24) - scaleSize(80),
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: scalePadding(6),
                 paddingVertical: scalePadding(4),
@@ -5687,7 +5688,6 @@ export default function DimensionOverlay({
                       flexDirection: 'row',
                       alignItems: 'flex-start',
                       marginVertical: scaleMargin(1),
-                      maxWidth: Dimensions.get('window').width - scaleSize(120),
                     }}
                   >
                     {/* Line number */}
@@ -5713,8 +5713,7 @@ export default function DimensionOverlay({
                         fontWeight: '600',
                         flex: 1,
                       }}
-                      numberOfLines={2}
-                      ellipsizeMode="tail"
+                      numberOfLines={3}
                     >
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Helper function to add label prefix
