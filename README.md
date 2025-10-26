@@ -346,6 +346,11 @@ bun tsc --noEmit
 ## 🎯 Roadmap
 
 ### ✅ v7.5.0 (Current)
+- **Quadrillion suffix support for Lake Michigan-scale measurements**
+  - Added Q (quadrillion) suffix for ultra-massive volumes and areas
+  - Lake Michigan volume now displays as `1.18Q gal` instead of `1180.00T gal`
+  - All formatters support Q → T → B → M → K hierarchy
+  - Applied to volumes (m³, L, ft³, gal) and areas (km², mi², ha, ac)
 - **Intelligent area unit scaling for small measurements**
   - Areas now automatically scale to the most readable unit (e.g., `3.32K mm²` → `33.2 cm²`)
   - Lowered mm²→cm² threshold from 10000 mm² (100 cm²) to 1000 mm² (10 cm²) for better readability

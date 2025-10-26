@@ -11,12 +11,30 @@
 1. ✅ Fix area display to use intelligent unit scaling (3.32K mm² → 33.2 cm²)
 2. ✅ Lower threshold for mm²→cm² conversion from 10000 to 1000
 3. ✅ Fix imperial areas showing "0.00 ac" for small measurements
+4. ✅ Add Q (quadrillion) suffix support for Lake Michigan-scale measurements
 
 ---
 
 ## Changes Made This Session
 
-### 1. Intelligent Area Unit Scaling (v7.5.0)
+### 1. Quadrillion Suffix Support (v7.5.0)
+
+**Problem:** Lake Michigan-scale measurements (1,180 trillion gallons = 1.18 quadrillion gallons) showed as `1180.00T gal` which is hard to read.
+
+**Solution:**
+Added Q (quadrillion) suffix support to all volume and area formatters:
+- `unitConversion.ts:323-353` - Added Q checks for metric volumes (m³, L)
+- `unitConversion.ts:378-408` - Added Q checks for imperial volumes (ft³, gal)
+- `DimensionOverlay.tsx:1467-1481` - Added Q checks for km² in map scale
+- `DimensionOverlay.tsx:1476-1492` - Added Q checks for mi² and acres in map scale
+- `DimensionOverlay.tsx:1508-1536` - Added Q checks for blueprint area formatters
+
+**Results:**
+- ✅ Lake Michigan volume: `1180.00T gal` → `1.18Q gal`
+- ✅ Ultra-massive areas display cleanly with Q suffix
+- ✅ All formatters follow the same pattern: Q → T → B → M → K
+
+### 2. Intelligent Area Unit Scaling (v7.5.0)
 
 **Problem:** Small area measurements showed awkward formatting:
 - Metric: `⌀ 65 mm (A: 3.32K mm²)` ❌ → Should be: `⌀ 65 mm (A: 33.2 cm²)` ✅

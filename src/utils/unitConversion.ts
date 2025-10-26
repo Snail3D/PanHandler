@@ -320,9 +320,11 @@ export function formatVolumeMeasurement(
       // Show in cubic meters with liters in parentheses (with K/M suffixes)
       const m3 = liters / 1000;
 
-      // Format m³ with K/M/B/T suffixes
+      // Format m³ with K/M/B/T/Q suffixes
       let m3Str: string;
-      if (m3 >= 1000000000000) {
+      if (m3 >= 1000000000000000) {
+        m3Str = `${(m3 / 1000000000000000).toFixed(2)}Q m³`;
+      } else if (m3 >= 1000000000000) {
         m3Str = `${(m3 / 1000000000000).toFixed(2)}T m³`;
       } else if (m3 >= 1000000000) {
         m3Str = `${(m3 / 1000000000).toFixed(2)}B m³`;
@@ -334,9 +336,11 @@ export function formatVolumeMeasurement(
         m3Str = `${m3.toFixed(2)} m³`;
       }
 
-      // Format liters with K/M/B/T suffixes
+      // Format liters with K/M/B/T/Q suffixes
       let litersStr: string;
-      if (liters >= 1000000000000) {
+      if (liters >= 1000000000000000) {
+        litersStr = `${(liters / 1000000000000000).toFixed(2)}Q L`;
+      } else if (liters >= 1000000000000) {
         litersStr = `${(liters / 1000000000000).toFixed(2)}T L`;
       } else if (liters >= 1000000000) {
         litersStr = `${(liters / 1000000000).toFixed(2)}B L`;
@@ -371,9 +375,11 @@ export function formatVolumeMeasurement(
         // Very large volumes - show cubic feet with gallons in parentheses (with K/M suffixes)
         const cubicFeet = volumeInMm3 / 28316846.592;
 
-        // Format ft³ with K/M/B/T suffixes
+        // Format ft³ with K/M/B/T/Q suffixes
         let ft3Str: string;
-        if (cubicFeet >= 1000000000000) {
+        if (cubicFeet >= 1000000000000000) {
+          ft3Str = `${(cubicFeet / 1000000000000000).toFixed(2)}Q ft³`;
+        } else if (cubicFeet >= 1000000000000) {
           ft3Str = `${(cubicFeet / 1000000000000).toFixed(2)}T ft³`;
         } else if (cubicFeet >= 1000000000) {
           ft3Str = `${(cubicFeet / 1000000000).toFixed(2)}B ft³`;
@@ -385,9 +391,11 @@ export function formatVolumeMeasurement(
           ft3Str = `${cubicFeet.toFixed(2)} ft³`;
         }
 
-        // Format gallons with K/M/B/T suffixes
+        // Format gallons with K/M/B/T/Q suffixes
         let gallonsStr: string;
-        if (gallons >= 1000000000000) {
+        if (gallons >= 1000000000000000) {
+          gallonsStr = `${(gallons / 1000000000000000).toFixed(2)}Q gal`;
+        } else if (gallons >= 1000000000000) {
           gallonsStr = `${(gallons / 1000000000000).toFixed(2)}T gal`;
         } else if (gallons >= 1000000000) {
           gallonsStr = `${(gallons / 1000000000).toFixed(2)}B gal`;
