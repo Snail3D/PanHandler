@@ -2525,28 +2525,62 @@ export default function DimensionOverlay({
             areaStr = formatMapScaleArea(areaDist2);
           } else {
             // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
+            // Also respect unitSystem toggle (metric vs imperial)
             const unit = calibration?.unit || 'mm';
             if (unit === 'mi') {
-              const formatMi2 = (mi2: number): string => {
-                if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
-                else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
-                else return `${mi2.toFixed(2)} mi²`;
-              };
-              const formatAcres = (acres: number): string => {
-                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
-                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
-                else if (acres >= 100) return `${Math.round(acres)} ac`;
-                else return `${acres.toFixed(2)} ac`;
-              };
-              const acres = m.area * 640;
-              areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+              // Calibration is in miles, but user might want metric display
+              if (unitSystem === 'metric') {
+                // Convert mi² to km²
+                const km2 = m.area * 2.58999; // 1 mi² = 2.58999 km²
+                const formatKm2 = (km2: number): string => {
+                  if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                  else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                  else return `${km2.toFixed(2)} km²`;
+                };
+                areaStr = formatKm2(km2);
+              } else {
+                // Imperial display
+                const formatMi2 = (mi2: number): string => {
+                  if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                  else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                  else return `${mi2.toFixed(2)} mi²`;
+                };
+                const formatAcres = (acres: number): string => {
+                  if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                  else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                  else if (acres >= 100) return `${Math.round(acres)} ac`;
+                  else return `${acres.toFixed(2)} ac`;
+                };
+                const acres = m.area * 640;
+                areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+              }
             } else if (unit === 'km') {
-              const formatKm2 = (km2: number): string => {
-                if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
-                else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
-                else return `${km2.toFixed(2)} km²`;
-              };
-              areaStr = formatKm2(m.area);
+              // Calibration is in km, but user might want imperial display
+              if (unitSystem === 'imperial') {
+                // Convert km² to mi²
+                const mi2 = m.area / 2.58999; // 1 mi² = 2.58999 km²
+                const formatMi2 = (mi2: number): string => {
+                  if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                  else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                  else return `${mi2.toFixed(2)} mi²`;
+                };
+                const formatAcres = (acres: number): string => {
+                  if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                  else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                  else if (acres >= 100) return `${Math.round(acres)} ac`;
+                  else return `${acres.toFixed(2)} ac`;
+                };
+                const acres = mi2 * 640;
+                areaStr = `${formatMi2(mi2)} (${formatAcres(acres)})`;
+              } else {
+                // Metric display
+                const formatKm2 = (km2: number): string => {
+                  if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                  else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                  else return `${km2.toFixed(2)} km²`;
+                };
+                areaStr = formatKm2(m.area);
+              }
             } else {
               areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
             }
@@ -2586,28 +2620,59 @@ export default function DimensionOverlay({
             areaStr = formatMapScaleArea(areaDisplay);
           } else {
             // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
+            // Also respect unitSystem toggle (metric vs imperial)
             const unit = calibration?.unit || 'mm';
             if (unit === 'mi') {
-              const formatMi2 = (mi2: number): string => {
-                if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
-                else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
-                else return `${mi2.toFixed(2)} mi²`;
-              };
-              const formatAcres = (acres: number): string => {
-                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
-                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
-                else if (acres >= 100) return `${Math.round(acres)} ac`;
-                else return `${acres.toFixed(2)} ac`;
-              };
-              const acres = m.area * 640;
-              areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+              // Calibration is in miles, but user might want metric display
+              if (unitSystem === 'metric') {
+                // Convert mi² to km²
+                const km2 = m.area * 2.58999;
+                const formatKm2 = (km2: number): string => {
+                  if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                  else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                  else return `${km2.toFixed(2)} km²`;
+                };
+                areaStr = formatKm2(km2);
+              } else {
+                const formatMi2 = (mi2: number): string => {
+                  if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                  else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                  else return `${mi2.toFixed(2)} mi²`;
+                };
+                const formatAcres = (acres: number): string => {
+                  if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                  else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                  else if (acres >= 100) return `${Math.round(acres)} ac`;
+                  else return `${acres.toFixed(2)} ac`;
+                };
+                const acres = m.area * 640;
+                areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+              }
             } else if (unit === 'km') {
-              const formatKm2 = (km2: number): string => {
-                if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
-                else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
-                else return `${km2.toFixed(2)} km²`;
-              };
-              areaStr = formatKm2(m.area);
+              // Calibration is in km, but user might want imperial display
+              if (unitSystem === 'imperial') {
+                const mi2 = m.area / 2.58999;
+                const formatMi2 = (mi2: number): string => {
+                  if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                  else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                  else return `${mi2.toFixed(2)} mi²`;
+                };
+                const formatAcres = (acres: number): string => {
+                  if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                  else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                  else if (acres >= 100) return `${Math.round(acres)} ac`;
+                  else return `${acres.toFixed(2)} ac`;
+                };
+                const acres = mi2 * 640;
+                areaStr = `${formatMi2(mi2)} (${formatAcres(acres)})`;
+              } else {
+                const formatKm2 = (km2: number): string => {
+                  if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                  else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                  else return `${km2.toFixed(2)} km²`;
+                };
+                areaStr = formatKm2(m.area);
+              }
             } else {
               areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
             }
@@ -4225,30 +4290,60 @@ export default function DimensionOverlay({
 
                     // For large units (mi, km), use inline formatting like circles do
                     // formatAreaMeasurement converts mi→ft² and km→m² which is wrong for large scales
+                    // Also respect unitSystem toggle (metric vs imperial)
                     const unit = calibration?.unit || 'mm';
                     if (unit === 'mi') {
-                      // Format mi² with acres (same as circle formatting)
-                      const formatMi2 = (mi2: number): string => {
-                        if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
-                        else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
-                        else return `${mi2.toFixed(2)} mi²`;
-                      };
-                      const formatAcres = (acres: number): string => {
-                        if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
-                        else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
-                        else if (acres >= 100) return `${Math.round(acres)} ac`;
-                        else return `${acres.toFixed(2)} ac`;
-                      };
-                      const acres = physicalArea * 640; // 1 mi² = 640 acres
-                      areaStr = `${formatMi2(physicalArea)} (${formatAcres(acres)})`;
+                      // Calibration is in miles
+                      if (unitSystem === 'metric') {
+                        // Convert mi² to km²
+                        const km2 = physicalArea * 2.58999;
+                        const formatKm2 = (km2: number): string => {
+                          if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                          else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                          else return `${km2.toFixed(2)} km²`;
+                        };
+                        areaStr = formatKm2(km2);
+                      } else {
+                        const formatMi2 = (mi2: number): string => {
+                          if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                          else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                          else return `${mi2.toFixed(2)} mi²`;
+                        };
+                        const formatAcres = (acres: number): string => {
+                          if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                          else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                          else if (acres >= 100) return `${Math.round(acres)} ac`;
+                          else return `${acres.toFixed(2)} ac`;
+                        };
+                        const acres = physicalArea * 640;
+                        areaStr = `${formatMi2(physicalArea)} (${formatAcres(acres)})`;
+                      }
                     } else if (unit === 'km') {
-                      // Format km² (same as circle formatting)
-                      const formatKm2 = (km2: number): string => {
-                        if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
-                        else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
-                        else return `${km2.toFixed(2)} km²`;
-                      };
-                      areaStr = formatKm2(physicalArea);
+                      // Calibration is in km
+                      if (unitSystem === 'imperial') {
+                        // Convert km² to mi²
+                        const mi2 = physicalArea / 2.58999;
+                        const formatMi2 = (mi2: number): string => {
+                          if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                          else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                          else return `${mi2.toFixed(2)} mi²`;
+                        };
+                        const formatAcres = (acres: number): string => {
+                          if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                          else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                          else if (acres >= 100) return `${Math.round(acres)} ac`;
+                          else return `${acres.toFixed(2)} ac`;
+                        };
+                        const acres = mi2 * 640;
+                        areaStr = `${formatMi2(mi2)} (${formatAcres(acres)})`;
+                      } else {
+                        const formatKm2 = (km2: number): string => {
+                          if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                          else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                          else return `${km2.toFixed(2)} km²`;
+                        };
+                        areaStr = formatKm2(physicalArea);
+                      }
                     } else {
                       // Small units - use regular formatter
                       areaStr = formatAreaMeasurement(physicalArea, unit as any, unitSystem);
