@@ -1304,24 +1304,45 @@ export default function DimensionOverlay({
   // Helper: Format a value that's already in map units
   const formatMapValue = (valueInMapUnits: number): string => {
     if (!mapScale) return '';
-    
-    // Format based on map's real unit and user's preferred unit system
+
+    // Format based on map's real unit (NO conversion - keep in calibration's unit system)
+    // This ensures area calculations work correctly in the legend
     if (mapScale.realUnit === 'km') {
-      return unitSystem === 'imperial' 
-        ? `${(valueInMapUnits * 0.621371).toFixed(2)} mi` // km to mi
-        : `${valueInMapUnits.toFixed(2)} km`;
+      // Add K/M suffixes for large values
+      if (valueInMapUnits >= 1000000) {
+        return `${(valueInMapUnits / 1000000).toFixed(2)}M km`;
+      } else if (valueInMapUnits >= 1000) {
+        return `${(valueInMapUnits / 1000).toFixed(2)}K km`;
+      } else {
+        return `${valueInMapUnits.toFixed(2)} km`;
+      }
     } else if (mapScale.realUnit === 'mi') {
-      return unitSystem === 'metric'
-        ? `${(valueInMapUnits * 1.60934).toFixed(2)} km` // mi to km
-        : `${valueInMapUnits.toFixed(2)} mi`;
+      // Add K/M suffixes for large values
+      if (valueInMapUnits >= 1000000) {
+        return `${(valueInMapUnits / 1000000).toFixed(2)}M mi`;
+      } else if (valueInMapUnits >= 1000) {
+        return `${(valueInMapUnits / 1000).toFixed(2)}K mi`;
+      } else {
+        return `${valueInMapUnits.toFixed(2)} mi`;
+      }
     } else if (mapScale.realUnit === 'm') {
-      return unitSystem === 'imperial'
-        ? `${(valueInMapUnits * 3.28084).toFixed(0)} ft` // m to ft
-        : `${valueInMapUnits.toFixed(0)} m`;
+      // Add K/M suffixes for large values
+      if (valueInMapUnits >= 1000000) {
+        return `${(valueInMapUnits / 1000000).toFixed(2)}M m`;
+      } else if (valueInMapUnits >= 1000) {
+        return `${(valueInMapUnits / 1000).toFixed(2)}K m`;
+      } else {
+        return `${valueInMapUnits.toFixed(0)} m`;
+      }
     } else { // ft
-      return unitSystem === 'metric'
-        ? `${(valueInMapUnits * 0.3048).toFixed(0)} m` // ft to m
-        : `${valueInMapUnits.toFixed(0)} ft`;
+      // Add K/M suffixes for large values
+      if (valueInMapUnits >= 1000000) {
+        return `${(valueInMapUnits / 1000000).toFixed(2)}M ft`;
+      } else if (valueInMapUnits >= 1000) {
+        return `${(valueInMapUnits / 1000).toFixed(2)}K ft`;
+      } else {
+        return `${valueInMapUnits.toFixed(0)} ft`;
+      }
     }
   };
 

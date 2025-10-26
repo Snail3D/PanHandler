@@ -1,8 +1,8 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-26
-**Version:** 7.0.0
-**Status:** Complete
+**Version:** 7.0.1
+**Status:** In Progress
 
 ---
 
@@ -16,10 +16,20 @@
 6. ✅ Implement multi-line legend wrapping
 7. ✅ Fix acres display for circles
 8. ✅ Version bump to 7.0.0
+9. ✅ Fix circle area unit mismatch for imperial map calibrations
 
 ---
 
 ## Changes Made This Session
+
+### 9. Circle Area Unit Mismatch Fix (v7.0.1)
+- **Fixed `formatMapValue` function** (`DimensionOverlay.tsx:1305-1347`)
+  - Removed unit system conversion logic
+  - Now keeps measurements in calibration's original unit system
+  - Imperial calibrations (250mi) now correctly show diameter and area in miles/feet
+  - Metric calibrations (250km) correctly show diameter and area in km/meters
+  - Added K/M suffixes to all map value formatting
+  - Example: Imperial calibration now shows `⌀ 1.10K mi (A: 3.80M ft²)` instead of mixing km and cm²
 
 ### 1. Rectangle Labeling System Improvements
 - **Removed center labels for rectangles** (`DimensionOverlay.tsx:5918-5924`)
@@ -96,11 +106,11 @@
 ## Files Modified
 
 - `src/utils/unitConversion.ts` - K/M suffixes for distances, areas, acres
-- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing
+- `src/components/DimensionOverlay.tsx` - Rectangle labeling, legend wrapping, circle parsing, formatMapValue fix
 - `App.tsx` - expo-av import fix
 - `package.json` - Version bump to 7.0.0
 - `app.json` - Version bump to 7.0.0
-- `README.md` - Updated roadmap and status to v7.0
+- `README.md` - Updated roadmap and status to v7.0, added circle fix note
 - `CLAUDE.md` - This file (session documentation)
 
 ---
@@ -121,6 +131,15 @@ Labels are now interactive only when:
 labelEditMode && !measurementMode
 ```
 This prevents accidental label edits during measurement placement.
+
+### formatMapValue Fix (v7.0.1)
+The `formatMapValue` function was incorrectly converting between unit systems based on user preference. This caused circles measured with imperial map calibrations (e.g., 250mi between points) to display diameters in km when the unit toggle was switched to metric, but the area calculation code expected imperial units, resulting in incorrect area displays with mixed units (km diameter but cm² area).
+
+**Solution:** Removed unit system conversion from `formatMapValue`. Now values always stay in the calibration's original unit system:
+- Imperial calibration (mi/ft) → always displays in mi/ft
+- Metric calibration (km/m) → always displays in km/m
+
+This ensures the legend's area calculation code can correctly parse the unit and calculate area in the matching unit system.
 
 ---
 
