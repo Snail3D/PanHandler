@@ -5718,31 +5718,38 @@ export default function DimensionOverlay({
                           const effectivelyInMapMode = isMapMode || calibration?.calibrationType === 'verbal';
                           const effectiveMapScale = mapScale || calibration?.verbalScale;
 
-                          // Map Mode: Use stored diameter, calculate area
+                          // Map Mode: Use stored diameter, calculate area from it
                           if (effectivelyInMapMode && effectiveMapScale) {
                             // Use the stored diameter value (it's correct)
-                            const storedDiameter = measurement.value; // e.g., "⌀ 4.484 km"
+                            displayValue = measurement.value; // e.g., "⌀ 3.010 km"
 
-                            // Calculate area from radius in pixels
-                            const diameterPx = measurement.radius * 2;
-                            const diameterDist = convertToMapScale(diameterPx);
-                            const radiusDist = diameterDist / 2;
-                            const areaDist2 = Math.PI * radiusDist * radiusDist;
-                            const areaStr = formatMapScaleArea(areaDist2);
+                            // Parse diameter value and unit from stored string
+                            const diameterMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
+                            if (diameterMatch) {
+                              const diameter = parseFloat(diameterMatch[1]);
+                              const unit = diameterMatch[2]; // 'km', 'mi', 'm', 'ft'
 
-                            // Use stored diameter with calculated area
-                            displayValue = storedDiameter;
+                              // Calculate area in the same unit as the diameter
+                              const radius = diameter / 2;
+                              const area = Math.PI * radius * radius;
 
-                            // Add volume if depth is present
-                            if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
-                              // Convert depth to map scale unit (km, mi, m, or ft)
-                              const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
-                              const volumeInMapUnits = areaDist2 * depthInMapUnit;
-                              const volumeStr = formatVolumeMeasurement(volumeInMapUnits, effectiveMapScale.realUnit, unitSystem);
-                              return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                              // Format area using map scale formatter
+                              const areaStr = formatMapScaleArea(area);
+
+                              // Add volume if depth is present
+                              if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
+                                // Convert depth to map scale unit
+                                const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
+                                const volume = area * depthInMapUnit;
+                                const volumeStr = formatVolumeMeasurement(volume, effectiveMapScale.realUnit, unitSystem);
+                                return `${displayValue} (A: ${areaStr} | V: ${volumeStr})`;
+                              }
+
+                              return `${displayValue} (A: ${areaStr})`;
                             }
 
-                            return `${displayValue} (A: ${areaStr})`;
+                            // Fallback if parsing fails
+                            return displayValue;
                           }
 
                           // Coin calibration mode - use stored diameter, calculate area from it
