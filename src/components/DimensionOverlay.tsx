@@ -5721,19 +5721,32 @@ export default function DimensionOverlay({
                           // Map Mode: Use stored diameter, calculate area from it
                           if (effectivelyInMapMode && effectiveMapScale) {
                             // Use the stored diameter value (it's correct)
-                            displayValue = measurement.value; // e.g., "⌀ 3.010 km"
+                            displayValue = measurement.value; // e.g., "⌀ 3.010 km" or "⌀ 1.29 mi"
 
                             // Parse diameter value and unit from stored string
                             const diameterMatch = measurement.value.match(/([\d.]+)\s*(\w+)/);
                             if (diameterMatch) {
-                              const diameter = parseFloat(diameterMatch[1]);
-                              const unit = diameterMatch[2]; // 'km', 'mi', 'm', 'ft'
+                              const diameterDisplay = parseFloat(diameterMatch[1]);
+                              const unitDisplay = diameterMatch[2]; // 'km', 'mi', 'm', 'ft'
 
-                              // Calculate area in the same unit as the diameter
-                              const radius = diameter / 2;
+                              // Convert diameter back to map's base unit if needed
+                              // (e.g., if showing 1.29 mi but map base is km, convert to km)
+                              let diameterInMapUnit = diameterDisplay;
+                              if (effectiveMapScale.realUnit === 'km' && unitDisplay === 'mi') {
+                                diameterInMapUnit = diameterDisplay * 1.60934; // mi to km
+                              } else if (effectiveMapScale.realUnit === 'mi' && unitDisplay === 'km') {
+                                diameterInMapUnit = diameterDisplay * 0.621371; // km to mi
+                              } else if (effectiveMapScale.realUnit === 'm' && unitDisplay === 'ft') {
+                                diameterInMapUnit = diameterDisplay * 0.3048; // ft to m
+                              } else if (effectiveMapScale.realUnit === 'ft' && unitDisplay === 'm') {
+                                diameterInMapUnit = diameterDisplay * 3.28084; // m to ft
+                              }
+
+                              // Calculate area in the map's base unit
+                              const radius = diameterInMapUnit / 2;
                               const area = Math.PI * radius * radius;
 
-                              // Format area using map scale formatter
+                              // Format area using map scale formatter (expects base unit)
                               const areaStr = formatMapScaleArea(area);
 
                               // Add volume if depth is present
