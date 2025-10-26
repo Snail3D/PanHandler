@@ -5722,7 +5722,7 @@ export default function DimensionOverlay({
                           if (isMapMode && mapScale && wasCreatedInMapMode) {
                             const diameterPx = measurement.radius * 2;
                             const diameterDist = convertToMapScale(diameterPx);
-                            displayValue = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+                            displayValue = `⌀ ${formatMapValue(diameterDist)}`;
                             // Calculate area in map units
                             const radiusDist = diameterDist / 2;
                             const areaDist2 = Math.PI * radiusDist * radiusDist;
