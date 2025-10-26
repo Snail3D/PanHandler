@@ -1466,7 +1466,15 @@ export default function DimensionOverlay({
     // FORCE TEST: Always return km² for metric
     if (currentUnitSystem === 'metric') {
       const km2 = areaInMapUnits2 * 2.59; // Quick mi² to km² conversion
-      if (km2 >= 1000) {
+      if (km2 >= 1000000000000000) {
+        return `${(km2 / 1000000000000000).toFixed(2)}Q km² TEST`;
+      } else if (km2 >= 1000000000000) {
+        return `${(km2 / 1000000000000).toFixed(2)}T km² TEST`;
+      } else if (km2 >= 1000000000) {
+        return `${(km2 / 1000000000).toFixed(2)}B km² TEST`;
+      } else if (km2 >= 1000000) {
+        return `${(km2 / 1000000).toFixed(2)}M km² TEST`;
+      } else if (km2 >= 1000) {
         return `${(km2 / 1000).toFixed(2)}K km² TEST`;
       }
       return `${km2.toFixed(2)} km² TEST`;
@@ -1474,14 +1482,16 @@ export default function DimensionOverlay({
 
     // Imperial mode - show mi² and acres
     const formatMi2 = (mi2: number): string => {
-      if (mi2 >= 1000000000000) return `${(mi2 / 1000000000000).toFixed(2)}T mi²`;
+      if (mi2 >= 1000000000000000) return `${(mi2 / 1000000000000000).toFixed(2)}Q mi²`;
+      else if (mi2 >= 1000000000000) return `${(mi2 / 1000000000000).toFixed(2)}T mi²`;
       else if (mi2 >= 1000000000) return `${(mi2 / 1000000000).toFixed(2)}B mi²`;
       else if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
       else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
       else return `${mi2.toFixed(2)} mi²`;
     };
     const formatAcres = (acres: number): string => {
-      if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
+      if (acres >= 1000000000000000) return `${(acres / 1000000000000000).toFixed(2)}Q ac`;
+      else if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
       else if (acres >= 1000000000) return `${(acres / 1000000000).toFixed(2)}B ac`;
       else if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
       else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
@@ -1504,7 +1514,8 @@ export default function DimensionOverlay({
     // For large-scale units (mi, km, ft, m), use custom logic with acres/hectares
     // Helper functions for formatting
     const formatAcres = (acres: number): string => {
-      if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
+      if (acres >= 1000000000000000) return `${(acres / 1000000000000000).toFixed(2)}Q ac`;
+      else if (acres >= 1000000000000) return `${(acres / 1000000000000).toFixed(2)}T ac`;
       else if (acres >= 1000000000) return `${(acres / 1000000000).toFixed(2)}B ac`;
       else if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
       else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
@@ -1513,7 +1524,8 @@ export default function DimensionOverlay({
     };
 
     const formatHectares = (hectares: number): string => {
-      if (hectares >= 1000000000000) return `${(hectares / 1000000000000).toFixed(2)}T ha`;
+      if (hectares >= 1000000000000000) return `${(hectares / 1000000000000000).toFixed(2)}Q ha`;
+      else if (hectares >= 1000000000000) return `${(hectares / 1000000000000).toFixed(2)}T ha`;
       else if (hectares >= 1000000000) return `${(hectares / 1000000000).toFixed(2)}B ha`;
       else if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
       else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
@@ -1521,9 +1533,10 @@ export default function DimensionOverlay({
       else return `${hectares.toFixed(2)} ha`;
     };
 
-    // Format the area value with K/M/B/T suffixes
+    // Format the area value with K/M/B/T/Q suffixes
     const formatArea = (val: number, unitStr: string): string => {
-      if (val >= 1000000000000) return `${(val / 1000000000000).toFixed(2)}T ${unitStr}`;
+      if (val >= 1000000000000000) return `${(val / 1000000000000000).toFixed(2)}Q ${unitStr}`;
+      else if (val >= 1000000000000) return `${(val / 1000000000000).toFixed(2)}T ${unitStr}`;
       else if (val >= 1000000000) return `${(val / 1000000000).toFixed(2)}B ${unitStr}`;
       else if (val >= 1000000) return `${(val / 1000000).toFixed(2)}M ${unitStr}`;
       else if (val >= 1000) return `${(val / 1000).toFixed(2)}K ${unitStr}`;
