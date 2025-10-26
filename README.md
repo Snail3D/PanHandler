@@ -345,19 +345,22 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.5.1 (Current)
-- **Fixed circle area calculation for large km/mi diameters in metric mode**
-  - Regex now correctly parses K/M suffixes in diameter values (e.g., `⌀ 1.58K km`)
-  - Prevents parsing errors that treated "K" as the unit instead of the suffix
-  - Circle with 1580 km diameter now shows `A: 1.96M km²` instead of incorrect `A: 1821.5 cm²`
-  - Works for both K (thousands) and M (millions) suffixes
-
-### ✅ v7.5.0 (Previous)
+### ✅ v7.5.0 (Current)
 - **Fixed circle area calculations for Known Scale mode (blueprint calibrations)**
   - Circles now correctly display area in mi²/km² instead of ft²/cm²
   - Imperial: `⌀ 478.23 mi (A: 179.62K mi² (114.96M ac))` ✅
   - Metric: `⌀ 769.71 km (A: 465.32K km²)` ✅
-- **Fixed regex parsing for circle diameter units**
+- **Fixed circle area parsing for K/M suffixes when switching units**
+  - Regex now correctly parses diameter values with K/M suffixes (e.g., `⌀ 1.58K km`)
+  - Prevents parsing errors that treated "K" as the unit instead of the suffix
+  - Circle with 1580 km diameter now shows `A: 1.96M km²` instead of incorrect `A: 1821.5 cm²`
+  - Works for both K (thousands) and M (millions) suffixes
+- **Fixed rectangle and all map mode measurements not converting units**
+  - Rectangle dimensions now convert when switching unit systems (e.g., `100 mi` → `160.93 km`)
+  - Rectangle areas now convert properly (e.g., `5000 mi²` → `12.95K km²`)
+  - All map mode measurements (distances, perimeters, areas) respect user's unit system preference
+  - Fixes issue where measurements stayed in calibration's original units
+- **Fixed regex parsing for circle diameter with feet symbols**
   - Corrected pattern to only match letters for units, not digits
   - Prevents `⌀ 172'` from being parsed as diameter=17, unit="2"
 - **Fixed freehand volume display in legend**
@@ -429,7 +432,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.1
+**Version:** v7.5.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
