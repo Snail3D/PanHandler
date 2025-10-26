@@ -1460,25 +1460,12 @@ export default function DimensionOverlay({
   };
 
   // Helper: Format map scale area (for rectangles, circles, freehand)
-  const formatMapScaleArea = (areaInMapUnits2: number): string => {
+  const formatMapScaleArea = (areaInMapUnits2: number, currentUnitSystem: 'metric' | 'imperial'): string => {
     if (!mapScale) return '';
-
-    console.log('formatMapScaleArea DEBUG:', {
-      areaInMapUnits2,
-      unitSystem,
-      mapScaleRealUnit: mapScale.realUnit
-    });
 
     // Convert based on user's unit system preference (metric vs imperial)
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
-
-    console.log('formatMapScaleArea LOGIC:', {
-      isMapMetric,
-      isMapImperial,
-      matchCondition: (unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial),
-      convertCondition: unitSystem === 'metric' && isMapImperial
-    });
 
     // Helper to format acres with K/M suffixes
     const formatAcres = (acres: number): string => {
@@ -1551,7 +1538,7 @@ export default function DimensionOverlay({
     };
 
     // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
-    if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
+    if ((currentUnitSystem === 'metric' && isMapMetric) || (currentUnitSystem === 'imperial' && isMapImperial)) {
       if (mapScale.realUnit === 'km') {
         return formatKm2(areaInMapUnits2);
       } else if (mapScale.realUnit === 'mi') {
@@ -1565,9 +1552,9 @@ export default function DimensionOverlay({
         return `${formatFt2(areaInMapUnits2)} (${formatAcres(acres)})`;
       }
     }
-    
+
     // User wants metric, but map is imperial - convert to metric
-    if (unitSystem === 'metric' && isMapImperial) {
+    if (currentUnitSystem === 'metric' && isMapImperial) {
       let m2 = 0;
       if (mapScale.realUnit === "mi") {
         m2 = areaInMapUnits2 * 2589988.11; // square miles to square meters
@@ -1585,7 +1572,7 @@ export default function DimensionOverlay({
     }
 
     // User wants imperial, but map is metric - convert to imperial
-    if (unitSystem === 'imperial' && isMapMetric) {
+    if (currentUnitSystem === 'imperial' && isMapMetric) {
       let ft2 = 0;
       if (mapScale.realUnit === "km") {
         ft2 = areaInMapUnits2 * 10763910.4; // square km to square feet
@@ -1888,7 +1875,7 @@ export default function DimensionOverlay({
         const widthStr = formatMapValue(widthDist);
         const heightStr = formatMapValue(heightDist);
         const areaDist2 = widthDist * heightDist;
-        const areaStr = formatMapScaleArea(areaDist2);
+        const areaStr = formatMapScaleArea(areaDist2, unitSystem);
         const value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         return { ...measurement, value, width: widthDist, height: heightDist, area: areaDist2 };
       }
@@ -1978,7 +1965,7 @@ export default function DimensionOverlay({
       if (isUsingMapMode && activeMapScale) {
         perimeterStr = formatMapScaleDistance(perimeter);
         area = areaPixels * Math.pow(activeMapScale.realDistance / activeMapScale.screenDistance, 2);
-        areaStr = formatMapScaleArea(area);
+        areaStr = formatMapScaleArea(area, unitSystem);
       } else {
         const perimeterInUnits = perimeter / (activeCalibration?.pixelsPerUnit || 1);
         perimeterStr = formatMeasurement(perimeterInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
@@ -2180,7 +2167,7 @@ export default function DimensionOverlay({
           const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
           const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
           physicalArea = areaDist2;
-          areaStr = formatMapScaleArea(areaDist2);
+          areaStr = formatMapScaleArea(areaDist2, unitSystem);
         } else {
           // Coin calibration mode
           const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
@@ -2296,7 +2283,7 @@ export default function DimensionOverlay({
           const widthStr = formatMapValue(widthDist);
           const heightStr = formatMapValue(heightDist);
           const areaDist2 = widthDist * heightDist;
-          const areaStr = formatMapScaleArea(areaDist2);
+          const areaStr = formatMapScaleArea(areaDist2, unitSystem);
           value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         } else {
           width = widthPx / (calibration?.pixelsPerUnit || 1);
@@ -2633,7 +2620,7 @@ export default function DimensionOverlay({
             // Convert area pixels to map scale area
             const areaPx = m.area * (calibration?.pixelsPerUnit || 1) * (calibration?.pixelsPerUnit || 1);
             const areaDist2 = convertToMapScale(Math.sqrt(areaPx)) ** 2;
-            areaStr = formatMapScaleArea(areaDist2);
+            areaStr = formatMapScaleArea(areaDist2, unitSystem);
           } else {
             // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
             // Also respect unitSystem toggle (metric vs imperial)
@@ -2728,7 +2715,7 @@ export default function DimensionOverlay({
           if (isMapMode && mapScale) {
             // Area is already stored in real units, just need to format it
             const areaDisplay = m.area;
-            areaStr = formatMapScaleArea(areaDisplay);
+            areaStr = formatMapScaleArea(areaDisplay, unitSystem);
           } else {
             // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
             // Also respect unitSystem toggle (metric vs imperial)
@@ -4395,7 +4382,7 @@ export default function DimensionOverlay({
                     // Area scales by the square of linear scale
                     const scaleRatio = sampleMapLength / samplePixelLength;
                     const areaDist2 = area * (scaleRatio * scaleRatio);
-                    areaStr = formatMapScaleArea(areaDist2);
+                    areaStr = formatMapScaleArea(areaDist2, unitSystem);
                   } else {
                     perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
 
@@ -6060,7 +6047,7 @@ export default function DimensionOverlay({
                               const area = Math.PI * radius * radius;
 
                               // Format area using map scale formatter
-                              const areaStr = formatMapScaleArea(area);
+                              const areaStr = formatMapScaleArea(area, unitSystem);
 
                               // Add volume if depth is present
                               if (measurement.depth !== undefined && measurement.depthUnit && effectiveMapScale) {
@@ -6257,7 +6244,7 @@ export default function DimensionOverlay({
                             const heightStr = formatMapValue(measurement.height);
                             displayValue = `${widthStr} × ${heightStr}`;
                             const areaDist2 = measurement.width * measurement.height;
-                            const areaStr = formatMapScaleArea(areaDist2);
+                            const areaStr = formatMapScaleArea(areaDist2, unitSystem);
 
                             // Add volume if depth is present
                             if (measurement.depth !== undefined && measurement.depthUnit) {
