@@ -552,6 +552,11 @@ export default function DimensionOverlay({
     opacity: chuckNorrisOpacity.value,
   }));
 
+  // Tetris Easter egg animated style
+  const tetrisAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: tetrisOpacity.value,
+  }));
+
   // Show inspirational quote overlay
 
   // Clean up freehand state when switching away from freehand mode
@@ -7484,13 +7489,15 @@ export default function DimensionOverlay({
         onRequestClose={() => {}}
       >
         <Animated.View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.95)',
-            opacity: tetrisOpacity.value,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+          style={[
+            {
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.95)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+            tetrisAnimatedStyle
+          ]}
         >
           {/* Static Tetris board with overflow */}
           <View

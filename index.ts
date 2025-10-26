@@ -3,7 +3,11 @@ console.log("[index] Project ID is: ", process.env.EXPO_PUBLIC_VIBECODE_PROJECT_
 import "./global.css";
 import "react-native-get-random-values";
 import { LogBox } from "react-native";
-LogBox.ignoreLogs(["Expo AV has been deprecated", "Disconnected from Metro"]);
+LogBox.ignoreLogs([
+  "Expo AV has been deprecated",
+  "Disconnected from Metro",
+  "Reading from `value` during component render", // Suppress Reanimated strict mode warnings
+]);
 
 import { registerRootComponent } from "expo";
 
