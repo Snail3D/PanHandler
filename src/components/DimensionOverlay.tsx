@@ -1729,7 +1729,7 @@ export default function DimensionOverlay({
       if (isUsingMapMode && activeMapScale) {
         const diameterPx = radius * 2;
         const diameterDist = convertToMapScale(diameterPx);
-        const value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+        const value = `⌀ ${formatMapValue(diameterDist)}`;
         return { ...measurement, value, radius };
       }
       
@@ -1748,8 +1748,8 @@ export default function DimensionOverlay({
       if (isUsingMapMode && activeMapScale) {
         const widthDist = convertToMapScale(widthPx);
         const heightDist = convertToMapScale(heightPx);
-        const widthStr = formatMapScaleDistance(widthPx);
-        const heightStr = formatMapScaleDistance(heightPx);
+        const widthStr = formatMapValue(widthDist);
+        const heightStr = formatMapValue(heightDist);
         const areaDist2 = widthDist * heightDist;
         const areaStr = formatMapScaleArea(areaDist2);
         const value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
@@ -2132,7 +2132,8 @@ export default function DimensionOverlay({
         // Map Mode: Apply scale conversion
         if (effectivelyInMapMode) {
           const diameterPx = radius * 2;
-          value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+          const diameterDist = convertToMapScale(diameterPx);
+          value = `⌀ ${formatMapValue(diameterDist)}`;
         } else {
           // Convert radius in pixels to diameter in mm/inches
           const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
@@ -2155,8 +2156,8 @@ export default function DimensionOverlay({
           const heightDist = convertToMapScale(heightPx);
           width = widthDist;
           height = heightDist;
-          const widthStr = formatMapScaleDistance(widthPx);
-          const heightStr = formatMapScaleDistance(heightPx);
+          const widthStr = formatMapValue(widthDist);
+          const heightStr = formatMapValue(heightDist);
           const areaDist2 = widthDist * heightDist;
           const areaStr = formatMapScaleArea(areaDist2);
           value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
@@ -5518,7 +5519,8 @@ export default function DimensionOverlay({
               if (effectivelyInMapMode) {
                 // Map mode: use map scale conversion
                 const diameterPx = radius * 2;
-                value = `⌀ ${formatMapScaleDistance(diameterPx)}`;
+                const diameterDist = convertToMapScale(diameterPx);
+                value = `⌀ ${formatMapValue(diameterDist)}`;
               } else {
                 // Coin mode: use pixelsPerUnit
                 const radiusInUnits = radius / (calibration?.pixelsPerUnit || 1);
