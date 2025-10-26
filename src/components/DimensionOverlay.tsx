@@ -5704,7 +5704,7 @@ export default function DimensionOverlay({
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
-                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flex: 1 }}>
+                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flexShrink: 1 }}>
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Recalculate display value based on current unit system
                         let displayValue = measurement.value;
