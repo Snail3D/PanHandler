@@ -211,19 +211,19 @@ export function formatAreaMeasurement(
       return `${valueInM2.toFixed(2)} m²`;
     }
   } else {
-    // Imperial: use in² for small areas, ft² for large
+    // Imperial: use in² for small areas, ft² for large, always show acres
     const valueInIn2 = areaInMm2 / 645.16;
+    const valueInFt2 = valueInIn2 / 144;
+    const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
+
+    // Format acres
+    const acreStr = acres >= 100
+      ? `${Math.round(acres)} ac`
+      : `${acres.toFixed(2)} ac`;
+
     if (valueInIn2 < 144) { // Less than 1ft²
-      return `${valueInIn2.toFixed(2)} in²`;
+      return `${valueInIn2.toFixed(2)} in² (${acreStr})`;
     } else {
-      const valueInFt2 = valueInIn2 / 144;
-      const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
-
-      // If < 100 acres, show 2 decimals; otherwise round to whole number
-      const acreStr = acres >= 100
-        ? `${Math.round(acres)} ac`
-        : `${acres.toFixed(2)} ac`;
-
       return `${valueInFt2.toFixed(2)} ft² (${acreStr})`;
     }
   }
