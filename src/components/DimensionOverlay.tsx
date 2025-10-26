@@ -2524,7 +2524,32 @@ export default function DimensionOverlay({
             const areaDist2 = convertToMapScale(Math.sqrt(areaPx)) ** 2;
             areaStr = formatMapScaleArea(areaDist2);
           } else {
-            areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
+            // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
+            const unit = calibration?.unit || 'mm';
+            if (unit === 'mi') {
+              const formatMi2 = (mi2: number): string => {
+                if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                else return `${mi2.toFixed(2)} mi²`;
+              };
+              const formatAcres = (acres: number): string => {
+                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                else if (acres >= 100) return `${Math.round(acres)} ac`;
+                else return `${acres.toFixed(2)} ac`;
+              };
+              const acres = m.area * 640;
+              areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+            } else if (unit === 'km') {
+              const formatKm2 = (km2: number): string => {
+                if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                else return `${km2.toFixed(2)} km²`;
+              };
+              areaStr = formatKm2(m.area);
+            } else {
+              areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
+            }
           }
           newValue = `${perimeterStr} ⊞ ${areaStr}`;
           newPerimeter = perimeterStr; // Store perimeter separately for inline display
@@ -2560,9 +2585,34 @@ export default function DimensionOverlay({
             const areaDisplay = m.area;
             areaStr = formatMapScaleArea(areaDisplay);
           } else {
-            areaStr = formatAreaMeasurement(m.area, calibration?.unit || 'mm', unitSystem);
+            // For large units (mi, km), use inline formatting to avoid mi→ft² conversion
+            const unit = calibration?.unit || 'mm';
+            if (unit === 'mi') {
+              const formatMi2 = (mi2: number): string => {
+                if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                else return `${mi2.toFixed(2)} mi²`;
+              };
+              const formatAcres = (acres: number): string => {
+                if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                else if (acres >= 100) return `${Math.round(acres)} ac`;
+                else return `${acres.toFixed(2)} ac`;
+              };
+              const acres = m.area * 640;
+              areaStr = `${formatMi2(m.area)} (${formatAcres(acres)})`;
+            } else if (unit === 'km') {
+              const formatKm2 = (km2: number): string => {
+                if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                else return `${km2.toFixed(2)} km²`;
+              };
+              areaStr = formatKm2(m.area);
+            } else {
+              areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
+            }
           }
-          newValue = `${perimeterStr} (A: ${areaStr})`;
+          newValue = `${perimeterStr} ⊞ ${areaStr}`;
           newPerimeter = perimeterStr; // Store perimeter separately for inline display
         } else {
           newValue = perimeterStr;
