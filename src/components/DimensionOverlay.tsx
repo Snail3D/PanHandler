@@ -4172,7 +4172,37 @@ export default function DimensionOverlay({
                     areaStr = formatMapScaleArea(areaDist2);
                   } else {
                     perimeterStr = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
-                    areaStr = formatAreaMeasurement(physicalArea, calibration?.unit || 'mm', unitSystem);
+
+                    // For large units (mi, km), use inline formatting like circles do
+                    // formatAreaMeasurement converts mi→ft² and km→m² which is wrong for large scales
+                    const unit = calibration?.unit || 'mm';
+                    if (unit === 'mi') {
+                      // Format mi² with acres (same as circle formatting)
+                      const formatMi2 = (mi2: number): string => {
+                        if (mi2 >= 1000000) return `${(mi2 / 1000000).toFixed(2)}M mi²`;
+                        else if (mi2 >= 1000) return `${(mi2 / 1000).toFixed(2)}K mi²`;
+                        else return `${mi2.toFixed(2)} mi²`;
+                      };
+                      const formatAcres = (acres: number): string => {
+                        if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+                        else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+                        else if (acres >= 100) return `${Math.round(acres)} ac`;
+                        else return `${acres.toFixed(2)} ac`;
+                      };
+                      const acres = physicalArea * 640; // 1 mi² = 640 acres
+                      areaStr = `${formatMi2(physicalArea)} (${formatAcres(acres)})`;
+                    } else if (unit === 'km') {
+                      // Format km² (same as circle formatting)
+                      const formatKm2 = (km2: number): string => {
+                        if (km2 >= 1000000) return `${(km2 / 1000000).toFixed(2)}M km²`;
+                        else if (km2 >= 1000) return `${(km2 / 1000).toFixed(2)}K km²`;
+                        else return `${km2.toFixed(2)} km²`;
+                      };
+                      areaStr = formatKm2(physicalArea);
+                    } else {
+                      // Small units - use regular formatter
+                      areaStr = formatAreaMeasurement(physicalArea, unit as any, unitSystem);
+                    }
                   }
                   
                   const formattedValue = `${perimeterStr} ⊞ ${areaStr}`;
