@@ -1549,21 +1549,73 @@ export default function DimensionOverlay({
     return `${areaInMapUnits2.toFixed(2)} ${mapScale.realUnit}²`;
   };
 
+  // Helper: Format area for blueprint/coin calibration mode with acres/hectares
+  // This handles ALL units: mi, km, ft, m, in, cm, mm
+  const formatBlueprintArea = (area: number, unit: string): string => {
+    // Helper functions for formatting
+    const formatAcres = (acres: number): string => {
+      if (acres >= 1000000) return `${(acres / 1000000).toFixed(2)}M ac`;
+      else if (acres >= 1000) return `${(acres / 1000).toFixed(2)}K ac`;
+      else if (acres >= 100) return `${Math.round(acres)} ac`;
+      else return `${acres.toFixed(2)} ac`;
+    };
+
+    const formatHectares = (hectares: number): string => {
+      if (hectares >= 1000000) return `${(hectares / 1000000).toFixed(2)}M ha`;
+      else if (hectares >= 1000) return `${(hectares / 1000).toFixed(2)}K ha`;
+      else if (hectares >= 100) return `${Math.round(hectares)} ha`;
+      else return `${hectares.toFixed(2)} ha`;
+    };
+
+    // Format the area value with K/M suffixes
+    const formatArea = (val: number, unitStr: string): string => {
+      if (val >= 1000000) return `${(val / 1000000).toFixed(2)}M ${unitStr}`;
+      else if (val >= 1000) return `${(val / 1000).toFixed(2)}K ${unitStr}`;
+      else return `${val.toFixed(2)} ${unitStr}`;
+    };
+
+    // Handle each unit type
+    if (unit === 'mi') {
+      const acres = area * 640; // 1 mi² = 640 acres
+      return `${formatArea(area, 'mi²')} (${formatAcres(acres)})`;
+    } else if (unit === 'km') {
+      return formatArea(area, 'km²');
+    } else if (unit === 'ft') {
+      const acres = area / 43560; // 1 acre = 43,560 ft²
+      return `${formatArea(area, 'ft²')} (${formatAcres(acres)})`;
+    } else if (unit === 'm') {
+      const hectares = area / 10000; // 1 hectare = 10,000 m²
+      return `${formatArea(area, 'm²')} (${formatHectares(hectares)})`;
+    } else if (unit === 'in') {
+      const acres = area / 6272640; // 1 acre = 6,272,640 in²
+      return `${formatArea(area, 'in²')} (${formatAcres(acres)})`;
+    } else if (unit === 'cm') {
+      const hectares = area / 100000000; // 1 hectare = 100,000,000 cm²
+      return `${formatArea(area, 'cm²')} (${formatHectares(hectares)})`;
+    } else if (unit === 'mm') {
+      const hectares = area / 10000000000; // 1 hectare = 10,000,000,000 mm²
+      return `${formatArea(area, 'mm²')} (${formatHectares(hectares)})`;
+    } else {
+      // Unknown unit - fallback to formatAreaMeasurement
+      return formatAreaMeasurement(area, unit as any, unitSystem);
+    }
+  };
+
   // Calculate distance in pixels and convert to real units
   const calculateDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
     const pixelDistance = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-    
+
     if (!calibration) {
       return `${pixelDistance.toFixed(0)} px`;
     }
-    
+
     const realDistance = pixelDistance / calibration.pixelsPerUnit;
-    
+
     // Map Mode: Apply scale conversion and respect Metric/Imperial
     if (isMapMode && mapScale) {
       return formatMapScaleDistance(pixelDistance);
     }
-    
+
     return formatMeasurement(realDistance, calibration.unit, unitSystem, 2);
   };
 
@@ -1787,7 +1839,7 @@ export default function DimensionOverlay({
       const widthStr = formatMeasurement(width, activeCalibration?.unit || 'mm', unitSystem, 2);
       const heightStr = formatMeasurement(height, activeCalibration?.unit || 'mm', unitSystem, 2);
       const area = width * height;
-      const areaStr = formatAreaMeasurement(area, activeCalibration?.unit || 'mm', unitSystem);
+      const areaStr = formatBlueprintArea(area, activeCalibration?.unit || 'mm');
       const value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
       return { ...measurement, value, width, height, area };
     } else if (mode === 'freehand') {
@@ -1873,7 +1925,7 @@ export default function DimensionOverlay({
         perimeterStr = formatMeasurement(perimeterInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
         const pixelsPerUnit = activeCalibration?.pixelsPerUnit || 1;
         area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
-        areaStr = formatAreaMeasurement(area, activeCalibration?.unit || 'mm', unitSystem);
+        areaStr = formatBlueprintArea(area, activeCalibration?.unit || 'mm');
       }
       
       return { 
@@ -2074,10 +2126,10 @@ export default function DimensionOverlay({
           // Coin calibration mode
           const perimeterInUnits = perimeterPx / (calibration?.pixelsPerUnit || 1);
           perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
-          
+
           const areaInUnits2 = areaPx2 / Math.pow(calibration?.pixelsPerUnit || 1, 2);
           physicalArea = areaInUnits2;
-          areaStr = formatAreaMeasurement(areaInUnits2, calibration?.unit || 'mm', unitSystem);
+          areaStr = formatBlueprintArea(areaInUnits2, calibration?.unit || 'mm');
         }
         
         // Create new polygon measurement
@@ -2193,7 +2245,7 @@ export default function DimensionOverlay({
           const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
           const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
           const area = width * height;
-          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+          const areaStr = formatBlueprintArea(area, calibration?.unit || 'mm');
           value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         }
 
@@ -2493,7 +2545,7 @@ export default function DimensionOverlay({
         const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
         const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
         const area = width * height;
-        const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+        const areaStr = formatBlueprintArea(area, calibration?.unit || 'mm');
         newValue = `${widthStr} × ${heightStr} (A: ${areaStr})`;
       } else if (m.mode === 'freehand') {
         // Recalculate freehand path length
@@ -2582,7 +2634,7 @@ export default function DimensionOverlay({
                 areaStr = formatKm2(m.area);
               }
             } else {
-              areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
+              areaStr = formatBlueprintArea(m.area, unit as any);
             }
           }
           newValue = `${perimeterStr} ⊞ ${areaStr}`;
@@ -2674,7 +2726,7 @@ export default function DimensionOverlay({
                 areaStr = formatKm2(m.area);
               }
             } else {
-              areaStr = formatAreaMeasurement(m.area, unit as any, unitSystem);
+              areaStr = formatBlueprintArea(m.area, unit as any);
             }
           }
           newValue = `${perimeterStr} ⊞ ${areaStr}`;
@@ -4345,8 +4397,8 @@ export default function DimensionOverlay({
                         areaStr = formatKm2(physicalArea);
                       }
                     } else {
-                      // Small units - use regular formatter
-                      areaStr = formatAreaMeasurement(physicalArea, unit as any, unitSystem);
+                      // Small units - use blueprint formatter
+                      areaStr = formatBlueprintArea(physicalArea, unit as any);
                     }
                   }
                   
@@ -6156,7 +6208,7 @@ export default function DimensionOverlay({
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
                           const area = measurement.width * measurement.height;
-                          const areaStr = formatAreaMeasurement(area, calibration?.unit || 'mm', unitSystem);
+                          const areaStr = formatBlueprintArea(area, calibration?.unit || 'mm');
 
                           // Add volume if depth is present
                           if (measurement.depth !== undefined && measurement.depthUnit) {
