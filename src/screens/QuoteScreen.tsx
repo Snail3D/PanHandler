@@ -37,12 +37,14 @@ export default function QuoteScreen({ onComplete }: QuoteScreenProps) {
 
   // Simple fade in, tap to continue
   useEffect(() => {
+    __DEV__ && console.log('📖 QuoteScreen mounting');
     const quote = getRandomQuote();
     setIntroQuote(quote);
+    __DEV__ && console.log('📖 QuoteScreen quote loaded:', quote);
 
     // Fade in after short delay
-    introOpacity.value = withDelay(300, withTiming(1, {
-      duration: 800,
+    introOpacity.value = withDelay(100, withTiming(1, {
+      duration: 400,
       easing: Easing.bezier(0.4, 0.0, 0.2, 1)
     }));
   }, []);

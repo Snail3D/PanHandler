@@ -32,6 +32,8 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 export default function App() {
   const [showIntro, setShowIntro] = useState(true);
   const appOpacity = useSharedValue(0);
+  
+  __DEV__ && console.log('🚀 App rendering, showIntro:', showIntro);
 
   // Configure audio session to allow background music/YouTube to continue playing
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function App() {
 
   // Handle quote screen completion
   const handleQuoteComplete = () => {
+    __DEV__ && console.log('📖 QuoteScreen completed, showing main app');
     setShowIntro(false);
 
     // Fade in main app
