@@ -1,38 +1,19 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Point, Measurement } from '../types/measurement';
 
-// Use MMKV instead of AsyncStorage - 10-100x faster, non-blocking
-const storage = new MMKV();
-
-// ONE-TIME FIX: Clear old persisted session data (v3.0.3)
-// This removes the huge persisted work sessions that were causing slowness
-try {
-  const oldData = storage.getString('measurement-settings');
-  if (oldData) {
-    const parsed = JSON.parse(oldData);
-    // If it has currentImageUri, it's old format - clear and rebuild with just settings
-    if (parsed?.state?.currentImageUri !== undefined) {
-      console.log('🧹 Clearing old work session data from MMKV...');
-      storage.delete('measurement-settings');
-      console.log('✅ Old data cleared - app will be fast now!');
-    }
-  }
-} catch (e) {
-  // Ignore errors, just making sure we clear if needed
-}
-
-const mmkvStorage = {
+// Use AsyncStorage for compatibility with Expo Go
+// Note: MMKV is faster but requires a development build
+const asyncStorage = {
   setItem: (name: string, value: string) => {
-    return storage.set(name, value);
+    return AsyncStorage.setItem(name, value);
   },
   getItem: (name: string) => {
-    const value = storage.getString(name);
-    return value ?? null;
+    return AsyncStorage.getItem(name);
   },
   removeItem: (name: string) => {
-    return storage.delete(name);
+    return AsyncStorage.removeItem(name);
   },
 };
 
@@ -324,7 +305,7 @@ const useStore = create<MeasurementStore>()(
     }),
     {
       name: 'measurement-settings',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => asyncStorage),
       partialize: (state) => ({ 
         unitSystem: state.unitSystem,
         defaultUnitSystem: state.defaultUnitSystem, // Persist default preference
