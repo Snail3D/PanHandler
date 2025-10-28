@@ -3013,6 +3013,9 @@ export default function DimensionOverlay({
           (window as any)._emailPromptHandlers = { handleEmailComplete, handleEmailDismiss };
           setShowEmailPromptModal(true);
         });
+        
+        // Wait for modal to fully close before proceeding to avoid blur screen issue
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
       
       setIsCapturing(true);
@@ -7467,12 +7470,6 @@ export default function DimensionOverlay({
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => setShowHelpModal(true)}
-          onLongPress={() => {
-            // Secret: Long-press to clear saved email (for testing)
-            setUserEmail(null);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            showAlert('Email Cleared', 'Your saved email has been cleared. You can now test the email prompt again!', 'success');
-          }}
           style={{
             position: 'absolute',
             zIndex: 30, // Same as AUTO LEVEL badge
@@ -7500,7 +7497,17 @@ export default function DimensionOverlay({
       )}
 
       {/* Help Modal */}
-      <HelpModal visible={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      <HelpModal 
+        visible={showHelpModal} 
+        onClose={() => setShowHelpModal(false)}
+        onEmailReset={() => {
+          // HelpModal already handles clearing the email and showing alert
+          // Just close the modal after user sees the alert
+          setTimeout(() => {
+            setShowHelpModal(false);
+          }, 2000);
+        }}
+      />
 
       {/* Chuck Norris Easter Egg Modal */}
       {showChuckNorrisModal && (
