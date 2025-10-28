@@ -156,8 +156,8 @@ export default function CameraScreen() {
   const [tempPhotoForBadge, setTempPhotoForBadge] = useState<string | null>(null);
   
   // Cinematic fade-in animation for camera screen
-  const cameraOpacity = useSharedValue(0);
-  const blackOverlayOpacity = useSharedValue(1); // Start with black overlay
+  const cameraOpacity = useSharedValue(1); // Start visible immediately
+  const blackOverlayOpacity = useSharedValue(0); // No black overlay initially
   const cameraFlashOpacity = useSharedValue(0); // For camera flash effect
   
   // Universal screen transition opacity for smooth mode changes
@@ -659,14 +659,14 @@ export default function CameraScreen() {
         const nowHorizontal = absBeta < 45 && absGamma < 45;
         isHorizontal.value = nowHorizontal; // Update shared value
         
-        // DEBUG: Log orientation detection
-        if (__DEV__ && wasHorizontal !== nowHorizontal) {
-          console.log('📱 Orientation changed:', {
-            absBeta: absBeta.toFixed(1),
-            nowHorizontal,
-            targetOpacity: nowHorizontal ? 1 : 0,
-          });
-        }
+        // DEBUG: Log orientation detection - COMMENTED OUT TO REDUCE LOG SPAM
+        // if (__DEV__ && wasHorizontal !== nowHorizontal) {
+        //   console.log('📱 Orientation changed:', {
+        //     absBeta: absBeta.toFixed(1),
+        //     nowHorizontal,
+        //     targetOpacity: nowHorizontal ? 1 : 0,
+        //   });
+        // }
         
         // Smooth 500ms fade transition between "Look Down" and instructions
         if (wasHorizontal !== nowHorizontal) {
@@ -690,14 +690,14 @@ export default function CameraScreen() {
             easing: Easing.inOut(Easing.ease),
           });
           
-          // DEBUG: Log opacity changes
-          if (__DEV__) {
-            console.log('🎨 Crosshair opacity changing:', {
-              from: levelLinesOpacity.value.toFixed(2),
-              to: targetOpacity,
-              absBeta: absBeta.toFixed(1),
-            });
-          }
+          // DEBUG: Log opacity changes - COMMENTED OUT TO REDUCE LOG SPAM
+          // if (__DEV__) {
+          //   console.log('🎨 Crosshair opacity changing:', {
+          //     from: levelLinesOpacity.value.toFixed(2),
+          //     to: targetOpacity,
+          //     absBeta: absBeta.toFixed(1),
+          //   });
+          // }
         }
         
         const maxBubbleOffset = 48; // Max pixels the bubble can move from center (120px crosshairs / 2.5)
@@ -832,15 +832,15 @@ export default function CameraScreen() {
       return;
     }
 
-    // Debug: Log when user is holding but conditions aren't perfect
-    if (isHoldingShutter && __DEV__) {
-      console.log('⏳ Holding shutter, waiting for alignment:', {
-        alignmentStatus,
-        isStable,
-        needsGood: alignmentStatus !== 'good',
-        needsStable: !isStable,
-      });
-    }
+    // Debug: Log when user is holding but conditions aren't perfect - COMMENTED OUT TO REDUCE LOG SPAM
+    // if (isHoldingShutter && __DEV__) {
+    //   console.log('⏳ Holding shutter, waiting for alignment:', {
+    //     alignmentStatus,
+    //     isStable,
+    //     needsGood: alignmentStatus !== 'good',
+    //     needsStable: !isStable,
+    //   });
+    // }
 
     if (alignmentStatus === 'good' && isStable) {
       // Trigger immediately when conditions are met (removed delay)
@@ -1007,37 +1007,27 @@ export default function CameraScreen() {
     const timers: NodeJS.Timeout[] = [];
 
     if (mode === 'camera') {
+      __DEV__ && console.log('📷 Camera mode initialized, setting up fade-in');
+      
       // Reset states immediately
       setIsCapturing(false);
       setIsTransitioning(false);
       setIsHoldingShutter(false); // Reset hold state so user must press again
       setIsCameraReady(false); // Camera not ready yet
 
-      cameraOpacity.value = 0;
-      blackOverlayOpacity.value = 1;
+      cameraOpacity.value = 1; // Start visible
+      blackOverlayOpacity.value = 0; // No black overlay
       transitionBlackOverlay.value = 0; // Clear transition overlay so camera's fade works
       cameraFlashOpacity.value = 0; // Reset flash in case it's still visible
       instructionsOpacity.value = 1; // Reset instructions to visible (hold fade)
       instructionsDisplayOpacity.value = 1; // Start with instructions visible
       lookDownOpacity.value = 0; // Start with "Look Down" hidden
 
-      // Faster fade-in (reduced from 1.5s to 0.6s)
+      // Camera is ready immediately
       timers.push(setTimeout(() => {
-        cameraOpacity.value = withTiming(1, {
-          duration: 600, // Faster 0.6 second fade
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-        blackOverlayOpacity.value = withTiming(0, {
-          duration: 600,
-          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
-        });
-
-        // Camera is ready after fade-in completes
-        timers.push(setTimeout(() => {
-          setIsCameraReady(true);
-          __DEV__ && console.log('📷 Camera is ready for capture');
-        }, 700)); // Wait for fade + a bit extra for camera to fully initialize
-      }, 150)); // Reduced delay from 300ms to 150ms
+        setIsCameraReady(true);
+        __DEV__ && console.log('📷 Camera is ready for capture');
+      }, 100)); // Brief delay for camera to initialize
     } else {
       // Not in camera mode, camera not ready
       setIsCameraReady(false);
@@ -1052,13 +1042,23 @@ export default function CameraScreen() {
     };
   }, [mode]);
 
-  const cameraAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: cameraOpacity.value,
-  }));
+  const cameraAnimatedStyle = useAnimatedStyle(() => {
+    if (__DEV__ && Math.random() < 0.001) { // Log occasionally to avoid spam
+      console.log('🎥 Camera opacity:', cameraOpacity.value);
+    }
+    return {
+      opacity: cameraOpacity.value,
+    };
+  });
 
-  const blackOverlayStyle = useAnimatedStyle(() => ({
-    opacity: blackOverlayOpacity.value,
-  }));
+  const blackOverlayStyle = useAnimatedStyle(() => {
+    if (__DEV__ && Math.random() < 0.001) { // Log occasionally to avoid spam
+      console.log('🖤 Black overlay opacity:', blackOverlayOpacity.value);
+    }
+    return {
+      opacity: blackOverlayOpacity.value,
+    };
+  });
 
   const screenTransitionStyle = useAnimatedStyle(() => ({
     // Don't fade content opacity - let the black overlay handle all opacity transitions
@@ -1085,6 +1085,100 @@ export default function CameraScreen() {
   const reminderTextAnimatedStyle = useAnimatedStyle(() => ({
     opacity: reminderTextOpacity.value,
   }));
+
+  // Animated styles for floating crosshair lines (horizontal and vertical)
+  const horizontalCrosshairLineStyle = useAnimatedStyle(() => ({
+    position: 'absolute',
+    top: -SCREEN_HEIGHT,
+    left: -SCREEN_WIDTH,
+    right: -SCREEN_WIDTH,
+    bottom: -SCREEN_HEIGHT,
+    opacity: levelLinesOpacity.value,
+    transform: [
+      { translateX: bubbleX.value * 3 },
+      { translateY: bubbleY.value * 3 },
+    ],
+  }));
+
+  const verticalCrosshairLineStyle = useAnimatedStyle(() => ({
+    position: 'absolute',
+    top: -SCREEN_HEIGHT,
+    left: -SCREEN_WIDTH,
+    right: -SCREEN_WIDTH,
+    bottom: -SCREEN_HEIGHT,
+    opacity: levelLinesOpacity.value,
+    transform: [
+      { translateX: bubbleX.value * 3 },
+      { translateY: bubbleY.value * 3 },
+    ],
+  }));
+
+  // Animated style for vertical gray line visibility
+  const verticalGrayLineStyle = useAnimatedStyle(() => {
+    'worklet';
+    const isVertical = isVerticalMode.value;
+    return {
+      position: 'absolute',
+      left: '50%',
+      top: 0,
+      bottom: 0,
+      opacity: isVertical ? 0 : 1, // Hide in vertical mode
+    };
+  });
+
+  // Static styles for messages (non-reactive values computed once)
+  const messageBaseStyle = {
+    position: 'absolute' as const,
+    bottom: insets.bottom + scaleSize(150), // Same position as instructions (above shutter)
+    left: scalePadding(24),
+    right: scalePadding(24),
+    alignItems: 'center' as const,
+    pointerEvents: 'none' as const,
+  };
+
+  const instructionsBaseStyle = {
+    position: 'absolute' as const,
+    bottom: insets.bottom + scaleSize(150), // Above shutter button
+    left: scalePadding(24),
+    right: scalePadding(24),
+    alignItems: 'center' as const,
+    pointerEvents: 'none' as const,
+  };
+
+  const coinPlacementBaseStyle = {
+    position: 'absolute' as const,
+    top: '50%',
+    left: '50%',
+    width: scaleSize(25),
+    height: scaleSize(25),
+    marginLeft: -scaleSize(12.5),
+    marginTop: -scaleSize(12.5),
+    pointerEvents: 'none' as const,
+  };
+
+  // Animated style for "Aim Down" message
+  const lookDownMessageAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: lookDownOpacity.value,
+  }));
+
+  // Animated style for instructions message
+  const instructionsAnimatedStyle = useAnimatedStyle(() => {
+    'worklet';
+    const displayOpacity = instructionsDisplayOpacity.value;
+    const holdOpacity = instructionsOpacity.value;
+    return {
+      opacity: displayOpacity * holdOpacity, // Combine both fade effects
+    };
+  });
+
+  // Animated style for coin placement circle
+  const coinPlacementAnimatedStyle = useAnimatedStyle(() => {
+    'worklet';
+    const horizontal = isHorizontal.value;
+    return {
+      opacity: horizontal ? 0.8 : 0,
+    };
+  });
 
   if (!permission) {
     return (
@@ -1449,6 +1543,7 @@ export default function CameraScreen() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: false,
+        allowsMultipleSelection: false, // Single-select mode - close immediately after selection
         quality: 1,
         exif: true, // Request EXIF data
       });
@@ -1617,17 +1712,7 @@ export default function CameraScreen() {
             
             {/* Vertical gray line - ONLY in horizontal mode */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                const isVertical = isVerticalMode.value;
-                return {
-                  position: 'absolute',
-                  left: '50%',
-                  top: 0,
-                  bottom: 0,
-                  opacity: isVertical ? 0 : 1, // Hide in vertical mode
-                };
-              })()}
+              style={verticalGrayLineStyle}
               pointerEvents="none"
             >
               <View
@@ -1643,21 +1728,7 @@ export default function CameraScreen() {
             {/* Floating RED crosshairs - LEVEL INDICATOR (moves with tilt) */}
             {/* Graceful fade when switching horizontal/vertical */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                return {
-                  position: 'absolute',
-                  top: -SCREEN_HEIGHT,
-                  left: -SCREEN_WIDTH,
-                  right: -SCREEN_WIDTH,
-                  bottom: -SCREEN_HEIGHT,
-                  opacity: levelLinesOpacity.value, // Smooth animated fade
-                  transform: [
-                    { translateX: bubbleX.value * 3 },
-                    { translateY: bubbleY.value * 3 },
-                  ],
-                };
-              })()}
+              style={horizontalCrosshairLineStyle}
               pointerEvents="none"
             >
               {/* Horizontal red line (horizon) */}
@@ -1676,21 +1747,7 @@ export default function CameraScreen() {
             
             {/* Vertical red line - Graceful fade when switching horizontal/vertical */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                return {
-                  position: 'absolute',
-                  top: -SCREEN_HEIGHT,
-                  left: -SCREEN_WIDTH,
-                  right: -SCREEN_WIDTH,
-                  bottom: -SCREEN_HEIGHT,
-                  opacity: levelLinesOpacity.value, // Smooth animated fade
-                  transform: [
-                    { translateX: bubbleX.value * 3 },
-                    { translateY: bubbleY.value * 3 },
-                  ],
-                };
-              })()}
+              style={verticalCrosshairLineStyle}
               pointerEvents="none"
             >
               <View
@@ -1811,19 +1868,7 @@ export default function CameraScreen() {
 
             {/* "Aim Down" Message - Shows when NOT horizontal, same position as instructions */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                const opacity = lookDownOpacity.value;
-                return {
-                  position: 'absolute',
-                  bottom: insets.bottom + scaleSize(150), // Same position as instructions (above shutter)
-                  left: scalePadding(24),
-                  right: scalePadding(24),
-                  alignItems: 'center',
-                  opacity: opacity,
-                  pointerEvents: 'none',
-                };
-              })()}
+              style={[messageBaseStyle, lookDownMessageAnimatedStyle]}
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(20), paddingVertical: scalePadding(14), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(14), fontWeight: '600', textAlign: 'center' }}>
@@ -1834,20 +1879,7 @@ export default function CameraScreen() {
 
             {/* Instructions Message - Shows when horizontal, positioned above shutter button */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                const displayOpacity = instructionsDisplayOpacity.value;
-                const holdOpacity = instructionsOpacity.value;
-                return {
-                  position: 'absolute',
-                  bottom: insets.bottom + scaleSize(150), // Above shutter button
-                  left: scalePadding(24),
-                  right: scalePadding(24),
-                  alignItems: 'center',
-                  opacity: displayOpacity * holdOpacity, // Combine both fade effects
-                  pointerEvents: 'none',
-                };
-              })()}
+              style={[instructionsBaseStyle, instructionsAnimatedStyle]}
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(16), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
@@ -1867,21 +1899,7 @@ export default function CameraScreen() {
 
             {/* Coin Placement Circle - Single 25px circle in center */}
             <Animated.View
-              style={(() => {
-                'worklet';
-                const horizontal = isHorizontal.value;
-                return {
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  width: scaleSize(25),
-                  height: scaleSize(25),
-                  marginLeft: -scaleSize(12.5),
-                  marginTop: -scaleSize(12.5),
-                  opacity: horizontal ? 0.8 : 0,
-                  pointerEvents: 'none',
-                };
-              })()}
+              style={[coinPlacementBaseStyle, coinPlacementAnimatedStyle]}
             >
               <View style={{
                 width: scaleSize(25),
@@ -2136,8 +2154,11 @@ export default function CameraScreen() {
                       easing: Easing.out(Easing.ease),
                     });
                   } else {
-                    // Vertical mode: Just haptic feedback, no hold state
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    // Vertical mode: Immediate capture for instant response
+                    if (!isCapturing && cameraRef.current) {
+                      takePicture();
+                    }
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   }
                 }}
                 onPressOut={() => {
@@ -2164,11 +2185,10 @@ export default function CameraScreen() {
                     isCameraReady,
                   });
 
-                  // Quick tap - capture in both orientations
-                  // Longer threshold (500ms) for better UX - user doesn't have to be super quick
-                  if (holdDuration < 500 && !isCapturing) {
+                  // For horizontal mode: Quick tap - capture immediately on release
+                  // Immediate capture for instant response
+                  if (!isCapturing && wasHolding && holdDuration < 500) {
                     takePicture();
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   } else if (isCapturing) {
                     __DEV__ && console.log('⚠️ Already capturing, skipping takePicture');
                   } else if (wasHolding && holdDuration >= 500) {
