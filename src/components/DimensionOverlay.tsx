@@ -514,6 +514,13 @@ export default function DimensionOverlay({
   // If there are measurements on reload, pan/zoom should be locked
   // IMPORTANT: This useEffect must be AFTER all other hooks to avoid hooks order issues
   useEffect(() => {
+    // Notify parent about lock state based on measurements
+    if (onPanZoomLockChange) {
+      const shouldLock = measurements.length > 0;
+      onPanZoomLockChange(shouldLock);
+      console.log('🔧 Initial lock state:', shouldLock ? 'LOCKED' : 'UNLOCKED', '(measurements:', measurements.length, ')');
+    }
+    
     if (measurements.length > 0) {
       setMeasurementMode(false); // Keep in pan mode but locked
     }
@@ -5441,15 +5448,17 @@ export default function DimensionOverlay({
 
       {/* Swipe trail effect (fading fingerprints along swipe path) */}
       {(() => {
-        console.log('🎨 Swipe Trail Check:', { 
-          isArray: Array.isArray(swipeTrail), 
-          length: swipeTrail?.length, 
-          hasSessionColor: !!sessionColor 
-        });
+        // COMMENTED OUT TO REDUCE LOG SPAM
+        // console.log('🎨 Swipe Trail Check:', { 
+        //   isArray: Array.isArray(swipeTrail), 
+        //   length: swipeTrail?.length, 
+        //   hasSessionColor: !!sessionColor 
+        // });
         
         if (!Array.isArray(swipeTrail) || swipeTrail.length === 0 || !sessionColor) return null;
         
-        console.log('🎨 Rendering', swipeTrail.length, 'trail points');
+        // COMMENTED OUT TO REDUCE LOG SPAM
+        // console.log('🎨 Rendering', swipeTrail.length, 'trail points');
         
         const fingerColor = sessionColor.main;
         const now = Date.now();
