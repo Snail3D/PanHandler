@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Image, Dimensions, StyleSheet } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -16,15 +16,26 @@ interface ZoomableImageProps {
   initialScale?: number;
   initialTranslateX?: number;
   initialTranslateY?: number;
+  locked?: boolean;  // When true, disables pan/zoom gestures
 }
 
-export default function ZoomableImage({ 
-  imageUri, 
+export default function ZoomableImage({
+  imageUri,
   onTransformChange,
   initialScale = 1,
   initialTranslateX = 0,
   initialTranslateY = 0,
+  locked = false,
 }: ZoomableImageProps) {
+  // Use shared value for locked state to avoid stale closures in gesture handlers
+  // This is critical for production builds where Hermes optimization can freeze callbacks
+  const isLockedShared = useSharedValue(locked);
+
+  // Update shared value when locked prop changes
+  useEffect(() => {
+    isLockedShared.value = locked;
+  }, [locked, isLockedShared]);
+
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
   const translateX = useSharedValue(initialTranslateX);
@@ -34,9 +45,16 @@ export default function ZoomableImage({
 
   const pinchGesture = Gesture.Pinch()
     .onUpdate((event) => {
+      'worklet';
+      // Check locked state - use shared value to avoid stale closures in production builds
+      if (isLockedShared.value) return;
+
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
     })
     .onEnd(() => {
+      'worklet';
+      if (isLockedShared.value) return;
+
       savedScale.value = scale.value;
       if (onTransformChange) {
         runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value);
@@ -45,10 +63,17 @@ export default function ZoomableImage({
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
+      'worklet';
+      // Check locked state - use shared value to avoid stale closures in production builds
+      if (isLockedShared.value) return;
+
       translateX.value = savedTranslateX.value + event.translationX;
       translateY.value = savedTranslateY.value + event.translationY;
     })
     .onEnd(() => {
+      'worklet';
+      if (isLockedShared.value) return;
+
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       if (onTransformChange) {
@@ -59,6 +84,10 @@ export default function ZoomableImage({
   const doubleTapGesture = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => {
+      'worklet';
+      // Check locked state - use shared value to avoid stale closures in production builds
+      if (isLockedShared.value) return;
+
       if (scale.value > 1) {
         scale.value = withSpring(1);
         savedScale.value = 1;
