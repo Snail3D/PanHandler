@@ -1622,24 +1622,25 @@ export default function CameraScreen() {
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
           <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
-            <CameraView 
-                ref={cameraRef}
-                style={{ flex: 1 }}
-                facing="back"
-                enableTorch={flashEnabled}
-                autofocus="off"
-              >
+            <View style={{ flex: 1 }}>
+              <CameraView 
+                  ref={cameraRef}
+                  style={{ flex: 1 }}
+                  facing="back"
+                  enableTorch={flashEnabled}
+                  autofocus="off"
+                />
               {/* Top controls */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 10,
-                paddingTop: insets.top + scaleMargin(16)
-              }}
-            >
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 10,
+                  paddingTop: insets.top + scaleMargin(16)
+                }}
+              >
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: scalePadding(24) }}>
                   {/* Original Controls - Right Side */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: scaleGap(12) }}>
@@ -2120,7 +2121,7 @@ export default function CameraScreen() {
                 )}
               </View>
             </View>
-          </CameraView>
+            </View>
           </TouchOverlayFingerprints>
           
           {/* Bottom Shutter Button */}
