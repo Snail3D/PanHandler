@@ -2340,7 +2340,7 @@ export default function CameraScreen() {
                   __DEV__ && console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
                 }}
               >
-                <ZoomableImage 
+                <ZoomableImage
                   key={displayImageUri}
                   imageUri={displayImageUri}
                   fingerColor={sessionColors.crosshair.main}
@@ -2351,6 +2351,7 @@ export default function CameraScreen() {
                   showLevelLine={false}
                   locked={isPanZoomLocked}
                   opacity={imageOpacity}
+                  singleFingerPan={true}
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
