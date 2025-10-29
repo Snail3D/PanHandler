@@ -2301,7 +2301,6 @@ export default function CameraScreen() {
         <HelpModal
           visible={showHelpModal}
           onClose={() => setShowHelpModal(false)}
-          onEmailReset={() => setShowEmailResetModal(true)}
         />
       </View>
     );
@@ -2471,16 +2470,6 @@ export default function CameraScreen() {
       <HelpModal
         visible={showHelpModal}
         onClose={() => setShowHelpModal(false)}
-        onEmailReset={() => setShowEmailResetModal(true)}
-      />
-
-      {/* Email Reset Confirmation Modal */}
-      <AlertModal
-        visible={showEmailResetModal}
-        title="Email Reset"
-        message="Your saved email has been cleared successfully. Tip: You can reset your email anytime by long-pressing the Help (?) button."
-        type="success"
-        onClose={() => setShowEmailResetModal(false)}
       />
 
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
