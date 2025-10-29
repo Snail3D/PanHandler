@@ -518,7 +518,7 @@ interface LabelModalProps {
   hasArea?: boolean; // Whether this measurement has an area (can add depth for volume)
   isMapMode?: boolean;
   measurementMode?: 'distance' | 'angle' | 'circle' | 'rectangle' | 'freehand' | 'polygon';
-  actionType?: 'save' | 'email'; // To show different button text/icon
+  actionType?: 'save' | 'email' | 'share'; // To show different button text/icon
   unitSystem?: 'metric' | 'imperial'; // For smart depth unit defaults
 }
 
@@ -852,15 +852,19 @@ export default function LabelModal({
                       })}
                     >
                       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Ionicons name={actionType === 'email' ? 'mail' : 'save'} size={20} color="#1C1C1E" />
+                        <Ionicons
+                          name={actionType === 'email' ? 'mail' : actionType === 'share' ? 'share-outline' : 'save'}
+                          size={20}
+                          color="#1C1C1E"
+                        />
                       </View>
-                      <Text style={{ 
-                        color: '#1C1C1E', 
-                        fontWeight: '700', 
-                        fontSize: 18, 
+                      <Text style={{
+                        color: '#1C1C1E',
+                        fontWeight: '700',
+                        fontSize: 18,
                         marginLeft: 8,
                       }}>
-                        {actionType === 'email' ? 'Email' : 'Save'}
+                        {actionType === 'email' ? 'Email' : actionType === 'share' ? 'Share' : 'Save'}
                       </Text>
                     </Pressable>
 
