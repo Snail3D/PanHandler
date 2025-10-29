@@ -4,7 +4,7 @@
     "name": "PanHandler",
     "slug": "panhandler",
     "scheme": "panhandler",
-    "version": "7.6.4",
+    "version": "7.6.6",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
