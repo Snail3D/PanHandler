@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.6.3
+**Version:** v7.6.4
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,15 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.6.4 - Pan/Zoom Lock Fix (Production Build Issue)
+- ✅ **Fixed:** Pan/zoom locked after coin calibration in production builds (race condition)
+- ✅ **Fixed:** Pan/zoom locked after map scale calibration (missing unlock call)
+- Moved coin calibration unlock to AFTER DimensionOverlay mounts to prevent race condition
+- Added unlock call after map scale calibration completes
+- Known Scale already worked correctly (no changes needed)
+- Single-finger pan/zoom already enabled (`singleFingerPan={true}`)
+- Fixes production-specific timing issue where DimensionOverlay's initial lock check would override the unlock
 
 ### v7.6.3 - Memory Leak Fixes (App-Backgrounding Performance)
 - ✅ **Fixed:** Memory leak in CameraScreen - zoomSaveTimeoutRef never cleared on unmount
