@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.6.0
+**Version:** v7.6.1
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,14 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.6.1 - Budget Android Phone Optimization
+- ✅ **Improved:** Enhanced low-end device detection to identify budget Android phones
+- ✅ **Optimized:** More aggressive throttling for budget devices (every 3 frames instead of 2)
+- Detects Android phones from 2018-2020 with <4GB RAM as budget devices
+- Budget devices: 50ms sensor rate + every 3rd frame = ~6.7fps UI updates (still smooth)
+- Regular production: 33ms sensor rate + every 2nd frame = 15fps UI updates
+- Ensures smooth performance even on budget Android devices without looking laggy
 
 ### v7.6.0 - Production Build Performance Optimization
 - ✅ **Fixed:** Reduced DeviceMotion sensor update rate in production from 60fps to 30fps
