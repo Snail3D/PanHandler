@@ -578,9 +578,9 @@ export default function CameraScreen() {
 
     // Adjust update rate based on device capability
     // Production builds: Use 33ms (30fps) to reduce CPU load - still smooth
-    // Dev builds: Use 16ms (60fps) for debugging
+    // Dev builds: Match low-end device performance (50ms/20fps) for testing budget Android experience
     // Low-end devices: 50ms (20fps) - smooth enough for budget Android phones
-    const updateInterval = __DEV__ ? 16 : (isLowEndDevice ? 50 : 33);
+    const updateInterval = __DEV__ ? 50 : (isLowEndDevice ? 50 : 33);
     DeviceMotion.setUpdateInterval(updateInterval);
 
     // Track haptic timers for cleanup (CRITICAL: prevents memory leak)
@@ -610,10 +610,11 @@ export default function CameraScreen() {
         const absBeta = Math.abs(beta);
 
         // Throttle state updates to reduce re-renders
-        // Dev: Update every frame, Production: Every 2 frames, Low-end: Every 3 frames
+        // Dev: Match low-end (every 3 frames) to test budget Android experience
+        // Production: Every 2 frames, Low-end: Every 3 frames
         frameCounter++;
-        const throttleFactor = isLowEndDevice ? 3 : 2;
-        const shouldUpdateState = __DEV__ || (frameCounter % throttleFactor === 0);
+        const throttleFactor = __DEV__ ? 3 : (isLowEndDevice ? 3 : 2);
+        const shouldUpdateState = frameCounter % throttleFactor === 0;
 
         if (shouldUpdateState) {
           // Store for guidance system
