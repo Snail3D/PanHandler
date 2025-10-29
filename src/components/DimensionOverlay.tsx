@@ -229,13 +229,14 @@ export default function DimensionOverlay({
   
   // Helper function to show alerts
   const showAlert = (
-    title: string, 
-    message: string, 
+    title: string,
+    message: string,
     type: 'info' | 'success' | 'error' | 'warning' = 'info',
     confirmText?: string,
     cancelText?: string,
     onConfirm?: () => void
   ) => {
+    __DEV__ && console.log('🚨 showAlert called:', { title, message, type, visible: true });
     setAlertConfig({
       visible: true,
       title,
@@ -245,6 +246,7 @@ export default function DimensionOverlay({
       cancelText,
       onConfirm,
     });
+    __DEV__ && console.log('🚨 alertConfig state set to visible=true');
   };
   
   const closeAlert = () => {
@@ -7573,11 +7575,18 @@ export default function DimensionOverlay({
       {/* Help Button - Positioned next to AUTO LEVEL badge */}
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
-          onPress={() => setShowHelpModal(true)}
+          onPress={() => {
+            __DEV__ && console.log('❓ Help button pressed (short press)');
+            setShowHelpModal(true);
+          }}
           onLongPress={() => {
+            __DEV__ && console.log('❓ Help button LONG PRESSED - clearing email');
+            __DEV__ && console.log('❓ Current userEmail:', userEmail);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setUserEmail(null);
+            __DEV__ && console.log('❓ About to call showAlert...');
             showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending an email.', 'success');
+            __DEV__ && console.log('❓ showAlert call completed');
           }}
           delayLongPress={800}
           style={{

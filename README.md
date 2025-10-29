@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.4
+**Version:** v7.5.5
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.5 - Alert Modal Debugging
+- ✅ **Added:** Comprehensive debug logging for long-press Help button email reset
+- Debug logs now track: long-press trigger → showAlert call → AlertModal render
+- Added `statusBarTranslucent` prop to AlertModal for better compatibility
+- Will help diagnose why modal doesn't appear on some devices
 
 ### v7.5.4 - Save Button → Share Button
 - ✅ **Changed:** Save button is now Share button with iOS share sheet
