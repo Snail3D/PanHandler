@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.9
+**Version:** v7.6.0
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,13 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.6.0 - Production Build Performance Optimization
+- ✅ **Fixed:** Reduced DeviceMotion sensor update rate in production from 60fps to 30fps
+- ✅ **Fixed:** Throttled state updates to every other frame in production (15fps UI updates)
+- Reduces CPU load from 240 state updates/sec to 60 state updates/sec in production
+- Dev builds still run at 60fps for smooth debugging
+- Should significantly improve camera/shutter responsiveness in TestFlight/App Store builds
 
 ### v7.5.9 - CRITICAL Performance Fix - AlertModal Spam
 - ✅ **Fixed:** Removed AlertModal render logging causing HUNDREDS of logs per second

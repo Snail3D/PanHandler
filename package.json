@@ -1,6 +1,6 @@
 {
   "name": "template-app-53",
-  "version": "7.5.9",
+  "version": "7.6.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
