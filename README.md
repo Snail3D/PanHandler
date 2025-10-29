@@ -345,12 +345,20 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.7.0 (Current)
-- **Fixed pan/zoom lock in production builds (CRITICAL)**
-  - Root cause: Stale closure issue where callbacks captured old state values in Hermes-optimized production builds
-  - Added `isPanZoomLockedRef` to maintain fresh state reference across renders
-  - Pan/zoom now unlocks properly after coin calibration, map scale calibration, and mode switches
-  - Fixed works-in-dev-but-fails-in-production issue that was blocking all production deployments
+### ✅ v7.7.1 (Current)
+- **Fixed pan/zoom lock in production builds - ACTUAL ROOT CAUSE (CRITICAL)**
+  - Previous fix in v7.7.0 didn't work - `locked` prop wasn't being used by ZoomableImage at all
+  - Root cause: ZoomableImage gesture handlers never checked if gestures should be disabled
+  - Added `locked` prop to ZoomableImage interface and implementation
+  - Used shared values (`isLockedShared`) to avoid stale closures in gesture worklets
+  - All gestures (pinch, pan, double-tap) now properly respect locked state
+  - Pan/zoom locks during calibration modals and unlocks after completion
+  - Works in both dev AND production builds (production is where Hermes optimization exposed the bug)
+
+### ✅ v7.7.0
+- **Fixed pan/zoom lock in production builds (INCOMPLETE FIX - see v7.7.1)**
+  - Added `isPanZoomLockedRef` in CameraScreen but didn't fix the actual issue
+  - The locked prop wasn't being received or used by ZoomableImage
 - **Fixed menu swipe crash in production builds (CRITICAL)**
   - Root cause: `setTimeout` inside Reanimated worklets doesn't work reliably in production with Hermes
   - Removed `runOnJS(setTimeout)` pattern that was causing immediate crashes
