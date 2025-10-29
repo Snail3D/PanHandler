@@ -17,50 +17,59 @@
 
 ### 1. Pan/Zoom Production Build Fix - ACTUAL ROOT CAUSE (v7.7.1) - CRITICAL
 
-**Problem:** Pan/zoom was still working after coin calibration and map scale calibration when it should have been locked. Also, single-finger panning was accidentally enabled on the measurement screen.
+**Problem:** Pan/zoom worked in development builds but not in production builds. It worked in the map scale modal but not after coin calibration.
 
 **Root Cause Found:**
-CameraScreen was passing `singleFingerPan={true}` to ZoomableImageV2. The pan gesture had this logic:
-```typescript
-.enabled(!locked || singleFingerPan)
-```
-
-This evaluates to:
-- `locked=true, singleFingerPan=true` → `.enabled(!true || true)` → `.enabled(true)` ❌ ALWAYS ENABLED
-
-The `singleFingerPan` flag was overriding the `locked` state, making the image pannable even during calibration.
-
-**Additional Issue:**
-`singleFingerPan={true}` was accidentally added to the measurement screen. This prop should only be used on calibration screens where you want single-finger panning. On the measurement screen, you want two-finger panning so it doesn't interfere with measurement taps.
+The gestures were using `.enabled(!locked)` which reads the `locked` prop directly. In production builds with Hermes optimization, props can get frozen/stale in closures. The gesture handlers were reading an old/frozen value of `locked` instead of the current value.
 
 **Solution:**
-Two-part fix:
+Complete rewrite of gesture locking mechanism in `ZoomableImageV2.tsx`:
 
-1. **Removed `singleFingerPan={true}` from CameraScreen.tsx** (line 2388)
-   - Measurement screen now requires 2-finger pan (won't interfere with taps)
-   - Restores original behavior
-
-2. **Changed pan gesture logic in ZoomableImageV2.tsx** (line 158)
+1. **Added shared value for locked state** (line 67)
    ```typescript
-   .enabled(!locked)  // locked takes priority: disabled if locked, enabled otherwise
+   const isLocked = useSharedValue(locked);
    ```
-   - Now `locked` always takes absolute priority
-   - When locked=true, pan is ALWAYS disabled regardless of `singleFingerPan`
-   - Prevents any modal from accidentally allowing pan when it shouldn't
+
+2. **Sync shared value with prop via useEffect** (lines 70-75)
+   ```typescript
+   useEffect(() => {
+     isLocked.value = locked;
+   }, [locked]);
+   ```
+
+3. **Removed ALL `.enabled(!locked)` calls** - These read stale props in production
+
+4. **Added `isLocked.value` checks inside ALL gesture handlers**
+   - Pinch gesture: Check `isLocked.value` in onStart, onUpdate, onEnd, onFinalize
+   - Rotation gesture: Check `isLocked.value` in onUpdate, onEnd, onFinalize
+   - Pan gesture: Check `isLocked.value` in onStart, onUpdate, onEnd, onFinalize
+   - Double-tap gesture: Check `isLocked.value` in onEnd
+   - All checks use `'worklet'` directive and early return if locked
 
 **Why This Works:**
-- Simple boolean logic: `locked` is the master switch
-- No OR condition that allows other flags to bypass the lock
-- Two-finger pan on measurement screen prevents accidental panning during taps
-- Single-finger pan only on calibration screen where appropriate
+- Shared values are reactive and work in worklets (UI thread)
+- Shared values don't suffer from stale closures like props
+- `useEffect` ensures the shared value stays in sync with prop changes
+- Checking inside worklets (not `.enabled()`) reads the current value every time
 - Works in both dev AND production builds
 
+**Why Map Scale Worked But Coin Calibration Didn't:**
+- Map scale modal calls `onPanZoomLockChange(false)` when opening (line 3821 in DimensionOverlay)
+- This happens AFTER the component is mounted and gestures are set up
+- Coin calibration transitions to measurement mode, which mounts DimensionOverlay
+- DimensionOverlay's `useEffect` calls `onPanZoomLockChange(false)` on mount
+- But in production, this callback might fire before gesture handlers are properly wired
+- The gesture handlers were reading the stale initial `locked=true` value
+
+**Additional Fix:**
+Removed `singleFingerPan={true}` from CameraScreen measurement screen (line 2388). This prop should only be used on calibration screens. Measurement screen should require 2-finger pan to avoid interfering with measurement taps.
+
 **Results:**
-- ✅ Pan gesture properly locks during calibration modals
-- ✅ Pan gesture unlocks after coin calibration
-- ✅ Pan gesture unlocks after map scale calibration
+- ✅ Pan/zoom properly locks during calibration modals
+- ✅ Pan/zoom unlocks after coin calibration
+- ✅ Pan/zoom unlocks after map scale calibration
 - ✅ Two-finger pan only on measurement screen (no interference with taps)
-- ✅ All gestures (pinch, pan, rotation) respect locked state
+- ✅ All gestures (pinch, pan, rotation, double-tap) respect locked state
 - ✅ Works in both dev AND production builds
 
 ### 2. Menu Swipe Crash Fix (v7.7.0) - CRITICAL
@@ -97,18 +106,18 @@ runOnJS(setSwipeTrail)([]);
 
 ## Research Findings
 
-### Key Issue: Stale Closures in React Native Production Builds
+### Key Issue: Stale Closures with Props in Production Builds
 
 **Sources:**
-- Multiple Stack Overflow posts about stale closures with useState and callbacks
 - React Native Reanimated GitHub issues about production crashes
-- Expo documentation on production vs dev build differences
+- Stack Overflow posts about stale closures in Hermes-optimized builds
+- Reanimated documentation on shared values and worklets
 
-**What Are Stale Closures:**
-When a callback function (like `onPanZoomLockChange`) captures variables from its surrounding scope, it creates a "closure." In development, React's hot reload keeps these fresh. In production with Hermes optimization, these closures can get "frozen" with old values.
+**What Goes Wrong:**
+When gesture handlers use `.enabled(!locked)`, they read the `locked` prop at the time the gesture is created. In production builds, Hermes aggressively optimizes and can freeze these prop values in closures. Even when the prop changes, the gesture handler still sees the old value.
 
 **Standard Solution:**
-Use `useRef` to maintain a mutable reference that bypasses the closure mechanism. This is documented in React's official patterns for avoiding stale closures.
+Use shared values instead of props for values that need to be read inside worklets. Shared values are reactive and always provide the current value, even in production builds.
 
 ### Key Issue: setTimeout in Reanimated Worklets
 
@@ -131,13 +140,23 @@ Avoid `setTimeout` in worklets entirely. Either:
 ## Files Modified
 
 - `src/components/ZoomableImageV2.tsx` - **THE ACTUAL FIX**
-  - Changed pan gesture `.enabled()` logic from `!locked || singleFingerPan` to `!locked` (line 158)
-  - Now `locked` always takes priority over other flags
+  - Added `isLocked` shared value for locked state (line 67)
+  - Added `useEffect` to sync shared value with prop (lines 70-75)
+  - Removed `.enabled(!locked)` from pinch gesture (line 127)
+  - Added `isLocked.value` checks to pinch gesture (lines 130-142, 149, 158)
+  - Removed `.enabled(!locked)` from rotation gesture (line 166)
+  - Added `isLocked.value` checks to rotation gesture (lines 169, 176, 187)
+  - Removed `.enabled(!locked)` from pan gesture (line 191)
+  - Added `isLocked.value` checks to pan gesture (lines 205-220, 229, 244)
+  - Removed `.enabled(!locked)` from double-tap gesture (line 258)
+  - Added `isLocked.value` check to double-tap gesture (line 261)
+  - Removed separate `doubleTapWhenLockedGesture` (was redundant)
+  - Updated gesture composition (lines 288-291)
 - `src/screens/CameraScreen.tsx`
-  - Removed `singleFingerPan={true}` from measurement screen ZoomableImage (line 2388)
+  - Removed `singleFingerPan={true}` from measurement screen ZoomableImage (was line 2388)
   - Restores two-finger pan behavior on measurement screen
-  - Added isPanZoomLockedRef for stale closure fix (line 379) - kept but not the main fix
-  - Updated onPanZoomLockChange callback to update ref (lines 2424-2427)
+  - Added debug logging to onPanZoomLockChange callback (line 2424)
+  - Kept isPanZoomLockedRef from v7.7.0 (not the main fix but doesn't hurt)
 - `src/components/DimensionOverlay.tsx`
   - Removed setTimeout from menu swipe worklet (line 3412-3413)
   - Now clears trail immediately without delay
@@ -167,6 +186,7 @@ For v7.6.0-v7.6.8 changes (performance optimization, memory leak sweep), see git
 6. Verify pan/zoom **UNLOCKS** after map scale calibration completes
 7. Verify menu swipe doesn't crash
 8. Verify two-finger pan works on measurement screen (not single-finger)
+9. Verify pan/zoom works in map scale placement modal (before placing pins)
 
 Dev builds will continue to work (they already did), but the real test is production.
 
@@ -185,10 +205,13 @@ Dev builds will continue to work (they already did), but the real test is produc
 ## Notes for Next Developer
 
 This session solved the "works in dev but fails in production" nightmare by:
-1. **Fixing gesture enable logic in ZoomableImageV2** - Changed from `!locked || singleFingerPan` to `!locked`
-2. **Removing accidental singleFingerPan flag from measurement screen** - Should only be on calibration screens
-3. Now `locked` takes absolute priority - when true, ALL pan gestures are disabled
-4. Two-finger pan on measurement screen prevents interference with measurement taps
-5. Removing `setTimeout` from Reanimated worklets to prevent crashes
+1. **Using shared values for locked state in gesture worklets** - THE ACTUAL FIX
+2. Shared values are reactive and don't suffer from stale closures like props
+3. Removed ALL `.enabled(!locked)` calls - these read stale props in production
+4. Check `isLocked.value` inside EVERY gesture handler with early returns
+5. Two-finger pan on measurement screen prevents interference with measurement taps
+6. Removing `setTimeout` from Reanimated worklets to prevent crashes
 
-Both issues are well-documented React Native patterns, but they only show up in production builds where Hermes applies aggressive optimizations. Always test production builds for state management and worklet code!
+The key insight: `.enabled()` reads props at gesture creation time. In production, Hermes freezes these values. Checking shared values inside worklets reads the CURRENT value every time.
+
+Both issues are well-documented React Native patterns, but they only show up in production builds where Hermes applies aggressive optimizations. Always test production builds for gesture state management and worklet code!
