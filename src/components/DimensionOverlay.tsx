@@ -3058,67 +3058,29 @@ export default function DimensionOverlay({
     try {
       __DEV__ && console.log('📧 Starting email export...');
 
-      __DEV__ && console.log('📧 Current userEmail:', userEmail);
-      let emailToUse = userEmail;
-      if (!emailToUse) {
-        __DEV__ && console.log('📧 No saved email, showing EmailPromptModal...');
-        await new Promise<void>((resolve) => {
-          const handleEmailComplete = (email: string | null) => {
-            __DEV__ && console.log('📧 EmailPromptModal completed with email:', email);
-            if (email && email.trim()) {
-              emailToUse = email.trim();
-              setUserEmail(emailToUse);
-              __DEV__ && console.log('📧 Email saved:', emailToUse);
-              // Show confirmation that email was saved
-              setTimeout(() => {
-                showAlert(
-                  'Email Saved',
-                  'Your email has been saved for future reports. Tip: You can reset it anytime by long-pressing the Help (?) button.',
-                  'success'
-                );
-              }, 500);
-            }
-            setShowEmailPromptModal(false);
-            resolve();
-          };
-
-          const handleEmailDismiss = () => {
-            setShowEmailPromptModal(false);
-            resolve();
-          };
-
-          (window as any)._emailPromptHandlers = { handleEmailComplete, handleEmailDismiss };
-          setShowEmailPromptModal(true);
-        });
-
-        // Wait for modal to fully close before proceeding to avoid blur screen issue
-        // Increased delay for TestFlight to ensure modal fully closes
-        await new Promise(resolve => setTimeout(resolve, 600));
-      }
-
       setIsCapturing(true);
       setCurrentLabel(label);
       await new Promise(resolve => setTimeout(resolve, 600));
-      
+
       if (!externalViewRef?.current) {
         showAlert('Error', 'View not ready. Wait and try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
       }
-      
-      const measurementsUri = await captureRef(externalViewRef.current, { 
-        format: 'jpg', 
+
+      const measurementsUri = await captureRef(externalViewRef.current, {
+        format: 'jpg',
         quality: 0.9,
         result: 'tmpfile',
       });
-      
+
       // Build email body
       let measurementText = label ? `${label} - Measurements by PanHandler\n` : 'PanHandler Measurements\n';
       measurementText += '========================================\n\n';
-      
+
       if (coinCircle) {
-        const coinDiameterDisplay = unitSystem === 'imperial' 
+        const coinDiameterDisplay = unitSystem === 'imperial'
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
         measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
@@ -3126,15 +3088,15 @@ export default function DimensionOverlay({
         const scale = calibration.verbalScale;
         measurementText += `Calibration: Map Scale (${scale.screenDistance}${scale.screenUnit} = ${scale.realDistance}${scale.realUnit})\n`;
       }
-      
+
       measurementText += `Unit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\nMeasurements:\n`;
-      
+
       measurements.forEach((m, idx) => {
         const colorInfo = getMeasurementColor(idx, m.mode);
         const valueOnly = m.value.replace(/^(Blue|Green|Red|Purple|Orange|Yellow|Pink|Amber|Cyan|Rose|Teal|Violet|Crimson|Magenta|Indigo|Sky|Lime)\s+/i, '');
         measurementText += `${valueOnly} (${colorInfo.name})\n`;
       });
-      
+
       measurementText += `\n\nAttached: 2 photos\n`;
       if (!isProUser) {
         measurementText += '\n═══════════════════════════\nMade with PanHandler for iOS\n═══════════════════════════';
@@ -3185,13 +3147,11 @@ export default function DimensionOverlay({
       __DEV__ && console.log('📧 Preparing to open email composer with attachments:', attachments.length);
 
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
-      const recipients = emailToUse ? [emailToUse] : [];
 
-      __DEV__ && console.log('📧 Opening MailComposer with:', { recipients, subject, attachmentsCount: attachments.length });
+      __DEV__ && console.log('📧 Opening MailComposer with:', { subject, attachmentsCount: attachments.length });
 
       const result = await MailComposer.composeAsync({
-        recipients,
-        ccRecipients: recipients,
+        recipients: [],
         subject,
         body: measurementText,
         attachments,
@@ -7576,19 +7536,9 @@ export default function DimensionOverlay({
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => {
-            __DEV__ && console.log('❓ Help button pressed (short press)');
+            __DEV__ && console.log('❓ Help button pressed');
             setShowHelpModal(true);
           }}
-          onLongPress={() => {
-            __DEV__ && console.log('❓ Help button LONG PRESSED - clearing email');
-            __DEV__ && console.log('❓ Current userEmail:', userEmail);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            setUserEmail(null);
-            __DEV__ && console.log('❓ About to call showAlert...');
-            showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending an email.', 'success');
-            __DEV__ && console.log('❓ showAlert call completed');
-          }}
-          delayLongPress={800}
           style={{
             position: 'absolute',
             zIndex: 30, // Same as AUTO LEVEL badge
@@ -7616,16 +7566,9 @@ export default function DimensionOverlay({
       )}
 
       {/* Help Modal */}
-      <HelpModal 
-        visible={showHelpModal} 
+      <HelpModal
+        visible={showHelpModal}
         onClose={() => setShowHelpModal(false)}
-        onEmailReset={() => {
-          // HelpModal already handles clearing the email and showing alert
-          // Just close the modal after user sees the alert
-          setTimeout(() => {
-            setShowHelpModal(false);
-          }, 2000);
-        }}
       />
 
       {/* Chuck Norris Easter Egg Modal */}

@@ -38,7 +38,6 @@ import {
 interface HelpModalProps {
   visible: boolean;
   onClose: () => void;
-  onEmailReset?: () => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -151,11 +150,10 @@ const ExpandableSection = ({
 // Comparison row component for Free vs Pro table
 // Removed: ComparisonRow component - Free vs Pro system no longer exists
 
-export default function HelpModal({ visible, onClose, onEmailReset }: HelpModalProps) {
+export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
-  const setUserEmail = useStore((s) => s.setUserEmail);
 
   // Track if close button was long-pressed to prevent modal closing
   const closeLongPressedRef = useRef(false);
@@ -431,16 +429,6 @@ Thank you for helping us improve PanHandler!
                       closeLongPressedRef.current = false;
                     }, 100);
                   }}
-                  onLongPress={() => {
-                    closeLongPressedRef.current = true;
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    setUserEmail(null);
-                    if (onEmailReset) {
-                      onEmailReset();
-                    }
-                    showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending a support email.', 'success');
-                  }}
-                  delayLongPress={800}
                   style={{
                     width: scaleSize(44),
                     height: scaleSize(44),
@@ -1277,10 +1265,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
-                    Save your email address on your first email sendoff for faster future workflows! <Text style={{ fontWeight: '600', color: '#5856D6' }}>(Secure, stored locally and not shared)</Text>
-                  </Text>
-                  <Text style={{ fontSize: 13, color: '#8E8E93', lineHeight: 19, marginTop: 8, fontStyle: 'italic' }}>
-                    💡 <Text style={{ fontWeight: '600' }}>Dev Tip:</Text> Long-press this help button (?) to clear your saved email for testing.
+                    Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.
                   </Text>
                 </View>
               </ExpandableSection>
@@ -1854,10 +1839,10 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="mail-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email for sending only</Text> — your email address is never shared with us
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email uses default Mail.app</Text> — no data stored or collected
                       </Text>
                     </View>
-                    
+
                     {/* No tracking */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="eye-off-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />

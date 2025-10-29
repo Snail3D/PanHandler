@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.5
+**Version:** v7.5.6
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
