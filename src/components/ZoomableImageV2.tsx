@@ -113,6 +113,11 @@ export default function ZoomableImage({
   const pinchGesture = Gesture.Pinch()
     .enabled(!locked) // Disable when locked to allow menu touches through
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
+    .onStart(() => {
+      if (__DEV__) {
+        console.log('🤏 Pinch started - locked:', locked);
+      }
+    })
     .onUpdate((event) => {
       gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
@@ -161,6 +166,9 @@ export default function ZoomableImage({
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
+      if (__DEV__) {
+        console.log('🖐️ Pan started - locked:', locked, 'singleFingerPan:', singleFingerPan);
+      }
       if (__DEV__ && singleFingerPan) {
         console.log('🖐️ Pan gesture started (single-finger mode enabled)');
       }
