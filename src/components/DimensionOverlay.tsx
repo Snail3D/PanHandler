@@ -2974,31 +2974,43 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
+    __DEV__ && console.log('📧 handleEmail called');
     // Show label modal first
     setPendingAction('email');
     setShowLabelModal(true);
+    __DEV__ && console.log('📧 Label modal shown, pending action set to email');
   };
 
   const performEmail = async (label: string | null) => {
+    __DEV__ && console.log('📧 performEmail called with label:', label);
+
     if (!currentImageUri) {
+      __DEV__ && console.log('📧 ERROR: No currentImageUri');
       showAlert('Email Error', 'No image to export.', 'error');
       return;
     }
-    
+
     try {
+      __DEV__ && console.log('📧 Checking if MailComposer is available...');
       const isAvailable = await MailComposer.isAvailableAsync();
+      __DEV__ && console.log('📧 MailComposer available:', isAvailable);
+
       if (!isAvailable) {
         showAlert('Email Not Available', 'No email app is configured.', 'warning');
         return;
       }
 
+      __DEV__ && console.log('📧 Current userEmail:', userEmail);
       let emailToUse = userEmail;
       if (!emailToUse) {
+        __DEV__ && console.log('📧 No saved email, showing EmailPromptModal...');
         await new Promise<void>((resolve) => {
           const handleEmailComplete = (email: string | null) => {
+            __DEV__ && console.log('📧 EmailPromptModal completed with email:', email);
             if (email && email.trim()) {
               emailToUse = email.trim();
               setUserEmail(emailToUse);
+              __DEV__ && console.log('📧 Email saved:', emailToUse);
               // Show confirmation that email was saved
               setTimeout(() => {
                 showAlert(
@@ -3171,14 +3183,18 @@ export default function DimensionOverlay({
   
   // Handle label modal completion
   const handleLabelComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
+    __DEV__ && console.log('📝 handleLabelComplete called with:', data);
+    __DEV__ && console.log('📝 pendingAction:', pendingAction);
     setShowLabelModal(false);
 
     // Remember the label for this session
     setCurrentLabel(data.label);
 
     if (pendingAction === 'save') {
+      __DEV__ && console.log('📝 Calling performSave...');
       performSave(data.label);
     } else if (pendingAction === 'email') {
+      __DEV__ && console.log('📝 Calling performEmail...');
       performEmail(data.label);
     }
 
