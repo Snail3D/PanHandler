@@ -60,7 +60,20 @@ export default function ZoomableImage({
   const fadeOpacity = useSharedValue(1);
   const gestureWasActive = useSharedValue(false);
   const gestureJustEnded = useSharedValue(false); // Debounce cooldown flag
-  
+
+  // CRITICAL: Use shared value for locked state to avoid stale closures in production builds
+  // In production, Hermes optimizes closures and the `locked` prop can get frozen
+  // Shared values are reactive and work correctly in both dev and production
+  const isLocked = useSharedValue(locked);
+
+  // Update shared value whenever locked prop changes
+  useEffect(() => {
+    isLocked.value = locked;
+    if (__DEV__) {
+      console.log('🔒 Locked state updated:', locked);
+    }
+  }, [locked]);
+
   // Helper function to clear gesture cooldown after delay
   const clearGestureCooldown = () => {
     setTimeout(() => {
@@ -111,92 +124,130 @@ export default function ZoomableImage({
   );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(!locked) // Disable when locked to allow menu touches through
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
+      'worklet';
+      if (isLocked.value) {
+        if (__DEV__) {
+          console.log('🚫 Pinch blocked - locked:', isLocked.value);
+        }
+        return;
+      }
       if (__DEV__) {
-        console.log('🤏 Pinch started - locked:', locked);
+        console.log('🤏 Pinch started - locked:', isLocked.value);
       }
     })
     .onUpdate((event) => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
     })
     .onEnd(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
     })
     .onFinalize(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       // Ensure gesture is fully complete
       savedScale.value = scale.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
     });
   
   const rotationGesture = Gesture.Rotation()
-    .enabled(!locked) // Disable when locked to allow menu touches through
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       gestureWasActive.value = true;
       rotation.value = savedRotation.value + event.rotation;
     })
     .onEnd(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Mark gesture as complete
-      
+
       // ROTATION DEBOUNCE: 50ms cooldown prevents buttons from sticking after rotation
       gestureJustEnded.value = true;
       runOnJS(clearGestureCooldown)();
     })
     .onFinalize(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       // Ensure gesture is fully complete
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
-      
+
       // Additional safety: set cooldown here too (in case onEnd didn't fire)
       gestureJustEnded.value = true;
       runOnJS(clearGestureCooldown)();
     });
 
   const panGesture = Gesture.Pan()
-    .enabled(!locked) // locked takes priority: disabled if locked, enabled otherwise
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
+      'worklet';
+      if (isLocked.value) {
+        if (__DEV__) {
+          runOnJS(console.log)('🚫 Pan blocked - locked:', isLocked.value);
+        }
+        return;
+      }
       if (__DEV__) {
-        console.log('🖐️ Pan started - locked:', locked, 'singleFingerPan:', singleFingerPan);
+        runOnJS(console.log)('🖐️ Pan started - locked:', isLocked.value, 'singleFingerPan:', singleFingerPan);
       }
       if (__DEV__ && singleFingerPan) {
-        console.log('🖐️ Pan gesture started (single-finger mode enabled)');
+        runOnJS(console.log)('🖐️ Pan gesture started (single-finger mode enabled)');
       }
     })
     .onUpdate((event) => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
       translateY.value = savedTranslateY.value + event.translationY * 0.7;
     })
     .onEnd(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       if (__DEV__ && singleFingerPan) {
-        console.log('✅ Pan gesture ended');
+        runOnJS(console.log)('✅ Pan gesture ended');
       }
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
-      
+
       // PAN DEBOUNCE: 50ms cooldown prevents buttons from sticking after pan
       gestureJustEnded.value = true;
       runOnJS(clearGestureCooldown)();
     })
     .onFinalize(() => {
+      'worklet';
+      if (isLocked.value) return; // Early return if locked
+
       // Ensure gesture is fully complete and release control
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
-      
+
       // Additional safety: set cooldown here too (in case onEnd didn't fire)
       gestureJustEnded.value = true;
       runOnJS(clearGestureCooldown)();
@@ -204,8 +255,17 @@ export default function ZoomableImage({
 
   const doubleTapGesture = Gesture.Tap()
     .numberOfTaps(2)
-    .enabled(!locked)
     .onEnd(() => {
+      'worklet';
+      // Check locked state in worklet - if locked, call special callback instead
+      if (isLocked.value) {
+        if (onDoubleTapWhenLocked) {
+          runOnJS(onDoubleTapWhenLocked)();
+        }
+        return;
+      }
+
+      // Not locked - do normal zoom behavior
       if (scale.value > 1) {
         scale.value = withSpring(1);
         savedScale.value = 1;
@@ -224,23 +284,9 @@ export default function ZoomableImage({
       }
     });
 
-  // Double-tap when LOCKED to switch to Measure mode (power-user shortcut)
-  const doubleTapWhenLockedGesture = Gesture.Tap()
-    .numberOfTaps(2)
-    .enabled(locked)
-    .maxDeltaX(10)
-    .maxDeltaY(10)
-    .onEnd(() => {
-      if (onDoubleTapWhenLocked) {
-        runOnJS(onDoubleTapWhenLocked)();
-      }
-    });
-
-  // Use simple simultaneous gestures for both modes
   // Compose gestures - use Race so double-tap and pan/zoom can coexist
   const composedGesture = Gesture.Race(
     doubleTapGesture,
-    doubleTapWhenLockedGesture,
     Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
   );
 
