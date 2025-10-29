@@ -11,6 +11,10 @@
         "resourceClass": "m-medium",
         "image": "latest"
       },
+      "android": {
+        "resourceClass": "m-medium",
+        "image": "latest"
+      },
       "env": {
         "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
         "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
@@ -25,6 +29,10 @@
         "resourceClass": "m-medium",
         "image": "latest"
       },
+      "android": {
+        "resourceClass": "m-medium",
+        "image": "latest"
+      },
       "env": {
         "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
         "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
@@ -35,6 +43,10 @@
     },
     "production": {
       "ios": {
+        "resourceClass": "m-medium",
+        "image": "latest"
+      },
+      "android": {
         "resourceClass": "m-medium",
         "image": "latest"
       },
