@@ -347,13 +347,13 @@ bun tsc --noEmit
 
 ### ✅ v7.7.1 (Current)
 - **Fixed pan/zoom lock in production builds - ACTUAL ROOT CAUSE (CRITICAL)**
-  - Previous fix in v7.7.0 didn't work - `locked` prop wasn't being used by ZoomableImage at all
-  - Root cause: ZoomableImage gesture handlers never checked if gestures should be disabled
-  - Added `locked` prop to ZoomableImage interface and implementation
-  - Used shared values (`isLockedShared`) to avoid stale closures in gesture worklets
-  - All gestures (pinch, pan, double-tap) now properly respect locked state
-  - Pan/zoom locks during calibration modals and unlocks after completion
-  - Works in both dev AND production builds (production is where Hermes optimization exposed the bug)
+  - Root cause: `singleFingerPan={true}` was overriding the `locked` state with OR logic
+  - The gesture was `.enabled(!locked || singleFingerPan)` which always evaluated to true when singleFingerPan was set
+  - Removed `singleFingerPan={true}` from measurement screen (should only be on calibration screen)
+  - Changed gesture logic to `.enabled(!locked)` so locked always takes priority
+  - Pan/zoom now properly locks during calibration modals and unlocks after
+  - Two-finger pan only on measurement screen (prevents interference with measurement taps)
+  - Works in both dev AND production builds
 
 ### ✅ v7.7.0
 - **Fixed pan/zoom lock in production builds (INCOMPLETE FIX - see v7.7.1)**
