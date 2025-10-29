@@ -1147,8 +1147,8 @@ export default function CameraScreen() {
 
   const coinPlacementBaseStyle = {
     position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
+    top: '50%' as `${number}%`,
+    left: '50%' as `${number}%`,
     width: scaleSize(25),
     height: scaleSize(25),
     marginLeft: -scaleSize(12.5),
