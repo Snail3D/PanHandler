@@ -102,6 +102,9 @@ export default function CoinCalibration({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CoinReference[]>([]);
   const [showCoinSelector, setShowCoinSelector] = useState(false);
+
+  // Track haptic timers for cleanup
+  const hapticTimersRef = useRef<NodeJS.Timeout[]>([]);
   
   // Coin selector fade animation
   const coinSelectorOpacity = useSharedValue(0);
@@ -332,6 +335,14 @@ export default function CoinCalibration({
     }
   }, [zoomScale, showTutorial, selectedCoin]);
 
+  // CRITICAL: Cleanup haptic timers on unmount
+  useEffect(() => {
+    return () => {
+      hapticTimersRef.current.forEach(timer => clearTimeout(timer));
+      hapticTimersRef.current = [];
+    };
+  }, []);
+
   // Reference circle in center of screen - represents the coin's actual diameter
   // MOVED UP: Now at 2/3 of screen height for better menu layout
   const referenceCenterX = SCREEN_WIDTH / 2;
@@ -344,16 +355,16 @@ export default function CoinCalibration({
 
   const handleLockIn = () => {
     if (!selectedCoin) return;
-    
+
     // Zelda "Item Get" haptic sequence - da-na-na-NAAAA! 🎵 (BEEFED UP!)
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);  // da (upgraded from Light)
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 100);  // na (upgraded)
-    setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200);  // na (upgraded to Heavy!)
-    setTimeout(() => {
+    hapticTimersRef.current.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 100));  // na (upgraded)
+    hapticTimersRef.current.push(setTimeout(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 200));  // na (upgraded to Heavy!)
+    hapticTimersRef.current.push(setTimeout(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // NAAAA!
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);  // Double tap for emphasis!
-      setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50);
-    }, 300);
+      hapticTimersRef.current.push(setTimeout(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 50));
+    }, 300));
     
     // Save coin preference
     setLastSelectedCoin(selectedCoin.name);
