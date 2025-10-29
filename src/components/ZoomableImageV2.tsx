@@ -155,7 +155,7 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
-    .enabled(!locked || singleFingerPan) // Allow pan when NOT locked OR when singleFingerPan is enabled
+    .enabled(!locked) // locked takes priority: disabled if locked, enabled otherwise
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)

@@ -2385,7 +2385,6 @@ export default function CameraScreen() {
                   showLevelLine={false}
                   locked={isPanZoomLocked}
                   opacity={imageOpacity}
-                  singleFingerPan={true}
                   onTransformChange={(scale, translateX, translateY, rotation) => {
                     const newZoom = { scale, translateX, translateY, rotation };
                     setMeasurementZoom(newZoom);
