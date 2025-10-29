@@ -345,7 +345,30 @@ bun tsc --noEmit
 
 ## 🎯 Roadmap
 
-### ✅ v7.5.0 (Current)
+### ✅ v7.7.0 (Current)
+- **Fixed pan/zoom lock in production builds (CRITICAL)**
+  - Root cause: Stale closure issue where callbacks captured old state values in Hermes-optimized production builds
+  - Added `isPanZoomLockedRef` to maintain fresh state reference across renders
+  - Pan/zoom now unlocks properly after coin calibration, map scale calibration, and mode switches
+  - Fixed works-in-dev-but-fails-in-production issue that was blocking all production deployments
+- **Fixed menu swipe crash in production builds (CRITICAL)**
+  - Root cause: `setTimeout` inside Reanimated worklets doesn't work reliably in production with Hermes
+  - Removed `runOnJS(setTimeout)` pattern that was causing immediate crashes
+  - Menu swipe now clears trail immediately without delay-based cleanup
+  - No more app crashes when collapsing menu with swipe gesture
+
+### ✅ v7.6.0-7.6.8
+- **Performance optimization for all devices**
+  - Reduced DeviceMotion sensor rate from 60fps → 50ms/20fps for smoother performance
+  - Standardized 50ms update interval across all devices (budget Android and high-end iOS)
+  - Removed debug console.log spam from AlertModal (hundreds of logs per second)
+- **Memory leak sweep**
+  - Fixed zoomSaveTimeoutRef leak in CameraScreen
+  - Cleaned up 9 timeout/interval refs in DimensionOverlay
+  - Added haptic timer cleanup in CoinCalibration (4 timers)
+  - All timers now properly cleaned on component unmount
+
+### ✅ v7.5.0
 - **Quadrillion suffix support for Lake Michigan-scale measurements**
   - Added Q (quadrillion) suffix for ultra-massive volumes and areas
   - Lake Michigan volume now displays as `1.18Q gal` instead of `1180.00T gal`

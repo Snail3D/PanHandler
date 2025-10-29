@@ -3409,13 +3409,8 @@ export default function DimensionOverlay({
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
 
-        // Clear trail after delay - wrap the whole setTimeout in runOnJS
-        const clearTrail = () => {
-          setTimeout(() => {
-            setSwipeTrail([]);
-          }, 1000);
-        };
-        runOnJS(clearTrail)();
+        // Clear trail immediately - setTimeout doesn't work reliably in worklets (production builds)
+        runOnJS(setSwipeTrail)([]);
       }
       // Swipe left OR right to open menu (when hidden)
       else if (isHorizontal && 

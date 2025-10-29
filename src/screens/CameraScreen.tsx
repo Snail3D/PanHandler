@@ -373,9 +373,10 @@ export default function CameraScreen() {
   };
   
   // Determine if pan/zoom should be locked
-  // Determine if pan/zoom should be locked
   // Controlled by DimensionOverlay (e.g., during blueprint recalibration with existing measurements)
+  // Use ref to avoid stale closure issues in production builds
   const [isPanZoomLocked, setIsPanZoomLocked] = useState(false);
+  const isPanZoomLockedRef = useRef(false);
 
 
   // Helper to detect orientation based on image (for future use)
@@ -2421,6 +2422,7 @@ export default function CameraScreen() {
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
                   onPanZoomLockChange={(shouldLock) => {
+                    isPanZoomLockedRef.current = shouldLock;
                     setIsPanZoomLocked(shouldLock);
                   }}
                   onRegisterDoubleTapCallback={(callback) => {
