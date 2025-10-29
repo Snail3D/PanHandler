@@ -477,13 +477,17 @@ export default function CameraScreen() {
         // Detect low-end device based on multiple factors
         const deviceYear = Device.deviceYearClass || 2024; // Default to current year if unknown
         const isOldDevice = deviceYear < 2018; // Devices older than iPhone X / Pixel 2 era
-        
+
         // Check available memory (if available)
         const totalMemory = Device.totalMemory || 4000000000; // Default to 4GB if unknown
         const hasLowMemory = totalMemory < 3000000000; // Less than 3GB RAM
-        
+
+        // Budget Android detection: Many cheap Android phones from 2020-2024 have weak CPUs
+        // but decent RAM (3-4GB). Check for Android devices with low year class despite recent years.
+        const isBudgetAndroid = Platform.OS === 'android' && deviceYear >= 2018 && deviceYear < 2021 && totalMemory < 4000000000;
+
         // Determine if device is low-end
-        const isLowEnd = isOldDevice || hasLowMemory;
+        const isLowEnd = isOldDevice || hasLowMemory || isBudgetAndroid;
         setIsLowEndDevice(isLowEnd);
         
         if (isReduceMotionEnabled || isLowEnd) {
@@ -575,7 +579,7 @@ export default function CameraScreen() {
     // Adjust update rate based on device capability
     // Production builds: Use 33ms (30fps) to reduce CPU load - still smooth
     // Dev builds: Use 16ms (60fps) for debugging
-    // Low-end devices: 50ms (20fps) - smooth enough
+    // Low-end devices: 50ms (20fps) - smooth enough for budget Android phones
     const updateInterval = __DEV__ ? 16 : (isLowEndDevice ? 50 : 33);
     DeviceMotion.setUpdateInterval(updateInterval);
 
@@ -583,7 +587,9 @@ export default function CameraScreen() {
     const hapticTimers: NodeJS.Timeout[] = [];
 
     // Throttle state updates in production to reduce re-renders
-    // Update UI every 2 frames instead of every frame (still 15fps UI updates at 30fps sensor)
+    // Low-end devices: Update every 3 frames (50ms sensor / 3 = 6.7fps UI updates)
+    // Regular production: Update every 2 frames (33ms sensor / 2 = 15fps UI updates)
+    // Dev: Update every frame for debugging
     let frameCounter = 0;
 
     const subscription = DeviceMotion.addListener((data) => {
@@ -603,9 +609,11 @@ export default function CameraScreen() {
         const gamma = smoothedGamma.current;
         const absBeta = Math.abs(beta);
 
-        // Throttle state updates to reduce re-renders (only update every other frame in production)
+        // Throttle state updates to reduce re-renders
+        // Dev: Update every frame, Production: Every 2 frames, Low-end: Every 3 frames
         frameCounter++;
-        const shouldUpdateState = __DEV__ || (frameCounter % 2 === 0);
+        const throttleFactor = isLowEndDevice ? 3 : 2;
+        const shouldUpdateState = __DEV__ || (frameCounter % throttleFactor === 0);
 
         if (shouldUpdateState) {
           // Store for guidance system
