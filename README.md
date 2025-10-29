@@ -502,6 +502,13 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 
 ## 📝 Recent Updates
 
+### v7.5.6 - Simplified Email Workflow
+- ✅ **Removed:** Saved email address functionality - simplified to use Mail.app defaults
+- ✅ **Removed:** Email prompt modal and long-press Help button reset
+- Email button now opens Mail.app directly with pre-populated subject, body, and 2 attachments
+- Share button provides quick sharing via iOS share sheet (AirDrop, Messages, etc.)
+- Both buttons remain side-by-side for different use cases
+
 ### v7.5.5 - Alert Modal Debugging
 - ✅ **Added:** Comprehensive debug logging for long-press Help button email reset
 - Debug logs now track: long-press trigger → showAlert call → AlertModal render
@@ -548,7 +555,7 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ## 💬 Support & Feedback
 
 - **YouTube:** [@realsnail3d](https://youtube.com/@realsnail3d)
-- **Email:** Long-press the Help (?) button in the app to reset your saved email
+- **Email:** Contact us via the app's email feature
 - **Bug Reports:** Found an issue? Let us know!
 
 ---
