@@ -2992,20 +2992,7 @@ export default function DimensionOverlay({
     }
 
     try {
-      __DEV__ && console.log('📧 Checking if MailComposer is available...');
-      const isAvailable = await MailComposer.isAvailableAsync();
-      __DEV__ && console.log('📧 MailComposer available:', isAvailable);
-
-      if (!isAvailable) {
-        // Show alert with option to use Share instead
-        showAlert(
-          'Email Not Configured',
-          'Mail app is not set up on this device. After capturing, you can use the native Share option to send via any messaging app.',
-          'warning'
-        );
-        // Continue with capture anyway - user can share the files manually
-        __DEV__ && console.log('📧 Will capture and prepare files for manual sharing');
-      }
+      __DEV__ && console.log('📧 Starting email export...');
 
       __DEV__ && console.log('📧 Current userEmail:', userEmail);
       let emailToUse = userEmail;
@@ -3030,21 +3017,21 @@ export default function DimensionOverlay({
             setShowEmailPromptModal(false);
             resolve();
           };
-          
+
           const handleEmailDismiss = () => {
             setShowEmailPromptModal(false);
             resolve();
           };
-          
+
           (window as any)._emailPromptHandlers = { handleEmailComplete, handleEmailDismiss };
           setShowEmailPromptModal(true);
         });
-        
+
         // Wait for modal to fully close before proceeding to avoid blur screen issue
         // Increased delay for TestFlight to ensure modal fully closes
         await new Promise(resolve => setTimeout(resolve, 600));
       }
-      
+
       setIsCapturing(true);
       setCurrentLabel(label);
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -3135,24 +3122,6 @@ export default function DimensionOverlay({
 
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
       const recipients = emailToUse ? [emailToUse] : [];
-
-      // Use expo-sharing if MailComposer is not available
-      if (!isAvailable) {
-        __DEV__ && console.log('📧 Using expo-sharing as fallback');
-        try {
-          // Share the first image (measurements with annotations)
-          await Sharing.shareAsync(attachments[0], {
-            mimeType: 'image/jpeg',
-            dialogTitle: subject,
-            UTI: 'public.jpeg',
-          });
-          showAlert('Share Complete', 'Your measurements have been shared!', 'success');
-        } catch (shareError) {
-          __DEV__ && console.error('📧 Share error:', shareError);
-          showAlert('Share Error', 'Could not open share sheet.', 'error');
-        }
-        return;
-      }
 
       __DEV__ && console.log('📧 Opening MailComposer with:', { recipients, subject, attachmentsCount: attachments.length });
 
