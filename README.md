@@ -490,13 +490,27 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.0
+**Version:** v7.5.1
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
 **This is production-ready. Ship it.**
 
 For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUNCH_GUIDE.md)
+
+---
+
+## 📝 Recent Updates
+
+### v7.5.1 - Panning Fix
+- ✅ **Fixed:** Single-finger panning now works in measurement mode after coin calibration
+- Previously required 2 fingers; now supports 1-finger pan for easier navigation
+
+### v7.5.0 - Area & Volume Display Improvements
+- ✅ Intelligent area unit scaling (3.32K mm² → 33.2 cm²)
+- ✅ Lower threshold for mm²→cm² conversion (from 10000 to 1000)
+- ✅ Fixed imperial areas showing "0.00 ac" for small measurements
+- ✅ Added Q (quadrillion) suffix support for Lake Michigan-scale measurements
 
 ---
 
