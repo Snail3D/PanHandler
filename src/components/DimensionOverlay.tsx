@@ -3098,29 +3098,48 @@ export default function DimensionOverlay({
       
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
-      
+
       const labelOnlyFilename = label ? `${label}_Label.png` : 'Label.png';
       const labelOnlyDest = `${FileSystem.cacheDirectory}${labelOnlyFilename}`;
       await FileSystem.copyAsync({ from: labelOnlyUri, to: labelOnlyDest });
       attachments.push(labelOnlyDest);
-      
+
+      // CRITICAL: Reset all capture states BEFORE opening email composer
+      // This prevents the screen from staying blank if user cancels email
       setIsCapturing(false);
       setCurrentLabel(null);
-      
+
+      // Wait for state to update and UI to restore
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      __DEV__ && console.log('📧 Preparing to open email composer with attachments:', attachments.length);
+
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
       const recipients = emailToUse ? [emailToUse] : [];
-      
-      await MailComposer.composeAsync({
+
+      __DEV__ && console.log('📧 Opening MailComposer with:', { recipients, subject, attachmentsCount: attachments.length });
+
+      const result = await MailComposer.composeAsync({
         recipients,
         ccRecipients: recipients,
         subject,
         body: measurementText,
         attachments,
       });
-      
+
+      __DEV__ && console.log('📧 MailComposer result:', result);
+
+      // Show success message if email was sent
+      if (result.status === 'sent') {
+        showAlert('Email Sent', 'Your measurements have been emailed successfully!', 'success');
+      }
+
     } catch (error) {
+      __DEV__ && console.error('📧 Email export error:', error);
       setIsCapturing(false);
       setCurrentLabel(null);
+      setHideMeasurementsForCapture(false);
+      if (setImageOpacity) setImageOpacity(1);
       showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
