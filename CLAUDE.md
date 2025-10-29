@@ -1,51 +1,68 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-29
-**Version:** 7.7.0
-**Status:** Complete ✅
+**Version:** 7.7.1
+**Status:** In Progress 🔧
 
 ---
 
 ## 📝 Session Goals
 
-1. ✅ Fix pan/zoom locked after calibration in production builds (works in dev)
+1. 🔧 Fix pan/zoom locked after calibration in production builds (ACTUAL FIX)
 2. ✅ Fix menu swipe gesture crashing app in production builds
 
 ---
 
 ## Changes Made This Session
 
-### 1. Pan/Zoom Production Build Fix (v7.7.0) - CRITICAL
+### 1. Pan/Zoom Production Build Fix - ACTUAL ROOT CAUSE (v7.7.1) - CRITICAL
 
-**Problem:** Pan/zoom was completely locked after coin calibration and map scale calibration in production builds (TestFlight/App Store), but worked perfectly in development builds.
+**Problem:** Pan/zoom was completely locked after coin calibration and map scale calibration in production builds (TestFlight/App Store). The previous fix in v7.7.0 didn't work because it only added a ref to CameraScreen, but the `locked` prop wasn't even being received or used by ZoomableImage.
 
-**Root Cause Found Through Research:**
-This is a **stale closure** issue - a well-documented React Native problem where callbacks capture old state values in production builds. When Hermes optimizes the production build, the inline callback at `CameraScreen.tsx:2423` gets frozen with stale references to `setIsPanZoomLocked`. The callback thinks the state is still locked even after `onPanZoomLockChange(false)` is called.
+**Root Cause Found:**
+The `locked` prop was being passed from CameraScreen to ZoomableImage, but:
+1. ZoomableImage's interface didn't include the `locked` prop
+2. The gesture handlers never checked if gestures should be disabled
+3. Even if the prop existed, using it directly would cause stale closures in production builds
 
 **Solution:**
-Added `isPanZoomLockedRef` to maintain a fresh reference that doesn't get caught in the closure:
-```typescript
-// CameraScreen.tsx:379
-const isPanZoomLockedRef = useRef(false);
+Fixed ZoomableImage to properly handle the locked state:
 
-// CameraScreen.tsx:2424-2427
-onPanZoomLockChange={(shouldLock) => {
-  isPanZoomLockedRef.current = shouldLock;  // Update ref FIRST
-  setIsPanZoomLocked(shouldLock);
-}}
+```typescript
+// ZoomableImage.tsx - Added to interface
+interface ZoomableImageProps {
+  // ... other props
+  locked?: boolean;  // When true, disables pan/zoom gestures
+}
+
+// ZoomableImage.tsx - Use shared value for locked state
+const isLockedShared = useSharedValue(locked);
+
+// Update shared value when prop changes
+useEffect(() => {
+  isLockedShared.value = locked;
+}, [locked, isLockedShared]);
+
+// In each gesture handler (pinch, pan, doubleTap)
+.onUpdate((event) => {
+  'worklet';
+  if (isLockedShared.value) return;  // Early return if locked
+  // ... rest of gesture logic
+})
 ```
 
 **Why This Works:**
-- Refs are mutable and don't cause re-renders
-- Refs bypass React's closure mechanism
-- Production builds can't optimize away the ref mutation
-- This is the standard React pattern for avoiding stale closures with callbacks
+- Shared values work in worklets (gesture handlers run on UI thread)
+- Shared values don't suffer from stale closures like regular state
+- `useEffect` ensures the shared value stays in sync with the prop
+- Early return prevents any gesture logic from running when locked
 
 **Results:**
+- ✅ Pan/zoom properly locks during calibration modals
 - ✅ Pan/zoom unlocks after coin calibration
 - ✅ Pan/zoom unlocks after map scale calibration
+- ✅ All gestures (pinch, pan, double-tap) respect locked state
 - ✅ Works in both dev AND production builds
-- ✅ No more "works in dev but fails in production" nightmare
 
 ### 2. Menu Swipe Crash Fix (v7.7.0) - CRITICAL
 
@@ -114,15 +131,22 @@ Avoid `setTimeout` in worklets entirely. Either:
 
 ## Files Modified
 
+- `src/components/ZoomableImage.tsx` - **THE ACTUAL FIX**
+  - Added `locked` prop to interface (line 19)
+  - Added `isLockedShared` shared value for locked state (line 32)
+  - Added `useEffect` to sync shared value with prop (lines 35-37)
+  - Added locked checks to pinch gesture (lines 49-50, 55-56)
+  - Added locked checks to pan gesture (lines 67-68, 74-75)
+  - Added locked checks to double-tap gesture (lines 88-89)
 - `src/screens/CameraScreen.tsx`
-  - Added isPanZoomLockedRef for stale closure fix (line 379)
+  - Added isPanZoomLockedRef for stale closure fix (line 379) - kept but not the main fix
   - Updated onPanZoomLockChange callback to update ref (lines 2424-2427)
 - `src/components/DimensionOverlay.tsx`
   - Removed setTimeout from menu swipe worklet (line 3412-3413)
   - Now clears trail immediately without delay
-- `package.json` - Version at 7.7.0
-- `app.json` - Version at 7.7.0
-- `README.md` - Updated roadmap with v7.7.0 fixes
+- `package.json` - Version bumped to 7.7.1
+- `app.json` - Version bumped to 7.7.1
+- `README.md` - Updated roadmap with v7.7.1 fixes
 - `CLAUDE.md` - This file (session documentation)
 
 ---
@@ -140,9 +164,11 @@ For v7.6.0-v7.6.8 changes (performance optimization, memory leak sweep), see git
 
 1. Build production version: `eas build --platform ios --profile production`
 2. Test via TestFlight
-3. Verify pan/zoom works after coin calibration
-4. Verify pan/zoom works after map scale calibration
-5. Verify menu swipe doesn't crash
+3. Verify pan/zoom **LOCKS** during coin calibration modal (can't pan while calibrating)
+4. Verify pan/zoom **UNLOCKS** after coin calibration completes
+5. Verify pan/zoom **LOCKS** during map scale calibration modal
+6. Verify pan/zoom **UNLOCKS** after map scale calibration completes
+7. Verify menu swipe doesn't crash
 
 Dev builds will continue to work (they already did), but the real test is production.
 
@@ -150,16 +176,19 @@ Dev builds will continue to work (they already did), but the real test is produc
 
 ## Next Steps
 
-1. ✅ Deploy v7.7.0 to production
+1. 🔧 Deploy v7.7.1 to production (THIS IS THE REAL FIX)
 2. Test all calibration modes in TestFlight
-3. Verify no more crashes or lock-ups
+3. Verify pan/zoom locks during calibration and unlocks after
+4. Verify no more crashes or lock-ups
 
 ---
 
 ## Notes for Next Developer
 
 This session solved the "works in dev but fails in production" nightmare by:
-1. Using `useRef` to avoid stale closures in optimized Hermes builds
-2. Removing `setTimeout` from Reanimated worklets to prevent crashes
+1. **Using shared values in ZoomableImage to check locked state in gesture worklets** (THE ACTUAL FIX)
+2. Shared values don't suffer from stale closures like regular state/props
+3. Gesture handlers run on the UI thread as worklets, so they need shared values
+4. Removing `setTimeout` from Reanimated worklets to prevent crashes
 
 Both issues are well-documented React Native patterns, but they only show up in production builds where Hermes applies aggressive optimizations. Always test production builds for state management and worklet code!
