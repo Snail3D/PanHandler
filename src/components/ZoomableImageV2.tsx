@@ -127,15 +127,7 @@ export default function ZoomableImage({
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      if (isLocked.value) {
-        if (__DEV__) {
-          console.log('🚫 Pinch blocked - locked:', isLocked.value);
-        }
-        return;
-      }
-      if (__DEV__) {
-        console.log('🤏 Pinch started - locked:', isLocked.value);
-      }
+      if (isLocked.value) return; // Early return if locked
     })
     .onUpdate((event) => {
       'worklet';
@@ -202,18 +194,7 @@ export default function ZoomableImage({
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      if (isLocked.value) {
-        if (__DEV__) {
-          runOnJS(console.log)('🚫 Pan blocked - locked:', isLocked.value);
-        }
-        return;
-      }
-      if (__DEV__) {
-        runOnJS(console.log)('🖐️ Pan started - locked:', isLocked.value, 'singleFingerPan:', singleFingerPan);
-      }
-      if (__DEV__ && singleFingerPan) {
-        runOnJS(console.log)('🖐️ Pan gesture started (single-finger mode enabled)');
-      }
+      if (isLocked.value) return; // Early return if locked
     })
     .onUpdate((event) => {
       'worklet';
@@ -228,9 +209,6 @@ export default function ZoomableImage({
       'worklet';
       if (isLocked.value) return; // Early return if locked
 
-      if (__DEV__ && singleFingerPan) {
-        runOnJS(console.log)('✅ Pan gesture ended');
-      }
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
