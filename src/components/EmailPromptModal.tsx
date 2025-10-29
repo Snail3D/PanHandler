@@ -32,29 +32,29 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
       visible={visible}
       transparent
       animationType="fade"
+      statusBarTranslucent
       onRequestClose={handleCancel}
     >
-      <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
+      <Pressable 
+        style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
+        onPress={handleCancel}
+      >
         <Pressable 
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
-          onPress={handleCancel}
+          style={{
+            width: '100%',
+            maxWidth: offered,
+            borderRadius: 32,
+            overflow: 'hidden',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 16 },
+            shadowOpacity: 0.5,
+            shadowRadius: 32,
+            elevation: 24,
+          }}
+          onPress={(e) => e.stopPropagation()}
         >
-          <Pressable 
-            style={{
-              width: '100%',
-              maxWidth: 420,
-              borderRadius: 32,
-              overflow: 'hidden',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 16 },
-              shadowOpacity: 0.5,
-              shadowRadius: 32,
-              elevation: 24,
-            }}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <BlurView intensity={100} tint="light">
-              <View style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.95)' }}>
                 {/* Header */}
                 <View style={{
                   paddingTop: 18,
@@ -255,10 +255,8 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
                   </View>
                 </View>
               </View>
-            </BlurView>
           </Pressable>
         </Pressable>
-      </BlurView>
     </Modal>
   );
 }

@@ -1331,6 +1331,9 @@ export default function CameraScreen() {
     // Clear local photo state now that it's persisted
     setCapturedPhotoUri(null);
     
+    // CRITICAL: Reset pan lock state to ensure gestures work
+    setIsPanZoomLocked(false);
+    
     // Simpler approach: Just fade to black, switch instantly, fade in
     setIsTransitioning(true);
     
@@ -1492,38 +1495,41 @@ export default function CameraScreen() {
     
     const photoUri = pendingPhotoUri;
     
-    if (type === 'coin') {
-      // COIN: Go to calibration immediately
-      if (photoUri) {
-        setCapturedPhotoUri(photoUri);
-        setPendingPhotoUri(null);
-      }
-      
-      setMode('zoomCalibrate');
-      
-      // Background MMKV write
-      setTimeout(() => {
-        if (photoUri) setImageUri(photoUri, false);
-      }, 100);
-      
-    } else {
-      // MAP/BLUEPRINT: Go to measurement
-      if (photoUri) {
-        setImageUri(photoUri, false);
-        setPendingPhotoUri(null);
-      }
-      
-      setMode('measurement');
-      
-      // Show appropriate modal
-      setTimeout(() => {
-        if (type === 'map') {
-          setShowVerbalScaleModal(true);
-        } else if (type === 'blueprint') {
-          setSkipToBlueprintMode(true);
+    // Small delay to ensure modal state updates before transitions
+    setTimeout(() => {
+      if (type === 'coin') {
+        // COIN: Go to calibration immediately
+        if (photoUri) {
+          setCapturedPhotoUri(photoUri);
+          setPendingPhotoUri(null);
         }
-      }, 100);
-    }
+        
+        setMode('zoomCalibrate');
+        
+        // Background MMKV write
+        setTimeout(() => {
+          if (photoUri) setImageUri(photoUri, false);
+        }, 100);
+        
+      } else {
+        // MAP/BLUEPRINT: Go to measurement
+        if (photoUri) {
+          setImageUri(photoUri, false);
+          setPendingPhotoUri(null);
+        }
+        
+        setMode('measurement');
+        
+        // Show appropriate modal with longer delay for TestFlight
+        setTimeout(() => {
+          if (type === 'map') {
+            setShowVerbalScaleModal(true);
+          } else if (type === 'blueprint') {
+            setSkipToBlueprintMode(true);
+          }
+        }, 400);
+      }
+    }, 200);
   };
 
   const pickImage = async () => {
