@@ -2421,6 +2421,7 @@ export default function CameraScreen() {
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
                   onPanZoomLockChange={(shouldLock) => {
+                    console.log('🔐 onPanZoomLockChange called with:', shouldLock);
                     isPanZoomLockedRef.current = shouldLock;
                     setIsPanZoomLocked(shouldLock);
                   }}
