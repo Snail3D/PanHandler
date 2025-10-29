@@ -23,6 +23,7 @@
         "NSCameraUsageDescription": "PanHandler needs camera access to take reference photos for measurements.",
         "NSPhotoLibraryUsageDescription": "PanHandler needs photo library access to save measurements and export images.",
         "NSPhotoLibraryAddUsageDescription": "PanHandler needs permission to save measurement images to your photo library.",
+        "NSMicrophoneUsageDescription": "PanHandler may need microphone access for video recording features.",
         "UISupportedInterfaceOrientations": [
           "UIInterfaceOrientationPortrait"
         ],
@@ -35,7 +36,11 @@
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
       "permissions": [
-        "CAMERA"
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
       ]
     },
     "plugins": [
@@ -44,6 +49,30 @@
         {
           "initialOrientation": "PORTRAIT"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "PanHandler needs camera access to take reference photos for measurements."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "PanHandler needs photo library access to save measurements and export images.",
+          "cameraPermission": "PanHandler needs camera access to capture photos for measurement."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "PanHandler needs photo library access to save measurements and export images.",
+          "savePhotosPermission": "PanHandler needs permission to save measurement images to your photo library.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-mail-composer"
       ]
     ],
     "extra": {
