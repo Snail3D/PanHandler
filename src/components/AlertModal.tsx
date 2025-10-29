@@ -15,16 +15,18 @@ interface AlertModalProps {
   type?: 'info' | 'success' | 'error' | 'warning';
 }
 
-export default function AlertModal({ 
-  visible, 
+export default function AlertModal({
+  visible,
   title,
   message,
-  onClose, 
+  onClose,
   confirmText = 'OK',
   cancelText,
   onConfirm,
   type = 'info',
 }: AlertModalProps) {
+  __DEV__ && console.log('🚨 AlertModal render:', { visible, title, message, type });
+
   const handleConfirm = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (onConfirm) {
@@ -59,6 +61,7 @@ export default function AlertModal({
       visible={visible}
       transparent
       animationType="fade"
+      statusBarTranslucent
       onRequestClose={handleCancel}
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
