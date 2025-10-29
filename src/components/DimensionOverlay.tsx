@@ -1,7 +1,7 @@
 // DimensionOverlay v5.4.0 - QUOTE IMMEDIATE - NO TYPING ANIMATION
 // CACHE BUST v5.4.0 - Quote shows immediately, tap to dismiss
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio, Share } from 'react-native';
+import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef, captureScreen } from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as MailComposer from 'expo-mail-composer';
+import * as Sharing from 'expo-sharing';
 import * as Haptics from 'expo-haptics';
 import * as FileSystem from 'expo-file-system';
 import { DeviceMotion } from 'expo-sensors';
@@ -3135,16 +3136,17 @@ export default function DimensionOverlay({
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
       const recipients = emailToUse ? [emailToUse] : [];
 
-      // Use Share API if MailComposer is not available
+      // Use expo-sharing if MailComposer is not available
       if (!isAvailable) {
-        __DEV__ && console.log('📧 Using Share API as fallback');
+        __DEV__ && console.log('📧 Using expo-sharing as fallback');
         try {
-          await Share.share({
-            title: subject,
-            message: measurementText,
-            url: attachments[0], // Share first attachment (measurements image)
+          // Share the first image (measurements with annotations)
+          await Sharing.shareAsync(attachments[0], {
+            mimeType: 'image/jpeg',
+            dialogTitle: subject,
+            UTI: 'public.jpeg',
           });
-          showAlert('Measurements Ready', 'Share completed! You can now send via any app.', 'success');
+          showAlert('Share Complete', 'Your measurements have been shared!', 'success');
         } catch (shareError) {
           __DEV__ && console.error('📧 Share error:', shareError);
           showAlert('Share Error', 'Could not open share sheet.', 'error');
@@ -7538,13 +7540,19 @@ export default function DimensionOverlay({
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => setShowHelpModal(true)}
+          onLongPress={() => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            setUserEmail(null);
+            showAlert('Email Reset', 'Your saved email has been cleared. You can set it again when sending an email.', 'success');
+          }}
+          delayLongPress={800}
           style={{
             position: 'absolute',
             zIndex: 30, // Same as AUTO LEVEL badge
             top: insets.top + 16, // Same vertical position as AUTO LEVEL
-            right: isAutoCaptured 
+            right: isAutoCaptured
               ? 128  // Position right next to AUTO LEVEL badge (with small gap) - moved left
-              : (coinCircle || calibration || mapScale) 
+              : (coinCircle || calibration || mapScale)
                 ? 128  // Position left of Calibrated badge when no AUTO LEVEL - moved left
                 : 16,  // Position in top right when no badges present
             backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(100, 149, 237, 0.85)', // Session color with opacity
