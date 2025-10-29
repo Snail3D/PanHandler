@@ -3408,11 +3408,14 @@ export default function DimensionOverlay({
         menuHiddenShared.value = true;
         runOnJS(setMenuHidden)(true);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
-        
-        // Start fading trail after 100ms
-        runOnJS(setTimeout)(() => {
-          runOnJS(setSwipeTrail)([]);
-        }, 1000); // Clear after 1 second
+
+        // Clear trail after delay - wrap the whole setTimeout in runOnJS
+        const clearTrail = () => {
+          setTimeout(() => {
+            setSwipeTrail([]);
+          }, 1000);
+        };
+        runOnJS(clearTrail)();
       }
       // Swipe left OR right to open menu (when hidden)
       else if (isHorizontal && 
