@@ -511,19 +511,18 @@ export default function DimensionOverlay({
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
   
-  // Initialize measurement mode based on whether there are existing measurements
-  // If there are measurements on reload, pan/zoom should be locked
+  // Initialize pan/zoom state - ALWAYS unlocked on mount
+  // User should be able to pan/zoom freely after entering measurement screen
   // IMPORTANT: This useEffect must be AFTER all other hooks to avoid hooks order issues
   useEffect(() => {
-    // Notify parent about lock state based on measurements
+    // ALWAYS unlock on mount - user needs to pan/zoom after calibration
     if (onPanZoomLockChange) {
-      const shouldLock = measurements.length > 0;
-      onPanZoomLockChange(shouldLock);
-      console.log('🔧 Initial lock state:', shouldLock ? 'LOCKED' : 'UNLOCKED', '(measurements:', measurements.length, ')');
+      onPanZoomLockChange(false);
+      console.log('🔧 Initial lock state: UNLOCKED on mount');
     }
-    
+
     if (measurements.length > 0) {
-      setMeasurementMode(false); // Keep in pan mode but locked
+      setMeasurementMode(false); // Keep in pan mode
     }
   }, []); // Only run on mount
 

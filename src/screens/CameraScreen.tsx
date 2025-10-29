@@ -1396,12 +1396,7 @@ export default function CameraScreen() {
           easing: Easing.out(Easing.ease),
         });
 
-        // CRITICAL: Reset pan lock AFTER DimensionOverlay mounts to override its initial lock check
-        // This prevents race condition where DimensionOverlay's useEffect re-locks on mount
-        setTimeout(() => {
-          setIsPanZoomLocked(false);
-          __DEV__ && console.log('🔓 Unlocked pan/zoom after calibration complete');
-        }, 50);
+        // DimensionOverlay will unlock pan/zoom automatically on mount
 
         setTimeout(() => {
           setIsTransitioning(false);
