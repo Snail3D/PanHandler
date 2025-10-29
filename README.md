@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.8
+**Version:** v7.5.9
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.9 - CRITICAL Performance Fix - AlertModal Spam
+- ✅ **Fixed:** Removed AlertModal render logging causing HUNDREDS of logs per second
+- AlertModal was re-rendering constantly with debug logging, completely killing performance
+- Removed console.log from AlertModal component and showAlert function
+- **This was the root cause of all the slowness!**
 
 ### v7.5.8 - Critical Performance Fix
 - ✅ **Fixed:** Removed debug console.logs that were causing severe slowness in dev and TestFlight

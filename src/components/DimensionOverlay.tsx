@@ -236,7 +236,6 @@ export default function DimensionOverlay({
     cancelText?: string,
     onConfirm?: () => void
   ) => {
-    __DEV__ && console.log('🚨 showAlert called:', { title, message, type, visible: true });
     setAlertConfig({
       visible: true,
       title,
@@ -246,7 +245,6 @@ export default function DimensionOverlay({
       cancelText,
       onConfirm,
     });
-    __DEV__ && console.log('🚨 alertConfig state set to visible=true');
   };
   
   const closeAlert = () => {

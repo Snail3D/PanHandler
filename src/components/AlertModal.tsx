@@ -25,8 +25,6 @@ export default function AlertModal({
   onConfirm,
   type = 'info',
 }: AlertModalProps) {
-  __DEV__ && console.log('🚨 AlertModal render:', { visible, title, message, type });
-
   const handleConfirm = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (onConfirm) {
