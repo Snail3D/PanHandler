@@ -600,6 +600,29 @@ export default function DimensionOverlay({
     }
   }, []); // Only run once on mount
 
+  // CRITICAL: Cleanup on component unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      // Clear all timeout/interval refs
+      if (freehandActivationTimerRef.current) clearTimeout(freehandActivationTimerRef.current);
+      if (azimuthTapTimeoutRef.current) clearTimeout(azimuthTapTimeoutRef.current);
+      if (imperialTapTimeoutRef.current) clearTimeout(imperialTapTimeoutRef.current);
+      if (calibratedTapTimeoutRef.current) clearTimeout(calibratedTapTimeoutRef.current);
+      if (autoLevelTapTimeoutRef.current) clearTimeout(autoLevelTapTimeoutRef.current);
+      if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+      if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
+      if (freehandLongPressRef.current) clearTimeout(freehandLongPressRef.current);
+
+      // Clear all haptic timers
+      hapticTimersRef.current.forEach(timer => clearTimeout(timer));
+      hapticTimersRef.current = [];
+
+      // Clear all lock-in timers
+      lockInTimersRef.current.forEach(timer => clearTimeout(timer));
+      lockInTimersRef.current = [];
+    };
+  }, []);
+
   // Detect panning/measuring/zooming/rotating and fade out tutorial - CINEMATIC
   useEffect(() => {
     if (!showPanTutorial || isDismissing.current) return; // Don't process if already dismissing!
