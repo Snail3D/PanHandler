@@ -1487,11 +1487,6 @@ export default function CameraScreen() {
 
   // Handle photo type selection from modal
   const handlePhotoTypeSelection = (type: PhotoType) => {
-    console.log('📸 handlePhotoTypeSelection called with type:', type);
-    console.log('📸 pendingPhotoUri:', pendingPhotoUri);
-    console.log('📸 currentImageUri:', currentImageUri);
-    console.log('📸 capturedPhotoUri:', capturedPhotoUri);
-
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
     setIsCapturing(false); // Reset since user made selection
@@ -1518,25 +1513,19 @@ export default function CameraScreen() {
 
       } else {
         // MAP/BLUEPRINT: Go to measurement
-        console.log('📸 Setting up for MAP/BLUEPRINT with photoUri:', photoUri);
-
         if (photoUri) {
           setImageUri(photoUri, false);
-          setCapturedPhotoUri(photoUri); // Make sure capturedPhotoUri is set!
+          setCapturedPhotoUri(photoUri); // CRITICAL: Set for displayImageUri
           setPendingPhotoUri(null);
         }
 
-        console.log('📸 Setting mode to measurement');
         setMode('measurement');
 
         // Show appropriate modal with longer delay for TestFlight
         setTimeout(() => {
-          console.log('📸 About to show modal, type:', type);
           if (type === 'map') {
-            console.log('📸 Setting showVerbalScaleModal to true');
             setShowVerbalScaleModal(true);
           } else if (type === 'blueprint') {
-            console.log('📸 Setting skipToBlueprintMode to true');
             setSkipToBlueprintMode(true);
           }
         }, 400);
