@@ -206,7 +206,7 @@ export default function DimensionOverlay({
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
   const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false); // Success modal for saves
-  const [pendingAction, setPendingAction] = useState<'save' | 'email' | null>(null);
+  const [pendingAction, setPendingAction] = useState<'save' | 'email' | 'share' | null>(null);
   const labelViewRef = useRef<View>(null); // For capturing photo with label
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
   const fusionZoomedViewRef = useRef<View>(null); // For capturing zoomed transparent canvas
@@ -2974,6 +2974,68 @@ export default function DimensionOverlay({
     }
   };
 
+  const handleShare = async () => {
+    // Show label modal first
+    setPendingAction('share');
+    setShowLabelModal(true);
+  };
+
+  const performShare = async (label: string | null) => {
+    if (!currentImageUri) {
+      showAlert('Share Error', 'No image to share.', 'error');
+      return;
+    }
+
+    try {
+      __DEV__ && console.log('📤 Starting share export...');
+
+      setIsCapturing(true);
+      setCurrentLabel(label);
+      await new Promise(resolve => setTimeout(resolve, 600));
+
+      if (!externalViewRef?.current) {
+        showAlert('Error', 'View not ready. Wait and try again.', 'error');
+        setIsCapturing(false);
+        setCurrentLabel(null);
+        return;
+      }
+
+      // Capture measurements image
+      const measurementsUri = await captureRef(externalViewRef.current, {
+        format: 'jpg',
+        quality: 0.9,
+        result: 'tmpfile',
+      });
+
+      // Copy to cache for sharing
+      const measurementsFilename = label ? `${label}_Measurements.jpg` : 'Measurements.jpg';
+      const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
+      await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
+
+      setIsCapturing(false);
+      setCurrentLabel(null);
+
+      // Wait for UI to restore
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      __DEV__ && console.log('📤 Opening share sheet...');
+
+      // Use expo-sharing to open iOS share sheet
+      await Sharing.shareAsync(measurementsDest, {
+        mimeType: 'image/jpeg',
+        dialogTitle: label ? `${label} - Measurements` : 'PanHandler Measurements',
+        UTI: 'public.jpeg',
+      });
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      __DEV__ && console.error('📤 Share error:', error);
+      setIsCapturing(false);
+      setCurrentLabel(null);
+      showAlert('Share Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+    }
+  };
+
   const handleEmail = async () => {
     __DEV__ && console.log('📧 handleEmail called');
     // Show label modal first
@@ -3190,6 +3252,9 @@ export default function DimensionOverlay({
     } else if (pendingAction === 'email') {
       __DEV__ && console.log('📝 Calling performEmail...');
       performEmail(data.label);
+    } else if (pendingAction === 'share') {
+      __DEV__ && console.log('📝 Calling performShare...');
+      performShare(data.label);
     }
 
     setPendingAction(null);
@@ -7432,11 +7497,11 @@ export default function DimensionOverlay({
             </View>
           )}
           
-          {/* Action Buttons - Always show Save and Email */}
+          {/* Action Buttons - Share and Email */}
           <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
             <>
               <Pressable
-                onPress={handleExport}
+                onPress={handleShare}
                 hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}
                 style={{
                   flex: 1,
@@ -7448,10 +7513,10 @@ export default function DimensionOverlay({
                   justifyContent: 'center',
                 }}
               >
-                <Ionicons name="images-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Save</Text>
+                <Ionicons name="share-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
+                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Share</Text>
               </Pressable>
-              
+
               <Pressable
                 onPress={handleEmail}
                 hitSlop={{ top: 0, bottom: 0, left: 0, right: 0 }}

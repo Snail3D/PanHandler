@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.3
+**Version:** v7.5.4
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.4 - Save Button → Share Button
+- ✅ **Changed:** Save button is now Share button with iOS share sheet
+- Share measurements via AirDrop, Messages, WhatsApp, or any app
+- Email button still opens Mail.app directly with pre-populated email and attachments
+- Keep the old Save to Photos functionality by using standard iOS share → Save Image
 
 ### v7.5.3 - Email & Sharing Fixes
 - ✅ **Fixed:** Long-press Help button (?) now clears saved email address
