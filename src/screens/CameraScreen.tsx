@@ -1362,13 +1362,10 @@ export default function CameraScreen() {
     
     // Clear local photo state now that it's persisted
     setCapturedPhotoUri(null);
-    
-    // CRITICAL: Reset pan lock state to ensure gestures work
-    setIsPanZoomLocked(false);
-    
+
     // Simpler approach: Just fade to black, switch instantly, fade in
     setIsTransitioning(true);
-    
+
     // ⚠️ CRITICAL: Defer AsyncStorage writes to prevent measurement screen lockup
     // Writing calibration + coinCircle blocks UI thread for 100-1000ms
     // Must happen AFTER transition to measurement screen
@@ -1381,24 +1378,31 @@ export default function CameraScreen() {
       setCoinCircle(calibrationData.coinCircle);
       __DEV__ && console.log('✅ Deferred calibration AsyncStorage write complete');
     }, 600); // Write after transition to measurement completes
-    
+
     // Fade to black quickly
     transitionBlackOverlay.value = withTiming(1, {
       duration: 400, // Fast fade to black
       easing: Easing.in(Easing.ease),
     });
-    
+
     // After black screen, switch mode and fade in
     setTimeout(() => {
       setMode('measurement');
-      
+
       // Small delay to let React render, then fade in
       setTimeout(() => {
         transitionBlackOverlay.value = withTiming(0, {
           duration: 600, // Smooth fade in
           easing: Easing.out(Easing.ease),
         });
-        
+
+        // CRITICAL: Reset pan lock AFTER DimensionOverlay mounts to override its initial lock check
+        // This prevents race condition where DimensionOverlay's useEffect re-locks on mount
+        setTimeout(() => {
+          setIsPanZoomLocked(false);
+          __DEV__ && console.log('🔓 Unlocked pan/zoom after calibration complete');
+        }, 50);
+
         setTimeout(() => {
           setIsTransitioning(false);
         }, 700); // Unlock after fade completes
