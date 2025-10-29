@@ -1061,6 +1061,19 @@ export default function CameraScreen() {
     };
   }, [mode]);
 
+  // CRITICAL: Cleanup on component unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      // Clear zoom save timeout
+      if (zoomSaveTimeoutRef.current) {
+        clearTimeout(zoomSaveTimeoutRef.current);
+        zoomSaveTimeoutRef.current = null;
+      }
+      // Remove all DeviceMotion listeners
+      DeviceMotion.removeAllListeners();
+    };
+  }, []);
+
   const cameraAnimatedStyle = useAnimatedStyle(() => {
     if (__DEV__ && Math.random() < 0.001) { // Log occasionally to avoid spam
       console.log('🎥 Camera opacity:', cameraOpacity.value);
