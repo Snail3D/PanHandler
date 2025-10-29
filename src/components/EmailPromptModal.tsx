@@ -39,10 +39,10 @@ export default function EmailPromptModal({ visible, onComplete, onDismiss }: Ema
         style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
         onPress={handleCancel}
       >
-        <Pressable 
+        <Pressable
           style={{
             width: '100%',
-            maxWidth: offered,
+            maxWidth: 400,
             borderRadius: 32,
             overflow: 'hidden',
             backgroundColor: 'rgba(255,255,255,0.95)',
