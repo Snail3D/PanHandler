@@ -573,34 +573,45 @@ export default function CameraScreen() {
     }
 
     // Adjust update rate based on device capability
+    // Production builds: Use 33ms (30fps) to reduce CPU load - still smooth
+    // Dev builds: Use 16ms (60fps) for debugging
     // Low-end devices: 50ms (20fps) - smooth enough
-    // Normal devices: 16ms (60fps) - buttery smooth like real bubble level
-    const updateInterval = isLowEndDevice ? 50 : 16;
+    const updateInterval = __DEV__ ? 16 : (isLowEndDevice ? 50 : 33);
     DeviceMotion.setUpdateInterval(updateInterval);
 
     // Track haptic timers for cleanup (CRITICAL: prevents memory leak)
     const hapticTimers: NodeJS.Timeout[] = [];
+
+    // Throttle state updates in production to reduce re-renders
+    // Update UI every 2 frames instead of every frame (still 15fps UI updates at 30fps sensor)
+    let frameCounter = 0;
 
     const subscription = DeviceMotion.addListener((data) => {
       if (data.rotation) {
         const betaRaw = data.rotation.beta * (180 / Math.PI);
         const gammaRaw = data.rotation.gamma * (180 / Math.PI);
         const alpha = data.rotation.alpha * (180 / Math.PI); // Rotation/roll
-        
+
         // Apply low-pass filter (exponential moving average) to reduce jitter
         // Alpha = 0.5 gives good balance between smoothness and responsiveness
         const filterAlpha = 0.5;
         smoothedBeta.current = smoothedBeta.current * (1 - filterAlpha) + betaRaw * filterAlpha;
         smoothedGamma.current = smoothedGamma.current * (1 - filterAlpha) + gammaRaw * filterAlpha;
-        
+
         // Use smoothed values for all calculations
         const beta = smoothedBeta.current;
         const gamma = smoothedGamma.current;
         const absBeta = Math.abs(beta);
-        
-        // Store for guidance system
-        setCurrentBeta(beta);
-        setCurrentGamma(gamma);
+
+        // Throttle state updates to reduce re-renders (only update every other frame in production)
+        frameCounter++;
+        const shouldUpdateState = __DEV__ || (frameCounter % 2 === 0);
+
+        if (shouldUpdateState) {
+          // Store for guidance system
+          setCurrentBeta(beta);
+          setCurrentGamma(gamma);
+        }
         
         // Auto-detect horizontal (0°) or vertical (90°)
         const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
@@ -616,8 +627,10 @@ export default function CameraScreen() {
           // Left/right tilt is ignored since user is looking straight at coin
           absTilt = Math.abs(absBeta - 90);
         }
-        
-        setTiltAngle(absTilt);
+
+        if (shouldUpdateState) {
+          setTiltAngle(absTilt);
+        }
         
         // Track angle stability
         recentAngles.current.push(absTilt);
@@ -632,7 +645,7 @@ export default function CameraScreen() {
           if (recentAccelerations.current.length > 10) recentAccelerations.current.shift();
           
           // Calculate acceleration variance for guidance
-          if (recentAccelerations.current.length >= 5) {
+          if (recentAccelerations.current.length >= 5 && shouldUpdateState) {
             const mean = recentAccelerations.current.reduce((a, b) => a + b, 0) / recentAccelerations.current.length;
             const variance = recentAccelerations.current.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentAccelerations.current.length;
             setAccelerationVariance(variance);
