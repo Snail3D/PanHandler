@@ -3022,7 +3022,8 @@ export default function DimensionOverlay({
         });
         
         // Wait for modal to fully close before proceeding to avoid blur screen issue
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Increased delay for TestFlight to ensure modal fully closes
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
       
       setIsCapturing(true);
