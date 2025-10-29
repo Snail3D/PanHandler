@@ -577,19 +577,17 @@ export default function CameraScreen() {
     }
 
     // Adjust update rate based on device capability
-    // Production builds: Use 33ms (30fps) to reduce CPU load - still smooth
-    // Dev builds: Match low-end device performance (50ms/20fps) for testing budget Android experience
-    // Low-end devices: 50ms (20fps) - smooth enough for budget Android phones
-    const updateInterval = __DEV__ ? 50 : (isLowEndDevice ? 50 : 33);
+    // Unified smooth performance: 50ms (20fps) for all devices
+    // This provides the best balance of smoothness, battery life, and CPU usage
+    const updateInterval = 50;
     DeviceMotion.setUpdateInterval(updateInterval);
 
     // Track haptic timers for cleanup (CRITICAL: prevents memory leak)
     const hapticTimers: NodeJS.Timeout[] = [];
 
-    // Throttle state updates in production to reduce re-renders
-    // Low-end devices: Update every 3 frames (50ms sensor / 3 = 6.7fps UI updates)
-    // Regular production: Update every 2 frames (33ms sensor / 2 = 15fps UI updates)
-    // Dev: Update every frame for debugging
+    // Throttle state updates to reduce re-renders
+    // Update every 3 frames (50ms sensor / 3 = ~6.7fps UI updates) for all devices
+    // Provides smooth, consistent experience across all devices
     let frameCounter = 0;
 
     const subscription = DeviceMotion.addListener((data) => {
@@ -610,11 +608,10 @@ export default function CameraScreen() {
         const absBeta = Math.abs(beta);
 
         // Throttle state updates to reduce re-renders
-        // Dev: Match low-end (every 3 frames) to test budget Android experience
-        // Production: Every 2 frames, Low-end: Every 3 frames
+        // Update every 3 frames for all devices (~6.7fps UI updates)
+        // Consistent, smooth experience for everyone
         frameCounter++;
-        const throttleFactor = __DEV__ ? 3 : (isLowEndDevice ? 3 : 2);
-        const shouldUpdateState = frameCounter % throttleFactor === 0;
+        const shouldUpdateState = frameCounter % 3 === 0;
 
         if (shouldUpdateState) {
           // Store for guidance system
