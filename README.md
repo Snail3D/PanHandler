@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.1
+**Version:** v7.5.2
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.2 - Email Export Fix
+- ✅ **Fixed:** Email export no longer shows blank/blurred screen
+- Screen now properly restores before opening email composer
+- Better error handling and logging for email flow
+- Prevents UI from getting stuck if user cancels email
 
 ### v7.5.1 - Panning Fix
 - ✅ **Fixed:** Single-finger panning now works in measurement mode after coin calibration
