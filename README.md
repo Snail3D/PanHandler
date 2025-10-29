@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.2
+**Version:** v7.5.3
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.3 - Email & Sharing Fixes
+- ✅ **Fixed:** Long-press Help button (?) now clears saved email address
+- ✅ **Fixed:** Email export now uses iOS Share sheet when Mail.app not configured
+- Share measurements via Messages, AirDrop, WhatsApp, or any app
+- Proper file sharing with expo-sharing instead of broken Share API
 
 ### v7.5.2 - Email Export Fix
 - ✅ **Fixed:** Email export no longer shows blank/blurred screen
