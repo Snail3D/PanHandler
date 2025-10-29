@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.7
+**Version:** v7.5.8
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,12 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.8 - Critical Performance Fix
+- ✅ **Fixed:** Removed debug console.logs that were causing severe slowness in dev and TestFlight
+- ✅ **Fixed:** Map mode selection now works correctly (added missing setCapturedPhotoUri)
+- Removed 9 unguarded console.log statements that were running in production
+- App should now run at full speed again
 
 ### v7.5.7 - Performance Fix
 - ✅ **Fixed:** Photo selection lag - removed blocking `await` on image orientation detection
