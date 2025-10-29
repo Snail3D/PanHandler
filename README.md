@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.6.2
+**Version:** v7.6.3
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,14 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.6.3 - Memory Leak Fixes (App-Backgrounding Performance)
+- ✅ **Fixed:** Memory leak in CameraScreen - zoomSaveTimeoutRef never cleared on unmount
+- ✅ **Fixed:** Memory leak in DimensionOverlay - 9 timeout/interval refs never cleared on unmount
+- Fixed refs: freehandActivationTimer, azimuthTapTimeout, imperialTapTimeout, calibratedTapTimeout, autoLevelTapTimeout, undoTimeout, undoInterval, freehandLongPress, hapticTimers array, lockInTimers array
+- Added cleanup useEffect to both components to clear all timers on unmount
+- Should fix the "app gets slower when I come back into it" issue
+- Prevents timer accumulation when switching between camera/measurement modes
 
 ### v7.6.2 - Unified Smooth Performance (User-Preferred Standard)
 - ✅ **Standardized:** 50ms sensor rate (20fps) for ALL devices - dev, production, budget, flagship
