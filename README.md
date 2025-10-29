@@ -490,7 +490,7 @@ Proprietary — All rights reserved
 
 ## 🚀 Status
 
-**Version:** v7.5.6
+**Version:** v7.5.7
 **Status:** Production Ready 🔥
 **Platform:** iOS (iPhone + iPad)
 
@@ -501,6 +501,11 @@ For App Store launch checklist, see [APP_STORE_LAUNCH_GUIDE.md](./APP_STORE_LAUN
 ---
 
 ## 📝 Recent Updates
+
+### v7.5.7 - Performance Fix
+- ✅ **Fixed:** Photo selection lag - removed blocking `await` on image orientation detection
+- Modal now appears immediately after selecting a photo instead of freezing with just a checkmark
+- Orientation detection runs in background without blocking UI
 
 ### v7.5.6 - Simplified Email Workflow
 - ✅ **Removed:** Saved email address functionality - simplified to use Mail.app defaults
