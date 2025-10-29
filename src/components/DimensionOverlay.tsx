@@ -8111,6 +8111,12 @@ export default function DimensionOverlay({
           setTimeout(() => {
             setShowBlueprintPlacementModal(false);
             setShowBlueprintDistanceModal(false);
+
+            // CRITICAL: Unlock pan/zoom after map scale calibration completes
+            if (onPanZoomLockChange) {
+              onPanZoomLockChange(false);
+              console.log('🔓 Unlocking pan/zoom - map scale calibration complete');
+            }
           }, 100);
           
           // Recalculate ALL existing measurements with new calibration (same as blueprint recalibration)
