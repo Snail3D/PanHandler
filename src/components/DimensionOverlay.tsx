@@ -1,7 +1,7 @@
 // DimensionOverlay v5.4.0 - QUOTE IMMEDIATE - NO TYPING ANIMATION
 // CACHE BUST v5.4.0 - Quote shows immediately, tap to dismiss
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio } from 'react-native';
+import { View, Text, Pressable, Dimensions, Modal, Image, ScrollView, Linking, PixelRatio, Share } from 'react-native';
 import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, runOnJS, Easing, interpolate } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -2996,8 +2996,14 @@ export default function DimensionOverlay({
       __DEV__ && console.log('📧 MailComposer available:', isAvailable);
 
       if (!isAvailable) {
-        showAlert('Email Not Available', 'No email app is configured.', 'warning');
-        return;
+        // Show alert with option to use Share instead
+        showAlert(
+          'Email Not Configured',
+          'Mail app is not set up on this device. After capturing, you can use the native Share option to send via any messaging app.',
+          'warning'
+        );
+        // Continue with capture anyway - user can share the files manually
+        __DEV__ && console.log('📧 Will capture and prepare files for manual sharing');
       }
 
       __DEV__ && console.log('📧 Current userEmail:', userEmail);
@@ -3128,6 +3134,23 @@ export default function DimensionOverlay({
 
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
       const recipients = emailToUse ? [emailToUse] : [];
+
+      // Use Share API if MailComposer is not available
+      if (!isAvailable) {
+        __DEV__ && console.log('📧 Using Share API as fallback');
+        try {
+          await Share.share({
+            title: subject,
+            message: measurementText,
+            url: attachments[0], // Share first attachment (measurements image)
+          });
+          showAlert('Measurements Ready', 'Share completed! You can now send via any app.', 'success');
+        } catch (shareError) {
+          __DEV__ && console.error('📧 Share error:', shareError);
+          showAlert('Share Error', 'Could not open share sheet.', 'error');
+        }
+        return;
+      }
 
       __DEV__ && console.log('📧 Opening MailComposer with:', { recipients, subject, attachmentsCount: attachments.length });
 
