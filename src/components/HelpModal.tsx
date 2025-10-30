@@ -1378,42 +1378,43 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
-                    Measure real-world distances on maps, blueprints, and scaled drawings. No coin needed!
+                    Measure real-world distances on maps, blueprints, and scaled drawings using coin calibration + map scale.
                   </Text>
-                  
+
                   {/* Calibration Methods */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 10 }}>
-                    🎯 Three Ways to Calibrate
+                    🎯 Two Ways to Calibrate
                   </Text>
-                  
-                  {/* Verbal Scale */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(0,102,255,0.08)', 
-                    borderRadius: 12, 
-                    padding: 12, 
+
+                  {/* Coin Reference + Map Scale */}
+                  <View style={{
+                    backgroundColor: 'rgba(0,102,255,0.08)',
+                    borderRadius: 12,
+                    padding: 12,
                     marginBottom: 10,
                     borderWidth: 1.5,
                     borderColor: 'rgba(0,102,255,0.2)',
                   }}>
                     <Text style={{ fontSize: 14, fontWeight: '600', color: '#0066FF', marginBottom: 6 }}>
-                      📏 Verbal Scale (Maps)
+                      🪙 Coin Reference + Map Scale
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19, marginBottom: 4 }}>
-                      Best for: Road maps, topo maps, property maps
+                      Best for: Road maps, topo maps, property maps with verbal scale
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                      → Calibrate with coin first{'\n'}
                       → Tap 🗺️ Map button{'\n'}
                       → Enter scale (e.g., "1 inch = 10 miles" or "1cm = 5km"){'\n'}
                       → Start measuring!
                     </Text>
                   </View>
-                  
+
                   {/* Known Scale */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(0,102,255,0.08)', 
-                    borderRadius: 12, 
-                    padding: 12, 
-                    marginBottom: 10,
+                  <View style={{
+                    backgroundColor: 'rgba(0,102,255,0.08)',
+                    borderRadius: 12,
+                    padding: 12,
+                    marginBottom: 14,
                     borderWidth: 1.5,
                     borderColor: 'rgba(0,102,255,0.2)',
                   }}>
@@ -1430,28 +1431,7 @@ Thank you for helping us improve PanHandler!
                       → Example: 50mm bar = 10 meters
                     </Text>
                   </View>
-                  
-                  {/* Coin Reference */}
-                  <View style={{ 
-                    backgroundColor: 'rgba(0,102,255,0.08)', 
-                    borderRadius: 12, 
-                    padding: 12, 
-                    marginBottom: 14,
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(0,102,255,0.2)',
-                  }}>
-                    <Text style={{ fontSize: 14, fontWeight: '600', color: '#0066FF', marginBottom: 6 }}>
-                      🪙 Coin Reference (Optional)
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19, marginBottom: 4 }}>
-                      If your map has a coin for scale:
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      → Calibrate with coin first{'\n'}
-                      → Then tap 🗺️ Map to set the map scale
-                    </Text>
-                  </View>
-                  
+
                   {/* Tools in Map Mode */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
                     🛠️ Tools in Map Mode
