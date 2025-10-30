@@ -1,8 +1,8 @@
 # 🤖 Current Session Notes
 
 **Date:** 2025-10-30
-**Version:** 7.7.3
-**Status:** ✅ VERIFIED IN PRODUCTION
+**Version:** 8.0.0
+**Status:** ✅ READY FOR PRODUCTION
 
 ---
 
@@ -281,9 +281,29 @@ Avoid `setTimeout` in worklets entirely. Either:
 - `src/components/DimensionOverlay.tsx`
   - Fixed pin placement after recalibration by resetting blueprint state (lines 3867-3892)
   - Added state resets for isPlacingBlueprint, measurementMode, blueprintPoints, and modal flags
-- `package.json` - Version bumped to 7.7.3
-- `app.json` - Version bumped to 7.7.3
+- `package.json` - Version bumped to 8.0.0
 - `CLAUDE.md` - This file (session documentation)
+
+---
+
+## Version 8.0.0 Summary
+
+This is a major version bump that includes critical fixes and enhancements:
+
+**Production Build Fixes (v7.7.2):**
+- Pan/zoom locking now works reliably in production builds using conditional rendering
+- Menu swipe gestures no longer crash the app
+
+**Measurement Accuracy (v7.7.3 → v8.0.0):**
+- Fixed 1000x volume calculation error for cubic miles (Lake Michigan now shows 1.2Q gal correctly)
+- Added B/T/Q (billion/trillion/quadrillion) suffix support for extreme map scales (1cm = 250km+)
+- Removed debug "TEST" text from area measurements
+- Fixed pin placement after recalibration in map scale mode
+
+**Use Cases Unlocked:**
+- State and country-sized map measurements with readable numbers
+- Accurate volume calculations for large bodies of water
+- Smooth recalibration workflow without placement glitches
 
 ---
 
