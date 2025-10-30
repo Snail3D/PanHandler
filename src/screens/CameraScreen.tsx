@@ -2375,7 +2375,7 @@ export default function CameraScreen() {
                 }}
               >
                 <ZoomableImage
-                  key={displayImageUri}
+                  key={`${displayImageUri}-${isPanZoomLocked}`}
                   imageUri={displayImageUri}
                   fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}
