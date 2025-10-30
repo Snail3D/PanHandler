@@ -1502,21 +1502,21 @@ export default function DimensionOverlay({
   const formatMapScaleArea = (areaInMapUnits2: number, currentUnitSystem: 'metric' | 'imperial'): string => {
     if (!mapScale) return '';
 
-    // FORCE TEST: Always return km² for metric
+    // Format area in km² for metric
     if (currentUnitSystem === 'metric') {
       const km2 = areaInMapUnits2 * 2.59; // Quick mi² to km² conversion
       if (km2 >= 1000000000000000) {
-        return `${(km2 / 1000000000000000).toFixed(2)}Q km² TEST`;
+        return `${(km2 / 1000000000000000).toFixed(2)}Q km²`;
       } else if (km2 >= 1000000000000) {
-        return `${(km2 / 1000000000000).toFixed(2)}T km² TEST`;
+        return `${(km2 / 1000000000000).toFixed(2)}T km²`;
       } else if (km2 >= 1000000000) {
-        return `${(km2 / 1000000000).toFixed(2)}B km² TEST`;
+        return `${(km2 / 1000000000).toFixed(2)}B km²`;
       } else if (km2 >= 1000000) {
-        return `${(km2 / 1000000).toFixed(2)}M km² TEST`;
+        return `${(km2 / 1000000).toFixed(2)}M km²`;
       } else if (km2 >= 1000) {
-        return `${(km2 / 1000).toFixed(2)}K km² TEST`;
+        return `${(km2 / 1000).toFixed(2)}K km²`;
       }
-      return `${km2.toFixed(2)} km² TEST`;
+      return `${km2.toFixed(2)} km²`;
     }
 
     // Imperial mode - show mi² and acres
