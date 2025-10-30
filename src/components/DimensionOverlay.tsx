@@ -1348,9 +1348,15 @@ export default function DimensionOverlay({
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
 
-    // Helper to format with K/M suffixes
+    // Helper to format with K/M/B/T/Q suffixes
     const formatWithSuffix = (value: number, unit: string): string => {
-      if (value >= 1000000) {
+      if (value >= 1000000000000000) {
+        return `${(value / 1000000000000000).toFixed(2)}Q ${unit}`;
+      } else if (value >= 1000000000000) {
+        return `${(value / 1000000000000).toFixed(2)}T ${unit}`;
+      } else if (value >= 1000000000) {
+        return `${(value / 1000000000).toFixed(2)}B ${unit}`;
+      } else if (value >= 1000000) {
         return `${(value / 1000000).toFixed(2)}M ${unit}`;
       } else if (value >= 1000) {
         return `${(value / 1000).toFixed(2)}K ${unit}`;
