@@ -3682,9 +3682,9 @@ export default function DimensionOverlay({
   }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isMapMode]);
 
   return (
-    <View 
+    <View
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      pointerEvents={showBlueprintPlacementModal ? "box-none" : "auto"}
+      pointerEvents={showBlueprintPlacementModal ? "box-none" : (measurementMode ? "auto" : "box-none")}
     >
       {/* Universal Touch Overlay - Captures ALL touches for fingerprints */}
       <View
