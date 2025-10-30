@@ -521,6 +521,11 @@ export default function DimensionOverlay({
       console.log('🔧 Initial lock state: UNLOCKED on mount');
     }
 
+    // CRITICAL: Start in pan mode, not measurement mode
+    // If we start with measurementMode=true or with 'distance' tool selected,
+    // it can interfere with pan/zoom gestures in production builds
+    setMeasurementMode(false); // Start in pan mode
+
     if (measurements.length > 0) {
       setMeasurementMode(false); // Keep in pan mode
     }

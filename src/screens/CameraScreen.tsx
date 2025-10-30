@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -377,6 +377,13 @@ export default function CameraScreen() {
   // Use ref to avoid stale closure issues in production builds
   const [isPanZoomLocked, setIsPanZoomLocked] = useState(false);
   const isPanZoomLockedRef = useRef(false);
+
+  // Stable callback reference to prevent frozen callbacks in production builds
+  const handlePanZoomLockChange = useCallback((shouldLock: boolean) => {
+    console.log('🔐 onPanZoomLockChange called with:', shouldLock);
+    isPanZoomLockedRef.current = shouldLock;
+    setIsPanZoomLocked(shouldLock);
+  }, []);
 
 
   // Helper to detect orientation based on image (for future use)
@@ -2420,11 +2427,7 @@ export default function CameraScreen() {
                   skipToMapMode={skipToMapMode}
                   skipToBlueprintMode={skipToBlueprintMode}
                   skipToAerialMode={skipToAerialMode}
-                  onPanZoomLockChange={(shouldLock) => {
-                    console.log('🔐 onPanZoomLockChange called with:', shouldLock);
-                    isPanZoomLockedRef.current = shouldLock;
-                    setIsPanZoomLocked(shouldLock);
-                  }}
+                  onPanZoomLockChange={handlePanZoomLockChange}
                   onRegisterDoubleTapCallback={(callback) => {
                     doubleTapToMeasureRef.current = callback;
                   }}
