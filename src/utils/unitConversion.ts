@@ -330,7 +330,7 @@ export function formatVolumeMeasurement(
   } else if (baseUnit === 'in') {
     volumeInMm3 = volumeInBaseUnit * 16387.064; // 1in³ = 16387.064mm³
   } else if (baseUnit === 'mi') {
-    volumeInMm3 = volumeInBaseUnit * 4.168e15; // 1mi³ = huge mm³
+    volumeInMm3 = volumeInBaseUnit * 4.168e18; // 1mi³ = 4.168×10^18 mm³
   } else {
     volumeInMm3 = volumeInBaseUnit * 28316846.592; // 1ft³ = 28316846.592mm³
   }
