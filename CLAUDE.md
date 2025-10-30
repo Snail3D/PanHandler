@@ -12,6 +12,7 @@
 2. ✅ Fix menu swipe gesture crashing app in production builds - **VERIFIED WORKING**
 3. ✅ Remove "TEST" debug text from area measurements - **COMPLETE**
 4. ✅ Add B/T/Q (billion/trillion/quadrillion) suffixes for extreme map scales - **COMPLETE**
+5. ✅ Fix cubic miles volume conversion (off by 1000x) - **COMPLETE**
 
 ---
 
@@ -152,6 +153,31 @@ Users mapping large regions (states, countries) can now use extreme scales and g
 - 1cm = 250km: Perfect for mapping Texas or California
 - Rectangle 5cm × 3cm = 1,250km × 750km with properly formatted area
 
+### 5. Fix Cubic Miles Volume Conversion (v7.7.3) - CRITICAL
+
+**Problem:** Volume calculations for large bodies of water (e.g., Lake Michigan) were showing 1.2 trillion gallons instead of the correct 1.2 quadrillion gallons - off by 1000x.
+
+**Root Cause:** The cubic miles (mi³) to cubic millimeters (mm³) conversion factor was incorrect:
+- Used: `4.168e15` (4.168 × 10^15)
+- Correct: `4.168e18` (4.168 × 10^18)
+- This caused all mi³ volumes to be underestimated by 1000x
+
+**Solution:**
+Fixed the conversion factor in `unitConversion.ts` line 333:
+```typescript
+// Before: volumeInMm3 = volumeInBaseUnit * 4.168e15;
+// After:  volumeInMm3 = volumeInBaseUnit * 4.168e18;
+```
+
+**Verification:**
+- 1 mile = 1,609,344 mm
+- 1 mi³ = (1,609,344)³ mm³ = 4,168,181,825,440,579,584 mm³ ≈ 4.168 × 10^18 mm³
+
+**Results:**
+- ✅ Lake Michigan volume now correctly shows ~1.2Q gal (quadrillion) instead of 1.2T gal (trillion)
+- ✅ All large-scale map volume calculations now accurate
+- ✅ Critical fix for scientific/geographic accuracy
+
 ---
 
 ## Research Findings
@@ -222,6 +248,7 @@ Avoid `setTimeout` in worklets entirely. Either:
   - Added B/T/Q suffixes to m² formatting in formatAreaMeasurement (lines 230-243)
   - Added B/T/Q suffixes to ft² formatting in formatAreaMeasurement (lines 251-265)
   - Added B/T/Q suffixes to acres formatting in formatAreaMeasurement (lines 267-283)
+  - **CRITICAL FIX:** Fixed mi³ to mm³ conversion from 4.168e15 to 4.168e18 (line 333)
 - `package.json` - Version bumped to 7.7.3
 - `app.json` - Version bumped to 7.7.3
 - `CLAUDE.md` - This file (session documentation)
