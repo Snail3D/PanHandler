@@ -515,20 +515,24 @@ export default function DimensionOverlay({
   // User should be able to pan/zoom freely after entering measurement screen
   // IMPORTANT: This useEffect must be AFTER all other hooks to avoid hooks order issues
   useEffect(() => {
-    // ALWAYS unlock on mount - user needs to pan/zoom after calibration
-    if (onPanZoomLockChange) {
-      onPanZoomLockChange(false);
-      console.log('🔧 Initial lock state: UNLOCKED on mount');
-    }
+    // CRITICAL: Add delay to ensure parent component is fully mounted and ready to receive callback
+    // In production builds, calling immediately can result in callback being ignored
+    setTimeout(() => {
+      // ALWAYS unlock on mount - user needs to pan/zoom after calibration
+      if (onPanZoomLockChange) {
+        onPanZoomLockChange(false);
+        console.log('🔧 Initial lock state: UNLOCKED on mount');
+      }
 
-    // CRITICAL: Start in pan mode, not measurement mode
-    // If we start with measurementMode=true or with 'distance' tool selected,
-    // it can interfere with pan/zoom gestures in production builds
-    setMeasurementMode(false); // Start in pan mode
+      // CRITICAL: Start in pan mode, not measurement mode
+      // If we start with measurementMode=true or with 'distance' tool selected,
+      // it can interfere with pan/zoom gestures in production builds
+      setMeasurementMode(false); // Start in pan mode
 
-    if (measurements.length > 0) {
-      setMeasurementMode(false); // Keep in pan mode
-    }
+      if (measurements.length > 0) {
+        setMeasurementMode(false); // Keep in pan mode
+      }
+    }, 100); // Small delay to ensure parent is ready
   }, []); // Only run on mount
 
   // NOTE: Quote animated styles removed - now handled by App.tsx
