@@ -3868,6 +3868,12 @@ export default function DimensionOverlay({
               console.log('📍 Recalibrating: Map scale with verbal base');
               setMapScale(null);
               setIsMapMode(false);
+              // Reset blueprint placement state
+              setIsPlacingBlueprint(false);
+              setMeasurementMode(false);
+              setBlueprintPoints([]);
+              setShowBlueprintPlacementModal(false);
+              setShowBlueprintDistanceModal(false);
               setShowMapScaleModal(true);
             }
             // Scenario 3: Map scale + Coin calibration
@@ -3876,6 +3882,12 @@ export default function DimensionOverlay({
               console.log('📍 Recalibrating: Map scale with coin base - returning to coin screen');
               setMapScale(null);
               setIsMapMode(false);
+              // Reset blueprint placement state
+              setIsPlacingBlueprint(false);
+              setMeasurementMode(false);
+              setBlueprintPoints([]);
+              setShowBlueprintPlacementModal(false);
+              setShowBlueprintDistanceModal(false);
               if (onReset) onReset(true); // Go to coin calibration screen
             }
             // Scenario 4: Coin calibration ONLY (no map scale)

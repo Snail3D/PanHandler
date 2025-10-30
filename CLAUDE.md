@@ -13,6 +13,7 @@
 3. ✅ Remove "TEST" debug text from area measurements - **COMPLETE**
 4. ✅ Add B/T/Q (billion/trillion/quadrillion) suffixes for extreme map scales - **COMPLETE**
 5. ✅ Fix cubic miles volume conversion (off by 1000x) - **COMPLETE**
+6. ✅ Fix pin placement not working after recalibration - **COMPLETE**
 
 ---
 
@@ -178,6 +179,34 @@ Fixed the conversion factor in `unitConversion.ts` line 333:
 - ✅ All large-scale map volume calculations now accurate
 - ✅ Critical fix for scientific/geographic accuracy
 
+### 6. Fix Pin Placement After Recalibration (v7.7.3) - COMPLETE
+
+**Problem:** After hitting "Recalibrate" in map scale mode and going through the pin placement flow again, pins wouldn't drop when released. The placement interaction appeared to work but the pins didn't actually get placed.
+
+**Root Cause:** When the recalibrate button was pressed, it reset the map scale state but **didn't reset the blueprint placement state**. This left stale state variables like:
+- `isPlacingBlueprint` (still true from previous session)
+- `measurementMode` (still active)
+- `blueprintPoints` (containing old pin data)
+- Modal visibility flags still set
+
+This caused the pin placement logic to think it was in the middle of an existing placement session and reject new pin placements.
+
+**Solution:**
+Added blueprint placement state resets to the recalibrate handler (lines 3867-3892 in DimensionOverlay.tsx):
+```typescript
+// Reset blueprint placement state
+setIsPlacingBlueprint(false);
+setMeasurementMode(false);
+setBlueprintPoints([]);
+setShowBlueprintPlacementModal(false);
+setShowBlueprintDistanceModal(false);
+```
+
+**Results:**
+- ✅ Pin placement now works correctly after recalibration
+- ✅ Fixed for both verbal calibration and coin calibration scenarios
+- ✅ Clean state reset ensures repeatable calibration workflow
+
 ---
 
 ## Research Findings
@@ -249,6 +278,9 @@ Avoid `setTimeout` in worklets entirely. Either:
   - Added B/T/Q suffixes to ft² formatting in formatAreaMeasurement (lines 251-265)
   - Added B/T/Q suffixes to acres formatting in formatAreaMeasurement (lines 267-283)
   - **CRITICAL FIX:** Fixed mi³ to mm³ conversion from 4.168e15 to 4.168e18 (line 333)
+- `src/components/DimensionOverlay.tsx`
+  - Fixed pin placement after recalibration by resetting blueprint state (lines 3867-3892)
+  - Added state resets for isPlacingBlueprint, measurementMode, blueprintPoints, and modal flags
 - `package.json` - Version bumped to 7.7.3
 - `app.json` - Version bumped to 7.7.3
 - `CLAUDE.md` - This file (session documentation)
