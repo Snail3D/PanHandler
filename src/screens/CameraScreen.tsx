@@ -2383,40 +2383,54 @@ export default function CameraScreen() {
                   __DEV__ && console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
                 }}
               >
-                <ZoomableImage
-                  key={`${displayImageUri}-lock-${isPanZoomLocked ? 'true' : 'false'}`}
-                  imageUri={displayImageUri}
-                  fingerColor={sessionColors.crosshair.main}
-                  initialScale={measurementZoom.scale}
-                  initialTranslateX={measurementZoom.translateX}
-                  initialTranslateY={measurementZoom.translateY}
-                  initialRotation={measurementZoom.rotation}
-                  showLevelLine={false}
-                  locked={isPanZoomLocked}
-                  opacity={imageOpacity}
-                  onTransformChange={(scale, translateX, translateY, rotation) => {
-                    const newZoom = { scale, translateX, translateY, rotation };
-                    setMeasurementZoom(newZoom);
-                    
-                    // ⚠️ CRITICAL PERFORMANCE FIX (Oct 16, 2025)
-                    // Debounce AsyncStorage writes to prevent 10-15 second button lockup
-                    // Writing to AsyncStorage 60+ times/sec during gestures blocks JS thread
-                    // See: NEVER_WRITE_TO_ASYNCSTORAGE_DURING_GESTURES.md
-                    // DO NOT REMOVE THIS DEBOUNCE OR BUTTONS WILL FREEZE AFTER PANNING
-                    if (zoomSaveTimeoutRef.current) {
-                      clearTimeout(zoomSaveTimeoutRef.current);
-                    }
-                    zoomSaveTimeoutRef.current = setTimeout(() => {
-                      setSavedZoomState(newZoom);
-                    }, 500);
-                  }}
-                  onDoubleTapWhenLocked={() => {
-                    // Call the DimensionOverlay's measure mode switcher
-                    if (doubleTapToMeasureRef.current) {
-                      doubleTapToMeasureRef.current();
-                    }
-                  }}
-                />
+                {/* NUCLEAR OPTION: Conditional rendering instead of locked prop */}
+                {/* Only render ZoomableImage when unlocked - complete unmount/remount cycle */}
+                {!isPanZoomLocked ? (
+                  <ZoomableImage
+                    key={displayImageUri}
+                    imageUri={displayImageUri}
+                    fingerColor={sessionColors.crosshair.main}
+                    initialScale={measurementZoom.scale}
+                    initialTranslateX={measurementZoom.translateX}
+                    initialTranslateY={measurementZoom.translateY}
+                    initialRotation={measurementZoom.rotation}
+                    showLevelLine={false}
+                    opacity={imageOpacity}
+                    onTransformChange={(scale, translateX, translateY, rotation) => {
+                      const newZoom = { scale, translateX, translateY, rotation };
+                      setMeasurementZoom(newZoom);
+
+                      // ⚠️ CRITICAL PERFORMANCE FIX (Oct 16, 2025)
+                      // Debounce AsyncStorage writes to prevent 10-15 second button lockup
+                      // Writing to AsyncStorage 60+ times/sec during gestures blocks JS thread
+                      // See: NEVER_WRITE_TO_ASYNCSTORAGE_DURING_GESTURES.md
+                      // DO NOT REMOVE THIS DEBOUNCE OR BUTTONS WILL FREEZE AFTER PANNING
+                      if (zoomSaveTimeoutRef.current) {
+                        clearTimeout(zoomSaveTimeoutRef.current);
+                      }
+                      zoomSaveTimeoutRef.current = setTimeout(() => {
+                        setSavedZoomState(newZoom);
+                      }, 500);
+                    }}
+                    onDoubleTapWhenLocked={() => {
+                      // Call the DimensionOverlay's measure mode switcher
+                      if (doubleTapToMeasureRef.current) {
+                        doubleTapToMeasureRef.current();
+                      }
+                    }}
+                  />
+                ) : (
+                  // Static image when locked - no gestures at all
+                  <Image
+                    source={{ uri: displayImageUri }}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      opacity: imageOpacity,
+                    }}
+                    resizeMode="contain"
+                  />
+                )}
                 {/* Measurement overlay needs to be sibling to image for capture */}
                 <DimensionOverlay 
                   zoomScale={measurementZoom.scale}
