@@ -25,13 +25,6 @@ const OPTIONS: PhotoTypeOption[] = [
     color: '#FF9500',
   },
   {
-    type: 'map',
-    title: 'Map Mode',
-    subtitle: 'Use verbal scale (1 inch = 10 miles)',
-    icon: MapIcon,
-    color: '#007AFF',
-  },
-  {
     type: 'blueprint',
     title: 'Known Scale Mode',
     subtitle: 'For aerial photos, blueprints, and more',
