@@ -407,14 +407,6 @@ Thank you for helping us improve PanHandler!
                     }}>
                       Guide
                     </Text>
-                    <Text style={{
-                      color: '#8E8E93',
-                      fontSize: scaleFontSize(13),
-                      fontWeight: '600',
-                      marginTop: scaleMargin(-2),
-                    }}>
-                      By CAD pros, for CAD pros
-                    </Text>
                   </View>
                 </Animated.View>
                 <Pressable
