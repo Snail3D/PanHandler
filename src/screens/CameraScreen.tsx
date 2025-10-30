@@ -381,8 +381,10 @@ export default function CameraScreen() {
   // Stable callback reference to prevent frozen callbacks in production builds
   const handlePanZoomLockChange = useCallback((shouldLock: boolean) => {
     console.log('🔐 onPanZoomLockChange called with:', shouldLock);
+    console.log('🔐 Current isPanZoomLocked state:', isPanZoomLockedRef.current);
     isPanZoomLockedRef.current = shouldLock;
     setIsPanZoomLocked(shouldLock);
+    console.log('🔐 Updated isPanZoomLocked to:', shouldLock);
   }, []);
 
 
@@ -2382,7 +2384,7 @@ export default function CameraScreen() {
                 }}
               >
                 <ZoomableImage
-                  key={`${displayImageUri}-${isPanZoomLocked}`}
+                  key={`${displayImageUri}-lock-${isPanZoomLocked ? 'true' : 'false'}`}
                   imageUri={displayImageUri}
                   fingerColor={sessionColors.crosshair.main}
                   initialScale={measurementZoom.scale}
