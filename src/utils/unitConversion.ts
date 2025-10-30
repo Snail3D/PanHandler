@@ -129,8 +129,14 @@ export function formatMeasurement(
   }
   
   if (unit === 'km') {
-    // Add K/M suffixes for large values
-    if (value >= 1000000) {
+    // Add K/M/B/T/Q suffixes for large values
+    if (value >= 1000000000000000) {
+      return `${(value / 1000000000000000).toFixed(2)}Q km`;
+    } else if (value >= 1000000000000) {
+      return `${(value / 1000000000000).toFixed(2)}T km`;
+    } else if (value >= 1000000000) {
+      return `${(value / 1000000000).toFixed(2)}B km`;
+    } else if (value >= 1000000) {
       return `${(value / 1000000).toFixed(2)}M km`;
     } else if (value >= 1000) {
       return `${(value / 1000).toFixed(2)}K km`;
@@ -159,8 +165,14 @@ export function formatMeasurement(
   }
 
   if (unit === 'mi') {
-    // Add K/M suffixes for large values
-    if (value >= 1000000) {
+    // Add K/M/B/T/Q suffixes for large values
+    if (value >= 1000000000000000) {
+      return `${(value / 1000000000000000).toFixed(2)}Q mi`;
+    } else if (value >= 1000000000000) {
+      return `${(value / 1000000000000).toFixed(2)}T mi`;
+    } else if (value >= 1000000000) {
+      return `${(value / 1000000000).toFixed(2)}B mi`;
+    } else if (value >= 1000000) {
       return `${(value / 1000000).toFixed(2)}M mi`;
     } else if (value >= 1000) {
       return `${(value / 1000).toFixed(2)}K mi`;
@@ -221,8 +233,14 @@ export function formatAreaMeasurement(
       return `${valueInCm2.toFixed(1)} cm²`;
     } else {
       const valueInM2 = areaInMm2 / 1000000;
-      // Format m² with K/M suffixes
-      if (valueInM2 >= 1000000) {
+      // Format m² with K/M/B/T/Q suffixes
+      if (valueInM2 >= 1000000000000000) {
+        return `${(valueInM2 / 1000000000000000).toFixed(2)}Q m²`;
+      } else if (valueInM2 >= 1000000000000) {
+        return `${(valueInM2 / 1000000000000).toFixed(2)}T m²`;
+      } else if (valueInM2 >= 1000000000) {
+        return `${(valueInM2 / 1000000000).toFixed(2)}B m²`;
+      } else if (valueInM2 >= 1000000) {
         return `${(valueInM2 / 1000000).toFixed(2)}M m²`;
       } else if (valueInM2 >= 1000) {
         return `${(valueInM2 / 1000).toFixed(2)}K m²`;
@@ -236,9 +254,15 @@ export function formatAreaMeasurement(
     const valueInFt2 = valueInIn2 / 144;
     const acres = valueInFt2 / 43560; // 1 acre = 43,560 ft²
 
-    // Format ft² with K/M suffixes
+    // Format ft² with K/M/B/T/Q suffixes
     let ft2Str: string;
-    if (valueInFt2 >= 1000000) {
+    if (valueInFt2 >= 1000000000000000) {
+      ft2Str = `${(valueInFt2 / 1000000000000000).toFixed(2)}Q ft²`;
+    } else if (valueInFt2 >= 1000000000000) {
+      ft2Str = `${(valueInFt2 / 1000000000000).toFixed(2)}T ft²`;
+    } else if (valueInFt2 >= 1000000000) {
+      ft2Str = `${(valueInFt2 / 1000000000).toFixed(2)}B ft²`;
+    } else if (valueInFt2 >= 1000000) {
       ft2Str = `${(valueInFt2 / 1000000).toFixed(2)}M ft²`;
     } else if (valueInFt2 >= 1000) {
       ft2Str = `${(valueInFt2 / 1000).toFixed(2)}K ft²`;
@@ -246,9 +270,15 @@ export function formatAreaMeasurement(
       ft2Str = `${valueInFt2.toFixed(2)} ft²`;
     }
 
-    // Format acres with K/M suffixes
+    // Format acres with K/M/B/T/Q suffixes
     let acreStr: string;
-    if (acres >= 1000000) {
+    if (acres >= 1000000000000000) {
+      acreStr = `${(acres / 1000000000000000).toFixed(2)}Q ac`;
+    } else if (acres >= 1000000000000) {
+      acreStr = `${(acres / 1000000000000).toFixed(2)}T ac`;
+    } else if (acres >= 1000000000) {
+      acreStr = `${(acres / 1000000000).toFixed(2)}B ac`;
+    } else if (acres >= 1000000) {
       acreStr = `${(acres / 1000000).toFixed(2)}M ac`;
     } else if (acres >= 1000) {
       acreStr = `${(acres / 1000).toFixed(2)}K ac`;
