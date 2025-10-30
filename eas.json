@@ -1,75 +1,32 @@
 {
   "cli": {
-    "version": ">= 13.2.0",
-    "appVersionSource": "remote"
+    "version": "16.17.4"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "resourceClass": "m-medium",
-        "image": "latest"
-      },
-      "android": {
-        "resourceClass": "m-medium",
-        "image": "latest"
-      },
-      "env": {
-        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
+        "simulator": true
       }
     },
     "preview": {
-      "distribution": "internal",
-      "ios": {
-        "resourceClass": "m-medium",
-        "image": "latest"
-      },
-      "android": {
-        "resourceClass": "m-medium",
-        "image": "latest"
-      },
-      "env": {
-        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
-      }
+      "distribution": "internal"
     },
     "production": {
+      "env": {},
       "ios": {
-        "resourceClass": "m-medium",
-        "image": "latest"
+        "distribution": "store"
       },
       "android": {
-        "resourceClass": "m-medium",
-        "image": "latest"
-      },
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GROK_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY": "",
-        "EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY": ""
+        "distribution": "store"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "YOUR_APPLE_ID_EMAIL",
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "YOUR_TEAM_ID"
-      },
-      "android": {
-        "serviceAccountKeyPath": "./path/to/api-key.json",
-        "track": "internal"
+        "ascAppId": "6754577499"
       }
     }
   }
