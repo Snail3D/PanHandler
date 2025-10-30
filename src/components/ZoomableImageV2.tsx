@@ -25,13 +25,13 @@ interface ZoomableImageProps {
   initialRotation?: number;
   zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
   showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
-  locked?: boolean; // If true, disable pan/zoom gestures
+  // REMOVED locked prop - now handled by conditional rendering in parent
   opacity?: number; // Opacity of the image (0-1), default 1
   singleFingerPan?: boolean; // If true, allow one-finger panning (for calibration screen)
 }
 
-export default function ZoomableImage({ 
-  imageUri, 
+export default function ZoomableImage({
+  imageUri,
   onTransformChange,
   onDoubleTapWhenLocked,
   onPanStart,
@@ -42,7 +42,7 @@ export default function ZoomableImage({
   initialRotation = 0,
   zoomToCenter = false,
   showLevelLine = false,
-  locked = false,
+  // REMOVED locked param - now handled by conditional rendering in parent
   opacity = 1,
   singleFingerPan = false,
 }: ZoomableImageProps) {
@@ -61,18 +61,7 @@ export default function ZoomableImage({
   const gestureWasActive = useSharedValue(false);
   const gestureJustEnded = useSharedValue(false); // Debounce cooldown flag
 
-  // CRITICAL: Use shared value for locked state to avoid stale closures in production builds
-  // In production, Hermes optimizes closures and the `locked` prop can get frozen
-  // Shared values are reactive and work correctly in both dev and production
-  const isLocked = useSharedValue(locked);
-
-  // Update shared value whenever locked prop changes
-  useEffect(() => {
-    isLocked.value = locked;
-    if (__DEV__) {
-      console.log('🔒 Locked state updated:', locked);
-    }
-  }, [locked]);
+  // REMOVED isLocked shared value - locking now handled by conditional rendering in parent
 
   // Helper function to clear gesture cooldown after delay
   const clearGestureCooldown = () => {
@@ -81,11 +70,6 @@ export default function ZoomableImage({
       __DEV__ && console.log('🔓 Gesture cooldown cleared - buttons should be responsive now');
     }, 50);
   };
-  
-  // Smooth fade when switching between locked/unlocked to prevent flash
-  useEffect(() => {
-    fadeOpacity.value = withTiming(1, { duration: 150 });
-  }, [locked]);
 
   // Cleanup: Reset transform values when imageUri changes to ensure fresh state
   useEffect(() => {
@@ -127,19 +111,15 @@ export default function ZoomableImage({
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
+      // No need to check locked - component won't render when locked
     })
     .onUpdate((event) => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
     })
     .onEnd(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       savedScale.value = scale.value;
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
@@ -147,26 +127,20 @@ export default function ZoomableImage({
     })
     .onFinalize(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       // Ensure gesture is fully complete
       savedScale.value = scale.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
     });
-  
+
   const rotationGesture = Gesture.Rotation()
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       gestureWasActive.value = true;
       rotation.value = savedRotation.value + event.rotation;
     })
     .onEnd(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Mark gesture as complete
 
@@ -176,8 +150,6 @@ export default function ZoomableImage({
     })
     .onFinalize(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       // Ensure gesture is fully complete
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Ensure gesture state is cleared
@@ -194,12 +166,10 @@ export default function ZoomableImage({
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
+      // No need to check locked - component won't render when locked
     })
     .onUpdate((event) => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
@@ -207,8 +177,6 @@ export default function ZoomableImage({
     })
     .onEnd(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
@@ -219,8 +187,6 @@ export default function ZoomableImage({
     })
     .onFinalize(() => {
       'worklet';
-      if (isLocked.value) return; // Early return if locked
-
       // Ensure gesture is fully complete and release control
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
@@ -235,15 +201,7 @@ export default function ZoomableImage({
     .numberOfTaps(2)
     .onEnd(() => {
       'worklet';
-      // Check locked state in worklet - if locked, call special callback instead
-      if (isLocked.value) {
-        if (onDoubleTapWhenLocked) {
-          runOnJS(onDoubleTapWhenLocked)();
-        }
-        return;
-      }
-
-      // Not locked - do normal zoom behavior
+      // Component only renders when unlocked, so just do zoom behavior
       if (scale.value > 1) {
         scale.value = withSpring(1);
         savedScale.value = 1;
