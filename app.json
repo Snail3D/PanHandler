@@ -1,14 +1,13 @@
 {
   "expo": {
-    "owner": "snail3d",
     "name": "PanHandler",
     "slug": "panhandler",
     "scheme": "panhandler",
-    "version": "7.7.2",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
-    "icon": "./assets/icon.png",
+    "icon": "./icon.png",
     "splash": {
       "image": "./assets/pan-handler-logo.png",
       "resizeMode": "contain",
@@ -18,29 +17,29 @@
     "ios": {
       "supportsTablet": true,
       "requireFullScreen": true,
-      "bundleIdentifier": "com.snail.panhandler",
+      "bundleIdentifier": "com.vibecode.panhandler-83ilg2",
       "infoPlist": {
-        "NSCameraUsageDescription": "PanHandler needs camera access to take reference photos for measurements.",
-        "NSPhotoLibraryUsageDescription": "PanHandler needs photo library access to save measurements and export images.",
-        "NSPhotoLibraryAddUsageDescription": "PanHandler needs permission to save measurement images to your photo library.",
-        "NSMicrophoneUsageDescription": "PanHandler may need microphone access for video recording features.",
-        "UISupportedInterfaceOrientations": [
-          "UIInterfaceOrientationPortrait"
-        ],
-        "UISupportedInterfaceOrientations~ipad": [
-          "UIInterfaceOrientationPortrait"
-        ]
-      }
+        "NSCameraUsageDescription": "PanHandler uses the camera to capture photos inside the app before you publish them.",
+        "NSMicrophoneUsageDescription": "PanHandler uses the microphone to record audio tracks that the app attaches to your creations.",
+        "NSPhotoLibraryUsageDescription": "PanHandler accesses your photo library so you can move media between the app and your library.",
+        "NSPhotoLibraryAddUsageDescription": "PanHandler saves media you export from the app into your photo library.",
+        "NSLocationWhenInUseUsageDescription": "PanHandler uses your location to show nearby content and services while you use the app.",
+        "NSMotionUsageDescription": "PanHandler uses motion data to run movement-based features you enable in the app.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "26"
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_MEDIA_LOCATION"
       ]
     },
     "plugins": [
