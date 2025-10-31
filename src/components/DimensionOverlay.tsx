@@ -5995,14 +5995,15 @@ export default function DimensionOverlay({
             </View>
           )}
 
-          {/* Measurement legend in upper-left corner - show when there are measurements */}
+          {/* Measurement legend in bottom-left corner - show when there are measurements */}
           {!hideMeasurementsForCapture && measurements.length > 0 && (
             <View
               style={{
                 position: 'absolute',
-                top: (currentLabel || isCapturing) ? insets.top + scaleMargin(16) + scaleSize(80) : insets.top + scaleMargin(16),
+                bottom: insets.bottom + scaleMargin(16), // Position at bottom with safe area
                 left: scaleMargin(12),
-                maxWidth: Dimensions.get('window').width * 0.60, // Use 60% of screen width to ensure calibration badge has room
+                right: scaleMargin(12), // Extend across full width with margins
+                maxHeight: Dimensions.get('window').height * 0.3, // Max 30% of screen height
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: scalePadding(6),
                 paddingVertical: scalePadding(4),
@@ -6035,8 +6036,14 @@ export default function DimensionOverlay({
       )}
               </View>
 
-              {/* Measurement items - hidden when collapsed (except during capture) */}
-              {(!legendCollapsed || isCapturing) && measurements.map((measurement, idx) => {
+              {/* Measurement items - hidden when collapsed (except during capture), wrapped in ScrollView */}
+              {(!legendCollapsed || isCapturing) && (
+                <ScrollView
+                  style={{ maxHeight: Dimensions.get('window').height * 0.25 }} // Slightly less than container to ensure header always visible
+                  showsVerticalScrollIndicator={true}
+                  bounces={true}
+                >
+                  {measurements.map((measurement, idx) => {
                 const color = getMeasurementColor(idx, measurement.mode);
                 return (
                   <View
@@ -6347,6 +6354,8 @@ export default function DimensionOverlay({
                   </View>
                 );
               })}
+                </ScrollView>
+              )}
             </View>
           )}
           
@@ -6689,26 +6698,27 @@ export default function DimensionOverlay({
           {/* End interactive labels wrapper */}
 
 
-      {/* PanHandler Supporter Badge - Bottom Right Corner */}
+      {/* PanHandler Supporter Badge - Top Left Corner */}
       {isDonor && (
         <View
           style={{
             position: 'absolute',
-            bottom: insets.bottom + scaleMargin(16), // Bottom safe area + padding
-            right: scaleMargin(16),
-            backgroundColor: 'rgba(255, 20, 147, 0.9)', // Deep pink/magenta for love
-            paddingHorizontal: scalePadding(8),
-            paddingVertical: scalePadding(6),
-            borderRadius: scaleBorderRadius(8),
+            top: insets.top + scaleMargin(16), // Top safe area + padding
+            left: scaleMargin(12),
+            backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(255, 20, 147, 0.9)', // Session color with opacity or fallback to pink
+            paddingHorizontal: scalePadding(8) * 0.8,
+            paddingVertical: scalePadding(6) * 0.8,
+            borderRadius: scaleBorderRadius(8) * 0.8,
             alignItems: 'center',
             zIndex: 31,
-            shadowColor: '#FF1493',
+            shadowColor: sessionColor ? sessionColor.main : '#FF1493',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
             shadowRadius: 4,
             elevation: 5,
             borderWidth: 1,
             borderColor: 'rgba(255, 255, 255, 0.3)',
+            transform: [{ scale: 0.8 }], // Scale entire badge to 80%
           }}
         >
           <View style={{ alignItems: 'center', gap: scaleGap(1) }}>
