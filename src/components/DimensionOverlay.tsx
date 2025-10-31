@@ -7612,9 +7612,9 @@ export default function DimensionOverlay({
             zIndex: 30, // Same as AUTO LEVEL badge
             top: insets.top + 16, // Same vertical position as AUTO LEVEL
             right: isAutoCaptured
-              ? 128  // Position right next to AUTO LEVEL badge (with small gap) - moved left
+              ? 140  // Position right next to AUTO LEVEL badge (with gap) - moved left for spacing
               : (coinCircle || calibration || mapScale)
-                ? 128  // Position left of Calibrated badge when no AUTO LEVEL - moved left
+                ? 140  // Position left of Calibrated badge when no AUTO LEVEL - moved left for spacing
                 : 16,  // Position in top right when no badges present
             backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(100, 149, 237, 0.85)', // Session color with opacity
             width: 30,
