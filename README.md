@@ -39,7 +39,6 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 - **Email Reports** — Annotated photos with measurements
 - **Save to Photos** — High-quality exports
-- **CAD Export** — DXF format for professional workflows
 - **Custom Labels** — Name your measurements
 
 ---
@@ -63,7 +62,7 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 - Get instant measurements
 
 ### 4. Export
-- Email, save, or export to CAD
+- Email or save to Photos
 - Share professionally formatted reports
 
 ---
@@ -74,7 +73,6 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 - ✅ Unlimited measurements & exports
 - ✅ All measurement tools included
-- ✅ CAD export (DXF format)
 - ✅ No subscriptions or in-app purchases
 
 ---
@@ -135,7 +133,7 @@ bun tsc --noEmit
 
 ## 🎓 Learn More
 
-**[📹 Video Tutorials on YouTube](https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi)**
+<a href="https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi" target="_blank"><strong>📹 Video Tutorials on YouTube</strong></a>
 
 Complete course covering:
 - Getting started
