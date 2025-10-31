@@ -2169,15 +2169,47 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
                       <Text style={{ fontSize: 28, letterSpacing: 3 }}>⭐⭐⭐⭐⭐</Text>
                     </View>
-                    <Text style={{ 
-                      color: '#B8860B', 
-                      fontSize: 14, 
-                      fontWeight: '600',
-                      textAlign: 'center',
-                      lineHeight: 20,
-                    }}>
-                      Search for "PanHandler" on the App Store or Play Store to leave a review! 🙏
-                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        // TODO: Replace 'YOUR_APP_ID' with your actual Apple App Store ID
+                        const appStoreId = 'YOUR_APP_ID'; // Get this from App Store Connect
+                        const androidPackage = 'com.snail.panhandler';
+
+                        const storeUrl = Platform.OS === 'ios'
+                          ? `itms-apps://itunes.apple.com/app/id${appStoreId}?action=write-review`
+                          : `market://details?id=${androidPackage}`;
+
+                        Linking.openURL(storeUrl).catch(() => {
+                          // Fallback to web URLs if native store apps aren't available
+                          const webUrl = Platform.OS === 'ios'
+                            ? `https://apps.apple.com/app/id${appStoreId}?action=write-review`
+                            : `https://play.google.com/store/apps/details?id=${androidPackage}`;
+                          Linking.openURL(webUrl);
+                        });
+                      }}
+                      style={({ pressed }) => ({
+                        paddingVertical: 14,
+                        paddingHorizontal: 20,
+                        backgroundColor: pressed ? '#D4A017' : '#FFD700',
+                        borderRadius: 12,
+                        marginTop: 4,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 4,
+                        elevation: 4,
+                      })}
+                    >
+                      <Text style={{
+                        color: '#1C1C1E',
+                        fontSize: 16,
+                        fontWeight: '700',
+                        textAlign: 'center',
+                      }}>
+                        Leave a Review 🙏
+                      </Text>
+                    </Pressable>
                    </AnimatedView>
                 </View>
               </View>
