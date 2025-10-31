@@ -40,9 +40,16 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
 
   // Apply manual declination input
   const applyManualDeclination = () => {
+    // Treat blank input as 0 (angle mode)
+    if (declinationInput.trim() === '') {
+      setMagneticDeclination(0);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      return;
+    }
+
     const declination = parseFloat(declinationInput);
     if (isNaN(declination)) {
-      return; // Just ignore invalid input, don't show alert
+      return; // Ignore invalid input
     }
 
     setMagneticDeclination(declination);
