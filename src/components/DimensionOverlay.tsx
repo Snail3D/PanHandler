@@ -5935,7 +5935,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + scaleMargin(16) + scaleSize(40), // Move down slightly to avoid PanHandler Supporter badge
+                top: insets.top + scaleMargin(16) + scaleSize(28), // Move down slightly to avoid single-line PanHandler Supporter badge
                 left: scaleMargin(12),
               }}
               pointerEvents="none"
@@ -6706,10 +6706,12 @@ export default function DimensionOverlay({
             top: insets.top + scaleMargin(16), // Top safe area + padding
             left: scaleMargin(12),
             backgroundColor: sessionColor ? `${sessionColor.main}dd` : 'rgba(255, 20, 147, 0.9)', // Session color with opacity or fallback to pink
-            paddingHorizontal: scalePadding(8) * 0.8,
-            paddingVertical: scalePadding(6) * 0.8,
-            borderRadius: scaleBorderRadius(8) * 0.8,
+            paddingHorizontal: scalePadding(10) * 0.8,
+            paddingVertical: scalePadding(5) * 0.8,
+            borderRadius: scaleBorderRadius(12) * 0.8,
+            flexDirection: 'row', // Single line layout
             alignItems: 'center',
+            gap: scaleGap(4),
             zIndex: 31,
             shadowColor: sessionColor ? sessionColor.main : '#FF1493',
             shadowOffset: { width: 0, height: 2 },
@@ -6721,27 +6723,15 @@ export default function DimensionOverlay({
             transform: [{ scale: 0.8 }], // Scale entire badge to 80%
           }}
         >
-          <View style={{ alignItems: 'center', gap: scaleGap(1) }}>
-            <Text style={{ fontSize: scaleFontSize(12) }}>❤️</Text>
-            <Text style={{
-              color: 'white',
-              fontSize: scaleFontSize(8),
-              fontWeight: '700',
-              letterSpacing: 0.3,
-              textAlign: 'center',
-            }}>
-              PanHandler
-            </Text>
-            <Text style={{
-              color: 'white',
-              fontSize: scaleFontSize(8),
-              fontWeight: '700',
-              letterSpacing: 0.3,
-              textAlign: 'center',
-            }}>
-              Supporter
-            </Text>
-          </View>
+          <Text style={{ fontSize: scaleFontSize(12) }}>❤️</Text>
+          <Text style={{
+            color: 'white',
+            fontSize: scaleFontSize(9),
+            fontWeight: '700',
+            letterSpacing: 0.3,
+          }}>
+            PanHandler Supporter
+          </Text>
         </View>
       )}
 
