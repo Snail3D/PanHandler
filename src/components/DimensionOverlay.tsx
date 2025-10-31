@@ -6000,7 +6000,7 @@ export default function DimensionOverlay({
                 position: 'absolute',
                 top: (currentLabel || isCapturing) ? insets.top + scaleMargin(16) + scaleSize(80) : insets.top + scaleMargin(16),
                 left: scaleMargin(12),
-                maxWidth: Dimensions.get('window').width * 0.55, // Limit to 55% of screen width to avoid calibration badge
+                maxWidth: Dimensions.get('window').width * 0.60, // Use 60% of screen width to ensure calibration badge has room
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: scalePadding(6),
                 paddingVertical: scalePadding(4),
@@ -6041,8 +6041,9 @@ export default function DimensionOverlay({
                     key={`legend-${measurement.id}`}
                     style={{
                       flexDirection: 'row',
-                      alignItems: 'center',
+                      alignItems: 'flex-start',
                       marginVertical: scaleMargin(1),
+                      flexWrap: 'wrap',
                     }}
                   >
                     {/* Line number */}
@@ -6057,10 +6058,12 @@ export default function DimensionOverlay({
                         backgroundColor: color.main,
                         borderRadius: scaleBorderRadius(2),
                         marginRight: scaleMargin(4),
+                        marginTop: scaleMargin(2), // Align with text baseline
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
                     <Text
+                      numberOfLines={0}
                       style={{
                         color: 'white',
                         fontSize: scaleFontSize(8),

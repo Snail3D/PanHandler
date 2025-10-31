@@ -14,6 +14,7 @@
 4. ✅ Add B/T/Q (billion/trillion/quadrillion) suffixes for extreme map scales - **COMPLETE**
 5. ✅ Fix cubic miles volume conversion (off by 1000x) - **COMPLETE**
 6. ✅ Fix pin placement not working after recalibration - **COMPLETE**
+7. ✅ Fix legend text wrapping to prevent overlap with calibration badge - **COMPLETE**
 
 ---
 
@@ -207,6 +208,44 @@ setShowBlueprintDistanceModal(false);
 - ✅ Fixed for both verbal calibration and coin calibration scenarios
 - ✅ Clean state reset ensures repeatable calibration workflow
 
+### 7. Fix Legend Text Wrapping (v8.0.0) - COMPLETE
+
+**Problem:** Legend text was running underneath the calibration badge on the right side of the screen, particularly noticeable on smaller phones. Long measurement strings like "⌀ 3.010 km (A: 119.81 km² | V: 1.2Q gal)" would extend too far and overlap with the badge.
+
+**Root Cause:** The legend container's maxWidth was calculated as `Dimensions.get('window').width - scaleMargin(24) - 180`, which wasn't conservative enough. Additionally, the Text component wasn't properly configured for multi-line wrapping.
+
+**Solution:**
+Changed the legend container maxWidth calculation (line 6003 in DimensionOverlay.tsx):
+```typescript
+// Before: maxWidth: Dimensions.get('window').width - scaleMargin(24) - 180
+// After:  maxWidth: Dimensions.get('window').width * 0.60
+```
+
+Added text wrapping configuration (lines 6065-6072):
+```typescript
+<Text
+  numberOfLines={0}  // Allow unlimited wrapping
+  style={{
+    color: 'white',
+    fontSize: scaleFontSize(8),
+    fontWeight: '600',
+    flex: 1,  // Take available space and wrap
+  }}
+>
+```
+
+**Why This Works:**
+- Using 60% of screen width is more conservative and leaves ample room (40%) for the calibration badge and margins
+- `numberOfLines={0}` allows the text to wrap to as many lines as needed
+- `flex: 1` allows the text to fill available space and wrap naturally at word boundaries
+- React Native's Text component wraps at spaces, keeping measurement units together (e.g., "119.81 km²" won't break mid-unit)
+
+**Results:**
+- ✅ Legend text now wraps before reaching calibration badge
+- ✅ No overlap on any screen size, including smaller phones
+- ✅ Units and symbols stay together without awkward mid-word breaks
+- ✅ Clean, readable layout that works across all device sizes
+
 ---
 
 ## Research Findings
@@ -271,6 +310,8 @@ Avoid `setTimeout` in worklets entirely. Either:
 - `src/components/DimensionOverlay.tsx`
   - Removed "TEST" suffix from formatMapScaleArea function (lines 1505-1519)
   - Added B/T/Q suffixes to formatWithSuffix helper (lines 1351-1368)
+  - Fixed pin placement after recalibration by resetting blueprint state (lines 3867-3892)
+  - Added state resets for isPlacingBlueprint, measurementMode, blueprintPoints, and modal flags
 - `src/utils/unitConversion.ts`
   - Added B/T/Q suffixes to km formatting in formatMeasurement (lines 131-146)
   - Added B/T/Q suffixes to mi formatting in formatMeasurement (lines 167-182)
@@ -278,9 +319,12 @@ Avoid `setTimeout` in worklets entirely. Either:
   - Added B/T/Q suffixes to ft² formatting in formatAreaMeasurement (lines 251-265)
   - Added B/T/Q suffixes to acres formatting in formatAreaMeasurement (lines 267-283)
   - **CRITICAL FIX:** Fixed mi³ to mm³ conversion from 4.168e15 to 4.168e18 (line 333)
+
+**v8.0.0 Files:**
 - `src/components/DimensionOverlay.tsx`
-  - Fixed pin placement after recalibration by resetting blueprint state (lines 3867-3892)
-  - Added state resets for isPlacingBlueprint, measurementMode, blueprintPoints, and modal flags
+  - Fixed legend text wrapping to prevent overlap with calibration badge (line 6003)
+  - Changed maxWidth from pixel calculation to 60% of screen width
+  - Added numberOfLines={0} and flex: 1 to Text component for proper wrapping (lines 6065-6072)
 - `package.json` - Version bumped to 8.0.0
 - `CLAUDE.md` - This file (session documentation)
 
@@ -300,10 +344,15 @@ This is a major version bump that includes critical fixes and enhancements:
 - Removed debug "TEST" text from area measurements
 - Fixed pin placement after recalibration in map scale mode
 
+**UI/UX Improvements (v8.0.0):**
+- Fixed legend text wrapping to prevent overlap with calibration badge on all screen sizes
+- Proper text wrapping at natural boundaries without breaking units or symbols
+
 **Use Cases Unlocked:**
 - State and country-sized map measurements with readable numbers
 - Accurate volume calculations for large bodies of water
 - Smooth recalibration workflow without placement glitches
+- Clean legend display on smaller phones without UI overlap
 
 ---
 
