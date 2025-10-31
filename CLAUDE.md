@@ -308,7 +308,7 @@ Completely redesigned the UI layout for better space utilization:
 - ✅ Label positioning adjusted to not overlap with supporter badge in email/save captures
 
 **Additional Fix:**
-Moved label display down by 80 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears below the badge instead of behind it.
+Moved label display down by 40 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears just below the badge with proper spacing.
 
 ---
 
