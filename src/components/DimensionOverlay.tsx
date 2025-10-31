@@ -5935,7 +5935,7 @@ export default function DimensionOverlay({
             <View
               style={{
                 position: 'absolute',
-                top: insets.top + scaleMargin(16),
+                top: insets.top + scaleMargin(16) + scaleSize(80), // Move down to avoid PanHandler Supporter badge
                 left: scaleMargin(12),
               }}
               pointerEvents="none"
