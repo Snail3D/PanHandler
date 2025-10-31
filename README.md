@@ -135,5 +135,3 @@ PanHandler has hidden surprises! Hints:
 </p>
 
 ---
-
-**📐 PanHandler — Professional measurements from your pocket.**
