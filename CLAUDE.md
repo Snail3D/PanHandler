@@ -16,6 +16,7 @@
 6. ✅ Fix pin placement not working after recalibration - **COMPLETE**
 7. ✅ Fix legend text wrapping to prevent overlap with calibration badge - **COMPLETE**
 8. ✅ Improve email report format to include measurement numbers and labels - **COMPLETE**
+9. ✅ Redesign UI layout: Move supporter badge to top-left, legend to bottom with scrolling - **COMPLETE**
 
 ---
 
@@ -270,6 +271,41 @@ measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
 - ✅ Clear format: "1. ⌀ 3.010 km (A: 119.81 km²) (Lake Michigan) (Blue)"
 - ✅ Easy to correlate email measurements with photo annotations
 
+### 9. Redesigned UI Layout (v8.0.0) - COMPLETE
+
+**Problem:** Legend text in top-left corner was overlapping with calibration badge. The legend box was small and text wrapping was difficult to manage.
+
+**Solution:**
+Completely redesigned the UI layout for better space utilization:
+
+1. **Moved PanHandler Supporter badge to top-left** (lines 6692-6737 in DimensionOverlay.tsx)
+   - Changed from bottom-right to top-left position
+   - Reduced size to 80% using `transform: [{ scale: 0.8 }]`
+   - Badge color now uses session color: `sessionColor ? sessionColor.main : 'rgba(255, 20, 147, 0.9)'`
+   - Supporters see their badge match the session color theme
+
+2. **Moved legend to bottom with full-width and scrolling** (lines 5998-6360 in DimensionOverlay.tsx)
+   - Changed from top-left to bottom position
+   - Extends full width: `left: scaleMargin(12), right: scaleMargin(12)`
+   - Max height: 30% of screen height
+   - Wrapped measurements in ScrollView with max 25% screen height
+   - Scrolls vertically when there are many measurements
+
+**Why This Works:**
+- Supporter badge in top-left has entire width to work with (no calibration badge conflict)
+- Legend at bottom has full width and plenty of room to expand
+- ScrollView allows unlimited measurements without UI overflow
+- No more text wrapping issues or overlap problems
+- Clean, spacious layout that scales to any screen size
+
+**Results:**
+- ✅ No more legend/badge overlap issues
+- ✅ Full-width legend can display long measurement strings without wrapping
+- ✅ Scrollable legend supports unlimited measurements
+- ✅ Supporter badge dynamically matches session color theme
+- ✅ Smaller (80%) supporter badge is less intrusive
+- ✅ Better use of screen real estate
+
 ---
 
 ## Research Findings
@@ -350,6 +386,14 @@ Avoid `setTimeout` in worklets entirely. Either:
   - Changed maxWidth from pixel calculation to 60% of screen width
   - Added numberOfLines={0} and flex: 1 to Text component for proper wrapping (lines 6065-6072)
   - Improved email report format to include measurement numbers and labels (lines 3140-3146)
+  - **MAJOR UI REDESIGN:**
+    - Moved PanHandler Supporter badge from bottom-right to top-left (lines 6692-6737)
+    - Scaled supporter badge to 80% size with `transform: [{ scale: 0.8 }]`
+    - Supporter badge now uses session color theme
+    - Moved legend from top-left to bottom (lines 5998-6360)
+    - Legend now extends full width with left and right margins
+    - Wrapped measurements in ScrollView for unlimited scrolling (lines 6040-6358)
+    - Legend max height: 30% of screen, measurements scroll at 25%
 - `package.json` - Version bumped to 8.0.0
 - `CLAUDE.md` - This file (session documentation)
 
@@ -370,6 +414,10 @@ This is a major version bump that includes critical fixes and enhancements:
 - Fixed pin placement after recalibration in map scale mode
 
 **UI/UX Improvements (v8.0.0):**
+- **MAJOR UI REDESIGN:** Completely reorganized layout for better space utilization
+  - Moved supporter badge from bottom-right to top-left (80% size, session color theme)
+  - Moved legend from top-left to bottom with full-width display
+  - Legend now scrollable for unlimited measurements (max 30% screen height)
 - Fixed legend text wrapping to prevent overlap with calibration badge on all screen sizes
 - Proper text wrapping at natural boundaries without breaking units or symbols
 - Improved email report format with numbered measurements and labels for easier correlation
