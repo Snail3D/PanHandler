@@ -2182,6 +2182,50 @@ Thank you for helping us improve PanHandler!
                 </View>
               </View>
 
+              {/* For the Nerds - GitHub Section */}
+              <View style={{ marginTop: 32, marginBottom: 24 }}>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  color: '#1C1C1E',
+                  textAlign: 'center',
+                  marginBottom: 16,
+                }}>
+                  For the Nerds 🤓
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    Linking.openURL('https://github.com/Snail3D/PanHandler');
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: '#24292e',
+                    borderRadius: 12,
+                    marginHorizontal: 24,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  <Ionicons name="logo-github" size={24} color="white" />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'white',
+                  }}>
+                    See the Code
+                  </Text>
+                </Pressable>
+              </View>
+
 
             </Animated.ScrollView>
                 </GestureDetector>
