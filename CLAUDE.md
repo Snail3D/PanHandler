@@ -308,8 +308,9 @@ Completely redesigned the UI layout for better space utilization:
 - ✅ Better use of screen real estate
 - ✅ Label positioning adjusted to not overlap with supporter badge in email/save captures
 
-**Additional Fix:**
-Moved label display down by 28 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears just below the single-line badge with optimal spacing.
+**Additional Fixes:**
+- Moved label display down by 28 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears just below the single-line badge with optimal spacing.
+- Adjusted help button position from `right: 128` to `right: 140` (line 7614-7617) to add spacing between help button and calibration badge for cleaner UI.
 
 ---
 
