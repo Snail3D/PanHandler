@@ -6322,6 +6322,18 @@ export default function DimensionOverlay({
                           const heightStr = formatMeasurement(measurement.height, calibration?.unit || 'mm', unitSystem, 2);
                           displayValue = `${widthStr} × ${heightStr}`;
                           const area = measurement.width * measurement.height;
+
+                          // DEBUG: Log area calculation values
+                          console.log('🔍 RECTANGLE AREA DEBUG:', {
+                            measurementWidth: measurement.width,
+                            measurementHeight: measurement.height,
+                            calculatedArea: area,
+                            calibrationUnit: calibration?.unit || 'mm',
+                            unitSystem: unitSystem,
+                            widthDisplay: widthStr,
+                            heightDisplay: heightStr,
+                          });
+
                           const areaStr = formatBlueprintArea(area, calibration?.unit || 'mm', unitSystem);
 
                           // Add volume if depth is present
@@ -6329,6 +6341,17 @@ export default function DimensionOverlay({
                             // Convert depth to the same base unit as area (calibration unit)
                             const depthInBaseUnit = convertUnit(measurement.depth, measurement.depthUnit, calibration?.unit || 'mm');
                             const volume = area * depthInBaseUnit;
+
+                            // DEBUG: Log volume calculation values
+                            console.log('🔍 VOLUME DEBUG:', {
+                              depthInput: measurement.depth,
+                              depthUnit: measurement.depthUnit,
+                              depthInBaseUnit: depthInBaseUnit,
+                              areaUsed: area,
+                              calculatedVolume: volume,
+                              calibrationUnit: calibration?.unit || 'mm',
+                            });
+
                             const volumeStr = formatVolumeMeasurement(volume, calibration?.unit || 'mm', unitSystem);
                             return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
                           }
