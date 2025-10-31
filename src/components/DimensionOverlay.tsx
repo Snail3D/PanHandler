@@ -3140,7 +3140,9 @@ export default function DimensionOverlay({
       measurements.forEach((m, idx) => {
         const colorInfo = getMeasurementColor(idx, m.mode);
         const valueOnly = m.value.replace(/^(Blue|Green|Red|Purple|Orange|Yellow|Pink|Amber|Cyan|Rose|Teal|Violet|Crimson|Magenta|Indigo|Sky|Lime)\s+/i, '');
-        measurementText += `${valueOnly} (${colorInfo.name})\n`;
+        // Format: Number. Measurement (Label if exists) (Color)
+        const labelPart = m.label ? ` (${m.label})` : '';
+        measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
       });
 
       measurementText += `\n\nAttached: 2 photos\n`;
