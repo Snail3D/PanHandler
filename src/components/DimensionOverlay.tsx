@@ -5398,9 +5398,9 @@ export default function DimensionOverlay({
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: 'bold', textAlign: 'center' }}>
                   {mode === 'distance' && currentPoints.length === 0 && 'Point 1'}
                   {mode === 'distance' && currentPoints.length === 1 && 'Point 2'}
-                  {mode === 'angle' && currentPoints.length === 0 && (isMapMode ? 'Start location' : 'Point 1')}
-                  {mode === 'angle' && currentPoints.length === 1 && (isMapMode ? 'North reference' : 'Point 2 (vertex)')}
-                  {mode === 'angle' && currentPoints.length === 2 && (isMapMode ? 'Destination' : 'Point 3')}
+                  {mode === 'angle' && currentPoints.length === 0 && (isAzimuthMode ? 'Start location' : 'Point 1')}
+                  {mode === 'angle' && currentPoints.length === 1 && (isAzimuthMode ? 'North reference' : 'Point 2 (vertex)')}
+                  {mode === 'angle' && currentPoints.length === 2 && (isAzimuthMode ? 'Destination' : 'Point 3')}
                   {mode === 'circle' && currentPoints.length === 0 && 'Center of circle'}
                   {mode === 'circle' && currentPoints.length === 1 && 'Outside of circle'}
                   {mode === 'rectangle' && currentPoints.length === 0 && 'First corner'}
