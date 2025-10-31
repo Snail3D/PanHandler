@@ -27,7 +27,7 @@
         "NSMotionUsageDescription": "PanHandler uses motion data to run movement-based features you enable in the app.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "26"
+      "buildNumber": "6754727828"
     },
     "android": {
       "edgeToEdgeEnabled": true,
