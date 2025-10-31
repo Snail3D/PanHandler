@@ -1,7 +1,7 @@
 # 🤖 Current Session Notes
 
-**Date:** 2025-10-30
-**Version:** 8.0.0
+**Date:** 2025-10-31
+**Version:** 8.0.1
 **Status:** ✅ READY FOR PRODUCTION
 
 ---
@@ -17,10 +17,65 @@
 7. ✅ Fix legend text wrapping to prevent overlap with calibration badge - **COMPLETE**
 8. ✅ Improve email report format to include measurement numbers and labels - **COMPLETE**
 9. ✅ Redesign UI layout: Move supporter badge to top-left, legend to bottom with scrolling - **COMPLETE**
+10. ✅ Add magnetic declination dropdown to place points modal (v8.0.1) - **COMPLETE**
 
 ---
 
 ## Changes Made This Session
+
+### 10. Add Magnetic Declination to Place Points Modal (v8.0.1) - COMPLETE
+
+**Problem:** The "Known Scale" (VerbalScaleModal) had a magnetic declination dropdown for azimuth correction, but the "Place Points" (BlueprintDistanceModal) calibration method did not. Users calibrating with known points (like GPS coordinates on a map) also need to account for magnetic declination.
+
+**Solution:**
+Added the same magnetic declination feature to BlueprintDistanceModal that already existed in VerbalScaleModal:
+
+1. **Added store integration** (lines 7, 20-21 in BlueprintDistanceModal.tsx)
+   - Imported `useStore` from measurementStore
+   - Access `magneticDeclination` and `setMagneticDeclination` from store
+
+2. **Added state management** (lines 25, 28 in BlueprintDistanceModal.tsx)
+   - `showDeclinationHelp` state for collapsible section
+   - `declinationInput` state synced with store value
+
+3. **Added apply function** (lines 41-50 in BlueprintDistanceModal.tsx)
+   - `applyManualDeclination()` validates and saves declination
+   - Haptic feedback on save
+
+4. **Wrapped content in ScrollView** (lines 81-85, 419 in BlueprintDistanceModal.tsx)
+   - Modal content now scrollable
+   - MaxHeight set to 80% of screen
+   - Accommodates expanded magnetic declination section
+
+5. **Added collapsible UI section** (lines 244-371 in BlueprintDistanceModal.tsx)
+   - Compass icon with "Magnetic Declination" header
+   - Chevron indicator for expand/collapse
+   - Blue-tinted design matching app aesthetic
+
+6. **Declination controls** (lines 280-370 in BlueprintDistanceModal.tsx)
+   - Numeric input field (positive = East, negative = West)
+   - Current value display showing degrees and direction
+   - "Map Orientation Required" reminder when declination ≠ 0
+   - Reminder text: "Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements"
+
+**Why This Matters:**
+- Both calibration methods now have feature parity
+- Users can set magnetic declination regardless of calibration approach
+- Azimuth measurements corrected for true north in both workflows
+- Consistent UX across all map calibration modes
+
+**Results:**
+- ✅ Magnetic declination available in place points calibration
+- ✅ Same UI/UX as known scale modal
+- ✅ Collapsible design keeps modal clean when not needed
+- ✅ Persistent across both calibration methods (shared store)
+- ✅ Scrollable modal prevents UI overflow
+
+**iOS Build:** 6754727828
+
+---
+
+## Changes Made Previously (v8.0.0)
 
 ### 1. Pan/Zoom Production Build Fix - NUCLEAR OPTION (v7.7.2) - CRITICAL
 
