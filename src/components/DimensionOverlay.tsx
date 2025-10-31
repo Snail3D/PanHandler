@@ -420,6 +420,10 @@ export default function DimensionOverlay({
   const [isMapMode, setIsMapMode] = useState(false);
   const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
   const [showMapScaleModal, setShowMapScaleModal] = useState(false);
+
+  // Azimuth mode: Active when map mode is on OR when magnetic declination is set (≠ 0)
+  // This allows azimuth measurements even in "known points" calibration without enabling full map mode
+  const isAzimuthMode = isMapMode || magneticDeclination !== 0;
   
   // Blueprint scale placement
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
@@ -1146,8 +1150,8 @@ export default function DimensionOverlay({
 
   // Helper to snap cursor to horizontal/vertical alignment with first point
   const snapCursorToAlignment = (cursorX: number, cursorY: number): { x: number, y: number, snapped: boolean } => {
-    // Special case: Map Mode + Angle mode + placing second point (north reference) → ALWAYS lock to vertical
-    if (isMapMode && mode === 'angle' && currentPoints.length === 1) {
+    // Special case: Azimuth Mode + Angle mode + placing second point (north reference) → ALWAYS lock to vertical
+    if (isAzimuthMode && mode === 'angle' && currentPoints.length === 1) {
       const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
       const dy = cursorY - firstPoint.y;
       
@@ -1663,9 +1667,10 @@ export default function DimensionOverlay({
       console.warn('⚠️ calculateAngle called with undefined points');
       return '0°';
     }
-    
-    // Map Mode: Calculate azimuth (bearing) - clockwise angle from north
-    if (isMapMode) {
+
+    // Azimuth Mode: Calculate azimuth (bearing) - clockwise angle from north
+    // Active when: map mode is on OR magnetic declination is set (≠ 0)
+    if (isAzimuthMode) {
       // p1 = starting point
       // p2 = north reference point (defines north direction)
       // p3 = destination point
@@ -3521,13 +3526,13 @@ export default function DimensionOverlay({
         const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
         const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
         const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
-        
-        // In map mode (azimuth), draw from p0 (start) to p1 (north) and p2 (dest)
+
+        // In azimuth mode, draw from p0 (start) to p1 (north) and p2 (dest)
         // In normal mode, draw from p1 (vertex) to p0 and p2
-        const vertex = isMapMode ? p0 : p1;
-        const arm1 = isMapMode ? p1 : p0;
-        const arm2 = isMapMode ? p2 : p2;
-        
+        const vertex = isAzimuthMode ? p0 : p1;
+        const arm1 = isAzimuthMode ? p1 : p0;
+        const arm2 = isAzimuthMode ? p2 : p2;
+
         return (
           <React.Fragment key={measurement.id}>
             {/* Glow layers */}
@@ -3538,20 +3543,20 @@ export default function DimensionOverlay({
             {/* Main lines */}
             <Line x1={vertex.x} y1={vertex.y} x2={arm1.x} y2={arm1.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
             <Line x1={vertex.x} y1={vertex.y} x2={arm2.x} y2={arm2.y} stroke={color.main} strokeWidth="2.5" strokeLinecap="round" />
-            <Path d={isMapMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
+            <Path d={isAzimuthMode ? generateArcPath(p1, p0, p2) : generateArcPath(p0, p1, p2)} stroke={color.main} strokeWidth="2" fill="none" strokeLinecap="round" />
             {/* Point markers with reduced glow (50%) */}
             {/* P0 glow layers */}
             <Circle cx={p0.x} cy={p0.y} r="6" fill={color.glow} opacity="0.05" />
             <Circle cx={p0.x} cy={p0.y} r="5" fill={color.glow} opacity="0.075" />
             <Circle cx={p0.x} cy={p0.y} r="4" fill={color.main} opacity="0.05" />
             <Circle cx={p0.x} cy={p0.y} r="3" fill={color.main} opacity="0.1" />
-            <Circle cx={p0.x} cy={p0.y} r={isMapMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
+            <Circle cx={p0.x} cy={p0.y} r={isAzimuthMode ? "5" : "4"} fill={color.main} stroke="white" strokeWidth="1" />
             {/* P1 (vertex in normal mode, north ref in map mode) */}
             <Circle cx={p1.x} cy={p1.y} r="6.5" fill={color.glow} opacity="0.05" />
             <Circle cx={p1.x} cy={p1.y} r="5.5" fill={color.glow} opacity="0.075" />
             <Circle cx={p1.x} cy={p1.y} r="4.5" fill={color.main} opacity="0.05" />
             <Circle cx={p1.x} cy={p1.y} r="3.5" fill={color.main} opacity="0.1" />
-            <Circle cx={p1.x} cy={p1.y} r={isMapMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
+            <Circle cx={p1.x} cy={p1.y} r={isAzimuthMode ? "4" : "5"} fill={color.main} stroke="white" strokeWidth="1" />
             {/* P2 glow layers */}
             <Circle cx={p2.x} cy={p2.y} r="6" fill={color.glow} opacity="0.05" />
             <Circle cx={p2.x} cy={p2.y} r="5" fill={color.glow} opacity="0.075" />
@@ -3698,7 +3703,7 @@ export default function DimensionOverlay({
       }
       return null;
     });
-  }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isMapMode]);
+  }, [measurements, zoomScale, zoomTranslateX, zoomTranslateY, zoomRotation, hideMeasurementsForCapture, isAzimuthMode]);
 
   return (
     <View
@@ -7156,7 +7161,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'angle' ? 4 : 0,
                   }}>
-                    {isMapMode ? 'Azimuth' : 'Angle'}
+                    {isAzimuthMode ? 'Azimuth' : 'Angle'}
                   </Text>
                 </View>
               </Pressable>
@@ -7502,7 +7507,7 @@ export default function DimensionOverlay({
                       } else if (selected?.mode === 'distance') {
                         return '📏 Selected Line: Drag endpoints to adjust • Tap line to move';
                       } else if (selected?.mode === 'angle') {
-                        return isMapMode 
+                        return isAzimuthMode
                           ? '🧭 Selected Azimuth: Drag points to adjust bearing'
                           : '📐 Selected Angle: Drag any point to adjust angle';
                       } else if (selected?.mode === 'freehand') {
