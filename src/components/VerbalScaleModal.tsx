@@ -504,7 +504,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                             value={declinationInput}
                             onChangeText={setDeclinationInput}
                             placeholder="0.0"
-                            keyboardType="numeric"
+                            keyboardType="numbers-and-punctuation"
                             onBlur={applyManualDeclination}
                             style={{
                               backgroundColor: 'rgba(255, 255, 255, 0.9)',

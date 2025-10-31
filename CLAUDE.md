@@ -54,9 +54,14 @@ Added the same magnetic declination feature to BlueprintDistanceModal that alrea
 
 6. **Declination controls** (lines 280-370 in BlueprintDistanceModal.tsx)
    - Numeric input field (positive = East, negative = West)
+   - **Keyboard type:** `numbers-and-punctuation` (allows minus sign for negative values)
    - Current value display showing degrees and direction
    - "Map Orientation Required" reminder when declination ≠ 0
    - Reminder text: "Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements"
+
+7. **Fixed keyboard type in VerbalScaleModal** (line 507)
+   - Changed from `keyboardType="numeric"` to `keyboardType="numbers-and-punctuation"`
+   - Now allows entering negative declination values (West)
 
 **Why This Matters:**
 - Both calibration methods now have feature parity
@@ -70,6 +75,7 @@ Added the same magnetic declination feature to BlueprintDistanceModal that alrea
 - ✅ Collapsible design keeps modal clean when not needed
 - ✅ Persistent across both calibration methods (shared store)
 - ✅ Scrollable modal prevents UI overflow
+- ✅ Keyboard supports negative values (minus sign) for West declination
 
 **iOS Build:** 6754727828
 
