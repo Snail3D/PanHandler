@@ -15,6 +15,7 @@
 5. ✅ Fix cubic miles volume conversion (off by 1000x) - **COMPLETE**
 6. ✅ Fix pin placement not working after recalibration - **COMPLETE**
 7. ✅ Fix legend text wrapping to prevent overlap with calibration badge - **COMPLETE**
+8. ✅ Improve email report format to include measurement numbers and labels - **COMPLETE**
 
 ---
 
@@ -246,6 +247,29 @@ Added text wrapping configuration (lines 6065-6072):
 - ✅ Units and symbols stay together without awkward mid-word breaks
 - ✅ Clean, readable layout that works across all device sizes
 
+### 8. Improve Email Report Legend Format (v8.0.0) - COMPLETE
+
+**Problem:** Email reports showed measurements without numbers or labels, making it hard to correlate with the legend. Format was just: `⌀ 3.010 km (A: 119.81 km²) (Blue)`
+
+**Solution:**
+Updated email body generation (lines 3140-3146 in DimensionOverlay.tsx) to include:
+1. Measurement number (1., 2., 3., etc.)
+2. Measurement value
+3. Label (if present)
+4. Color name
+
+```typescript
+// Format: Number. Measurement (Label if exists) (Color)
+const labelPart = m.label ? ` (${m.label})` : '';
+measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
+```
+
+**Results:**
+- ✅ Email now shows numbered measurements matching on-screen legend
+- ✅ Labels included when present for easier identification
+- ✅ Clear format: "1. ⌀ 3.010 km (A: 119.81 km²) (Lake Michigan) (Blue)"
+- ✅ Easy to correlate email measurements with photo annotations
+
 ---
 
 ## Research Findings
@@ -325,6 +349,7 @@ Avoid `setTimeout` in worklets entirely. Either:
   - Fixed legend text wrapping to prevent overlap with calibration badge (line 6003)
   - Changed maxWidth from pixel calculation to 60% of screen width
   - Added numberOfLines={0} and flex: 1 to Text component for proper wrapping (lines 6065-6072)
+  - Improved email report format to include measurement numbers and labels (lines 3140-3146)
 - `package.json` - Version bumped to 8.0.0
 - `CLAUDE.md` - This file (session documentation)
 
@@ -347,6 +372,7 @@ This is a major version bump that includes critical fixes and enhancements:
 **UI/UX Improvements (v8.0.0):**
 - Fixed legend text wrapping to prevent overlap with calibration badge on all screen sizes
 - Proper text wrapping at natural boundaries without breaking units or symbols
+- Improved email report format with numbered measurements and labels for easier correlation
 
 **Use Cases Unlocked:**
 - State and country-sized map measurements with readable numbers
