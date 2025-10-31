@@ -306,10 +306,10 @@ const useStore = create<MeasurementStore>()(
     {
       name: 'measurement-settings',
       storage: createJSONStorage(() => asyncStorage),
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         unitSystem: state.unitSystem,
         defaultUnitSystem: state.defaultUnitSystem, // Persist default preference
-        magneticDeclination: state.magneticDeclination, // Persist declination setting
+        // magneticDeclination: REMOVED - always start at 0 (angle mode by default)
         lastSelectedCoin: state.lastSelectedCoin,
         userEmail: state.userEmail, // Persist user email
         sessionCount: state.sessionCount, // Persist session count
