@@ -305,6 +305,10 @@ Completely redesigned the UI layout for better space utilization:
 - ✅ Supporter badge dynamically matches session color theme
 - ✅ Smaller (80%) supporter badge is less intrusive
 - ✅ Better use of screen real estate
+- ✅ Label positioning adjusted to not overlap with supporter badge in email/save captures
+
+**Additional Fix:**
+Moved label display down by 80 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears below the badge instead of behind it.
 
 ---
 
