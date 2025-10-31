@@ -6000,7 +6000,7 @@ export default function DimensionOverlay({
                 position: 'absolute',
                 top: (currentLabel || isCapturing) ? insets.top + scaleMargin(16) + scaleSize(80) : insets.top + scaleMargin(16),
                 left: scaleMargin(12),
-                maxWidth: Dimensions.get('window').width - scaleMargin(24) - scaleSize(80),
+                maxWidth: Dimensions.get('window').width * 0.55, // Limit to 55% of screen width to avoid calibration badge
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
                 paddingHorizontal: scalePadding(6),
                 paddingVertical: scalePadding(4),
@@ -6065,11 +6065,8 @@ export default function DimensionOverlay({
                         color: 'white',
                         fontSize: scaleFontSize(8),
                         fontWeight: '600',
-                        flexShrink: 1,
-                        flexWrap: 'wrap',
-                        maxWidth: Dimensions.get('window').width - scaleMargin(24) - scaleSize(80) - scaleSize(30), // Account for number, color box, and padding
+                        flex: 1,
                       }}
-                      numberOfLines={2} // Allow 2 lines for wrapping
                     >
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Helper function to add label prefix
