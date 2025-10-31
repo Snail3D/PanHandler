@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native';
+import { View, Text, Pressable, Modal, TextInput, Keyboard, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useStore from '../state/measurementStore';
 
 interface BlueprintDistanceModalProps {
   visible: boolean;
@@ -14,9 +15,17 @@ interface BlueprintDistanceModalProps {
 
 export default function BlueprintDistanceModal({ visible, onComplete, onDismiss, mode = 'blueprint' }: BlueprintDistanceModalProps) {
   const insets = useSafeAreaInsets();
-  
+
+  // Access store for magnetic declination
+  const magneticDeclination = useStore((s) => s.magneticDeclination);
+  const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
+
   const [distance, setDistance] = useState('');
   const [unit, setUnit] = useState<'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi'>('cm');
+  const [showDeclinationHelp, setShowDeclinationHelp] = useState(false);
+
+  // Magnetic declination state
+  const [declinationInput, setDeclinationInput] = useState(magneticDeclination.toString());
 
   const isAerial = mode === 'aerial';
   const title = isAerial ? 'Ground Distance' : 'Enter Distance';
@@ -28,6 +37,17 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
 
   const distanceNum = parseFloat(distance);
   const isValid = !isNaN(distanceNum) && distanceNum > 0;
+
+  // Apply manual declination input
+  const applyManualDeclination = () => {
+    const declination = parseFloat(declinationInput);
+    if (isNaN(declination)) {
+      return; // Just ignore invalid input, don't show alert
+    }
+
+    setMagneticDeclination(declination);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
   const handleContinue = () => {
     if (!isValid) return;
@@ -42,6 +62,7 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
           top: insets.top + 80,
           left: 20,
           right: 20,
+          maxHeight: '80%',
           borderRadius: 20,
           overflow: 'hidden',
           shadowColor: '#000',
@@ -57,6 +78,11 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
               overflow: 'hidden',
             }}
           >
+            <ScrollView
+              style={{ maxHeight: '100%' }}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
             <View style={{
               backgroundColor: 'rgba(255, 255, 255, 0.45)',
               borderRadius: 20,
@@ -215,6 +241,135 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                 </View>
               )}
 
+              {/* Magnetic Declination Section - Collapsible */}
+              <View style={{ marginTop: 12, marginBottom: 16 }}>
+                <Pressable
+                  onPress={() => {
+                    setShowDeclinationHelp(!showDeclinationHelp);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  style={{
+                    padding: 10,
+                    backgroundColor: 'rgba(100, 150, 255, 0.12)',
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: 'rgba(100, 150, 255, 0.25)',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Ionicons name="compass-outline" size={16} color="#0066FF" />
+                    <Text style={{
+                      marginLeft: 6,
+                      fontSize: 13,
+                      fontWeight: '700',
+                      color: 'rgba(0, 0, 0, 0.85)'
+                    }}>
+                      Magnetic Declination
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name={showDeclinationHelp ? "chevron-up" : "chevron-down"}
+                    size={16}
+                    color="rgba(0, 0, 0, 0.4)"
+                  />
+                </Pressable>
+
+                {showDeclinationHelp && (
+                  <View style={{
+                    padding: 12,
+                    backgroundColor: 'rgba(100, 150, 255, 0.08)',
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: 'rgba(100, 150, 255, 0.2)',
+                    marginTop: 8,
+                  }}>
+                    <Text style={{
+                      fontSize: 11,
+                      color: 'rgba(0, 0, 0, 0.6)',
+                      marginBottom: 10,
+                      lineHeight: 15,
+                    }}>
+                      Set your magnetic declination to correct azimuth measurements for true north. Positive = East, Negative = West.
+                    </Text>
+
+                    {/* Declination Input Row */}
+                    <View style={{ marginBottom: 8 }}>
+                      <TextInput
+                        value={declinationInput}
+                        onChangeText={setDeclinationInput}
+                        placeholder="0.0"
+                        keyboardType="numeric"
+                        onBlur={applyManualDeclination}
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: 8,
+                          borderWidth: 1,
+                          borderColor: 'rgba(0, 0, 0, 0.08)',
+                          padding: 10,
+                          fontSize: 14,
+                          fontWeight: '600',
+                          color: 'rgba(0, 0, 0, 0.85)',
+                          textAlign: 'center',
+                        }}
+                      />
+                    </View>
+
+                    {/* Current Declination Display */}
+                    <View style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                      borderRadius: 6,
+                      padding: 8,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: 'rgba(0, 0, 0, 0.6)' }}>
+                        Current:
+                      </Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#0066FF' }}>
+                        {magneticDeclination.toFixed(2)}° {magneticDeclination >= 0 ? 'E' : 'W'}
+                      </Text>
+                    </View>
+
+                    {/* Map Orientation Reminder - only show if declination is set */}
+                    {magneticDeclination !== 0 && (
+                      <View style={{
+                        marginTop: 8,
+                        padding: 10,
+                        backgroundColor: 'rgba(255, 180, 0, 0.15)',
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 180, 0, 0.3)',
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                      }}>
+                        <Ionicons name="information-circle" size={16} color="#FF9500" style={{ marginRight: 6, marginTop: 1 }} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={{
+                            fontSize: 11,
+                            fontWeight: '700',
+                            color: 'rgba(0, 0, 0, 0.85)',
+                            marginBottom: 3,
+                          }}>
+                            Map Orientation Required
+                          </Text>
+                          <Text style={{
+                            fontSize: 10,
+                            color: 'rgba(0, 0, 0, 0.65)',
+                            lineHeight: 14,
+                          }}>
+                            Use pan & zoom to orient your map so north is straight up on screen for accurate azimuth measurements.
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+
               {/* LOCK IN Button */}
               {isValid && (
                 <Pressable
@@ -230,8 +385,8 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                     handleContinue();
                   }}
                   style={({ pressed }) => ({
-                    backgroundColor: pressed 
-                      ? 'rgba(52, 199, 89, 0.9)' 
+                    backgroundColor: pressed
+                      ? 'rgba(52, 199, 89, 0.9)'
                       : 'rgba(52, 199, 89, 0.85)',
                     borderRadius: 20,
                     paddingVertical: 18,
@@ -246,9 +401,9 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                     transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                   })}
                 >
-                  <Text style={{ 
-                    color: '#FFFFFF', 
-                    fontWeight: '900', 
+                  <Text style={{
+                    color: '#FFFFFF',
+                    fontWeight: '900',
                     fontSize: 28,
                     textAlign: 'center',
                     letterSpacing: 2,
@@ -261,6 +416,7 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                 </Pressable>
               )}
             </View>
+            </ScrollView>
           </BlurView>
         </View>
       </View>
