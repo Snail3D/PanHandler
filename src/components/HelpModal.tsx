@@ -2206,7 +2206,7 @@ Thank you for helping us improve PanHandler!
                         fontWeight: '700',
                         textAlign: 'center',
                       }}>
-                        Leave a Review 🙏
+                        Tap here to leave a review 🙏
                       </Text>
                     </Pressable>
                    </AnimatedView>
