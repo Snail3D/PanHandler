@@ -421,12 +421,15 @@ This is a major version bump that includes critical fixes and enhancements:
 
 **UI/UX Improvements (v8.0.0):**
 - **MAJOR UI REDESIGN:** Completely reorganized layout for better space utilization
-  - Moved supporter badge from bottom-right to top-left (80% size, session color theme)
+  - Moved supporter badge from bottom-right to top-left (80% size, session color theme, single-line layout)
   - Moved legend from top-left to bottom with full-width display
   - Legend now scrollable for unlimited measurements (max 30% screen height)
+  - Label positioning optimized to avoid badge overlap in email/save captures (28px offset)
+  - Help button spacing adjusted for cleaner UI (moved from right: 128 to right: 140)
 - Fixed legend text wrapping to prevent overlap with calibration badge on all screen sizes
 - Proper text wrapping at natural boundaries without breaking units or symbols
 - Improved email report format with numbered measurements and labels for easier correlation
+- All UI elements now properly spaced with no overlaps or cramped layouts
 
 **Use Cases Unlocked:**
 - State and country-sized map measurements with readable numbers
