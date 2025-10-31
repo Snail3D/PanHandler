@@ -2284,9 +2284,28 @@ export default function DimensionOverlay({
         } else {
           width = widthPx / (calibration?.pixelsPerUnit || 1);
           height = heightPx / (calibration?.pixelsPerUnit || 1);
+
+          // DEBUG: Log rectangle creation
+          console.log('📐 RECTANGLE CREATED:', {
+            widthPx,
+            heightPx,
+            pixelsPerUnit: calibration?.pixelsPerUnit,
+            widthInUnits: width,
+            heightInUnits: height,
+            calibrationUnit: calibration?.unit,
+          });
+
           const widthStr = formatMeasurement(width, calibration?.unit || 'mm', unitSystem, 2);
           const heightStr = formatMeasurement(height, calibration?.unit || 'mm', unitSystem, 2);
           const area = width * height;
+
+          console.log('📐 AREA AT CREATION:', {
+            width,
+            height,
+            areaCalculated: area,
+            calibrationUnit: calibration?.unit,
+          });
+
           const areaStr = formatBlueprintArea(area, calibration?.unit || 'mm', unitSystem);
           value = `${widthStr} × ${heightStr} (A: ${areaStr})`;
         }
