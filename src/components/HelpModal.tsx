@@ -2172,7 +2172,7 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        const appStoreId = '746571'; // PanHandler App Store ID
+                        const appStoreId = '6754577499'; // PanHandler App Store ID
                         const androidPackage = 'com.snail.panhandler';
 
                         const storeUrl = Platform.OS === 'ios'
