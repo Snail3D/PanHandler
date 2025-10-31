@@ -220,27 +220,6 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                 </View>
               </View>
 
-              {/* Live Preview */}
-              {isValid && (
-                <View style={{
-                  backgroundColor: 'rgba(52, 199, 89, 0.15)',
-                  borderRadius: 12,
-                  padding: 16,
-                  marginBottom: 16,
-                  borderWidth: 1,
-                  borderColor: 'rgba(52, 199, 89, 0.3)',
-                }}>
-                  <Text style={{
-                    fontSize: 18,
-                    fontWeight: '700',
-                    color: '#2E7D32',
-                    textAlign: 'center',
-                  }}>
-                    {distance} {unit}
-                  </Text>
-                </View>
-              )}
-
               {/* Magnetic Declination Section - Collapsible */}
               <View style={{ marginTop: 12, marginBottom: 16 }}>
                 <Pressable
