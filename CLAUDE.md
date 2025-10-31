@@ -278,11 +278,12 @@ measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
 **Solution:**
 Completely redesigned the UI layout for better space utilization:
 
-1. **Moved PanHandler Supporter badge to top-left** (lines 6692-6737 in DimensionOverlay.tsx)
+1. **Moved PanHandler Supporter badge to top-left** (lines 6701-6736 in DimensionOverlay.tsx)
    - Changed from bottom-right to top-left position
    - Reduced size to 80% using `transform: [{ scale: 0.8 }]`
    - Badge color now uses session color: `sessionColor ? sessionColor.main : 'rgba(255, 20, 147, 0.9)'`
    - Supporters see their badge match the session color theme
+   - **Single-line layout:** Heart emoji + "PanHandler Supporter" text in one row using `flexDirection: 'row'`
 
 2. **Moved legend to bottom with full-width and scrolling** (lines 5998-6360 in DimensionOverlay.tsx)
    - Changed from top-left to bottom position
@@ -308,7 +309,7 @@ Completely redesigned the UI layout for better space utilization:
 - ✅ Label positioning adjusted to not overlap with supporter badge in email/save captures
 
 **Additional Fix:**
-Moved label display down by 40 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears just below the badge with proper spacing.
+Moved label display down by 28 pixels (line 5938) to prevent overlap with PanHandler Supporter badge in email and save captures. Label now appears just below the single-line badge with optimal spacing.
 
 ---
 
