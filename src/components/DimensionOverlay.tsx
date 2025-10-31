@@ -6870,7 +6870,23 @@ export default function DimensionOverlay({
                       </Text>
                     </Pressable>
                   ) : (
-                    <View style={{ flex: 1 }} />
+                    // Show swipe hint when NOT in edit mode and NOT in label edit mode
+                    <View style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: scalePadding(8),
+                    }}>
+                      <Text style={{
+                        fontSize: scaleFontSize(10),
+                        color: 'rgba(0, 0, 0, 0.35)',
+                        fontWeight: '500',
+                        textAlign: 'center',
+                      }}>
+                        ← Swipe menu to collapse →
+                      </Text>
+                    </View>
                   )}
 
                   {/* Right: Undo button - only show if there are measurements or current points */}
