@@ -261,6 +261,7 @@ export default function CameraScreen() {
   const isFirstTimeDonor = useStore((s) => s.isFirstTimeDonor);
   const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
   const setUserEmail = useStore((s) => s.setUserEmail);
+  const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
 
   // BattlingBots donation modal state
   const [showBattlingBots, setShowBattlingBots] = useState(false);
@@ -1524,6 +1525,9 @@ export default function CameraScreen() {
     setIsTransitioning(false);
     setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
     setMode('camera');
+
+    // Reset magnetic declination to 0 (angle mode by default for new photos)
+    setMagneticDeclination(0);
   };
 
   // Handle photo type selection from modal
