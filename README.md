@@ -45,10 +45,10 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 ## 🚀 Quick Start
 
-### 1. Take a Photo
+### 1. Take a Photo Horizontally _(vertical photos will automatically go to to set known points for scale)_
 - Hold camera perpendicular (90°) to subject
 - Use the bubble level for alignment
-- Tap shutter or let it auto-capture
+- Tap shutter or Hold for auto-capture
 
 ### 2. Calibrate with a Coin
 - Search for your coin (650+ available)
@@ -63,7 +63,7 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 ### 4. Export
 - Email or save to Photos
-- Share professionally formatted reports
+- Share professionally formatted reports instantly
 
 ---
 
@@ -86,7 +86,7 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 - React Native Reanimated v3
 - NativeWind (Tailwind CSS)
 
-### How It Works
+### How It Works _(coin calibration mode)_
 
 ```
 1. User aligns coin to reference circle
@@ -96,32 +96,6 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 Coin diameters are precisely known (standardized minting), providing accurate calibration.
 
-### Project Structure
-
-```
-src/
-├── components/       # UI components (CalibrationModal, DimensionOverlay, etc.)
-├── screens/          # Main screens (MeasurementScreen, CameraScreen)
-├── state/            # Zustand store with persistence
-├── utils/            # Coin database, unit conversions, device scaling
-└── types/            # TypeScript definitions
-```
-
----
-
-## 🔧 Development
-
-```bash
-# Install dependencies
-bun install
-
-# Type checking
-bun tsc --noEmit
-
-# Development server runs on port 8081 (auto-managed by Vibecode)
-```
-
----
 
 ## 📚 Documentation
 
@@ -155,26 +129,9 @@ PanHandler has hidden surprises! Hints:
 ## 👨‍💻 Credits
 
 **Created by:** [Snail](https://youtube.com/@realsnail3d) (3D Designer)
-**Development Partner:** Ken (AI Agent at Vibecode)
-**Launch:** October 2025
+**Launch:** November 2025
 
 **Mission:** Make CAD designing faster, easier, and more accurate for everyone.
-
----
-
-## 📄 License
-
-Proprietary — All rights reserved
-
----
-
-## 🚀 Status
-
-**Version:** 8.0.0
-**Status:** Production Ready 🔥
-**Platform:** iOS (iPhone + iPad)
-
----
 
 ## 💬 Support
 
