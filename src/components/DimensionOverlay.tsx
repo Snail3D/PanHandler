@@ -1615,6 +1615,17 @@ export default function DimensionOverlay({
       }
       return formatArea(area, 'ft²');
     } else if (unit === 'm') {
+      // Check if user wants imperial - then convert to ft² and acres
+      if (currentUnitSystem === 'imperial') {
+        const ft2 = area * 10.7639; // 1 m² = 10.7639 ft²
+        const acres = ft2 / 43560;
+        // Only show acres if >= 0.01 ac
+        if (acres >= 0.01) {
+          return `${formatArea(ft2, 'ft²')} (${formatAcres(acres)})`;
+        }
+        return formatArea(ft2, 'ft²');
+      }
+      // Otherwise show m² with hectares
       const hectares = area / 10000; // 1 hectare = 10,000 m²
       // Only show hectares if >= 0.01 ha (100 m²)
       if (hectares >= 0.01) {
