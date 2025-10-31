@@ -6060,7 +6060,17 @@ export default function DimensionOverlay({
                       }}
                     />
                     {/* Measurement value with area for circles and rectangles */}
-                    <Text style={{ color: 'white', fontSize: scaleFontSize(8), fontWeight: '600', flexShrink: 1 }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontSize: scaleFontSize(8),
+                        fontWeight: '600',
+                        flexShrink: 1,
+                        flexWrap: 'wrap',
+                        maxWidth: Dimensions.get('window').width - scaleMargin(24) - scaleSize(80) - scaleSize(30), // Account for number, color box, and padding
+                      }}
+                      numberOfLines={2} // Allow 2 lines for wrapping
+                    >
                       {showCalculatorWords ? getCalculatorWord(measurement.value) : (() => {
                         // Helper function to add label prefix
                         const addLabelPrefix = (value: string) => {
