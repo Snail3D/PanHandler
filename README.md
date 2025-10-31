@@ -67,8 +67,6 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 ---
 
-## 💰 Pricing
-
 **Free. Forever.**
 
 - ✅ Unlimited measurements & exports
@@ -85,16 +83,6 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 - TypeScript + Zustand state management
 - React Native Reanimated v3
 - NativeWind (Tailwind CSS)
-
-### How It Works _(coin calibration mode)_
-
-```
-1. User aligns coin to reference circle
-2. App calculates: pixelsPerMM = (circleDiameter / zoomScale) / coinDiameterMM
-3. For any measurement: realDistance = pixelDistance / pixelsPerMM
-```
-
-Coin diameters are precisely known (standardized minting), providing accurate calibration.
 
 
 ## 📚 Documentation
