@@ -21,17 +21,6 @@ After downloading:
 
 ---
 
-**Latest Version: 7.5.0**
-
-👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
-
-After downloading:
-1. Enable "Install from Unknown Sources" in your Android settings
-2. Open the downloaded APK file
-3. Follow the installation prompts
-
-> **Note:** The APK is available on the [Releases page](https://github.com/Snail3D/PanHandler/releases). Click "Assets" to download the APK file.
-
 ## 🎯 What is PanHandler?
 
 PanHandler turns your iPhone camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, volumes, and more with CAD-level precision.
