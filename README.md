@@ -18,9 +18,9 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 ## 📥 Download for Android
 
-**Latest Version: 1.1.1**
+**Latest Version: 7.5.0**
 
-👉 **[Download PanHandler 1.1.1 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
+👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
 
 After downloading:
 1. Enable "Install from Unknown Sources" in your Android settings
