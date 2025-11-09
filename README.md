@@ -6,16 +6,6 @@
 
 ---
 
-## 🎯 What is PanHandler?
-
-PanHandler turns your iPhone camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, volumes, and more with CAD-level precision.
-
-**From a can of Coke to an ocean — measure anything in between.**
-
-**No expensive laser tools. No subscriptions. Just your phone and a coin.**
-
----
-
 ## 📥 Download for Android
 
 **Latest Version: 7.5.0**
@@ -28,6 +18,16 @@ After downloading:
 3. Follow the installation prompts
 
 > **Note:** The APK is available on the [Releases page](https://github.com/Snail3D/PanHandler/releases). Click "Assets" to download the APK file.
+
+---
+
+## 🎯 What is PanHandler?
+
+PanHandler turns your iPhone camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, volumes, and more with CAD-level precision.
+
+**From a can of Coke to an ocean — measure anything in between.**
+
+**No expensive laser tools. No subscriptions. Just your phone and a coin.**
 
 ---
 
