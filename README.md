@@ -2,6 +2,8 @@
 
 ## 📥 Download for Android
 
+**Get the Android APK:**
+
 **Latest Version: 7.5.0**
 
 👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
