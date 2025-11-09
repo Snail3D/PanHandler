@@ -1,11 +1,17 @@
 # 📐 PanHandler
 
-## 📥 Download for Android
-
-**Get the Android APK:**
+## 📥 Download
 
 **Latest Version: 7.5.0**
 
+### iOS (TestFlight Beta)
+👉 **[Join the iOS Beta on TestFlight](https://testflight.apple.com/join/kd4CbvSj)**
+
+1. Install TestFlight from the App Store
+2. Open the link above on your iPhone or iPad
+3. Tap "Accept" and "Install" to get the beta version
+
+### Android
 👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
 
 After downloading:
@@ -45,12 +51,13 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 | **Rectangle** | Length, width, area, and volume calculations |
 | **Freehand** | Trace custom paths, get area and volume for closed shapes |
 
-### 🪙 Calibration
+### 🪙 Calibration Options
 
 - **650+ Coins Supported** — From 130+ countries worldwide
-- **Map Scale Mode** — Measure from blueprints and drawings
+- **Known Scale Mode** — Perfect for aerial photos, blueprints, floor plans, and engineering drawings. Measure a known distance (like a scale bar or reference object) and enter its real-world size. Example: Measure a 50mm scale bar that equals 10 meters in real life.
+- **Verbal Scale Mode** — Ideal for maps and drawings with scale notation. Enter a verbal scale like "1 inch = 10 miles" or "1 cm = 100 meters" and PanHandler calculates everything automatically.
 - **Auto-Level Capture** — Hold level for auto-capture
-- **One-Time Setup** — Calibration remembered
+- **One-Time Setup** — Calibration remembered for your session
 
 ### 💾 Export Options
 
