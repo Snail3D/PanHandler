@@ -23,6 +23,16 @@ After downloading:
 
 ---
 
+## 📹 Watch the Demo
+
+<a href="https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg" target="_blank">
+  <img src="https://img.youtube.com/vi/DcqQPxMOd5U/maxresdefault.jpg" alt="PanHandler Demo Video" width="600">
+</a>
+
+[Watch on YouTube](https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg)
+
+---
+
 > Transform your iPhone into a precision measurement tool — no hardware needed, just a coin.
 
 **Professional measurements • CAD-ready exports • Free forever**
