@@ -25,11 +25,13 @@ After downloading:
 
 ## 📹 Watch the Demo
 
+See PanHandler in action! Watch how easy it is to measure anything with just your phone and a coin.
+
 <a href="https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg" target="_blank">
   <img src="https://img.youtube.com/vi/DcqQPxMOd5U/maxresdefault.jpg" alt="PanHandler Demo Video" width="600">
 </a>
 
-[Watch on YouTube](https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg)
+**[Watch on YouTube](https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg)** • [Full Tutorial Playlist](https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi)
 
 ---
 
