@@ -7,12 +7,16 @@
 ### iOS (TestFlight Beta)
 👉 **[Join the iOS Beta on TestFlight](https://testflight.apple.com/join/kd4CbvSj)**
 
+Get early access to PanHandler on iPhone and iPad through Apple's TestFlight beta program. Test new features before they're released and help shape the future of the app.
+
 1. Install TestFlight from the App Store
 2. Open the link above on your iPhone or iPad
 3. Tap "Accept" and "Install" to get the beta version
 
 ### Android
 👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
+
+Download the latest Android APK directly from GitHub. No app store required - just download and install to start measuring.
 
 After downloading:
 1. Enable "Install from Unknown Sources" in your Android settings
