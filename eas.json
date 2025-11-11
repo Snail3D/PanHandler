@@ -1,7 +1,4 @@
 {
-  "cli": {
-    "version": "16.17.4"
-  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -19,7 +16,8 @@
         "distribution": "store"
       },
       "android": {
-        "distribution": "store"
+        "distribution": "store",
+        "buildType": "app-bundle"
       }
     }
   },
