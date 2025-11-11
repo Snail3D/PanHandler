@@ -80,6 +80,8 @@
             "minSdkVersion": 24,
             "targetSdkVersion": 34,
             "compileSdkVersion": 34,
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
             "blockedPermissions": [
               "android.permission.ACTIVITY_RECOGNITION"
             ]
