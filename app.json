@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 29,
+      "versionCode": 30,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -48,8 +48,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "PanHandler needs photo library access to save measurements and export images.",
-          "cameraPermission": "PanHandler needs camera access to capture photos for measurement."
+          "photosPermission": "PanHandler needs photo library access to save measurements and export images."
         }
       ],
       [
