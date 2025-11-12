@@ -2424,16 +2424,22 @@ export default function CameraScreen() {
                     }}
                   />
                 ) : (
-                  // Static image when locked - no gestures at all
-                  <Image
-                    source={{ uri: displayImageUri }}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      opacity: imageOpacity,
-                    }}
-                    resizeMode="contain"
-                  />
+                  // Static image when locked - wrapped to prevent Android double-tap zoom
+                  <View 
+                    style={{ width: '100%', height: '100%' }}
+                    onStartShouldSetResponder={() => Platform.OS === 'android'} // Intercept touches on Android
+                    onResponderTerminationRequest={() => false} // Don't let children steal touch
+                  >
+                    <Image
+                      source={{ uri: displayImageUri }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        opacity: imageOpacity,
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
                 )}
                 {/* Measurement overlay needs to be sibling to image for capture */}
                 <DimensionOverlay 
