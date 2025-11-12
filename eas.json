@@ -18,7 +18,10 @@
       "android": {
         "distribution": "store",
         "buildType": "app-bundle",
-        "autoIncrement": true
+        "autoIncrement": true,
+        "cache": {
+          "disabled": true
+        }
       }
     }
   },
