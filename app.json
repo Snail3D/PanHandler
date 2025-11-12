@@ -94,7 +94,10 @@
             ],
             "usesFeature": {
               "android.hardware.camera": true,
-              "android.hardware.camera.autofocus": true
+              "android.hardware.camera.autofocus": true,
+              "android.hardware.location": false,
+              "android.hardware.location.gps": false,
+              "android.hardware.location.network": false
             }
           }
         }
