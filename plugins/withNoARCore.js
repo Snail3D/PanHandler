@@ -51,29 +51,29 @@ function withNoARCore(config) {
           }).join('\n');
         }
 
-        // ALWAYS forcefully add ARCore as optional to prevent the "AR Required" error
-        // Remove any existing ARCore optional tags first to avoid duplicates
+        // Remove ALL ARCore metadata completely - NO ARCore at all
         manifestContent = manifestContent.replace(
-          /<meta-data[^>]*android:name="com\.google\.ar\.core"[^>]*\/>/gi,
-          ''
-        );
-        manifestContent = manifestContent.replace(
-          /<meta-data[^>]*android:name="com\.google\.ar\.core\.min_apk_version"[^>]*\/>/gi, 
+          /<meta-data[^>]*android:name="com\.google\.ar[^"]*"[^>]*\/>/gi,
           ''
         );
         
-        // Now add the ARCore optional metadata RIGHT BEFORE closing </application>
-        // This MUST be the last thing we do to ensure nothing overwrites it
-        const arCoreMetadata = `    <!-- FORCE ARCore Optional - DO NOT REMOVE -->
-    <meta-data android:name="com.google.ar.core" android:value="optional" />
-    <meta-data android:name="com.google.ar.core.min_apk_version" android:value="241010000" />
-    <!-- END ARCore Optional -->`;
-        
+        // Remove any ARCore uses-feature
         manifestContent = manifestContent.replace(
-          '</application>',
-          arCoreMetadata + '\n    </application>'
+          /<uses-feature[^>]*android:name="[^"]*ar\.core[^"]*"[^>]*\/>/gi,
+          ''
         );
-        console.log('[withNoARCore] FORCEFULLY added ARCore as optional with minimum version');
+        manifestContent = manifestContent.replace(
+          /<uses-feature[^>]*android:name="android\.hardware\.camera\.ar"[^>]*\/>/gi,
+          ''
+        );
+        
+        // Remove any ARCore uses-library
+        manifestContent = manifestContent.replace(
+          /<uses-library[^>]*android:name="com\.google\.ar[^"]*"[^>]*\/>/gi,
+          ''
+        );
+        
+        console.log('[withNoARCore] REMOVED all ARCore references - NO ARCore at all');
 
         if (manifestContent !== originalContent) {
           fs.writeFileSync(manifestPath, manifestContent, 'utf-8');
