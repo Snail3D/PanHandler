@@ -26,13 +26,6 @@
       },
       "cache": {
         "disabled": true
-      },
-      "hooks": {
-        "eas": {
-          "build": {
-            "onStart": "./eas-hooks/eas-build-post-install.sh"
-          }
-        }
       }
     },
     "production-clean": {
