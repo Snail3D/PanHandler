@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 32,
+      "versionCode": 33,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -76,12 +76,13 @@
               "android.permission.ACCESS_COARSE_LOCATION",
               "android.permission.ACCESS_FINE_LOCATION",
               "android.permission.ACCESS_MEDIA_LOCATION",
-              "android.permission.ACCESS_NETWORK_STATE",
               "android.permission.SYSTEM_ALERT_WINDOW",
               "android.permission.USE_BIOMETRIC",
               "android.permission.USE_FINGERPRINT",
               "com.android.vending.CHECK_LICENSE",
-              "android.permission.RECORD_AUDIO"
+              "android.permission.RECORD_AUDIO",
+              "android.permission.MODIFY_AUDIO_SETTINGS",
+              "android.permission.READ_MEDIA_AUDIO"
             ],
             "usesFeature": {
               "android.hardware.camera": true
@@ -91,7 +92,8 @@
       ],
       "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withNoARCore.js",
-      "./plugins/withExcludeFormFactors.js"
+      "./plugins/withExcludeFormFactors.js",
+      "./plugins/withNukePermissions.js"
     ],
     "extra": {
       "eas": {
