@@ -51,15 +51,19 @@ function withNoARCore(config) {
           }).join('\n');
         }
 
-        // Add ARCore as optional to prevent the "AR Required" error
+        // Add ARCore as optional with minimum version to prevent the "AR Required" error
         // This tells Google Play that AR is NOT required
         if (!manifestContent.includes('com.google.ar.core')) {
-          // Find the closing </application> tag and add metadata before it
+          // Find the closing </application> tag and add both metadata tags
+          // BOTH are required when declaring ARCore as optional
+          const arCoreMetadata = `    <meta-data android:name="com.google.ar.core" android:value="optional" />
+    <meta-data android:name="com.google.ar.core.min_apk_version" android:value="241010000" />`;
+          
           manifestContent = manifestContent.replace(
             '</application>',
-            '    <meta-data android:name="com.google.ar.core" android:value="optional" />\n    </application>'
+            arCoreMetadata + '\n    </application>'
           );
-          console.log('[withNoARCore] Added ARCore as optional to prevent AR requirement');
+          console.log('[withNoARCore] Added ARCore as optional with minimum version to prevent AR requirement');
         }
 
         if (manifestContent !== originalContent) {
