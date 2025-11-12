@@ -93,20 +93,20 @@ export default function ZoomableImage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Continuously notify parent of transform changes during gestures
-  useAnimatedReaction(
-    () => ({ scale: scale.value, x: translateX.value, y: translateY.value, rotation: rotation.value }),
-    (current, previous) => {
-      if (onTransformChange && previous) {
-        // Only update if values actually changed
-        if (current.scale !== previous.scale || current.x !== previous.x || current.y !== previous.y || current.rotation !== previous.rotation) {
-          // COMMENTED OUT TO REDUCE LOG SPAM
-          // __DEV__ && console.log('📊 Transform changed:', current.scale.toFixed(2), current.x.toFixed(0), current.y.toFixed(0), current.rotation.toFixed(1));
-          runOnJS(onTransformChange)(current.scale, current.x, current.y, current.rotation);
-        }
-      }
-    }
-  );
+  // DISABLED: Continuous transform updates were blocking UI thread on Android
+  // This was calling onTransformChange 60+ times/sec during pan gestures
+  // Which triggered setMeasurementZoom React state updates that blocked the UI
+  // Now only update onEnd of gestures (see pinch/pan/rotation onEnd callbacks below)
+  // useAnimatedReaction(
+  //   () => ({ scale: scale.value, x: translateX.value, y: translateY.value, rotation: rotation.value }),
+  //   (current, previous) => {
+  //     if (onTransformChange && previous) {
+  //       if (current.scale !== previous.scale || current.x !== previous.x || current.y !== previous.y || current.rotation !== previous.rotation) {
+  //         runOnJS(onTransformChange)(current.scale, current.x, current.y, current.rotation);
+  //       }
+  //     }
+  //   }
+  // );
 
   const pinchGesture = Gesture.Pinch()
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
@@ -181,6 +181,11 @@ export default function ZoomableImage({
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
+
+      // Notify parent of transform change (disabled useAnimatedReaction, so we do it here)
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value, rotation.value);
+      }
 
       // PAN DEBOUNCE: 50ms cooldown prevents buttons from sticking after pan
       gestureJustEnded.value = true;
