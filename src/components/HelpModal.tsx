@@ -1830,7 +1830,7 @@ Thank you for helping us improve PanHandler!
                     </View>
                     
                   </View>
-                </Animated.View>
+                </View>
               </View>
 
               {/* Permissions Section - Quick Guide */}
