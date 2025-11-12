@@ -11,14 +11,18 @@
       "distribution": "internal"
     },
     "production": {
-      "env": {},
+      "env": {
+        "EXPO_NO_TELEMETRY": "1",
+        "EXPO_NO_CAPABILITY_SYNC": "1"
+      },
       "ios": {
         "distribution": "store"
       },
       "android": {
         "distribution": "store",
         "buildType": "app-bundle",
-        "autoIncrement": true
+        "autoIncrement": false,
+        "gradleCommand": ":app:assembleRelease"
       },
       "cache": {
         "disabled": true
@@ -29,6 +33,14 @@
             "onStart": "./eas-hooks/eas-build-post-install.sh"
           }
         }
+      }
+    },
+    "production-clean": {
+      "extends": "production",
+      "android": {
+        "distribution": "store",
+        "buildType": "apk",
+        "autoIncrement": false
       }
     }
   },
