@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 28,
+      "versionCode": 29,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -43,16 +43,6 @@
         "expo-screen-orientation",
         {
           "initialOrientation": "PORTRAIT"
-        }
-      ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "PanHandler needs camera access to take reference photos for measurements.",
-          "recordAudioAndroid": false,
-          "enableBarCodeScanner": false,
-          "enableCodeScanner": false,
-          "enableMLKitBarcodeScanner": false
         }
       ],
       [
