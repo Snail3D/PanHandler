@@ -19,12 +19,10 @@
       "requireFullScreen": true,
       "bundleIdentifier": "com.vibecode.panhandler-83ilg2",
       "infoPlist": {
-        "NSCameraUsageDescription": "PanHandler uses the camera to capture photos inside the app before you publish them.",
-        "NSMicrophoneUsageDescription": "PanHandler uses the microphone to record audio tracks that the app attaches to your creations.",
-        "NSPhotoLibraryUsageDescription": "PanHandler accesses your photo library so you can move media between the app and your library.",
-        "NSPhotoLibraryAddUsageDescription": "PanHandler saves media you export from the app into your photo library.",
-        "NSLocationWhenInUseUsageDescription": "PanHandler uses your location to show nearby content and services while you use the app.",
-        "NSMotionUsageDescription": "PanHandler uses motion data to run movement-based features you enable in the app.",
+        "NSCameraUsageDescription": "PanHandler uses the camera to capture reference photos for measurements.",
+        "NSPhotoLibraryUsageDescription": "PanHandler accesses your photo library to import photos for measurement.",
+        "NSPhotoLibraryAddUsageDescription": "PanHandler saves measurement images to your photo library.",
+        "NSMotionUsageDescription": "PanHandler uses motion data for tilt detection and level alignment.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "buildNumber": "6754727828"
@@ -32,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 20,
+      "versionCode": 21,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
