@@ -1835,8 +1835,7 @@ Thank you for helping us improve PanHandler!
 
               {/* Permissions Section - Quick Guide */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
-                <Animated.View 
-                  entering={FadeIn.delay(675)}
+                <View 
                   style={{
                     backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
@@ -1898,7 +1897,7 @@ Thank you for helping us improve PanHandler!
                       Go to Settings → PanHandler → Enable Camera & Photos
                     </Text>
                   </View>
-                </Animated.View>
+                </View>
               </View>
 
 
@@ -2012,12 +2011,11 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </Text>
                   </View>
-                </Animated.View>
+                </View>
               </View>
               {/* Easter Egg Hints Section - Compact */}
               <View style={{ marginBottom: 12, marginTop: 8 }}>
-                <Animated.View 
-                  entering={FadeIn.delay(800)}
+                <View 
                   style={{
                     backgroundColor: 'rgba(255,215,0,0.15)',
                     borderRadius: 16,
@@ -2137,13 +2135,12 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
                     Hold the left egg for a surprise. Tap the right egg (how many times?) for another surprise. Oh, and by the way, look out for bot battles that might come up while you're using the app — they may reveal more Easter eggs ;)
                   </Text>
-                </Animated.View>
+                </View>
 
                 {/* Rating - Compact */}
                 <View style={{ marginTop: 16 }}>
                   {/* Rating Section - Compact */}
-                  <AnimatedView
-                    entering={FadeIn.delay(800)}
+                  <View
                     style={{
                       paddingVertical: 10,
                       paddingHorizontal: 14,
