@@ -197,34 +197,18 @@ export default function ZoomableImage({
       runOnJS(clearGestureCooldown)();
     });
 
-  const doubleTapGesture = Gesture.Tap()
-    .numberOfTaps(2)
-    .onEnd(() => {
-      'worklet';
-      // Component only renders when unlocked, so just do zoom behavior
-      if (scale.value > 1) {
-        scale.value = withSpring(1);
-        savedScale.value = 1;
-        translateX.value = withSpring(0);
-        translateY.value = withSpring(0);
-        savedTranslateX.value = 0;
-        savedTranslateY.value = 0;
-        rotation.value = withSpring(0);
-        savedRotation.value = 0;
-      } else {
-        scale.value = withSpring(2);
-        savedScale.value = 2;
-      }
-      if (onTransformChange) {
-        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value, rotation.value);
-      }
-    });
+  // DISABLED: Double-tap zoom causes "bouncing" issues and conflicts with measurement workflow
+  // Users expect double-tap to switch to measure mode, not zoom in/out
+  // If zoom-out is needed, users can pinch to zoom out instead
+  // const doubleTapGesture = Gesture.Tap()
+  //   .numberOfTaps(2)
+  //   .onEnd(() => {
+  //     'worklet';
+  //     ...zoom logic removed...
+  //   });
 
-  // Compose gestures - use Race so double-tap and pan/zoom can coexist
-  const composedGesture = Gesture.Race(
-    doubleTapGesture,
-    Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture)
-  );
+  // Compose gestures - removed double-tap to prevent bouncing on Android
+  const composedGesture = Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture);
 
 
   const animatedStyle = useAnimatedStyle(() => ({
