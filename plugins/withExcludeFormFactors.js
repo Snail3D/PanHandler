@@ -19,31 +19,34 @@ module.exports = function withExcludeFormFactors(config) {
       manifest['uses-feature'] = [];
     }
 
-    // Add features to exclude TV, Chromebook, and Wearable
-    const excludeFeatures = [
-      {
-        $: {
-          'android:name': 'android.software.leanback',
-          'android:required': 'false'
-        }
-      },
-      {
+    // Remove TV and microphone features entirely
+    manifest['uses-feature'] = manifest['uses-feature'].filter((feature) => {
+      const name = feature.$?.['android:name'];
+      // Remove leanback (TV) and microphone completely
+      const shouldRemove = name === 'android.software.leanback' || 
+                          name === 'android.hardware.microphone';
+      if (shouldRemove) {
+        console.log(`[withExcludeFormFactors] Removing feature: ${name}`);
+      }
+      return !shouldRemove;
+    });
+
+    // Only require touchscreen (excludes TVs)
+    const touchscreenFeature = manifest['uses-feature'].find(f => 
+      f.$?.['android:name'] === 'android.hardware.touchscreen'
+    );
+    
+    if (!touchscreenFeature) {
+      manifest['uses-feature'].push({
         $: {
           'android:name': 'android.hardware.touchscreen',
           'android:required': 'true'
         }
-      }
-    ];
-
-    // Remove any existing entries for these features
-    manifest['uses-feature'] = manifest['uses-feature'].filter((feature) => {
-      const name = feature.$?.['android:name'];
-      return name !== 'android.software.leanback' && 
-             name !== 'android.hardware.touchscreen';
-    });
-
-    // Add exclusion features
-    manifest['uses-feature'].push(...excludeFeatures);
+      });
+    } else {
+      // Make sure touchscreen is required
+      touchscreenFeature.$['android:required'] = 'true';
+    }
 
     console.log('[withExcludeFormFactors] Excluded TV, Chromebook, and Wearable devices');
 
