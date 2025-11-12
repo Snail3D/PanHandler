@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 35,
+      "versionCode": 36,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -90,6 +90,7 @@
           }
         }
       ],
+      "./plugins/withRemoveActivityRecognition.js",
       [
         "react-native-vision-camera",
         {
@@ -97,11 +98,9 @@
           "enableMicrophonePermission": false
         }
       ],
-      "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withNoARCore.js",
       "./plugins/withExcludeFormFactors.js",
-      "./plugins/withNukePermissions.js",
-      "./plugins/withFinalNuke.js"
+      "./plugins/withNukePermissions.js"
     ],
     "extra": {
       "eas": {

@@ -1,4 +1,4 @@
-const { withDangerousMod } = require('@expo/config-plugins');
+const { withDangerousMod, withPlugins } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
@@ -23,7 +23,7 @@ module.exports = function withNukePermissions(config) {
         // List of ALL permissions we DON'T want
         const unwantedPermissions = [
           'android.permission.RECORD_AUDIO',
-          'android.permission.USE_BIOMETRIC',
+          'android.permission.USE_BIOMETRIC', 
           'android.permission.USE_FINGERPRINT',
           'android.permission.ACTIVITY_RECOGNITION',
           'android.permission.SYSTEM_ALERT_WINDOW',
@@ -33,6 +33,8 @@ module.exports = function withNukePermissions(config) {
           'android.permission.ACCESS_MEDIA_LOCATION',
           'android.permission.MODIFY_AUDIO_SETTINGS',
           'android.permission.READ_MEDIA_AUDIO',
+          'android.permission.READ_MEDIA_VIDEO',
+          'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
           'com.android.vending.CHECK_LICENSE',
         ];
 
@@ -79,6 +81,14 @@ module.exports = function withNukePermissions(config) {
         // Clean up any empty lines
         manifestContent = manifestContent.replace(/^\s*[\r\n]/gm, '');
 
+        // FORCE add CAMERA permission if it was removed
+        if (!manifestContent.includes('android.permission.CAMERA')) {
+          manifestContent = manifestContent.replace(
+            '<uses-permission android:name="android.permission.INTERNET"',
+            '<uses-permission android:name="android.permission.CAMERA"/>\n  <uses-permission android:name="android.permission.INTERNET"'
+          );
+        }
+        
         if (manifestContent !== originalContent) {
           fs.writeFileSync(manifestPath, manifestContent, 'utf-8');
           console.log('[withNukePermissions] ✅ Successfully nuked all unwanted permissions and features');
