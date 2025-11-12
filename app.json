@@ -32,7 +32,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 16,
+      "versionCode": 17,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -106,7 +106,7 @@
           }
         }
       ],
-      "./plugins/withDisableARCore.js",
+      "./plugins/withCompleteARRemoval.js",
       "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withExcludeFormFactors.js"
     ],
