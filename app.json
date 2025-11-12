@@ -84,7 +84,12 @@
             "enableProguardInReleaseBuilds": true,
             "blockedPermissions": [
               "android.permission.ACTIVITY_RECOGNITION"
-            ]
+            ],
+            "usesFeature": {
+              "android.hardware.camera": true,
+              "android.hardware.camera.autofocus": true,
+              "com.google.ar.core": false
+            }
           }
         }
       ]
