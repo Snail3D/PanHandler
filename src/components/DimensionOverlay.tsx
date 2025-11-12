@@ -3397,9 +3397,14 @@ export default function DimensionOverlay({
     });
   
   // Quick swipe gesture to collapse/expand menu
+  // ANDROID FIX: Use failOffsetY to prevent vertical scrolling from triggering
+  // Use enableTrackpadTwoFingerGesture(false) to ensure native touches work
   const menuSwipeGesture = Gesture.Pan()
-    .minDistance(40) // Require more movement before activating
+    .minDistance(60) // Increased from 40 - require significant swipe before activating
     .maxPointers(1) // Only single finger
+    .activeOffsetX([-50, 50]) // Only activate after 50px horizontal movement
+    .failOffsetY([-20, 20]) // Fail if vertical movement > 20px (prevents interfering with taps)
+    .enableTrackpadTwoFingerGesture(false) // Native touches only
     .onStart(() => {
       'worklet';
       // Clear any existing trail when starting new swipe
@@ -6732,8 +6737,8 @@ export default function DimensionOverlay({
       )}
 
       {/* Bottom toolbar - Water droplet style */}
-      {/* REMOVED GestureDetector - menuSwipeGesture was blocking ALL button taps after panning */}
       {!menuMinimized && !isCapturing && !isPlacingBlueprint && !showBlueprintPlacementModal && (
+        <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
             pointerEvents="auto"
             style={[
@@ -7582,6 +7587,7 @@ export default function DimensionOverlay({
               </View>
             </BlurView>
           </Animated.View>
+        </GestureDetector>
       )}
       
       {/* Battling Bots Pro Upgrade Modal */}
