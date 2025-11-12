@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 38,
+      "versionCode": 39,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -90,17 +90,21 @@
           }
         }
       ],
-      "./plugins/withRemoveActivityRecognition.js",
       [
         "react-native-vision-camera",
         {
           "cameraPermissionText": "PanHandler needs camera access to capture photos for measurement.",
-          "enableMicrophonePermission": false
+          "enableMicrophonePermission": false,
+          "enableFrameProcessors": false,
+          "enableCodeScanner": false
         }
       ],
+      "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withNoARCore.js",
       "./plugins/withExcludeFormFactors.js",
-      "./plugins/withNukePermissions.js"
+      "./plugins/withNukePermissions.js",
+      "./plugins/withAbsoluteFinalCleanup.js",
+      "./plugins/withGradlePermissionRemoval.js"
     ],
     "extra": {
       "eas": {
