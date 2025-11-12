@@ -1,35 +1,14 @@
-diff --git a/node_modules/react-native-vision-camera/android/build.gradle b/node_modules/react-native-vision-camera/android/build.gradle
-index 1111111..2222222 100644
---- a/node_modules/react-native-vision-camera/android/build.gradle
-+++ b/node_modules/react-native-vision-camera/android/build.gradle
-@@ -1,1 +1,1 @@
--// Patched to remove audio permissions
-+// Patched by PanHandler to remove audio permissions
 diff --git a/node_modules/react-native-vision-camera/lib/module/expo-plugin/withVisionCamera.js b/node_modules/react-native-vision-camera/lib/module/expo-plugin/withVisionCamera.js
-index 1111111..2222222 100644
+index 405acd1..2db6dd8 100644
 --- a/node_modules/react-native-vision-camera/lib/module/expo-plugin/withVisionCamera.js
 +++ b/node_modules/react-native-vision-camera/lib/module/expo-plugin/withVisionCamera.js
-@@ -29,7 +29,8 @@ const withCamera = (config, props = {}) => {
-   config = withInfoPlist(config, withCameraIos);
-   const androidPermissions = [];
-   if (props.enableCameraPermission) androidPermissions.push('android.permission.CAMERA');
+@@ -22,7 +22,8 @@ const withCamera = (config, props = {}) => {
+     config.ios.infoPlist.NSLocationWhenInUseUsageDescription = props.locationPermissionText ?? config.ios.infoPlist.NSLocationWhenInUseUsageDescription ?? LOCATION_USAGE;
+   }
+   const androidPermissions = ['android.permission.CAMERA'];
 -  if (props.enableMicrophonePermission) androidPermissions.push('android.permission.RECORD_AUDIO');
-+  // PATCHED: Never add RECORD_AUDIO permission
++  // PATCHED BY PANHANDLER - NEVER ADD AUDIO PERMISSIONS
 +  // if (props.enableMicrophonePermission) androidPermissions.push('android.permission.RECORD_AUDIO');
-   config = withPlugins(config, [[AndroidConfig.Permissions.withPermissions, androidPermissions]]);
-   return config;
- };
-diff --git a/node_modules/react-native-vision-camera/src/expo-plugin/withVisionCamera.ts b/node_modules/react-native-vision-camera/src/expo-plugin/withVisionCamera.ts
-index 1111111..2222222 100644
---- a/node_modules/react-native-vision-camera/src/expo-plugin/withVisionCamera.ts
-+++ b/node_modules/react-native-vision-camera/src/expo-plugin/withVisionCamera.ts
-@@ -29,7 +29,8 @@ const withCamera: ConfigPlugin<Props> = (config, props = {}) => {
- 
-   const androidPermissions = []
-   if (props.enableCameraPermission) androidPermissions.push('android.permission.CAMERA')
--  if (props.enableMicrophonePermission) androidPermissions.push('android.permission.RECORD_AUDIO')
-+  // PATCHED: Never add RECORD_AUDIO permission
-+  // if (props.enableMicrophonePermission) androidPermissions.push('android.permission.RECORD_AUDIO')
-   config = withPlugins(config, [[AndroidConfig.Permissions.withPermissions, androidPermissions]])
- 
-   return config
+   if (props.enableLocation) androidPermissions.push('android.permission.ACCESS_FINE_LOCATION');
+   if (props.enableLocation != null) {
+     // set Podfile property to build location-related stuff
