@@ -1904,8 +1904,7 @@ Thank you for helping us improve PanHandler!
 
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
-                <Animated.View 
-                  entering={FadeIn.delay(700)}
+                <View 
                   style={{
                     backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
