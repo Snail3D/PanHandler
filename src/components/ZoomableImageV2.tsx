@@ -209,11 +209,8 @@ export default function ZoomableImage({
   //   });
 
   // Compose gestures - removed double-tap to prevent bouncing on Android
-  // ANDROID FIX: Use Exclusive instead of Simultaneous to force faster gesture release
-  const composedGesture = Gesture.Race(
-    pinchGesture, 
-    Gesture.Simultaneous(rotationGesture, panGesture)
-  );
+  // All gestures work simultaneously (pinch, rotate, pan all at once)
+  const composedGesture = Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture);
 
 
   const animatedStyle = useAnimatedStyle(() => ({
