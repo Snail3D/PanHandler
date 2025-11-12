@@ -97,7 +97,7 @@ const ExpandableSection = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14), zIndex: expanded ? 999 : 0 }]}>
+    <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14) }]}>
       <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -110,7 +110,7 @@ const ExpandableSection = ({
           shadowOffset: { width: 0, height: 0 },
           shadowOpacity: 0.2,
           shadowRadius: scaleSize(12),
-          elevation: expanded ? 999 : 6,
+          elevation: expanded ? 8 : 6,
           borderWidth: scaleSize(1),
           borderColor: 'rgba(255,255,255,0.35)',
         }}
