@@ -14,7 +14,8 @@ module.exports = function withDisableARCore(config) {
     // Remove any existing ARCore metadata
     if (application['meta-data']) {
       application['meta-data'] = application['meta-data'].filter(
-        (meta) => meta.$['android:name'] !== 'com.google.ar.core'
+        (meta) => meta.$['android:name'] !== 'com.google.ar.core' && 
+                  meta.$['android:name'] !== 'com.google.ar.core.min_apk_version'
       );
     } else {
       application['meta-data'] = [];
@@ -25,6 +26,14 @@ module.exports = function withDisableARCore(config) {
       $: {
         'android:name': 'com.google.ar.core',
         'android:value': 'optional',
+      },
+    });
+
+    // Add minimum ARCore version
+    application['meta-data'].push({
+      $: {
+        'android:name': 'com.google.ar.core.min_apk_version',
+        'android:value': '1',
       },
     });
 
