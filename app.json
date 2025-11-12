@@ -97,8 +97,8 @@
         }
       ],
       "./plugins/withRemoveActivityRecognition.js",
-      "./plugins/withExcludeFormFactors.js",
-      "./plugins/withNoARCore.js"
+      "./plugins/withNoARCore.js",
+      "./plugins/withExcludeFormFactors.js"
     ],
     "extra": {
       "eas": {
