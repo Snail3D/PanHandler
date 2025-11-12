@@ -325,6 +325,7 @@ Thank you for helping us improve PanHandler!
   // Only activates on significant horizontal swipe, doesn't interfere with vertical scrolling or child touches
   const swipeGesture = Gesture.Pan()
     .activeOffsetX(50) // Only activate after 50px horizontal movement to the right
+    .failOffsetY([-10, 10]) // ANDROID FIX: Fail immediately on vertical movement (allows scrolling)
     .enableTrackpadTwoFingerGesture(false) // Ensure native touches work
     .onEnd((event) => {
       // Check if swipe is left-to-right and crosses halfway
