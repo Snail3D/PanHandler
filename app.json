@@ -84,7 +84,13 @@
             "targetSdkVersion": 35,
             "enableProguardInReleaseBuilds": true,
             "blockedPermissions": [
-              "android.permission.ACTIVITY_RECOGNITION"
+              "android.permission.ACTIVITY_RECOGNITION",
+              "android.permission.ACCESS_COARSE_LOCATION",
+              "android.permission.ACCESS_FINE_LOCATION",
+              "android.permission.SYSTEM_ALERT_WINDOW",
+              "android.permission.USE_BIOMETRIC",
+              "android.permission.USE_FINGERPRINT",
+              "com.android.vending.CHECK_LICENSE"
             ],
             "usesFeature": {
               "android.hardware.camera": true,
