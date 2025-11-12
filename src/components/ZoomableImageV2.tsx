@@ -228,8 +228,10 @@ export default function ZoomableImage({
 
   return (
     <>
-      {/* Universal fingerprints for pan gestures (multi-touch) */}
-      <UniversalFingerprints color={fingerColor} enabled={true} captureMultiTouch={true} />
+      {/* DISABLED: UniversalFingerprints was blocking buttons on Android after panning
+          zIndex: 1000 overlay with touch handlers interferes with button taps
+          Fingerprints only needed in calibration screen, not measurement screen */}
+      {/* <UniversalFingerprints color={fingerColor} enabled={true} captureMultiTouch={true} /> */}
       
       <View 
         style={StyleSheet.absoluteFill} 
