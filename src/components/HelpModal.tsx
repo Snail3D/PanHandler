@@ -1761,13 +1761,12 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', marginTop: 12, lineHeight: 18, textAlign: 'center' }}>
                     💡 Tip: Higher resolution photos = better accuracy
                   </Text>
-                </Animated.View>
+                </View>
               </View>
 
               {/* Privacy & Security Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
-                <Animated.View 
-                  entering={FadeIn.delay(650)}
+                <View 
                   style={{
                     backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
