@@ -80,6 +80,8 @@
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
             "enableProguardInReleaseBuilds": true,
+            "useAndroidX": true,
+            "enableJetifier": true,
             "blockedPermissions": [
               "android.permission.ACTIVITY_RECOGNITION",
               "android.permission.ACCESS_COARSE_LOCATION",
