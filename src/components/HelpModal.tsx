@@ -104,7 +104,7 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.5)',
+          backgroundColor: 'transparent',
           borderRadius: scaleBorderRadius(20),
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
@@ -113,6 +113,7 @@ const ExpandableSection = ({
           elevation: expanded ? 8 : 6,
           borderWidth: scaleSize(1),
           borderColor: 'rgba(255,255,255,0.35)',
+          overflow: 'hidden',
         }}
       >
         <View
@@ -121,6 +122,7 @@ const ExpandableSection = ({
             alignItems: 'center',
             justifyContent: 'center',
             padding: scalePadding(18),
+            backgroundColor: 'rgba(255,255,255,0.5)',
           }}
         >
           <Text style={{
@@ -138,7 +140,11 @@ const ExpandableSection = ({
         </View>
 
         <AnimatedView style={contentAnimatedStyle}>
-          <View style={{ paddingHorizontal: scalePadding(18), paddingBottom: scalePadding(18) }}>
+          <View style={{ 
+            paddingHorizontal: scalePadding(18), 
+            paddingBottom: scalePadding(18),
+            backgroundColor: 'rgba(255,255,255,0.5)',
+          }}>
             {children}
           </View>
         </AnimatedView>
