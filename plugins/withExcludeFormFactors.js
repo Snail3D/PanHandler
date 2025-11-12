@@ -19,12 +19,16 @@ module.exports = function withExcludeFormFactors(config) {
       manifest['uses-feature'] = [];
     }
 
-    // Remove TV and microphone features entirely
+    // Remove unwanted features entirely
     manifest['uses-feature'] = manifest['uses-feature'].filter((feature) => {
       const name = feature.$?.['android:name'];
-      // Remove leanback (TV) and microphone completely
+      // Remove leanback (TV), microphone, location, and faketouch
       const shouldRemove = name === 'android.software.leanback' || 
-                          name === 'android.hardware.microphone';
+                          name === 'android.hardware.microphone' ||
+                          name === 'android.hardware.location' ||
+                          name === 'android.hardware.location.gps' ||
+                          name === 'android.hardware.location.network' ||
+                          name === 'android.hardware.faketouch';
       if (shouldRemove) {
         console.log(`[withExcludeFormFactors] Removing feature: ${name}`);
       }
