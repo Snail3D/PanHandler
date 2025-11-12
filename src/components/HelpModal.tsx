@@ -143,7 +143,7 @@ const ExpandableSection = ({
           <View style={{ 
             paddingHorizontal: scalePadding(18), 
             paddingBottom: scalePadding(18),
-            backgroundColor: 'rgba(255,255,255,0.5)',
+            backgroundColor: 'transparent',
           }}>
             {children}
           </View>
