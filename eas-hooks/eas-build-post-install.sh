@@ -22,6 +22,12 @@ find . -name "AndroidManifest.xml" -type f | while read -r manifest; do
     # Remove microphone feature
     sed -i.bak '/<uses-feature.*microphone/d' "$manifest"
     
+    # Remove ALL ARCore references - NO ARCore at all
+    sed -i.bak '/<meta-data.*com\.google\.ar/d' "$manifest"
+    sed -i.bak '/<uses-feature.*ar\.core/d' "$manifest"
+    sed -i.bak '/<uses-feature.*camera\.ar/d' "$manifest"
+    sed -i.bak '/<uses-library.*com\.google\.ar/d' "$manifest"
+    
     # Clean up backup files
     rm -f "${manifest}.bak"
 done
