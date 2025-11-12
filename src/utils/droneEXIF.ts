@@ -1,7 +1,6 @@
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import piexif from 'piexifjs';
-import { getGroundElevation, calculateRelativeAltitude } from './elevationAPI';
 import { getPhoneAltitude, calculateDroneRelativeAltitude, calculateGPSDistance, validateGroundReference } from './groundReference';
 
 /**
