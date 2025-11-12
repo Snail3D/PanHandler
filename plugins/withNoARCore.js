@@ -51,11 +51,22 @@ function withNoARCore(config) {
           }).join('\n');
         }
 
+        // Add ARCore as optional to prevent the "AR Required" error
+        // This tells Google Play that AR is NOT required
+        if (!manifestContent.includes('com.google.ar.core')) {
+          // Find the closing </application> tag and add metadata before it
+          manifestContent = manifestContent.replace(
+            '</application>',
+            '    <meta-data android:name="com.google.ar.core" android:value="optional" />\n    </application>'
+          );
+          console.log('[withNoARCore] Added ARCore as optional to prevent AR requirement');
+        }
+
         if (manifestContent !== originalContent) {
           fs.writeFileSync(manifestPath, manifestContent, 'utf-8');
-          console.log('[withNoARCore] Successfully cleaned AndroidManifest.xml of all ARCore references');
+          console.log('[withNoARCore] Successfully updated AndroidManifest.xml');
         } else {
-          console.log('[withNoARCore] No ARCore references found in AndroidManifest.xml');
+          console.log('[withNoARCore] No changes needed in AndroidManifest.xml');
         }
       }
 
