@@ -125,6 +125,11 @@ export default function ZoomableImage({
       savedTranslateX.value = translateX.value;
       savedTranslateY.value = translateY.value;
       gestureWasActive.value = false; // Mark gesture as complete
+      
+      // Notify parent of transform change (disabled useAnimatedReaction, so we do it here)
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value, rotation.value);
+      }
     })
     .onFinalize(() => {
       'worklet';
@@ -144,6 +149,11 @@ export default function ZoomableImage({
       'worklet';
       savedRotation.value = rotation.value;
       gestureWasActive.value = false; // Mark gesture as complete
+      
+      // Notify parent of transform change (disabled useAnimatedReaction, so we do it here)
+      if (onTransformChange) {
+        runOnJS(onTransformChange)(scale.value, translateX.value, translateY.value, rotation.value);
+      }
 
       // ROTATION DEBOUNCE: 50ms cooldown prevents buttons from sticking after rotation
       gestureJustEnded.value = true;
