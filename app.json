@@ -30,13 +30,12 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 22,
+      "versionCode": 23,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.INTERNET",
-        "android.permission.ACCESS_MEDIA_LOCATION"
+        "android.permission.INTERNET"
       ]
     },
     "plugins": [
@@ -66,7 +65,7 @@
         {
           "photosPermission": "PanHandler needs photo library access to save measurements and export images.",
           "savePhotosPermission": "PanHandler needs permission to save measurement images to your photo library.",
-          "isAccessMediaLocationEnabled": true
+          "isAccessMediaLocationEnabled": false
         }
       ],
       [
@@ -83,6 +82,7 @@
               "android.permission.ACTIVITY_RECOGNITION",
               "android.permission.ACCESS_COARSE_LOCATION",
               "android.permission.ACCESS_FINE_LOCATION",
+              "android.permission.ACCESS_MEDIA_LOCATION",
               "android.permission.ACCESS_NETWORK_STATE",
               "android.permission.SYSTEM_ALERT_WINDOW",
               "android.permission.USE_BIOMETRIC",
