@@ -2203,7 +2203,7 @@ Thank you for helping us improve PanHandler!
                         Tap here to leave a review 🙏
                       </Text>
                     </Pressable>
-                   </AnimatedView>
+                   </View>
                 </View>
               </View>
 
