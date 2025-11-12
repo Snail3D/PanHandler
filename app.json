@@ -84,6 +84,9 @@
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true,
             "usesCleartextTraffic": false,
+            "ndk": {
+              "abiFilters": ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"]
+            },
             "blockedPermissions": [
               "android.permission.ACTIVITY_RECOGNITION"
             ]
