@@ -32,7 +32,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 14,
+      "versionCode": 15,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -93,17 +93,22 @@
             ],
             "usesFeature": {
               "android.hardware.camera": true,
-              "android.hardware.camera.autofocus": true,
+              "android.hardware.camera.autofocus": false,
               "android.hardware.location": false,
               "android.hardware.location.gps": false,
               "android.hardware.location.network": false,
-              "android.hardware.microphone": false
+              "android.hardware.microphone": false,
+              "android.hardware.touchscreen": true,
+              "android.software.leanback": false,
+              "android.hardware.type.television": false,
+              "android.hardware.type.watch": false
             }
           }
         }
       ],
       "./plugins/withDisableARCore.js",
-      "./plugins/withRemoveActivityRecognition.js"
+      "./plugins/withRemoveActivityRecognition.js",
+      "./plugins/withExcludeFormFactors.js"
     ],
     "extra": {
       "eas": {
