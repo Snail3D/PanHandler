@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -115,7 +115,7 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
 // This is the primary screen of the app after the opening quote (App.tsx)
 // ═══════════════════════════════════════════════════════════════
 export default function CameraScreen() {
-  const [permission, requestPermission] = useCameraPermissions();
+  const { hasPermission, requestPermission } = useCameraPermission();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
@@ -230,7 +230,8 @@ export default function CameraScreen() {
   const encouragementTextOpacity = useSharedValue(0);
   const reminderTextOpacity = useSharedValue(0);
   
-  const cameraRef = useRef<CameraView>(null);
+  const cameraRef = useRef<Camera>(null);
+  const device = useCameraDevice('back');
   const measurementViewRef = useRef<View | null>(null);
   const doubleTapToMeasureRef = useRef<(() => void) | null>(null);
   
@@ -1223,7 +1224,7 @@ export default function CameraScreen() {
     };
   });
 
-  if (!permission) {
+  if (hasPermission === null) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black' }}>
         <Text style={{ color: 'white' }}>Loading camera...</Text>
@@ -1231,7 +1232,7 @@ export default function CameraScreen() {
     );
   }
 
-  if (!permission.granted) {
+  if (!hasPermission) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', paddingHorizontal: scalePadding(24) }}>
         <Ionicons name="camera-outline" size={scaleIconSize(64)} color="white" />
@@ -1264,11 +1265,17 @@ export default function CameraScreen() {
       cameraFlashOpacity.value = withTiming(0, { duration: 100, easing: Easing.out(Easing.ease) });
       
       // Take photo
-      const photo = await cameraRef.current.takePictureAsync({ quality: 1, skipProcessing: false });
+      const photo = await cameraRef.current.takePhoto({ 
+        qualityPrioritization: 'quality',
+        enableAutoStabilization: true 
+      });
       
-      if (!photo?.uri) {
-        throw new Error('No photo URI returned');
+      if (!photo?.path) {
+        throw new Error('No photo path returned');
       }
+      
+      // react-native-vision-camera returns path, not URI
+      const photoUri = `file://${photo.path}`;
       
       // Determine if table or wall based on phone tilt
       const absBeta = Math.abs(currentBeta);
@@ -1279,7 +1286,7 @@ export default function CameraScreen() {
       
       if (isLookingAtTable) {
         // TABLE PHOTO: Go directly to calibration
-        setCapturedPhotoUri(photo.uri);
+        setCapturedPhotoUri(photoUri);
         setMode('zoomCalibrate');
         setIsCapturing(false); // Reset since leaving camera mode
         
@@ -1289,7 +1296,7 @@ export default function CameraScreen() {
         setSkipToAerialMode(false);
         
         // Deferred MMKV write in background
-        setTimeout(() => setImageUri(photo.uri, false), 200);
+        setTimeout(() => setImageUri(photoUri, false), 200);
         
         // Simple fade animation
         cameraOpacity.value = withTiming(0, { duration: 150, easing: Easing.bezier(0.4, 0.0, 0.2, 1) });
@@ -1300,7 +1307,7 @@ export default function CameraScreen() {
       } else {
         // WALL PHOTO: Go directly to Known Scale Mode (skip modal)
         // Use capturedPhotoUri for immediate UI update (like table photos)
-        setCapturedPhotoUri(photo.uri);
+        setCapturedPhotoUri(photoUri);
         setMode('measurement');
         setIsCapturing(false); // Reset immediately
         
@@ -1310,7 +1317,7 @@ export default function CameraScreen() {
         setSkipToAerialMode(false);
         
         // Background MMKV write (non-blocking)
-        setTimeout(() => setImageUri(photo.uri, false), 200);
+        setTimeout(() => setImageUri(photoUri, false), 200);
         
         // Show blueprint modal after a brief delay
         setTimeout(() => {
@@ -1329,7 +1336,7 @@ export default function CameraScreen() {
       (async () => {
         try {
           if (mediaLibraryPermission?.granted || (await requestMediaLibraryPermission()).granted) {
-            const asset = await MediaLibrary.createAssetAsync(photo.uri);
+            const asset = await MediaLibrary.createAssetAsync(photoUri);
             try {
               const album = await MediaLibrary.getAlbumAsync('PanHandler');
               if (album) {
@@ -1677,13 +1684,21 @@ export default function CameraScreen() {
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
           <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
             <View style={{ flex: 1 }}>
-              <CameraView 
-                  ref={cameraRef}
-                  style={{ flex: 1 }}
-                  facing="back"
-                  enableTorch={flashEnabled}
-                  autofocus="off"
+              {device ? (
+                <Camera 
+                    ref={cameraRef}
+                    style={{ flex: 1 }}
+                    device={device}
+                    isActive={mode === 'camera'}
+                    photo={true}
+                    enableZoomGesture={false}
+                    torch={flashEnabled ? 'on' : 'off'}
                 />
+              ) : (
+                <View style={{ flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: 'white' }}>Loading camera...</Text>
+                </View>
+              )}
               {/* Top controls */}
               <View
                 style={{
