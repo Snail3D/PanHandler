@@ -4,7 +4,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withDelay, withTiming, Easing } from "react-native-reanimated";
-import { Audio } from 'expo-av';
 import CameraScreen from "./src/screens/CameraScreen";
 import QuoteScreen from "./src/screens/QuoteScreen";
 
@@ -35,20 +34,9 @@ export default function App() {
   
   __DEV__ && console.log('🚀 App rendering, showIntro:', showIntro);
 
-  // Configure audio session to allow background music/YouTube to continue playing
+  // Audio configuration removed - expo-av was adding unwanted permissions
   useEffect(() => {
-    const configureAudioSession = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          playsInSilentModeIOS: false, // Don't play audio in silent mode
-        });
-        console.log('✅ Audio session configured - background audio will continue playing');
-      } catch (error) {
-        console.warn('⚠️ Failed to configure audio session:', error);
-      }
-    };
-
-    configureAudioSession();
+    console.log('✅ App initialized - no audio configuration needed');
   }, []);
 
   // Handle quote screen completion
