@@ -45,16 +45,11 @@ module.exports = function withDisableARCore(config) {
       application['meta-data'] = [];
     }
     
-    // IMPORTANT: Explicitly add ARCore as "optional" 
-    // This tells Google Play that AR is NOT required
-    application['meta-data'].push({
-      $: {
-        'android:name': 'com.google.ar.core',
-        'android:value': 'optional'
-      }
-    });
+    // DO NOT add any ARCore metadata - the app doesn't use AR at all
+    // Adding com.google.ar.core=optional requires also adding min_apk_version
+    // Simpler to just remove all ARCore references completely
     
-    console.log('[withDisableARCore] Added com.google.ar.core=optional metadata');
+    console.log('[withDisableARCore] Removed all ARCore metadata - app does not use AR');
 
     return config;
   });
