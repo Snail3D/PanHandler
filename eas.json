@@ -21,7 +21,7 @@
       "android": {
         "distribution": "store",
         "buildType": "app-bundle",
-        "autoIncrement": false,
+        "autoIncrement": true,
         "gradleCommand": ":app:assembleRelease"
       },
       "cache": {
