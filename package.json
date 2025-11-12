@@ -23,7 +23,7 @@
     "expo-av": "~15.1.4",
     "expo-blur": "~14.1.4",
     "expo-build-properties": "~0.14.6",
-    "expo-camera": "~15.0.16",
+    "expo-camera": "~16.1.6",
     "expo-clipboard": "~7.1.4",
     "expo-constants": "~17.1.5",
     "expo-crypto": "^14.0.2",
