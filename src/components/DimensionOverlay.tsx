@@ -7005,8 +7005,9 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
-          <GestureDetector gesture={modeSwitchGesture}>
-            <Animated.View style={[{ marginBottom: scaleMargin(8) }, modeSwipeAnimatedStyle]}>
+          {/* REMOVED GestureDetector - was blocking button taps after panning */}
+          {/* Swipe-to-cycle feature removed to fix 15-second button delay */}
+            <View style={[{ marginBottom: scaleMargin(8) }]}>
               <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
                 <Pressable
@@ -7339,9 +7340,8 @@ export default function DimensionOverlay({
                   </Text>
                 </View>
               </Pressable>
+              </View>
             </View>
-            </Animated.View>
-          </GestureDetector>
 
           {/* Unit System and Map Mode Row */}
           <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), gap: scaleGap(6) }}>
