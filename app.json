@@ -75,6 +75,7 @@
       [
         "expo-mail-composer"
       ],
+      "./plugins/withDisableARCore.js",
       [
         "expo-build-properties",
         {
@@ -87,8 +88,7 @@
             ],
             "usesFeature": {
               "android.hardware.camera": true,
-              "android.hardware.camera.autofocus": true,
-              "com.google.ar.core": false
+              "android.hardware.camera.autofocus": true
             }
           }
         }
