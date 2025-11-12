@@ -30,7 +30,7 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "package": "com.snail.panhandler",
-      "versionCode": 26,
+      "versionCode": 27,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
