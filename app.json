@@ -76,6 +76,7 @@
         "expo-mail-composer"
       ],
       "./plugins/withDisableARCore.js",
+      "./plugins/withRemoveActivityRecognition.js",
       [
         "expo-build-properties",
         {
