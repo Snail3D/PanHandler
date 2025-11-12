@@ -82,7 +82,7 @@ const ExpandableSection = ({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
-      zIndex: 0,
+      // REMOVED zIndex - was causing overlay issues on Android
     };
   });
   
