@@ -31,23 +31,6 @@ module.exports = function withExcludeFormFactors(config) {
       return !shouldRemove;
     });
 
-    // Only require touchscreen (excludes TVs)
-    const touchscreenFeature = manifest['uses-feature'].find(f => 
-      f.$?.['android:name'] === 'android.hardware.touchscreen'
-    );
-    
-    if (!touchscreenFeature) {
-      manifest['uses-feature'].push({
-        $: {
-          'android:name': 'android.hardware.touchscreen',
-          'android:required': 'true'
-        }
-      });
-    } else {
-      // Make sure touchscreen is required
-      touchscreenFeature.$['android:required'] = 'true';
-    }
-
     console.log('[withExcludeFormFactors] Excluded TV, Chromebook, and Wearable devices');
 
     return config;
