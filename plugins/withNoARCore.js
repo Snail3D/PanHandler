@@ -51,20 +51,29 @@ function withNoARCore(config) {
           }).join('\n');
         }
 
-        // Add ARCore as optional with minimum version to prevent the "AR Required" error
-        // This tells Google Play that AR is NOT required
-        if (!manifestContent.includes('com.google.ar.core')) {
-          // Find the closing </application> tag and add both metadata tags
-          // BOTH are required when declaring ARCore as optional
-          const arCoreMetadata = `    <meta-data android:name="com.google.ar.core" android:value="optional" />
-    <meta-data android:name="com.google.ar.core.min_apk_version" android:value="241010000" />`;
-          
-          manifestContent = manifestContent.replace(
-            '</application>',
-            arCoreMetadata + '\n    </application>'
-          );
-          console.log('[withNoARCore] Added ARCore as optional with minimum version to prevent AR requirement');
-        }
+        // ALWAYS forcefully add ARCore as optional to prevent the "AR Required" error
+        // Remove any existing ARCore optional tags first to avoid duplicates
+        manifestContent = manifestContent.replace(
+          /<meta-data[^>]*android:name="com\.google\.ar\.core"[^>]*\/>/gi,
+          ''
+        );
+        manifestContent = manifestContent.replace(
+          /<meta-data[^>]*android:name="com\.google\.ar\.core\.min_apk_version"[^>]*\/>/gi, 
+          ''
+        );
+        
+        // Now add the ARCore optional metadata RIGHT BEFORE closing </application>
+        // This MUST be the last thing we do to ensure nothing overwrites it
+        const arCoreMetadata = `    <!-- FORCE ARCore Optional - DO NOT REMOVE -->
+    <meta-data android:name="com.google.ar.core" android:value="optional" />
+    <meta-data android:name="com.google.ar.core.min_apk_version" android:value="241010000" />
+    <!-- END ARCore Optional -->`;
+        
+        manifestContent = manifestContent.replace(
+          '</application>',
+          arCoreMetadata + '\n    </application>'
+        );
+        console.log('[withNoARCore] FORCEFULLY added ARCore as optional with minimum version');
 
         if (manifestContent !== originalContent) {
           fs.writeFileSync(manifestPath, manifestContent, 'utf-8');
