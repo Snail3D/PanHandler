@@ -6765,8 +6765,8 @@ export default function DimensionOverlay({
       )}
 
       {/* Bottom toolbar - Water droplet style */}
+      {/* REMOVED GestureDetector - menuSwipeGesture was blocking ALL button taps after panning */}
       {!menuMinimized && !isCapturing && !isPlacingBlueprint && !showBlueprintPlacementModal && (
-        <GestureDetector gesture={menuSwipeGesture}>
           <Animated.View
             pointerEvents="auto"
             style={[
@@ -7612,10 +7612,9 @@ export default function DimensionOverlay({
           </View>
           
           {/* Pro status footer - REMOVED: Now donation-based via BattlingBots */}
-        </View>
-        </BlurView>
+              </View>
+            </BlurView>
           </Animated.View>
-        </GestureDetector>
       )}
       
       {/* Battling Bots Pro Upgrade Modal */}
