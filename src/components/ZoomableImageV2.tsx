@@ -64,11 +64,12 @@ export default function ZoomableImage({
   // REMOVED isLocked shared value - locking now handled by conditional rendering in parent
 
   // Helper function to clear gesture cooldown after delay
+  // ANDROID FIX: Increased from 50ms to 200ms - Android gesture system holds context longer
   const clearGestureCooldown = () => {
     setTimeout(() => {
       gestureJustEnded.value = false;
       __DEV__ && console.log('🔓 Gesture cooldown cleared - buttons should be responsive now');
-    }, 50);
+    }, 200);
   };
 
   // Cleanup: Reset transform values when imageUri changes to ensure fresh state
@@ -208,7 +209,11 @@ export default function ZoomableImage({
   //   });
 
   // Compose gestures - removed double-tap to prevent bouncing on Android
-  const composedGesture = Gesture.Simultaneous(pinchGesture, rotationGesture, panGesture);
+  // ANDROID FIX: Use Exclusive instead of Simultaneous to force faster gesture release
+  const composedGesture = Gesture.Race(
+    pinchGesture, 
+    Gesture.Simultaneous(rotationGesture, panGesture)
+  );
 
 
   const animatedStyle = useAnimatedStyle(() => ({
