@@ -3710,44 +3710,11 @@ export default function DimensionOverlay({
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       pointerEvents={showBlueprintPlacementModal ? "box-none" : "auto"}
     >
-      {/* Universal Touch Overlay - Captures ALL touches for fingerprints */}
-      <View
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1 }}
-        pointerEvents="box-none"
-        onStartShouldSetResponder={() => true}
-        onResponderGrant={(event) => {
-          const { pageX, pageY } = event.nativeEvent;
-          const pressure = event.nativeEvent.force || 0.5;
-          
-          // Create fingerprint at touch location with session color
-          setFingerTouches([{ 
-            x: pageX, 
-            y: pageY, 
-            id: `universal-touch-${Date.now()}`,
-            pressure: pressure,
-            seed: Math.random()
-          }]);
-          
-          fingerOpacity.value = withTiming(1, { duration: 150 });
-          fingerScale.value = 1;
-          fingerRotation.value = 0;
-        }}
-        onResponderRelease={() => {
-          // Fade out fingerprint
-          fingerOpacity.value = withTiming(0, { 
-            duration: 800, 
-            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
-          });
-          fingerScale.value = withTiming(1.5, { 
-            duration: 800, 
-            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
-          });
-          fingerRotation.value = withTiming(15, { 
-            duration: 800, 
-            easing: Easing.bezier(0.4, 0.6, 0.2, 1) 
-          });
-        }}
-      />
+      {/* REMOVED: Universal Touch Overlay was blocking buttons after panning!
+          The onStartShouldSetResponder was claiming responder chain on Android
+          and preventing buttons from receiving taps for 15+ seconds after pan gestures.
+          Fingerprints are already handled by UniversalFingerprints in ZoomableImageV2.
+      */}
       
       {/* Persistent "Calibration Locked" indicator */}
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && (
