@@ -12,6 +12,13 @@ android {
     }
 }
 
+// BLOCK ARCore from being pulled in as transitive dependency
+configurations.all {
+    exclude group: 'com.google.ar', module: 'core'
+    exclude group: 'com.google.ar.sceneform', module: 'core'
+    exclude group: 'com.google.ar.sceneform.ux', module: 'sceneform-ux'
+}
+
 // Forcefully remove permissions at build time - Works for both APK and AAB builds
 afterEvaluate {
     // Hook into MULTIPLE tasks to catch all manifest generation
