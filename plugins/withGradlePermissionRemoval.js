@@ -87,7 +87,7 @@ afterEvaluate {
                             manifestContent = manifestContent.replaceAll('\\s*tools:node=\\'remove\\'', '')
                             
                             manifestFile.write(manifestContent, 'UTF-8')
-                            println "[PanHandler] ✅ Cleaned manifest #${cleanedCount}: " + manifestFile.path
+                            println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + manifestFile.path
                         }
                     }
                     
@@ -95,7 +95,7 @@ afterEvaluate {
                         println "[PanHandler] ⚠️ No manifest files found in any location"
                         manifestLocations.each { println "  Tried: " + it.path }
                     } else {
-                        println "[PanHandler] ✅ Cleaned ${cleanedCount} manifest file(s)"
+                        println "[PanHandler] ✅ Cleaned " + cleanedCount + " manifest file(s)"
                     }
                 }
             }
