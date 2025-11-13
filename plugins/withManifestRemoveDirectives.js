@@ -22,7 +22,6 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest['uses-feature'] = [];
     }
 
-    // Add tools:node="remove" for all unwanted permissions
     const unwantedPermissions = [
       'android.permission.RECORD_AUDIO',
       'android.permission.MODIFY_AUDIO_SETTINGS',
@@ -37,7 +36,15 @@ module.exports = function withManifestRemoveDirectives(config) {
       'com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE',
     ];
 
+    // CRITICAL: First REMOVE any existing instances (added by native modules)
+    // Then add the tools:node="remove" version
     unwantedPermissions.forEach(permission => {
+      // Remove existing permission declarations (without tools:node)
+      manifest['uses-permission'] = (manifest['uses-permission'] || []).filter(perm => {
+        return perm.$?.['android:name'] !== permission || perm.$?.['tools:node'] === 'remove';
+      });
+      
+      // Now add the tools:node="remove" directive
       manifest['uses-permission'].push({
         $: {
           'android:name': permission,
@@ -53,7 +60,14 @@ module.exports = function withManifestRemoveDirectives(config) {
       'android.hardware.camera.ar', // ARCore camera feature
     ];
 
+    // CRITICAL: First REMOVE any existing feature declarations
     unwantedFeatures.forEach(feature => {
+      // Remove existing feature declarations (without tools:node)
+      manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
+        return feat.$?.['android:name'] !== feature || feat.$?.['tools:node'] === 'remove';
+      });
+      
+      // Now add the tools:node="remove" directive
       manifest['uses-feature'].push({
         $: {
           'android:name': feature,
