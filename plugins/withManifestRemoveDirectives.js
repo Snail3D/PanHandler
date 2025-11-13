@@ -87,25 +87,18 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest.application[0]['meta-data'] = [];
     }
 
-    // CRITICAL: Remove ALL ARCore metadata, then add explicit "not supported" declaration
-    // Google Play requires EXPLICIT declaration that AR is not supported
-    // Just removing isn't enough - must actively declare "unsupported"
+    // CRITICAL: COMPLETELY REMOVE all ARCore metadata
+    // Google Play will NOT require AR if there's NO ARCore metadata at all
+    // Don't use "unsupported" (invalid), don't use "optional" (still requires Play Services)
+    // Complete removal = no AR requirement
     
-    // First remove any existing ARCore metadata
+    // Remove ALL existing ARCore metadata
     manifest.application[0]['meta-data'] = (manifest.application[0]['meta-data'] || []).filter(meta => {
       const name = meta.$?.['android:name'];
       return !name || !name.includes('com.google.ar');
     });
-    
-    // Then add EXPLICIT "unsupported" declaration (different from "optional")
-    manifest.application[0]['meta-data'].push({
-      $: {
-        'android:name': 'com.google.ar.core',
-        'android:value': 'unsupported',
-      },
-    });
 
-    console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions,', unwantedFeatures.length, 'features, and ARCore set to UNSUPPORTED');
+    console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions,', unwantedFeatures.length, 'features, and REMOVED all ARCore metadata');
 
     return config;
   });
