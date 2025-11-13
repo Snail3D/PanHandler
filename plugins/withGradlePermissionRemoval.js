@@ -58,6 +58,13 @@ afterEvaluate {
                 // Remove CHECK_LICENSE permission
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending\\\\.CHECK_LICENSE"[^>]*/>', '')
                 
+                // Remove BIND_GET_INSTALL_REFERRER_SERVICE permission
+                manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.google\\\\.android\\\\.finsky\\\\.permission\\\\.BIND_GET_INSTALL_REFERRER_SERVICE"[^>]*/>', '')
+                
+                // Remove faketouch feature (more variations)
+                manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android:name="android\\\\.hardware\\\\.faketouch"[^>]*/>', '')
+                manifestContent = manifestContent.replaceAll('<uses-feature[^>]*faketouch[^>]*/>', '')
+                
                 manifestFile.write(manifestContent, 'UTF-8')
                 println "[PanHandler] ✅ FORCEFULLY REMOVED unwanted permissions from: " + manifestFile.path
             } else {
