@@ -60,11 +60,16 @@ module.exports = function withManifestRemoveDirectives(config) {
       }
     });
 
-    // REMOVE any existing unwanted features and enforce allowlist (camera handled separately below)
+    // REMOVE any existing unwanted features and enforce strict allowlist
+    // CRITICAL: Remove camera.ar, faketouch, and all unwanted features completely
     manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
       const name = feat.$?.['android:name'];
       if (!name) return false;
-      return allowedFeatures.includes(name) || name === 'android.hardware.camera.ar';
+      // Block camera.ar and faketouch COMPLETELY - don't declare them at all
+      if (name === 'android.hardware.camera.ar' || name === 'android.hardware.faketouch') {
+        return false;
+      }
+      return allowedFeatures.includes(name);
     });
 
     const existingFeatureSet = new Set(manifest['uses-feature'].map(feat => feat.$?.['android:name']));
@@ -89,25 +94,10 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest.application[0]['meta-data'] = [];
     }
 
-    // CRITICAL: Block ARCore completely
-    // Remove ALL existing ARCore metadata and features
+    // CRITICAL: Block ARCore completely - remove ALL metadata
     manifest.application[0]['meta-data'] = (manifest.application[0]['meta-data'] || []).filter(meta => {
       const name = meta.$?.['android:name'];
       return !name || !name.includes('com.google.ar');
-    });
-    
-    // Remove any existing camera.ar features first
-    manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
-      return feat.$?.['android:name'] !== 'android.hardware.camera.ar';
-    });
-    
-    // Add explicit "ARCore NOT required" feature declaration
-    // This tells Google Play the app works WITHOUT AR
-    manifest['uses-feature'].push({
-      $: {
-        'android:name': 'android.hardware.camera.ar',
-        'android:required': 'false',
-      },
     });
 
     console.log('[withManifestRemoveDirectives] Enforced allowed permissions/features and removed all ARCore metadata');
