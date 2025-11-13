@@ -28,26 +28,20 @@ afterEvaluate {
         try {
             tasks.named(theTaskName).configure {
                 doLast {
-                    println "[PanHandler] Running cleanup after task: " + theTaskName
+                    println "[PanHandler] ========================================="
+                    println "[PanHandler] Running AGGRESSIVE manifest cleanup after: " + theTaskName
+                    println "[PanHandler] ========================================="
                     
-                    // Try ALL possible manifest locations (AAB uses different paths than APK)
-                    def manifestLocations = [
-                        new File(buildDir, 'intermediates/merged_manifests/release/AndroidManifest.xml'),
-                        new File(buildDir, 'intermediates/merged_manifests/release/merge/AndroidManifest.xml'),
-                        new File(buildDir, 'intermediates/packaged_manifests/release/AndroidManifest.xml'),
-                        new File(buildDir, 'intermediates/bundle_manifest/release/AndroidManifest.xml'),
-                        new File(buildDir, 'intermediates/merged_manifest/release/AndroidManifest.xml'),
-                        new File(buildDir, 'intermediates/merged_native_libs/release/out/AndroidManifest.xml'),
-                        new File(projectDir, 'build/intermediates/merged_manifests/release/AndroidManifest.xml'),
-                        new File(projectDir, 'build/intermediates/merged_manifests/release/merge/AndroidManifest.xml')
-                    ]
-                    
-                    // Clean ALL found manifests (AAB might have multiple)
+                    // NUCLEAR OPTION: Find ALL AndroidManifest.xml files and clean them
                     def cleanedCount = 0
-                    manifestLocations.each { manifestFile ->
-                        if (manifestFile?.exists()) {
-                            cleanedCount++
-                            def manifestContent = manifestFile.getText('UTF-8')
+                    def searchRoot = new File(buildDir, 'intermediates')
+                    
+                    if (searchRoot.exists()) {
+                        searchRoot.eachFileRecurse { file ->
+                            if (file.name == 'AndroidManifest.xml' && file.path.contains('release')) {
+                                println "[PanHandler] Found manifest: " + file.path
+                                cleanedCount++
+                                def manifestContent = file.getText('UTF-8')
                             
                             // Remove RECORD_AUDIO permission
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.RECORD_AUDIO"[^>]*/>', '')
@@ -89,21 +83,28 @@ afterEvaluate {
                             manifestContent = manifestContent.replaceAll('<uses-feature[^>]*camera\\\\.ar[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('<uses-library[^>]*com\\\\.google\\\\.ar[^>]*/>', '')
                             
-                            // Remove any tools:node="remove" attributes that didn't work (clean them out)
-                            manifestContent = manifestContent.replaceAll('\\s*tools:node="remove"', '')
-                            manifestContent = manifestContent.replaceAll('\\s*tools:node=\\'remove\\'', '')
-                            
-                            manifestFile.write(manifestContent, 'UTF-8')
-                            println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + manifestFile.path
+                                // Remove any tools:node="remove" attributes that didn't work (clean them out)
+                                manifestContent = manifestContent.replaceAll('\\s*tools:node="remove"', '')
+                                manifestContent = manifestContent.replaceAll('\\s*tools:node=\\'remove\\'', '')
+                                
+                                // Count what we removed
+                                def removedItems = []
+                                if (manifestContent =~ /ACTIVITY_RECOGNITION/) removedItems.add('ACTIVITY_RECOGNITION')
+                                if (manifestContent =~ /CHECK_LICENSE/) removedItems.add('CHECK_LICENSE')
+                                if (manifestContent =~ /faketouch/) removedItems.add('faketouch')
+                                
+                                file.write(manifestContent, 'UTF-8')
+                                println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + file.path
+                                if (removedItems.size() > 0) {
+                                    println "[PanHandler]   Removed: " + removedItems.join(', ')
+                                }
+                            }
                         }
                     }
                     
-                    if (cleanedCount == 0) {
-                        println "[PanHandler] ⚠️ No manifest files found in any location"
-                        manifestLocations.each { println "  Tried: " + it.path }
-                    } else {
-                        println "[PanHandler] ✅ Cleaned " + cleanedCount + " manifest file(s)"
-                    }
+                    println "[PanHandler] ========================================="
+                    println "[PanHandler] ✅ CLEANED " + cleanedCount + " MANIFEST FILE(S)"
+                    println "[PanHandler] ========================================="
                 }
             }
         } catch (Exception e) {
