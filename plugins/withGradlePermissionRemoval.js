@@ -12,20 +12,23 @@ android {
     }
 }
 
-// Forcefully remove permissions at build time - Updated for newer Android Gradle Plugin
-tasks.whenTaskAdded { task ->
-    if (task.name == 'processReleaseManifest' || task.name == 'processDebugManifest') {
-        task.doLast {
-            def manifestFile = new File(buildDir, 'intermediates/merged_manifests/release/AndroidManifest.xml')
-            if (!manifestFile.exists()) {
-                manifestFile = new File(buildDir, 'intermediates/merged_manifests/debug/AndroidManifest.xml')
-            }
-            if (!manifestFile.exists()) {
-                // Try another common location
-                manifestFile = new File(buildDir, 'intermediates/manifests/full/release/AndroidManifest.xml')
-            }
+// Forcefully remove permissions at build time - Multiple fallback paths
+afterEvaluate {
+    tasks.named('processReleaseManifest').configure {
+        doLast {
+            // Try ALL possible manifest locations
+            def manifestLocations = [
+                new File(buildDir, 'intermediates/merged_manifests/release/AndroidManifest.xml'),
+                new File(buildDir, 'intermediates/merged_manifests/release/merge/AndroidManifest.xml'),
+                new File(buildDir, 'intermediates/packaged_manifests/release/AndroidManifest.xml'),
+                new File(buildDir, 'intermediates/bundle_manifest/release/AndroidManifest.xml'),
+                new File(projectDir, 'build/intermediates/merged_manifests/release/AndroidManifest.xml'),
+                new File(projectDir, 'build/intermediates/merged_manifests/release/merge/AndroidManifest.xml')
+            ]
             
-            if (manifestFile.exists()) {
+            def manifestFile = manifestLocations.find { it.exists() }
+            
+            if (manifestFile?.exists()) {
                 def manifestContent = manifestFile.getText('UTF-8')
                 
                 // Remove RECORD_AUDIO permission
@@ -56,9 +59,10 @@ tasks.whenTaskAdded { task ->
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending\\\\.CHECK_LICENSE"[^>]*/>', '')
                 
                 manifestFile.write(manifestContent, 'UTF-8')
-                println "[PanHandler] Forcefully removed unwanted permissions from manifest at: " + manifestFile.path
+                println "[PanHandler] ✅ FORCEFULLY REMOVED unwanted permissions from: " + manifestFile.path
             } else {
-                println "[PanHandler] Warning: Could not find manifest file to clean"
+                println "[PanHandler] ❌ ERROR: Could not find manifest file in any location!"
+                manifestLocations.each { println "  Tried: " + it.path }
             }
         }
     }
