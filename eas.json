@@ -22,7 +22,7 @@
         "distribution": "store",
         "buildType": "app-bundle",
         "autoIncrement": true,
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:bundleRelease"
       },
       "cache": {
         "disabled": true
