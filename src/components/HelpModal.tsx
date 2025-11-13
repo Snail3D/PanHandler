@@ -112,7 +112,7 @@ const ExpandableSection = ({
           shadowRadius: scaleSize(12),
           elevation: expanded ? 8 : 6,
           borderWidth: scaleSize(1),
-          borderColor: 'rgba(255,255,255,0.35)',
+          borderColor: color,
           overflow: 'hidden',
         }}
       >
@@ -122,7 +122,7 @@ const ExpandableSection = ({
             alignItems: 'center',
             justifyContent: 'center',
             padding: scalePadding(18),
-            backgroundColor: 'rgba(255,255,255,0.3)',
+            backgroundColor: color,
           }}
         >
           <Text style={{
