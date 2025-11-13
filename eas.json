@@ -25,7 +25,8 @@
         "gradleCommand": ":app:bundleRelease"
       },
       "cache": {
-        "disabled": true
+        "disabled": true,
+        "customPaths": ["patches"]
       }
     },
     "production-clean": {
