@@ -122,7 +122,7 @@ const ExpandableSection = ({
             alignItems: 'center',
             justifyContent: 'center',
             padding: scalePadding(18),
-            backgroundColor: color,
+            backgroundColor: `${color}30`,
           }}
         >
           <Text style={{
