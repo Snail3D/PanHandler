@@ -22,58 +22,60 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest['uses-feature'] = [];
     }
 
-    const unwantedPermissions = [
-      'android.permission.RECORD_AUDIO',
-      'android.permission.MODIFY_AUDIO_SETTINGS',
-      'android.permission.ACTIVITY_RECOGNITION',
-      'android.permission.USE_BIOMETRIC',
-      'android.permission.USE_FINGERPRINT',
-      'android.permission.ACCESS_NETWORK_STATE',
-      'android.permission.READ_MEDIA_AUDIO',
-      'android.permission.READ_MEDIA_VIDEO',
-      'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
-      'com.android.vending.CHECK_LICENSE',
-      'com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE',
+    const allowedPermissions = [
+      'android.permission.CAMERA',
+      'android.permission.INTERNET',
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.VIBRATE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
     ];
 
-    // CRITICAL: First REMOVE any existing instances (added by native modules)
-    // Then add the tools:node="remove" version
-    unwantedPermissions.forEach(permission => {
-      // Remove existing permission declarations (without tools:node)
-      manifest['uses-permission'] = (manifest['uses-permission'] || []).filter(perm => {
-        return perm.$?.['android:name'] !== permission || perm.$?.['tools:node'] === 'remove';
-      });
-      
-      // Now add the tools:node="remove" directive
-      manifest['uses-permission'].push({
-        $: {
-          'android:name': permission,
-          'tools:node': 'remove',
-        },
-      });
+    const allowedFeatures = [
+      'android.hardware.camera',
+    ];
+
+    const currentPermissions = (manifest['uses-permission'] || []).map(perm => perm.$?.['android:name'] || JSON.stringify(perm));
+    console.log('[withManifestRemoveDirectives] Permissions BEFORE allowlist:', currentPermissions);
+
+    // CRITICAL: REMOVE any unwanted permissions and enforce allowlist
+    manifest['uses-permission'] = (manifest['uses-permission'] || []).filter(perm => {
+      const name = perm.$?.['android:name'];
+      if (!name) return false;
+      return allowedPermissions.includes(name);
     });
 
-    // Add tools:node="remove" for unwanted features
-    // NOTE: camera.ar is handled separately below with required="false"
-    const unwantedFeatures = [
-      'android.hardware.microphone',
-      'android.hardware.faketouch',
-    ];
+    const afterFilterPermissions = manifest['uses-permission'].map(perm => perm.$?.['android:name'] || JSON.stringify(perm));
+    console.log('[withManifestRemoveDirectives] Permissions AFTER filter:', afterFilterPermissions);
 
-    // CRITICAL: First REMOVE any existing feature declarations
-    unwantedFeatures.forEach(feature => {
-      // Remove existing feature declarations (without tools:node)
-      manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
-        return feat.$?.['android:name'] !== feature || feat.$?.['tools:node'] === 'remove';
-      });
-      
-      // Now add the tools:node="remove" directive
-      manifest['uses-feature'].push({
-        $: {
-          'android:name': feature,
-          'tools:node': 'remove',
-        },
-      });
+    // Ensure every allowed permission is present exactly once
+    const existingPermissionSet = new Set(manifest['uses-permission'].map(perm => perm.$?.['android:name']));
+    allowedPermissions.forEach(permission => {
+      if (!existingPermissionSet.has(permission)) {
+        manifest['uses-permission'].push({
+          $: {
+            'android:name': permission,
+          },
+        });
+      }
+    });
+
+    // REMOVE any existing unwanted features and enforce allowlist (camera handled separately below)
+    manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
+      const name = feat.$?.['android:name'];
+      if (!name) return false;
+      return allowedFeatures.includes(name) || name === 'android.hardware.camera.ar';
+    });
+
+    const existingFeatureSet = new Set(manifest['uses-feature'].map(feat => feat.$?.['android:name']));
+    allowedFeatures.forEach(feature => {
+      if (!existingFeatureSet.has(feature)) {
+        manifest['uses-feature'].push({
+          $: {
+            'android:name': feature,
+          },
+        });
+      }
     });
 
     // Block ARCore metadata from being added
@@ -108,7 +110,7 @@ module.exports = function withManifestRemoveDirectives(config) {
       },
     });
 
-    console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions,', unwantedFeatures.length, 'features, and REMOVED all ARCore metadata');
+    console.log('[withManifestRemoveDirectives] Enforced allowed permissions/features and removed all ARCore metadata');
 
     return config;
   });
