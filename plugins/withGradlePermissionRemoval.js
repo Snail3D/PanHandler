@@ -17,11 +17,11 @@ afterEvaluate {
     // Hook into MULTIPLE tasks to catch all manifest generation
     def cleanupTasks = ['processReleaseManifest', 'processReleaseBundleManifest', 'packageReleaseBundle']
     
-    cleanupTasks.each { taskName ->
+    cleanupTasks.each { theTaskName ->
         try {
-            tasks.named(taskName).configure {
+            tasks.named(theTaskName).configure {
                 doLast {
-                    println "[PanHandler] Running cleanup after task: ${taskName}"
+                    println "[PanHandler] Running cleanup after task: " + theTaskName
                     
                     // Try ALL possible manifest locations (AAB uses different paths than APK)
                     def manifestLocations = [
@@ -100,7 +100,7 @@ afterEvaluate {
                 }
             }
         } catch (Exception e) {
-            println "[PanHandler] Task ${taskName} not found, skipping"
+            println "[PanHandler] Task " + theTaskName + " not found, skipping"
         }
     }
 }`;
