@@ -21,8 +21,16 @@ configurations.all {
 
 // Forcefully remove permissions at build time - Works for both APK and AAB builds
 afterEvaluate {
-    // Hook into MULTIPLE tasks to catch all manifest generation
-    def cleanupTasks = ['processReleaseManifest', 'processReleaseBundleManifest', 'packageReleaseBundle']
+    // Hook into ALL manifest-related tasks - more comprehensive
+    def cleanupTasks = [
+        'processReleaseManifest',
+        'processReleaseBundleManifest',
+        'processReleaseResources',
+        'mergeReleaseResources',
+        'packageReleaseBundle',
+        'bundleReleaseResources',
+        'generateReleaseResources'
+    ]
     
     cleanupTasks.each { theTaskName ->
         try {
@@ -38,7 +46,7 @@ afterEvaluate {
                     
                     if (searchRoot.exists()) {
                         searchRoot.eachFileRecurse { file ->
-                            if (file.name == 'AndroidManifest.xml' && file.path.contains('release')) {
+                            if (file.name == 'AndroidManifest.xml' && (file.path.contains('release') || file.path.contains('merged'))) {
                                 println "[PanHandler] Found manifest: " + file.path
                                 cleanedCount++
                                 def manifestContent = file.getText('UTF-8')
@@ -67,31 +75,34 @@ afterEvaluate {
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.READ_MEDIA_VIDEO"[^>]*/>', '')
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.READ_MEDIA_VISUAL_USER_SELECTED"[^>]*/>', '')
                 
-                            // Remove CHECK_LICENSE permission (multiple variations)
-                            manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending\\\\.CHECK_LICENSE[^>]*/>', '')
+                            // Remove CHECK_LICENSE permission (multiple variations - MORE AGGRESSIVE)
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*CHECK_LICENSE[^>]*/>', '')
+                            manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending[^>]*/>', '')
                             
                             // Remove BIND_GET_INSTALL_REFERRER_SERVICE permission
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.google\\\\.android\\\\.finsky[^>]*/>', '')
                             
-                            // Remove faketouch feature (ALL variations - with and without required attribute)
+                            // Remove faketouch feature (ALL variations - MORE AGGRESSIVE)
                             manifestContent = manifestContent.replaceAll('<uses-feature[^>]*faketouch[^>]*/>', '')
-                            manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android:name="android\\\\.hardware\\\\.faketouch"[^>]*>', '')
+                            manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android\\\\.hardware\\\\.faketouch[^>]*/>', '')
                             
-                            // Remove ALL ARCore references
+                            // Remove only ARCore metadata and libraries, but KEEP camera.ar feature with required="false"
                             manifestContent = manifestContent.replaceAll('<meta-data[^>]*com\\\\.google\\\\.ar\\\\.core[^>]*/>', '')
-                            manifestContent = manifestContent.replaceAll('<uses-feature[^>]*camera\\\\.ar[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('<uses-library[^>]*com\\\\.google\\\\.ar[^>]*/>', '')
+                            // IMPORTANT: DO NOT remove camera.ar feature - we need it with required="false"
                             
                                 // Remove any tools:node="remove" attributes that didn't work (clean them out)
                                 manifestContent = manifestContent.replaceAll('\\s*tools:node="remove"', '')
                                 manifestContent = manifestContent.replaceAll('\\s*tools:node=\\'remove\\'', '')
                                 
-                                // Count what we removed
+                                // Count what we removed (and what should be left)
                                 def removedItems = []
                                 if (manifestContent =~ /ACTIVITY_RECOGNITION/) removedItems.add('ACTIVITY_RECOGNITION')
                                 if (manifestContent =~ /CHECK_LICENSE/) removedItems.add('CHECK_LICENSE')
                                 if (manifestContent =~ /faketouch/) removedItems.add('faketouch')
+                                if (manifestContent =~ /camera\.ar.*required.*false/) {
+                                    println "[PanHandler]   ✅ camera.ar required=false FOUND (GOOD!)"
+                                }
                                 
                                 file.write(manifestContent, 'UTF-8')
                                 println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + file.path
