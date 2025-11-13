@@ -87,15 +87,22 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest.application[0]['meta-data'] = [];
     }
 
-    // CRITICAL: COMPLETELY REMOVE all ARCore metadata
-    // Google Play will NOT require AR if there's NO ARCore metadata at all
-    // Don't use "unsupported" (invalid), don't use "optional" (still requires Play Services)
-    // Complete removal = no AR requirement
+    // CRITICAL: Block ARCore completely
+    // We need BOTH removal AND explicit blocking with uses-feature required="false"
     
-    // Remove ALL existing ARCore metadata
+    // First remove ALL existing ARCore metadata
     manifest.application[0]['meta-data'] = (manifest.application[0]['meta-data'] || []).filter(meta => {
       const name = meta.$?.['android:name'];
       return !name || !name.includes('com.google.ar');
+    });
+    
+    // Add explicit "ARCore NOT required" feature declaration
+    // This tells Google Play the app works WITHOUT AR
+    manifest['uses-feature'].push({
+      $: {
+        'android:name': 'android.hardware.camera.ar',
+        'android:required': 'false',
+      },
     });
 
     console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions,', unwantedFeatures.length, 'features, and REMOVED all ARCore metadata');
