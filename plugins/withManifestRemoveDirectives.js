@@ -54,10 +54,10 @@ module.exports = function withManifestRemoveDirectives(config) {
     });
 
     // Add tools:node="remove" for unwanted features
+    // NOTE: camera.ar is handled separately below with required="false"
     const unwantedFeatures = [
       'android.hardware.microphone',
       'android.hardware.faketouch',
-      'android.hardware.camera.ar', // ARCore camera feature
     ];
 
     // CRITICAL: First REMOVE any existing feature declarations
@@ -88,12 +88,15 @@ module.exports = function withManifestRemoveDirectives(config) {
     }
 
     // CRITICAL: Block ARCore completely
-    // We need BOTH removal AND explicit blocking with uses-feature required="false"
-    
-    // First remove ALL existing ARCore metadata
+    // Remove ALL existing ARCore metadata and features
     manifest.application[0]['meta-data'] = (manifest.application[0]['meta-data'] || []).filter(meta => {
       const name = meta.$?.['android:name'];
       return !name || !name.includes('com.google.ar');
+    });
+    
+    // Remove any existing camera.ar features first
+    manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
+      return feat.$?.['android:name'] !== 'android.hardware.camera.ar';
     });
     
     // Add explicit "ARCore NOT required" feature declaration
