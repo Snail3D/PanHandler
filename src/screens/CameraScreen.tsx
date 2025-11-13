@@ -116,7 +116,10 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
 // ═══════════════════════════════════════════════════════════════
 export default function CameraScreen() {
   const { hasPermission, requestPermission } = useCameraPermission();
-  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
+  // CRITICAL: Only request PHOTO permissions, NOT audio or video
+  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions({
+    granularPermissions: ['photo'] // Android 13+ only requests READ_MEDIA_IMAGES, not AUDIO/VIDEO
+  });
   const [mode, setMode] = useState<ScreenMode>('camera');
   const [isCapturing, setIsCapturing] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<CoinReference | null>(null);
