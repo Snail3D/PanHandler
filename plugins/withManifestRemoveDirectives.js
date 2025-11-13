@@ -50,6 +50,7 @@ module.exports = function withManifestRemoveDirectives(config) {
     const unwantedFeatures = [
       'android.hardware.microphone',
       'android.hardware.faketouch',
+      'android.hardware.camera.ar', // ARCore camera feature
     ];
 
     unwantedFeatures.forEach(feature => {
@@ -61,7 +62,26 @@ module.exports = function withManifestRemoveDirectives(config) {
       });
     });
 
-    console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions and', unwantedFeatures.length, 'features');
+    // Block ARCore metadata from being added
+    if (!manifest.application) {
+      manifest.application = [{}];
+    }
+    if (!manifest.application[0]) {
+      manifest.application[0] = {};
+    }
+    if (!manifest.application[0]['meta-data']) {
+      manifest.application[0]['meta-data'] = [];
+    }
+
+    // Add tools:node="remove" for ARCore metadata
+    manifest.application[0]['meta-data'].push({
+      $: {
+        'android:name': 'com.google.ar.core',
+        'tools:node': 'remove',
+      },
+    });
+
+    console.log('[withManifestRemoveDirectives] Added tools:node="remove" for', unwantedPermissions.length, 'permissions,', unwantedFeatures.length, 'features, and ARCore metadata');
 
     return config;
   });
