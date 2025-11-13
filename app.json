@@ -100,13 +100,13 @@
           "enableCodeScanner": false
         }
       ],
-      "./plugins/withManifestRemoveDirectives.js",
       "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withNoARCore.js",
       "./plugins/withExcludeFormFactors.js",
       "./plugins/withNukePermissions.js",
       "./plugins/withAbsoluteFinalCleanup.js",
-      "./plugins/withGradlePermissionRemoval.js"
+      "./plugins/withGradlePermissionRemoval.js",
+      "./plugins/withManifestRemoveDirectives.js"
     ],
     "extra": {
       "eas": {
