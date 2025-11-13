@@ -1,8 +1,12 @@
 # 📐 PanHandler
 
+> Transform your phone into a precision measurement tool — no hardware needed, just a coin.
+
+**Professional measurements • CAD-ready exports • Free forever**
+
 ## 📥 Download
 
-**Latest Version: 7.5.0**
+**Latest Version: 7.7**
 
 ### iOS (TestFlight Beta)
 👉 **[Join the iOS Beta on TestFlight](https://testflight.apple.com/join/kd4CbvSj)**
@@ -83,27 +87,189 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Amazing Accuracy
 
-### 1. Take a Photo Horizontally _(vertical photos will automatically go to to set known points for scale)_
-- Hold camera perpendicular (90°) to subject
-- Use the bubble level for alignment
-- Tap shutter or Hold for auto-capture
+PanHandler achieves **~0.5 mm accuracy** with small objects!
 
-### 2. Calibrate with a Coin
-- Search for your coin (650+ available)
-- Place coin in photo
-- Align calibration circle to coin edge
-- Lock in calibration
+**That's approximately:**
+- 1/50th of an inch
+- Thickness of a credit card
+- 5-6 sheets of paper
 
-### 3. Measure
-- Choose measurement type
-- Tap to place points
-- Get instant measurements
+💡 **Pro Tip:** Higher resolution photos = better accuracy
 
-### 4. Export
-- Email or save to Photos
-- Share professionally formatted reports instantly
+---
+
+## 🚀 Quick Start Guide
+
+### 📸 Step 1: Take a Perfect Photo
+
+**Hold camera perpendicular (90°) to subject:**
+- **Flat surfaces**: Look straight down
+- **Vertical surfaces**: Face directly at walls/objects
+
+**Distance matters:**
+- Small objects: 18 inches (1.5 feet / 0.5m)
+- Large objects: 3-4 feet away
+
+**Position coin in center of object**
+
+#### 🎯 AUTO LEVEL - Hands-Free Capture
+
+PanHandler features automatic capture when your phone is level:
+
+1. Frame your object with the coin
+2. Watch the bubble level crosshairs
+3. Level your phone to center the bubble
+4. Hold steady - photo captures automatically!
+
+💡 No button press needed! Auto-captured photos are saved to both Camera Roll and a special "Auto-Leveled" album.
+
+**Don't like auto-capture?** Flip the toggle and use the manual shutter button instead!
+
+---
+
+### 🪙 Step 2: Calibrate with a Coin
+
+After capturing your photo, calibrate using a reference coin for precise measurements:
+
+- **Search for your coin type** - 650+ coins from 130+ countries worldwide
+- **Zoom in and position** the calibration circle
+- **Align circle edges perfectly** to cover the coin
+- Tap **"Lock In Calibration"** when ready
+
+**Need a do-over?** Tap the red **Recalibrate** button below the calibration badge to start fresh.
+
+---
+
+### 📏 Step 3: Place Measurements
+
+Switch between **Pan Mode** and **Measure Mode**:
+
+**Pan/Zoom Mode:**
+- Two-finger drag to pan
+- Pinch to zoom
+- Rotate with two fingers
+
+**Measure Mode:**
+- Precision cursor shows exactly where points will be placed
+- Tap to place measurement points
+- Each measurement gets a unique color
+- Toggle labels on/off with the hide button
+
+#### Measurement Types:
+
+**📐 Distance**
+- Place 2 points
+- Get straight-line distance
+
+**📐 Angle**
+- Place 3 points (vertex in middle)
+- Get angle in degrees
+- Switch to **Azimuth Mode** for compass bearings
+
+**⭕ Circle**
+- Place 2-3 points on circle edge
+- Get radius, diameter, area, circumference, volume
+
+**▭ Rectangle (Box)**
+- Place 4 corner points
+- Get length, width, area, volume
+
+**✏️ Freehand**
+- Long-press the Distance button to activate
+- Draw custom paths
+- Get area and perimeter (volume for closed shapes)
+- Perfect for wire paths, curved distances, irregular shapes
+
+---
+
+### 💾 Step 4: Save & Share
+
+**Export Options:**
+
+📸 **Labeled Photo** - All measurements shown with colors and labels
+🔧 **CAD Export** - 50% opacity for easy tracing in CAD software
+📄 **Reference Photo** - Clean image with scale information
+✉️ **Email Reports** - Detailed report with all photos and measurement data
+
+**Smart Organization:**
+All saved measurements go to a "PanHandler Measurements" album in Photos!
+
+---
+
+## 🗺️ Advanced Modes
+
+### Map Mode
+Measure real-world distances on maps, blueprints, and scaled drawings using coin calibration + map scale.
+
+**Two Ways to Calibrate:**
+
+#### 🪙 Coin Reference + Map Scale
+**Best for:** Road maps, topo maps, property maps with verbal scale
+
+**Steps:**
+1. Calibrate with coin first
+2. Tap 🗺️ Map button
+3. Enter scale (e.g., "1 inch = 10 miles" or "1cm = 5km")
+4. Start measuring!
+
+#### 📍 Known Distance (Blueprint Mode)
+**Best for:** Blueprints, floor plans, technical drawings, aerial photos
+
+**Steps:**
+1. Measure a known reference distance
+2. Enter its real-world value (e.g., "this 50mm line = 10 meters")
+3. PanHandler calculates scale automatically
+4. Measure everything else!
+
+---
+
+## 📧 Email Workflow
+
+Tap **Email** to generate a professional report:
+
+**What's Included:**
+- Subject line with your measurement name
+- Calibration reference (coin size or scale)
+- Unit system (Metric/Imperial)
+- Complete measurement table with all values
+- 2 attached photos:
+  - Full measurements photo
+  - Transparent CAD canvas (50% opacity)
+
+**Pro Tip:** Use Share button for quick sharing via AirDrop/Messages, or Email for detailed reports!
+
+---
+
+## 🔧 CAD Software Integration
+
+### Fusion 360 Import Tutorial
+
+1. **Import as Canvas**
+   - Insert → Canvas
+   - Select your PanHandler export
+
+2. **Scale the Canvas**
+   - Right-click canvas → Calibrate
+   - Measure a known distance in the photo
+   - Enter the real value from PanHandler
+
+3. **Start Designing**
+   - Trace over the photo with sketches
+   - Perfect for reverse engineering parts!
+
+**Works with any CAD software** - Scale values are included on every export for perfect alignment.
+
+---
+
+## 🔒 Privacy & Security
+
+- ✅ **Photos stay on your device** — never uploaded or transferred to our servers
+- ✅ **Email uses default Mail.app** — no data stored or collected
+- ✅ **Zero tracking** — no analytics on your photos, files, or measurements
+- ✅ **No account required** — start measuring immediately
+- ✅ **Works offline** — lightweight and secure, everything runs locally
 
 ---
 
