@@ -61,13 +61,18 @@ module.exports = function withManifestRemoveDirectives(config) {
     });
 
     // REMOVE any existing unwanted features and enforce strict allowlist
-    // CRITICAL: Remove camera.ar, faketouch, and all unwanted features completely
+    // CRITICAL: Remove faketouch and all unwanted features completely
+    // DO NOT remove camera.ar - we need it but libraries will add it
     manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
       const name = feat.$?.['android:name'];
       if (!name) return false;
-      // Block camera.ar and faketouch COMPLETELY - don't declare them at all
-      if (name === 'android.hardware.camera.ar' || name === 'android.hardware.faketouch') {
+      // Block faketouch COMPLETELY
+      if (name === 'android.hardware.faketouch') {
         return false;
+      }
+      // Keep camera.ar if it exists (we'll ensure required=false below)
+      if (name === 'android.hardware.camera.ar') {
+        return true;
       }
       return allowedFeatures.includes(name);
     });
@@ -94,11 +99,26 @@ module.exports = function withManifestRemoveDirectives(config) {
       manifest.application[0]['meta-data'] = [];
     }
 
-    // CRITICAL: Block ARCore completely - remove ALL metadata
+    // CRITICAL: Block ARCore AND MLKit completely - remove ALL metadata
     manifest.application[0]['meta-data'] = (manifest.application[0]['meta-data'] || []).filter(meta => {
       const name = meta.$?.['android:name'];
-      return !name || !name.includes('com.google.ar');
+      if (!name) return true;
+      // Remove ARCore metadata
+      if (name.includes('com.google.ar')) return false;
+      // Remove MLKit metadata that triggers AR checks
+      if (name.includes('com.google.mlkit')) return false;
+      if (name.includes('com.google.android.gms')) return false;
+      return true;
     });
+    
+    // Ensure camera.ar has required="false" if it exists
+    const cameraArFeature = manifest['uses-feature'].find(feat => 
+      feat.$?.['android:name'] === 'android.hardware.camera.ar'
+    );
+    if (cameraArFeature && cameraArFeature.$) {
+      cameraArFeature.$['android:required'] = 'false';
+      console.log('[withManifestRemoveDirectives] Set camera.ar required=false');
+    }
 
     console.log('[withManifestRemoveDirectives] Enforced allowed permissions/features and removed all ARCore metadata');
 
