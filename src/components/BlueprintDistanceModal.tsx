@@ -83,14 +83,22 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
             style={{
               borderRadius: 20,
               overflow: 'hidden',
+              flex: 1,
             }}
           >
+            <ScrollView 
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
             <View style={{
               backgroundColor: 'rgba(255, 255, 255, 0.45)',
               borderRadius: 20,
               borderWidth: 1,
               borderColor: 'rgba(255, 255, 255, 0.4)',
               padding: 20,
+              minHeight: '100%',
             }}>
               {/* Header */}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -397,6 +405,7 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                 </Pressable>
               )}
             </View>
+            </ScrollView>
           </BlurView>
         </View>
       </View>

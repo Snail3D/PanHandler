@@ -2050,16 +2050,16 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 12, marginTop: 8 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(0,0,0,0.15)',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 16,
                     padding: 14,
-                    shadowColor: '#FFD700',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 10,
-                    elevation: 4,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 2,
                     borderWidth: 1.5,
-                    borderColor: 'rgba(255,215,0,0.35)',
+                    borderColor: 'rgba(0,0,0,0.15)',
                     borderStyle: 'dashed',
                   }}
                 >
@@ -2113,7 +2113,7 @@ Thank you for helping us improve PanHandler!
                         transform: [{ scale: leftEggPressing ? 0.9 : 1 }],
                       }}
                     >
-                      <Text style={{ fontSize: 22 }}>🥚</Text>
+                      <Text style={{ fontSize: 32 }}>🥚</Text>
                     </Pressable>
                     
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
@@ -2161,7 +2161,7 @@ Thank you for helping us improve PanHandler!
                         }, 2000);
                       }}
                     >
-                      <Text style={{ fontSize: 22 }}>🥚</Text>
+                      <Text style={{ fontSize: 32 }}>🥚</Text>
                     </Pressable>
                   </View>
                   
@@ -2217,7 +2217,7 @@ Thank you for helping us improve PanHandler!
                       style={({ pressed }) => ({
                         paddingVertical: 14,
                         paddingHorizontal: 20,
-                        backgroundColor: pressed ? '#D4A017' : '#FFD700',
+                        backgroundColor: pressed ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
                         borderRadius: 12,
                         marginTop: 4,
                         shadowColor: '#000',
