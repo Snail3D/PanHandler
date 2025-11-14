@@ -222,13 +222,8 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                 </View>
               </View>
 
-              {/* Magnetic Declination Section - Collapsible with ScrollView */}
-              <ScrollView
-                style={{ maxHeight: 200, marginTop: 12, marginBottom: 16 }}
-                showsVerticalScrollIndicator={true}
-                bounces={false}
-              >
-              <View>
+              {/* Magnetic Declination Section - Collapsible */}
+              <View style={{ marginTop: 12, marginBottom: 16 }}>
                 <Pressable
                   onPress={() => {
                     setShowDeclinationHelp(!showDeclinationHelp);
@@ -355,9 +350,8 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
                   </View>
                 )}
               </View>
-              </ScrollView>
 
-              {/* LOCK IN Button - Always visible, outside ScrollView */}
+              {/* LOCK IN Button */}
               {isValid && (
                 <Pressable
                   onPress={() => {
