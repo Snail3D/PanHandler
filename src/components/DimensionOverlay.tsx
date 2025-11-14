@@ -3325,9 +3325,9 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
 
-  // Swipe gesture for cycling through measurement modes - ONLY active when NOT placing measurements
+  // Swipe gesture for cycling through measurement modes - ONLY active when IN measurement mode
   const modeSwitchGesture = Gesture.Pan()
-    .enabled(!measurementMode) // CRITICAL: Disable when placing measurements to avoid interfering with pan lock
+    .enabled(measurementMode) // CRITICAL: Only enable when in Measure mode, disabled in Pan mode
     .minDistance(15) // Lower minDistance (15px) but requires high velocity for activation
     .shouldCancelWhenOutside(false) // Don't cancel if finger leaves - allows fluid gestures
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
