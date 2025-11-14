@@ -1722,7 +1722,7 @@ Thank you for helping us improve PanHandler!
                   </Text>
                 </Pressable>
 
-                {/* Reference Photo Image */}
+                {/* Reference Photo Image - Placeholder until image is added */}
                 <View style={{
                   backgroundColor: 'rgba(255,87,34,0.05)',
                   borderRadius: 14,
@@ -1731,15 +1731,16 @@ Thank you for helping us improve PanHandler!
                   borderColor: 'rgba(255,87,34,0.2)',
                   alignItems: 'center',
                 }}>
-                  <Image
-                    source={require('../../assets/reference-photo-aids.png')}
-                    style={{
-                      width: '100%',
-                      height: 200,
-                      borderRadius: 10,
-                      resizeMode: 'contain',
-                    }}
-                  />
+                  <View style={{
+                    width: '100%',
+                    height: 200,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(255,87,34,0.15)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Ionicons name="image-outline" size={48} color="rgba(255,87,34,0.4)" />
+                  </View>
                   <Text style={{ fontSize: 12, color: '#999', marginTop: 8, textAlign: 'center' }}>
                     Most Useful Fidget Reference Photo Aids
                   </Text>
