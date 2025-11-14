@@ -956,13 +956,15 @@ export default function DimensionOverlay({
         if (finished) {
           runOnJS(setShowTetris)(false);
           
-          // CLEAR ALL MEASUREMENTS! 🧹
-          runOnJS(setMeasurements)([]);
-          runOnJS(setCurrentPoints)([]);
-          runOnJS(setHasTriggeredTetris)(false); // Allow trigger again if they rebuild
-          
-          // Clear the saved label since measurements are cleared
-          runOnJS(setCurrentLabel)(null);
+          // CRITICAL: Clear measurements and points IMMEDIATELY after animation finishes
+          // Do this synchronously without waiting for animation callback
+          runOnJS(() => {
+            setMeasurements([]);
+            setCurrentPoints([]);
+            setHasTriggeredTetris(false); // Allow trigger again if they rebuild
+            setCurrentLabel(null); // Clear the saved label since measurements are cleared
+            console.log('🧹 TETRIS: Measurements cleared');
+          });
           
           // Success haptic for the reset - wrapped in runOnJS
           runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Success);
