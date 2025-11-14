@@ -3323,10 +3323,10 @@ export default function DimensionOverlay({
   
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
 
-  // Swipe gesture for cycling through measurement modes - SIMPLE VERSION that doesn't interfere with buttons
+  // Swipe gesture for cycling through measurement modes - CAREFUL: Low minDistance to allow button taps through
   const modeSwitchGesture = Gesture.Pan()
-    .minDistance(20) // Require 20px movement before activating - allows taps to work instantly
-    .shouldCancelWhenOutside(true) // Cancel if finger leaves gesture area
+    .minDistance(15) // Lower minDistance (15px) but requires high velocity for activation
+    .shouldCancelWhenOutside(false) // Don't cancel if finger leaves - allows fluid gestures
     .maxPointers(1) // Only single finger swipes, prevents interference with pinch gestures
     .onStart(() => {
       // Reset offset when gesture starts
@@ -3337,22 +3337,24 @@ export default function DimensionOverlay({
       modeSwipeOffset.value = event.translationX;
     })
     .onEnd((event) => {
-      // Very relaxed thresholds for fluid swiping
-      const threshold = 30; // 30px swipe to trigger mode change
+      // Use VELOCITY + DISTANCE for more natural short-flick detection
+      // This allows quick flicks (high velocity) but won't interfere with slow deliberate taps
+      const velocityThreshold = 300; // px/s - fast flick
+      const distanceThreshold = 25; // Minimum 25px movement
       const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
       const currentIndex = modes.indexOf(mode);
       
-      // Detect primarily horizontal swipes
+      // Detect primarily horizontal swipes with good velocity
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
+      const hasVelocity = Math.abs(event.velocityX) > velocityThreshold;
+      const hasDistance = Math.abs(event.translationX) > distanceThreshold;
       
-      if (isHorizontal && Math.abs(event.translationX) > threshold) {
+      // Trigger on: fast flick OR good distance (original distance-based detection still works)
+      if (isHorizontal && (hasVelocity || hasDistance)) {
         if (event.translationX < 0) {
           // Swipe left - next mode
           let nextIndex = (currentIndex + 1) % modes.length;
           let nextMode = modes[nextIndex];
-          
-          // Freehand is now always available (donation-based, not paywall)
-          
           runOnJS(setMode)(nextMode);
           runOnJS(setModeColorIndex)(nextIndex);
           runOnJS(setCurrentPoints)([]);
@@ -3362,9 +3364,6 @@ export default function DimensionOverlay({
           // Swipe right - previous mode
           let prevIndex = (currentIndex - 1 + modes.length) % modes.length;
           let prevMode = modes[prevIndex];
-          
-          // Freehand is now always available (donation-based, not paywall)
-          
           runOnJS(setMode)(prevMode);
           runOnJS(setModeColorIndex)(prevIndex);
           runOnJS(setCurrentPoints)([]);
@@ -6977,8 +6976,8 @@ export default function DimensionOverlay({
           </View>
 
           {/* Measurement Type Toggle - Single Row (Box, Circle, Angle, Freehand, Distance) */}
-          {/* REMOVED GestureDetector - was blocking button taps after panning */}
-          {/* Swipe-to-cycle feature removed to fix 15-second button delay */}
+          {/* Re-added GestureDetector with careful configuration to avoid button lockups */}
+          <GestureDetector gesture={modeSwitchGesture}>
             <View style={[{ marginBottom: scaleMargin(8) }]}>
               <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
@@ -7314,6 +7313,7 @@ export default function DimensionOverlay({
               </Pressable>
               </View>
             </View>
+          </GestureDetector>
 
           {/* Unit System and Map Mode Row */}
           <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), gap: scaleGap(6) }}>
