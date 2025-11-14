@@ -1823,16 +1823,16 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#34C759',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                    elevation: 4,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 2,
                     borderWidth: 1,
-                    borderColor: 'rgba(52, 199, 89, 0.2)',
+                    borderColor: 'rgba(0,0,0,0.1)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
@@ -1840,12 +1840,12 @@ Thank you for helping us improve PanHandler!
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      backgroundColor: 'rgba(52, 199, 89, 0.15)',
+                      backgroundColor: 'rgba(0,0,0,0.08)',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 10,
                     }}>
-                      <Ionicons name="shield-checkmark" size={24} color="#34C759" />
+                      <Ionicons name="shield-checkmark" size={24} color="#333" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       Privacy & Security
@@ -1893,16 +1893,16 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#FF9500',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                    elevation: 4,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 2,
                     borderWidth: 1,
-                    borderColor: 'rgba(255, 149, 0, 0.2)',
+                    borderColor: 'rgba(0,0,0,0.1)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
@@ -1910,12 +1910,12 @@ Thank you for helping us improve PanHandler!
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      backgroundColor: 'rgba(255, 149, 0, 0.15)',
+                      backgroundColor: 'rgba(0,0,0,0.08)',
                       justifyContent: 'center',
                       alignItems: 'center',
                       marginRight: 10,
                     }}>
-                      <Ionicons name="settings-outline" size={24} color="#FF9500" />
+                      <Ionicons name="settings-outline" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       App Permissions
@@ -1960,16 +1960,16 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 20,
                     padding: 20,
-                    shadowColor: '#007AFF',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                    elevation: 4,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 2,
                     borderWidth: 1,
-                    borderColor: 'rgba(0,122,255,0.2)',
+                    borderColor: 'rgba(0,0,0,0.1)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
