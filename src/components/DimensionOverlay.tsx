@@ -350,7 +350,7 @@ export default function DimensionOverlay({
     if (onRegisterDoubleTapCallback) {
       const switchToMeasureMode = () => {
         setMeasurementMode(true);
-        setShowCursor(true);
+        setShowCursor(false); // Don't show cursor until user touches screen
         setCursorPosition({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       };
