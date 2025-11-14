@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-vision-camera/android/build.gradle b/node_modules/react-native-vision-camera/android/build.gradle
-index b1d9973..89f18f1 100644
+index b1d9973..5c5d931 100644
 --- a/node_modules/react-native-vision-camera/android/build.gradle
 +++ b/node_modules/react-native-vision-camera/android/build.gradle
 @@ -203,9 +203,9 @@ dependencies {
@@ -9,9 +9,9 @@ index b1d9973..89f18f1 100644
 -    // Fall-back to just including the code for the CodeScanner to avoid the 2.4 MB bundle in the app.
 -    // On devices with Google Play Services, this can also download the CodeScanner model on-demand.
 -    implementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
-+    // PATCHED BY PANHANDLER: Completely removed MLKit dependency when code scanner is disabled
-+    // This prevents Play Services checks that trigger AR requirements
-+    // Original line was: implementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1"
++    // PATCHED BY PANHANDLER: Use LOCAL MLKit instead of Play Services version
++    // This includes the model locally and doesn't require Play Services at runtime
++    implementation 'com.google.mlkit:barcode-scanning:17.3.0'
    }
  
    if (enableFrameProcessors) {
