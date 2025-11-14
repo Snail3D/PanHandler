@@ -3409,10 +3409,10 @@ export default function DimensionOverlay({
   // ANDROID FIX: Use failOffsetY to prevent vertical scrolling from triggering
   // Use enableTrackpadTwoFingerGesture(false) to ensure native touches work
   const menuSwipeGesture = Gesture.Pan()
-    .minDistance(60) // Increased from 40 - require significant swipe before activating
+    .minDistance(80) // High threshold - must be deliberate swipe
     .maxPointers(1) // Only single finger
-    .activeOffsetX([-50, 50]) // Only activate after 50px horizontal movement
-    .failOffsetY([-20, 20]) // Fail if vertical movement > 20px (prevents interfering with taps)
+    .activeOffsetX([-80, 80]) // Require 80px horizontal movement before activating
+    .failOffsetY([-30, 30]) // Fail if vertical movement > 30px (prevents interfering with taps)
     .enableTrackpadTwoFingerGesture(false) // Native touches only
     .onStart(() => {
       'worklet';
