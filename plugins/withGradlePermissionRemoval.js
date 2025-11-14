@@ -123,9 +123,6 @@ afterEvaluate {
                                 
                                 file.write(manifestContent, 'UTF-8')
                                 println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + file.path
-                                if (removedItems.size() > 0) {
-                                    println "[PanHandler]   Removed: " + removedItems.join(', ')
-                                }
                             }
                         }
                     }
