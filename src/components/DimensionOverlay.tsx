@@ -7006,12 +7006,12 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                  backgroundColor: 'transparent',
                   shadowColor: mode === 'rectangle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'rectangle' ? 0.8 : 0,
-                  shadowRadius: mode === 'rectangle' ? 8 : 0,
-                  elevation: mode === 'rectangle' ? 8 : 0,
+                  shadowOpacity: mode === 'rectangle' ? 1.0 : 0,
+                  shadowRadius: mode === 'rectangle' ? 12 : 0,
+                  elevation: mode === 'rectangle' ? 12 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -7051,12 +7051,12 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                  backgroundColor: 'transparent',
                   shadowColor: mode === 'circle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'circle' ? 0.8 : 0,
-                  shadowRadius: mode === 'circle' ? 8 : 0,
-                  elevation: mode === 'circle' ? 8 : 0,
+                  shadowOpacity: mode === 'circle' ? 1.0 : 0,
+                  shadowRadius: mode === 'circle' ? 12 : 0,
+                  elevation: mode === 'circle' ? 12 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -7132,12 +7132,12 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                  backgroundColor: 'transparent',
                   shadowColor: mode === 'angle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'angle' ? 0.8 : 0,
-                  shadowRadius: mode === 'angle' ? 8 : 0,
-                  elevation: mode === 'angle' ? 8 : 0,
+                  shadowOpacity: mode === 'angle' ? 1.0 : 0,
+                  shadowRadius: mode === 'angle' ? 12 : 0,
+                  elevation: mode === 'angle' ? 12 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -7217,12 +7217,12 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                  backgroundColor: 'transparent',
                   shadowColor: mode === 'distance' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'distance' ? 0.8 : 0,
-                  shadowRadius: mode === 'distance' ? 8 : 0,
-                  elevation: mode === 'distance' ? 8 : 0,
+                  shadowOpacity: mode === 'distance' ? 1.0 : 0,
+                  shadowRadius: mode === 'distance' ? 12 : 0,
+                  elevation: mode === 'distance' ? 12 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -7289,12 +7289,12 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
+                  backgroundColor: 'transparent',
                   shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: mode === 'freehand' ? 0.8 : 0,
-                  shadowRadius: mode === 'freehand' ? 8 : 0,
-                  elevation: mode === 'freehand' ? 8 : 0,
+                  shadowOpacity: mode === 'freehand' ? 1.0 : 0,
+                  shadowRadius: mode === 'freehand' ? 12 : 0,
+                  elevation: mode === 'freehand' ? 12 : 0,
                 }}
               >
                 <View style={{ alignItems: 'center', justifyContent: 'center' }}>
