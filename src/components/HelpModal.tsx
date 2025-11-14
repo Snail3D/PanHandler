@@ -325,19 +325,8 @@ Thank you for helping us improve PanHandler!
     transform: [{ scale: headerScale.value }],
   }));
 
-  // Swipe gesture to close modal (left to right)
-  // Only activates on significant horizontal swipe, doesn't interfere with vertical scrolling or child touches
-  const swipeGesture = Gesture.Pan()
-    .activeOffsetX(50) // Only activate after 50px horizontal movement to the right
-    .failOffsetY([-10, 10]) // ANDROID FIX: Fail immediately on vertical movement (allows scrolling)
-    .enableTrackpadTwoFingerGesture(false) // Ensure native touches work
-    .onEnd((event) => {
-      // Check if swipe is left-to-right and crosses halfway
-      if (event.translationX > 150 && event.velocityX > 0) {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        onClose();
-      }
-    });
+  // REMOVED: Swipe gesture was interfering with scroll on Android
+  // Users can use the X button to close instead
 
   return (
     <>
@@ -447,7 +436,6 @@ Thank you for helping us improve PanHandler!
                 collapsable={false}
                 style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
-                <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: scalePadding(20) }}
@@ -2320,7 +2308,6 @@ Thank you for helping us improve PanHandler!
 
 
             </Animated.ScrollView>
-                </GestureDetector>
               </View>
             </View>
 

@@ -25,7 +25,7 @@ interface ZoomableImageProps {
   initialRotation?: number;
   zoomToCenter?: boolean; // If true, zoom toward screen center; if false, zoom toward focal point
   showLevelLine?: boolean; // Show level reference line (only during panning, not in measurements)
-  // REMOVED locked prop - now handled by conditional rendering in parent
+  locked?: boolean; // If true, disable all pan/zoom gestures
   opacity?: number; // Opacity of the image (0-1), default 1
   singleFingerPan?: boolean; // If true, allow one-finger panning (for calibration screen)
 }
@@ -42,7 +42,7 @@ export default function ZoomableImage({
   initialRotation = 0,
   zoomToCenter = false,
   showLevelLine = false,
-  // REMOVED locked param - now handled by conditional rendering in parent
+  locked = false,
   opacity = 1,
   singleFingerPan = false,
 }: ZoomableImageProps) {
@@ -109,6 +109,7 @@ export default function ZoomableImage({
   // );
 
   const pinchGesture = Gesture.Pinch()
+    .enabled(!locked) // Disable when locked
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
@@ -139,6 +140,7 @@ export default function ZoomableImage({
     });
 
   const rotationGesture = Gesture.Rotation()
+    .enabled(!locked) // Disable when locked
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       'worklet';
@@ -171,6 +173,7 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
+    .enabled(!locked) // Disable when locked
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
