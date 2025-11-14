@@ -3250,9 +3250,9 @@ export default function DimensionOverlay({
     : mode === 'circle' ? 2  // center + edge point
     : 2;  // rectangle: 2 corners
   
-  // Lock pan/zoom once any points are placed
+  // Lock pan/zoom when in Measure mode OR when any points are placed
   // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
-  const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
+  const isPanZoomLocked = isPlacingBlueprint ? false : (measurementMode || hasAnyMeasurements);
   
   // Notify parent when lock state changes
   useEffect(() => {
@@ -7006,7 +7006,7 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  backgroundColor: mode === 'rectangle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   shadowColor: mode === 'rectangle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: mode === 'rectangle' ? 0.8 : 0,
@@ -7051,7 +7051,7 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  backgroundColor: mode === 'circle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   shadowColor: mode === 'circle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: mode === 'circle' ? 0.8 : 0,
@@ -7132,7 +7132,7 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  backgroundColor: mode === 'angle' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   shadowColor: mode === 'angle' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: mode === 'angle' ? 0.8 : 0,
@@ -7217,7 +7217,7 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  backgroundColor: mode === 'distance' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   shadowColor: mode === 'distance' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: mode === 'distance' ? 0.8 : 0,
@@ -7289,7 +7289,7 @@ export default function DimensionOverlay({
                   paddingVertical: scalePadding(6),
                   paddingHorizontal: scalePadding(2),
                   borderRadius: scaleBorderRadius(7.5),
-                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  backgroundColor: mode === 'freehand' ? 'rgba(255, 255, 255, 0.25)' : 'transparent',
                   shadowColor: mode === 'freehand' ? getCurrentModeColor().main : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: mode === 'freehand' ? 0.8 : 0,
