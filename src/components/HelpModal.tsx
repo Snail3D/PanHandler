@@ -104,15 +104,15 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.5)',
+          backgroundColor: 'rgba(255,255,255,0.3)',
           borderRadius: scaleBorderRadius(20),
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.2,
+          shadowOpacity: 0.3,
           shadowRadius: scaleSize(12),
           elevation: expanded ? 8 : 6,
-          borderWidth: scaleSize(1),
-          borderColor: 'rgba(255,255,255,0.35)',
+          borderWidth: scaleSize(2),
+          borderColor: color,
           overflow: 'hidden',
         }}
       >
@@ -1835,7 +1835,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#34C759',
@@ -1905,7 +1905,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#FF9500',
@@ -1972,7 +1972,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#007AFF',
@@ -2330,14 +2330,14 @@ Thank you for helping us improve PanHandler!
                 borderBottomLeftRadius: 32,
                 borderBottomRightRadius: 32,
                 overflow: 'hidden',
-                backgroundColor: 'transparent',
+                backgroundColor: 'rgba(255,255,255,0.85)',
               }}
             >
               <View
                 style={{
                   paddingVertical: 12,
                   paddingHorizontal: 24,
-                  backgroundColor: 'transparent',
+                  backgroundColor: 'rgba(255,255,255,0.85)',
                   borderTopWidth: 1,
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
