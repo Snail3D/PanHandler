@@ -60,8 +60,12 @@ export default function ZoomableImage({
   const fadeOpacity = useSharedValue(1);
   const gestureWasActive = useSharedValue(false);
   const gestureJustEnded = useSharedValue(false); // Debounce cooldown flag
-
-  // REMOVED isLocked shared value - locking now handled by conditional rendering in parent
+  const isLocked = useSharedValue(locked);
+  
+  // Update locked state reactively
+  useEffect(() => {
+    isLocked.value = locked;
+  }, [locked, isLocked]);
 
   // Helper function to clear gesture cooldown after delay
   // ANDROID FIX: Increased from 50ms to 200ms - Android gesture system holds context longer
@@ -109,14 +113,15 @@ export default function ZoomableImage({
   // );
 
   const pinchGesture = Gesture.Pinch()
-    .enabled(!locked) // Disable when locked
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      // No need to check locked - component won't render when locked
+      // Check locked state and exit early if locked
+      if (isLocked.value) return;
     })
     .onUpdate((event) => {
       'worklet';
+      if (isLocked.value) return; // Exit early if locked
       gestureWasActive.value = true;
       scale.value = Math.max(1, Math.min(savedScale.value * event.scale, 35));
     })
@@ -140,10 +145,10 @@ export default function ZoomableImage({
     });
 
   const rotationGesture = Gesture.Rotation()
-    .enabled(!locked) // Disable when locked
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onUpdate((event) => {
       'worklet';
+      if (isLocked.value) return; // Exit early if locked
       gestureWasActive.value = true;
       rotation.value = savedRotation.value + event.rotation;
     })
@@ -173,17 +178,18 @@ export default function ZoomableImage({
     });
 
   const panGesture = Gesture.Pan()
-    .enabled(!locked) // Disable when locked
     .minDistance(singleFingerPan ? 5 : 10) // Lower for single-finger, normal for 2-finger
     .minPointers(singleFingerPan ? 1 : 2) // Allow 1 finger in calibration, require 2 in measurement
     .maxPointers(singleFingerPan ? 2 : 2) // Allow up to 2 fingers in calibration (for flexibility)
     .shouldCancelWhenOutside(true) // Release immediately when fingers leave
     .onStart(() => {
       'worklet';
-      // No need to check locked - component won't render when locked
+      // Check locked state and exit early if locked
+      if (isLocked.value) return;
     })
     .onUpdate((event) => {
       'worklet';
+      if (isLocked.value) return; // Exit early if locked
       gestureWasActive.value = true;
       // Reduce sensitivity by 30% (multiply by 0.7)
       translateX.value = savedTranslateX.value + event.translationX * 0.7;
