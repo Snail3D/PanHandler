@@ -21,15 +21,12 @@ configurations.all {
 
 // Forcefully remove permissions at build time - Works for both APK and AAB builds
 afterEvaluate {
-    // Hook into ALL manifest-related tasks - more comprehensive
+    // Hook into the EXACT task that creates the final AAB manifest
     def cleanupTasks = [
+        'processApplicationManifestReleaseForBundle',  // Creates bundle manifest - THIS IS THE ONE!
         'processReleaseManifest',
-        'processReleaseBundleManifest',
-        'processReleaseResources',
-        'mergeReleaseResources',
-        'packageReleaseBundle',
-        'bundleReleaseResources',
-        'generateReleaseResources'
+        'processReleaseMainManifest',
+        'packageReleaseBundle'
     ]
     
     cleanupTasks.each { theTaskName ->
@@ -46,16 +43,22 @@ afterEvaluate {
                     
                     if (searchRoot.exists()) {
                         searchRoot.eachFileRecurse { file ->
-                            if (file.name == 'AndroidManifest.xml' && (file.path.contains('release') || file.path.contains('merged'))) {
+                            if (file.name == 'AndroidManifest.xml' && (file.path.contains('release') || file.path.contains('merged') || file.path.contains('bundle'))) {
                                 println "[PanHandler] Found manifest: " + file.path
                                 cleanedCount++
                                 def manifestContent = file.getText('UTF-8')
                                 
                                 // DEBUG: Show what's in the manifest BEFORE cleaning
-                                println "[PanHandler] BEFORE cleanup:"
-                                if (manifestContent =~ /CHECK_LICENSE/) println "[PanHandler]   ❌ CHECK_LICENSE FOUND"
-                                if (manifestContent =~ /faketouch/) println "[PanHandler]   ❌ faketouch FOUND"
-                                if (manifestContent =~ /camera\.ar/) println "[PanHandler]   ❌ camera.ar FOUND"
+                                def foundIssues = []
+                                if (manifestContent =~ /CHECK_LICENSE/) foundIssues.add('CHECK_LICENSE')
+                                if (manifestContent =~ /faketouch/) foundIssues.add('faketouch')
+                                if (manifestContent =~ /camera\.ar/) foundIssues.add('camera.ar')
+                                
+                                if (foundIssues.size() > 0) {
+                                    println "[PanHandler] BEFORE cleanup - Found: " + foundIssues.join(', ')
+                                } else {
+                                    println "[PanHandler] BEFORE cleanup - Clean!"
+                                }
                             
                             // Remove RECORD_AUDIO permission
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.RECORD_AUDIO"[^>]*/>', '')
@@ -104,20 +107,27 @@ afterEvaluate {
                                 manifestContent = manifestContent.replaceAll('\\s*tools:node=\\'remove\\'', '')
                                 
                                 // DEBUG: Show what's in the manifest AFTER cleaning
-                                println "[PanHandler] AFTER cleanup:"
-                                if (manifestContent =~ /CHECK_LICENSE/) println "[PanHandler]   ❌ CHECK_LICENSE STILL THERE!"
-                                if (manifestContent =~ /faketouch/) println "[PanHandler]   ❌ faketouch STILL THERE!"
-                                if (manifestContent =~ /camera\.ar/) println "[PanHandler]   ❌ camera.ar STILL THERE!"
+                                def stillPresent = []
+                                if (manifestContent =~ /CHECK_LICENSE/) stillPresent.add('CHECK_LICENSE')
+                                if (manifestContent =~ /faketouch/) stillPresent.add('faketouch')
+                                if (manifestContent =~ /camera\.ar/) stillPresent.add('camera.ar')
+                                
+                                if (stillPresent.size() > 0) {
+                                    println "[PanHandler] AFTER cleanup - Still present: " + stillPresent.join(', ')
+                                } else {
+                                    println "[PanHandler] AFTER cleanup - All clean!"
+                                }
                                 
                                 // ADD camera.ar required="false" if it's not there
                                 if (!(manifestContent =~ /camera\.ar/)) {
-                                    println "[PanHandler]   ✅ Adding camera.ar required=false"
+                                    println "[PanHandler] ✅ Adding camera.ar required=false"
                                     def cameraFeaturePos = manifestContent.indexOf('<uses-feature android:name="android.hardware.camera"')
                                     if (cameraFeaturePos > 0) {
                                         def insertPos = manifestContent.indexOf('/>', cameraFeaturePos) + 2
                                         manifestContent = manifestContent.substring(0, insertPos) + 
                                             '\\n  <uses-feature android:name="android.hardware.camera.ar" android:required="false"/>' +
                                             manifestContent.substring(insertPos)
+                                        println "[PanHandler] ✅ Successfully added camera.ar required=false"
                                     }
                                 }
                                 
