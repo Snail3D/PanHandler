@@ -1293,6 +1293,9 @@ export default function CameraScreen() {
         setMode('zoomCalibrate');
         setIsCapturing(false); // Reset since leaving camera mode
         
+        // Reset flash to OFF after taking photo to prevent black screen on retake
+        setFlashEnabled(false);
+        
         // Clear any blueprint/map flags from previous photos
         setSkipToBlueprintMode(false);
         setSkipToMapMode(false);
@@ -1313,6 +1316,9 @@ export default function CameraScreen() {
         setCapturedPhotoUri(photoUri);
         setMode('measurement');
         setIsCapturing(false); // Reset immediately
+        
+        // Reset flash to OFF after taking photo to prevent black screen on retake
+        setFlashEnabled(false);
         
         // Clear any blueprint/map flags from previous photos
         setSkipToBlueprintMode(false);
