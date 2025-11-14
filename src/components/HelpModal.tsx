@@ -390,7 +390,7 @@ Thank you for helping us improve PanHandler!
                     shadowOpacity: 0.4,
                     shadowRadius: scaleSize(10),
                   }}>
-                    <Ionicons name="help-circle" size={scaleIconSize(28)} color="#007AFF" />
+                    <Ionicons name="help-circle" size={scaleIconSize(28)} color="#666" />
                   </View>
                   <View>
                     <Text style={{
@@ -446,7 +446,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="play-circle"
                 title="🎬 Video Courses"
-                color="#FF2D55"
+                color="#666"
                 delay={0}
 
               >
@@ -502,10 +502,10 @@ Thank you for helping us improve PanHandler!
                   <View style={{ 
                     marginTop: 16, 
                     padding: 12, 
-                    backgroundColor: 'rgba(52, 199, 89, 0.08)',
+                    backgroundColor: 'rgba(0,0,0, 0.08)',
                     borderRadius: 12,
                     borderWidth: 1,
-                    borderColor: 'rgba(52, 199, 89, 0.2)',
+                    borderColor: 'rgba(0,0,0, 0.2)',
                   }}>
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Text style={{ fontSize: 16, marginRight: 8 }}>✨</Text>
@@ -525,7 +525,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="camera"
                 title="📸 Step 1: Take a Perfect Photo"
-                color="#34C759"
+                color="#666"
                 delay={50}
 
 
@@ -567,7 +567,7 @@ Thank you for helping us improve PanHandler!
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                    <Ionicons name="flash" size={22} color="#34C759" />
+                    <Ionicons name="flash" size={22} color="#666" />
                     <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
                       AUTO LEVEL - Hands-Free Capture
                     </Text>
@@ -627,7 +627,7 @@ Thank you for helping us improve PanHandler!
                     borderColor: 'rgba(52,199,89,0.2)',
                   }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                      <Ionicons name="settings-outline" size={18} color="#34C759" />
+                      <Ionicons name="settings-outline" size={18} color="#666" />
                       <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
                         Camera Controls
                       </Text>
@@ -645,7 +645,7 @@ Thank you for helping us improve PanHandler!
                   {/* Auto-Leveled Album Feature */}
                   <View style={{
                     marginTop: 12,
-                    backgroundColor: 'rgba(88,86,214,0.08)',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
                     borderRadius: 14,
                     padding: 14,
                     borderWidth: 1.5,
@@ -668,7 +668,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="analytics"
                 title="🪙 Step 2: Calibrate with Coin"
-                color="#FF9500"
+                color="#666"
                 delay={100}
 
 
@@ -694,11 +694,11 @@ Thank you for helping us improve PanHandler!
                 {/* Recalibrate Button */}
                 <View style={{
                   marginTop: 14,
-                  backgroundColor: 'rgba(239,68,68,0.12)',
+                  backgroundColor: 'rgba(0,0,0,0.12)',
                   borderRadius: 14,
                   padding: 14,
                   borderWidth: 1.5,
-                  borderColor: 'rgba(239,68,68,0.25)',
+                  borderColor: 'rgba(0,0,0,0.25)',
                 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="refresh-outline" size={18} color="#EF4444" />
@@ -718,7 +718,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="resize"
                 title="📏 Step 3: Place Measurements"
-                color="#AF52DE"
+                color="#666"
                 delay={200}
 
 
@@ -730,12 +730,12 @@ Thank you for helping us improve PanHandler!
                 {/* Distance */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(175,82,222,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     marginBottom: 10,
                     borderWidth: 2,
-                    borderColor: 'rgba(175,82,222,0.25)',
+                    borderColor: 'rgba(0,0,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -758,12 +758,12 @@ Thank you for helping us improve PanHandler!
                 {/* Angle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(255,149,0,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     marginBottom: 10,
                     borderWidth: 2,
-                    borderColor: 'rgba(255,149,0,0.25)',
+                    borderColor: 'rgba(0,0,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -787,12 +787,12 @@ Thank you for helping us improve PanHandler!
                 {/* Circle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(233,30,99,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     marginBottom: 10,
                     borderWidth: 2,
-                    borderColor: 'rgba(233,30,99,0.25)',
+                    borderColor: 'rgba(0,0,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -809,12 +809,12 @@ Thank you for helping us improve PanHandler!
                 {/* Rectangle */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(25,118,210,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     marginBottom: 10,
                     borderWidth: 2,
-                    borderColor: 'rgba(25,118,210,0.25)',
+                    borderColor: 'rgba(0,0,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -831,11 +831,11 @@ Thank you for helping us improve PanHandler!
                 {/* Freehand/Free Measure */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(16,185,129,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     borderWidth: 2,
-                    borderColor: 'rgba(16,185,129,0.25)',
+                    borderColor: 'rgba(0,0,0,0.25)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
@@ -860,7 +860,7 @@ Thank you for helping us improve PanHandler!
                   </Text>
                   
                   {/* Lasso Mode Feature */}
-                  <View style={{ backgroundColor: 'rgba(16,185,129,0.20)', borderRadius: 12, padding: 12, marginTop: 8, borderWidth: 1.5, borderColor: 'rgba(16,185,129,0.35)' }}>
+                  <View style={{ backgroundColor: 'rgba(0,0,0,0.20)', borderRadius: 12, padding: 12, marginTop: 8, borderWidth: 1.5, borderColor: 'rgba(0,0,0,0.35)' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                       <Text style={{ fontSize: 16, marginRight: 6 }}>🎯</Text>
                       <Text style={{ fontSize: 14, color: '#2E7D32', fontWeight: '700' }}>
@@ -875,7 +875,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   
-                  <View style={{ backgroundColor: 'rgba(16,185,129,0.15)', borderRadius: 10, padding: 10, marginTop: 8 }}>
+                  <View style={{ backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: 10, padding: 10, marginTop: 8 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
                       How to use:
                     </Text>
@@ -933,7 +933,7 @@ Thank you for helping us improve PanHandler!
                   {/* Cursor */}
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <View style={{ marginRight: 10, marginTop: 2 }}>
-                      <Ionicons name="add" size={18} color="#007AFF" />
+                      <Ionicons name="add" size={18} color="#666" />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
@@ -961,7 +961,7 @@ Thank you for helping us improve PanHandler!
                   {/* Hide Labels Toggle */}
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <View style={{ marginRight: 10, marginTop: 2 }}>
-                      <Ionicons name="eye-outline" size={18} color="#007AFF" />
+                      <Ionicons name="eye-outline" size={18} color="#666" />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
@@ -1012,7 +1012,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="move"
                 title="✏️ Move & Edit Measurements"
-                color="#FF2D55"
+                color="#666"
                 delay={350}
 
 
@@ -1051,7 +1051,7 @@ Thank you for helping us improve PanHandler!
                   {/* Add Labels - One-Click Editing */}
                   <View
                     style={{
-                      backgroundColor: 'rgba(88,86,214,0.12)',
+                      backgroundColor: 'rgba(0,0,0,0.12)',
                       borderRadius: 14,
                       padding: 14,
                       marginTop: 4,
@@ -1081,7 +1081,7 @@ Thank you for helping us improve PanHandler!
                       padding: 14,
                       marginTop: 4,
                       borderWidth: 2,
-                      borderColor: 'rgba(255,45,85,0.25)',
+                      borderColor: 'rgba(0,0,0,0.25)',
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -1158,7 +1158,7 @@ Thank you for helping us improve PanHandler!
                 {/* PanHandler Measurements Album Feature */}
                 <View style={{
                   marginTop: 16,
-                  backgroundColor: 'rgba(88,86,214,0.08)',
+                  backgroundColor: 'rgba(0,0,0,0.08)',
                   borderRadius: 14,
                   padding: 14,
                   borderWidth: 1.5,
@@ -1178,7 +1178,7 @@ Thank you for helping us improve PanHandler!
                 {/* CAD Integration */}
                 <View
                   style={{
-                    backgroundColor: 'rgba(88,86,214,0.12)',
+                    backgroundColor: 'rgba(0,0,0,0.12)',
                     borderRadius: 14,
                     padding: 14,
                     borderWidth: 2,
@@ -1202,7 +1202,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 title="📧 Email Workflow Guide"
                 icon="mail"
-                color="#34C759"
+                color="#666"
                 delay={450}
 
 
@@ -1237,7 +1237,7 @@ Thank you for helping us improve PanHandler!
                 {/* Email Settings Reminder */}
                 <View style={{ 
                   marginTop: 16, 
-                  backgroundColor: 'rgba(88,86,214,0.08)', 
+                  backgroundColor: 'rgba(0,0,0,0.08)', 
                   borderRadius: 12, 
                   padding: 14, 
                   borderWidth: 2, 
@@ -1259,7 +1259,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 title="🔧 CAD Import Guide"
                 icon="construct"
-                color="#FF9500"
+                color="#666"
                 delay={500}
 
 
@@ -1315,7 +1315,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
                         Use the coin information in the photo label to quickly scale your canvas in CAD
                       </Text>
-                      <View style={{ backgroundColor: 'rgba(255,149,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
+                      <View style={{ backgroundColor: 'rgba(0,0,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(0,0,0,0.25)' }}>
                         <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
                           <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows the coin you selected and its size (e.g., "US Quarter - Ø 24.26mm" or "Euro 1 - Ø 23.25mm"). Use this to set your canvas scale by measuring the coin in the photo!
                         </Text>
@@ -1342,7 +1342,7 @@ Thank you for helping us improve PanHandler!
 
                 <View style={{ backgroundColor: 'rgba(52,199,89,0.12)', borderRadius: 14, padding: 12, marginTop: 8, borderWidth: 2, borderColor: 'rgba(52,199,89,0.25)' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                    <Ionicons name="checkmark-circle" size={20} color="#34C759" />
+                    <Ionicons name="checkmark-circle" size={20} color="#666" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
                       Pro Tip
                     </Text>
@@ -1565,7 +1565,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 icon="warning"
                 title="🔧 Troubleshooting"
-                color="#FF9500"
+                color="#666"
                 delay={650}
 
 
@@ -1632,7 +1632,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{
                       marginTop: 12,
                       padding: 10,
-                      backgroundColor: 'rgba(255, 59, 48, 0.08)',
+                      backgroundColor: 'rgba(0,0,0, 0.08)',
                       borderRadius: 10,
                       borderLeftWidth: 3,
                       borderLeftColor: '#FF3B30',
@@ -1673,7 +1673,7 @@ Thank you for helping us improve PanHandler!
               <ExpandableSection
                 title="🖨️ 3D Printed Aids"
                 icon="image"
-                color="#FF5722"
+                color="#666"
                 delay={700}
               >
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
@@ -1688,7 +1688,7 @@ Thank you for helping us improve PanHandler!
                     });
                   }}
                   style={{
-                    backgroundColor: 'rgba(255,87,34,0.1)',
+                    backgroundColor: 'rgba(0,0,0,0.1)',
                     borderRadius: 14,
                     padding: 14,
                     borderWidth: 2,
@@ -1697,7 +1697,7 @@ Thank you for helping us improve PanHandler!
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="open-outline" size={18} color="#FF5722" />
+                    <Ionicons name="open-outline" size={18} color="#666" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
                       View on MakerWorld
                     </Text>
@@ -1708,44 +1708,22 @@ Thank you for helping us improve PanHandler!
                 </Pressable>
 
                 {/* Reference Photo Image - Placeholder until image is added */}
-                <View style={{
-                  backgroundColor: 'rgba(255,87,34,0.05)',
-                  borderRadius: 14,
-                  padding: 12,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,87,34,0.2)',
-                  alignItems: 'center',
-                }}>
-                  <View style={{
-                    width: '100%',
-                    height: 200,
-                    borderRadius: 10,
-                    backgroundColor: 'rgba(255,87,34,0.15)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                    <Ionicons name="image-outline" size={48} color="rgba(255,87,34,0.4)" />
-                  </View>
-                  <Text style={{ fontSize: 12, color: '#999', marginTop: 8, textAlign: 'center' }}>
-                    Most Useful Fidget Reference Photo Aids
-                  </Text>
-                </View>
               </ExpandableSection>
 
               {/* Accuracy Fun Fact Section */}
               <View style={{ marginBottom: 16, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,204,0,0.15)',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
                     borderRadius: 20,
                     padding: 18,
-                    shadowColor: '#FFCC00',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 14,
-                    elevation: 6,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,204,0,0.35)',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 2,
+                    borderWidth: 1,
+                    borderColor: 'rgba(0,0,0,0.1)',
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
@@ -1775,8 +1753,8 @@ Thank you for helping us improve PanHandler!
                         textShadowOffset: { width: 0, height: -1 },
                         textShadowRadius: 1,
                       }} />
-                      {/* Yellow star on top */}
-                      <Ionicons name="star" size={24} color="#FFCC00" />
+                      {/* Gray star on top */}
+                      <Ionicons name="star" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
                       🎯 Amazing Accuracy
@@ -1792,11 +1770,11 @@ Thank you for helping us improve PanHandler!
                   </Text>
                   
                   <View style={{ 
-                    backgroundColor: 'rgba(255,204,0,0.1)', 
+                    backgroundColor: 'rgba(0,0,0,0.05)', 
                     borderRadius: 14, 
                     padding: 14, 
                     borderWidth: 1, 
-                    borderColor: 'rgba(255,204,0,0.2)',
+                    borderColor: 'rgba(0,0,0,0.1)',
                     gap: 6,
                   }}>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', marginBottom: 4, fontWeight: '600', textAlign: 'center' }}>
@@ -1855,7 +1833,7 @@ Thank you for helping us improve PanHandler!
                   <View style={{ gap: 12 }}>
                     {/* Photos stay on device */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="phone-portrait-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Ionicons name="phone-portrait-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to our servers
                       </Text>
@@ -1863,7 +1841,7 @@ Thank you for helping us improve PanHandler!
                     
                     {/* Email privacy */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="mail-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Ionicons name="mail-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email uses default Mail.app</Text> — no data stored or collected
                       </Text>
@@ -1871,7 +1849,7 @@ Thank you for helping us improve PanHandler!
 
                     {/* No tracking */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="eye-off-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Ionicons name="eye-off-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics on your photos, files, or measurements
                       </Text>
@@ -1879,7 +1857,7 @@ Thank you for helping us improve PanHandler!
                     
                     {/* Lightweight & offline */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                      <Ionicons name="cloud-offline-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
+                      <Ionicons name="cloud-offline-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Works offline</Text> — lightweight and secure, everything runs locally
                       </Text>
@@ -1928,13 +1906,13 @@ Thank you for helping us improve PanHandler!
                   
                   <View style={{ gap: 10, marginBottom: 12 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Ionicons name="camera" size={16} color="#FF9500" style={{ marginRight: 8 }} />
+                      <Ionicons name="camera" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
                         <Text style={{ fontWeight: '600' }}>Camera</Text> — to take photos
                       </Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Ionicons name="images" size={16} color="#FF9500" style={{ marginRight: 8 }} />
+                      <Ionicons name="images" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
                         <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
                       </Text>
@@ -1982,7 +1960,7 @@ Thank you for helping us improve PanHandler!
                       alignItems: 'center',
                       marginRight: 10,
                     }}>
-                      <Ionicons name="information-circle" size={24} color="#007AFF" />
+                      <Ionicons name="information-circle" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
                       About PanHandler
@@ -2072,7 +2050,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 12, marginTop: 8 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,215,0,0.15)',
+                    backgroundColor: 'rgba(0,0,0,0.15)',
                     borderRadius: 16,
                     padding: 14,
                     shadowColor: '#FFD700',
@@ -2199,7 +2177,7 @@ Thank you for helping us improve PanHandler!
                     style={{
                       paddingVertical: 10,
                       paddingHorizontal: 14,
-                      backgroundColor: 'rgba(255,215,0,0.12)',
+                      backgroundColor: 'rgba(0,0,0,0.12)',
                       borderRadius: 12,
                       borderWidth: 1.5,
                       borderColor: 'rgba(255,215,0,0.25)',
