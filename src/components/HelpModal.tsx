@@ -2127,7 +2127,7 @@ Thank you for helping us improve PanHandler!
 
                           // Open YouTube link after 3 seconds
                           leftEggNestedTimers.current.push(setTimeout(() => {
-                            Linking.openURL('https://youtube.com/shorts/r93XNgWN4ss?si=FEoWQBI6E_-9fuRW');
+                            Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?si=dKMcnoCc-US58IfK');
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setLeftEggPressing(false);
                             leftEggNestedTimers.current = []; // Clear tracked timers after completion
