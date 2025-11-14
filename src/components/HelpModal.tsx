@@ -141,8 +141,9 @@ const ExpandableSection = ({
 
         <AnimatedView style={contentAnimatedStyle}>
           <View style={{ 
-            paddingHorizontal: scalePadding(18), 
-            paddingBottom: scalePadding(18),
+            paddingHorizontal: scalePadding(12), 
+            paddingTop: scalePadding(8),
+            paddingBottom: scalePadding(12),
             backgroundColor: 'transparent',
           }}>
             {children}
@@ -1907,6 +1908,68 @@ Thank you for helping us improve PanHandler!
                 </View>
               </View>
 
+
+              {/* Reference Photo Tool Section */}
+              <ExpandableSection
+                title="📷 Reference Photo Tool"
+                icon="image"
+                color="#FF5722"
+                delay={500}
+              >
+                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 12 }}>
+                  Need perfect reference photos for CAD, 3D printing, or manufacturing? Check out the <Text style={{ fontWeight: '600' }}>MakerWorld Reference Photo Tool</Text> — a companion tool for precision measurements!
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    Linking.openURL('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761').catch(() => {
+                      showAlert('Error', 'Could not open link', 'error');
+                    });
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(255,87,34,0.1)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,87,34,0.3)',
+                    marginBottom: 12,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="open-outline" size={18} color="#FF5722" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
+                      View on MakerWorld
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
+                    Perfect for getting consistent reference photos from any angle
+                  </Text>
+                </Pressable>
+
+                <View style={{ gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>📐</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Precision Positioning</Text> - Exact angles for reference photos
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>🎯</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>Multi-Angle Capture</Text> - Get 360° reference views
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 16, marginRight: 10 }}>✨</Text>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
+                      <Text style={{ fontWeight: '600' }}>PanHandler Ready</Text> - Perfect for calibration and measurement
+                    </Text>
+                  </View>
+                </View>
+              </ExpandableSection>
 
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
