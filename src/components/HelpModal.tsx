@@ -1684,6 +1684,68 @@ Thank you for helping us improve PanHandler!
                 </View>
               </ExpandableSection>
 
+              {/* 3D Printed Aids Section */}
+              <ExpandableSection
+                title="🖨️ 3D Printed Aids"
+                icon="image"
+                color="#FF5722"
+                delay={700}
+              >
+                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 14 }}>
+                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    Linking.openURL('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761').catch(() => {
+                      showAlert('Error', 'Could not open link', 'error');
+                    });
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(255,87,34,0.1)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,87,34,0.3)',
+                    marginBottom: 16,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="open-outline" size={18} color="#FF5722" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
+                      View on MakerWorld
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
+                    Download and 3D print for perfect reference photos
+                  </Text>
+                </Pressable>
+
+                {/* Reference Photo Image */}
+                <View style={{
+                  backgroundColor: 'rgba(255,87,34,0.05)',
+                  borderRadius: 14,
+                  padding: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,87,34,0.2)',
+                  alignItems: 'center',
+                }}>
+                  <Image
+                    source={require('../../assets/reference-photo-aids.png')}
+                    style={{
+                      width: '100%',
+                      height: 200,
+                      borderRadius: 10,
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text style={{ fontSize: 12, color: '#999', marginTop: 8, textAlign: 'center' }}>
+                    Most Useful Fidget Reference Photo Aids
+                  </Text>
+                </View>
+              </ExpandableSection>
+
               {/* Accuracy Fun Fact Section */}
               <View style={{ marginBottom: 16, marginTop: 12 }}>
                 <View 
@@ -1907,69 +1969,6 @@ Thank you for helping us improve PanHandler!
                   </View>
                 </View>
               </View>
-
-
-              {/* 3D Printed Aids Section */}
-              <ExpandableSection
-                title="🖨️ 3D Printed Aids"
-                icon="image"
-                color="#FF5722"
-                delay={500}
-              >
-                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 14 }}>
-                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
-                </Text>
-
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    Linking.openURL('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761').catch(() => {
-                      showAlert('Error', 'Could not open link', 'error');
-                    });
-                  }}
-                  style={{
-                    backgroundColor: 'rgba(255,87,34,0.1)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,87,34,0.3)',
-                    marginBottom: 16,
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="open-outline" size={18} color="#FF5722" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
-                      View on MakerWorld
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
-                    Download and 3D print for perfect reference photos
-                  </Text>
-                </Pressable>
-
-                {/* Reference Photo Image */}
-                <View style={{
-                  backgroundColor: 'rgba(255,87,34,0.05)',
-                  borderRadius: 14,
-                  padding: 12,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,87,34,0.2)',
-                  alignItems: 'center',
-                }}>
-                  <Image
-                    source={require('../../assets/reference-photo-aids.png')}
-                    style={{
-                      width: '100%',
-                      height: 200,
-                      borderRadius: 10,
-                      resizeMode: 'contain',
-                    }}
-                  />
-                  <Text style={{ fontSize: 12, color: '#999', marginTop: 8, textAlign: 'center' }}>
-                    Most Useful Fidget Reference Photo Aids
-                  </Text>
-                </View>
-              </ExpandableSection>
 
               {/* About Section */}
               <View style={{ marginBottom: 20, marginTop: 12 }}>
