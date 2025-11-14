@@ -104,7 +104,7 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'transparent',
+          backgroundColor: 'rgba(255,255,255,0.5)',
           borderRadius: scaleBorderRadius(20),
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
@@ -112,7 +112,7 @@ const ExpandableSection = ({
           shadowRadius: scaleSize(12),
           elevation: expanded ? 8 : 6,
           borderWidth: scaleSize(1),
-          borderColor: color,
+          borderColor: 'rgba(255,255,255,0.35)',
           overflow: 'hidden',
         }}
       >
@@ -122,7 +122,6 @@ const ExpandableSection = ({
             alignItems: 'center',
             justifyContent: 'center',
             padding: scalePadding(18),
-            backgroundColor: `${color}30`,
           }}
         >
           <Text style={{
@@ -141,10 +140,8 @@ const ExpandableSection = ({
 
         <AnimatedView style={contentAnimatedStyle}>
           <View style={{ 
-            paddingHorizontal: scalePadding(12), 
-            paddingTop: scalePadding(8),
-            paddingBottom: scalePadding(12),
-            backgroundColor: 'transparent',
+            paddingHorizontal: scalePadding(18), 
+            paddingBottom: scalePadding(18),
           }}>
             {children}
           </View>
@@ -448,7 +445,7 @@ Thank you for helping us improve PanHandler!
               <View
                 ref={modalContainerRef}
                 collapsable={false}
-                style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
+                style={{ flex: 1, backgroundColor: 'rgba(248,248,250,0.7)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
