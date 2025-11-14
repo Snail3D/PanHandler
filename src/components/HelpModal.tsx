@@ -441,6 +441,8 @@ Thank you for helping us improve PanHandler!
                     contentContainerStyle={{ padding: scalePadding(20) }}
                     showsVerticalScrollIndicator={false}
                     scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
+                    scrollEnabled={true}
+                    nestedScrollEnabled={true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
@@ -2090,7 +2092,7 @@ Thank you for helping us improve PanHandler!
 
                           // Open YouTube link after 3 seconds
                           leftEggNestedTimers.current.push(setTimeout(() => {
-                            Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?si=dKMcnoCc-US58IfK');
+                            Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?feature=share');
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setLeftEggPressing(false);
                             leftEggNestedTimers.current = []; // Clear tracked timers after completion
