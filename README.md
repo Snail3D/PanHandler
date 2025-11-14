@@ -18,7 +18,7 @@ PanHandler is now available on the App Store! Get the official release for iPhon
 3. Tap "Get" to download and install
 
 ### Android
-👉 **[Download PanHandler 7.7 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
+👉 **[Download Latest PanHandler APK](https://github.com/Snail3D/PanHandler/releases/latest)**
 
 Download the latest Android APK directly from GitHub. No app store required - just download and install to start measuring.
 
