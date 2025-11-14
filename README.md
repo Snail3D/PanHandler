@@ -263,6 +263,29 @@ Tap **Email** to generate a professional report:
 
 ---
 
+## 🖨️ 3D Printed Aids
+
+Want even better reference photos for your design work? **Check out our FREE MakerWorld listing** named **"Most Useful Fidget"** — a 3D-printable tool designed specifically for perfect reference photography!
+
+### Why Use 3D Printed Aids?
+
+📐 **Precision Positioning** - Exact angles for consistent reference photos
+🎯 **Multi-Angle Capture** - Get 360° reference views from any direction
+✨ **PanHandler Ready** - Perfect for calibration and measurement
+🔗 **CAD/3D Printing Workflow** - Designed with makers in mind
+
+### Get Started
+
+👉 **[Download "Most Useful Fidget" on MakerWorld](https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761)**
+
+**Steps:**
+1. Download the STL files
+2. 3D print in your preferred color (red and natural work great!)
+3. Use with PanHandler for perfect reference photos
+4. Import into your CAD software for tracing
+
+---
+
 ## 🔒 Privacy & Security
 
 - ✅ **Photos stay on your device** — never uploaded or transferred to our servers
