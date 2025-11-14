@@ -8,17 +8,17 @@
 
 **Latest Version: 7.7**
 
-### iOS (TestFlight Beta)
-👉 **[Join the iOS Beta on TestFlight](https://testflight.apple.com/join/kd4CbvSj)**
+### iOS (App Store)
+👉 **[Download from the App Store](https://apps.apple.com/us/app/panhandler/id6754727828)**
 
-Get early access to PanHandler on iPhone and iPad through Apple's TestFlight beta program. Test new features before they're released and help shape the future of the app.
+PanHandler is now available on the App Store! Get the official release for iPhone and iPad.
 
-1. Install TestFlight from the App Store
-2. Open the link above on your iPhone or iPad
-3. Tap "Accept" and "Install" to get the beta version
+1. Open the App Store on your iPhone or iPad
+2. Search for "PanHandler" or use the link above
+3. Tap "Get" to download and install
 
 ### Android
-👉 **[Download PanHandler 7.5.0 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
+👉 **[Download PanHandler 7.7 APK](https://github.com/Snail3D/PanHandler/releases/latest)**
 
 Download the latest Android APK directly from GitHub. No app store required - just download and install to start measuring.
 
@@ -35,11 +35,11 @@ After downloading:
 
 See PanHandler in action! Watch how easy it is to measure anything with just your phone and a coin.
 
-<a href="https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg" target="_blank">
-  <img src="https://img.youtube.com/vi/DcqQPxMOd5U/maxresdefault.jpg" alt="PanHandler Demo Video" width="600">
+<a href="https://youtu.be/NhaMdsvyS8I?si=XauIHwBNuMDMRPUy" target="_blank">
+  <img src="https://img.youtube.com/vi/NhaMdsvyS8I/maxresdefault.jpg" alt="PanHandler Demo Video" width="600">
 </a>
 
-**[Watch on YouTube](https://youtube.com/shorts/DcqQPxMOd5U?si=pn2v8ljXqlzsgxYg)** • [Full Tutorial Playlist](https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi)
+**[Watch on YouTube](https://youtu.be/NhaMdsvyS8I?si=XauIHwBNuMDMRPUy)** • [Full Tutorial Playlist](https://www.youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi)
 
 ---
 

@@ -32,7 +32,7 @@ afterEvaluate {
     cleanupTasks.each { theTaskName ->
         try {
             tasks.named(theTaskName).configure {
-                doFirst {
+                doLast { // Changed from doFirst - runs AFTER task completes
                     println "[PanHandler] ========================================="
                     println "[PanHandler] Running AGGRESSIVE manifest cleanup after: " + theTaskName
                     println "[PanHandler] ========================================="
