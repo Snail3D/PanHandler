@@ -1909,15 +1909,15 @@ Thank you for helping us improve PanHandler!
               </View>
 
 
-              {/* Reference Photo Tool Section */}
+              {/* 3D Printed Aids Section */}
               <ExpandableSection
-                title="🖨️ 3D Printed Tool"
+                title="🖨️ 3D Printed Aids"
                 icon="image"
                 color="#FF5722"
                 delay={500}
               >
-                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 12 }}>
-                  Need perfect reference photos for CAD, 3D printing, or manufacturing? Check out the <Text style={{ fontWeight: '600' }}>MakerWorld Reference Photo Tool</Text> — a companion tool for precision measurements!
+                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 14 }}>
+                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
                 </Text>
 
                 <Pressable
@@ -1933,7 +1933,7 @@ Thank you for helping us improve PanHandler!
                     padding: 14,
                     borderWidth: 2,
                     borderColor: 'rgba(255,87,34,0.3)',
-                    marginBottom: 12,
+                    marginBottom: 16,
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
@@ -1943,31 +1943,31 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
-                    Perfect for getting consistent reference photos from any angle
+                    Download and 3D print for perfect reference photos
                   </Text>
                 </Pressable>
 
-                <View style={{ gap: 8 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 16, marginRight: 10 }}>📐</Text>
-                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Precision Positioning</Text> - Exact angles for reference photos
-                    </Text>
-                  </View>
-
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 16, marginRight: 10 }}>🎯</Text>
-                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Multi-Angle Capture</Text> - Get 360° reference views
-                    </Text>
-                  </View>
-
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 16, marginRight: 10 }}>✨</Text>
-                    <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>PanHandler Ready</Text> - Perfect for calibration and measurement
-                    </Text>
-                  </View>
+                {/* Reference Photo Image */}
+                <View style={{
+                  backgroundColor: 'rgba(255,87,34,0.05)',
+                  borderRadius: 14,
+                  padding: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,87,34,0.2)',
+                  alignItems: 'center',
+                }}>
+                  <Image
+                    source={require('../../assets/reference-photo-aids.png')}
+                    style={{
+                      width: '100%',
+                      height: 200,
+                      borderRadius: 10,
+                      resizeMode: 'contain',
+                    }}
+                  />
+                  <Text style={{ fontSize: 12, color: '#999', marginTop: 8, textAlign: 'center' }}>
+                    Most Useful Fidget Reference Photo Aids
+                  </Text>
                 </View>
               </ExpandableSection>
 
