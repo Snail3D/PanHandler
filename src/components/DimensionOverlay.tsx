@@ -3254,6 +3254,13 @@ export default function DimensionOverlay({
   // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
   const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
   
+  // Notify parent when lock state changes
+  useEffect(() => {
+    if (onPanZoomLockChange) {
+      onPanZoomLockChange(isPanZoomLocked);
+    }
+  }, [isPanZoomLocked, onPanZoomLockChange]);
+  
   // Handle label modal completion
   const handleLabelComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
     __DEV__ && console.log('📝 handleLabelComplete called with:', data);
