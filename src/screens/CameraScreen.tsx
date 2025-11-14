@@ -2405,19 +2405,18 @@ export default function CameraScreen() {
                   __DEV__ && console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
                 }}
               >
-                {/* NUCLEAR OPTION: Conditional rendering instead of locked prop */}
-                {/* Only render ZoomableImage when unlocked - complete unmount/remount cycle */}
-                {!isPanZoomLocked ? (
-                  <ZoomableImage
-                    key={displayImageUri}
-                    imageUri={displayImageUri}
-                    fingerColor={sessionColors.crosshair.main}
-                    initialScale={measurementZoom.scale}
-                    initialTranslateX={measurementZoom.translateX}
-                    initialTranslateY={measurementZoom.translateY}
-                    initialRotation={measurementZoom.rotation}
-                    showLevelLine={false}
-                    opacity={imageOpacity}
+                {/* Render ZoomableImage always, but disable gestures when locked */}
+                <ZoomableImage
+                  key={displayImageUri}
+                  imageUri={displayImageUri}
+                  fingerColor={sessionColors.crosshair.main}
+                  initialScale={measurementZoom.scale}
+                  initialTranslateX={measurementZoom.translateX}
+                  initialTranslateY={measurementZoom.translateY}
+                  initialRotation={measurementZoom.rotation}
+                  showLevelLine={false}
+                  locked={isPanZoomLocked}
+                  opacity={imageOpacity}
                     onTransformChange={(scale, translateX, translateY, rotation) => {
                       const newZoom = { scale, translateX, translateY, rotation };
                       setMeasurementZoom(newZoom);
@@ -2441,24 +2440,6 @@ export default function CameraScreen() {
                       }
                     }}
                   />
-                ) : (
-                  // Static image when locked - wrapped to prevent Android double-tap zoom
-                  <View 
-                    style={{ width: '100%', height: '100%' }}
-                    onStartShouldSetResponder={() => Platform.OS === 'android'} // Intercept touches on Android
-                    onResponderTerminationRequest={() => false} // Don't let children steal touch
-                  >
-                    <Image
-                      source={{ uri: displayImageUri }}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        opacity: imageOpacity,
-                      }}
-                      resizeMode="contain"
-                    />
-                  </View>
-                )}
                 {/* Measurement overlay needs to be sibling to image for capture */}
                 <DimensionOverlay 
                   zoomScale={measurementZoom.scale}
