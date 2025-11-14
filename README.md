@@ -22,12 +22,18 @@ PanHandler is now available on the App Store! Get the official release for iPhon
 
 Download the latest Android APK directly from GitHub. No app store required - just download and install to start measuring.
 
-After downloading:
-1. Enable "Install from Unknown Sources" in your Android settings
-2. Open the downloaded APK file
-3. Follow the installation prompts
+**Installation Steps:**
 
-> **Note:** The APK is available on the [Releases page](https://github.com/Snail3D/PanHandler/releases). Click "Assets" to download the APK file.
+1. **Download the APK** from the [Releases page](https://github.com/Snail3D/PanHandler/releases) (click "Assets" to see the APK file)
+2. **Enable "Install from Unknown Sources"**:
+   - Go to **Settings → Security** (or **Settings → Apps**)
+   - Find **Install Unknown Apps** or **Unknown Sources**
+   - Enable it for your browser or file manager
+   - *Note: You do NOT need to enable Developer Mode - just this simple setting*
+3. **Tap the downloaded APK file** to install
+4. **Follow the installation prompts**
+
+> **Security Note:** You're installing directly from the official PanHandler GitHub repository. This is safe and lets you get updates immediately without waiting for app store approval.
 
 ---
 
