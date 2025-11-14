@@ -104,15 +104,15 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.05)',
+          backgroundColor: 'rgba(255,255,255,0.9)',
           borderRadius: scaleBorderRadius(20),
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.3,
-          shadowRadius: scaleSize(12),
-          elevation: expanded ? 8 : 6,
-          borderWidth: scaleSize(2),
-          borderColor: color,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: scaleSize(8),
+          elevation: expanded ? 4 : 2,
+          borderWidth: scaleSize(1),
+          borderColor: 'rgba(0,0,0,0.1)',
           overflow: 'hidden',
         }}
       >
@@ -134,7 +134,7 @@ const ExpandableSection = ({
             {title}
           </Text>
           <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: scalePadding(18) }]}>
-            <Ionicons name="chevron-down" size={scaleIconSize(24)} color={color} />
+            <Ionicons name="chevron-down" size={scaleIconSize(24)} color="#666" />
           </AnimatedView>
         </View>
 
