@@ -75,16 +75,18 @@ afterEvaluate {
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.READ_MEDIA_VIDEO"[^>]*/>', '')
                 manifestContent = manifestContent.replaceAll('<uses-permission[^>]*android:name="android\\\\.permission\\\\.READ_MEDIA_VISUAL_USER_SELECTED"[^>]*/>', '')
                 
-                            // Remove CHECK_LICENSE permission (multiple variations - MORE AGGRESSIVE)
+                            // Remove CHECK_LICENSE permission (MULTIPLE variations - MOST AGGRESSIVE)
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*CHECK_LICENSE[^>]*/>', '')
+                            manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending\\\\.CHECK_LICENSE[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.android\\\\.vending[^>]*/>', '')
                             
                             // Remove BIND_GET_INSTALL_REFERRER_SERVICE permission
                             manifestContent = manifestContent.replaceAll('<uses-permission[^>]*com\\\\.google\\\\.android\\\\.finsky[^>]*/>', '')
                             
-                            // Remove faketouch feature (ALL variations - MORE AGGRESSIVE)
+                            // Remove faketouch feature (ALL VARIATIONS - MOST AGGRESSIVE)
                             manifestContent = manifestContent.replaceAll('<uses-feature[^>]*faketouch[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android\\\\.hardware\\\\.faketouch[^>]*/>', '')
+                            manifestContent = manifestContent.replaceAll('\\s*<uses-feature\\s+android:name="android\\\\.hardware\\\\.faketouch"[^>]*/?>', '')
                             
                             // Remove only ARCore metadata and libraries, but KEEP camera.ar feature with required="false"
                             manifestContent = manifestContent.replaceAll('<meta-data[^>]*com\\\\.google\\\\.ar\\\\.core[^>]*/>', '')
@@ -98,11 +100,9 @@ afterEvaluate {
                                 // Count what we removed (and what should be left)
                                 def removedItems = []
                                 if (manifestContent =~ /ACTIVITY_RECOGNITION/) removedItems.add('ACTIVITY_RECOGNITION')
-                                if (manifestContent =~ /CHECK_LICENSE/) removedItems.add('CHECK_LICENSE')
-                                if (manifestContent =~ /faketouch/) removedItems.add('faketouch')
-                                if (manifestContent =~ /camera\.ar.*required.*false/) {
-                                    println "[PanHandler]   ✅ camera.ar required=false FOUND (GOOD!)"
-                                }
+                                if (manifestContent =~ /CHECK_LICENSE/) removedItems.add('CHECK_LICENSE (STILL PRESENT - BAD!)')
+                                if (manifestContent =~ /faketouch/) removedItems.add('faketouch (STILL PRESENT - BAD!)')
+                                if (manifestContent =~ /camera\.ar/) removedItems.add('camera.ar (STILL PRESENT - BAD!)')
                                 
                                 file.write(manifestContent, 'UTF-8')
                                 println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + file.path
