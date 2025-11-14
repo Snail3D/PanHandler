@@ -6776,13 +6776,13 @@ export default function DimensionOverlay({
               }}
             >
               <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 borderRadius: scaleBorderRadius(20),
                 paddingHorizontal: scalePadding(10),
                 paddingTop: scalePadding(10),
                 paddingBottom: scalePadding(10),
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.35)',
+                borderColor: 'rgba(255, 255, 255, 0.2)',
               }}>
 
                 {/* Header with undo button and hide menu on same line */}
