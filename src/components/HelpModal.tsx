@@ -445,7 +445,7 @@ Thank you for helping us improve PanHandler!
               <View
                 ref={modalContainerRef}
                 collapsable={false}
-                style={{ flex: 1, backgroundColor: 'rgba(248,248,250,0.7)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
+                style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
