@@ -104,7 +104,7 @@ const ExpandableSection = ({
           setExpanded(!expanded);
         }}
         style={{
-          backgroundColor: 'rgba(255,255,255,0.3)',
+          backgroundColor: 'rgba(255,255,255,0.05)',
           borderRadius: scaleBorderRadius(20),
           shadowColor: color,
           shadowOffset: { width: 0, height: 0 },
@@ -467,7 +467,7 @@ Thank you for helping us improve PanHandler!
                     Watch our complete video tutorial series
                   </Text>
                   
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 16 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 16 }}>
                     Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.
                   </Text>
                   
@@ -606,16 +606,16 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
                   
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 10, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 10, textAlign: 'center' }}>
                     Position your object + coin in frame, then level phone to auto-capture
                   </Text>
                   
                   {/* How it works */}
                   <View style={{ marginBottom: 12, paddingHorizontal: 8 }}>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
                       <Text style={{ fontWeight: '700' }}>How it works:</Text>
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                       1. Frame your object with the coin{'\n'}
                       2. Watch the bubble level crosshairs{'\n'}
                       3. Level your phone to center the bubble{'\n'}
@@ -647,7 +647,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ gap: 8 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                         <Text style={{ fontSize: 14, marginRight: 6 }}>🔘</Text>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, flex: 1 }}>
+                        <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, flex: 1 }}>
                           <Text style={{ fontWeight: '600' }}>Auto-Capture Toggle</Text> - Not a fan of hands-free? Just flip the switch and use the shutter button instead!
                         </Text>
                       </View>
@@ -669,7 +669,7 @@ Thank you for helping us improve PanHandler!
                         Smart Photo Organization
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       Auto-captured photos are automatically saved to both your Camera Roll AND a special "Auto-Leveled" album in Photos for easy access!
                     </Text>
                   </View>
@@ -718,7 +718,7 @@ Thank you for helping us improve PanHandler!
                       Oops! Need a Do-Over?
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     Made a mistake with your calibration? No worries! Just tap the red <Text style={{ fontWeight: '600' }}>Recalibrate</Text> button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!
                   </Text>
                 </View>
@@ -761,7 +761,7 @@ Thank you for helping us improve PanHandler!
                       Distance Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                     Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!{'\n\n'}
                     <Text style={{ fontWeight: '600', color: '#AF52DE' }}>Pro Tip:</Text> Connect multiple lines by placing endpoints together to create triangles and polygons. <Text style={{ fontWeight: '700' }}>Areas are automatically calculated and shown in the legend!</Text> 📐
                   </Text>
@@ -791,7 +791,7 @@ Thank you for helping us improve PanHandler!
                       Angle Mode (azimuth in Map Mode)
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                     Measure angles between two lines. Place first endpoint, then vertex (corner), then second endpoint.
                   </Text>
                 </View>
@@ -813,7 +813,7 @@ Thank you for helping us improve PanHandler!
                       Circle Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                     Measure circular objects. Tap center point, then tap edge to define radius and diameter. <Text style={{ fontWeight: '600', color: '#E91E63' }}>Area shown in legend!</Text>
                   </Text>
                 </View>
@@ -835,7 +835,7 @@ Thank you for helping us improve PanHandler!
                       Rectangle Mode
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                     Measure rectangular objects. Tap two opposite corners to get length and height measurements. <Text style={{ fontWeight: '600', color: '#1976D2' }}>Area shown in legend!</Text> Edges snap to perfect horizontal and vertical lines automagically!
                   </Text>
                 </View>
@@ -867,7 +867,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
                     Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
                   </Text>
                   
@@ -879,7 +879,7 @@ Thank you for helping us improve PanHandler!
                         LASSO MODE - Close the loop!
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 6 }}>
                       When you draw close to your starting point, it <Text style={{ fontWeight: '600' }}>auto-snaps</Text> to close the loop! You will feel haptic feedback when it connects.
                     </Text>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', lineHeight: 19 }}>
@@ -891,7 +891,7 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
                       How to use:
                     </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       1. Long-press the Distance button{'\n'}
                       2. Place finger and hold for 1.5 seconds{'\n'}
                       3. Draw your path{'\n'}
@@ -899,7 +899,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(16,185,129,0.15)' }}>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', lineHeight: 18 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', lineHeight: 18 }}>
                       💡 Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!
                     </Text>
                   </View>
@@ -923,7 +923,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Pan/Zoom Mode
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Pinch to zoom, drag to pan
                       </Text>
                     </View>
@@ -936,7 +936,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Measure Mode
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Tap to place points with precision cursor
                       </Text>
                     </View>
@@ -951,7 +951,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Precision Cursor
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Floating crosshair shows exactly where points will be placed
                       </Text>
                     </View>
@@ -964,7 +964,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Color-Coded
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Each measurement gets a unique color
                       </Text>
                     </View>
@@ -979,7 +979,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Hide Labels
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Toggle measurement labels off to view your photo clearly. Legend stays visible for reference
                       </Text>
                     </View>
@@ -1003,16 +1003,16 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </View>
                     <View style={{ gap: 8 }}>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Swipe right anywhere on menu</Text> to collapse it off-screen
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Tap side tab</Text> to bring menu back
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Drag side tab up/down</Text> to reposition it
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         • Menu collapses instantly for quick workspace access
                       </Text>
                     </View>
@@ -1041,7 +1041,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Move Measurements
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Tap and drag circles, rectangles, or freehand paths to move them around
                       </Text>
                     </View>
@@ -1054,7 +1054,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Edit Points
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Tap and drag any point to adjust measurements. Freehand paths can be reshaped by moving individual points!
                       </Text>
                     </View>
@@ -1077,7 +1077,7 @@ Thank you for helping us improve PanHandler!
                         Add Custom Labels
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
                       <Text style={{ fontWeight: '600' }}>Enable "Edit labels" mode:</Text> Tap the "Edit labels" button in the legend, then tap any measurement label (the colored badge with numbers) to add or edit custom names
                     </Text>
                     <Text style={{ fontSize: 13, color: '#6E6E73', lineHeight: 19, fontStyle: 'italic' }}>
@@ -1102,7 +1102,7 @@ Thank you for helping us improve PanHandler!
                         Quick Delete: 4 Rapid Taps
                       </Text>
                     </View>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                       Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!
                     </Text>
                   </View>
@@ -1114,7 +1114,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Magnetic Snapping
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Points snap to nearby existing points (7mm range) when moving, making precise alignment easy
                       </Text>
                     </View>
@@ -1133,7 +1133,7 @@ Thank you for helping us improve PanHandler!
               >
                 {/* FREE badge */}
 
-                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 12 }}>
+                <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 12 }}>
                   Export photos with measurements and detailed reports
                 </Text>
 
@@ -1182,7 +1182,7 @@ Thank you for helping us improve PanHandler!
                       Organized Measurements
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     All saved measurements are automatically organized into a "PanHandler Measurements" album in your Photos app for easy access and sharing!
                   </Text>
                 </View>
@@ -1204,7 +1204,7 @@ Thank you for helping us improve PanHandler!
                       Works with Any CAD Software
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                  <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                     Import photos as canvases in any CAD software. Scale values are included on every export for perfect alignment.
                   </Text>
                 </View>
@@ -1261,7 +1261,7 @@ Thank you for helping us improve PanHandler!
                       Pro Tip: Lightning Fast Workflow
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.
                   </Text>
                 </View>
@@ -1279,7 +1279,7 @@ Thank you for helping us improve PanHandler!
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
                   Import to Any CAD Software
                 </Text>
-                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 16 }}>
+                <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 16 }}>
                   Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images.
                 </Text>
                 
@@ -1292,7 +1292,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Open Your CAD Software
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Create a new project or open an existing design
                       </Text>
                     </View>
@@ -1308,7 +1308,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Insert Canvas Image
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Import the CAD Canvas Photo from PanHandler as a canvas or reference image
                       </Text>
                     </View>
@@ -1324,11 +1324,11 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Scale Using Coin Reference
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, marginBottom: 8 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
                         Use the coin information in the photo label to quickly scale your canvas in CAD
                       </Text>
                       <View style={{ backgroundColor: 'rgba(255,149,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(255,149,0,0.25)' }}>
-                        <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
+                        <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
                           <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows the coin you selected and its size (e.g., "US Quarter - Ø 24.26mm" or "Euro 1 - Ø 23.25mm"). Use this to set your canvas scale by measuring the coin in the photo!
                         </Text>
                       </View>
@@ -1345,7 +1345,7 @@ Thank you for helping us improve PanHandler!
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
                         Trace & Model
                       </Text>
-                      <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         Trace over the 50% opacity image using your CAD tools for easy reference!
                       </Text>
                     </View>
@@ -1359,7 +1359,7 @@ Thank you for helping us improve PanHandler!
                       Pro Tip
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                     The 50% opacity makes it easy to see your CAD lines while still having the reference visible
                   </Text>
                 </View>
@@ -1563,7 +1563,7 @@ Thank you for helping us improve PanHandler!
                   />
                   <Text style={{
                     fontSize: 12,
-                    color: '#3C3C43',
+                    color: '#1C1C1E',
                     textAlign: 'center',
                     fontStyle: 'italic',
                     lineHeight: 18,
@@ -1610,7 +1610,7 @@ Thank you for helping us improve PanHandler!
                       🐛 Send Bug Report
                     </Text>
                     
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 12 }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 12 }}>
                       Having trouble? Our support team is here to help!
                     </Text>
                     
@@ -1649,19 +1649,19 @@ Thank you for helping us improve PanHandler!
                       borderLeftWidth: 3,
                       borderLeftColor: '#FF3B30',
                     }}>
-                      <Text style={{ fontSize: 12, color: '#3C3C43', lineHeight: 18, marginBottom: 6 }}>
+                      <Text style={{ fontSize: 12, color: '#1C1C1E', lineHeight: 18, marginBottom: 6 }}>
                         <Text style={{ fontWeight: '700' }}>What to include:</Text>
                       </Text>
                       <View style={{ gap: 4 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
+                          <Text style={{ fontSize: 12, color: '#1C1C1E', marginRight: 6 }}>•</Text>
+                          <Text style={{ fontSize: 12, color: '#1C1C1E', flex: 1 }}>
                             Description of the issue (e.g., "App freezes after calibration")
                           </Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', marginRight: 6 }}>•</Text>
-                          <Text style={{ fontSize: 12, color: '#3C3C43', flex: 1 }}>
+                          <Text style={{ fontSize: 12, color: '#1C1C1E', marginRight: 6 }}>•</Text>
+                          <Text style={{ fontSize: 12, color: '#1C1C1E', flex: 1 }}>
                             Your device info (automatically included)
                           </Text>
                         </View>
@@ -1688,7 +1688,7 @@ Thank you for helping us improve PanHandler!
                 color="#FF5722"
                 delay={700}
               >
-                <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 21, marginBottom: 14 }}>
+                <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
                   Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
                 </Text>
 
@@ -1714,7 +1714,7 @@ Thank you for helping us improve PanHandler!
                       View on MakerWorld
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
                     Download and 3D print for perfect reference photos
                   </Text>
                 </Pressable>
@@ -1795,7 +1795,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 14, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 14, textAlign: 'center' }}>
                     PanHandler achieves{' '}
                     <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>
                       ~0.5 mm accuracy
@@ -1814,18 +1814,18 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 14, color: '#1C1C1E', marginBottom: 4, fontWeight: '600', textAlign: 'center' }}>
                       📐 That's approximately:
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
                       • 1/50th of an inch
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
                       • Thickness of a credit card
                     </Text>
-                    <Text style={{ fontSize: 14, color: '#3C3C43', lineHeight: 20, textAlign: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
                       • 5-6 sheets of paper
                     </Text>
                   </View>
 
-                  <Text style={{ fontSize: 13, color: '#3C3C43', fontStyle: 'italic', marginTop: 12, lineHeight: 18, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', marginTop: 12, lineHeight: 18, textAlign: 'center' }}>
                     💡 Tip: Higher resolution photos = better accuracy
                   </Text>
                 </View>
@@ -1868,7 +1868,7 @@ Thank you for helping us improve PanHandler!
                     {/* Photos stay on device */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="phone-portrait-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
-                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                      <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to our servers
                       </Text>
                     </View>
@@ -1876,7 +1876,7 @@ Thank you for helping us improve PanHandler!
                     {/* Email privacy */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="mail-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
-                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                      <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email uses default Mail.app</Text> — no data stored or collected
                       </Text>
                     </View>
@@ -1884,7 +1884,7 @@ Thank you for helping us improve PanHandler!
                     {/* No tracking */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="eye-off-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
-                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                      <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics on your photos, files, or measurements
                       </Text>
                     </View>
@@ -1892,7 +1892,7 @@ Thank you for helping us improve PanHandler!
                     {/* Lightweight & offline */}
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="cloud-offline-outline" size={18} color="#34C759" style={{ marginRight: 8, marginTop: 2 }} />
-                      <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, flex: 1 }}>
+                      <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Works offline</Text> — lightweight and secure, everything runs locally
                       </Text>
                     </View>
@@ -1934,20 +1934,20 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12 }}>
                     PanHandler needs access to:
                   </Text>
                   
                   <View style={{ gap: 10, marginBottom: 12 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="camera" size={16} color="#FF9500" style={{ marginRight: 8 }} />
-                      <Text style={{ fontSize: 14, color: '#3C3C43', flex: 1 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
                         <Text style={{ fontWeight: '600' }}>Camera</Text> — to take photos
                       </Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="images" size={16} color="#FF9500" style={{ marginRight: 8 }} />
-                      <Text style={{ fontSize: 14, color: '#3C3C43', flex: 1 }}>
+                      <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
                         <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
                       </Text>
                     </View>
@@ -1960,7 +1960,7 @@ Thank you for helping us improve PanHandler!
                     borderLeftWidth: 3,
                     borderLeftColor: '#FF9500',
                   }}>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 19 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       <Text style={{ fontWeight: '700' }}>Need to enable permissions?</Text>{'\n'}
                       Go to Settings → PanHandler → Enable Camera & Photos
                     </Text>
@@ -2001,7 +2001,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
 
-                  <Text style={{ fontSize: 15, color: '#3C3C43', lineHeight: 22, marginBottom: 16 }}>
+                  <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 16 }}>
                     Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a slug on a mission to make measuring faster, easier, and accurate for everyone!
                   </Text>
 
@@ -2199,7 +2199,7 @@ Thank you for helping us improve PanHandler!
                     </Pressable>
                   </View>
                   
-                  <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
                     Hold the left egg for a surprise. Tap the right egg (how many times?) for another surprise. Oh, and by the way, look out for bot battles that might come up while you're using the app — they may reveal more Easter eggs ;)
                   </Text>
                 </View>
