@@ -62,7 +62,7 @@ module.exports = function withManifestRemoveDirectives(config) {
 
     // REMOVE any existing unwanted features and enforce strict allowlist
     // CRITICAL: Remove faketouch and all unwanted features completely
-    // DO NOT remove camera.ar - we need it but libraries will add it
+    // CRITICAL: Remove camera.ar COMPLETELY - Google Play sees ANY presence as AR capability
     manifest['uses-feature'] = (manifest['uses-feature'] || []).filter(feat => {
       const name = feat.$?.['android:name'];
       if (!name) return false;
@@ -70,9 +70,10 @@ module.exports = function withManifestRemoveDirectives(config) {
       if (name === 'android.hardware.faketouch') {
         return false;
       }
-      // Keep camera.ar if it exists (we'll ensure required=false below)
+      // REMOVE camera.ar completely - even with required=false, Play Store thinks it's AR
       if (name === 'android.hardware.camera.ar') {
-        return true;
+        console.log('[withManifestRemoveDirectives] REMOVING camera.ar - Play Store interprets presence as AR capability');
+        return false;
       }
       return allowedFeatures.includes(name);
     });
@@ -111,14 +112,8 @@ module.exports = function withManifestRemoveDirectives(config) {
       return true;
     });
     
-    // Ensure camera.ar has required="false" if it exists
-    const cameraArFeature = manifest['uses-feature'].find(feat => 
-      feat.$?.['android:name'] === 'android.hardware.camera.ar'
-    );
-    if (cameraArFeature && cameraArFeature.$) {
-      cameraArFeature.$['android:required'] = 'false';
-      console.log('[withManifestRemoveDirectives] Set camera.ar required=false');
-    }
+    // REMOVED: Do NOT add camera.ar at all - Google Play interprets ANY presence as AR capability
+    // Even with required="false", Play Console shows AR as required
 
     console.log('[withManifestRemoveDirectives] Enforced allowed permissions/features and removed all ARCore metadata');
 

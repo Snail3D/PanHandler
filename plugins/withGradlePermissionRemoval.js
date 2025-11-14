@@ -97,10 +97,13 @@ afterEvaluate {
                             manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android\\\\.hardware\\\\.faketouch[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('\\s*<uses-feature\\s+android:name="android\\\\.hardware\\\\.faketouch"[^>]*/?>', '')
                             
-                            // Remove only ARCore metadata and libraries, but KEEP camera.ar feature with required="false"
+                            // CRITICAL: Remove ALL AR references including camera.ar feature
+                            // Google Play interprets ANY presence of camera.ar as AR capability, even with required=false
                             manifestContent = manifestContent.replaceAll('<meta-data[^>]*com\\\\.google\\\\.ar\\\\.core[^>]*/>', '')
                             manifestContent = manifestContent.replaceAll('<uses-library[^>]*com\\\\.google\\\\.ar[^>]*/>', '')
-                            // IMPORTANT: DO NOT remove camera.ar feature - we need it with required="false"
+                            // Remove camera.ar feature completely
+                            manifestContent = manifestContent.replaceAll('<uses-feature[^>]*android\\\\.hardware\\\\.camera\\\\.ar[^>]*/>', '')
+                            manifestContent = manifestContent.replaceAll('\\s*<uses-feature\\s+android:name="android\\\\.hardware\\\\.camera\\\\.ar"[^>]*/?>', '')
                             
                                 // Remove any tools:node="remove" attributes that didn't work (clean them out)
                                 manifestContent = manifestContent.replaceAll('\\s*tools:node="remove"', '')
@@ -113,23 +116,13 @@ afterEvaluate {
                                 if (manifestContent =~ /camera\.ar/) stillPresent.add('camera.ar')
                                 
                                 if (stillPresent.size() > 0) {
-                                    println "[PanHandler] AFTER cleanup - Still present: " + stillPresent.join(', ')
+                                    println "[PanHandler] ⚠️  AFTER cleanup - Still present: " + stillPresent.join(', ')
                                 } else {
-                                    println "[PanHandler] AFTER cleanup - All clean!"
+                                    println "[PanHandler] ✅ AFTER cleanup - All clean! No AR references."
                                 }
                                 
-                                // ADD camera.ar required="false" if it's not there
-                                if (!(manifestContent =~ /camera\.ar/)) {
-                                    println "[PanHandler] ✅ Adding camera.ar required=false"
-                                    def cameraFeaturePos = manifestContent.indexOf('<uses-feature android:name="android.hardware.camera"')
-                                    if (cameraFeaturePos > 0) {
-                                        def insertPos = manifestContent.indexOf('/>', cameraFeaturePos) + 2
-                                        manifestContent = manifestContent.substring(0, insertPos) + 
-                                            '\\n  <uses-feature android:name="android.hardware.camera.ar" android:required="false"/>' +
-                                            manifestContent.substring(insertPos)
-                                        println "[PanHandler] ✅ Successfully added camera.ar required=false"
-                                    }
-                                }
+                                // REMOVED: Do NOT add camera.ar at all
+                                // Google Play interprets ANY presence of camera.ar (even required=false) as AR capability
                                 
                                 file.write(manifestContent, 'UTF-8')
                                 println "[PanHandler] ✅ Cleaned manifest #" + cleanedCount + ": " + file.path
