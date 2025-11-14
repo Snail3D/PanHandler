@@ -448,7 +448,7 @@ Thank you for helping us improve PanHandler!
               <View
                 ref={modalContainerRef}
                 collapsable={false}
-                style={{ flex: 1, backgroundColor: 'transparent', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
+                style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
                 <GestureDetector gesture={swipeGesture}>
                   <Animated.ScrollView
@@ -1230,7 +1230,7 @@ Thank you for helping us improve PanHandler!
                   Example Email Format
                 </Text>
                 
-                <View style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E5E5EA' }}>
+                <View style={{ backgroundColor: 'rgba(52,199,89,0.08)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(52,199,89,0.2)' }}>
                   <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
                     Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>Arduino Case - Measurements</Text>
                   </Text>
@@ -1620,7 +1620,7 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={handleSupportEmail}
                       style={({ pressed }) => ({
-                        backgroundColor: pressed ? '#F2F2F7' : 'white',
+                        backgroundColor: pressed ? 'rgba(255,149,0,0.15)' : 'rgba(255,149,0,0.08)',
                         borderRadius: 12,
                         padding: 14,
                         flexDirection: 'row',
@@ -1838,7 +1838,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'transparent',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#34C759',
@@ -1908,7 +1908,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'transparent',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#FF9500',
@@ -1975,7 +1975,7 @@ Thank you for helping us improve PanHandler!
               <View style={{ marginBottom: 20, marginTop: 12 }}>
                 <View 
                   style={{
-                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    backgroundColor: 'transparent',
                     borderRadius: 20,
                     padding: 20,
                     shadowColor: '#007AFF',
@@ -2333,14 +2333,14 @@ Thank you for helping us improve PanHandler!
                 borderBottomLeftRadius: 32,
                 borderBottomRightRadius: 32,
                 overflow: 'hidden',
-                backgroundColor: 'rgba(255,255,255,0.85)',
+                backgroundColor: 'transparent',
               }}
             >
               <View
                 style={{
                   paddingVertical: 12,
                   paddingHorizontal: 24,
-                  backgroundColor: 'rgba(255,255,255,0.85)',
+                  backgroundColor: 'transparent',
                   borderTopWidth: 1,
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
