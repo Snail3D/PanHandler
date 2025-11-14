@@ -1911,7 +1911,7 @@ Thank you for helping us improve PanHandler!
 
               {/* Reference Photo Tool Section */}
               <ExpandableSection
-                title="📷 Reference Photo Tool"
+                title="🖨️ 3D Printed Tool"
                 icon="image"
                 color="#FF5722"
                 delay={500}
