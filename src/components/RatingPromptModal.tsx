@@ -11,6 +11,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 interface RatingPromptModalProps {
   visible: boolean;
@@ -21,6 +22,7 @@ interface RatingPromptModalProps {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function RatingPromptModal({ visible, onClose, onRate }: RatingPromptModalProps) {
+  const { t } = useTranslation();
   const scale = useSharedValue(0.8);
   const opacity = useSharedValue(0);
   
@@ -115,7 +117,7 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
               textAlign: 'center',
               marginBottom: 12
             }}>
-              Enjoying PanHandler?
+              {t('modals.ratingPrompt.title')}
             </Text>
 
             {/* Description */}
