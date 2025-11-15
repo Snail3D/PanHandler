@@ -3757,7 +3757,7 @@ export default function DimensionOverlay({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons name={stepBrothersMode ? "thumbs-up" : "checkmark-circle"} size={scaleIconSize(16)} color="white" />
             <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', marginLeft: scaleMargin(4) }}>
-              {stepBrothersMode ? "YEP!" : "Calibrated"}
+              {stepBrothersMode ? "YEP!" : t('dimensionOverlay.calibrated')}
             </Text>
           </View>
           <Text style={{
