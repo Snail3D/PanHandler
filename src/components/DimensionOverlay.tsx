@@ -7406,7 +7406,7 @@ export default function DimensionOverlay({
                 flex: 1,
                 paddingVertical: scalePadding(5),
                 borderRadius: scaleBorderRadius(9),
-                backgroundColor: isMapMode ? 'rgba(100, 150, 255, 0.25)' : 'rgba(120, 120, 128, 0.18)',
+                backgroundColor: isMapMode ? 'rgba(100, 150, 255, 0.25)' : 'rgba(120, 120, 128, 0.3)',
                 borderWidth: isMapMode ? 1.5 : 0,
                 borderColor: isMapMode ? 'rgba(100, 150, 255, 0.5)' : 'transparent',
                 paddingHorizontal: scalePadding(8),
