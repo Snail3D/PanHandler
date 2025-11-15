@@ -321,7 +321,7 @@ Thank you for helping us improve PanHandler!
       console.error('Error composing support email:', error);
       showAlert(
         'Error',
-        'Could not open email. Please email us at snailmail3d@gmail.com',
+        t('helpModal.emailError'),
         'error'
       );
     }
@@ -600,7 +600,7 @@ Thank you for helping us improve PanHandler!
                       textDecorationColor: '#FF2D55',
                       textDecorationStyle: 'solid',
                     }}>
-                      📹 PanHandler YouTube Course Here!
+                      {t('helpModal.youtubeCourseTip')}
                     </Text>
                   </Pressable>
                   
@@ -742,7 +742,7 @@ Thank you for helping us improve PanHandler!
                   
                   <View style={{ marginTop: 8, backgroundColor: 'rgba(0,0,0,0.08)', borderRadius: 10, padding: 10 }}>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', textAlign: 'center' }}>
-                      💡 Holding the shutter button helps ensure your photo is sharp and perfectly level!
+                      {t('helpModal.shutterButtonTip')}
                     </Text>
                   </View>
 
@@ -1260,10 +1260,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>🧲</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Magnetic Snapping
+                        {t('helpModal.magneticSnapping')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Points snap to nearby existing points (7mm range) when moving, making precise alignment easy
+                        {t('helpModal.magneticSnappingDesc')}
                       </Text>
                     </View>
                   </View>
@@ -1628,7 +1628,7 @@ Thank you for helping us improve PanHandler!
                     borderLeftColor: '#0066FF',
                   }}>
                     <Text style={{ fontSize: 13, color: '#0066FF', fontWeight: '600', marginBottom: 4 }}>
-                      💡 Pro Tip
+                      💡 {t('helpModal.proTipLabel')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
                       {t('helpModal.mapModeProTip')}
