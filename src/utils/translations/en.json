@@ -266,7 +266,12 @@
     "lassoModeTitle": "LASSO MODE - Close the loop!",
     "lassoModeSnap": "When you draw close to your starting point, it auto-snaps to close the loop! You will feel haptic feedback when it connects.",
     "lassoModeArea": "Closed loops show both perimeter AND area in the legend!",
-    "freehandHowToUse": "How to use:"
+    "freehandHowToUse": "How to use:",
+    "freehandStep1": "Select the Free Draw tool",
+    "freehandStep2": "Place finger and hold for 1.5 seconds",
+    "freehandStep3": "Draw your path",
+    "freehandStep4": "Release to complete",
+    "freehandGreatFor": "Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!"
   },
   
   "battlingBots": {
