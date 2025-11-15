@@ -12,6 +12,7 @@ import { Svg, Line, Circle, Path, Rect } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
 import AlertModal from './AlertModal';
+import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -182,6 +183,9 @@ const ExpandableSection = ({
 // Removed: ComparisonRow component - Free vs Pro system no longer exists
 
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
+  // Initialize i18n translation hook
+  const { t } = useTranslation();
+  
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!

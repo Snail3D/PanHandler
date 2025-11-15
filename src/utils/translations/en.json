@@ -61,6 +61,8 @@
   
   "dimensionOverlay": {
     "calibrated": "Calibrated",
+    "supporter": "Supporter",
+    "panhandlerSupporter": "PanHandler Supporter",
     "recalibrateButton": "Recalibrate",
     "panMode": "Pan Mode - Move/zoom image",
     "editMode": "Edit Mode - Move measurements",  
@@ -78,7 +80,48 @@
     "locked": "Pan/Zoom locked - tap Edit to move measurements",
     "emailSent": "Email prepared!",
     "imageSaved": "Saved to Photos!",
-    "measurements": "Measurements"
+    "measurements": "Measurements",
+    "newPhoto": "New Photo",
+    "mapMode": "Map Mode",
+    "blueprintMode": "Blueprint Mode"
+  },
+  
+  "modals": {
+    "labelModal": {
+      "title": "Label Measurement",
+      "enterLabel": "Enter label (optional)",
+      "enterDepth": "Enter depth (optional)",
+      "done": "Done",
+      "cancel": "Cancel"
+    },
+    "verbalScaleModal": {
+      "title": "Map Scale",
+      "description": "Enter the map scale",
+      "screenDistance": "Screen distance",
+      "realDistance": "Real distance",
+      "apply": "Apply",
+      "cancel": "Cancel"
+    },
+    "blueprintModal": {
+      "title": "Known Distance",
+      "description": "Measure a known reference distance",
+      "enterDistance": "Enter real-world distance",
+      "apply": "Apply",
+      "cancel": "Cancel"
+    },
+    "emailPrompt": {
+      "title": "Name Your Measurement",
+      "placeholder": "e.g., Arduino Case",
+      "send": "Send Email",
+      "cancel": "Cancel"
+    },
+    "photoTypeSelection": {
+      "title": "Choose Calibration Method",
+      "coin": "Coin",
+      "map": "Map Scale",
+      "blueprint": "Blueprint/Known Scale",
+      "aerial": "Aerial/Drone Photo"
+    }
   },
   
   "helpModal": {
