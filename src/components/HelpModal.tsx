@@ -954,13 +954,13 @@ Thank you for helping us improve PanHandler!
                       />
                     </Svg>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Freehand Mode (Free Measure)
+                      {t('helpModal.freehandMode')}
                     </Text>
                   </View>
                   
                   
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
-                    Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.
+                    {t('helpModal.freehandDescription')}
                   </Text>
                   
                   {/* Lasso Mode Feature */}
@@ -968,14 +968,14 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                       <Text style={{ fontSize: 16, marginRight: 6 }}>🎯</Text>
                       <Text style={{ fontSize: 14, color: '#2E7D32', fontWeight: '700' }}>
-                        LASSO MODE - Close the loop!
+                        {t('helpModal.lassoModeTitle')}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 6 }}>
-                      When you draw close to your starting point, it <Text style={{ fontWeight: '600' }}>auto-snaps</Text> to close the loop! You will feel haptic feedback when it connects.
+                      {t('helpModal.lassoModeSnap')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', lineHeight: 19 }}>
-                      ✨ Closed loops show both <Text style={{ fontWeight: '800' }}>perimeter AND area</Text> in the legend!
+                      ✨ {t('helpModal.lassoModeArea')}
                     </Text>
                   </View>
                   
