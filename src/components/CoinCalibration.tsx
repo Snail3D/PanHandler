@@ -12,6 +12,7 @@ import useStore from '../state/measurementStore';
 import TouchOverlayFingerprints from './TouchOverlayFingerprints';
 import { extractDroneMetadata, DroneMetadata } from '../utils/droneEXIF';
 import { CoinIcon } from './CalibrationIcons';
+import { useTranslation } from 'react-i18next';
 import {
   scaleFontSize,
   scalePadding,
@@ -69,6 +70,9 @@ export default function CoinCalibration({
   onCancel,
   onHelp,
 }: CoinCalibrationProps) {
+  // Initialize i18n translation hook
+  const { t } = useTranslation();
+  
   const insets = useSafeAreaInsets();
   const hasSeenPinchTutorial = useStore((s) => s.hasSeenPinchTutorial);
   const setHasSeenPinchTutorial = useStore((s) => s.setHasSeenPinchTutorial);
