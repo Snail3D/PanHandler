@@ -758,11 +758,11 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                       <Ionicons name="albums" size={18} color="#5856D6" />
                       <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
-                        Smart Photo Organization
+                        {t('helpModal.smartPhotoOrganization')}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      Auto-captured photos are automatically saved to both your Camera Roll AND a special "Auto-Leveled" album in Photos for easy access!
+                      {t('helpModal.autoCapturedSaved')}
                     </Text>
                   </View>
                 </View>
