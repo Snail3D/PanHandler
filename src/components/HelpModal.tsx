@@ -13,6 +13,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
 import AlertModal from './AlertModal';
 import { useTranslation } from 'react-i18next';
+import { getCurrentRTL } from '../utils/i18n';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -185,6 +186,9 @@ const ExpandableSection = ({
 export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Initialize i18n translation hook
   const { t } = useTranslation();
+  
+  // Check if current language is RTL
+  const isRTL = getCurrentRTL();
   
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
@@ -469,8 +473,8 @@ Thank you for helping us improve PanHandler!
             >
                   <ScrollView
                     ref={modalContentRef}
-                    style={{ flex: 1 }}
-                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
+                    style={{ flex: 1, direction: isRTL ? 'rtl' : 'ltr' }}
+                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40), direction: isRTL ? 'rtl' : 'ltr' }}
                     showsVerticalScrollIndicator={true}
                     scrollEventThrottle={16}
                     scrollEnabled={true}

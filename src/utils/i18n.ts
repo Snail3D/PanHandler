@@ -67,36 +67,44 @@ export const DEFAULT_COINS_BY_LANGUAGE: Record<string, string> = {
   'th': '10 Baht'
 };
 
+// Languages that use RTL (right-to-left) layout
+export const RTL_LANGUAGES = ['ar', 'ur'];
+
+// Check if current language is RTL
+export const isRTL = (languageCode: string): boolean => {
+  return RTL_LANGUAGES.includes(languageCode);
+};
+
 // All supported languages with native names
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English', native: 'English' },
-  { code: 'es', name: 'Spanish', native: 'Español' },
-  { code: 'zh', name: 'Chinese', native: '中文' },
-  { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
-  { code: 'fr', name: 'French', native: 'Français' },
-  { code: 'ar', name: 'Arabic', native: 'العربية' },
-  { code: 'bn', name: 'Bengali', native: 'বাংলা' },
-  { code: 'ru', name: 'Russian', native: 'Русский' },
-  { code: 'pt', name: 'Portuguese', native: 'Português' },
-  { code: 'ur', name: 'Urdu', native: 'اردو' },
-  { code: 'id', name: 'Indonesian', native: 'Bahasa Indonesia' },
-  { code: 'de', name: 'German', native: 'Deutsch' },
-  { code: 'ja', name: 'Japanese', native: '日本語' },
-  { code: 'pl', name: 'Polish', native: 'Polski' },
-  { code: 'el', name: 'Greek', native: 'Ελληνικά' },
-  { code: 'sw', name: 'Swahili', native: 'Kiswahili' },
-  { code: 'mr', name: 'Marathi', native: 'मराठी' },
-  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
-  { code: 'tr', name: 'Turkish', native: 'Türkçe' },
-  { code: 'ko', name: 'Korean', native: '한국어' },
-  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
-  { code: 'ha', name: 'Hausa', native: 'Hausa' },
-  { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
-  { code: 'fil', name: 'Filipino', native: 'Filipino' },
-  { code: 'am', name: 'Amharic', native: 'አማርኛ' },
-  { code: 'my', name: 'Burmese', native: 'မြန်မာ' },
-  { code: 'th', name: 'Thai', native: 'ไทย' }
+  { code: 'en', name: 'English', native: 'English', rtl: false },
+  { code: 'es', name: 'Spanish', native: 'Español', rtl: false },
+  { code: 'zh', name: 'Chinese', native: '中文', rtl: false },
+  { code: 'hi', name: 'Hindi', native: 'हिन्दी', rtl: false },
+  { code: 'fr', name: 'French', native: 'Français', rtl: false },
+  { code: 'ar', name: 'Arabic', native: 'العربية', rtl: true },
+  { code: 'bn', name: 'Bengali', native: 'বাংলা', rtl: false },
+  { code: 'ru', name: 'Russian', native: 'Русский', rtl: false },
+  { code: 'pt', name: 'Portuguese', native: 'Português', rtl: false },
+  { code: 'ur', name: 'Urdu', native: 'اردو', rtl: true },
+  { code: 'id', name: 'Indonesian', native: 'Bahasa Indonesia', rtl: false },
+  { code: 'de', name: 'German', native: 'Deutsch', rtl: false },
+  { code: 'ja', name: 'Japanese', native: '日本語', rtl: false },
+  { code: 'pl', name: 'Polish', native: 'Polski', rtl: false },
+  { code: 'el', name: 'Greek', native: 'Ελληνικά', rtl: false },
+  { code: 'sw', name: 'Swahili', native: 'Kiswahili', rtl: false },
+  { code: 'mr', name: 'Marathi', native: 'मराठी', rtl: false },
+  { code: 'te', name: 'Telugu', native: 'తెలుగు', rtl: false },
+  { code: 'tr', name: 'Turkish', native: 'Türkçe', rtl: false },
+  { code: 'ko', name: 'Korean', native: '한국어', rtl: false },
+  { code: 'ta', name: 'Tamil', native: 'தமிழ்', rtl: false },
+  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt', rtl: false },
+  { code: 'ha', name: 'Hausa', native: 'Hausa', rtl: false },
+  { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', rtl: false },
+  { code: 'fil', name: 'Filipino', native: 'Filipino', rtl: false },
+  { code: 'am', name: 'Amharic', native: 'አማርኛ', rtl: false },
+  { code: 'my', name: 'Burmese', native: 'မြန်မာ', rtl: false },
+  { code: 'th', name: 'Thai', native: 'ไทย', rtl: false }
 ];
 
 // Initialize i18n
@@ -167,6 +175,12 @@ export const changeLanguage = async (languageCode: string) => {
 export const getDefaultCoin = (): string => {
   const currentLang = i18n.language.split('-')[0];
   return DEFAULT_COINS_BY_LANGUAGE[currentLang] || 'US Quarter';
+};
+
+// Get RTL status for current language
+export const getCurrentRTL = (): boolean => {
+  const currentLang = i18n.language.split('-')[0];
+  return isRTL(currentLang);
 };
 
 initI18n();
