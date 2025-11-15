@@ -311,7 +311,15 @@
     "proTip3": "Use cursor guide - Measurement cursor appears above your finger for precise placement",
     "proTip4": "Edit after placing - Move measurements or adjust individual points while in Edit mode",
     "proTip5": "Quick delete - Tap any measurement (in edit mode) 4 times rapidly to delete it",
-    "stressTestTitle": "Add as many points as you want - you can't break it!"
+    "stressTestTitle": "Add as many points as you want - you can't break it!",
+    "cameraIssues": "Camera Issues",
+    "photosNotSaving": "Photos not saving or app freezing? Your device storage may be full. Delete old photos and videos from your Photos app to free up space. iOS needs available storage to process new images.",
+    "performanceIssues": "Performance Issues",
+    "appRunningSlow": "App running slowly? Check your device storage. A full device can cause lag and freezing. Aim to keep at least 1-2 GB of free space.",
+    "appRestart": "App Restart",
+    "stillHavingIssues": "Still having issues? Force-quit the app (swipe up from app switcher) and reopen. If problems persist, delete and reinstall the app for a fresh start.",
+    "sendBugReport": "Send Bug Report",
+    "havingTrouble": "Having trouble? Our support team is here to help!"
   },
   
   "battlingBots": {
