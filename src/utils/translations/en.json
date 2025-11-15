@@ -217,7 +217,17 @@
     "videoCoursesTitle": "Video Courses",
     "step1Title": "Step 1: Take a Perfect Photo",
     "step2Title": "Step 2: Calibrate with Coin",
-    "step3Title": "Step 3: Place Measurements"
+    "step3Title": "Step 3: Place Measurements",
+    "volumeTitle": "Volume Calculation",
+    "navigationTitle": "Navigation & Controls",
+    "moveEditTitle": "Move & Edit Measurements",
+    "saveShareTitle": "Save & Share",
+    "emailWorkflowTitle": "Email Workflow Guide",
+    "advancedTitle": "Advanced Features",
+    "mapModeTitle": "Map Mode",
+    "proTipsTitle": "Pro Tips",
+    "troubleshootingTitle": "Troubleshooting",
+    "cadIntegrationTitle": "Export & CAD Integration"
   },
   
   "battlingBots": {

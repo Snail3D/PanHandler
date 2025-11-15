@@ -548,7 +548,7 @@ Thank you for helping us improve PanHandler!
               {/* Video Course Section - NEW! */}
               <ExpandableSection
                 icon="play-circle"
-                title="🎬 Video Courses"
+                title={`🎬 ${t('helpModal.videoCoursesTitle')}`}
                 color="#666"
               >
                 <View style={{ marginLeft: 4 }}>
@@ -997,7 +997,7 @@ Thank you for helping us improve PanHandler!
               {/* Volume Calculation */}
               <ExpandableSection
                 icon="cube"
-                title="📦 Volume Calculation"
+                title={`📦 ${t('helpModal.volumeTitle')}`}
                 color="#666"
                 delay={250}
               >
@@ -1053,7 +1053,7 @@ Thank you for helping us improve PanHandler!
               {/* Controls & Navigation */}
               <ExpandableSection
                 icon="navigate-circle"
-                title="🎮 Navigation & Controls"
+                title={`🎮 ${t('helpModal.navigationTitle')}`}
                 color="#666"
                 delay={300}
 
@@ -1167,7 +1167,7 @@ Thank you for helping us improve PanHandler!
               {/* Move & Edit Mode */}
               <ExpandableSection
                 icon="move"
-                title="✏️ Move & Edit Measurements"
+                title={`✏️ ${t('helpModal.moveEditTitle')}`}
                 color="#666"
                 delay={350}
 
@@ -1269,7 +1269,7 @@ Thank you for helping us improve PanHandler!
               {/* Export Features */}
               <ExpandableSection
                 icon="download"
-                title="💾 Save & Share"
+                title={`💾 ${t('helpModal.saveShareTitle')}`}
                 color="#5856D6"
                 delay={400}
 
@@ -1356,7 +1356,7 @@ Thank you for helping us improve PanHandler!
 
               {/* Email Workflow - Expandable */}
               <ExpandableSection
-                title="📧 Email Workflow Guide"
+                title={`📧 ${t('helpModal.emailWorkflowTitle')}`}
                 icon="mail"
                 color="#666"
                 delay={450}
@@ -1413,7 +1413,7 @@ Thank you for helping us improve PanHandler!
 
               {/* CAD Import Tutorial - Expandable */}
               <ExpandableSection
-                title="🔧 CAD Import Guide"
+                title={`🔧 ${t('helpModal.cadIntegrationTitle')}`}
                 icon="construct"
                 color="#666"
                 delay={500}
@@ -1511,7 +1511,7 @@ Thank you for helping us improve PanHandler!
 
               <ExpandableSection
                 icon="map"
-                title="🗺️ Map Mode"
+                title={`🗺️ ${t('helpModal.mapModeTitle')}`}
                 color="#666"
                 delay={550}
 
@@ -1643,7 +1643,7 @@ Thank you for helping us improve PanHandler!
               {/* Pro Tips */}
               <ExpandableSection
                 icon="bulb"
-                title="💡 Pro Tips"
+                title={`💡 ${t('helpModal.proTipsTitle')}`}
                 color="#00C7BE"
                 delay={600}
 
@@ -1711,7 +1711,7 @@ Thank you for helping us improve PanHandler!
               {/* Troubleshooting Section */}
               <ExpandableSection
                 icon="warning"
-                title="🔧 Troubleshooting"
+                title={`🔧 ${t('helpModal.troubleshootingTitle')}`}
                 color="#666"
                 delay={650}
 
