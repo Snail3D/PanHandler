@@ -481,6 +481,66 @@ Thank you for helping us improve PanHandler!
                     alwaysBounceVertical={false}
                     scrollToOverflowEnabled={true}
                   >
+              {/* Language Selector for PDF Guide */}
+              <View style={{ marginBottom: 20 }}>
+                <Text style={{ 
+                  fontSize: 16, 
+                  fontWeight: '700', 
+                  color: '#1C1C1E', 
+                  textAlign: 'center',
+                  marginBottom: 12 
+                }}>
+                  📄 PDF Guide Languages
+                </Text>
+                <View style={{ 
+                  flexDirection: 'row', 
+                  flexWrap: 'wrap', 
+                  justifyContent: 'center',
+                  gap: 8,
+                  paddingHorizontal: 4
+                }}>
+                  {[
+                    { code: 'en', flag: '🇺🇸', name: 'English' },
+                    { code: 'es', flag: '🇪🇸', name: 'Español' }
+                  ].map((lang) => (
+                    <Pressable
+                      key={lang.code}
+                      onPress={async () => {
+                        try {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                          await generatePdfGuide(lang.code);
+                        } catch (error) {
+                          console.error('Error generating PDF:', error);
+                          showAlert('Error', \`Failed to generate PDF guide in \${lang.name}. Please try again.\`, 'error');
+                        }
+                      }}
+                      style={({ pressed }) => ({
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: 8,
+                        backgroundColor: pressed ? 'rgba(0, 122, 255, 0.15)' : 'rgba(0, 122, 255, 0.08)',
+                        borderWidth: 1,
+                        borderColor: 'rgba(0, 122, 255, 0.2)',
+                      })}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '600' }}>
+                        {lang.flag} {lang.name}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+                <Text style={{ 
+                  fontSize: 11, 
+                  color: '#8E8E93', 
+                  textAlign: 'center',
+                  marginTop: 8,
+                  fontStyle: 'italic'
+                }}>
+                  More languages coming soon...
+                </Text>
+              </View>
+              
               {/* Video Course Section - NEW! */}
               <ExpandableSection
                 icon="play-circle"
