@@ -1187,10 +1187,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>👆</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Move Measurements
+                        {t('helpModal.moveMeasurements')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Tap and drag circles, rectangles, or freehand paths to move them around
+                        {t('helpModal.moveDesc')}
                       </Text>
                     </View>
                   </View>
@@ -1200,10 +1200,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>🎯</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Edit Points
+                        {t('helpModal.editPoints')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Tap and drag any point to adjust measurements. Freehand paths can be reshaped by moving individual points!
+                        {t('helpModal.editPointsDesc')}
                       </Text>
                     </View>
                   </View>
@@ -1222,14 +1222,14 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                       <Text style={{ fontSize: 18, marginRight: 8 }}>🏷️</Text>
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6' }}>
-                        Add Custom Labels
+                        {t('helpModal.addCustomLabels')}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
-                      <Text style={{ fontWeight: '600' }}>Enable "Edit labels" mode:</Text> Tap the "Edit labels" button in the legend, then tap any measurement label (the colored badge with numbers) to add or edit custom names
+                      {t('helpModal.enableEditLabels')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#6E6E73', lineHeight: 19, fontStyle: 'italic' }}>
-                      Labels appear on saved photos and in email reports
+                      {t('helpModal.labelsAppearOnSaves')}
                     </Text>
                   </View>
 
@@ -1247,11 +1247,11 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                       <Text style={{ fontSize: 18, marginRight: 8 }}>🗑️</Text>
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#FF2D55' }}>
-                        Quick Delete: 4 Rapid Taps
+                        {t('helpModal.quickDelete')}
                       </Text>
                     </View>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                      Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!
+                      {t('helpModal.tap4TimesDelete')}
                     </Text>
                   </View>
 
