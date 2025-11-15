@@ -77,7 +77,7 @@ See PanHandler in action! Watch how easy it is to measure anything with just you
 
 ## 🎯 What is PanHandler?
 
-PanHandler turns your iPhone camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, volumes, and more with CAD-level precision.
+PanHandler turns almost any smartphone's camera into a professional measurement tool using coin-based calibration and advanced computer vision. Measure distances, angles, areas, volumes, and more with CAD-level precision.
 
 **From a can of Coke to an ocean — measure anything in between.**
 
