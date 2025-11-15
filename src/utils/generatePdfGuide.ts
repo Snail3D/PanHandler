@@ -330,7 +330,7 @@ export async function generatePdfGuide(): Promise<void> {
             <div class="subsection">
               <p><strong>Camera Screen:</strong></p>
               <div class="bullet-point">• <strong>Photo Library</strong> (bottom-left): Import existing photo</div>
-              <div class="bullet-point">• <strong>Scale Mode Button</strong> (bottom-left, three icons): Choose Map/Blueprint/Aerial calibration</div>
+              <div class="bullet-point">• <strong>Scale Mode Button</strong> (bottom-left, three icons): Choose Map/Blueprint (choose 2 known points)</div>
               <div class="bullet-point">• <strong>Shutter Button</strong>: Tap to capture, or hold for auto-capture when aligned</div>
               <div class="bullet-point">• <strong>Flash</strong> (top-right): Toggle torch light</div>
               <div class="bullet-point">• <strong>Help</strong> (top-right): Open this guide</div>
@@ -434,7 +434,6 @@ export async function generatePdfGuide(): Promise<void> {
               <p><strong>Alternative Calibration Methods:</strong></p>
               <div class="bullet-point">• <strong>Map Mode</strong>: Use map scale (e.g., "1 inch = 10 miles")</div>
               <div class="bullet-point">• <strong>Blueprint Mode</strong>: Enter known distance between two points</div>
-              <div class="bullet-point">• <strong>Aerial/Drone Mode</strong>: Use altitude data from drone photos (reads XMP metadata)</div>
             </div>
             
             <div class="tip-box">
