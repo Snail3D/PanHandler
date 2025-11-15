@@ -271,7 +271,21 @@
     "freehandStep2": "Place finger and hold for 1.5 seconds",
     "freehandStep3": "Draw your path",
     "freehandStep4": "Release to complete",
-    "freehandGreatFor": "Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!"
+    "freehandGreatFor": "Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!",
+    "panZoomMode": "Pan/Zoom Mode",
+    "pinchZoomDrag": "Pinch to zoom, drag to pan",
+    "measureMode": "Measure Mode",
+    "tapPlacePrecision": "Tap to place points with precision cursor",
+    "precisionCursor": "Precision Cursor",
+    "precisionCursorDesc": "Floating crosshair shows exactly where points will be placed",
+    "colorCoded": "Color-Coded",
+    "eachMeasurementColor": "Each measurement gets a unique color",
+    "hideLabels": "Hide Labels",
+    "hideLabelsDesc": "Toggle measurement labels off to view your photo clearly. Legend stays visible for reference",
+    "menuControls": "Menu Controls",
+    "swipeRightCollapse": "Swipe right anywhere on menu to collapse it off-screen",
+    "swipeLeftExpand": "Swipe left to bring it back",
+    "tapCollapseIcon": "Or tap the collapse icon in the menu header"
   },
   
   "battlingBots": {
