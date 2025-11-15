@@ -305,7 +305,13 @@
     "referencePhoto": "Reference Photo - Clean with scale info",
     "emailReports": "Email Reports - All photos + data",
     "organizedMeasurements": "Organized Measurements",
-    "savedToAlbum": "All saved measurements are automatically organized into a \"PanHandler Measurements\" album in your Photos app for easy access and sharing!"
+    "savedToAlbum": "All saved measurements are automatically organized into a \"PanHandler Measurements\" album in your Photos app for easy access and sharing!",
+    "proTip1": "Auto-save enabled - Minimize the app anytime, resume your session later",
+    "proTip2": "Switch units anytime - Toggle between metric ⇄ imperial instantly",
+    "proTip3": "Use cursor guide - Measurement cursor appears above your finger for precise placement",
+    "proTip4": "Edit after placing - Move measurements or adjust individual points while in Edit mode",
+    "proTip5": "Quick delete - Tap any measurement (in edit mode) 4 times rapidly to delete it",
+    "stressTestTitle": "Add as many points as you want - you can't break it!"
   },
   
   "battlingBots": {

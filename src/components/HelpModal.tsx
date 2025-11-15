@@ -1655,19 +1655,19 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Minimize the app anytime, resume your session later
+                    💾 {t('helpModal.proTip1')}
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🔄 <Text style={{ fontWeight: '600' }}>Switch units anytime</Text> - Toggle between metric ⇄ imperial instantly
+                    🔄 {t('helpModal.proTip2')}
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🎯 <Text style={{ fontWeight: '600' }}>Use cursor guide</Text> - Measurement cursor appears above your finger for precise placement
+                    🎯 {t('helpModal.proTip3')}
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points while in Edit mode
+                    ✏️ {t('helpModal.proTip4')}
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
+                    🗑️ {t('helpModal.proTip5')}
                   </Text>
                 </View>
                 
@@ -1688,7 +1688,7 @@ Thank you for helping us improve PanHandler!
                     marginBottom: 10,
                     letterSpacing: -0.3,
                   }}>
-                    🚀 Add as many points as you want - you can't break it!
+                    🚀 {t('helpModal.stressTestTitle')}
                   </Text>
                   <Image 
                     source={{ uri: 'https://images.composerapi.com/93039A99-47C5-414B-80B6-3CF31EECDF86.jpg' }}
