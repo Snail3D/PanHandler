@@ -2342,6 +2342,12 @@ export default function CameraScreen() {
           }}
           sessionColor={crosshairColor}
         />
+
+        {/* Help Modal - Camera Mode */}
+        <HelpModal
+          visible={showHelpModal}
+          onClose={() => setShowHelpModal(false)}
+        />
       </View>
     );
   }
