@@ -9,7 +9,7 @@
 **Latest Version: 7.8**
 
 ### iOS (App Store)
-👉 **[Download from the App Store](https://apps.apple.com/us/app/panhandler/id6754727828)**
+👉 **[Download from the App Store](https://apps.apple.com/app/id6754727828)**
 
 PanHandler is now available on the App Store! Get the official release for iPhone and iPad.
 
