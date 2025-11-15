@@ -358,9 +358,8 @@ export async function generatePdfGuide(): Promise<void> {
             <div class="subsection">
               <p><strong>Moving Measurement Points:</strong></p>
               <div class="bullet-point">1. Tap <strong>Pan/Edit</strong> button (shows "Edit" when points exist)</div>
-              <div class="bullet-point">2. Tap a measurement to select it (turns yellow)</div>
-              <div class="bullet-point">3. Drag any point to reposition</div>
-              <div class="bullet-point">4. Values update in real-time</div>
+              <div class="bullet-point">2. Drag any point to reposition</div>
+              <div class="bullet-point">3. Values update in real-time</div>
             </div>
             
             <div class="subsection">
