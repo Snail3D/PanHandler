@@ -1663,6 +1663,7 @@ export default function CameraScreen() {
   // Camera Mode
   if (mode === 'camera') {
     return (
+      <>
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
           <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
@@ -2342,13 +2343,14 @@ export default function CameraScreen() {
           }}
           sessionColor={crosshairColor}
         />
-
-        {/* Help Modal - Camera Mode */}
-        <HelpModal
-          visible={showHelpModal}
-          onClose={() => setShowHelpModal(false)}
-        />
       </View>
+
+      {/* Help Modal - Camera Mode (outside View for proper z-index) */}
+      <HelpModal
+        visible={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
+      </>
     );
   }
 
