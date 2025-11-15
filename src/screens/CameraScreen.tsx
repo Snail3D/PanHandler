@@ -2351,6 +2351,7 @@ export default function CameraScreen() {
   const displayImageUri = capturedPhotoUri || currentImageUri;
   
   return (
+    <>
     <Animated.View style={[{ flex: 1, backgroundColor: 'black' }, screenTransitionStyle]}>
       {displayImageUri && (
         <>
@@ -2504,12 +2505,6 @@ export default function CameraScreen() {
         </>
       )}
 
-      {/* Help Modal */}
-      <HelpModal
-        visible={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
-
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
       
@@ -2545,5 +2540,12 @@ export default function CameraScreen() {
       />
 
     </Animated.View>
+
+    {/* Help Modal - Rendered outside animated view to avoid z-index issues */}
+    <HelpModal
+      visible={showHelpModal}
+      onClose={() => setShowHelpModal(false)}
+    />
+    </>
   );
 }
