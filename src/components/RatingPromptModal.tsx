@@ -128,7 +128,7 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
               lineHeight: 24,
               marginBottom: 28
             }}>
-              Your feedback helps us improve and reach more users who need precise measurements!
+              {t('modals.ratingPrompt.message')}
             </Text>
 
             {/* Buttons */}
@@ -154,7 +154,7 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
                     fontSize: 17, 
                     fontWeight: '600',
                   }}>
-                    Rate on App Store ⭐️
+                    {t('modals.ratingPrompt.rateButton')}
                   </Text>
                 </View>
               </AnimatedPressable>
@@ -174,7 +174,7 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
-                  Maybe Later
+                  {t('modals.ratingPrompt.maybeLater')}
                 </Text>
               </Pressable>
             </View>
