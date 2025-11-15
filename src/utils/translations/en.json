@@ -87,7 +87,22 @@
     "area": "A",
     "volume": "V",
     "perimeter": "P",
-    "diameter": "Ø"
+    "diameter": "Ø",
+    "instructionDistance1": "Tap to place first point",
+    "instructionDistance2": "Tap to place second point",
+    "instructionAngle1": "Tap to place vertex (middle point)",
+    "instructionAngle2": "Tap to place first arm",
+    "instructionAngle3": "Tap to place second arm",
+    "instructionCircle1": "Tap to place center",
+    "instructionCircle2": "Tap to place edge",
+    "instructionRectangle1": "Tap first corner",
+    "instructionRectangle2": "Tap opposite corner",
+    "instructionFreehand": "Draw your path",
+    "instructionFreehandClose": "Close loop for area",
+    "tapToPlacePoint": "Tap to place point",
+    "dragToMove": "Drag to move",
+    "tapToEdit": "Tap to edit",
+    "doubleTapToLabel": "Double-tap to add label"
   },
   
   "units": {

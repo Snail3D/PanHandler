@@ -3,6 +3,7 @@ import { View, Text, Modal, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { CoinIcon, MapIcon, BlueprintIcon } from './CalibrationIcons';
+import { useTranslation } from 'react-i18next';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
