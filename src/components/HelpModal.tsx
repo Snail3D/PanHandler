@@ -1155,13 +1155,13 @@ Thank you for helping us improve PanHandler!
                         • {t('helpModal.swipeRightCollapse')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        • <Text style={{ fontWeight: '600' }}>Tap side tab</Text> to bring menu back
+                        • {t('helpModal.tapSideTab')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        • <Text style={{ fontWeight: '600' }}>Drag side tab up/down</Text> to reposition it
+                        • {t('helpModal.dragSideTab')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        • Menu collapses instantly for quick workspace access
+                        • {t('helpModal.menuCollapsesInstantly')}
                       </Text>
                     </View>
                   </View>
@@ -1178,7 +1178,7 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  After placing measurements, you can move and edit them while in Edit mode.
+                  {t('helpModal.afterPlacingMeasurements')}
                 </Text>
                 
                 <View style={{ gap: 12 }}>

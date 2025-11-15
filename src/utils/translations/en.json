@@ -285,7 +285,11 @@
     "menuControls": "Menu Controls",
     "swipeRightCollapse": "Swipe right anywhere on menu to collapse it off-screen",
     "swipeLeftExpand": "Swipe left to bring it back",
-    "tapCollapseIcon": "Or tap the collapse icon in the menu header"
+    "tapCollapseIcon": "Or tap the collapse icon in the menu header",
+    "tapSideTab": "Tap side tab to bring menu back",
+    "dragSideTab": "Drag side tab up/down to reposition it",
+    "menuCollapsesInstantly": "Menu collapses instantly for quick workspace access",
+    "afterPlacingMeasurements": "After placing measurements, you can move and edit them while in Edit mode."
   },
   
   "battlingBots": {
