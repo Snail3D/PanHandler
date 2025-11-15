@@ -6776,13 +6776,13 @@ export default function DimensionOverlay({
               }}
             >
               <View style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 borderRadius: scaleBorderRadius(20),
                 paddingHorizontal: scalePadding(10),
                 paddingTop: scalePadding(10),
                 paddingBottom: scalePadding(10),
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.4)',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
               }}>
 
                 {/* Header with undo button and hide menu on same line */}
@@ -6989,7 +6989,7 @@ export default function DimensionOverlay({
           {/* Re-added GestureDetector with careful configuration to avoid button lockups */}
           <GestureDetector gesture={modeSwitchGesture}>
             <View style={[{ marginBottom: scaleMargin(8) }]}>
-              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'transparent', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={(event) => {
