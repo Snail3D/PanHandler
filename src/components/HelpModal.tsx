@@ -1528,9 +1528,6 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    💡 <Text style={{ fontWeight: '600' }}>Calibration stays accurate</Text> - Zoom freely after placing, coordinates are stored in image space
-                  </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Minimize the app anytime, resume your session later
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
@@ -1542,11 +1539,8 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points while in Edit mode
                   </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
-                  </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                    🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
+                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
                   </Text>
                 </View>
                 
