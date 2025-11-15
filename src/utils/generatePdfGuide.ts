@@ -366,7 +366,7 @@ export async function generatePdfGuide(): Promise<void> {
             <div class="subsection">
               <p><strong>Adding Labels:</strong></p>
               <div class="bullet-point">• Double-tap any measurement</div>
-              <div class="bullet-point">• Enter custom label (e.g., "Width", "Height")</div>
+              <div class="bullet-point">• Enter measurement name/description</div>
               <div class="bullet-point">• For areas: optionally add depth for volume</div>
             </div>
             
