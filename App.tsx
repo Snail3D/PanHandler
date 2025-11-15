@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withDelay, withTiming, Easing } from "react-native-reanimated";
 import CameraScreen from "./src/screens/CameraScreen";
 import QuoteScreen from "./src/screens/QuoteScreen";
+import './src/utils/i18n'; // Initialize i18n on app startup
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE

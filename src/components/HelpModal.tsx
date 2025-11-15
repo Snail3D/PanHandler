@@ -2510,10 +2510,14 @@ Thank you for helping us improve PanHandler!
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                           const { changeLanguage } = await import('../utils/i18n');
                           await changeLanguage(lang.code);
-                          // TODO: Reload app or refresh components to show new language
-                          showAlert('Language Changed', `Language set to ${lang.label.split(' ')[1]}. Restart app to see changes.`, 'success');
+                          // Close and reopen modal to refresh with new language
+                          onClose();
+                          setTimeout(() => {
+                            showAlert('🌍 Language Changed', `App language set to ${lang.label.split(' ')[1]}`, 'success');
+                          }, 300);
                         } catch (error) {
                           console.error('Error changing language:', error);
+                          showAlert('Error', 'Failed to change language. Please try again.', 'error');
                         }
                       }}
                       style={{ color: '#007AFF', textDecorationLine: 'underline' }}
