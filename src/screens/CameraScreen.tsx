@@ -919,7 +919,7 @@ export default function CameraScreen() {
 
     // Priority 1: Too much motion
     if (motionSeverity > 0.6) {
-      newMessage = "Hold still";
+      newMessage = t('cameraScreen.holdSteady');
     }
     // Priority 2: Significant tilt
     else if (tiltSeverity > 0.4 && tiltAngle > 5) {
@@ -927,10 +927,10 @@ export default function CameraScreen() {
       const targetOrientation = absBeta < 45 ? 'horizontal' : 'vertical';
 
       if (targetOrientation === 'horizontal') {
-        if (currentBeta > 5) newMessage = "Tilt backward";
-        else if (currentBeta < -5) newMessage = "Tilt forward";
+        if (currentBeta > 5) newMessage = t('cameraScreen.tiltBackward') || "Tilt backward";
+        else if (currentBeta < -5) newMessage = t('cameraScreen.tiltForward') || "Tilt forward";
         else if (Math.abs(currentGamma) > 5) {
-          newMessage = currentGamma > 5 ? "Tilt left" : "Tilt right";
+          newMessage = currentGamma > 5 ? (t('cameraScreen.tiltLeft') || "Tilt left") : (t('cameraScreen.tiltRight') || "Tilt right");
         }
       } else {
         const verticalDiff = Math.abs(currentBeta) - 90;
