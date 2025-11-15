@@ -353,7 +353,22 @@
     "gettingStartedTutorials": "Getting started tutorials",
     "advancedTechniques": "Advanced measurement techniques",
     "realWorldWorkflow": "Real-world workflow examples",
-    "tipsAndTricks": "Tips & tricks for best results"
+    "tipsAndTricks": "Tips & tricks for best results",
+    "holdCameraPerpendicular": "Hold camera perpendicular (90°)",
+    "flatSurfacesDown": "Flat surfaces: Look straight down",
+    "verticalSurfaces": "Vertical surfaces: Face directly at walls/objects",
+    "distanceMatters": "Distance matters:",
+    "smallObjects": "Small objects: 18 inches (1.5 feet / 0.5m)",
+    "largeObjects": "Large objects: 6 feet (2 meters) or further",
+    "coinInCenter": "Coin in center of object",
+    "autoLevelHandsFree": "AUTO LEVEL - Hands-Free Capture",
+    "bubbleLevel": "BUBBLE LEVEL",
+    "positionObjectAutoCapture": "Position your object + coin in frame, then level phone to auto-capture",
+    "howItWorks": "How it works:",
+    "frameObjectCoin": "Frame your object with the coin",
+    "watchBubbleLevel": "Watch the bubble level crosshairs",
+    "levelPhoneCenterBubble": "Level your phone to center the bubble",
+    "holdDownShutter": "Hold down the shutter button until photo captures"
   },
   
   "battlingBots": {

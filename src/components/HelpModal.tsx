@@ -663,23 +663,23 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>📐</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Hold camera perpendicular (90°)</Text>{'\n'}
-                      • Flat surfaces: Look straight down{'\n'}
-                      • Vertical surfaces: Face directly at walls/objects
+                      <Text style={{ fontWeight: '600' }}>{t('helpModal.holdCameraPerpendicular')}</Text>{'\n'}
+                      • {t('helpModal.flatSurfacesDown')}{'\n'}
+                      • {t('helpModal.verticalSurfaces')}
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', marginBottom: 8, alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>📏</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Distance matters:</Text>{'\n'}
-                      • Small objects: 18 inches (1.5 feet / 0.5m){'\n'}
-                      • Large objects: 6 feet (2 meters) or further
+                      <Text style={{ fontWeight: '600' }}>{t('helpModal.distanceMatters')}</Text>{'\n'}
+                      • {t('helpModal.smallObjects')}{'\n'}
+                      • {t('helpModal.largeObjects')}
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                     <Text style={{ fontSize: 16, marginRight: 8 }}>🪙</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Coin in center of object</Text>
+                      <Text style={{ fontWeight: '600' }}>{t('helpModal.coinInCenter')}</Text>
                     </Text>
                   </View>
                 </View>
@@ -698,7 +698,7 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                     <Ionicons name="flash" size={22} color="#666" />
                     <Text style={{ fontSize: 16, fontWeight: '700', color: '#2E7D32', marginLeft: 6 }}>
-                      AUTO LEVEL - Hands-Free Capture
+                      {t('helpModal.autoLevelHandsFree')}
                     </Text>
                   </View>
                   
@@ -718,25 +718,25 @@ Thank you for helping us improve PanHandler!
                         shadowOpacity: 0.4,
                         shadowRadius: 8,
                       }}>
-                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#2E7D32' }}>BUBBLE LEVEL</Text>
+                        <Text style={{ fontSize: 17, fontWeight: '700', color: '#2E7D32' }}>{t('helpModal.bubbleLevel')}</Text>
                       </View>
                     </View>
                   </View>
                   
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 10, textAlign: 'center' }}>
-                    Position your object + coin in frame, then level phone to auto-capture
+                    {t('helpModal.positionObjectAutoCapture')}
                   </Text>
                   
                   {/* How it works */}
                   <View style={{ marginBottom: 12, paddingHorizontal: 8 }}>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
-                      <Text style={{ fontWeight: '700' }}>How it works:</Text>
+                      <Text style={{ fontWeight: '700' }}>{t('helpModal.howItWorks')}</Text>
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                      1. Frame your object with the coin{'\n'}
-                      2. Watch the bubble level crosshairs{'\n'}
-                      3. Level your phone to center the bubble{'\n'}
-                      4. Hold down the shutter button until photo captures
+                      1. {t('helpModal.frameObjectCoin')}{'\n'}
+                      2. {t('helpModal.watchBubbleLevel')}{'\n'}
+                      3. {t('helpModal.levelPhoneCenterBubble')}{'\n'}
+                      4. {t('helpModal.holdDownShutter')}
                     </Text>
                   </View>
                   
