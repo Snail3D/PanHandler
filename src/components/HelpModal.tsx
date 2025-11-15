@@ -720,10 +720,10 @@ Thank you for helping us improve PanHandler!
                     • Zoom in and position the calibration circle
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • <Text style={{ fontWeight: '600' }}>Align circle edges perfectly to cover the coin</Text> - Match the outer edge precisely
+                    • <Text style={{ fontWeight: '600' }}>Match the outside edge of the coin with the outside edge of the colored circle</Text>
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22 }}>
-                    • Tap "Lock In Calibration" when ready
+                    • Tap Lock in when aligned
                   </Text>
                 </View>
                 
