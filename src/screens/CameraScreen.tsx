@@ -28,6 +28,7 @@ import DroneIcon from '../components/DroneIcon';
 import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
+import { useTranslation } from 'react-i18next';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 import BlueprintPlacementModal from '../components/BlueprintPlacementModal';
 import BlueprintDistanceModal from '../components/BlueprintDistanceModal';
@@ -115,6 +116,9 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
 // This is the primary screen of the app after the opening quote (App.tsx)
 // ═══════════════════════════════════════════════════════════════
 export default function CameraScreen() {
+  // Initialize i18n translation hook
+  const { t } = useTranslation();
+  
   const { hasPermission, requestPermission } = useCameraPermission();
   // CRITICAL: Only request PHOTO permissions, NOT audio or video
   const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions({
@@ -2167,7 +2171,7 @@ export default function CameraScreen() {
                           textShadowRadius: scaleSize(6),
                         }}
                       >
-                        Capturing...
+                        {t('cameraScreen.capturing')}
                       </Text>
                     )}
                   </View>
