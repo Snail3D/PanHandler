@@ -13,7 +13,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import SnailIcon from './SnailIcon';
 import AlertModal from './AlertModal';
 import { useTranslation } from 'react-i18next';
-import { getCurrentRTL } from '../utils/i18n';
+import { getCurrentRTL, SUPPORTED_LANGUAGES } from '../utils/i18n';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -2595,41 +2595,7 @@ Thank you for helping us improve PanHandler!
                     🌍 {t('helpModal.selectLanguage')}
                   </Text>
                   <Text style={{ fontSize: 11, color: '#1C1C1E', lineHeight: 16, textAlign: 'center', flexWrap: 'wrap' }}>
-                    {[
-                      { code: 'en', label: 'EN English' },
-                      { code: 'es', label: 'ES Español' },
-                      { code: 'fr', label: 'FR Français' },
-                      { code: 'de', label: 'DE Deutsch' },
-                      { code: 'it', label: 'IT Italiano' },
-                      { code: 'pt', label: 'PT Português' },
-                      { code: 'ru', label: 'RU Русский' },
-                      { code: 'pl', label: 'PL Polski' },
-                      { code: 'tr', label: 'TR Türkçe' },
-                      { code: 'uk', label: 'UK Українська' },
-                      { code: 'vi', label: 'VI Tiếng Việt' },
-                      { code: 'id', label: 'ID Bahasa' },
-                      { code: 'jv', label: 'JV Basa Jawa' },
-                      { code: 'sw', label: 'SW Kiswahili' },
-                      { code: 'zh', label: 'ZH 中文' },
-                      { code: 'ja', label: 'JA 日本語' },
-                      { code: 'ko', label: 'KO 한국어' },
-                      { code: 'hi', label: 'HI हिन्दी' },
-                      { code: 'bn', label: 'BN বাংলা' },
-                      { code: 'mr', label: 'MR मराठी' },
-                      { code: 'ta', label: 'TA தமிழ்' },
-                      { code: 'te', label: 'TE తెలుగు' },
-                      { code: 'ar', label: 'AR العربية' },
-                      { code: 'ur', label: 'UR اردو' },
-                      { code: 'he', label: 'HE עברית' },
-                      { code: 'fa', label: 'FA فارسی' },
-                      { code: 'el', label: 'EL Ελληνικά' },
-                      { code: 'ha', label: 'HA Hausa' },
-                      { code: 'pa', label: 'PA ਪੰਜਾਬੀ' },
-                      { code: 'fil', label: 'FIL Filipino' },
-                      { code: 'am', label: 'AM አማርኛ' },
-                      { code: 'my', label: 'MY မြန်မာ' },
-                      { code: 'th', label: 'TH ไทย' },
-                    ].map((lang, index, array) => (
+                    {SUPPORTED_LANGUAGES.map((lang, index, array) => (
                       <Text
                         key={lang.code}
                         onPress={async () => {
@@ -2638,7 +2604,7 @@ Thank you for helping us improve PanHandler!
                             // Close and reopen modal to refresh with new language
                             onClose();
                             setTimeout(() => {
-                              showAlert('🌍 ' + t('helpModal.languageChanged'), `${lang.label}`, 'success');
+                              showAlert('🌍 ' + t('helpModal.languageChanged'), `${lang.native}`, 'success');
                             }, 300);
                           } catch (error) {
                             console.error('Error changing language:', error);
@@ -2647,7 +2613,7 @@ Thank you for helping us improve PanHandler!
                         }}
                         style={{ color: '#007AFF', textDecorationLine: 'underline', marginHorizontal: 2 }}
                       >
-                        {lang.label}{index < array.length - 1 ? ', ' : ''}
+                        {lang.code.toUpperCase()} {lang.native}{index < array.length - 1 ? ', ' : ''}
                       </Text>
                     ))}
                   </Text>
