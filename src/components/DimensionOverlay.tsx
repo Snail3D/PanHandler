@@ -921,7 +921,7 @@ export default function DimensionOverlay({
         // NOW open the video! 😂
         const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
         Linking.openURL(youtubeUrl).catch(err => {
-          showAlert('Error', 'Could not open video', 'error');
+          showAlert(t('common.error'), t('alerts.videoError') || 'Could not open video', 'error');
           console.error('Failed to open URL:', err);
         });
       }, 3200);
@@ -2940,14 +2940,14 @@ export default function DimensionOverlay({
 
   const performSave = async (label: string | null) => {
     if (!currentImageUri) {
-      showAlert('Export Error', 'No image to export. Please take a photo first.', 'error');
+      showAlert(t('common.error'), t('alerts.noImage') || 'No image to export. Please take a photo first.', 'error');
       return;
     }
 
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        showAlert('Permission Required', 'Please grant photo library access.', 'warning');
+        showAlert(t('alerts.permissionDenied'), t('alerts.photoLibraryPermissionNeeded'), 'warning');
         return;
       }
       
@@ -2956,7 +2956,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('View Error', 'View ref not available. Try again.', 'error');
+        showAlert(t('alerts.viewError'), t('alerts.viewError'), 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
@@ -2988,7 +2988,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during capture.', 'error');
+        showAlert(t('common.error'), t('alerts.viewError'), 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -3028,7 +3028,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      showAlert('Save Error', `${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      showAlert(t('alerts.saveError'), `${error instanceof Error ? error.message : t('common.error')}`, 'error');
     }
   };
 
@@ -3219,7 +3219,7 @@ export default function DimensionOverlay({
 
       // Show success message if email was sent
       if (result.status === 'sent') {
-        showAlert('Email Sent', 'Your measurements have been emailed successfully!', 'success');
+        showAlert(t('alerts.emailSent') || 'Email Sent', t('dimensionOverlay.emailSent'), 'success');
       }
 
     } catch (error) {

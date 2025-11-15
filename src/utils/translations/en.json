@@ -236,7 +236,16 @@
     "calibrationRequired": "Please calibrate with a coin first",
     "noMeasurements": "No measurements to save",
     "emailError": "Failed to prepare email",
-    "saveError": "Failed to save image"
+    "saveError": "Failed to save image",
+    "emailSent": "Email Sent",
+    "emailSuccess": "Your measurements have been emailed successfully!",
+    "imageSaved": "Images Saved",
+    "imagesSavedSuccess": "Images saved to your photo library!",
+    "videoError": "Could not open video",
+    "noImage": "No image to export. Please take a photo first.",
+    "viewError": "View not available. Try again.",
+    "exportError": "Export Error",
+    "permissionRequired": "Permission Required"
   },
   
   "quotes": {
