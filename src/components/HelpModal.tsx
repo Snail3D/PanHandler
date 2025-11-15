@@ -2428,7 +2428,7 @@ Thank you for helping us improve PanHandler!
                   textAlign: 'center',
                   marginBottom: 16,
                 }}>
-                  For the Nerds 🤓
+                  {t('helpModal.forTheNerds')} 🤓
                 </Text>
                 <Pressable
                   onPress={() => {
@@ -2458,7 +2458,7 @@ Thank you for helping us improve PanHandler!
                     fontWeight: '600',
                     color: 'white',
                   }}>
-                    See the Code
+                    {t('helpModal.seeTheCode')}
                   </Text>
                 </Pressable>
               </View>
