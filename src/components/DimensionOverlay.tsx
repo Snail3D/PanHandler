@@ -6989,7 +6989,7 @@ export default function DimensionOverlay({
           {/* Re-added GestureDetector with careful configuration to avoid button lockups */}
           <GestureDetector gesture={modeSwitchGesture}>
             <View style={[{ marginBottom: scaleMargin(8) }]}>
-              <View style={{ flexDirection: 'row', backgroundColor: 'transparent', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={(event) => {
