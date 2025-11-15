@@ -445,6 +445,8 @@ Thank you for helping us improve PanHandler!
                     nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
+                    directionalLockEnabled={false}
+                    alwaysBounceVertical={true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
