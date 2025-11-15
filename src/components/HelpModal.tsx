@@ -1959,7 +1959,15 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        Linking.openSettings();
+                        Linking.openSettings().catch(() => {
+                          // Fallback: Try to open general settings
+                          const url = Platform.OS === 'ios' 
+                            ? 'app-settings:' 
+                            : 'package:com.snail.panhandler';
+                          Linking.openURL(url).catch(() => {
+                            showAlert('Error', 'Could not open settings', 'error');
+                          });
+                        });
                       }}
                       style={({ pressed }) => ({
                         backgroundColor: pressed ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.1)',
