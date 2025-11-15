@@ -7033,7 +7033,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'rectangle' ? 4 : 0,
                   }}>
-                    Box
+                    {t('dimensionOverlay.rectangle')}
                   </Text>
                 </View>
               </Pressable>
@@ -7078,7 +7078,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'circle' ? 4 : 0,
                   }}>
-                    Circle
+                    {t('dimensionOverlay.circle')}
                   </Text>
                 </View>
               </Pressable>
@@ -7162,7 +7162,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'angle' ? 4 : 0,
                   }}>
-                    {isAzimuthMode ? 'Azimuth' : 'Angle'}
+                    {isAzimuthMode ? (t('dimensionOverlay.azimuth') || 'Azimuth') : t('dimensionOverlay.angle')}
                   </Text>
                 </View>
               </Pressable>
@@ -7244,7 +7244,7 @@ export default function DimensionOverlay({
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'distance' ? 4 : 0,
                   }}>
-                    Line
+                    {t('dimensionOverlay.distance')}
                   </Text>
                 </View>
               </Pressable>
@@ -7319,8 +7319,8 @@ export default function DimensionOverlay({
                     textShadowColor: mode === 'freehand' ? getCurrentModeColor().glow : 'transparent',
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: mode === 'freehand' ? 4 : 0,
-                  }}>
-                    Free
+  }}>
+                    {t('dimensionOverlay.freehand')}
                   </Text>
                 </View>
               </Pressable>
