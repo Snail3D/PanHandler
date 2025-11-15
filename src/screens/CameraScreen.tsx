@@ -29,6 +29,8 @@ import { CoinReference } from '../utils/coinReferences';
 import { VerbalScale } from '../state/measurementStore';
 import DiagnosticScreen from './DiagnosticScreen';
 import { useTranslation } from 'react-i18next';
+import { getCurrentRTL } from '../utils/i18n';
+import { formatNumber } from '../utils/i18nNumbers';
 import PhotoTypeSelectionModal, { PhotoType } from '../components/PhotoTypeSelectionModal';
 import BlueprintPlacementModal from '../components/BlueprintPlacementModal';
 import BlueprintDistanceModal from '../components/BlueprintDistanceModal';
@@ -117,7 +119,10 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
 // ═══════════════════════════════════════════════════════════════
 export default function CameraScreen() {
   // Initialize i18n translation hook
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // Check if current language is RTL
+  const isRTL = getCurrentRTL();
   
   const { hasPermission, requestPermission } = useCameraPermission();
   // CRITICAL: Only request PHOTO permissions, NOT audio or video
