@@ -7350,7 +7350,7 @@ export default function DimensionOverlay({
                     fontSize: scaleFontSize(10),
                     color: unitSystem === 'metric' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
-                    Metric
+                    {t('buttons.metric')}
                   </Text>
                 </View>
               </Pressable>
@@ -7372,7 +7372,7 @@ export default function DimensionOverlay({
                     fontSize: scaleFontSize(10),
                     color: unitSystem === 'imperial' ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                   }}>
-                    Imperial
+                    {t('buttons.imperial')}
                   </Text>
                 </View>
               </Pressable>
@@ -7446,7 +7446,7 @@ export default function DimensionOverlay({
                   fontSize: scaleFontSize(10),
                   color: isMapMode ? '#0066FF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  Map
+                  {t('dimensionOverlay.mapMode')}
                 </Text>
               </View>
             </Pressable>
