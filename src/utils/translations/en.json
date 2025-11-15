@@ -126,7 +126,12 @@
     "shareButton": "Share",
     "newPhotoButton": "New Photo",
     "recalibrateButtonText": "Recalibrate",
-    "swipeMenuToCollapse": "← Swipe menu to collapse →"
+    "swipeMenuToCollapse": "← Swipe menu to collapse →",
+    "editLabels": "Edit labels",
+    "show": "Show",
+    "hide": "Hide",
+    "undo": "Undo",
+    "clear": "Clear"
   },
   
   "units": {
