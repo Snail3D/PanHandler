@@ -41,19 +41,41 @@ Download the latest Android APK directly from GitHub. No app store required - ju
 
 Complete user guides available in 30 languages - perfect for students and international users!
 
-**Download PDF Guide:**
-- 🇺🇸 **EN** [English](https://github.com/Snail3D/PanHandler) | 🇪🇸 **ES** [Español](https://github.com/Snail3D/PanHandler) | 🇨🇳 **ZH** [中文](https://github.com/Snail3D/PanHandler) | 🇮🇳 **HI** [हिन्दी](https://github.com/Snail3D/PanHandler)
-- 🇫🇷 **FR** [Français](https://github.com/Snail3D/PanHandler) | 🇸🇦 **AR** [العربية](https://github.com/Snail3D/PanHandler) | 🇧🇩 **BN** [বাংলা](https://github.com/Snail3D/PanHandler) | 🇷🇺 **RU** [Русский](https://github.com/Snail3D/PanHandler)
-- 🇵🇹 **PT** [Português](https://github.com/Snail3D/PanHandler) | 🇵🇰 **UR** [اردو](https://github.com/Snail3D/PanHandler) | 🇮🇩 **ID** [Bahasa Indonesia](https://github.com/Snail3D/PanHandler) | 🇩🇪 **DE** [Deutsch](https://github.com/Snail3D/PanHandler)
-- 🇯🇵 **JA** [日本語](https://github.com/Snail3D/PanHandler) | 🇵🇱 **PL** [Polski](https://github.com/Snail3D/PanHandler) | 🇬🇷 **EL** [Ελληνικά](https://github.com/Snail3D/PanHandler) | 🇰🇪 **SW** [Kiswahili](https://github.com/Snail3D/PanHandler)
-- 🇮🇳 **MR** [मराठी](https://github.com/Snail3D/PanHandler) | 🇮🇳 **TE** [తెలుగు](https://github.com/Snail3D/PanHandler) | 🇹🇷 **TR** [Türkçe](https://github.com/Snail3D/PanHandler) | 🇰🇷 **KO** [한국어](https://github.com/Snail3D/PanHandler)
-- 🇮🇳 **TA** [தமிழ்](https://github.com/Snail3D/PanHandler) | 🇻🇳 **VI** [Tiếng Việt](https://github.com/Snail3D/PanHandler) | 🇳🇬 **HA** [Hausa](https://github.com/Snail3D/PanHandler) | 🇮🇳 **PA** [ਪੰਜਾਬੀ](https://github.com/Snail3D/PanHandler)
-- 🇵🇭 **FIL** [Filipino](https://github.com/Snail3D/PanHandler) | 🇪🇹 **AM** [አማርኛ](https://github.com/Snail3D/PanHandler) | 🇲🇲 **MY** [မြန်မာ](https://github.com/Snail3D/PanHandler) | 🇹🇭 **TH** [ไทย](https://github.com/Snail3D/PanHandler)
-- 🇮🇱 **HE** [עברית](https://github.com/Snail3D/PanHandler) | 🇮🇷 **FA** [فارسی](https://github.com/Snail3D/PanHandler)
+### 📥 Download PDF Guides
 
-💡 **Or generate from the app:** Tap Help (?) → PDF Guide → Choose your language
+**Row 1 - Major Languages:**
+- 🇺🇸 **EN** [English](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-EN-English.pdf) | 🇪🇸 **ES** [Español](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-ES-Espanol.pdf) | 🇫🇷 **FR** [Français](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-FR-French.pdf) | 🇩🇪 **DE** [Deutsch](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-DE-German.pdf)
 
-*Each guide includes region-appropriate coin examples and QR codes for quick downloads!*
+**Row 2 - European Languages:**
+- 🇵🇹 **PT** [Português](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-PT-Portuguese.pdf) | 🇷🇺 **RU** [Русский](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-RU-Russian.pdf) | 🇵🇱 **PL** [Polski](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-PL-Polish.pdf) | 🇬🇷 **EL** [Ελληνικά](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-EL-Greek.pdf)
+
+**Row 3 - Asian Languages (East & SE):**
+- 🇨🇳 **ZH** [中文](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-ZH-Chinese.pdf) | 🇯🇵 **JA** [日本語](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-JA-Japanese.pdf) | 🇰🇷 **KO** [한국어](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-KO-Korean.pdf) | 🇹🇷 **TR** [Türkçe](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-TR-Turkish.pdf)
+
+**Row 4 - South & SE Asian Languages:**
+- 🇮🇳 **HI** [हिन्दी](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-HI-Hindi.pdf) | 🇮🇳 **BN** [বাংলা](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-BN-Bengali.pdf) | 🇮🇳 **MR** [मराठी](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-MR-Marathi.pdf) | 🇮🇳 **TA** [தமிழ்](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-TA-Tamil.pdf)
+
+**Row 5 - South Asian (cont.) & SE Asian:**
+- 🇮🇳 **TE** [తెలుగు](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-TE-Telugu.pdf) | 🇮🇳 **PA** [ਪੰਜਾਬੀ](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-PA-Punjabi.pdf) | 🇮🇩 **ID** [Bahasa Indonesia](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-ID-Indonesian.pdf) | 🇵🇭 **FIL** [Filipino](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-FIL-Filipino.pdf)
+
+**Row 6 - SE Asian & Middle East:**
+- 🇻🇳 **VI** [Tiếng Việt](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-VI-Vietnamese.pdf) | 🇹🇭 **TH** [ไทย](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-TH-Thai.pdf) | 🇲🇲 **MY** [မြန်မာ](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-MY-Burmese.pdf) | 🇸🇦 **AR** [العربية](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-AR-Arabic.pdf)
+
+**Row 7 - Middle Eastern & African:**
+- 🇵🇰 **UR** [اردو](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-UR-Urdu.pdf) | 🇮🇱 **HE** [עברית](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-HE-Hebrew.pdf) | 🇮🇷 **FA** [فارسی](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-FA-Farsi.pdf) | 🇰🇪 **SW** [Kiswahili](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-SW-Swahili.pdf)
+
+**Row 8 - African Languages:**
+- 🇳🇬 **HA** [Hausa](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-HA-Hausa.pdf) | 🇪🇹 **AM** [አማርኛ](https://github.com/Snail3D/PanHandler/releases/download/pdf-guides-v1/PanHandler-Guide-AM-Amharic.pdf)
+
+### 📱 Or Generate from the App
+**Tap Help (?) → PDF Guide → Select your language**
+- No download needed - generate on demand in any supported language
+- Always up-to-date with latest app version
+- Available offline
+
+---
+
+*PDFs include region-appropriate coin examples, QR codes, and complete instructions in each language!*
 
 ---
 
