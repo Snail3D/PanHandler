@@ -1368,11 +1368,11 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Tap <Text style={{ fontWeight: '600', color: '#34C759' }}>Email</Text> to generate a report with 2 photos and a detailed measurement table.
+                  {t('helpModal.emailWorkflowDesc')}
                 </Text>
                 
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 8, fontWeight: '600' }}>
-                  Example Email Format
+                  {t('helpModal.exampleEmailFormat')}
                 </Text>
                 
                 <View style={{ backgroundColor: 'rgba(52,199,89,0.08)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(52,199,89,0.2)' }}>
@@ -1406,11 +1406,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Text style={{ fontSize: 16, marginRight: 6 }}>⚡</Text>
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6' }}>
-                      Pro Tip: Lightning Fast Workflow
+                      {t('helpModal.proTipFastWorkflow')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.
+                    {t('helpModal.shareVsEmail')}
                   </Text>
                 </View>
               </ExpandableSection>
@@ -1425,10 +1425,10 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
-                  Import to Any CAD Software
+                  {t('helpModal.importToCAD')}
                 </Text>
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 16 }}>
-                  Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images.
+                  {t('helpModal.useCADCanvas')}
                 </Text>
                 
                 <View style={{ marginBottom: 14 }}>

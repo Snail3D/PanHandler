@@ -326,7 +326,20 @@
     "bestForRoadMaps": "Best for: Road maps, topo maps, property maps with verbal scale",
     "knownScaleBlueprints": "Known Scale (Blueprints)",
     "bestForDroneBlueprints": "Best for: Drone photos, blueprints, floor plans, engineering drawings",
-    "toolsInMapMode": "Tools in Map Mode"
+    "toolsInMapMode": "Tools in Map Mode",
+    "emailWorkflowDesc": "Tap Email to generate a report with 2 photos and a detailed measurement table.",
+    "exampleEmailFormat": "Example Email Format",
+    "emailSubject": "Subject:",
+    "emailCalibration": "Calibration Reference:",
+    "emailUnitSystem": "Unit System:",
+    "emailMeasurements": "Measurements:",
+    "emailAttached": "Attached: 2 photos",
+    "emailFullPhoto": "Full measurements photo",
+    "emailCADCanvas": "Transparent CAD canvas (50% opacity)",
+    "proTipFastWorkflow": "Pro Tip: Lightning Fast Workflow",
+    "shareVsEmail": "Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.",
+    "importToCAD": "Import to Any CAD Software",
+    "useCADCanvas": "Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images."
   },
   
   "battlingBots": {
