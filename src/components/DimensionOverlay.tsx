@@ -6124,10 +6124,10 @@ export default function DimensionOverlay({
                                 const depthInMapUnit = convertUnit(measurement.depth, measurement.depthUnit, effectiveMapScale.realUnit);
                                 const volume = area * depthInMapUnit;
                                 const volumeStr = formatVolumeMeasurement(volume, effectiveMapScale.realUnit, unitSystem);
-                                return addLabelPrefix(`${displayValue} (A: ${areaStr} | V: ${volumeStr})`);
+                                return addLabelPrefix(`${displayValue} (${t('dimensionOverlay.area')}: ${areaStr} | ${t('dimensionOverlay.volume')}: ${volumeStr})`);
                               }
 
-                              return addLabelPrefix(`${displayValue} (A: ${areaStr})`);
+                              return addLabelPrefix(`${displayValue} (${t('dimensionOverlay.area')}: ${areaStr})`);
                             }
 
                             // Fallback if parsing fails
