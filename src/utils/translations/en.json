@@ -289,7 +289,16 @@
     "tapSideTab": "Tap side tab to bring menu back",
     "dragSideTab": "Drag side tab up/down to reposition it",
     "menuCollapsesInstantly": "Menu collapses instantly for quick workspace access",
-    "afterPlacingMeasurements": "After placing measurements, you can move and edit them while in Edit mode."
+    "afterPlacingMeasurements": "After placing measurements, you can move and edit them while in Edit mode.",
+    "moveMeasurements": "Move Measurements",
+    "moveDesc": "Tap and drag circles, rectangles, or freehand paths to move them around",
+    "editPoints": "Edit Points",
+    "editPointsDesc": "Tap and drag any point to adjust measurements. Freehand paths can be reshaped by moving individual points!",
+    "addCustomLabels": "Add Custom Labels",
+    "enableEditLabels": "Enable \"Edit labels\" mode: Tap the \"Edit labels\" button in the legend, then tap any measurement label (the colored badge with numbers) to add or edit custom names",
+    "labelsAppearOnSaves": "Labels appear on saved photos and in email reports",
+    "quickDelete": "Quick Delete: 4 Rapid Taps",
+    "tap4TimesDelete": "Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!"
   },
   
   "battlingBots": {
