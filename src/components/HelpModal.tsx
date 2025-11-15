@@ -1110,10 +1110,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>🎨</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Color-Coded
+                        {t('helpModal.colorCoded')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Each measurement gets a unique color
+                        {t('helpModal.eachMeasurementColor')}
                       </Text>
                     </View>
                   </View>
@@ -1125,10 +1125,10 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Hide Labels
+                        {t('helpModal.hideLabels')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Toggle measurement labels off to view your photo clearly. Legend stays visible for reference
+                        {t('helpModal.hideLabelsDesc')}
                       </Text>
                     </View>
                   </View>
@@ -1147,12 +1147,12 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                       <Ionicons name="menu" size={20} color="#FF3B30" />
                       <Text style={{ fontSize: 15, fontWeight: '700', color: '#FF3B30', marginLeft: 6 }}>
-                        Menu Controls
+                        {t('helpModal.menuControls')}
                       </Text>
                     </View>
                     <View style={{ gap: 8 }}>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        • <Text style={{ fontWeight: '600' }}>Swipe right anywhere on menu</Text> to collapse it off-screen
+                        • {t('helpModal.swipeRightCollapse')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
                         • <Text style={{ fontWeight: '600' }}>Tap side tab</Text> to bring menu back
