@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 interface EmailPromptModalProps {
   visible: boolean;
@@ -11,6 +12,7 @@ interface EmailPromptModalProps {
 }
 
 export default function EmailPromptModal({ visible, onComplete, onDismiss }: EmailPromptModalProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
 
   const handleSave = () => {

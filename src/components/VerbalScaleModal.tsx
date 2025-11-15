@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VerbalScale } from '../state/measurementStore';
 import useStore from '../state/measurementStore';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 
 type ScaleMode = 'verbal' | 'blueprint';
 
@@ -18,6 +19,7 @@ interface VerbalScaleModalProps {
 }
 
 export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode, onDismiss }: VerbalScaleModalProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   
   // Access store for magnetic declination
