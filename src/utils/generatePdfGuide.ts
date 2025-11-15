@@ -471,7 +471,6 @@ export async function generatePdfGuide(): Promise<void> {
           <div class="section-content">
             <div class="bullet-point">✅ <strong>Level is critical</strong> - take time to align crosshairs for best accuracy</div>
             <div class="bullet-point">✅ <strong>Coin placement</strong> - put it on same surface/plane as measurement objects</div>
-            <div class="bullet-point">✅ <strong>Closer is better</strong> - fill your frame with the subject</div>
             <div class="bullet-point">✅ <strong>Good lighting</strong> - avoid harsh shadows and glare</div>
             <div class="bullet-point">✅ <strong>Perpendicular shots</strong> - face subject directly for minimal distortion</div>
             <div class="bullet-point">✅ <strong>Use labels</strong> - double-tap measurements to add custom names</div>
