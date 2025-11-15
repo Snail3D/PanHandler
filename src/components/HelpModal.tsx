@@ -981,18 +981,18 @@ Thank you for helping us improve PanHandler!
                   
                   <View style={{ backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: 10, padding: 10, marginTop: 8 }}>
                     <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginBottom: 4 }}>
-                      How to use:
+                      {t('helpModal.freehandHowToUse')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      1. Select the Free Draw tool{'\n'}
-                      2. Place finger and hold for 1.5 seconds{'\n'}
-                      3. Draw your path{'\n'}
-                      4. Release to complete
+                      1. {t('helpModal.freehandStep1')}{'\n'}
+                      2. {t('helpModal.freehandStep2')}{'\n'}
+                      3. {t('helpModal.freehandStep3')}{'\n'}
+                      4. {t('helpModal.freehandStep4')}
                     </Text>
                   </View>
                   <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(16,185,129,0.15)' }}>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', lineHeight: 18 }}>
-                      💡 Great for calculating wire paths in electrical projects, curved distances, or any non-straight measurement!
+                      💡 {t('helpModal.freehandGreatFor')}
                     </Text>
                   </View>
                 </View>
