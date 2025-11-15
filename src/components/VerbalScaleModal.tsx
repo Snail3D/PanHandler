@@ -153,7 +153,7 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                       />
                     </Svg>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: 'rgba(0, 0, 0, 0.85)' }}>
-                      Map Scale
+                      {t('modals.verbalScaleModal.title')}
                     </Text>
                   </View>
                   <Pressable
