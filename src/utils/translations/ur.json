@@ -41,7 +41,12 @@
     "perfectLevel": "کامل! ثابت قدم رہیں",
     "tooMuchMovement": "بہت زیادہ حرکت",
     "alignCrosshairs": "کراس شائرز کو سیدھ کریں۔",
-    "autoCapture": "آٹو کیپچر تیار ہے۔"
+    "autoCapture": "آٹو کیپچر تیار ہے۔",
+    "holdStill": "چپ کر جاؤ",
+    "tiltBackward": "پیچھے کی طرف جھکاؤ",
+    "tiltForward": "آگے جھکاؤ",
+    "tiltLeft": "بائیں جھکاؤ",
+    "tiltRight": "دائیں طرف جھکیں۔"
   },
   "coinCalibration": {
     "title": "سکے کے ساتھ کیلیبریٹ کریں۔",
@@ -69,7 +74,12 @@
     "locked": "Pan/Zoom locked - tap Edit to move measurements",
     "emailSent": "ای میل تیار!",
     "imageSaved": "تصاویر میں محفوظ!",
-    "measurements": "پیمائش"
+    "measurements": "پیمائش",
+    "supporter": "حمایتی",
+    "panhandlerSupporter": "پین ہینڈلر سپورٹر",
+    "newPhoto": "نئی تصویر",
+    "mapMode": "نقشہ وضع",
+    "blueprintMode": "بلیو پرنٹ موڈ"
   },
   "helpModal": {
     "title": "گائیڈ",

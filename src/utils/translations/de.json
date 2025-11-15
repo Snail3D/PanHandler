@@ -41,7 +41,12 @@
     "perfectLevel": "Perfekt! Ruhig halten!",
     "tooMuchMovement": "Zu viel Bewegung",
     "alignCrosshairs": "Fadenkreuz ausrichten",
-    "autoCapture": "Automatische Aufnahme bereit"
+    "autoCapture": "Automatische Aufnahme bereit",
+    "holdStill": "Stillhalten",
+    "tiltBackward": "Nach hinten kippen",
+    "tiltForward": "Nach vorne neigen",
+    "tiltLeft": "Neigen Sie nach links",
+    "tiltRight": "Nach rechts neigen"
   },
   "coinCalibration": {
     "title": "Mit einer Münze kalibrieren",
@@ -69,7 +74,12 @@
     "locked": "Schwenk-/Zoomfunktion gesperrt – tippen Sie auf „Bearbeiten“, um die Maße zu verschieben.",
     "emailSent": "E-Mail ist fertig!",
     "imageSaved": "In Fotos gespeichert!",
-    "measurements": "Messungen"
+    "measurements": "Messungen",
+    "supporter": "Fan",
+    "panhandlerSupporter": "Bettler-Unterstützer",
+    "newPhoto": "Neues Foto",
+    "mapMode": "Kartenmodus",
+    "blueprintMode": "Blaupausenmodus"
   },
   "helpModal": {
     "title": "Führung",

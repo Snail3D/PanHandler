@@ -41,7 +41,12 @@
     "perfectLevel": "ਬਿਲਕੁਲ ਸਹੀ! ਸਥਿਰ ਰਹੋ",
     "tooMuchMovement": "ਬਹੁਤ ਜ਼ਿਆਦਾ ਹਰਕਤ",
     "alignCrosshairs": "ਕਰਾਸਹੇਅਰਾਂ ਨੂੰ ਇਕਸਾਰ ਕਰੋ",
-    "autoCapture": "ਆਟੋ-ਕੈਪਚਰ ਲਈ ਤਿਆਰ"
+    "autoCapture": "ਆਟੋ-ਕੈਪਚਰ ਲਈ ਤਿਆਰ",
+    "holdStill": "ਸਥਿਰ ਰਹੋ",
+    "tiltBackward": "ਪਿੱਛੇ ਵੱਲ ਝੁਕਾਓ",
+    "tiltForward": "ਅੱਗੇ ਝੁਕਾਓ",
+    "tiltLeft": "ਖੱਬੇ ਪਾਸੇ ਝੁਕੋ",
+    "tiltRight": "ਸੱਜੇ ਪਾਸੇ ਝੁਕੋ"
   },
   "coinCalibration": {
     "title": "ਸਿੱਕੇ ਨਾਲ ਕੈਲੀਬ੍ਰੇਟ ਕਰੋ",
@@ -69,7 +74,12 @@
     "locked": "ਪੈਨ/ਜ਼ੂਮ ਲਾਕ ਕੀਤਾ ਗਿਆ - ਮਾਪਾਂ ਨੂੰ ਮੂਵ ਕਰਨ ਲਈ ਸੰਪਾਦਨ 'ਤੇ ਟੈਪ ਕਰੋ",
     "emailSent": "ਈਮੇਲ ਤਿਆਰ!",
     "imageSaved": "ਫੋਟੋਆਂ ਵਿੱਚ ਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ!",
-    "measurements": "ਮਾਪ"
+    "measurements": "ਮਾਪ",
+    "supporter": "ਸਮਰਥਕ",
+    "panhandlerSupporter": "ਪੈਨਹੈਂਡਲਰ ਸਮਰਥਕ",
+    "newPhoto": "ਨਵੀਂ ਫੋਟੋ",
+    "mapMode": "ਨਕਸ਼ਾ ਮੋਡ",
+    "blueprintMode": "ਬਲੂਪ੍ਰਿੰਟ ਮੋਡ"
   },
   "helpModal": {
     "title": "ਗਾਈਡ",

@@ -41,7 +41,12 @@
     "perfectLevel": "Cikakku! Rike Dage",
     "tooMuchMovement": "Yawan Motsi",
     "alignCrosshairs": "Daidaita Crosshairs",
-    "autoCapture": "Shirye-shiryen ɗaukar atomatik"
+    "autoCapture": "Shirye-shiryen ɗaukar atomatik",
+    "holdStill": "Rike har yanzu",
+    "tiltBackward": "karkata baya",
+    "tiltForward": "karkata gaba",
+    "tiltLeft": "karkata hagu",
+    "tiltRight": "karkata dama"
   },
   "coinCalibration": {
     "title": "Calibrate tare da Coin",
@@ -69,7 +74,12 @@
     "locked": "Kunna/Kulle Zuƙowa - taɓa Shirya don matsar da ma'auni",
     "emailSent": "An shirya imel!",
     "imageSaved": "Ajiye zuwa Hotuna!",
-    "measurements": "Ma'auni"
+    "measurements": "Ma'auni",
+    "supporter": "Mataimaki",
+    "panhandlerSupporter": "PanHandler Supporter",
+    "newPhoto": "Sabon Hoto",
+    "mapMode": "Yanayin taswira",
+    "blueprintMode": "Yanayin Blueprint"
   },
   "helpModal": {
     "title": "Jagora",

@@ -41,7 +41,12 @@
     "perfectLevel": "बहुत बढ़िया! स्थिर रहो",
     "tooMuchMovement": "बहुत अधिक हलचल",
     "alignCrosshairs": "क्रॉसहेयर संरेखित करें",
-    "autoCapture": "ऑटो-कैप्चर तैयार"
+    "autoCapture": "ऑटो-कैप्चर तैयार",
+    "holdStill": "बिना हिले",
+    "tiltBackward": "पीछे की ओर झुकें",
+    "tiltForward": "आगे की ओर झुकें",
+    "tiltLeft": "बाईं ओर झुकें",
+    "tiltRight": "दाईं ओर झुकें"
   },
   "coinCalibration": {
     "title": "सिक्के से अंशांकन करें",
@@ -69,7 +74,12 @@
     "locked": "पैन/ज़ूम लॉक - मापों को स्थानांतरित करने के लिए संपादित करें पर टैप करें",
     "emailSent": "ईमेल तैयार!",
     "imageSaved": "फ़ोटो में सहेजा गया!",
-    "measurements": "मापन"
+    "measurements": "मापन",
+    "supporter": "समर्थक",
+    "panhandlerSupporter": "पैनहैंडलर समर्थक",
+    "newPhoto": "नई तस्वीर",
+    "mapMode": "मानचित्र मोड",
+    "blueprintMode": "ब्लूप्रिंट मोड"
   },
   "helpModal": {
     "title": "मार्गदर्शक",

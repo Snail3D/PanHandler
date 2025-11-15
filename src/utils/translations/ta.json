@@ -41,7 +41,12 @@
     "perfectLevel": "அருமை! உறுதியாக இருங்கள்",
     "tooMuchMovement": "அதிக இயக்கம்",
     "alignCrosshairs": "குறுக்கு நாற்காலிகளை சீரமைக்கவும்",
-    "autoCapture": "தானியங்கிப் படம்பிடிப்பு தயார்"
+    "autoCapture": "தானியங்கிப் படம்பிடிப்பு தயார்",
+    "holdStill": "அசையாமல் இரு",
+    "tiltBackward": "பின்னோக்கி சாய்",
+    "tiltForward": "முன்னோக்கி சாய்",
+    "tiltLeft": "இடதுபுறம் சாய்",
+    "tiltRight": "வலதுபுறம் சாய்"
   },
   "coinCalibration": {
     "title": "நாணயத்துடன் அளவீடு செய்",
@@ -69,7 +74,12 @@
     "locked": "நகர்த்து/பெரிதாக்கு பூட்டப்பட்டது - அளவீடுகளை நகர்த்த திருத்து என்பதைத் தட்டவும்.",
     "emailSent": "மின்னஞ்சல் தயார்!",
     "imageSaved": "புகைப்படங்களில் சேமிக்கப்பட்டது!",
-    "measurements": "அளவீடுகள்"
+    "measurements": "அளவீடுகள்",
+    "supporter": "ஆதரவாளர்",
+    "panhandlerSupporter": "PanHandler ஆதரவாளர்",
+    "newPhoto": "புதிய புகைப்படம்",
+    "mapMode": "வரைபடப் பயன்முறை",
+    "blueprintMode": "புளூபிரிண்ட் பயன்முறை"
   },
   "helpModal": {
     "title": "கையேடு",

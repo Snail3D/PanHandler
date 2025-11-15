@@ -41,7 +41,12 @@
     "perfectLevel": "নিখুঁত! স্থির থাকো।",
     "tooMuchMovement": "খুব বেশি নড়াচড়া",
     "alignCrosshairs": "ক্রসহেয়ার সারিবদ্ধ করুন",
-    "autoCapture": "অটো-ক্যাপচার প্রস্তুত"
+    "autoCapture": "অটো-ক্যাপচার প্রস্তুত",
+    "holdStill": "স্থির থাকো",
+    "tiltBackward": "পিছনের দিকে কাত করুন",
+    "tiltForward": "সামনের দিকে কাত করুন",
+    "tiltLeft": "বাম দিকে কাত করুন",
+    "tiltRight": "ডানদিকে কাত করুন"
   },
   "coinCalibration": {
     "title": "কয়েন দিয়ে ক্যালিব্রেট করুন",
@@ -69,7 +74,12 @@
     "locked": "প্যান/জুম লক করা আছে - পরিমাপ সরাতে সম্পাদনা করুন ট্যাপ করুন",
     "emailSent": "ইমেল প্রস্তুত!",
     "imageSaved": "ফটোতে সংরক্ষিত!",
-    "measurements": "পরিমাপ"
+    "measurements": "পরিমাপ",
+    "supporter": "সমর্থক",
+    "panhandlerSupporter": "প্যানহ্যান্ডলার সমর্থক",
+    "newPhoto": "নতুন ছবি",
+    "mapMode": "মানচিত্র মোড",
+    "blueprintMode": "ব্লুপ্রিন্ট মোড"
   },
   "helpModal": {
     "title": "গাইড",

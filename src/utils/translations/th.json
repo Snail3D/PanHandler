@@ -41,7 +41,12 @@
     "perfectLevel": "เพอร์เฟกต์! ถือให้มั่นคง",
     "tooMuchMovement": "การเคลื่อนไหวมากเกินไป",
     "alignCrosshairs": "จัดแนวเส้นเล็ง",
-    "autoCapture": "พร้อมจับภาพอัตโนมัติ"
+    "autoCapture": "พร้อมจับภาพอัตโนมัติ",
+    "holdStill": "อยู่นิ่งๆ",
+    "tiltBackward": "เอียงไปข้างหลัง",
+    "tiltForward": "เอียงไปข้างหน้า",
+    "tiltLeft": "เอียงไปทางซ้าย",
+    "tiltRight": "เอียงไปทางขวา"
   },
   "coinCalibration": {
     "title": "ปรับเทียบด้วยเหรียญ",
@@ -69,7 +74,12 @@
     "locked": "ล็อคการแพน/ซูม - แตะแก้ไขเพื่อย้ายการวัด",
     "emailSent": "เตรียมพร้อมอีเมลแล้ว!",
     "imageSaved": "บันทึกลงในรูปภาพ!",
-    "measurements": "การวัด"
+    "measurements": "การวัด",
+    "supporter": "ผู้สนับสนุน",
+    "panhandlerSupporter": "ผู้สนับสนุน PanHandler",
+    "newPhoto": "ภาพใหม่",
+    "mapMode": "โหมดแผนที่",
+    "blueprintMode": "โหมดบลูพริ้นท์"
   },
   "helpModal": {
     "title": "แนะนำ",

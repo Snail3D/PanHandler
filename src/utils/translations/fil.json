@@ -41,7 +41,12 @@
     "perfectLevel": "Perpekto! Hold Steady",
     "tooMuchMovement": "Napakaraming Paggalaw",
     "alignCrosshairs": "I-align ang mga Crosshair",
-    "autoCapture": "Handa na ang Auto-Capture"
+    "autoCapture": "Handa na ang Auto-Capture",
+    "holdStill": "Manahimik ka",
+    "tiltBackward": "Ikiling pabalik",
+    "tiltForward": "Ikiling pasulong",
+    "tiltLeft": "Ikiling pakaliwa",
+    "tiltRight": "Ikiling pakanan"
   },
   "coinCalibration": {
     "title": "I-calibrate gamit ang Coin",
@@ -69,7 +74,12 @@
     "locked": "I-pan/Zoom lock - i-tap ang I-edit upang ilipat ang mga sukat",
     "emailSent": "Inihanda ang email!",
     "imageSaved": "Na-save sa Mga Larawan!",
-    "measurements": "Mga sukat"
+    "measurements": "Mga sukat",
+    "supporter": "Tagasuporta",
+    "panhandlerSupporter": "PanHandler Supporter",
+    "newPhoto": "Bagong Larawan",
+    "mapMode": "Mode ng Mapa",
+    "blueprintMode": "Blueprint Mode"
   },
   "helpModal": {
     "title": "Patnubay",

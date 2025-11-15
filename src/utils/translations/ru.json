@@ -41,7 +41,12 @@
     "perfectLevel": "Отлично! Держись крепче!",
     "tooMuchMovement": "Слишком много движения",
     "alignCrosshairs": "Выровнять перекрестие",
-    "autoCapture": "Готов к автоматическому захвату"
+    "autoCapture": "Готов к автоматическому захвату",
+    "holdStill": "Стой спокойно",
+    "tiltBackward": "Наклон назад",
+    "tiltForward": "Наклон вперед",
+    "tiltLeft": "Наклон влево",
+    "tiltRight": "Наклон вправо"
   },
   "coinCalibration": {
     "title": "Калибровка с помощью монеты",
@@ -69,7 +74,12 @@
     "locked": "Панорамирование/масштабирование заблокированы — нажмите «Изменить», чтобы переместить измерения.",
     "emailSent": "Письмо подготовлено!",
     "imageSaved": "Сохранено в Фото!",
-    "measurements": "Измерения"
+    "measurements": "Измерения",
+    "supporter": "Сторонник",
+    "panhandlerSupporter": "Сторонник PanHandler",
+    "newPhoto": "Новое фото",
+    "mapMode": "Режим карты",
+    "blueprintMode": "Режим чертежа"
   },
   "helpModal": {
     "title": "Гид",

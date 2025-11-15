@@ -41,7 +41,12 @@
     "perfectLevel": "¡Perfecto! Mantén la posición.",
     "tooMuchMovement": "Demasiado movimiento",
     "alignCrosshairs": "Alinear la cruz",
-    "autoCapture": "Listo para captura automática"
+    "autoCapture": "Listo para captura automática",
+    "holdStill": "Quédate quieto",
+    "tiltBackward": "Inclínate hacia atrás",
+    "tiltForward": "Inclínate hacia adelante",
+    "tiltLeft": "Inclina hacia la izquierda",
+    "tiltRight": "Inclínate a la derecha"
   },
   "coinCalibration": {
     "title": "Calibrar con moneda",
@@ -69,7 +74,12 @@
     "locked": "Desplazamiento/zoom bloqueado: pulse Editar para mover las medidas",
     "emailSent": "¡Correo electrónico preparado!",
     "imageSaved": "¡Guardado en Fotos!",
-    "measurements": "Medidas"
+    "measurements": "Medidas",
+    "supporter": "Seguidor",
+    "panhandlerSupporter": "Simpatizante de PanHandler",
+    "newPhoto": "Nueva foto",
+    "mapMode": "Modo mapa",
+    "blueprintMode": "Modo de planos"
   },
   "helpModal": {
     "title": "Guía",

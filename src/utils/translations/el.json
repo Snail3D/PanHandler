@@ -41,7 +41,12 @@
     "perfectLevel": "Τέλεια! Κρατήστε σταθερό",
     "tooMuchMovement": "Υπερβολική κίνηση",
     "alignCrosshairs": "Ευθυγράμμιση σταυρονημάτων",
-    "autoCapture": "Έτοιμο για αυτόματη λήψη"
+    "autoCapture": "Έτοιμο για αυτόματη λήψη",
+    "holdStill": "Μείνετε ακίνητοι",
+    "tiltBackward": "Κλίση προς τα πίσω",
+    "tiltForward": "Κλίση προς τα εμπρός",
+    "tiltLeft": "Κλίση αριστερά",
+    "tiltRight": "Κλίση προς τα δεξιά"
   },
   "coinCalibration": {
     "title": "Βαθμονόμηση με κέρμα",
@@ -69,7 +74,12 @@
     "locked": "Κλειδωμένη μετατόπιση/ζουμ - πατήστε Επεξεργασία για να μετακινήσετε μετρήσεις",
     "emailSent": "Το email είναι έτοιμο!",
     "imageSaved": "Αποθηκεύτηκε στις Φωτογραφίες!",
-    "measurements": "Μετρήσεις"
+    "measurements": "Μετρήσεις",
+    "supporter": "Υποστηρικτής",
+    "panhandlerSupporter": "Υποστηρικτής PanHandler",
+    "newPhoto": "Νέα φωτογραφία",
+    "mapMode": "Λειτουργία χάρτη",
+    "blueprintMode": "Λειτουργία Σχεδίου"
   },
   "helpModal": {
     "title": "Οδηγός",
