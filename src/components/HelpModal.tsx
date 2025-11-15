@@ -1282,35 +1282,35 @@ Thank you for helping us improve PanHandler!
                 {/* FREE badge */}
 
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 12 }}>
-                  Export photos with measurements and detailed reports
+                  {t('helpModal.exportPhotosReports')}
                 </Text>
 
                 <View style={{ gap: 8 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, marginRight: 10 }}>📸</Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Labeled Photo</Text> - All measurements shown
+                      {t('helpModal.labeledPhoto')}
                     </Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, marginRight: 10 }}>🔧</Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>CAD Export</Text> - 50% opacity for easy tracing
+                      {t('helpModal.cadExport')}
                     </Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, marginRight: 10 }}>📄</Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Reference Photo</Text> - Clean with scale info
+                      {t('helpModal.referencePhoto')}
                     </Text>
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, marginRight: 10 }}>✉️</Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Email Reports</Text> - All photos + data
+                      {t('helpModal.emailReports')}
                     </Text>
                   </View>
                 </View>
@@ -1327,11 +1327,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="folder" size={18} color="#5856D6" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
-                      Organized Measurements
+                      {t('helpModal.organizedMeasurements')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    All saved measurements are automatically organized into a "PanHandler Measurements" album in your Photos app for easy access and sharing!
+                    {t('helpModal.savedToAlbum')}
                   </Text>
                 </View>
 
