@@ -298,7 +298,14 @@
     "enableEditLabels": "Enable \"Edit labels\" mode: Tap the \"Edit labels\" button in the legend, then tap any measurement label (the colored badge with numbers) to add or edit custom names",
     "labelsAppearOnSaves": "Labels appear on saved photos and in email reports",
     "quickDelete": "Quick Delete: 4 Rapid Taps",
-    "tap4TimesDelete": "Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!"
+    "tap4TimesDelete": "Tap any measurement 4 times rapidly (within 500ms each) to delete it. You will feel haptic feedback with each tap!",
+    "exportPhotosReports": "Export photos with measurements and detailed reports",
+    "labeledPhoto": "Labeled Photo - All measurements shown",
+    "cadExport": "CAD Export - 50% opacity for easy tracing",
+    "referencePhoto": "Reference Photo - Clean with scale info",
+    "emailReports": "Email Reports - All photos + data",
+    "organizedMeasurements": "Organized Measurements",
+    "savedToAlbum": "All saved measurements are automatically organized into a \"PanHandler Measurements\" album in your Photos app for easy access and sharing!"
   },
   
   "battlingBots": {
