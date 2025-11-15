@@ -1902,16 +1902,14 @@ Thank you for helping us improve PanHandler!
                       <Ionicons name="star" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', marginLeft: 8, letterSpacing: -0.3 }}>
-                      🎯 Amazing Accuracy
+                      {t('helpModal.amazingAccuracy')}
                     </Text>
                   </View>
                   
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 14, textAlign: 'center' }}>
-                    PanHandler achieves{' '}
                     <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>
-                      ~0.5 mm accuracy
+                      {t('helpModal.accuracyText')}
                     </Text>
-                    {'\n'}with small objects
                   </Text>
                   
                   <View style={{ 
@@ -1923,21 +1921,21 @@ Thank you for helping us improve PanHandler!
                     gap: 6,
                   }}>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', marginBottom: 4, fontWeight: '600', textAlign: 'center' }}>
-                      📐 That's approximately:
+                      {t('helpModal.thatsApproximately')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
-                      • 1/50th of an inch
+                      {t('helpModal.accuracyExample1')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
-                      • Thickness of a credit card
+                      {t('helpModal.accuracyExample2')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, textAlign: 'center' }}>
-                      • 5-6 sheets of paper
+                      {t('helpModal.accuracyExample3')}
                     </Text>
                   </View>
 
                   <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', marginTop: 12, lineHeight: 18, textAlign: 'center' }}>
-                    💡 Tip: Higher resolution photos = better accuracy
+                    {t('helpModal.accuracyTip')}
                   </Text>
                 </View>
               </View>
@@ -1971,7 +1969,7 @@ Thank you for helping us improve PanHandler!
                       <Ionicons name="shield-checkmark" size={24} color="#333" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
-                      Privacy & Security
+                      {t('helpModal.privacySecurity')}
                     </Text>
                   </View>
                   
@@ -1980,7 +1978,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="phone-portrait-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to us
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>{t('helpModal.photosStayOnDevice')}</Text> — {t('helpModal.photosStayOnDeviceDesc')}
                       </Text>
                     </View>
                     
@@ -1988,7 +1986,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="mail-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Email uses default Mail.app</Text> — no data stored or collected
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>{t('helpModal.emailUsesDefaultMailApp')}</Text> — {t('helpModal.emailUsesDefaultMailAppDesc')}
                       </Text>
                     </View>
 
@@ -1996,7 +1994,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="eye-off-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics about you, your photos, files, or measurements
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>{t('helpModal.zeroTracking')}</Text> — {t('helpModal.zeroTrackingDesc')}
                       </Text>
                     </View>
                     
@@ -2004,7 +2002,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="cloud-offline-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Works offline</Text> — lightweight and secure, everything runs locally
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>{t('helpModal.worksOffline')}</Text> — {t('helpModal.worksOfflineDesc')}
                       </Text>
                     </View>
                     
@@ -2072,8 +2070,7 @@ Thank you for helping us improve PanHandler!
                     borderLeftColor: '#666',
                   }}>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 10 }}>
-                      <Text style={{ fontWeight: '700' }}>Need to enable permissions?</Text>{'\n'}
-                      Tap the button below to open PanHandler settings
+                      <Text style={{ fontWeight: '700' }}>{t('helpModal.needToEnablePermissions')}</Text>
                     </Text>
                     <Pressable
                       onPress={() => {
@@ -2097,7 +2094,7 @@ Thank you for helping us improve PanHandler!
                       })}
                     >
                       <Text style={{ fontSize: 13, fontWeight: '700', color: '#1C1C1E' }}>
-                        Open App Settings
+                        {t('helpModal.openAppSettings')}
                       </Text>
                     </Pressable>
                   </View>
@@ -2133,12 +2130,12 @@ Thank you for helping us improve PanHandler!
                       <Ionicons name="information-circle" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
-                      About PanHandler
+                      {t('helpModal.aboutPanHandler')}
                     </Text>
                   </View>
 
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 16 }}>
-                    Created by <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Snail</Text>, a slug on a mission to make measuring faster, easier, and accurate for everyone!
+                    {t('helpModal.createdBySnail')}
                   </Text>
 
                   {/* Buy Me a Coffee Button */}
@@ -2169,7 +2166,7 @@ Thank you for helping us improve PanHandler!
                         letterSpacing: 0.3,
                         textAlign: 'center',
                       }}>
-                        Buy Me a Coffee
+                        {t('helpModal.buyMeACoffee')}
                       </Text>
                     </Pressable>
                   </View>
@@ -2181,7 +2178,7 @@ Thank you for helping us improve PanHandler!
                     lineHeight: 19,
                     marginBottom: 20,
                   }}>
-                    Enjoying PanHandler? Support development and help keep this app free for everyone! ☕
+                    {t('helpModal.enjoyingPanHandler')}
                   </Text>
 
                   {/* Simple YouTube text link */}
@@ -2190,7 +2187,7 @@ Thank you for helping us improve PanHandler!
                     style={{ marginBottom: 20, alignItems: 'center' }}
                   >
                     <Text style={{ fontSize: 14, color: '#007AFF', textDecorationLine: 'underline' }}>
-                      Follow on YouTube
+                      {t('helpModal.followOnYouTube')}
                     </Text>
                   </Pressable>
 
@@ -2208,9 +2205,9 @@ Thank you for helping us improve PanHandler!
                       fontStyle: 'italic',
                       letterSpacing: 0.3,
                     }}>
-                      Dedicated to my grandfather{'\n'}
+                      {t('helpModal.dedicatedToGrandfather')}{'\n'}
                       <Text style={{ fontSize: 11, color: '#A8A8A8' }}>
-                        (who is actually good at math)
+                        {t('helpModal.whoIsActuallyGoodAtMath')}
                       </Text>
                     </Text>
                   </View>
@@ -2290,7 +2287,7 @@ Thank you for helping us improve PanHandler!
                     </Pressable>
                     
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#1C1C1E', marginHorizontal: 8, letterSpacing: -0.3 }}>
-                      Hidden Surprises
+                      {t('helpModal.hiddenSurprises')}
                     </Text>
                     
                     {/* Right egg - 7 taps to open YouTube */}
@@ -2339,7 +2336,7 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18, textAlign: 'center', fontStyle: 'italic' }}>
-                    Hold the left egg for a surprise. Tap the right egg (how many times?) for another surprise. Oh, and by the way, look out for bot battles that might come up while you're using the app — they may reveal more Easter eggs ;)
+                    {t('helpModal.surprisesHint')}
                   </Text>
                 </View>
 
@@ -2364,7 +2361,7 @@ Thank you for helping us improve PanHandler!
                       fontWeight: '700',
                       marginBottom: 8,
                     }}>
-                      Do you like this app?
+                      {t('helpModal.doYouLikeThisApp')}
                     </Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
                       <Text style={{ fontSize: 28, letterSpacing: 3 }}>⭐⭐⭐⭐⭐</Text>
