@@ -4,6 +4,7 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as StoreReview from 'expo-store-review';
+import { useTranslation } from 'react-i18next';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import {
@@ -39,6 +40,9 @@ export default function BattlingBotsModal({
   isFirstTimeDonor = false,
   conversationIndex,
 }: BattlingBotsModalProps) {
+  // Initialize i18n translation hook
+  const { t } = useTranslation();
+  
   // Access store for donation tracking
   const setIsDonor = useStore((s) => s.setIsDonor);
   const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
@@ -577,7 +581,7 @@ export default function BattlingBotsModal({
                         fontWeight: '800',
                         color: '#1C1C1E',
                       }}>
-                        Behind the Scenes
+                        {t('battlingBots.title')}
                       </Text>
                       <Ionicons name="chatbubbles" size={scaleIconSize(28)} color="#F59E0B" />
                     </View>
@@ -764,7 +768,7 @@ export default function BattlingBotsModal({
                       color: '#1C1C1E',
                       marginBottom: scaleMargin(6),
                     }}>
-                      Support Snail
+                      {t('battlingBots.supportSnail')}
                     </Text>
                     <Text style={{
                       fontSize: scaleFontSize(15),
@@ -773,8 +777,7 @@ export default function BattlingBotsModal({
                       lineHeight: scaleSize(22),
                       fontWeight: '500',
                     }}>
-                      PanHandler is a passion project.{'\n'}
-                      Help keep it alive! ☕
+                      {t('battlingBots.subtitle')}
                     </Text>
                   </View>
 
@@ -838,7 +841,7 @@ export default function BattlingBotsModal({
                         fontWeight: '800',
                         letterSpacing: 0.3,
                       }}>
-                        Buy Me a Coffee
+                        {t('battlingBots.buyMeCoffee')}
                       </Text>
                     </View>
                   </Pressable>
@@ -860,7 +863,7 @@ export default function BattlingBotsModal({
                       fontWeight: '600',
                       textAlign: 'center',
                     }}>
-                      I can't do coffee: Leave a review! ⭐
+                      {t('battlingBots.cantDoCoffee')}
                     </Text>
                   </Pressable>
                 </Animated.View>
