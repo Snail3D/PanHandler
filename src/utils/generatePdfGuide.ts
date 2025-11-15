@@ -166,7 +166,7 @@ export async function generatePdfGuide(): Promise<void> {
             
             <div style="text-align: center; flex: 1;">
               <div style="background: white; padding: 10px; border-radius: 8px; display: inline-block; border: 2px solid #E5E5EA;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://apps.apple.com/app/id6754577499" 
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://apps.apple.com/us/app/panhandler/id6754727828" 
                      alt="App Store QR Code" 
                      style="width: 150px; height: 150px; display: block;" />
               </div>
