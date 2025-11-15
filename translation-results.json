@@ -1,0 +1,154 @@
+{
+  "zh-CN": {
+    "name": "Chinese",
+    "title": "PanHandler 指南",
+    "subtitle": "精确测量的完整参考",
+    "coinExamples": "1 Yuan (25mm), 5 Jiao (20.5mm)",
+    "step1": "第 1 步：拍一张完美的照片",
+    "step2": "第 2 步：用硬币校准",
+    "step3": "第 3 步：进行测量"
+  },
+  "hi": {
+    "name": "Hindi",
+    "title": "पैनहैंडलर गाइड",
+    "subtitle": "सटीक माप के लिए पूर्ण संदर्भ",
+    "coinExamples": "₹5 Rupee (23mm), ₹10 Rupee (27mm)",
+    "step1": "चरण 1: एक उत्तम फ़ोटो लें",
+    "step2": "चरण 2: सिक्के के साथ अंशांकन करें",
+    "step3": "चरण 3: माप रखें"
+  },
+  "fr": {
+    "name": "French",
+    "title": "Guide du gestionnaire de casseroles",
+    "subtitle": "Référence complète pour des mesures précises",
+    "coinExamples": "€1 Euro (23.25mm), €2 Euro (25.75mm)",
+    "step1": "Étape 1 : Prenez une photo parfaite",
+    "step2": "Étape 2 : Calibrer avec Coin",
+    "step3": "Étape 3 : Placer les mesures"
+  },
+  "ar": {
+    "name": "Arabic",
+    "title": "دليل بانهاندلر",
+    "subtitle": "مرجع كامل للقياسات الدقيقة",
+    "coinExamples": "Saudi Riyal, UAE Dirham",
+    "step1": "الخطوة 1: التقط صورة مثالية",
+    "step2": "الخطوة 2: المعايرة بالعملة المعدنية",
+    "step3": "الخطوة 3: ضع القياسات"
+  },
+  "bn": {
+    "name": "Bengali",
+    "title": "প্যানহ্যান্ডলার গাইড",
+    "subtitle": "সুনির্দিষ্ট পরিমাপের জন্য সম্পূর্ণ রেফারেন্স",
+    "coinExamples": "₹5 Rupee (23mm), ₹10 Rupee (27mm)",
+    "step1": "ধাপ 1: একটি নিখুঁত ছবি তুলুন",
+    "step2": "ধাপ 2: কয়েন দিয়ে ক্যালিব্রেট করুন",
+    "step3": "ধাপ 3: স্থান পরিমাপ"
+  },
+  "ru": {
+    "name": "Russian",
+    "title": "Руководство по PanHandler",
+    "subtitle": "Полный справочник для точных измерений",
+    "coinExamples": "10 Ruble (22mm), 5 Ruble (25mm)",
+    "step1": "Шаг 1. Сделайте идеальную фотографию",
+    "step2": "Шаг 2. Калибровка с помощью монеты",
+    "step3": "Шаг 3: Разместите измерения"
+  },
+  "pt": {
+    "name": "Portuguese",
+    "title": "Guia PanHandler",
+    "subtitle": "Referência completa para medições precisas",
+    "coinExamples": "€1 Euro (23.25mm), €2 Euro (25.75mm)",
+    "step1": "Etapa 1: tire uma foto perfeita",
+    "step2": "Passo 2: Calibrar com Moeda",
+    "step3": "Etapa 3: fazer medições"
+  },
+  "ur": {
+    "name": "Urdu",
+    "title": "پنہینڈلر گائیڈ",
+    "subtitle": "عین مطابق پیمائش کے لئے مکمل حوالہ",
+    "coinExamples": "₹5 Rupee (23mm), ₹10 Rupee (27mm)",
+    "step1": "مرحلہ 1: ایک کامل تصویر لیں",
+    "step2": "مرحلہ 2: سکے کے ساتھ کیلیبریٹ",
+    "step3": "مرحلہ 3: پیمائش کریں"
+  },
+  "id": {
+    "name": "Indonesian",
+    "title": "Panduan PanHandler",
+    "subtitle": "Referensi Lengkap untuk Pengukuran Yang Tepat",
+    "coinExamples": "1000 Rupiah (24mm), 500 Rupiah (24mm)",
+    "step1": "Langkah 1: Ambil Foto Sempurna",
+    "step2": "Langkah 2: Kalibrasi dengan Koin",
+    "step3": "Langkah 3: Tempatkan Pengukuran"
+  },
+  "de": {
+    "name": "German",
+    "title": "PanHandler-Leitfaden",
+    "subtitle": "Vollständige Referenz für präzise Messungen",
+    "coinExamples": "€1 Euro (23.25mm), €2 Euro (25.75mm)",
+    "step1": "Schritt 1: Machen Sie ein perfektes Foto",
+    "step2": "Schritt 2: Mit Münze kalibrieren",
+    "step3": "Schritt 3: Messungen durchführen"
+  },
+  "ja": {
+    "name": "Japanese",
+    "title": "パンハンドラー ガイド",
+    "subtitle": "正確な測定のための完全なリファレンス",
+    "coinExamples": "500 Yen (26.5mm), 100 Yen (22.6mm)",
+    "step1": "ステップ 1: 完璧な写真を撮る",
+    "step2": "ステップ 2: コインで校正する",
+    "step3": "ステップ 3: 測定を行う"
+  },
+  "sw": {
+    "name": "Swahili",
+    "title": "Mwongozo wa Panhandler",
+    "subtitle": "Kumbukumbu kamili kwa vipimo sahihi",
+    "coinExamples": "Kenyan Shilling, Tanzanian Shilling",
+    "step1": "Hatua ya 1: Chukua picha kamili",
+    "step2": "Hatua ya 2: Calibrate na sarafu",
+    "step3": "Hatua ya 3: Weka vipimo"
+  },
+  "mr": {
+    "name": "Marathi",
+    "title": "पॅनहँडलर मार्गदर्शक",
+    "subtitle": "अचूक मोजमापांसाठी संपूर्ण संदर्भ",
+    "coinExamples": "₹5 Rupee (23mm), ₹10 Rupee (27mm)",
+    "step1": "पायरी 1: एक परिपूर्ण फोटो घ्या",
+    "step2": "पायरी 2: नाण्याने कॅलिब्रेट करा",
+    "step3": "पायरी 3: स्थान मोजमाप"
+  },
+  "te": {
+    "name": "Telugu",
+    "title": "PanHandler గైడ్",
+    "subtitle": "ఖచ్చితమైన కొలతల కోసం పూర్తి సూచన",
+    "coinExamples": "₹5 Rupee (23mm), ₹10 Rupee (27mm)",
+    "step1": "దశ 1: పర్ఫెక్ట్ ఫోటో తీయండి",
+    "step2": "దశ 2: కాయిన్‌తో క్రమాంకనం చేయండి",
+    "step3": "దశ 3: స్థల కొలతలు"
+  },
+  "tr": {
+    "name": "Turkish",
+    "title": "PanHandler Kılavuzu",
+    "subtitle": "Hassas Ölçümler için Eksiksiz Referans",
+    "coinExamples": "1 Lira (23.15mm), 50 Kuruş (23.85mm)",
+    "step1": "1. Adım: Mükemmel Bir Fotoğraf Çekin",
+    "step2": "Adım 2: Parayla Kalibre Etme",
+    "step3": "Adım 3: Ölçümleri Yerleştirin"
+  },
+  "ko": {
+    "name": "Korean",
+    "title": "팬핸들러 가이드",
+    "subtitle": "정확한 측정을 위한 완벽한 참조",
+    "coinExamples": "500 Won (26.5mm), 100 Won (24mm)",
+    "step1": "1단계: 완벽한 사진 찍기",
+    "step2": "2단계: 동전으로 보정",
+    "step3": "3단계: 측정 장소"
+  },
+  "ta": {
+    "name": "Tamil",
+    "error": "Too Many Requests IP: 2603:8080:9d00:51ad:29e7:9219:59d4:d2a0, Time: 2025-11-15T10:59:07Z, Url: https://translate.google.com/translate_a/single?client=at&dt=t&dt=rm&dj=1"
+  },
+  "vi": {
+    "name": "Vietnamese",
+    "error": "Too Many Requests IP: 2603:8080:9d00:51ad:29e7:9219:59d4:d2a0, Time: 2025-11-15T10:59:08Z, Url: https://translate.google.com/translate_a/single?client=at&dt=t&dt=rm&dj=1"
+  }
+}
