@@ -882,7 +882,7 @@ Thank you for helping us improve PanHandler!
                       How to use:
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      1. Long-press the Distance button{'\n'}
+                      1. Select the Free Draw tool{'\n'}
                       2. Place finger and hold for 1.5 seconds{'\n'}
                       3. Draw your path{'\n'}
                       4. Release to complete
@@ -896,11 +896,67 @@ Thank you for helping us improve PanHandler!
                 </View>
               </ExpandableSection>
 
+              {/* Volume Calculation */}
+              <ExpandableSection
+                icon="cube"
+                title="📦 Volume Calculation"
+                color="#666"
+                delay={250}
+              >
+                <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
+                  Calculate 3D volumes by adding depth measurements to your 2D area calculations.
+                </Text>
+
+                <View style={{
+                  backgroundColor: 'rgba(0,0,0,0.08)',
+                  borderRadius: 12,
+                  padding: 14,
+                  marginBottom: 12,
+                  borderWidth: 1,
+                  borderColor: 'rgba(0,0,0,0.15)',
+                }}>
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                    How to Calculate Volume:
+                  </Text>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    1. Measure the area (Rectangle, Circle, or closed shape){'\n'}
+                    2. Tap the <Text style={{ fontWeight: '700' }}>Edit Labels</Text> button{'\n'}
+                    3. Tap on the measurement label{'\n'}
+                    4. Enter the <Text style={{ fontWeight: '700' }}>depth</Text> value{'\n'}
+                    5. Volume is automatically calculated!
+                  </Text>
+                </View>
+
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                  Works With:
+                </Text>
+                <View style={{ marginLeft: 8, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    • <Text style={{ fontWeight: '600' }}>Rectangles</Text> - Box volumes{'\n'}
+                    • <Text style={{ fontWeight: '600' }}>Circles</Text> - Cylinder volumes{'\n'}
+                    • <Text style={{ fontWeight: '600' }}>Connected Line Polygons</Text> - Custom volumes{'\n'}
+                    • <Text style={{ fontWeight: '600' }}>Closed Free Draw Lassos</Text> - Irregular volumes
+                  </Text>
+                </View>
+
+                <View style={{
+                  backgroundColor: 'rgba(255,149,0,0.1)',
+                  borderRadius: 10,
+                  padding: 10,
+                  borderWidth: 1,
+                  borderColor: 'rgba(0,0,0,0.15)',
+                }}>
+                  <Text style={{ fontSize: 12, color: '#1C1C1E', lineHeight: 17 }}>
+                    <Text style={{ fontWeight: '700' }}>⚠️ Important:</Text> For Free Draw lassos, the line <Text style={{ fontWeight: '700' }}>cannot cross itself</Text> or the area (and volume) will not be calculated correctly.
+                  </Text>
+                </View>
+              </ExpandableSection>
+
               {/* Controls & Navigation */}
               <ExpandableSection
                 icon="navigate-circle"
                 title="🎮 Navigation & Controls"
-                color="#FF3B30"
+                color="#666"
                 delay={300}
 
 
@@ -2092,7 +2148,10 @@ Thank you for helping us improve PanHandler!
 
                           // Open YouTube link after 3 seconds
                           leftEggNestedTimers.current.push(setTimeout(() => {
-                            Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?feature=share');
+                            Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?feature=share').catch((err) => {
+                              console.log('Failed to open YouTube link:', err);
+                              showAlert('Error', 'Could not open YouTube link', 'error');
+                            });
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setLeftEggPressing(false);
                             leftEggNestedTimers.current = []; // Clear tracked timers after completion
