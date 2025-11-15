@@ -6906,7 +6906,7 @@ export default function DimensionOverlay({
                 </View>
 
           {/* Mode Toggle: Edit/Move vs Measure */}
-          <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
+          <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), backgroundColor: 'rgba(120, 120, 128, 0.3)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
             <Pressable
               onPress={(event) => {
                 setDebugInfo({ lastTouch: Date.now(), interceptor: 'PAN_BUTTON', mode: 'PRESS' });
@@ -6989,7 +6989,7 @@ export default function DimensionOverlay({
           {/* Re-added GestureDetector with careful configuration to avoid button lockups */}
           <GestureDetector gesture={modeSwitchGesture}>
             <View style={[{ marginBottom: scaleMargin(8) }]}>
-              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
+              <View style={{ flexDirection: 'row', backgroundColor: 'rgba(120, 120, 128, 0.3)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
                 {/* Box (Rectangle) */}
                 <Pressable
                 onPress={(event) => {
@@ -7328,7 +7328,7 @@ export default function DimensionOverlay({
           {/* Unit System and Map Mode Row */}
           <View style={{ flexDirection: 'row', marginBottom: scaleMargin(8), gap: scaleGap(6) }}>
             {/* Unit System Toggle: Metric vs Imperial - Compact */}
-            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.18)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
+            <View style={{ flexDirection: 'row', flex: 1, backgroundColor: 'rgba(120, 120, 128, 0.3)', borderRadius: scaleBorderRadius(9), padding: scalePadding(1.5) }}>
               <Pressable
                 onPress={() => {
                   setUnitSystem('metric');
