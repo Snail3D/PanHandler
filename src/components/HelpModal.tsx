@@ -1547,10 +1547,7 @@ Thank you for helping us improve PanHandler!
                       {t('helpModal.bestForRoadMaps')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      → Calibrate with coin first{'\n'}
-                      → Tap 🗺️ Map button{'\n'}
-                      → Enter scale (e.g., "1 inch = 10 miles" or "1cm = 5km"){'\n'}
-                      → Start measuring!
+                      {t('helpModal.coinSteps')}
                     </Text>
                   </View>
 
@@ -1570,10 +1567,7 @@ Thank you for helping us improve PanHandler!
                       {t('helpModal.bestForDroneBlueprints')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      → Find the scale bar on your drawing{'\n'}
-                      → Measure the bar with Distance mode{'\n'}
-                      → Tap 🗺️ Map and enter real-world length{'\n'}
-                      → Example: 50mm bar = 10 meters
+                      {t('helpModal.knownScaleSteps')}
                     </Text>
                   </View>
 
@@ -1583,46 +1577,46 @@ Thank you for helping us improve PanHandler!
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      📏 <Text style={{ fontWeight: '600' }}>Distance</Text> - Measure straight-line distances (as the crow flies)
+                      📏 <Text style={{ fontWeight: '600' }}>{t('helpModal.distanceMode')}</Text> - {t('helpModal.distanceModeDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🧭 <Text style={{ fontWeight: '600' }}>Azimuth</Text> - Get compass bearings from point to point
+                      🧭 <Text style={{ fontWeight: '600' }}>{t('helpModal.azimuthMode')}</Text> - {t('helpModal.azimuthModeDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#6A6A6A', lineHeight: 21, marginLeft: 12, marginBottom: 6 }}>
-                      Place: Start → North reference → Destination
+                      {t('helpModal.azimuthPlacement')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      ⬜ <Text style={{ fontWeight: '600' }}>Rectangle</Text> - Calculate area of regions or zones
+                      ⬜ <Text style={{ fontWeight: '600' }}>{t('helpModal.rectangleMode')}</Text> - {t('helpModal.rectangleModeDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      ⭕ <Text style={{ fontWeight: '600' }}>Circle</Text> - Measure radial distances and circular areas
+                      ⭕ <Text style={{ fontWeight: '600' }}>{t('helpModal.circleMode')}</Text> - {t('helpModal.circleModeDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                      ✏️ <Text style={{ fontWeight: '600' }}>Freehand</Text> - Trace irregular boundaries for perimeter and area
+                      ✏️ <Text style={{ fontWeight: '600' }}>{t('helpModal.freehandMode')}</Text> - {t('helpModal.freehandModeDesc')}
                     </Text>
                   </View>
                   {/* Common Use Cases */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
-                    🎯 Common Use Cases
+                    🎯 {t('helpModal.commonUseCases')}
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      📐 <Text style={{ fontWeight: '600' }}>Blueprints & Floor Plans (Known Scale)</Text> - Measure room dimensions and layout distances
+                      📐 <Text style={{ fontWeight: '600' }}>{t('helpModal.blueprintsFloorPlans')}</Text> - {t('helpModal.blueprintsDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🏗️ <Text style={{ fontWeight: '600' }}>Engineering Drawings</Text> - Calculate component spacing and assembly dimensions
+                      🏗️ <Text style={{ fontWeight: '600' }}>{t('helpModal.engineeringDrawings')}</Text> - {t('helpModal.engineeringDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🗺️ <Text style={{ fontWeight: '600' }}>Topographic Maps</Text> - Measure trail distances and terrain features
+                      🗺️ <Text style={{ fontWeight: '600' }}>{t('helpModal.topographicMaps')}</Text> - {t('helpModal.topographicDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🚁 <Text style={{ fontWeight: '600' }}>Drone & Aerial Photos</Text> - Measure property boundaries and outdoor features from above
+                      🚁 <Text style={{ fontWeight: '600' }}>{t('helpModal.droneAerialPhotos')}</Text> - {t('helpModal.droneDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>
-                      🏠 <Text style={{ fontWeight: '600' }}>Property & Real Estate</Text> - Calculate lot sizes and boundaries
+                      🏠 <Text style={{ fontWeight: '600' }}>{t('helpModal.propertyRealEstate')}</Text> - {t('helpModal.propertyDesc')}
                     </Text>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                      🏛️ <Text style={{ fontWeight: '600' }}>Historical Analysis</Text> - Study archived plans and territorial maps
+                      🏛️ <Text style={{ fontWeight: '600' }}>{t('helpModal.historicalAnalysis')}</Text> - {t('helpModal.historicalDesc')}
                     </Text>
                   </View>
                   {/* Pro Tip */}
@@ -1637,7 +1631,7 @@ Thank you for helping us improve PanHandler!
                       💡 Pro Tip
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19 }}>
-                      Toggle between Metric and Imperial anytime! If your map shows "1 cm = 5 km" but you prefer miles, just switch units and measurements convert automatically.
+                      {t('helpModal.mapModeProTip')}
                     </Text>
                   </View>
                 </View>
