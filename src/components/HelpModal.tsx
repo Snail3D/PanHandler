@@ -1069,10 +1069,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>🗺️</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Pan/Zoom Mode
+                        {t('helpModal.panZoomMode')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Pinch to zoom, drag to pan
+                        {t('helpModal.pinchZoomDrag')}
                       </Text>
                     </View>
                   </View>
@@ -1082,10 +1082,10 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 18, marginRight: 10 }}>📏</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Measure Mode
+                        {t('helpModal.measureMode')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Tap to place points with precision cursor
+                        {t('helpModal.tapPlacePrecision')}
                       </Text>
                     </View>
                   </View>
@@ -1097,10 +1097,10 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Precision Cursor
+                        {t('helpModal.precisionCursor')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Floating crosshair shows exactly where points will be placed
+                        {t('helpModal.precisionCursorDesc')}
                       </Text>
                     </View>
                   </View>
@@ -2509,7 +2509,9 @@ Thank you for helping us improve PanHandler!
                     { code: 'fil', label: 'FIL Filipino' },
                     { code: 'am', label: 'AM አማርኛ' },
                     { code: 'my', label: 'MY မြန်မာ' },
-                    { code: 'th', label: 'TH ไทย' }
+                    { code: 'th', label: 'TH ไทย' },
+                    { code: 'he', label: 'HE עברית' },
+                    { code: 'fa', label: 'FA فارسی' }
                   ].map((lang, index, array) => (
                     <Text
                       key={lang.code}

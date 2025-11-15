@@ -32,6 +32,8 @@ import fil from './translations/fil.json';
 import am from './translations/am.json';
 import my from './translations/my.json';
 import th from './translations/th.json';
+import he from './translations/he.json';
+import fa from './translations/fa.json';
 
 const LANGUAGE_KEY = '@panhandler_language';
 
@@ -64,11 +66,13 @@ export const DEFAULT_COINS_BY_LANGUAGE: Record<string, string> = {
   'fil': '5 Peso',
   'am': 'Ethiopian 1 Birr',
   'my': 'Kyat',
-  'th': '10 Baht'
+  'th': '10 Baht',
+  'he': '₪1 Shekel',
+  'fa': 'Iranian Rial'
 };
 
 // Languages that use RTL (right-to-left) layout
-export const RTL_LANGUAGES = ['ar', 'ur'];
+export const RTL_LANGUAGES = ['ar', 'ur', 'he', 'fa'];
 
 // Check if current language is RTL
 export const isRTL = (languageCode: string): boolean => {
@@ -104,7 +108,9 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'fil', name: 'Filipino', native: 'Filipino', rtl: false },
   { code: 'am', name: 'Amharic', native: 'አማርኛ', rtl: false },
   { code: 'my', name: 'Burmese', native: 'မြန်မာ', rtl: false },
-  { code: 'th', name: 'Thai', native: 'ไทย', rtl: false }
+  { code: 'th', name: 'Thai', native: 'ไทย', rtl: false },
+  { code: 'he', name: 'Hebrew', native: 'עברית', rtl: true },
+  { code: 'fa', name: 'Farsi', native: 'فارسی', rtl: true }
 ];
 
 // Initialize i18n
@@ -155,7 +161,9 @@ const initI18n = async () => {
         fil: { translation: fil },
         am: { translation: am },
         my: { translation: my },
-        th: { translation: th }
+        th: { translation: th },
+        he: { translation: he },
+        fa: { translation: fa }
       },
       lng: savedLanguage,
       fallbackLng: 'en',

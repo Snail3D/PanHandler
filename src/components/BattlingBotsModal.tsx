@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as StoreReview from 'expo-store-review';
 import { useTranslation } from 'react-i18next';
+import { getCurrentRTL } from '../utils/i18n';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import {
@@ -42,6 +43,9 @@ export default function BattlingBotsModal({
 }: BattlingBotsModalProps) {
   // Initialize i18n translation hook
   const { t } = useTranslation();
+  
+  // Check if current language is RTL
+  const isRTL = getCurrentRTL();
   
   // Access store for donation tracking
   const setIsDonor = useStore((s) => s.setIsDonor);

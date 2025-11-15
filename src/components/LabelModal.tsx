@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { getCurrentRTL } from '../utils/i18n';
 import { getMakerExamplesForPlaceholder } from '../utils/makerExamplesI18n';
 
 // Small, inventive maker items for placeholder examples
@@ -538,6 +539,7 @@ export default function LabelModal({
   unitSystem = 'metric'
 }: LabelModalProps) {
   const { t } = useTranslation();
+  const isRTL = getCurrentRTL();
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
   const [depth, setDepth] = useState('');
