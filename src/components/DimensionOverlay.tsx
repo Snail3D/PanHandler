@@ -28,6 +28,7 @@ import TypewriterText from './TypewriterText';
 import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 import { getRandomChuckNorrisJoke } from '../utils/chuckNorrisJokes';
+import { useTranslation } from 'react-i18next';
 import SnailIcon from './SnailIcon';
 import {
   scaleFontSize,
@@ -141,6 +142,8 @@ export default function DimensionOverlay({
   skipToBlueprintMode = false,
   skipToAerialMode = false,
 }: DimensionOverlayProps) {
+  // Initialize i18n translation hook
+  const { t } = useTranslation();
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
   
@@ -6942,7 +6945,7 @@ export default function DimensionOverlay({
                   fontSize: scaleFontSize(12),
                   color: !measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  {isPanZoomLocked ? 'Edit' : 'Pan'}
+                  {isPanZoomLocked ? t('buttons.edit') : t('buttons.pan')}
                 </Text>
               </View>
             </Pressable>
