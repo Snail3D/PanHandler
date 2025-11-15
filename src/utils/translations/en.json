@@ -63,6 +63,7 @@
     "calibrated": "Calibrated",
     "supporter": "Supporter",
     "panhandlerSupporter": "PanHandler Supporter",
+    "brandName": "PanHandler",
     "recalibrateButton": "Recalibrate",
     "panMode": "Pan Mode - Move/zoom image",
     "editMode": "Edit Mode - Move measurements",  

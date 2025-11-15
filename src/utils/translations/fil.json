@@ -76,10 +76,11 @@
     "imageSaved": "Na-save sa Mga Larawan!",
     "measurements": "Mga sukat",
     "supporter": "Tagasuporta",
-    "panhandlerSupporter": "PanHandler Supporter",
+    "panhandlerSupporter": "PanHandler Tagasuporta",
     "newPhoto": "Bagong Larawan",
     "mapMode": "Mode ng Mapa",
-    "blueprintMode": "Blueprint Mode"
+    "blueprintMode": "Blueprint Mode",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Patnubay",

@@ -76,10 +76,11 @@
     "imageSaved": "Сохранено в Фото!",
     "measurements": "Измерения",
     "supporter": "Сторонник",
-    "panhandlerSupporter": "Сторонник PanHandler",
+    "panhandlerSupporter": "PanHandler Сторонник",
     "newPhoto": "Новое фото",
     "mapMode": "Режим карты",
-    "blueprintMode": "Режим чертежа"
+    "blueprintMode": "Режим чертежа",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Гид",

@@ -76,10 +76,11 @@
     "imageSaved": "บันทึกลงในรูปภาพ!",
     "measurements": "การวัด",
     "supporter": "ผู้สนับสนุน",
-    "panhandlerSupporter": "ผู้สนับสนุน PanHandler",
+    "panhandlerSupporter": "PanHandler ผู้สนับสนุน",
     "newPhoto": "ภาพใหม่",
     "mapMode": "โหมดแผนที่",
-    "blueprintMode": "โหมดบลูพริ้นท์"
+    "blueprintMode": "โหมดบลูพริ้นท์",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "แนะนำ",

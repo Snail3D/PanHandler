@@ -76,10 +76,11 @@
     "imageSaved": "Đã lưu vào Ảnh!",
     "measurements": "Các phép đo",
     "supporter": "Người ủng hộ",
-    "panhandlerSupporter": "Người ủng hộ PanHandler",
+    "panhandlerSupporter": "PanHandler Người ủng hộ",
     "newPhoto": "Ảnh mới",
     "mapMode": "Chế độ bản đồ",
-    "blueprintMode": "Chế độ bản thiết kế"
+    "blueprintMode": "Chế độ bản thiết kế",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Hướng dẫn",

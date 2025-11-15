@@ -76,10 +76,11 @@
     "imageSaved": "Ajiye zuwa Hotuna!",
     "measurements": "Ma'auni",
     "supporter": "Mataimaki",
-    "panhandlerSupporter": "PanHandler Supporter",
+    "panhandlerSupporter": "PanHandler Mataimaki",
     "newPhoto": "Sabon Hoto",
     "mapMode": "Yanayin taswira",
-    "blueprintMode": "Yanayin Blueprint"
+    "blueprintMode": "Yanayin Blueprint",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Jagora",

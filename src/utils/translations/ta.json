@@ -79,7 +79,8 @@
     "panhandlerSupporter": "PanHandler ஆதரவாளர்",
     "newPhoto": "புதிய புகைப்படம்",
     "mapMode": "வரைபடப் பயன்முறை",
-    "blueprintMode": "புளூபிரிண்ட் பயன்முறை"
+    "blueprintMode": "புளூபிரிண்ட் பயன்முறை",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "கையேடு",

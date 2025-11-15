@@ -76,10 +76,11 @@
     "imageSaved": "تم حفظه في الصور!",
     "measurements": "القياسات",
     "supporter": "مؤيد",
-    "panhandlerSupporter": "مؤيد بان هاندلر",
+    "panhandlerSupporter": "PanHandler مؤيد",
     "newPhoto": "صورة جديدة",
     "mapMode": "وضع الخريطة",
-    "blueprintMode": "وضع المخطط"
+    "blueprintMode": "وضع المخطط",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "مرشد",
@@ -93,7 +94,7 @@
   "battlingBots": {
     "title": "Behind the Scenes",
     "supportSnail": "دعم الحلزون",
-    "subtitle": "بان هاندلر مشروعٌ شغوف. ساهم في إبقائه حيًا!",
+    "subtitle": "PanHandler هاندلر مشروعٌ شغوف. ساهم في إبقائه حيًا!",
     "buyMeCoffee": "اشتري لي قهوة",
     "cantDoCoffee": "لا أستطيع شرب القهوة: اترك تعليقا!",
     "maybeLater": "ربما في وقت لاحق"

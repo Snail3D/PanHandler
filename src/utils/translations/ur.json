@@ -76,10 +76,11 @@
     "imageSaved": "تصاویر میں محفوظ!",
     "measurements": "پیمائش",
     "supporter": "حمایتی",
-    "panhandlerSupporter": "پین ہینڈلر سپورٹر",
+    "panhandlerSupporter": "PanHandler حمایتی",
     "newPhoto": "نئی تصویر",
     "mapMode": "نقشہ وضع",
-    "blueprintMode": "بلیو پرنٹ موڈ"
+    "blueprintMode": "بلیو پرنٹ موڈ",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "گائیڈ",

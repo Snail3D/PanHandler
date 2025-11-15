@@ -76,10 +76,11 @@
     "imageSaved": "Enregistré dans Photos !",
     "measurements": "Mesures",
     "supporter": "Supporter",
-    "panhandlerSupporter": "Soutien aux mendiants",
+    "panhandlerSupporter": "PanHandler Supporter",
     "newPhoto": "Nouvelle photo",
     "mapMode": "Mode carte",
-    "blueprintMode": "Mode plan"
+    "blueprintMode": "Mode plan",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Guide",

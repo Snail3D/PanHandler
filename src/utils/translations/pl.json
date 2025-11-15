@@ -76,10 +76,11 @@
     "imageSaved": "Zapisano w Zdjęciach!",
     "measurements": "Pomiary",
     "supporter": "Kibic",
-    "panhandlerSupporter": "Wspierający PanHandler",
+    "panhandlerSupporter": "PanHandler Kibic",
     "newPhoto": "Nowe zdjęcie",
     "mapMode": "Tryb mapy",
-    "blueprintMode": "Tryb projektu"
+    "blueprintMode": "Tryb projektu",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Przewodnik",

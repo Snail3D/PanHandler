@@ -76,10 +76,11 @@
     "imageSaved": "ఫోటోలకు సేవ్ చేయబడింది!",
     "measurements": "కొలతలు",
     "supporter": "మద్దతుదారు",
-    "panhandlerSupporter": "పాన్ హ్యాండ్లర్ మద్దతుదారు",
+    "panhandlerSupporter": "PanHandler మద్దతుదారు",
     "newPhoto": "కొత్త ఫోటో",
     "mapMode": "మ్యాప్ మోడ్",
-    "blueprintMode": "బ్లూప్రింట్ మోడ్"
+    "blueprintMode": "బ్లూప్రింట్ మోడ్",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "గైడ్",

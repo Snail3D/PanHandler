@@ -76,10 +76,11 @@
     "imageSaved": "Disimpan ke Foto!",
     "measurements": "Pengukuran",
     "supporter": "Pendukung",
-    "panhandlerSupporter": "Pendukung PanHandler",
+    "panhandlerSupporter": "PanHandler Pendukung",
     "newPhoto": "Foto Baru",
     "mapMode": "Mode Peta",
-    "blueprintMode": "Mode Cetak Biru"
+    "blueprintMode": "Mode Cetak Biru",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Memandu",
