@@ -70,21 +70,28 @@ const ExpandableSection = ({
   }, [delay]);
 
   useEffect(() => {
-    if (isAnimatingRef.current) return; // Prevent concurrent animations
-    
+    // Reset animating flag at start of new animation
     isAnimatingRef.current = true;
+    
     if (expanded) {
       // Use timing instead of spring to prevent continuous updates that block touches
-      heightValue.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }, () => {
-        isAnimatingRef.current = false;
+      heightValue.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }, (finished) => {
+        if (finished) isAnimatingRef.current = false;
       });
       rotateValue.value = withTiming(180, { duration: 300, easing: Easing.out(Easing.cubic) });
     } else {
-      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) }, () => {
-        isAnimatingRef.current = false;
+      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) }, (finished) => {
+        if (finished) isAnimatingRef.current = false;
       });
       rotateValue.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     }
+    
+    // Safety timeout to ensure flag is always reset
+    const timeout = setTimeout(() => {
+      isAnimatingRef.current = false;
+    }, 500);
+    
+    return () => clearTimeout(timeout);
   }, [expanded]);
 
   // Simple fade animation only (no scale to prevent jerky scrolling)
@@ -128,8 +135,7 @@ const ExpandableSection = ({
         {/* Header - Separate Pressable for better touch handling */}
         <Pressable
           onPress={() => {
-            // Prevent rapid toggling during animations that could cause race conditions
-            if (isAnimatingRef.current) return;
+            // Toggle immediately - don't block on animation state
             const newExpanded = !expanded;
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setExpanded(newExpanded);
