@@ -649,7 +649,7 @@ Thank you for helping us improve PanHandler!
               {/* Camera & Auto Level */}
               <ExpandableSection
                 icon="camera"
-                title="📸 Step 1: Take a Perfect Photo"
+                title={`📸 ${t('helpModal.step1Title')}`}
                 color="#666"
                 delay={50}
 
@@ -767,7 +767,7 @@ Thank you for helping us improve PanHandler!
               {/* Calibration */}
               <ExpandableSection
                 icon="analytics"
-                title="🪙 Step 2: Calibrate with Coin"
+                title={`🪙 ${t('helpModal.step2Title')}`}
                 color="#666"
                 delay={100}
 
@@ -817,7 +817,7 @@ Thank you for helping us improve PanHandler!
               {/* Measurement Modes */}
               <ExpandableSection
                 icon="resize"
-                title="📏 Step 3: Place Measurements"
+                title={`📏 ${t('helpModal.step3Title')}`}
                 color="#666"
                 delay={200}
 
