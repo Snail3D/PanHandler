@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { getMakerExamplesForPlaceholder } from '../utils/makerExamplesI18n';
 
 // Small, inventive maker items for placeholder examples
 // Mix of real maker projects and absurdly funny ones

@@ -261,8 +261,12 @@
     "circleDescription": "Measure circles by placing center and edge points. Shows radius, diameter, area, and optional volume.",
     "rectangleMode": "Rectangle Mode (Box)",
     "rectangleDescription": "Measure rectangles by placing opposite corners. Shows width, height, area, and optional volume.",
-    "freehandMode": "Freehand Mode (Free Draw)",
-    "freehandDescription": "Draw custom paths. Shows path length. Close the path to calculate area!"
+    "freehandMode": "Freehand Mode (Free Measure)",
+    "freehandDescription": "Draw custom paths to measure any shape. Perfect for wire paths, curved edges, or irregular contours.",
+    "lassoModeTitle": "LASSO MODE - Close the loop!",
+    "lassoModeSnap": "When you draw close to your starting point, it auto-snaps to close the loop! You will feel haptic feedback when it connects.",
+    "lassoModeArea": "Closed loops show both perimeter AND area in the legend!",
+    "freehandHowToUse": "How to use:"
   },
   
   "battlingBots": {
