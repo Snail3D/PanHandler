@@ -1438,10 +1438,10 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Open Your CAD Software
+                        {t('helpModal.cadStep1')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Create a new project or open an existing design
+                        {t('helpModal.cadStep1Desc')}
                       </Text>
                     </View>
                   </View>
@@ -1454,10 +1454,10 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Insert Canvas Image
+                        {t('helpModal.cadStep2')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Import the CAD Canvas Photo from PanHandler as a canvas or reference image
+                        {t('helpModal.cadStep2Desc')}
                       </Text>
                     </View>
                   </View>
@@ -1470,14 +1470,14 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Scale Using Coin Reference
+                        {t('helpModal.cadStep3')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20, marginBottom: 8 }}>
-                        Use the coin information in the photo label to quickly scale your canvas in CAD
+                        {t('helpModal.cadStep3Desc')}
                       </Text>
                       <View style={{ backgroundColor: 'rgba(0,0,0,0.12)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: 'rgba(0,0,0,0.25)' }}>
                         <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                          <Text style={{ fontWeight: '700' }}>Quick Scaling:</Text> The photo label shows the coin you selected and its size (e.g., "US Quarter - Ø 24.26mm" or "Euro 1 - Ø 23.25mm"). Use this to set your canvas scale by measuring the coin in the photo!
+                          {t('helpModal.quickScaling')}
                         </Text>
                       </View>
                     </View>
@@ -1491,10 +1491,10 @@ Thank you for helping us improve PanHandler!
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginBottom: 4 }}>
-                        Trace & Model
+                        {t('helpModal.cadStep4')}
                       </Text>
                       <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                        Trace over the 50% opacity image using your CAD tools for easy reference!
+                        {t('helpModal.cadStep4Desc')}
                       </Text>
                     </View>
                   </View>
@@ -1504,11 +1504,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     <Ionicons name="checkmark-circle" size={20} color="#666" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
-                      Pro Tip
+                      {t('helpModal.cadProTip')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    The 50% opacity makes it easy to see your CAD lines while still having the reference visible
+                    {t('helpModal.cad50Opacity')}
                   </Text>
                 </View>
               </ExpandableSection>

@@ -370,7 +370,18 @@
     "levelPhoneCenterBubble": "Level your phone to center the bubble",
     "holdDownShutter": "Hold down the shutter button until photo captures",
     "oopsNeedDoOver": "Oops! Need a Do-Over?",
-    "madeMistakeCalibration": "Made a mistake with your calibration? No worries! Just tap the red Recalibrate button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!"
+    "madeMistakeCalibration": "Made a mistake with your calibration? No worries! Just tap the red Recalibrate button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!",
+    "cadStep1": "Open Your CAD Software",
+    "cadStep1Desc": "Create a new project or open an existing design",
+    "cadStep2": "Insert Canvas Image",
+    "cadStep2Desc": "Import the CAD Canvas Photo from PanHandler as a canvas or reference image",
+    "cadStep3": "Scale Using Coin Reference",
+    "cadStep3Desc": "Use the coin information in the photo label to quickly scale your canvas in CAD",
+    "quickScaling": "Quick Scaling: The photo label shows the coin you selected and its size (e.g., \"US Quarter - Ø 24.26mm\" or \"Euro 1 - Ø 23.25mm\"). Use this to set your canvas scale by measuring the coin in the photo!",
+    "cadStep4": "Trace & Model",
+    "cadStep4Desc": "Trace over the 50% opacity image using your CAD tools for easy reference!",
+    "cadProTip": "Pro Tip",
+    "cad50Opacity": "The 50% opacity makes it easy to see your CAD lines while still having the reference visible"
   },
   
   "battlingBots": {
