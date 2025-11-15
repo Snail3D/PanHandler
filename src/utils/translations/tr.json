@@ -76,10 +76,11 @@
     "imageSaved": "Fotoğraflar'a kaydedildi!",
     "measurements": "Ölçümler",
     "supporter": "Destekçi",
-    "panhandlerSupporter": "PanHandler Destekçisi",
+    "panhandlerSupporter": "PanHandler Destekçi",
     "newPhoto": "Yeni Fotoğraf",
     "mapMode": "Harita Modu",
-    "blueprintMode": "Mavi Baskı Modu"
+    "blueprintMode": "Mavi Baskı Modu",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Rehber",

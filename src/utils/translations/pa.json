@@ -76,10 +76,11 @@
     "imageSaved": "ਫੋਟੋਆਂ ਵਿੱਚ ਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ!",
     "measurements": "ਮਾਪ",
     "supporter": "ਸਮਰਥਕ",
-    "panhandlerSupporter": "ਪੈਨਹੈਂਡਲਰ ਸਮਰਥਕ",
+    "panhandlerSupporter": "PanHandler ਸਮਰਥਕ",
     "newPhoto": "ਨਵੀਂ ਫੋਟੋ",
     "mapMode": "ਨਕਸ਼ਾ ਮੋਡ",
-    "blueprintMode": "ਬਲੂਪ੍ਰਿੰਟ ਮੋਡ"
+    "blueprintMode": "ਬਲੂਪ੍ਰਿੰਟ ਮੋਡ",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "ਗਾਈਡ",
@@ -93,7 +94,7 @@
   "battlingBots": {
     "title": "ਪਰਦੇ ਪਿੱਛੇ",
     "supportSnail": "ਸਪੋਰਟ ਘੋਗਾ",
-    "subtitle": "ਪੈਨਹੈਂਡਲਰ ਇੱਕ ਜਨੂੰਨ ਪ੍ਰੋਜੈਕਟ ਹੈ। ਇਸਨੂੰ ਜ਼ਿੰਦਾ ਰੱਖਣ ਵਿੱਚ ਮਦਦ ਕਰੋ!",
+    "subtitle": "PanHandler ਇੱਕ ਜਨੂੰਨ ਪ੍ਰੋਜੈਕਟ ਹੈ। ਇਸਨੂੰ ਜ਼ਿੰਦਾ ਰੱਖਣ ਵਿੱਚ ਮਦਦ ਕਰੋ!",
     "buyMeCoffee": "ਮੈਨੂੰ ਇੱਕ ਕੌਫੀ ਖਰੀਦੋ",
     "cantDoCoffee": "ਮੈਂ ਕੌਫੀ ਨਹੀਂ ਪੀ ਸਕਦਾ: ਇੱਕ ਸਮੀਖਿਆ ਛੱਡੋ!",
     "maybeLater": "ਸ਼ਾਇਦ ਬਾਅਦ ਵਿੱਚ"

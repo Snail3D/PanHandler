@@ -76,10 +76,11 @@
     "imageSaved": "사진에 저장되었습니다!",
     "measurements": "측정",
     "supporter": "서포터",
-    "panhandlerSupporter": "팬핸들러 서포터",
+    "panhandlerSupporter": "PanHandler 서포터",
     "newPhoto": "새로운 사진",
     "mapMode": "지도 모드",
-    "blueprintMode": "블루프린트 모드"
+    "blueprintMode": "블루프린트 모드",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "가이드",

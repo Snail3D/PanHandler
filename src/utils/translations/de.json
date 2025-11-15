@@ -76,10 +76,11 @@
     "imageSaved": "In Fotos gespeichert!",
     "measurements": "Messungen",
     "supporter": "Fan",
-    "panhandlerSupporter": "Bettler-Unterstützer",
+    "panhandlerSupporter": "PanHandler Fan",
     "newPhoto": "Neues Foto",
     "mapMode": "Kartenmodus",
-    "blueprintMode": "Blaupausenmodus"
+    "blueprintMode": "Blaupausenmodus",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Führung",

@@ -76,10 +76,11 @@
     "imageSaved": "写真に保存しました!",
     "measurements": "測定",
     "supporter": "サポーター",
-    "panhandlerSupporter": "PanHandlerサポーター",
+    "panhandlerSupporter": "PanHandler サポーター",
     "newPhoto": "新しい写真",
     "mapMode": "マップモード",
-    "blueprintMode": "ブループリントモード"
+    "blueprintMode": "ブループリントモード",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "ガイド",

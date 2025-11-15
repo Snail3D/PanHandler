@@ -76,10 +76,11 @@
     "imageSaved": "ফটোতে সংরক্ষিত!",
     "measurements": "পরিমাপ",
     "supporter": "সমর্থক",
-    "panhandlerSupporter": "প্যানহ্যান্ডলার সমর্থক",
+    "panhandlerSupporter": "PanHandler সমর্থক",
     "newPhoto": "নতুন ছবি",
     "mapMode": "মানচিত্র মোড",
-    "blueprintMode": "ব্লুপ্রিন্ট মোড"
+    "blueprintMode": "ব্লুপ্রিন্ট মোড",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "গাইড",
@@ -93,7 +94,7 @@
   "battlingBots": {
     "title": "পর্দার অন্তরালে",
     "supportSnail": "সাপোর্ট শামুক",
-    "subtitle": "প্যানহ্যান্ডলার একটি আবেগঘন প্রকল্প। এটিকে বাঁচিয়ে রাখতে সাহায্য করুন!",
+    "subtitle": "PanHandler একটি আবেগঘন প্রকল্প। এটিকে বাঁচিয়ে রাখতে সাহায্য করুন!",
     "buyMeCoffee": "আমাকে একটা কফি কিনে দাও",
     "cantDoCoffee": "আমি কফি করতে পারি না: একটি পর্যালোচনা দিন!",
     "maybeLater": "হয়তো পরে"

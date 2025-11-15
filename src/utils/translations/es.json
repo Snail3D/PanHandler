@@ -76,10 +76,11 @@
     "imageSaved": "¡Guardado en Fotos!",
     "measurements": "Medidas",
     "supporter": "Seguidor",
-    "panhandlerSupporter": "Simpatizante de PanHandler",
+    "panhandlerSupporter": "PanHandler Seguidor",
     "newPhoto": "Nueva foto",
     "mapMode": "Modo mapa",
-    "blueprintMode": "Modo de planos"
+    "blueprintMode": "Modo de planos",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Guía",

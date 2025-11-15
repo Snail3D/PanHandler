@@ -79,7 +79,8 @@
     "panhandlerSupporter": "PanHandler ደጋፊ",
     "newPhoto": "አዲስ ፎቶ",
     "mapMode": "የካርታ ሁነታ",
-    "blueprintMode": "የብሉፕሪንት ሁነታ"
+    "blueprintMode": "የብሉፕሪንት ሁነታ",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "መመሪያ",

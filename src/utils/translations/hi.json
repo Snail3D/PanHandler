@@ -76,10 +76,11 @@
     "imageSaved": "फ़ोटो में सहेजा गया!",
     "measurements": "मापन",
     "supporter": "समर्थक",
-    "panhandlerSupporter": "पैनहैंडलर समर्थक",
+    "panhandlerSupporter": "PanHandler समर्थक",
     "newPhoto": "नई तस्वीर",
     "mapMode": "मानचित्र मोड",
-    "blueprintMode": "ब्लूप्रिंट मोड"
+    "blueprintMode": "ब्लूप्रिंट मोड",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "मार्गदर्शक",
@@ -93,7 +94,7 @@
   "battlingBots": {
     "title": "पर्दे के पीछे",
     "supportSnail": "समर्थन घोंघा",
-    "subtitle": "पैनहैंडलर एक जुनूनी प्रोजेक्ट है। इसे जीवित रखने में मदद करें!",
+    "subtitle": "PanHandler एक जुनूनी प्रोजेक्ट है। इसे जीवित रखने में मदद करें!",
     "buyMeCoffee": "मुझे एक कॉफ़ी खरीदो",
     "cantDoCoffee": "मैं कॉफी नहीं कर सकता: एक समीक्षा छोड़ दो!",
     "maybeLater": "शायद बाद में"

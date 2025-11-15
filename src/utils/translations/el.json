@@ -76,10 +76,11 @@
     "imageSaved": "Αποθηκεύτηκε στις Φωτογραφίες!",
     "measurements": "Μετρήσεις",
     "supporter": "Υποστηρικτής",
-    "panhandlerSupporter": "Υποστηρικτής PanHandler",
+    "panhandlerSupporter": "PanHandler Υποστηρικτής",
     "newPhoto": "Νέα φωτογραφία",
     "mapMode": "Λειτουργία χάρτη",
-    "blueprintMode": "Λειτουργία Σχεδίου"
+    "blueprintMode": "Λειτουργία Σχεδίου",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Οδηγός",

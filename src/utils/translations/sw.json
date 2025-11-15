@@ -76,10 +76,11 @@
     "imageSaved": "Imehifadhiwa kwenye Picha!",
     "measurements": "Vipimo",
     "supporter": "Msaidizi",
-    "panhandlerSupporter": "Msaidizi wa PanHandler",
+    "panhandlerSupporter": "PanHandler Msaidizi",
     "newPhoto": "Picha Mpya",
     "mapMode": "Hali ya Ramani",
-    "blueprintMode": "Njia ya Blueprint"
+    "blueprintMode": "Njia ya Blueprint",
+    "brandName": "PanHandler"
   },
   "helpModal": {
     "title": "Mwongozo",
