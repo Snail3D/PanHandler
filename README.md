@@ -37,9 +37,9 @@ Download the latest Android APK directly from GitHub. No app store required - ju
 
 ---
 
-## 📄 Multilingual PDF Guides (28 Languages!)
+## 📄 Multilingual PDF Guides (30 Languages!)
 
-Complete user guides available in 28 languages - perfect for students and international users!
+Complete user guides available in 30 languages - perfect for students and international users!
 
 **Download PDF Guide:**
 - 🇺🇸 **EN** [English](https://github.com/Snail3D/PanHandler) | 🇪🇸 **ES** [Español](https://github.com/Snail3D/PanHandler) | 🇨🇳 **ZH** [中文](https://github.com/Snail3D/PanHandler) | 🇮🇳 **HI** [हिन्दी](https://github.com/Snail3D/PanHandler)
@@ -49,6 +49,7 @@ Complete user guides available in 28 languages - perfect for students and intern
 - 🇮🇳 **MR** [मराठी](https://github.com/Snail3D/PanHandler) | 🇮🇳 **TE** [తెలుగు](https://github.com/Snail3D/PanHandler) | 🇹🇷 **TR** [Türkçe](https://github.com/Snail3D/PanHandler) | 🇰🇷 **KO** [한국어](https://github.com/Snail3D/PanHandler)
 - 🇮🇳 **TA** [தமிழ்](https://github.com/Snail3D/PanHandler) | 🇻🇳 **VI** [Tiếng Việt](https://github.com/Snail3D/PanHandler) | 🇳🇬 **HA** [Hausa](https://github.com/Snail3D/PanHandler) | 🇮🇳 **PA** [ਪੰਜਾਬੀ](https://github.com/Snail3D/PanHandler)
 - 🇵🇭 **FIL** [Filipino](https://github.com/Snail3D/PanHandler) | 🇪🇹 **AM** [አማርኛ](https://github.com/Snail3D/PanHandler) | 🇲🇲 **MY** [မြန်မာ](https://github.com/Snail3D/PanHandler) | 🇹🇭 **TH** [ไทย](https://github.com/Snail3D/PanHandler)
+- 🇮🇱 **HE** [עברית](https://github.com/Snail3D/PanHandler) | 🇮🇷 **FA** [فارسی](https://github.com/Snail3D/PanHandler)
 
 💡 **Or generate from the app:** Tap Help (?) → PDF Guide → Choose your language
 
