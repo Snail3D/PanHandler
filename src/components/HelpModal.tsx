@@ -557,11 +557,11 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
-                    Watch our complete video tutorial series
+                    {t('helpModal.videoCoursesDescription')}
                   </Text>
                   
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 16 }}>
-                    Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.
+                    {t('helpModal.videoCoursesLearn')}
                   </Text>
                   
                   {/* Red Banner Button - Matches Play Icon Color */}
@@ -778,7 +778,7 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  After capturing your photo, calibrate using the reference coin to enable precise measurements.
+                  {t('helpModal.afterCapturing')}
                 </Text>
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
