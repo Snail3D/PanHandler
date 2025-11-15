@@ -782,16 +782,16 @@ Thank you for helping us improve PanHandler!
                 </Text>
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • <Text style={{ fontWeight: '600' }}>Search for your coin type</Text> - 650+ coins from 130+ countries worldwide! Includes coins from every continent to ensure accessibility for everyone.
+                    • <Text style={{ fontWeight: '600' }}>{t('helpModal.searchCoinType')}</Text> - {t('helpModal.650CoinsWorldwide')}
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • Zoom in and position the calibration circle
+                    • {t('helpModal.zoomPosition')}
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 6 }}>
-                    • <Text style={{ fontWeight: '600' }}>Match the outside edge of the coin with the outside edge of the colored circle</Text>
+                    • <Text style={{ fontWeight: '600' }}>{t('helpModal.matchEdges')}</Text>
                   </Text>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22 }}>
-                    • Tap Lock in when aligned
+                    • {t('helpModal.tapLockIn')}
                   </Text>
                 </View>
                 

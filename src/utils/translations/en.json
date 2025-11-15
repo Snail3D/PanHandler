@@ -232,7 +232,13 @@
     "troubleshootingTitle": "Troubleshooting",
     "cadIntegrationTitle": "Export & CAD Integration",
     "languagesTitle": "Languages",
-    "afterCapturing": "After capturing your photo, calibrate using the reference coin to enable precise measurements."
+    "afterCapturing": "After capturing your photo, calibrate using the reference coin to enable precise measurements.",
+    "searchCoinType": "Search for your coin type",
+    "650CoinsWorldwide": "650+ coins from 130+ countries worldwide! Includes coins from every continent to ensure accessibility for everyone.",
+    "zoomPosition": "Zoom in and position the calibration circle",
+    "matchEdges": "Match the outside edge of the coin with the outside edge of the colored circle",
+    "tapLockIn": "Tap Lock in when aligned",
+    "chooseMeasurement": "Choose from multiple measurement types to capture all dimensions of your object."
   },
   
   "battlingBots": {
