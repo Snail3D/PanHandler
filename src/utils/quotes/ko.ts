@@ -48,8 +48,8 @@ export const quotes_ko: string[] = [
   "I'm not procrastinating, I'm prototyping.",
   "This is a feature, not a bug.",
   "Works on my machine.",
-  "It's not broken, it's just... redesigned.",
-  "I didn't choose the maker life. The maker life chose me.",
-  "My other project is also unfinished.",
-  "Powered by caffeine and stubbornness.",
+  "It's not a bug, it's a feature.",
+  "There's no place like 127.0.0.1.",
+  "sudo make me a sandwich.",
+  "Have you tried turning it off and on again?",
 ];
