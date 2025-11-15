@@ -158,9 +158,38 @@
     "photoTypeSelection": {
       "title": "Choose Calibration Method",
       "coin": "Coin",
+      "coinDescription": "Use any coin for reference",
       "map": "Map Scale",
+      "mapDescription": "Maps with scale notation",
       "blueprint": "Blueprint/Known Scale",
-      "aerial": "Aerial/Drone Photo"
+      "blueprintDescription": "Known reference distance",
+      "aerial": "Aerial/Drone Photo",
+      "aerialDescription": "Uses altitude metadata"
+    },
+    "ratingPrompt": {
+      "title": "Enjoying PanHandler?",
+      "message": "Your feedback helps us improve and reach more users who need precise measurements!",
+      "rateButton": "Rate on App Store",
+      "maybeLater": "Maybe Later"
+    },
+    "magneticDeclination": {
+      "title": "Magnetic Declination",
+      "description": "Enter your location's magnetic declination",
+      "placeholder": "e.g., 14.5",
+      "apply": "Apply",
+      "skip": "Skip"
+    },
+    "manualAltitude": {
+      "title": "Enter Altitude",
+      "description": "Drone altitude in meters",
+      "placeholder": "e.g., 120",
+      "apply": "Apply",
+      "cancel": "Cancel"
+    },
+    "unitSelector": {
+      "selectUnit": "Select Unit",
+      "metric": "Metric",
+      "imperial": "Imperial"
     }
   },
   
