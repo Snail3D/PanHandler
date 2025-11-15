@@ -17,22 +17,7 @@ interface PhotoTypeOption {
   color: string;
 }
 
-const OPTIONS: PhotoTypeOption[] = [
-  {
-    type: 'coin',
-    title: 'Coin Reference',
-    subtitle: 'Classic calibration with a coin',
-    icon: CoinIcon,
-    color: '#FF9500',
-  },
-  {
-    type: 'blueprint',
-    title: 'Known Scale Mode',
-    subtitle: 'For aerial photos, blueprints, and more',
-    icon: BlueprintIcon,
-    color: '#5856D6',
-  },
-];
+// Options will be created dynamically using translations in component
 
 interface PhotoTypeSelectionModalProps {
   visible: boolean;
@@ -47,6 +32,25 @@ const PhotoTypeSelectionModal: React.FC<PhotoTypeSelectionModalProps> = ({
   onCancel,
   sessionColor,
 }) => {
+  const { t } = useTranslation();
+  
+  const OPTIONS: PhotoTypeOption[] = [
+    {
+      type: 'coin',
+      title: t('modals.photoTypeSelection.coin'),
+      subtitle: t('modals.photoTypeSelection.coinDescription'),
+      icon: CoinIcon,
+      color: '#FF9500',
+    },
+    {
+      type: 'blueprint',
+      title: t('modals.photoTypeSelection.blueprint'),
+      subtitle: t('modals.photoTypeSelection.blueprintDescription'),
+      icon: BlueprintIcon,
+      color: '#5856D6',
+    },
+  ];
+  
   const handleSelect = (type: PhotoType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onSelect(type);
