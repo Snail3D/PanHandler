@@ -3,6 +3,7 @@ import { Modal, View, Text, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 interface AlertModalProps {
   visible: boolean;
@@ -20,11 +21,13 @@ export default function AlertModal({
   title,
   message,
   onClose,
-  confirmText = 'OK',
+  confirmText,
   cancelText,
   onConfirm,
   type = 'info',
 }: AlertModalProps) {
+  const { t } = useTranslation();
+  
   const handleConfirm = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (onConfirm) {
@@ -154,7 +157,7 @@ export default function AlertModal({
                         textAlign: 'center',
                       }}
                     >
-                      {confirmText}
+                      {confirmText || t('common.ok')}
                     </Text>
                   </Pressable>
 
