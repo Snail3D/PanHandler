@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, View, Text, Pressable, ScrollView, Linking } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView, Linking, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as StoreReview from 'expo-store-review';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import useStore from '../state/measurementStore';
 import {
@@ -489,6 +490,33 @@ export default function BattlingBotsModal({
     onClose();
   };
   
+  const handleReview = async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Try native review prompt first
+    if (await StoreReview.hasAction()) {
+      await StoreReview.requestReview();
+    } else {
+      // Fallback to direct store links
+      const appStoreId = '6754727828';
+      const androidPackage = 'com.snail.panhandler';
+      
+      const storeUrl = Platform.OS === 'ios'
+        ? `itms-apps://itunes.apple.com/app/id${appStoreId}?action=write-review`
+        : `market://details?id=${androidPackage}`;
+      
+      Linking.openURL(storeUrl).catch(() => {
+        // Fallback to web URLs if native store apps aren't available
+        const webUrl = Platform.OS === 'ios'
+          ? `https://apps.apple.com/app/id${appStoreId}?action=write-review`
+          : `https://play.google.com/store/apps/details?id=${androidPackage}`;
+        Linking.openURL(webUrl);
+      });
+    }
+    
+    onClose();
+  };
+  
   const offerStyle = useAnimatedStyle(() => ({
     opacity: offerOpacity.value,
   }));
@@ -511,8 +539,12 @@ export default function BattlingBotsModal({
       statusBarTranslucent
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: scalePadding(20) }}>
+        <Pressable 
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: scalePadding(20) }}
+          onPress={handleClose}
+        >
           <View
+            onStartShouldSetResponder={() => true}
             style={{
               borderRadius: scaleBorderRadius(24),
               width: '100%',
@@ -811,31 +843,31 @@ export default function BattlingBotsModal({
                     </View>
                   </Pressable>
 
-                  {/* Close Button */}
+                  {/* Review Button */}
                   <Pressable
-                    onPress={handleClose}
+                    onPress={handleReview}
                     style={({ pressed }) => ({
-                      backgroundColor: pressed ? 'rgba(120,120,128,0.16)' : 'rgba(120,120,128,0.08)',
+                      backgroundColor: pressed ? 'rgba(255, 204, 0, 0.25)' : 'rgba(255, 204, 0, 0.15)',
                       paddingVertical: scalePadding(16),
                       borderRadius: scaleBorderRadius(14),
                       borderWidth: scaleSize(1),
-                      borderColor: 'rgba(120,120,128,0.2)',
+                      borderColor: 'rgba(255, 204, 0, 0.4)',
                     })}
                   >
                     <Text style={{
-                      color: '#6B7280',
+                      color: '#1C1C1E',
                       fontSize: scaleFontSize(17),
                       fontWeight: '600',
                       textAlign: 'center',
                     }}>
-                      Maybe later
+                      I can't do coffee: Leave a review! ⭐
                     </Text>
                   </Pressable>
                 </Animated.View>
               )}
             </View>
           </View>
-        </View>
+        </Pressable>
       </BlurView>
     </Modal>
   );
