@@ -372,8 +372,8 @@ export async function generatePdfGuide(): Promise<void> {
             
             <div class="subsection">
               <p><strong>Deleting:</strong></p>
-              <div class="bullet-point">• Select measurement (turns yellow)</div>
-              <div class="bullet-point">• Tap trash icon in legend</div>
+              <div class="bullet-point">• Tap <strong>Undo</strong> button to remove last placed point</div>
+              <div class="bullet-point">• Or tap 4 times on a line/object when in edit mode to delete it</div>
             </div>
           </div>
         </div>
