@@ -7492,13 +7492,13 @@ export default function DimensionOverlay({
               }}>
                 {isPlacingBlueprint
                   ? blueprintPoints.length === 0
-                    ? '📍 Pinch to zoom • Drag to pan • Then tap to place first pin'
-                    : '📍 Tap to place second pin on known distance'
+                    ? t('dimensionOverlay.helperBlueprintZoom')
+                    : t('dimensionOverlay.helperBlueprintSecondPin')
                   : measurementMode 
                   ? mode === 'circle' 
-                    ? '⭕ Tap center, then tap edge of circle'
+                    ? t('dimensionOverlay.helperCircle')
                     : mode === 'rectangle'
-                    ? '⬜ Tap first corner, then tap opposite corner'
+                    ? t('dimensionOverlay.helperRectangle')
                     : mode === 'freehand'
                     ? (() => {
                         // Dynamic helper for freehand drawing
@@ -7506,39 +7506,39 @@ export default function DimensionOverlay({
                           // Check if path self-intersects
                           const selfIntersects = doesPathSelfIntersect(freehandPath);
                           if (selfIntersects) {
-                            return '❌ Cannot find surface area - path crossed itself';
+                            return t('dimensionOverlay.helperFreehandIntersects');
                           } else {
-                            return '💡 Connect end to first point to find surface area';
+                            return t('dimensionOverlay.helperFreehandClose');
                           }
                         }
-                        return '✏️ Touch and drag to draw freehand path';
+                        return t('dimensionOverlay.helperFreehand');
                       })()
                     : mode === 'angle'
                     ? isMapMode
-                      ? '🧭 Tap 3 points: start location, north reference, destination'
-                      : '📐 Tap 3 points: start, vertex (center), end'
-                    : '📏 Tap to place 2 points for distance'
+                      ? t('dimensionOverlay.helperAzimuth')
+                      : t('dimensionOverlay.helperAngle')
+                    : t('dimensionOverlay.helperDistance')
                   : selectedMeasurementId
                   ? (() => {
                       const selected = measurements.find(m => m.id === selectedMeasurementId);
                       if (selected?.mode === 'circle') {
-                        return '⭕ Selected Circle: Drag center to move • Drag edge to resize';
+                        return t('dimensionOverlay.helperSelectedCircle');
                       } else if (selected?.mode === 'rectangle') {
-                        return '⬜ Selected Rectangle: Drag corners to resize • Drag edges to move';
+                        return t('dimensionOverlay.helperSelectedRectangle');
                       } else if (selected?.mode === 'distance') {
-                        return '📏 Selected Line: Drag endpoints to adjust • Tap line to move';
+                        return t('dimensionOverlay.helperSelectedDistance');
                       } else if (selected?.mode === 'angle') {
                         return isAzimuthMode
-                          ? '🧭 Selected Azimuth: Drag points to adjust bearing'
-                          : '📐 Selected Angle: Drag any point to adjust angle';
+                          ? t('dimensionOverlay.helperSelectedAzimuth')
+                          : t('dimensionOverlay.helperSelectedAngle');
                       } else if (selected?.mode === 'freehand') {
-                        return '✏️ Selected Path: Drag any point to reshape path';
+                        return t('dimensionOverlay.helperSelectedFreehand');
                       }
-                      return '✏️ Tap any measurement to select';
+                      return t('dimensionOverlay.helperMeasurements');
                     })()
                   : measurements.length > 0
-                  ? '✏️ Edit Mode: Tap any measurement to select • Tap trash icon to delete'
-                  : '👉👉👉 Swipe to Close Menu'
+                  ? t('dimensionOverlay.helperEditMode')
+                  : t('dimensionOverlay.helperCloseMenu')
                 }
               </Text>
             </View>
