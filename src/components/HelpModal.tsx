@@ -1789,19 +1789,19 @@ Thank you for helping us improve PanHandler!
                       borderLeftColor: '#FF3B30',
                     }}>
                       <Text style={{ fontSize: 12, color: '#1C1C1E', lineHeight: 18, marginBottom: 6 }}>
-                        <Text style={{ fontWeight: '700' }}>What to include:</Text>
+                        <Text style={{ fontWeight: '700' }}>{t('helpModal.whatToInclude')}</Text>
                       </Text>
                       <View style={{ gap: 4 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                           <Text style={{ fontSize: 12, color: '#1C1C1E', marginRight: 6 }}>•</Text>
                           <Text style={{ fontSize: 12, color: '#1C1C1E', flex: 1 }}>
-                            Description of the issue (e.g., "App freezes after calibration")
+                            {t('helpModal.descriptionOfIssue')}
                           </Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                           <Text style={{ fontSize: 12, color: '#1C1C1E', marginRight: 6 }}>•</Text>
                           <Text style={{ fontSize: 12, color: '#1C1C1E', flex: 1 }}>
-                            Your device info (automatically included)
+                            {t('helpModal.yourDeviceInfo')}
                           </Text>
                         </View>
                       </View>
@@ -1814,7 +1814,7 @@ Thank you for helping us improve PanHandler!
                       marginTop: 8,
                       fontStyle: 'italic',
                     }}>
-                      We typically respond within 24 hours
+                      {t('helpModal.typicallyRespondWithin24')}
                     </Text>
                   </View>
                 </View>
@@ -1828,7 +1828,7 @@ Thank you for helping us improve PanHandler!
                 delay={700}
               >
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
-                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
+                  {t('helpModal.wantBetterReferencePhotos')} <Text style={{ fontWeight: '600' }}>'{t('helpModal.mostUsefulFidget')}'</Text>
                 </Text>
 
                 <Pressable
