@@ -615,11 +615,11 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Text style={{ fontSize: 16, marginRight: 8 }}>✨</Text>
                       <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, flex: 1 }}>
-                        <Text style={{ fontWeight: '700' }}>Course includes:</Text>{'\n'}
-                        • Getting started tutorials{'\n'}
-                        • Advanced measurement techniques{'\n'}
-                        • Real-world workflow examples{'\n'}
-                        • Tips & tricks for best results
+                        <Text style={{ fontWeight: '700' }}>{t('helpModal.courseIncludes')}</Text>{'\n'}
+                        • {t('helpModal.gettingStartedTutorials')}{'\n'}
+                        • {t('helpModal.advancedTechniques')}{'\n'}
+                        • {t('helpModal.realWorldWorkflow')}{'\n'}
+                        • {t('helpModal.tipsAndTricks')}
                       </Text>
                     </View>
                   </View>
