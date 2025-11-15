@@ -430,7 +430,7 @@ Thank you for helping us improve PanHandler!
                       fontWeight: '700',
                       letterSpacing: -0.5,
                     }}>
-                      Guide
+                      {t('helpModal.title')}
                     </Text>
                   </View>
                 </Animated.View>
