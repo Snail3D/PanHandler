@@ -238,7 +238,20 @@
     "zoomPosition": "Zoom in and position the calibration circle",
     "matchEdges": "Match the outside edge of the coin with the outside edge of the colored circle",
     "tapLockIn": "Tap Lock in when aligned",
-    "chooseMeasurement": "Choose from multiple measurement types to capture all dimensions of your object."
+    "chooseMeasurement": "Choose from multiple measurement types to capture all dimensions of your object.",
+    "calculate3DVolumes": "Calculate 3D volumes by adding depth measurements to your 2D area calculations.",
+    "howToCalculateVolume": "How to Calculate Volume:",
+    "volumeStep1": "Measure the area (Rectangle, Circle, or closed shape)",
+    "volumeStep2": "Tap the Edit Labels button",
+    "volumeStep3": "Tap on the measurement label",
+    "volumeStep4": "Enter the depth value",
+    "volumeStep5": "Volume is automatically calculated!",
+    "worksWith": "Works With:",
+    "rectanglesBoxVolumes": "Rectangles - Box volumes",
+    "circlesCylinderVolumes": "Circles - Cylinder volumes",
+    "connectedLinePolygons": "Connected Line Polygons - Custom volumes",
+    "closedFreeDrawLassos": "Closed Free Draw Lassos - Irregular volumes",
+    "importantFreeDraw": "Important: For Free Draw lassos, the line cannot cross itself or the area (and volume) will not be calculated correctly."
   },
   
   "battlingBots": {

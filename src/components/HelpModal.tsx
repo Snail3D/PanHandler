@@ -1006,7 +1006,7 @@ Thank you for helping us improve PanHandler!
                 delay={250}
               >
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
-                  Calculate 3D volumes by adding depth measurements to your 2D area calculations.
+                  {t('helpModal.calculate3DVolumes')}
                 </Text>
 
                 <View style={{
@@ -1018,26 +1018,26 @@ Thank you for helping us improve PanHandler!
                   borderColor: 'rgba(0,0,0,0.15)',
                 }}>
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
-                    How to Calculate Volume:
+                    {t('helpModal.howToCalculateVolume')}
                   </Text>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    1. Measure the area (Rectangle, Circle, or closed shape){'\n'}
-                    2. Tap the <Text style={{ fontWeight: '700' }}>Edit Labels</Text> button{'\n'}
-                    3. Tap on the measurement label{'\n'}
-                    4. Enter the <Text style={{ fontWeight: '700' }}>depth</Text> value{'\n'}
-                    5. Volume is automatically calculated!
+                    1. {t('helpModal.volumeStep1')}{'\n'}
+                    2. {t('helpModal.volumeStep2')}{'\n'}
+                    3. {t('helpModal.volumeStep3')}{'\n'}
+                    4. {t('helpModal.volumeStep4')}{'\n'}
+                    5. {t('helpModal.volumeStep5')}
                   </Text>
                 </View>
 
                 <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
-                  Works With:
+                  {t('helpModal.worksWith')}
                 </Text>
                 <View style={{ marginLeft: 8, marginBottom: 12 }}>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    • <Text style={{ fontWeight: '600' }}>Rectangles</Text> - Box volumes{'\n'}
-                    • <Text style={{ fontWeight: '600' }}>Circles</Text> - Cylinder volumes{'\n'}
-                    • <Text style={{ fontWeight: '600' }}>Connected Line Polygons</Text> - Custom volumes{'\n'}
-                    • <Text style={{ fontWeight: '600' }}>Closed Free Draw Lassos</Text> - Irregular volumes
+                    • {t('helpModal.rectanglesBoxVolumes')}{'\n'}
+                    • {t('helpModal.circlesCylinderVolumes')}{'\n'}
+                    • {t('helpModal.connectedLinePolygons')}{'\n'}
+                    • {t('helpModal.closedFreeDrawLassos')}
                   </Text>
                 </View>
 
@@ -1049,7 +1049,7 @@ Thank you for helping us improve PanHandler!
                   borderColor: 'rgba(0,0,0,0.15)',
                 }}>
                   <Text style={{ fontSize: 12, color: '#1C1C1E', lineHeight: 17 }}>
-                    <Text style={{ fontWeight: '700' }}>⚠️ Important:</Text> For Free Draw lassos, the line <Text style={{ fontWeight: '700' }}>cannot cross itself</Text> or the area (and volume) will not be calculated correctly.
+                    ⚠️ {t('helpModal.importantFreeDraw')}
                   </Text>
                 </View>
               </ExpandableSection>
