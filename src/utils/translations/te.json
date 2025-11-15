@@ -41,7 +41,12 @@
     "perfectLevel": "పర్ఫెక్ట్! స్థిరంగా పట్టుకోండి",
     "tooMuchMovement": "చాలా ఎక్కువ కదలిక",
     "alignCrosshairs": "క్రాస్‌హైర్‌లను సమలేఖనం చేయండి",
-    "autoCapture": "ఆటో-క్యాప్చర్ సిద్ధంగా ఉంది"
+    "autoCapture": "ఆటో-క్యాప్చర్ సిద్ధంగా ఉంది",
+    "holdStill": "కదలకుండా పట్టుకోండి",
+    "tiltBackward": "వెనుకకు వంపు",
+    "tiltForward": "ముందుకు వంపు",
+    "tiltLeft": "ఎడమవైపుకు వంపు",
+    "tiltRight": "కుడివైపుకు వంపు"
   },
   "coinCalibration": {
     "title": "కాయిన్‌తో క్రమాంకనం చేయండి",
@@ -69,7 +74,12 @@
     "locked": "ప్యాన్/జూమ్ లాక్ చేయబడింది - కొలతలను తరలించడానికి సవరించు నొక్కండి.",
     "emailSent": "ఇమెయిల్ సిద్ధంగా ఉంది!",
     "imageSaved": "ఫోటోలకు సేవ్ చేయబడింది!",
-    "measurements": "కొలతలు"
+    "measurements": "కొలతలు",
+    "supporter": "మద్దతుదారు",
+    "panhandlerSupporter": "పాన్ హ్యాండ్లర్ మద్దతుదారు",
+    "newPhoto": "కొత్త ఫోటో",
+    "mapMode": "మ్యాప్ మోడ్",
+    "blueprintMode": "బ్లూప్రింట్ మోడ్"
   },
   "helpModal": {
     "title": "గైడ్",

@@ -41,7 +41,12 @@
     "perfectLevel": "完美！保持住！",
     "tooMuchMovement": "动作过多",
     "alignCrosshairs": "对齐十字线",
-    "autoCapture": "自动捕捉功能已就绪"
+    "autoCapture": "自动捕捉功能已就绪",
+    "holdStill": "保持静止",
+    "tiltBackward": "向后倾斜",
+    "tiltForward": "向前倾斜",
+    "tiltLeft": "向左倾斜",
+    "tiltRight": "向右倾斜"
   },
   "coinCalibration": {
     "title": "用硬币校准",
@@ -69,7 +74,12 @@
     "locked": "平移/缩放已锁定 - 点击“编辑”按钮移动测量数据",
     "emailSent": "邮件已准备就绪！",
     "imageSaved": "已保存到照片！",
-    "measurements": "测量"
+    "measurements": "测量",
+    "supporter": "支持者",
+    "panhandlerSupporter": "PanHandler 支持者",
+    "newPhoto": "新照片",
+    "mapMode": "地图模式",
+    "blueprintMode": "蓝图模式"
   },
   "helpModal": {
     "title": "指导",

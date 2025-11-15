@@ -41,7 +41,12 @@
     "perfectLevel": "ممتاز! ثبات",
     "tooMuchMovement": "الكثير من الحركة",
     "alignCrosshairs": "محاذاة خطوط التقاطع",
-    "autoCapture": "جاهز للالتقاط التلقائي"
+    "autoCapture": "جاهز للالتقاط التلقائي",
+    "holdStill": "ثبات",
+    "tiltBackward": "إمالة للخلف",
+    "tiltForward": "إمالة للأمام",
+    "tiltLeft": "إمالة إلى اليسار",
+    "tiltRight": "إمالة إلى اليمين"
   },
   "coinCalibration": {
     "title": "معايرة باستخدام العملة المعدنية",
@@ -69,7 +74,12 @@
     "locked": "تم قفل التكبير/التصغير - انقر فوق \"تحرير\" لنقل القياسات",
     "emailSent": "تم إعداد البريد الإلكتروني!",
     "imageSaved": "تم حفظه في الصور!",
-    "measurements": "القياسات"
+    "measurements": "القياسات",
+    "supporter": "مؤيد",
+    "panhandlerSupporter": "مؤيد بان هاندلر",
+    "newPhoto": "صورة جديدة",
+    "mapMode": "وضع الخريطة",
+    "blueprintMode": "وضع المخطط"
   },
   "helpModal": {
     "title": "مرشد",

@@ -41,7 +41,12 @@
     "perfectLevel": "परिपूर्ण! स्थिर राहा.",
     "tooMuchMovement": "खूप हालचाल",
     "alignCrosshairs": "क्रॉसहेअर संरेखित करा",
-    "autoCapture": "ऑटो-कॅप्चर तयार"
+    "autoCapture": "ऑटो-कॅप्चर तयार",
+    "holdStill": "स्थिर रहा",
+    "tiltBackward": "मागे झुका",
+    "tiltForward": "पुढे झुका",
+    "tiltLeft": "डावीकडे झुका",
+    "tiltRight": "उजवीकडे वाकवा"
   },
   "coinCalibration": {
     "title": "नाण्याने कॅलिब्रेट करा",
@@ -69,7 +74,12 @@
     "locked": "पॅन/झूम लॉक केले - माप हलविण्यासाठी संपादित करा वर टॅप करा",
     "emailSent": "ईमेल तयार!",
     "imageSaved": "फोटो मध्ये सेव्ह केले!",
-    "measurements": "मोजमाप"
+    "measurements": "मोजमाप",
+    "supporter": "समर्थक",
+    "panhandlerSupporter": "पॅनहँडलर समर्थक",
+    "newPhoto": "नवीन फोटो",
+    "mapMode": "नकाशा मोड",
+    "blueprintMode": "ब्लूप्रिंट मोड"
   },
   "helpModal": {
     "title": "मार्गदर्शक",

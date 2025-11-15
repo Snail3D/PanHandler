@@ -41,7 +41,12 @@
     "perfectLevel": "完璧！しっかり握って",
     "tooMuchMovement": "動きすぎ",
     "alignCrosshairs": "クロスヘアを合わせる",
-    "autoCapture": "自動キャプチャ対応"
+    "autoCapture": "自動キャプチャ対応",
+    "holdStill": "じっと動かないで",
+    "tiltBackward": "後ろに傾ける",
+    "tiltForward": "前方に傾ける",
+    "tiltLeft": "左に傾ける",
+    "tiltRight": "右に傾ける"
   },
   "coinCalibration": {
     "title": "コインで調整",
@@ -69,7 +74,12 @@
     "locked": "パン/ズームはロックされています - 測定値を移動するには編集をタップしてください",
     "emailSent": "メールを準備しました！",
     "imageSaved": "写真に保存しました!",
-    "measurements": "測定"
+    "measurements": "測定",
+    "supporter": "サポーター",
+    "panhandlerSupporter": "PanHandlerサポーター",
+    "newPhoto": "新しい写真",
+    "mapMode": "マップモード",
+    "blueprintMode": "ブループリントモード"
   },
   "helpModal": {
     "title": "ガイド",

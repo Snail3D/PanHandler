@@ -41,7 +41,12 @@
     "perfectLevel": "Hoàn hảo! Giữ vững",
     "tooMuchMovement": "Quá nhiều chuyển động",
     "alignCrosshairs": "Căn chỉnh đường ngắm",
-    "autoCapture": "Sẵn sàng tự động chụp"
+    "autoCapture": "Sẵn sàng tự động chụp",
+    "holdStill": "Giữ nguyên",
+    "tiltBackward": "Nghiêng về phía sau",
+    "tiltForward": "Nghiêng về phía trước",
+    "tiltLeft": "Nghiêng sang trái",
+    "tiltRight": "Nghiêng phải"
   },
   "coinCalibration": {
     "title": "Hiệu chuẩn bằng đồng xu",
@@ -69,7 +74,12 @@
     "locked": "Đã khóa Pan/Zoom - chạm vào Chỉnh sửa để di chuyển các phép đo",
     "emailSent": "Đã chuẩn bị email!",
     "imageSaved": "Đã lưu vào Ảnh!",
-    "measurements": "Các phép đo"
+    "measurements": "Các phép đo",
+    "supporter": "Người ủng hộ",
+    "panhandlerSupporter": "Người ủng hộ PanHandler",
+    "newPhoto": "Ảnh mới",
+    "mapMode": "Chế độ bản đồ",
+    "blueprintMode": "Chế độ bản thiết kế"
   },
   "helpModal": {
     "title": "Hướng dẫn",

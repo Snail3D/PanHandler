@@ -41,7 +41,12 @@
     "perfectLevel": "Sempurna! Tahan dengan stabil",
     "tooMuchMovement": "Terlalu Banyak Gerakan",
     "alignCrosshairs": "Sejajarkan Garis Bidik",
-    "autoCapture": "Siap Tangkap Otomatis"
+    "autoCapture": "Siap Tangkap Otomatis",
+    "holdStill": "Diam saja",
+    "tiltBackward": "Miring ke belakang",
+    "tiltForward": "Miring ke depan",
+    "tiltLeft": "Miring ke kiri",
+    "tiltRight": "Miringkan ke kanan"
   },
   "coinCalibration": {
     "title": "Kalibrasi dengan Koin",
@@ -69,7 +74,12 @@
     "locked": "Pan/Zoom terkunci - ketuk Edit untuk memindahkan pengukuran",
     "emailSent": "Email sudah disiapkan!",
     "imageSaved": "Disimpan ke Foto!",
-    "measurements": "Pengukuran"
+    "measurements": "Pengukuran",
+    "supporter": "Pendukung",
+    "panhandlerSupporter": "Pendukung PanHandler",
+    "newPhoto": "Foto Baru",
+    "mapMode": "Mode Peta",
+    "blueprintMode": "Mode Cetak Biru"
   },
   "helpModal": {
     "title": "Memandu",

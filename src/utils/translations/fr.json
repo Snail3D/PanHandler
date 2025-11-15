@@ -41,7 +41,12 @@
     "perfectLevel": "Parfait ! Tenez bon !",
     "tooMuchMovement": "Trop de mouvement",
     "alignCrosshairs": "Aligner le réticule",
-    "autoCapture": "Prêt pour la capture automatique"
+    "autoCapture": "Prêt pour la capture automatique",
+    "holdStill": "Restez immobile",
+    "tiltBackward": "Inclinez-vous vers l'arrière",
+    "tiltForward": "Inclinez-vous vers l'avant",
+    "tiltLeft": "Inclinez à gauche",
+    "tiltRight": "Inclinez à droite"
   },
   "coinCalibration": {
     "title": "Calibrer avec une pièce de monnaie",
@@ -69,7 +74,12 @@
     "locked": "Panoramique/Zoom verrouillé - appuyez sur Modifier pour déplacer les mesures",
     "emailSent": "Courriel prêt !",
     "imageSaved": "Enregistré dans Photos !",
-    "measurements": "Mesures"
+    "measurements": "Mesures",
+    "supporter": "Supporter",
+    "panhandlerSupporter": "Soutien aux mendiants",
+    "newPhoto": "Nouvelle photo",
+    "mapMode": "Mode carte",
+    "blueprintMode": "Mode plan"
   },
   "helpModal": {
     "title": "Guide",

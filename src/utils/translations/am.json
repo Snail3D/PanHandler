@@ -41,7 +41,12 @@
     "perfectLevel": "ፍጹም! ተረጋጋ",
     "tooMuchMovement": "በጣም ብዙ እንቅስቃሴ",
     "alignCrosshairs": "Crosshairs አሰልፍ",
-    "autoCapture": "ራስ-ሰር ቀረጻ ዝግጁ"
+    "autoCapture": "ራስ-ሰር ቀረጻ ዝግጁ",
+    "holdStill": "ዝም ብለህ ጠብቅ",
+    "tiltBackward": "ወደ ኋላ ዘንበል",
+    "tiltForward": "ወደ ፊት ዘንበል",
+    "tiltLeft": "ወደ ግራ ዘንበል",
+    "tiltRight": "ወደ ቀኝ ያዙሩ"
   },
   "coinCalibration": {
     "title": "በሳንቲም አስተካክል።",
@@ -69,7 +74,12 @@
     "locked": "ፓን/አጉላ ተቆልፏል - መለኪያዎችን ለማንቀሳቀስ አርትዕን መታ ያድርጉ",
     "emailSent": "ኢሜል ተዘጋጅቷል!",
     "imageSaved": "ወደ ፎቶዎች ተቀምጧል!",
-    "measurements": "መለኪያዎች"
+    "measurements": "መለኪያዎች",
+    "supporter": "ደጋፊ",
+    "panhandlerSupporter": "PanHandler ደጋፊ",
+    "newPhoto": "አዲስ ፎቶ",
+    "mapMode": "የካርታ ሁነታ",
+    "blueprintMode": "የብሉፕሪንት ሁነታ"
   },
   "helpModal": {
     "title": "መመሪያ",

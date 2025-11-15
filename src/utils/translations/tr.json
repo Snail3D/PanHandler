@@ -41,7 +41,12 @@
     "perfectLevel": "Mükemmel! Sabit Dur",
     "tooMuchMovement": "Çok Fazla Hareket",
     "alignCrosshairs": "Nişangahları Hizala",
-    "autoCapture": "Otomatik Yakalama Hazır"
+    "autoCapture": "Otomatik Yakalama Hazır",
+    "holdStill": "Sabit dur",
+    "tiltBackward": "Geriye doğru eğin",
+    "tiltForward": "Öne doğru eğil",
+    "tiltLeft": "Sola eğin",
+    "tiltRight": "Sağa doğru eğin"
   },
   "coinCalibration": {
     "title": "Madeni Para ile Kalibre Et",
@@ -69,7 +74,12 @@
     "locked": "Pan/Zoom kilitli - ölçümleri taşımak için Düzenle'ye dokunun",
     "emailSent": "E-posta hazır!",
     "imageSaved": "Fotoğraflar'a kaydedildi!",
-    "measurements": "Ölçümler"
+    "measurements": "Ölçümler",
+    "supporter": "Destekçi",
+    "panhandlerSupporter": "PanHandler Destekçisi",
+    "newPhoto": "Yeni Fotoğraf",
+    "mapMode": "Harita Modu",
+    "blueprintMode": "Mavi Baskı Modu"
   },
   "helpModal": {
     "title": "Rehber",

@@ -41,7 +41,12 @@
     "perfectLevel": "ပြီးပြည့်စုံသော! တည်ငြိမ်စွာထားပါ။",
     "tooMuchMovement": "လှုပ်ရှားမှုများလွန်းခြင်း။",
     "alignCrosshairs": "Crosshairs တန်းညှိပါ။",
-    "autoCapture": "အလိုအလျောက် ဖမ်းယူရန် အသင့်ဖြစ်ပါပြီ။"
+    "autoCapture": "အလိုအလျောက် ဖမ်းယူရန် အသင့်ဖြစ်ပါပြီ။",
+    "holdStill": "ငြိမ်ငြိမ်နေပါ။",
+    "tiltBackward": "နောက်သို့ စောင်းပါ။",
+    "tiltForward": "ရှေ့သို့စောင်းပါ။",
+    "tiltLeft": "ဘယ်ဘက်စောင်း",
+    "tiltRight": "ညာစောင်း"
   },
   "coinCalibration": {
     "title": "Coin ဖြင့် ချိန်ညှိပါ။",
@@ -69,7 +74,12 @@
     "locked": "ပန်/ချဲ့ခြင်း လော့ခ်ချခြင်း - တိုင်းတာမှုများကို ရွှေ့ရန် တည်းဖြတ်ပါ ကိုနှိပ်ပါ။",
     "emailSent": "အီးမေးလ်ပြင်ဆင်ပါ။",
     "imageSaved": "Photos တွင် သိမ်းထားသည်။",
-    "measurements": "တိုင်းတာမှုများ"
+    "measurements": "တိုင်းတာမှုများ",
+    "supporter": "ထောက်ခံသူ",
+    "panhandlerSupporter": "PanHandler ထောက်ခံသူ",
+    "newPhoto": "ဓာတ်ပုံအသစ်",
+    "mapMode": "မြေပုံမုဒ်",
+    "blueprintMode": "အသေးစိတ်ပုံစံမုဒ်"
   },
   "helpModal": {
     "title": "လမ်းညွှန်",

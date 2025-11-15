@@ -41,7 +41,12 @@
     "perfectLevel": "완벽해요! 안정적으로 잡아주세요",
     "tooMuchMovement": "너무 많은 움직임",
     "alignCrosshairs": "크로스헤어 정렬",
-    "autoCapture": "자동 캡처 준비 완료"
+    "autoCapture": "자동 캡처 준비 완료",
+    "holdStill": "가만히 있어",
+    "tiltBackward": "뒤로 기울이기",
+    "tiltForward": "앞으로 기울이기",
+    "tiltLeft": "왼쪽으로 기울이기",
+    "tiltRight": "오른쪽으로 기울이기"
   },
   "coinCalibration": {
     "title": "동전으로 보정",
@@ -69,7 +74,12 @@
     "locked": "팬/줌 잠금 - 편집을 탭하여 측정값을 이동합니다.",
     "emailSent": "이메일 준비 완료!",
     "imageSaved": "사진에 저장되었습니다!",
-    "measurements": "측정"
+    "measurements": "측정",
+    "supporter": "서포터",
+    "panhandlerSupporter": "팬핸들러 서포터",
+    "newPhoto": "새로운 사진",
+    "mapMode": "지도 모드",
+    "blueprintMode": "블루프린트 모드"
   },
   "helpModal": {
     "title": "가이드",

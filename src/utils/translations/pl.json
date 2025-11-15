@@ -41,7 +41,12 @@
     "perfectLevel": "Idealnie! Trzymaj stabilnie",
     "tooMuchMovement": "Zbyt dużo ruchu",
     "alignCrosshairs": "Wyrównaj celowniki",
-    "autoCapture": "Gotowy do automatycznego przechwytywania"
+    "autoCapture": "Gotowy do automatycznego przechwytywania",
+    "holdStill": "Trzymaj się nieruchomo",
+    "tiltBackward": "Pochyl się do tyłu",
+    "tiltForward": "Pochyl do przodu",
+    "tiltLeft": "Pochyl w lewo",
+    "tiltRight": "Pochyl w prawo"
   },
   "coinCalibration": {
     "title": "Kalibracja za pomocą monety",
@@ -69,7 +74,12 @@
     "locked": "Zablokowane przesuwanie/powiększanie – dotknij opcji Edytuj, aby przenieść pomiary",
     "emailSent": "E-mail przygotowany!",
     "imageSaved": "Zapisano w Zdjęciach!",
-    "measurements": "Pomiary"
+    "measurements": "Pomiary",
+    "supporter": "Kibic",
+    "panhandlerSupporter": "Wspierający PanHandler",
+    "newPhoto": "Nowe zdjęcie",
+    "mapMode": "Tryb mapy",
+    "blueprintMode": "Tryb projektu"
   },
   "helpModal": {
     "title": "Przewodnik",

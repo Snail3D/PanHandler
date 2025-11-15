@@ -41,7 +41,12 @@
     "perfectLevel": "Kamili! Shikilia Imara",
     "tooMuchMovement": "Mwendo Kubwa Sana",
     "alignCrosshairs": "Pangilia Crosshairs",
-    "autoCapture": "Nasa Kiotomatiki Tayari"
+    "autoCapture": "Nasa Kiotomatiki Tayari",
+    "holdStill": "Shikilia tuli",
+    "tiltBackward": "Tilt nyuma",
+    "tiltForward": "Tilt mbele",
+    "tiltLeft": "Tilt kushoto",
+    "tiltRight": "Tilt kulia"
   },
   "coinCalibration": {
     "title": "Rekebisha kwa Coin",
@@ -69,7 +74,12 @@
     "locked": "Pan/Zoom imefungwa - gusa Hariri ili usogeze vipimo",
     "emailSent": "Barua pepe imeandaliwa!",
     "imageSaved": "Imehifadhiwa kwenye Picha!",
-    "measurements": "Vipimo"
+    "measurements": "Vipimo",
+    "supporter": "Msaidizi",
+    "panhandlerSupporter": "Msaidizi wa PanHandler",
+    "newPhoto": "Picha Mpya",
+    "mapMode": "Hali ya Ramani",
+    "blueprintMode": "Njia ya Blueprint"
   },
   "helpModal": {
     "title": "Mwongozo",
