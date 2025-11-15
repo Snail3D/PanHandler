@@ -6982,7 +6982,7 @@ export default function DimensionOverlay({
                   fontSize: scaleFontSize(12),
                   color: measurementMode ? '#34C759' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  Measure
+                  {t('buttons.measure')}
                 </Text>
               </View>
             </Pressable>
