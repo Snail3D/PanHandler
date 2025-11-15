@@ -3,6 +3,7 @@ import { View, Text, Pressable, Modal, TextInput, Keyboard } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 // Small, inventive maker items for placeholder examples
 // Mix of real maker projects and absurdly funny ones
@@ -535,6 +536,7 @@ export default function LabelModal({
   actionType = 'save',
   unitSystem = 'metric'
 }: LabelModalProps) {
+  const { t } = useTranslation();
   const [label, setLabel] = useState('');
   const [placeholder, setPlaceholder] = useState('');
   const [depth, setDepth] = useState('');
