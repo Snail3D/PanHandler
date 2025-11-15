@@ -956,7 +956,7 @@ export default function CoinCalibration({
               textShadowRadius: scaleSize(4),
             }}
           >
-            Pinch to Zoom
+            {t('coinCalibration.pinchToZoom')}
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Text

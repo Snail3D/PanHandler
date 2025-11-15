@@ -1935,7 +1935,7 @@ export default function CameraScreen() {
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(20), paddingVertical: scalePadding(14), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(14), fontWeight: '600', textAlign: 'center' }}>
-                  Aim down for auto level/capture
+                  {t('cameraScreen.aimDown')}
                 </Text>
               </View>
             </Animated.View>
@@ -1946,16 +1946,16 @@ export default function CameraScreen() {
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(16), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
-                  1. Place coin in center
+                  {t('cameraScreen.placeCoinCenter')}
                 </Text>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
-                  2. Line up the lines
+                  {t('cameraScreen.lineUpLines')}
                 </Text>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
-                  3. Tap to capture
+                  {t('cameraScreen.tapToCapture')}
                 </Text>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(10), fontWeight: '500', textAlign: 'center', lineHeight: scaleSize(16), opacity: 0.8 }}>
-                  (hold for auto capture)
+                  {t('cameraScreen.holdForAutoCapture')}
                 </Text>
               </View>
             </Animated.View>
