@@ -216,6 +216,8 @@
     "pdfGuideLanguages": "PDF Guide Languages",
     "moreLanguagesSoon": "More languages coming soon...",
     "videoCoursesTitle": "Video Courses",
+    "videoCoursesDescription": "Watch our complete video tutorial series",
+    "videoCoursesLearn": "Learn how to use PanHandler with step-by-step video guides and real-world workflow examples.",
     "step1Title": "Step 1: Take a Perfect Photo",
     "step2Title": "Step 2: Calibrate with Coin",
     "step3Title": "Step 3: Place Measurements",
@@ -229,7 +231,8 @@
     "proTipsTitle": "Pro Tips",
     "troubleshootingTitle": "Troubleshooting",
     "cadIntegrationTitle": "Export & CAD Integration",
-    "languagesTitle": "Languages"
+    "languagesTitle": "Languages",
+    "afterCapturing": "After capturing your photo, calibrate using the reference coin to enable precise measurements."
   },
   
   "battlingBots": {
