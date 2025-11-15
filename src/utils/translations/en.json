@@ -346,7 +346,9 @@
     "photoLibraryPermission": "Photo Library — to save measurements",
     "needToEnablePermissions": "Need to enable permissions? Tap the button below to open PanHandler settings",
     "forTheNerds": "For the Nerds",
-    "seeTheCode": "See the Code"
+    "seeTheCode": "See the Code",
+    "smartPhotoOrganization": "Smart Photo Organization",
+    "autoCapturedSaved": "Auto-captured photos are automatically saved to both your Camera Roll AND a special \"Auto-Leveled\" album in Photos for easy access!"
   },
   
   "battlingBots": {
