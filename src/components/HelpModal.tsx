@@ -443,6 +443,8 @@ Thank you for helping us improve PanHandler!
                     scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
                     scrollEnabled={true}
                     nestedScrollEnabled={true}
+                    keyboardShouldPersistTaps="handled"
+                    removeClippedSubviews={false}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
