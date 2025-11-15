@@ -348,7 +348,12 @@
     "forTheNerds": "For the Nerds",
     "seeTheCode": "See the Code",
     "smartPhotoOrganization": "Smart Photo Organization",
-    "autoCapturedSaved": "Auto-captured photos are automatically saved to both your Camera Roll AND a special \"Auto-Leveled\" album in Photos for easy access!"
+    "autoCapturedSaved": "Auto-captured photos are automatically saved to both your Camera Roll AND a special \"Auto-Leveled\" album in Photos for easy access!",
+    "courseIncludes": "Course includes:",
+    "gettingStartedTutorials": "Getting started tutorials",
+    "advancedTechniques": "Advanced measurement techniques",
+    "realWorldWorkflow": "Real-world workflow examples",
+    "tipsAndTricks": "Tips & tricks for best results"
   },
   
   "battlingBots": {
