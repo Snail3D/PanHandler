@@ -828,7 +828,7 @@ Thank you for helping us improve PanHandler!
 
               >
                 <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Choose from multiple measurement types to capture all dimensions of your object.
+                  {t('helpModal.chooseMeasurement')}
                 </Text>
                 
                 {/* Distance */}
@@ -850,12 +850,12 @@ Thank you for helping us improve PanHandler!
                       <Circle cx="13" cy="8" r="2" fill="#AF52DE" />
                     </Svg>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Distance Mode
+                      {t('helpModal.distanceMode')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                    Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!{'\n\n'}
-                    <Text style={{ fontWeight: '600', color: '#AF52DE' }}>Pro Tip:</Text> Connect multiple lines by placing endpoints together to create triangles and polygons. <Text style={{ fontWeight: '700' }}>Areas are automatically calculated and shown in the legend!</Text> 📐
+                    {t('helpModal.distanceDescription')}{'\n\n'}
+                    {t('helpModal.distanceProTip')} 📐
                   </Text>
                 </View>
 
@@ -880,11 +880,11 @@ Thank you for helping us improve PanHandler!
                       <Line x1="5.2" y1="10" x2="4.4" y2="10.2" stroke="#FF9500" strokeWidth="1" strokeLinecap="round" />
                     </Svg>
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Angle Mode (azimuth in Map Mode)
+                      {t('helpModal.angleMode')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                    Measure angles between two lines. Place first endpoint, then vertex (corner), then second endpoint.
+                    {t('helpModal.angleDescription')}
                   </Text>
                 </View>
 
@@ -902,11 +902,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     <Ionicons name="radio-button-off" size={20} color="#E91E63" />
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Circle Mode
+                      {t('helpModal.circleMode')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                    Measure circular objects. Tap center point, then tap edge to define radius and diameter. <Text style={{ fontWeight: '600', color: '#E91E63' }}>Area shown in legend!</Text>
+                    {t('helpModal.circleDescription')}
                   </Text>
                 </View>
 
@@ -924,11 +924,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
                     <Ionicons name="square-outline" size={20} color="#1976D2" />
                     <Text style={{ fontSize: 15, fontWeight: '600', color: '#1C1C1E', marginLeft: 8 }}>
-                      Rectangle Mode
+                      {t('helpModal.rectangleMode')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                    Measure rectangular objects. Tap two opposite corners to get length and height measurements. <Text style={{ fontWeight: '600', color: '#1976D2' }}>Area shown in legend!</Text> Edges snap to perfect horizontal and vertical lines automagically!
+                    {t('helpModal.rectangleDescription')}
                   </Text>
                 </View>
 

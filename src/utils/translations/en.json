@@ -251,7 +251,18 @@
     "circlesCylinderVolumes": "Circles - Cylinder volumes",
     "connectedLinePolygons": "Connected Line Polygons - Custom volumes",
     "closedFreeDrawLassos": "Closed Free Draw Lassos - Irregular volumes",
-    "importantFreeDraw": "Important: For Free Draw lassos, the line cannot cross itself or the area (and volume) will not be calculated correctly."
+    "importantFreeDraw": "Important: For Free Draw lassos, the line cannot cross itself or the area (and volume) will not be calculated correctly.",
+    "distanceMode": "Distance Mode",
+    "distanceDescription": "Measure straight-line distances. Tap to place two points and get the distance between them. A gentle snap keeps lines horizontal and vertical automagically!",
+    "distanceProTip": "Pro Tip: Connect multiple lines by placing endpoints together to create triangles and polygons. Areas are automatically calculated and shown in the legend!",
+    "angleMode": "Angle Mode (azimuth in Map Mode)",
+    "angleDescription": "Measure angles between two lines. Place first endpoint, then vertex (corner), then second endpoint.",
+    "circleMode": "Circle Mode",
+    "circleDescription": "Measure circles by placing center and edge points. Shows radius, diameter, area, and optional volume.",
+    "rectangleMode": "Rectangle Mode (Box)",
+    "rectangleDescription": "Measure rectangles by placing opposite corners. Shows width, height, area, and optional volume.",
+    "freehandMode": "Freehand Mode (Free Draw)",
+    "freehandDescription": "Draw custom paths. Shows path length. Close the path to calculate area!"
   },
   
   "battlingBots": {
