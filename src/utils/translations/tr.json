@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamera",
+    "help": "Yardım",
+    "save": "Kaydetmek",
+    "email": "E-posta",
+    "close": "Kapalı",
+    "cancel": "İptal etmek",
+    "confirm": "Onaylamak",
+    "done": "Tamamlamak",
+    "next": "Sonraki",
+    "back": "Geri",
+    "ok": "TAMAM",
+    "yes": "Evet",
+    "no": "HAYIR",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarı"
+  },
+  "buttons": {
+    "lockIn": "Kilitlemek",
+    "lockInCalibration": "Kalibrasyonda Kilitleme",
+    "recalibrate": "Yeniden kalibre et",
+    "pan": "Tava",
+    "edit": "Düzenlemek",
+    "measure": "Ölçüm",
+    "undo": "Geri al",
+    "trash": "Silmek",
+    "unitToggle": "Birim",
+    "metric": "Metrik",
+    "imperial": "İmparatorluk",
+    "flash": "Flaş",
+    "photoLibrary": "Fotoğraf Kütüphanesi",
+    "scaleMode": "Ölçek Modu"
+  },
+  "cameraScreen": {
+    "lookDown": "Aşağı Bak",
+    "holdSteady": "Sabit Tutun",
+    "capturing": "Yakalanıyor...",
+    "almostLevel": "Neredeyse Seviye",
+    "perfectLevel": "Mükemmel! Sabit Dur",
+    "tooMuchMovement": "Çok Fazla Hareket",
+    "alignCrosshairs": "Nişangahları Hizala",
+    "autoCapture": "Otomatik Yakalama Hazır"
+  },
+  "coinCalibration": {
+    "title": "Madeni Para ile Kalibre Et",
+    "searchPlaceholder": "Madeni parayı ara...",
+    "zoomInstructions": "Yakınlaştırmak için sıkıştırın, konumlandırmak için sürükleyin",
+    "alignInstructions": "Madeni paranın dış kenarını renkli dairenin dış kenarıyla eşleştirin",
+    "lockInWhenReady": "Hizalandığında Dokunma Kilidi"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Kalibre edilmiş",
+    "recalibrateButton": "Yeniden kalibre et",
+    "panMode": "Pan Modu - Görüntüyü taşı/yakınlaştır",
+    "editMode": "Düzenleme Modu - Ölçümleri taşı",
+    "measureMode": "Ölçüm Modu - Yeni ölçümler yerleştirin",
+    "distance": "Mesafe",
+    "angle": "Açı",
+    "circle": "Daire",
+    "rectangle": "Dikdörtgen",
+    "freehand": "Serbest el",
+    "legend": "Efsane",
+    "tapToCollapse": "Daraltmak için dokunun",
+    "tapToExpand": "Genişletmek için dokunun",
+    "labelPrompt": "Ölçüm adını/açıklamasını girin",
+    "depthPrompt": "Derinliği girin (isteğe bağlı)",
+    "locked": "Pan/Zoom kilitli - ölçümleri taşımak için Düzenle'ye dokunun",
+    "emailSent": "E-posta hazır!",
+    "imageSaved": "Fotoğraflar'a kaydedildi!",
+    "measurements": "Ölçümler"
+  },
+  "helpModal": {
+    "title": "Rehber",
+    "pdfGuideLanguages": "PDF Rehber Dilleri",
+    "moreLanguagesSoon": "Yakında daha fazla dil eklenecek...",
+    "videoCoursesTitle": "Video Kursları",
+    "step1Title": "1. Adım: Mükemmel Bir Fotoğraf Çekin",
+    "step2Title": "Adım 2: Coin ile Kalibre Edin",
+    "step3Title": "Adım 3: Ölçümleri Yerleştirin"
+  },
+  "battlingBots": {
+    "title": "Sahne Arkası",
+    "supportSnail": "Destek Salyangozu",
+    "subtitle": "PanHandler tutkuyla yürütülen bir proje. Onu canlı tutmaya yardımcı olun!",
+    "buyMeCoffee": "Bana bir kahve ısmarla",
+    "cantDoCoffee": "Kahve içemiyorum: Yorum bırakın!",
+    "maybeLater": "Belki Daha Sonra"
+  },
+  "alerts": {
+    "permissionDenied": "İzin reddedildi",
+    "cameraPermissionNeeded": "Fotoğraf çekmek için kamera izni gereklidir",
+    "photoLibraryPermissionNeeded": "Görüntüleri kaydetmek için fotoğraf kütüphanesi izni gereklidir",
+    "calibrationRequired": "Lütfen önce bir madeni para ile kalibre edin",
+    "noMeasurements": "Kaydedilecek ölçüm yok",
+    "emailError": "E-posta hazırlanamadı",
+    "saveError": "Görüntü kaydedilemedi"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "கேமரா",
+    "help": "உதவி",
+    "save": "சேமிக்கவும்",
+    "email": "மின்னஞ்சல்",
+    "close": "மூடு",
+    "cancel": "ரத்துசெய்",
+    "confirm": "உறுதிப்படுத்தவும்",
+    "done": "முடிந்தது",
+    "next": "அடுத்து",
+    "back": "மீண்டும்",
+    "ok": "சரி",
+    "yes": "ஆம்",
+    "no": "இல்லை",
+    "loading": "ஏற்றுகிறது...",
+    "error": "பிழை",
+    "success": "வெற்றி"
+  },
+  "buttons": {
+    "lockIn": "பூட்டு",
+    "lockInCalibration": "லாக் இன் அளவுத்திருத்தம்",
+    "recalibrate": "மறு அளவீடு செய்",
+    "pan": "பான்",
+    "edit": "திருத்து",
+    "measure": "அளவிடு",
+    "undo": "செயல்தவிர்",
+    "trash": "நீக்கு",
+    "unitToggle": "அலகு",
+    "metric": "மெட்ரிக்",
+    "imperial": "இம்பீரியல்",
+    "flash": "ஃபிளாஷ்",
+    "photoLibrary": "புகைப்பட நூலகம்",
+    "scaleMode": "அளவுகோல் பயன்முறை"
+  },
+  "cameraScreen": {
+    "lookDown": "கீழே பாருங்கள்",
+    "holdSteady": "நிலையாகப் பிடி",
+    "capturing": "படம்பிடிக்கிறது...",
+    "almostLevel": "கிட்டத்தட்ட நிலை",
+    "perfectLevel": "அருமை! உறுதியாக இருங்கள்",
+    "tooMuchMovement": "அதிக இயக்கம்",
+    "alignCrosshairs": "குறுக்கு நாற்காலிகளை சீரமைக்கவும்",
+    "autoCapture": "தானியங்கிப் படம்பிடிப்பு தயார்"
+  },
+  "coinCalibration": {
+    "title": "நாணயத்துடன் அளவீடு செய்",
+    "searchPlaceholder": "நாணயத்தைத் தேடு...",
+    "zoomInstructions": "பெரிதாக்க பின்ச் செய்யவும், நிலைக்கு இழுக்கவும்",
+    "alignInstructions": "நாணயத்தின் வெளிப்புற விளிம்பை வண்ண வட்டத்தின் வெளிப்புற விளிம்போடு பொருத்தவும்.",
+    "lockInWhenReady": "சீரமைக்கும்போது பூட்டு என்பதைத் தட்டவும்."
+  },
+  "dimensionOverlay": {
+    "calibrated": "அளவீடு செய்யப்பட்டது",
+    "recalibrateButton": "மறு அளவீடு செய்",
+    "panMode": "பான் பயன்முறை - படத்தை நகர்த்து/பெரிதாக்கு",
+    "editMode": "திருத்து முறை - அளவீடுகளை நகர்த்து",
+    "measureMode": "அளவீட்டு முறை - புதிய அளவீடுகளை வைக்கவும்",
+    "distance": "தூரம்",
+    "angle": "கோணம்",
+    "circle": "வட்டம்",
+    "rectangle": "செவ்வகம்",
+    "freehand": "சுதந்திரமான",
+    "legend": "புராணக்கதை",
+    "tapToCollapse": "சுருக்க தட்டவும்",
+    "tapToExpand": "விரிவாக்க தட்டவும்",
+    "labelPrompt": "அளவீட்டு பெயர்/விளக்கத்தை உள்ளிடவும்",
+    "depthPrompt": "ஆழத்தை உள்ளிடவும் (விரும்பினால்)",
+    "locked": "நகர்த்து/பெரிதாக்கு பூட்டப்பட்டது - அளவீடுகளை நகர்த்த திருத்து என்பதைத் தட்டவும்.",
+    "emailSent": "மின்னஞ்சல் தயார்!",
+    "imageSaved": "புகைப்படங்களில் சேமிக்கப்பட்டது!",
+    "measurements": "அளவீடுகள்"
+  },
+  "helpModal": {
+    "title": "கையேடு",
+    "pdfGuideLanguages": "PDF வழிகாட்டி மொழிகள்",
+    "moreLanguagesSoon": "மேலும் மொழிகள் விரைவில்...",
+    "videoCoursesTitle": "வீடியோ பாடநெறிகள்",
+    "step1Title": "படி 1: சரியான புகைப்படத்தை எடுங்கள்",
+    "step2Title": "படி 2: நாணயத்தைப் பயன்படுத்தி அளவீடு செய்யவும்",
+    "step3Title": "படி 3: இட அளவீடுகள்"
+  },
+  "battlingBots": {
+    "title": "திரைக்குப் பின்னால்",
+    "supportSnail": "நத்தைக்கு ஆதரவு",
+    "subtitle": "PanHandler ஒரு ஆர்வமுள்ள திட்டம். அதை உயிர்ப்புடன் வைத்திருக்க உதவுங்கள்!",
+    "buyMeCoffee": "எனக்கு ஒரு காபி வாங்கித் தாருங்கள்.",
+    "cantDoCoffee": "எனக்கு காபி போடத் தெரியாது: ஒரு விமர்சனம் போடுங்க!",
+    "maybeLater": "ஒருவேளை பின்னர்"
+  },
+  "alerts": {
+    "permissionDenied": "அனுமதி மறுக்கப்பட்டது",
+    "cameraPermissionNeeded": "புகைப்படங்களை எடுக்க கேமரா அனுமதி தேவை.",
+    "photoLibraryPermissionNeeded": "படங்களைச் சேமிக்க புகைப்பட நூலக அனுமதி தேவை.",
+    "calibrationRequired": "முதலில் ஒரு நாணயத்தைப் பயன்படுத்தி அளவீடு செய்யவும்.",
+    "noMeasurements": "சேமிக்க அளவீடுகள் எதுவும் இல்லை.",
+    "emailError": "மின்னஞ்சலைத் தயாரிக்க முடியவில்லை.",
+    "saveError": "படத்தைச் சேமிக்க முடியவில்லை."
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

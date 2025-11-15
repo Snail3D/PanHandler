@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "కెమెరా",
+    "help": "సహాయం",
+    "save": "సేవ్ చేయండి",
+    "email": "ఇ-మెయిల్",
+    "close": "ముగింపు / ముగింపు",
+    "cancel": "రద్దు చేయి",
+    "confirm": "నిర్ధారించండి",
+    "done": "పూర్తయింది",
+    "next": "తరువాతి",
+    "back": "వెనుకకు",
+    "ok": "సరే",
+    "yes": "అవును",
+    "no": "లేదు",
+    "loading": "లోడ్ అవుతోంది...",
+    "error": "లోపం",
+    "success": "విజయం"
+  },
+  "buttons": {
+    "lockIn": "లాక్ ఇన్",
+    "lockInCalibration": "లాక్ ఇన్ కాలిబ్రేషన్",
+    "recalibrate": "తిరిగి క్రమాంకనం చేయి",
+    "pan": "పాన్",
+    "edit": "సవరించు",
+    "measure": "కొలత",
+    "undo": "చర్య రద్దు చేయి",
+    "trash": "తొలగించు",
+    "unitToggle": "యూనిట్",
+    "metric": "మెట్రిక్",
+    "imperial": "సామ్రాజ్యవాదం",
+    "flash": "ఫ్లాష్",
+    "photoLibrary": "ఫోటో లైబ్రరీ",
+    "scaleMode": "స్కేల్ మోడ్"
+  },
+  "cameraScreen": {
+    "lookDown": "కిందకి చూడు",
+    "holdSteady": "స్థిరంగా పట్టుకోండి",
+    "capturing": "సంగ్రహిస్తోంది...",
+    "almostLevel": "దాదాపు స్థాయి",
+    "perfectLevel": "పర్ఫెక్ట్! స్థిరంగా పట్టుకోండి",
+    "tooMuchMovement": "చాలా ఎక్కువ కదలిక",
+    "alignCrosshairs": "క్రాస్‌హైర్‌లను సమలేఖనం చేయండి",
+    "autoCapture": "ఆటో-క్యాప్చర్ సిద్ధంగా ఉంది"
+  },
+  "coinCalibration": {
+    "title": "కాయిన్‌తో క్రమాంకనం చేయండి",
+    "searchPlaceholder": "నాణెం వెతుకు...",
+    "zoomInstructions": "జూమ్ చేయడానికి పించ్ చేయండి, స్థానానికి లాగండి",
+    "alignInstructions": "నాణెం బయటి అంచుని రంగు వృత్తం బయటి అంచుతో సరిపోల్చండి.",
+    "lockInWhenReady": "సమలేఖనం చేసినప్పుడు లాక్ ఇన్ నొక్కండి"
+  },
+  "dimensionOverlay": {
+    "calibrated": "క్రమాంకనం చేయబడింది",
+    "recalibrateButton": "తిరిగి క్రమాంకనం చేయి",
+    "panMode": "పాన్ మోడ్ - చిత్రాన్ని తరలించు/జూమ్ చేయి",
+    "editMode": "సవరణ మోడ్ - కొలతలను తరలించండి",
+    "measureMode": "కొలత మోడ్ - కొత్త కొలతలను ఉంచండి",
+    "distance": "దూరం",
+    "angle": "కోణం",
+    "circle": "వృత్తం",
+    "rectangle": "దీర్ఘచతురస్రం",
+    "freehand": "ఫ్రీహ్యాండ్",
+    "legend": "లెజెండ్",
+    "tapToCollapse": "కుదించడానికి నొక్కండి",
+    "tapToExpand": "విస్తరించడానికి నొక్కండి",
+    "labelPrompt": "కొలత పేరు/వివరణను నమోదు చేయండి",
+    "depthPrompt": "లోతును నమోదు చేయండి (ఐచ్ఛికం)",
+    "locked": "ప్యాన్/జూమ్ లాక్ చేయబడింది - కొలతలను తరలించడానికి సవరించు నొక్కండి.",
+    "emailSent": "ఇమెయిల్ సిద్ధంగా ఉంది!",
+    "imageSaved": "ఫోటోలకు సేవ్ చేయబడింది!",
+    "measurements": "కొలతలు"
+  },
+  "helpModal": {
+    "title": "గైడ్",
+    "pdfGuideLanguages": "PDF గైడ్ భాషలు",
+    "moreLanguagesSoon": "మరిన్ని భాషలు త్వరలో వస్తున్నాయి...",
+    "videoCoursesTitle": "వీడియో కోర్సులు",
+    "step1Title": "దశ 1: పరిపూర్ణమైన ఫోటో తీయండి",
+    "step2Title": "దశ 2: కాయిన్‌తో క్రమాంకనం చేయండి",
+    "step3Title": "దశ 3: స్థల కొలతలు"
+  },
+  "battlingBots": {
+    "title": "తెర వెనుక",
+    "supportSnail": "నత్తకు మద్దతు ఇవ్వండి",
+    "subtitle": "PanHandler అనేది ఒక అభిరుచి గల ప్రాజెక్ట్. దీన్ని సజీవంగా ఉంచడంలో సహాయపడండి!",
+    "buyMeCoffee": "నాకు కాఫీ కొనుక్కో",
+    "cantDoCoffee": "నేను కాఫీ చేయలేను: సమీక్ష రాయండి!",
+    "maybeLater": "బహుశా తరువాత"
+  },
+  "alerts": {
+    "permissionDenied": "అనుమతి నిరాకరించబడింది",
+    "cameraPermissionNeeded": "ఫోటోలు తీయడానికి కెమెరా అనుమతి అవసరం.",
+    "photoLibraryPermissionNeeded": "చిత్రాలను సేవ్ చేయడానికి ఫోటో లైబ్రరీ అనుమతి అవసరం.",
+    "calibrationRequired": "దయచేసి ముందుగా నాణెంతో క్రమాంకనం చేయండి.",
+    "noMeasurements": "సేవ్ చేయడానికి కొలతలు లేవు",
+    "emailError": "ఇమెయిల్ సిద్ధం చేయడంలో విఫలమైంది",
+    "saveError": "చిత్రాన్ని సేవ్ చేయడంలో విఫలమైంది"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

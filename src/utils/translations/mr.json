@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "कॅमेरा",
+    "help": "मदत",
+    "save": "जतन करा",
+    "email": "ईमेल",
+    "close": "बंद करा",
+    "cancel": "रद्द करा",
+    "confirm": "पुष्टी करा",
+    "done": "झाले",
+    "next": "पुढे",
+    "back": "मागे",
+    "ok": "ठीक आहे",
+    "yes": "होय",
+    "no": "नाही",
+    "loading": "लोड होत आहे...",
+    "error": "त्रुटी",
+    "success": "यश"
+  },
+  "buttons": {
+    "lockIn": "लॉक इन करा",
+    "lockInCalibration": "लॉक इन कॅलिब्रेशन",
+    "recalibrate": "रिकॅलिब्रेट करा",
+    "pan": "पॅन",
+    "edit": "संपादित करा",
+    "measure": "मोजमाप",
+    "undo": "पूर्ववत करा",
+    "trash": "हटवा",
+    "unitToggle": "युनिट",
+    "metric": "मेट्रिक",
+    "imperial": "शाही",
+    "flash": "फ्लॅश",
+    "photoLibrary": "फोटो लायब्ररी",
+    "scaleMode": "स्केल मोड"
+  },
+  "cameraScreen": {
+    "lookDown": "खाली पहा",
+    "holdSteady": "स्थिर राहा",
+    "capturing": "कॅप्चर करत आहे...",
+    "almostLevel": "जवळजवळ पातळी",
+    "perfectLevel": "परिपूर्ण! स्थिर राहा.",
+    "tooMuchMovement": "खूप हालचाल",
+    "alignCrosshairs": "क्रॉसहेअर संरेखित करा",
+    "autoCapture": "ऑटो-कॅप्चर तयार"
+  },
+  "coinCalibration": {
+    "title": "नाण्याने कॅलिब्रेट करा",
+    "searchPlaceholder": "नाणे शोधा...",
+    "zoomInstructions": "झूम करण्यासाठी पिंच करा, स्थितीवर ड्रॅग करा",
+    "alignInstructions": "नाण्याच्या बाहेरील कडा रंगीत वर्तुळाच्या बाहेरील कडाशी जुळवा.",
+    "lockInWhenReady": "संरेखित झाल्यावर लॉक इन वर टॅप करा"
+  },
+  "dimensionOverlay": {
+    "calibrated": "कॅलिब्रेट केलेले",
+    "recalibrateButton": "रिकॅलिब्रेट करा",
+    "panMode": "पॅन मोड - प्रतिमा हलवा/झूम करा",
+    "editMode": "संपादन मोड - मोजमाप हलवा",
+    "measureMode": "मापन मोड - नवीन माप ठेवा",
+    "distance": "अंतर",
+    "angle": "कोन",
+    "circle": "वर्तुळ",
+    "rectangle": "आयत",
+    "freehand": "मुक्तहस्त",
+    "legend": "आख्यायिका",
+    "tapToCollapse": "कोलॅप्स करण्यासाठी टॅप करा",
+    "tapToExpand": "विस्तृत करण्यासाठी टॅप करा",
+    "labelPrompt": "मापनाचे नाव/वर्णन एंटर करा",
+    "depthPrompt": "खोली एंटर करा (पर्यायी)",
+    "locked": "पॅन/झूम लॉक केले - माप हलविण्यासाठी संपादित करा वर टॅप करा",
+    "emailSent": "ईमेल तयार!",
+    "imageSaved": "फोटो मध्ये सेव्ह केले!",
+    "measurements": "मोजमाप"
+  },
+  "helpModal": {
+    "title": "मार्गदर्शक",
+    "pdfGuideLanguages": "पीडीएफ मार्गदर्शक भाषा",
+    "moreLanguagesSoon": "लवकरच आणखी भाषा येत आहेत...",
+    "videoCoursesTitle": "व्हिडिओ कोर्सेस",
+    "step1Title": "पायरी १: एक परिपूर्ण फोटो काढा",
+    "step2Title": "पायरी २: नाण्याने कॅलिब्रेट करा",
+    "step3Title": "पायरी ३: ठिकाणाचे मोजमाप"
+  },
+  "battlingBots": {
+    "title": "पडद्यामागे",
+    "supportSnail": "सपोर्ट स्नेल",
+    "subtitle": "पॅनहँडलर हा एक आवडता प्रकल्प आहे. तो जिवंत ठेवण्यास मदत करा!",
+    "buyMeCoffee": "मला कॉफी विकत आणा",
+    "cantDoCoffee": "मी कॉफी करू शकत नाही: एक पुनरावलोकन द्या!",
+    "maybeLater": "कदाचित नंतर"
+  },
+  "alerts": {
+    "permissionDenied": "परवानगी नाकारली",
+    "cameraPermissionNeeded": "फोटो काढण्यासाठी कॅमेरा परवानगी आवश्यक आहे",
+    "photoLibraryPermissionNeeded": "प्रतिमा जतन करण्यासाठी फोटो लायब्ररीची परवानगी आवश्यक आहे",
+    "calibrationRequired": "कृपया प्रथम नाण्याने कॅलिब्रेट करा.",
+    "noMeasurements": "जतन करण्यासाठी कोणतेही माप नाहीत",
+    "emailError": "ईमेल तयार करण्यात अयशस्वी",
+    "saveError": "इमेज सेव्ह करता आली नाही."
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

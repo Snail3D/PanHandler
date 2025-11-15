@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "ক্যামেরা",
+    "help": "সাহায্য",
+    "save": "সংরক্ষণ করুন",
+    "email": "ইমেইল",
+    "close": "বন্ধ করা",
+    "cancel": "বাতিল করুন",
+    "confirm": "নিশ্চিত করুন",
+    "done": "সম্পন্ন",
+    "next": "পরবর্তী",
+    "back": "পিছনে",
+    "ok": "ঠিক আছে",
+    "yes": "হাঁ",
+    "no": "না",
+    "loading": "লোড হচ্ছে...",
+    "error": "ত্রুটি",
+    "success": "সাফল্য"
+  },
+  "buttons": {
+    "lockIn": "Lock in",
+    "lockInCalibration": "লক ইন ক্যালিব্রেশন",
+    "recalibrate": "পুনঃক্যালিব্রেট করুন",
+    "pan": "প্যান",
+    "edit": "সম্পাদনা",
+    "measure": "পরিমাপ",
+    "undo": "পূর্বাবস্থায় ফেরান",
+    "trash": "Delete",
+    "unitToggle": "ইউনিট",
+    "metric": "মেট্রিক",
+    "imperial": "ইম্পেরিয়াল",
+    "flash": "ফ্ল্যাশ",
+    "photoLibrary": "ছবির লাইব্রেরি",
+    "scaleMode": "স্কেল মোড"
+  },
+  "cameraScreen": {
+    "lookDown": "নিচে তাকাও",
+    "holdSteady": "স্থির থাকো",
+    "capturing": "ক্যাপচার করা হচ্ছে...",
+    "almostLevel": "প্রায় স্তর",
+    "perfectLevel": "নিখুঁত! স্থির থাকো।",
+    "tooMuchMovement": "খুব বেশি নড়াচড়া",
+    "alignCrosshairs": "ক্রসহেয়ার সারিবদ্ধ করুন",
+    "autoCapture": "অটো-ক্যাপচার প্রস্তুত"
+  },
+  "coinCalibration": {
+    "title": "কয়েন দিয়ে ক্যালিব্রেট করুন",
+    "searchPlaceholder": "মুদ্রা অনুসন্ধান করুন...",
+    "zoomInstructions": "জুম করতে পিঞ্চ করুন, অবস্থানে টেনে আনুন",
+    "alignInstructions": "মুদ্রার বাইরের প্রান্তটি রঙিন বৃত্তের বাইরের প্রান্তের সাথে মিলিয়ে নিন।",
+    "lockInWhenReady": "সারিবদ্ধ হলে লক ইন ট্যাপ করুন"
+  },
+  "dimensionOverlay": {
+    "calibrated": "ক্যালিব্রেটেড",
+    "recalibrateButton": "পুনঃক্যালিব্রেট করুন",
+    "panMode": "প্যান মোড - ছবি সরান/জুম করুন",
+    "editMode": "সম্পাদনা মোড - পরিমাপ সরান",
+    "measureMode": "পরিমাপ মোড - নতুন পরিমাপ রাখুন",
+    "distance": "দূরত্ব",
+    "angle": "কোণ",
+    "circle": "বৃত্ত",
+    "rectangle": "আয়তক্ষেত্র",
+    "freehand": "ফ্রিহ্যান্ড",
+    "legend": "কিংবদন্তি",
+    "tapToCollapse": "সঙ্কুচিত করতে ট্যাপ করুন",
+    "tapToExpand": "প্রসারিত করতে আলতো চাপুন",
+    "labelPrompt": "পরিমাপের নাম/বর্ণনা লিখুন",
+    "depthPrompt": "গভীরতা লিখুন (ঐচ্ছিক)",
+    "locked": "প্যান/জুম লক করা আছে - পরিমাপ সরাতে সম্পাদনা করুন ট্যাপ করুন",
+    "emailSent": "ইমেল প্রস্তুত!",
+    "imageSaved": "ফটোতে সংরক্ষিত!",
+    "measurements": "পরিমাপ"
+  },
+  "helpModal": {
+    "title": "গাইড",
+    "pdfGuideLanguages": "পিডিএফ গাইড ভাষা",
+    "moreLanguagesSoon": "আরও ভাষা শীঘ্রই আসছে...",
+    "videoCoursesTitle": "ভিডিও কোর্স",
+    "step1Title": "ধাপ ১: একটি নিখুঁত ছবি তুলুন",
+    "step2Title": "ধাপ ২: কয়েন দিয়ে ক্যালিব্রেট করুন",
+    "step3Title": "ধাপ ৩: স্থান পরিমাপ"
+  },
+  "battlingBots": {
+    "title": "পর্দার অন্তরালে",
+    "supportSnail": "সাপোর্ট শামুক",
+    "subtitle": "প্যানহ্যান্ডলার একটি আবেগঘন প্রকল্প। এটিকে বাঁচিয়ে রাখতে সাহায্য করুন!",
+    "buyMeCoffee": "আমাকে একটা কফি কিনে দাও",
+    "cantDoCoffee": "আমি কফি করতে পারি না: একটি পর্যালোচনা দিন!",
+    "maybeLater": "হয়তো পরে"
+  },
+  "alerts": {
+    "permissionDenied": "অনুমতি অস্বীকার করা হয়েছে",
+    "cameraPermissionNeeded": "ছবি তোলার জন্য ক্যামেরার অনুমতি প্রয়োজন",
+    "photoLibraryPermissionNeeded": "ছবি সংরক্ষণের জন্য ফটো লাইব্রেরির অনুমতি প্রয়োজন",
+    "calibrationRequired": "প্রথমে একটি মুদ্রা দিয়ে ক্যালিব্রেট করুন।",
+    "noMeasurements": "সংরক্ষণ করার জন্য কোনও পরিমাপ নেই",
+    "emailError": "ইমেল প্রস্তুত করা যায়নি",
+    "saveError": "ছবি সংরক্ষণ করা যায়নি"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

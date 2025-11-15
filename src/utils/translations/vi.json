@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Máy ảnh",
+    "help": "Giúp đỡ",
+    "save": "Cứu",
+    "email": "E-mail",
+    "close": "Đóng",
+    "cancel": "Hủy bỏ",
+    "confirm": "Xác nhận",
+    "done": "Xong",
+    "next": "Kế tiếp",
+    "back": "Mặt sau",
+    "ok": "ĐƯỢC RỒI",
+    "yes": "Đúng",
+    "no": "KHÔNG",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "buttons": {
+    "lockIn": "Khóa trong",
+    "lockInCalibration": "Khóa trong hiệu chuẩn",
+    "recalibrate": "Hiệu chuẩn lại",
+    "pan": "Chảo",
+    "edit": "Biên tập",
+    "measure": "Đo lường",
+    "undo": "Hoàn tác",
+    "trash": "Xóa bỏ",
+    "unitToggle": "Đơn vị",
+    "metric": "Hệ mét",
+    "imperial": "Đế chế",
+    "flash": "Đèn flash",
+    "photoLibrary": "Thư viện ảnh",
+    "scaleMode": "Chế độ tỷ lệ"
+  },
+  "cameraScreen": {
+    "lookDown": "Nhìn xuống",
+    "holdSteady": "Giữ vững",
+    "capturing": "Đang chụp...",
+    "almostLevel": "Gần như bằng phẳng",
+    "perfectLevel": "Hoàn hảo! Giữ vững",
+    "tooMuchMovement": "Quá nhiều chuyển động",
+    "alignCrosshairs": "Căn chỉnh đường ngắm",
+    "autoCapture": "Sẵn sàng tự động chụp"
+  },
+  "coinCalibration": {
+    "title": "Hiệu chuẩn bằng đồng xu",
+    "searchPlaceholder": "Tìm kiếm đồng xu...",
+    "zoomInstructions": "Chụm để phóng to, kéo đến vị trí",
+    "alignInstructions": "Ghép cạnh ngoài của đồng xu với cạnh ngoài của hình tròn màu",
+    "lockInWhenReady": "Chạm vào Khóa khi căn chỉnh"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Đã hiệu chuẩn",
+    "recalibrateButton": "Hiệu chuẩn lại",
+    "panMode": "Chế độ Pan - Di chuyển/phóng to hình ảnh",
+    "editMode": "Chế độ chỉnh sửa - Di chuyển phép đo",
+    "measureMode": "Chế độ đo - Đặt phép đo mới",
+    "distance": "Khoảng cách",
+    "angle": "Góc",
+    "circle": "Vòng tròn",
+    "rectangle": "Hình chữ nhật",
+    "freehand": "Vẽ tay",
+    "legend": "Huyền thoại",
+    "tapToCollapse": "Nhấn để thu gọn",
+    "tapToExpand": "Nhấn để mở rộng",
+    "labelPrompt": "Nhập tên/mô tả phép đo",
+    "depthPrompt": "Nhập độ sâu (tùy chọn)",
+    "locked": "Đã khóa Pan/Zoom - chạm vào Chỉnh sửa để di chuyển các phép đo",
+    "emailSent": "Đã chuẩn bị email!",
+    "imageSaved": "Đã lưu vào Ảnh!",
+    "measurements": "Các phép đo"
+  },
+  "helpModal": {
+    "title": "Hướng dẫn",
+    "pdfGuideLanguages": "Hướng dẫn PDF Ngôn ngữ",
+    "moreLanguagesSoon": "Sẽ sớm có thêm nhiều ngôn ngữ khác...",
+    "videoCoursesTitle": "Khóa học video",
+    "step1Title": "Bước 1: Chụp một bức ảnh hoàn hảo",
+    "step2Title": "Bước 2: Hiệu chuẩn bằng đồng xu",
+    "step3Title": "Bước 3: Đặt phép đo"
+  },
+  "battlingBots": {
+    "title": "Hậu trường",
+    "supportSnail": "Hỗ trợ Snail",
+    "subtitle": "PanHandler là một dự án tâm huyết. Hãy chung tay duy trì dự án này nhé!",
+    "buyMeCoffee": "Mua cho tôi một cốc cà phê",
+    "cantDoCoffee": "Tôi không uống được cà phê: Hãy để lại đánh giá!",
+    "maybeLater": "Có thể sau này"
+  },
+  "alerts": {
+    "permissionDenied": "Quyền bị từ chối",
+    "cameraPermissionNeeded": "Cần phải có sự cho phép của máy ảnh để chụp ảnh",
+    "photoLibraryPermissionNeeded": "Cần có quyền thư viện ảnh để lưu hình ảnh",
+    "calibrationRequired": "Vui lòng hiệu chuẩn bằng đồng xu trước",
+    "noMeasurements": "Không có phép đo nào để lưu",
+    "emailError": "Không chuẩn bị được email",
+    "saveError": "Không lưu được hình ảnh"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

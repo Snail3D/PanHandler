@@ -45,7 +45,14 @@ const LANGUAGES = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷', coin: '1 Lira' },
   { code: 'ko', name: 'Korean', flag: '🇰🇷', coin: '500 Won' },
   { code: 'ta', name: 'Tamil', flag: '🇮🇳', coin: '₹10 Rupee' },
-  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳', coin: '5000 Dong' }
+  { code: 'vi', name: 'Vietnamese', flag: '🇻🇳', coin: '5000 Dong' },
+  // New languages for developing regions
+  { code: 'ha', name: 'Hausa', flag: '🇳🇬', coin: 'Nigerian 50 Naira' },
+  { code: 'pa', name: 'Punjabi', flag: '🇮🇳', coin: '₹10 Rupee' },
+  { code: 'fil', name: 'Filipino', flag: '🇵🇭', coin: '5 Peso' },
+  { code: 'am', name: 'Amharic', flag: '🇪🇹', coin: 'Ethiopian 1 Birr' },
+  { code: 'my', name: 'Burmese', flag: '🇲🇲', coin: 'Kyat' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭', coin: '10 Baht' }
 ];
 
 // Load English template

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "カメラ",
+    "help": "ヘルプ",
+    "save": "保存",
+    "email": "メール",
+    "close": "近い",
+    "cancel": "キャンセル",
+    "confirm": "確認する",
+    "done": "終わり",
+    "next": "次",
+    "back": "戻る",
+    "ok": "わかりました",
+    "yes": "はい",
+    "no": "いいえ",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功"
+  },
+  "buttons": {
+    "lockIn": "ロックイン",
+    "lockInCalibration": "ロックインキャリブレーション",
+    "recalibrate": "再調整",
+    "pan": "パン",
+    "edit": "編集",
+    "measure": "測定",
+    "undo": "元に戻す",
+    "trash": "消去",
+    "unitToggle": "ユニット",
+    "metric": "メトリック",
+    "imperial": "インペリアル",
+    "flash": "フラッシュ",
+    "photoLibrary": "写真ライブラリ",
+    "scaleMode": "スケールモード"
+  },
+  "cameraScreen": {
+    "lookDown": "下を見る",
+    "holdSteady": "しっかり保つ",
+    "capturing": "キャプチャ中...",
+    "almostLevel": "ほぼ水平",
+    "perfectLevel": "完璧！しっかり握って",
+    "tooMuchMovement": "動きすぎ",
+    "alignCrosshairs": "クロスヘアを合わせる",
+    "autoCapture": "自動キャプチャ対応"
+  },
+  "coinCalibration": {
+    "title": "コインで調整",
+    "searchPlaceholder": "コインを検索...",
+    "zoomInstructions": "ピンチしてズーム、ドラッグして位置を調整",
+    "alignInstructions": "コインの外側の縁を色付きの円の外側の縁に合わせます",
+    "lockInWhenReady": "位置合わせしたらタップしてロックする"
+  },
+  "dimensionOverlay": {
+    "calibrated": "校正済み",
+    "recalibrateButton": "再調整",
+    "panMode": "パンモード - 画像の移動/ズーム",
+    "editMode": "編集モード - 測定値を移動",
+    "measureMode": "測定モード - 新しい測定を配置する",
+    "distance": "距離",
+    "angle": "角度",
+    "circle": "丸",
+    "rectangle": "矩形",
+    "freehand": "フリーハンド",
+    "legend": "伝説",
+    "tapToCollapse": "折りたたむにはタップしてください",
+    "tapToExpand": "Tap to expand",
+    "labelPrompt": "測定名/説明を入力してください",
+    "depthPrompt": "深さを入力してください（オプション）",
+    "locked": "パン/ズームはロックされています - 測定値を移動するには編集をタップしてください",
+    "emailSent": "メールを準備しました！",
+    "imageSaved": "写真に保存しました!",
+    "measurements": "測定"
+  },
+  "helpModal": {
+    "title": "ガイド",
+    "pdfGuideLanguages": "PDFガイド言語",
+    "moreLanguagesSoon": "その他の言語も近日中に追加予定です...",
+    "videoCoursesTitle": "ビデオコース",
+    "step1Title": "ステップ1：完璧な写真を撮る",
+    "step2Title": "ステップ2：コインで調整する",
+    "step3Title": "ステップ3：測定を行う"
+  },
+  "battlingBots": {
+    "title": "舞台裏",
+    "supportSnail": "カタツムリをサポートする",
+    "subtitle": "PanHandlerは情熱のプロジェクトです。ぜひご協力ください！",
+    "buyMeCoffee": "コーヒーを買ってください",
+    "cantDoCoffee": "コーヒーが苦手です: レビューを残してください!",
+    "maybeLater": "後で"
+  },
+  "alerts": {
+    "permissionDenied": "許可が拒否されました",
+    "cameraPermissionNeeded": "写真を撮るにはカメラの許可が必要です",
+    "photoLibraryPermissionNeeded": "画像を保存するにはフォトライブラリの許可が必要です",
+    "calibrationRequired": "まずはコインで調整してください",
+    "noMeasurements": "保存する測定値はありません",
+    "emailError": "メールの準備に失敗しました",
+    "saveError": "画像の保存に失敗しました"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

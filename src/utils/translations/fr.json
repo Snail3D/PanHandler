@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Caméra",
+    "help": "Aide",
+    "save": "Sauvegarder",
+    "email": "E-mail",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "done": "Fait",
+    "next": "Suivant",
+    "back": "Dos",
+    "ok": "D'ACCORD",
+    "yes": "Oui",
+    "no": "Non",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Success"
+  },
+  "buttons": {
+    "lockIn": "Verrouiller",
+    "lockInCalibration": "Lock In Calibration",
+    "recalibrate": "Recalibrer",
+    "pan": "Poêle",
+    "edit": "Modifier",
+    "measure": "Mesure",
+    "undo": "Défaire",
+    "trash": "Supprimer",
+    "unitToggle": "Unité",
+    "metric": "Métrique",
+    "imperial": "Impérial",
+    "flash": "Éclair",
+    "photoLibrary": "Photothèque",
+    "scaleMode": "Mode d'échelle"
+  },
+  "cameraScreen": {
+    "lookDown": "Regardez en bas",
+    "holdSteady": "Tenez bon",
+    "capturing": "Capture en cours...",
+    "almostLevel": "Presque niveau",
+    "perfectLevel": "Parfait ! Tenez bon !",
+    "tooMuchMovement": "Trop de mouvement",
+    "alignCrosshairs": "Aligner le réticule",
+    "autoCapture": "Prêt pour la capture automatique"
+  },
+  "coinCalibration": {
+    "title": "Calibrer avec une pièce de monnaie",
+    "searchPlaceholder": "Rechercher une pièce...",
+    "zoomInstructions": "Pincez pour zoomer, faites glisser pour positionner",
+    "alignInstructions": "Faites correspondre le bord extérieur de la pièce avec le bord extérieur du cercle coloré.",
+    "lockInWhenReady": "Verrouiller par pression lorsque aligné"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Calibré",
+    "recalibrateButton": "Recalibrer",
+    "panMode": "Mode panoramique - Déplacer/zoomer l'image",
+    "editMode": "Mode édition - Déplacer les mesures",
+    "measureMode": "Mode Mesure - Effectuer de nouvelles mesures",
+    "distance": "Distance",
+    "angle": "Angle",
+    "circle": "Cercle",
+    "rectangle": "Rectangle",
+    "freehand": "À main levée",
+    "legend": "Légende",
+    "tapToCollapse": "Appuyez pour réduire",
+    "tapToExpand": "Appuyez pour agrandir",
+    "labelPrompt": "Saisissez le nom/la description de la mesure",
+    "depthPrompt": "Saisissez la profondeur (facultatif)",
+    "locked": "Panoramique/Zoom verrouillé - appuyez sur Modifier pour déplacer les mesures",
+    "emailSent": "Courriel prêt !",
+    "imageSaved": "Enregistré dans Photos !",
+    "measurements": "Mesures"
+  },
+  "helpModal": {
+    "title": "Guide",
+    "pdfGuideLanguages": "Guide PDF Langues",
+    "moreLanguagesSoon": "D'autres langues seront bientôt disponibles...",
+    "videoCoursesTitle": "Cours vidéo",
+    "step1Title": "Step 1: Take a Perfect Photo",
+    "step2Title": "Étape 2 : Calibrer avec une pièce de monnaie",
+    "step3Title": "Step 3: Place Measurements"
+  },
+  "battlingBots": {
+    "title": "Dans les coulisses",
+    "supportSnail": "Support Snail",
+    "subtitle": "PanHandler est un projet qui nous tient à cœur. Aidez-nous à le faire vivre !",
+    "buyMeCoffee": "Offrez-moi un café",
+    "cantDoCoffee": "Je ne supporte pas le café : Laissez un avis !",
+    "maybeLater": "Peut-être plus tard"
+  },
+  "alerts": {
+    "permissionDenied": "Accès refusé",
+    "cameraPermissionNeeded": "L'autorisation de prendre des photos est requise.",
+    "photoLibraryPermissionNeeded": "L'autorisation de la photothèque est requise pour enregistrer les images.",
+    "calibrationRequired": "Veuillez d'abord calibrer avec une pièce de monnaie.",
+    "noMeasurements": "Aucune mesure à enregistrer",
+    "emailError": "Échec de la préparation de l'e-mail",
+    "saveError": "Impossible d'enregistrer l'image"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

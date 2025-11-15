@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamera",
+    "help": "Msaada",
+    "save": "Hifadhi",
+    "email": "Barua pepe",
+    "close": "Funga",
+    "cancel": "Ghairi",
+    "confirm": "Thibitisha",
+    "done": "Imekamilika",
+    "next": "Inayofuata",
+    "back": "Nyuma",
+    "ok": "Sawa",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "loading": "Inapakia...",
+    "error": "Hitilafu",
+    "success": "Mafanikio"
+  },
+  "buttons": {
+    "lockIn": "Funga ndani",
+    "lockInCalibration": "Lock In Calibration",
+    "recalibrate": "Sawazisha upya",
+    "pan": "Panua",
+    "edit": "Hariri",
+    "measure": "Pima",
+    "undo": "Tendua",
+    "trash": "Futa",
+    "unitToggle": "Kitengo",
+    "metric": "Kipimo",
+    "imperial": "Imperial",
+    "flash": "Mwako",
+    "photoLibrary": "Maktaba ya Picha",
+    "scaleMode": "Njia ya Scale"
+  },
+  "cameraScreen": {
+    "lookDown": "Angalia Chini",
+    "holdSteady": "Shikilia Imara",
+    "capturing": "Inanasa...",
+    "almostLevel": "Karibu Kiwango",
+    "perfectLevel": "Kamili! Shikilia Imara",
+    "tooMuchMovement": "Mwendo Kubwa Sana",
+    "alignCrosshairs": "Pangilia Crosshairs",
+    "autoCapture": "Nasa Kiotomatiki Tayari"
+  },
+  "coinCalibration": {
+    "title": "Rekebisha kwa Coin",
+    "searchPlaceholder": "Tafuta sarafu...",
+    "zoomInstructions": "Bana ili kukuza, buruta hadi mahali",
+    "alignInstructions": "Linganisha makali ya nje ya sarafu na makali ya nje ya mduara wa rangi",
+    "lockInWhenReady": "Gusa Funga wakati imepangiliwa"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Imesawazishwa",
+    "recalibrateButton": "Sawazisha upya",
+    "panMode": "Njia ya Kufungua - Sogeza/kuza picha",
+    "editMode": "Hariri Modi - Sogeza vipimo",
+    "measureMode": "Measure Mode - Place new measurements",
+    "distance": "Umbali",
+    "angle": "Pembe",
+    "circle": "Mduara",
+    "rectangle": "Mstatili",
+    "freehand": "Freehand",
+    "legend": "Hadithi",
+    "tapToCollapse": "Gusa ili ukunje",
+    "tapToExpand": "Gusa ili kupanua",
+    "labelPrompt": "Weka jina/maelezo ya kipimo",
+    "depthPrompt": "Ingiza kina (si lazima)",
+    "locked": "Pan/Zoom imefungwa - gusa Hariri ili usogeze vipimo",
+    "emailSent": "Barua pepe imeandaliwa!",
+    "imageSaved": "Imehifadhiwa kwenye Picha!",
+    "measurements": "Vipimo"
+  },
+  "helpModal": {
+    "title": "Mwongozo",
+    "pdfGuideLanguages": "Lugha za Mwongozo wa PDF",
+    "moreLanguagesSoon": "Lugha zaidi zinakuja hivi karibuni...",
+    "videoCoursesTitle": "Kozi za Video",
+    "step1Title": "Hatua ya 1: Piga Picha Kamili",
+    "step2Title": "Hatua ya 2: Rekebisha kwa Sarafu",
+    "step3Title": "Hatua ya 3: Vipimo vya Mahali"
+  },
+  "battlingBots": {
+    "title": "Nyuma ya Pazia",
+    "supportSnail": "Msaada Konokono",
+    "subtitle": "PanHandler ni mradi wa shauku. Saidia kuiweka hai!",
+    "buyMeCoffee": "Ninunulie Kahawa",
+    "cantDoCoffee": "Siwezi kufanya kahawa: Acha ukaguzi!",
+    "maybeLater": "Labda Baadaye"
+  },
+  "alerts": {
+    "permissionDenied": "Ruhusa Imekataliwa",
+    "cameraPermissionNeeded": "Ruhusa ya kamera inahitajika ili kupiga picha",
+    "photoLibraryPermissionNeeded": "Ruhusa ya maktaba ya picha inahitajika ili kuhifadhi picha",
+    "calibrationRequired": "Tafadhali rekebisha kwa kutumia sarafu kwanza",
+    "noMeasurements": "Hakuna vipimo vya kuhifadhi",
+    "emailError": "Imeshindwa kuandaa barua pepe",
+    "saveError": "Imeshindwa kuhifadhi picha"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

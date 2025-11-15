@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "ካሜራ",
+    "help": "እገዛ",
+    "save": "አስቀምጥ",
+    "email": "ኢሜይል",
+    "close": "ገጠመ",
+    "cancel": "ሰርዝ",
+    "confirm": "አረጋግጥ",
+    "done": "ተከናውኗል",
+    "next": "ቀጥሎ",
+    "back": "ተመለስ",
+    "ok": "እሺ",
+    "yes": "አዎ",
+    "no": "አይ",
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት",
+    "success": "ስኬት"
+  },
+  "buttons": {
+    "lockIn": "ቆልፍ",
+    "lockInCalibration": "በካሊብሬሽን ውስጥ ቆልፍ",
+    "recalibrate": "እንደገና አስተካክል።",
+    "pan": "ፓን",
+    "edit": "አርትዕ",
+    "measure": "ለካ",
+    "undo": "ቀልብስ",
+    "trash": "ሰርዝ",
+    "unitToggle": "ክፍል",
+    "metric": "መለኪያ",
+    "imperial": "ኢምፔሪያል",
+    "flash": "ብልጭታ",
+    "photoLibrary": "የፎቶ ቤተ-መጽሐፍት",
+    "scaleMode": "ልኬት ሁነታ"
+  },
+  "cameraScreen": {
+    "lookDown": "ወደ ታች ተመልከት",
+    "holdSteady": "ተረጋጋ",
+    "capturing": "በማንሳት ላይ...",
+    "almostLevel": "ደረጃ ማለት ይቻላል።",
+    "perfectLevel": "ፍጹም! ተረጋጋ",
+    "tooMuchMovement": "በጣም ብዙ እንቅስቃሴ",
+    "alignCrosshairs": "Crosshairs አሰልፍ",
+    "autoCapture": "ራስ-ሰር ቀረጻ ዝግጁ"
+  },
+  "coinCalibration": {
+    "title": "በሳንቲም አስተካክል።",
+    "searchPlaceholder": "ሳንቲም ፈልግ...",
+    "zoomInstructions": "ለማጉላት ይቆንጥጡ፣ ወደ ቦታ ይጎትቱ",
+    "alignInstructions": "የሳንቲሙን የውጭ ጫፍ ከቀለም ክብ ውጫዊ ጠርዝ ጋር ያዛምዱ",
+    "lockInWhenReady": "ሲሰለፉ ቆልፍን መታ ያድርጉ"
+  },
+  "dimensionOverlay": {
+    "calibrated": "የተስተካከለ",
+    "recalibrateButton": "እንደገና አስተካክል።",
+    "panMode": "የፓን ሁነታ - ምስልን አንቀሳቅስ/አጉላ",
+    "editMode": "የአርትዕ ሁነታ - መለኪያዎችን አንቀሳቅስ",
+    "measureMode": "የመለኪያ ሁነታ - አዲስ መለኪያዎችን ያስቀምጡ",
+    "distance": "ርቀት",
+    "angle": "አንግል",
+    "circle": "ክብ",
+    "rectangle": "አራት ማዕዘን",
+    "freehand": "ነፃ እጅ",
+    "legend": "አፈ ታሪክ",
+    "tapToCollapse": "ለመሰብሰብ መታ ያድርጉ",
+    "tapToExpand": "ለመዘርጋት መታ ያድርጉ",
+    "labelPrompt": "የመለኪያ ስም/መግለጫ አስገባ",
+    "depthPrompt": "ጥልቀት አስገባ (አማራጭ)",
+    "locked": "ፓን/አጉላ ተቆልፏል - መለኪያዎችን ለማንቀሳቀስ አርትዕን መታ ያድርጉ",
+    "emailSent": "ኢሜል ተዘጋጅቷል!",
+    "imageSaved": "ወደ ፎቶዎች ተቀምጧል!",
+    "measurements": "መለኪያዎች"
+  },
+  "helpModal": {
+    "title": "መመሪያ",
+    "pdfGuideLanguages": "ፒዲኤፍ መመሪያ ቋንቋዎች",
+    "moreLanguagesSoon": "ተጨማሪ ቋንቋዎች በቅርቡ ይመጣሉ...",
+    "videoCoursesTitle": "የቪዲዮ ኮርሶች",
+    "step1Title": "ደረጃ 1፡ ፍጹም የሆነ ፎቶ አንሳ",
+    "step2Title": "ደረጃ 2፡ በሳንቲም መለካት",
+    "step3Title": "ደረጃ 3፡ የቦታ መለኪያዎች"
+  },
+  "battlingBots": {
+    "title": "ከትዕይንቶች በስተጀርባ",
+    "supportSnail": "Snailን ይደግፉ",
+    "subtitle": "PanHandler የፍላጎት ፕሮጀክት ነው። በሕይወት እንዲቆይ እርዱ!",
+    "buyMeCoffee": "ቡና ግዛልኝ",
+    "cantDoCoffee": "ቡና መሥራት አልችልም: ግምገማ ይተው!",
+    "maybeLater": "ምናልባት በኋላ"
+  },
+  "alerts": {
+    "permissionDenied": "ፍቃድ ተከልክሏል።",
+    "cameraPermissionNeeded": "ፎቶዎችን ለማንሳት የካሜራ ፍቃድ ያስፈልጋል",
+    "photoLibraryPermissionNeeded": "ምስሎችን ለማስቀመጥ የፎቶ ቤተ-መጽሐፍት ፈቃድ ያስፈልጋል",
+    "calibrationRequired": "እባክዎ መጀመሪያ በሳንቲም ያስተካክሉ",
+    "noMeasurements": "ለማስቀመጥ ምንም መለኪያዎች የሉም",
+    "emailError": "ኢሜይል ማዘጋጀት አልተሳካም።",
+    "saveError": "ምስል ማስቀመጥ አልተሳካም።"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

@@ -2455,6 +2455,74 @@ Thank you for helping us improve PanHandler!
                 </Pressable>
               </View>
 
+              {/* Language Selector - Bottom of Modal */}
+              <View style={{ marginTop: 48, paddingTop: 24, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.1)' }}>
+                <Text style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: '#1C1C1E',
+                  textAlign: 'center',
+                  marginBottom: 12,
+                }}>
+                  🌍 Languages
+                </Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#3C3C43',
+                  textAlign: 'center',
+                  lineHeight: 20,
+                  paddingHorizontal: 16,
+                }}>
+                  {[
+                    { code: 'en', label: 'EN English' },
+                    { code: 'es', label: 'ES Español' },
+                    { code: 'zh', label: 'ZH 中文' },
+                    { code: 'hi', label: 'HI हिन्दी' },
+                    { code: 'fr', label: 'FR Français' },
+                    { code: 'ar', label: 'AR العربية' },
+                    { code: 'bn', label: 'BN বাংলা' },
+                    { code: 'ru', label: 'RU Русский' },
+                    { code: 'pt', label: 'PT Português' },
+                    { code: 'ur', label: 'UR اردو' },
+                    { code: 'id', label: 'ID Bahasa Indonesia' },
+                    { code: 'de', label: 'DE Deutsch' },
+                    { code: 'ja', label: 'JA 日本語' },
+                    { code: 'pl', label: 'PL Polski' },
+                    { code: 'el', label: 'EL Ελληνικά' },
+                    { code: 'sw', label: 'SW Kiswahili' },
+                    { code: 'mr', label: 'MR मराठी' },
+                    { code: 'te', label: 'TE తెలుగు' },
+                    { code: 'tr', label: 'TR Türkçe' },
+                    { code: 'ko', label: 'KO 한국어' },
+                    { code: 'ta', label: 'TA தமிழ்' },
+                    { code: 'vi', label: 'VI Tiếng Việt' },
+                    { code: 'ha', label: 'HA Hausa' },
+                    { code: 'pa', label: 'PA ਪੰਜਾਬੀ' },
+                    { code: 'fil', label: 'FIL Filipino' },
+                    { code: 'am', label: 'AM አማርኛ' },
+                    { code: 'my', label: 'MY မြန်မာ' },
+                    { code: 'th', label: 'TH ไทย' }
+                  ].map((lang, index, array) => (
+                    <Text
+                      key={lang.code}
+                      onPress={async () => {
+                        try {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                          const { changeLanguage } = await import('../utils/i18n');
+                          await changeLanguage(lang.code);
+                          // TODO: Reload app or refresh components to show new language
+                          showAlert('Language Changed', `Language set to ${lang.label.split(' ')[1]}. Restart app to see changes.`, 'success');
+                        } catch (error) {
+                          console.error('Error changing language:', error);
+                        }
+                      }}
+                      style={{ color: '#007AFF', textDecorationLine: 'underline' }}
+                    >
+                      {lang.label}{index < array.length - 1 ? ', ' : ''}
+                    </Text>
+                  ))}
+                </Text>
+              </View>
 
             </ScrollView>
             </View>

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Κάμερα",
+    "help": "Βοήθεια",
+    "save": "Εκτός",
+    "email": "E-mail",
+    "close": "Κοντά",
+    "cancel": "Ματαίωση",
+    "confirm": "Επιβεβαιώνω",
+    "done": "Γινώμενος",
+    "next": "Επόμενος",
+    "back": "Πίσω",
+    "ok": "ΕΝΤΑΞΕΙ",
+    "yes": "Ναί",
+    "no": "Οχι",
+    "loading": "Φόρτωση...",
+    "error": "Σφάλμα",
+    "success": "Επιτυχία"
+  },
+  "buttons": {
+    "lockIn": "Κλείδωμα",
+    "lockInCalibration": "Κλείδωμα βαθμονόμησης",
+    "recalibrate": "Επαναβαθμονόμηση",
+    "pan": "Τηγάνι",
+    "edit": "Εκδίδω",
+    "measure": "Μέτρο",
+    "undo": "Ξεκάνω",
+    "trash": "Διαγράφω",
+    "unitToggle": "Μονάδα",
+    "metric": "Μετρικός",
+    "imperial": "Αυτοκρατορικός",
+    "flash": "Λάμψη",
+    "photoLibrary": "Βιβλιοθήκη φωτογραφιών",
+    "scaleMode": "Λειτουργία κλίμακας"
+  },
+  "cameraScreen": {
+    "lookDown": "Κοίτα κάτω",
+    "holdSteady": "Κρατήστε σταθερό",
+    "capturing": "Λήψη...",
+    "almostLevel": "Σχεδόν επίπεδο",
+    "perfectLevel": "Τέλεια! Κρατήστε σταθερό",
+    "tooMuchMovement": "Υπερβολική κίνηση",
+    "alignCrosshairs": "Ευθυγράμμιση σταυρονημάτων",
+    "autoCapture": "Έτοιμο για αυτόματη λήψη"
+  },
+  "coinCalibration": {
+    "title": "Βαθμονόμηση με κέρμα",
+    "searchPlaceholder": "Αναζήτηση νομίσματος...",
+    "zoomInstructions": "Τσιμπήστε για μεγέθυνση, σύρετε στη θέση",
+    "alignInstructions": "Αντιστοιχίστε την εξωτερική άκρη του νομίσματος με την εξωτερική άκρη του χρωματιστού κύκλου",
+    "lockInWhenReady": "Πατήστε Κλείδωμα όταν είναι ευθυγραμμισμένο"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Βαθμονομημένο",
+    "recalibrateButton": "Επαναβαθμονόμηση",
+    "panMode": "Λειτουργία μετατόπισης - Μετακίνηση/ζουμ εικόνας",
+    "editMode": "Λειτουργία επεξεργασίας - Μετακίνηση μετρήσεων",
+    "measureMode": "Λειτουργία μέτρησης - Τοποθέτηση νέων μετρήσεων",
+    "distance": "Απόσταση",
+    "angle": "Γωνία",
+    "circle": "Κύκλος",
+    "rectangle": "Ορθογώνιο παραλληλόγραμμο",
+    "freehand": "Ελεύθερο χέρι",
+    "legend": "Θρύλος",
+    "tapToCollapse": "Πατήστε για σύμπτυξη",
+    "tapToExpand": "Πατήστε για ανάπτυξη",
+    "labelPrompt": "Εισαγάγετε όνομα/περιγραφή μέτρησης",
+    "depthPrompt": "Εισαγάγετε βάθος (προαιρετικό)",
+    "locked": "Κλειδωμένη μετατόπιση/ζουμ - πατήστε Επεξεργασία για να μετακινήσετε μετρήσεις",
+    "emailSent": "Το email είναι έτοιμο!",
+    "imageSaved": "Αποθηκεύτηκε στις Φωτογραφίες!",
+    "measurements": "Μετρήσεις"
+  },
+  "helpModal": {
+    "title": "Οδηγός",
+    "pdfGuideLanguages": "Οδηγός PDF Γλώσσες",
+    "moreLanguagesSoon": "Περισσότερες γλώσσες σύντομα...",
+    "videoCoursesTitle": "Μαθήματα βίντεο",
+    "step1Title": "Βήμα 1: Τραβήξτε μια τέλεια φωτογραφία",
+    "step2Title": "Βήμα 2: Βαθμονόμηση με κέρμα",
+    "step3Title": "Βήμα 3: Τοποθετήστε τις μετρήσεις"
+  },
+  "battlingBots": {
+    "title": "Πίσω από τα παρασκήνια",
+    "supportSnail": "Υποστήριξη Σαλιγκάρι",
+    "subtitle": "Το PanHandler είναι ένα έργο πάθους. Βοηθήστε να παραμείνει ζωντανό!",
+    "buyMeCoffee": "Κέρασέ μου έναν καφέ",
+    "cantDoCoffee": "Δεν μπορώ να πιω καφέ: Αφήστε μια κριτική!",
+    "maybeLater": "Ίσως αργότερα"
+  },
+  "alerts": {
+    "permissionDenied": "Η άδεια απορρίφθηκε",
+    "cameraPermissionNeeded": "Απαιτείται άδεια κάμερας για τη λήψη φωτογραφιών",
+    "photoLibraryPermissionNeeded": "Απαιτείται άδεια χρήσης της βιβλιοθήκης φωτογραφιών για την αποθήκευση εικόνων",
+    "calibrationRequired": "Παρακαλώ βαθμονομήστε πρώτα με ένα νόμισμα",
+    "noMeasurements": "Δεν υπάρχουν μετρήσεις για αποθήκευση",
+    "emailError": "Αποτυχία προετοιμασίας email",
+    "saveError": "Η αποθήκευση της εικόνας απέτυχε"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

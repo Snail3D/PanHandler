@@ -34,8 +34,46 @@ export const DEFAULT_COINS_BY_LANGUAGE: Record<string, string> = {
   'sw': 'Kenyan 20 Shilling',
   'tr': '1 Lira',
   'ko': '500 Won',
-  'vi': '5000 Dong'
+  'vi': '5000 Dong',
+  'ha': 'Nigerian 50 Naira',
+  'pa': '₹10 Rupee',
+  'fil': '5 Peso',
+  'am': 'Ethiopian 1 Birr',
+  'my': 'Kyat',
+  'th': '10 Baht'
 };
+
+// All supported languages with native names
+export const SUPPORTED_LANGUAGES = [
+  { code: 'en', name: 'English', native: 'English' },
+  { code: 'es', name: 'Spanish', native: 'Español' },
+  { code: 'zh', name: 'Chinese', native: '中文' },
+  { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
+  { code: 'fr', name: 'French', native: 'Français' },
+  { code: 'ar', name: 'Arabic', native: 'العربية' },
+  { code: 'bn', name: 'Bengali', native: 'বাংলা' },
+  { code: 'ru', name: 'Russian', native: 'Русский' },
+  { code: 'pt', name: 'Portuguese', native: 'Português' },
+  { code: 'ur', name: 'Urdu', native: 'اردو' },
+  { code: 'id', name: 'Indonesian', native: 'Bahasa Indonesia' },
+  { code: 'de', name: 'German', native: 'Deutsch' },
+  { code: 'ja', name: 'Japanese', native: '日本語' },
+  { code: 'pl', name: 'Polish', native: 'Polski' },
+  { code: 'el', name: 'Greek', native: 'Ελληνικά' },
+  { code: 'sw', name: 'Swahili', native: 'Kiswahili' },
+  { code: 'mr', name: 'Marathi', native: 'मराठी' },
+  { code: 'te', name: 'Telugu', native: 'తెలుగు' },
+  { code: 'tr', name: 'Turkish', native: 'Türkçe' },
+  { code: 'ko', name: 'Korean', native: '한국어' },
+  { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
+  { code: 'vi', name: 'Vietnamese', native: 'Tiếng Việt' },
+  { code: 'ha', name: 'Hausa', native: 'Hausa' },
+  { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
+  { code: 'fil', name: 'Filipino', native: 'Filipino' },
+  { code: 'am', name: 'Amharic', native: 'አማርኛ' },
+  { code: 'my', name: 'Burmese', native: 'မြန်မာ' },
+  { code: 'th', name: 'Thai', native: 'ไทย' }
+];
 
 // Initialize i18n
 const initI18n = async () => {

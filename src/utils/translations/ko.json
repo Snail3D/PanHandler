@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "카메라",
+    "help": "돕다",
+    "save": "구하다",
+    "email": "이메일",
+    "close": "닫다",
+    "cancel": "취소",
+    "confirm": "확인하다",
+    "done": "완료",
+    "next": "다음",
+    "back": "뒤쪽에",
+    "ok": "좋아요",
+    "yes": "예",
+    "no": "아니요",
+    "loading": "로딩중...",
+    "error": "오류",
+    "success": "성공"
+  },
+  "buttons": {
+    "lockIn": "잠금",
+    "lockInCalibration": "잠금 보정",
+    "recalibrate": "재교정",
+    "pan": "팬",
+    "edit": "편집하다",
+    "measure": "측정하다",
+    "undo": "끄르다",
+    "trash": "삭제",
+    "unitToggle": "단위",
+    "metric": "미터법",
+    "imperial": "장엄한",
+    "flash": "플래시",
+    "photoLibrary": "사진 라이브러리",
+    "scaleMode": "스케일 모드"
+  },
+  "cameraScreen": {
+    "lookDown": "아래를 보세요",
+    "holdSteady": "꾸준히 유지하다",
+    "capturing": "캡처 중...",
+    "almostLevel": "거의 수평",
+    "perfectLevel": "완벽해요! 안정적으로 잡아주세요",
+    "tooMuchMovement": "너무 많은 움직임",
+    "alignCrosshairs": "크로스헤어 정렬",
+    "autoCapture": "자동 캡처 준비 완료"
+  },
+  "coinCalibration": {
+    "title": "동전으로 보정",
+    "searchPlaceholder": "코인 검색...",
+    "zoomInstructions": "확대/축소하려면 핀치하고, 위치로 이동하려면 드래그하세요.",
+    "alignInstructions": "동전의 바깥쪽 가장자리를 색칠된 원의 바깥쪽 가장자리와 맞춰보세요.",
+    "lockInWhenReady": "정렬되면 잠금을 탭하세요"
+  },
+  "dimensionOverlay": {
+    "calibrated": "교정됨",
+    "recalibrateButton": "재교정",
+    "panMode": "팬 모드 - 이미지 이동/확대/축소",
+    "editMode": "편집 모드 - 측정값 이동",
+    "measureMode": "측정 모드 - 새로운 측정을 수행합니다.",
+    "distance": "거리",
+    "angle": "각도",
+    "circle": "원",
+    "rectangle": "구형",
+    "freehand": "자유형",
+    "legend": "전설",
+    "tapToCollapse": "탭하여 접기",
+    "tapToExpand": "확장하려면 탭하세요",
+    "labelPrompt": "측정 이름/설명을 입력하세요",
+    "depthPrompt": "깊이 입력(선택 사항)",
+    "locked": "팬/줌 잠금 - 편집을 탭하여 측정값을 이동합니다.",
+    "emailSent": "이메일 준비 완료!",
+    "imageSaved": "사진에 저장되었습니다!",
+    "measurements": "측정"
+  },
+  "helpModal": {
+    "title": "가이드",
+    "pdfGuideLanguages": "PDF 가이드 언어",
+    "moreLanguagesSoon": "곧 더 많은 언어가 추가될 예정입니다.",
+    "videoCoursesTitle": "비디오 강좌",
+    "step1Title": "1단계: 완벽한 사진 촬영",
+    "step2Title": "2단계: 동전으로 보정",
+    "step3Title": "3단계: 측정 위치 지정"
+  },
+  "battlingBots": {
+    "title": "비하인드 스토리",
+    "supportSnail": "달팽이 지원",
+    "subtitle": "PanHandler는 열정이 넘치는 프로젝트입니다. 계속 발전할 수 있도록 도와주세요!",
+    "buyMeCoffee": "나에게 커피 한 잔 사줘",
+    "cantDoCoffee": "저는 커피를 마실 수 없어요: 리뷰를 남겨주세요!",
+    "maybeLater": "아마도 나중에"
+  },
+  "alerts": {
+    "permissionDenied": "허가 거부됨",
+    "cameraPermissionNeeded": "사진 촬영 시 카메라 허가가 필요합니다.",
+    "photoLibraryPermissionNeeded": "이미지를 저장하려면 사진 라이브러리 권한이 필요합니다.",
+    "calibrationRequired": "먼저 동전으로 교정해주세요",
+    "noMeasurements": "저장할 측정값이 없습니다",
+    "emailError": "이메일 준비에 실패했습니다",
+    "saveError": "이미지 저장에 실패했습니다"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}
