@@ -1,0 +1,116 @@
+{
+  "common": {
+    "camera": "Camera",
+    "help": "Help",
+    "save": "Save",
+    "email": "Email",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "done": "Done",
+    "next": "Next",
+    "back": "Back",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  
+  "buttons": {
+    "lockIn": "Lock in",
+    "lockInCalibration": "Lock In Calibration",
+    "recalibrate": "Recalibrate",
+    "pan": "Pan",
+    "edit": "Edit",
+    "measure": "Measure",
+    "undo": "Undo",
+    "trash": "Delete",
+    "unitToggle": "Unit",
+    "metric": "Metric",
+    "imperial": "Imperial",
+    "flash": "Flash",
+    "photoLibrary": "Photo Library",
+    "scaleMode": "Scale Mode"
+  },
+  
+  "cameraScreen": {
+    "lookDown": "Look Down",
+    "holdSteady": "Hold Steady",
+    "capturing": "Capturing...",
+    "almostLevel": "Almost Level",
+    "perfectLevel": "Perfect! Hold Steady",
+    "tooMuchMovement": "Too Much Movement",
+    "alignCrosshairs": "Align Crosshairs",
+    "autoCapture": "Auto-Capture Ready"
+  },
+  
+  "coinCalibration": {
+    "title": "Calibrate with Coin",
+    "searchPlaceholder": "Search coin...",
+    "zoomInstructions": "Pinch to zoom, drag to position",
+    "alignInstructions": "Match the outside edge of the coin with the outside edge of the colored circle",
+    "lockInWhenReady": "Tap Lock in when aligned"
+  },
+  
+  "dimensionOverlay": {
+    "calibrated": "Calibrated",
+    "recalibrateButton": "Recalibrate",
+    "panMode": "Pan Mode - Move/zoom image",
+    "editMode": "Edit Mode - Move measurements",  
+    "measureMode": "Measure Mode - Place new measurements",
+    "distance": "Distance",
+    "angle": "Angle",
+    "circle": "Circle",
+    "rectangle": "Rectangle",
+    "freehand": "Freehand",
+    "legend": "Legend",
+    "tapToCollapse": "Tap to collapse",
+    "tapToExpand": "Tap to expand",
+    "labelPrompt": "Enter measurement name/description",
+    "depthPrompt": "Enter depth (optional)",
+    "locked": "Pan/Zoom locked - tap Edit to move measurements",
+    "emailSent": "Email prepared!",
+    "imageSaved": "Saved to Photos!",
+    "measurements": "Measurements"
+  },
+  
+  "helpModal": {
+    "title": "Guide",
+    "pdfGuideLanguages": "PDF Guide Languages",
+    "moreLanguagesSoon": "More languages coming soon...",
+    "videoCoursesTitle": "Video Courses",
+    "step1Title": "Step 1: Take a Perfect Photo",
+    "step2Title": "Step 2: Calibrate with Coin",
+    "step3Title": "Step 3: Place Measurements"
+  },
+  
+  "battlingBots": {
+    "title": "Behind the Scenes",
+    "supportSnail": "Support Snail",
+    "subtitle": "PanHandler is a passion project. Help keep it alive!",
+    "buyMeCoffee": "Buy Me a Coffee",
+    "cantDoCoffee": "I can't do coffee: Leave a review!",
+    "maybeLater": "Maybe Later"
+  },
+  
+  "alerts": {
+    "permissionDenied": "Permission Denied",
+    "cameraPermissionNeeded": "Camera permission is required to take photos",
+    "photoLibraryPermissionNeeded": "Photo library permission is required to save images",
+    "calibrationRequired": "Please calibrate with a coin first",
+    "noMeasurements": "No measurements to save",
+    "emailError": "Failed to prepare email",
+    "saveError": "Failed to save image"
+  },
+  
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}
+
