@@ -6,7 +6,7 @@
 
 ## 📥 Download
 
-**Latest Version: 7.7**
+**Latest Version: 7.8**
 
 ### iOS (App Store)
 👉 **[Download from the App Store](https://apps.apple.com/us/app/panhandler/id6754727828)**
@@ -76,6 +76,25 @@ PanHandler turns your iPhone camera into a professional measurement tool using c
 | **Circle** | Radius, diameter, area, circumference, and volume |
 | **Rectangle** | Length, width, area, and volume calculations |
 | **Freehand** | Trace custom paths, get area and volume for closed shapes |
+
+### 📦 Volume Calculation
+
+Calculate 3D volumes by adding depth measurements to your 2D area calculations:
+
+**How to Calculate Volume:**
+1. Measure the area (Rectangle, Circle, or closed shape)
+2. Tap the **Edit Labels** button
+3. Tap on the measurement label
+4. Enter the **depth** value
+5. Volume is automatically calculated!
+
+**Works With:**
+- **Rectangles** — Box volumes
+- **Circles** — Cylinder volumes
+- **Connected Line Polygons** — Custom volumes
+- **Closed Free Draw Lassos** — Irregular volumes
+
+⚠️ **Important:** For Free Draw lassos, the line **cannot cross itself** or the area (and volume) will not be calculated correctly.
 
 ### 🪙 Calibration Options
 
