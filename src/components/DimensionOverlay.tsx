@@ -6838,7 +6838,7 @@ export default function DimensionOverlay({
                         />
                       </View>
                       <Text style={{ fontSize: scaleFontSize(12), color: 'rgba(0, 0, 0, 0.4)', marginLeft: scaleMargin(6) }}>
-                        {hideMeasurementLabels ? "Show" : "Hide"}
+                        {hideMeasurementLabels ? t('dimensionOverlay.show') : t('dimensionOverlay.hide')}
                       </Text>
                     </Pressable>
                   ) : (
@@ -6870,7 +6870,7 @@ export default function DimensionOverlay({
                         />
                       </View>
                       <Text style={{ fontSize: scaleFontSize(12), color: labelEditMode ? "rgba(0, 122, 255, 1)" : "rgba(0, 0, 0, 0.4)", marginLeft: scaleMargin(4) }}>
-                        Edit labels
+                        {t('dimensionOverlay.editLabels')}
                       </Text>
                     </Pressable>
                   ) : (
@@ -6919,8 +6919,8 @@ export default function DimensionOverlay({
                         marginLeft: scaleMargin(5),
                       }}>
                         {measurements.length > 0
-                          ? `Undo (${measurements.length})`
-                          : 'Clear'}
+                          ? `${t('dimensionOverlay.undo')} (${measurements.length})`
+                          : t('dimensionOverlay.clear')}
                       </Text>
                     </Pressable>
                   ) : (
