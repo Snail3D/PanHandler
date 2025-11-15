@@ -1413,8 +1413,8 @@ Thank you for helping us improve PanHandler!
 
               <ExpandableSection
                 icon="map"
-                title="Map Mode"
-                color="#0066FF"
+                title="🗺️ Map Mode"
+                color="#666"
                 delay={550}
 
 
