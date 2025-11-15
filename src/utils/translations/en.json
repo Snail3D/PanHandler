@@ -451,7 +451,13 @@
     "mostUsefulFidget": "Most Useful Fidget",
     "downloadForFree": "Download for FREE!",
     "proTipLightningFast": "Pro Tip: Lightning Fast Workflow",
-    "shareVsEmailDescription": "Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments."
+    "shareVsEmailDescription": "Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.",
+    "whatToInclude": "What to include:",
+    "yourDeviceInfo": "Your device info (automatically included)",
+    "typicallyRespondWithin24": "We typically respond within 24 hours",
+    "3dPrintedAids": "3D Printed Aids",
+    "knownDistanceForBlueprints": "Known Distance (Blueprints)",
+    "bestForDronePhotos": "Best for: Drone photos, blueprints, floor plans, engineering drawings"
   },
   
   "battlingBots": {
