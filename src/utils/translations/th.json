@@ -135,7 +135,13 @@
     "hiddenSurprises": "Hidden Surprises",
     "surprisesHint": "Hold the left egg for a surprise. Tap the right egg (how many times?) for another surprise. Oh, and by the way, look out for bot battles that might come up while you're using the app — they may reveal more Easter eggs ;)",
     "doYouLikeThisApp": "Do you like this app?",
-    "openAppSettings": "Open App Settings"
+    "openAppSettings": "Open App Settings",
+    "magneticSnapping": "Magnetic Snapping",
+    "magneticSnappingDesc": "Points snap to nearby existing points (7mm range) when moving, making precise alignment easy",
+    "youtubeCourseTip": "📹 PanHandler YouTube Course Here!",
+    "shutterButtonTip": "💡 Holding the shutter button helps ensure your photo is sharp and perfectly level!",
+    "proTipLabel": "Pro Tip",
+    "emailError": "Could not open email. Please email us at snailmail3d@gmail.com"
   },
   "battlingBots": {
     "title": "เบื้องหลัง",
