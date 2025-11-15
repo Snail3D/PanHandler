@@ -2047,25 +2047,25 @@ Thank you for helping us improve PanHandler!
                       <Ionicons name="settings-outline" size={24} color="#666" />
                     </View>
                     <Text style={{ fontSize: 18, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.3 }}>
-                      App Permissions
+                      {t('helpModal.appPermissions')}
                     </Text>
                   </View>
                   
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12 }}>
-                    PanHandler needs access to:
+                    {t('helpModal.panhandlerNeedsAccess')}
                   </Text>
                   
                   <View style={{ gap: 10, marginBottom: 12 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="camera" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Camera</Text> — to take photos
+                        {t('helpModal.cameraPermission')}
                       </Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="images" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
+                        {t('helpModal.photoLibraryPermission')}
                       </Text>
                     </View>
                   </View>

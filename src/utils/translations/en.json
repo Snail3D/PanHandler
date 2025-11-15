@@ -339,7 +339,12 @@
     "proTipFastWorkflow": "Pro Tip: Lightning Fast Workflow",
     "shareVsEmail": "Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.",
     "importToCAD": "Import to Any CAD Software",
-    "useCADCanvas": "Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images."
+    "useCADCanvas": "Use the CAD Canvas Photo to trace your measurements in any CAD software that supports canvas images.",
+    "appPermissions": "App Permissions",
+    "panhandlerNeedsAccess": "PanHandler needs access to:",
+    "cameraPermission": "Camera — to take photos",
+    "photoLibraryPermission": "Photo Library — to save measurements",
+    "needToEnablePermissions": "Need to enable permissions? Tap the button below to open PanHandler settings"
   },
   
   "battlingBots": {
