@@ -368,7 +368,9 @@
     "frameObjectCoin": "Frame your object with the coin",
     "watchBubbleLevel": "Watch the bubble level crosshairs",
     "levelPhoneCenterBubble": "Level your phone to center the bubble",
-    "holdDownShutter": "Hold down the shutter button until photo captures"
+    "holdDownShutter": "Hold down the shutter button until photo captures",
+    "oopsNeedDoOver": "Oops! Need a Do-Over?",
+    "madeMistakeCalibration": "Made a mistake with your calibration? No worries! Just tap the red Recalibrate button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!"
   },
   
   "battlingBots": {

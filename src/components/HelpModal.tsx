@@ -807,11 +807,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="refresh-outline" size={18} color="#EF4444" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#EF4444', marginLeft: 6 }}>
-                      Oops! Need a Do-Over?
+                      {t('helpModal.oopsNeedDoOver')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    Made a mistake with your calibration? No worries! Just tap the red <Text style={{ fontWeight: '600' }}>Recalibrate</Text> button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!
+                    {t('helpModal.madeMistakeCalibration')}
                   </Text>
                 </View>
               </ExpandableSection>
