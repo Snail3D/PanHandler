@@ -125,7 +125,7 @@ const ExpandableSection = ({
           }}
         >
           <Text style={{
-            fontSize: scaleFontSize(17),
+            fontSize: scaleFontSize(14.5),
             fontWeight: '700',
             color: '#1C1C1E',
             textAlign: 'center',
@@ -609,39 +609,14 @@ Thank you for helping us improve PanHandler!
                       1. Frame your object with the coin{'\n'}
                       2. Watch the bubble level crosshairs{'\n'}
                       3. Level your phone to center the bubble{'\n'}
-                      4. Hold steady - photo captures automatically!
+                      4. Hold down the shutter button until photo captures
                     </Text>
                   </View>
                   
-                  <View style={{ marginTop: 8, backgroundColor: 'rgba(52,199,89,0.15)', borderRadius: 10, padding: 10 }}>
-                    <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic', textAlign: 'center' }}>
-                      💡 No button press needed! Just level your phone and the camera captures when perfectly aligned
+                  <View style={{ marginTop: 8, backgroundColor: 'rgba(0,0,0,0.08)', borderRadius: 10, padding: 10 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', textAlign: 'center' }}>
+                      💡 Holding the shutter button helps ensure your photo is sharp and perfectly level!
                     </Text>
-                  </View>
-                  
-                  {/* NEW: Camera Controls */}
-                  <View style={{
-                    marginTop: 12,
-                    backgroundColor: 'rgba(52,199,89,0.08)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(52,199,89,0.2)',
-                  }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                      <Ionicons name="settings-outline" size={18} color="#666" />
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
-                        Camera Controls
-                      </Text>
-                    </View>
-                    <View style={{ gap: 8 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 14, marginRight: 6 }}>🔘</Text>
-                        <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, flex: 1 }}>
-                          <Text style={{ fontWeight: '600' }}>Auto-Capture Toggle</Text> - Not a fan of hands-free? Just flip the switch and use the shutter button instead!
-                        </Text>
-                      </View>
-                    </View>
                   </View>
 
                   {/* Auto-Leveled Album Feature */}
