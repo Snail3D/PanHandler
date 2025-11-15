@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "ਕੈਮਰਾ",
+    "help": "ਮਦਦ ਕਰੋ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "email": "ਈਮੇਲ",
+    "close": "ਬੰਦ ਕਰੋ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ",
+    "done": "ਹੋ ਗਿਆ",
+    "next": "ਅਗਲਾ",
+    "back": "ਪਿੱਛੇ",
+    "ok": "ਠੀਕ ਹੈ",
+    "yes": "ਹਾਂ",
+    "no": "ਨਹੀਂ",
+    "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...",
+    "error": "ਗਲਤੀ",
+    "success": "ਸਫਲਤਾ"
+  },
+  "buttons": {
+    "lockIn": "ਲਾਕ ਇਨ ਕਰੋ",
+    "lockInCalibration": "ਲਾਕ ਇਨ ਕੈਲੀਬ੍ਰੇਸ਼ਨ",
+    "recalibrate": "ਮੁੜ-ਕੈਲੀਬਰੇਟ ਕਰੋ",
+    "pan": "ਪੈਨ",
+    "edit": "ਸੋਧੋ",
+    "measure": "ਮਾਪ",
+    "undo": "ਅਣਡੂ ਕਰੋ",
+    "trash": "ਮਿਟਾਓ",
+    "unitToggle": "ਯੂਨਿਟ",
+    "metric": "ਮੈਟ੍ਰਿਕ",
+    "imperial": "ਇੰਪੀਰੀਅਲ",
+    "flash": "ਫਲੈਸ਼",
+    "photoLibrary": "ਫੋਟੋ ਲਾਇਬ੍ਰੇਰੀ",
+    "scaleMode": "ਸਕੇਲ ਮੋਡ"
+  },
+  "cameraScreen": {
+    "lookDown": "ਹੇਠਾਂ ਦੇਖੋ",
+    "holdSteady": "ਸਥਿਰ ਰੱਖੋ",
+    "capturing": "ਕੈਪਚਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "almostLevel": "ਲਗਭਗ ਪੱਧਰ",
+    "perfectLevel": "ਬਿਲਕੁਲ ਸਹੀ! ਸਥਿਰ ਰਹੋ",
+    "tooMuchMovement": "ਬਹੁਤ ਜ਼ਿਆਦਾ ਹਰਕਤ",
+    "alignCrosshairs": "ਕਰਾਸਹੇਅਰਾਂ ਨੂੰ ਇਕਸਾਰ ਕਰੋ",
+    "autoCapture": "ਆਟੋ-ਕੈਪਚਰ ਲਈ ਤਿਆਰ"
+  },
+  "coinCalibration": {
+    "title": "ਸਿੱਕੇ ਨਾਲ ਕੈਲੀਬ੍ਰੇਟ ਕਰੋ",
+    "searchPlaceholder": "ਸਿੱਕਾ ਖੋਜੋ...",
+    "zoomInstructions": "ਜ਼ੂਮ ਕਰਨ ਲਈ ਚੂੰਢੀ ਭਰੋ, ਸਥਿਤੀ 'ਤੇ ਘਸੀਟੋ",
+    "alignInstructions": "ਸਿੱਕੇ ਦੇ ਬਾਹਰੀ ਕਿਨਾਰੇ ਨੂੰ ਰੰਗੀਨ ਚੱਕਰ ਦੇ ਬਾਹਰੀ ਕਿਨਾਰੇ ਨਾਲ ਮਿਲਾਓ।",
+    "lockInWhenReady": "ਇਕਸਾਰ ਹੋਣ 'ਤੇ ਲਾਕ ਇਨ 'ਤੇ ਟੈਪ ਕਰੋ"
+  },
+  "dimensionOverlay": {
+    "calibrated": "ਕੈਲੀਬਰੇਟ ਕੀਤਾ ਗਿਆ",
+    "recalibrateButton": "ਮੁੜ-ਕੈਲੀਬਰੇਟ ਕਰੋ",
+    "panMode": "ਪੈਨ ਮੋਡ - ਚਿੱਤਰ ਨੂੰ ਮੂਵ/ਜ਼ੂਮ ਕਰੋ",
+    "editMode": "ਸੰਪਾਦਨ ਮੋਡ - ਮਾਪਾਂ ਨੂੰ ਹਿਲਾਓ",
+    "measureMode": "ਮਾਪ ਮੋਡ - ਨਵੇਂ ਮਾਪ ਰੱਖੋ",
+    "distance": "ਦੂਰੀ",
+    "angle": "ਕੋਣ",
+    "circle": "ਚੱਕਰ",
+    "rectangle": "ਆਇਤਾਕਾਰ",
+    "freehand": "ਫ੍ਰੀਹੈਂਡ",
+    "legend": "ਦੰਤਕਥਾ",
+    "tapToCollapse": "ਸਮੇਟਣ ਲਈ ਟੈਪ ਕਰੋ",
+    "tapToExpand": "ਵਿਸਤਾਰ ਕਰਨ ਲਈ ਟੈਪ ਕਰੋ",
+    "labelPrompt": "ਮਾਪ ਦਾ ਨਾਮ/ਵਰਣਨ ਦਰਜ ਕਰੋ",
+    "depthPrompt": "ਡੂੰਘਾਈ ਦਰਜ ਕਰੋ (ਵਿਕਲਪਿਕ)",
+    "locked": "ਪੈਨ/ਜ਼ੂਮ ਲਾਕ ਕੀਤਾ ਗਿਆ - ਮਾਪਾਂ ਨੂੰ ਮੂਵ ਕਰਨ ਲਈ ਸੰਪਾਦਨ 'ਤੇ ਟੈਪ ਕਰੋ",
+    "emailSent": "ਈਮੇਲ ਤਿਆਰ!",
+    "imageSaved": "ਫੋਟੋਆਂ ਵਿੱਚ ਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ!",
+    "measurements": "ਮਾਪ"
+  },
+  "helpModal": {
+    "title": "ਗਾਈਡ",
+    "pdfGuideLanguages": "PDF ਗਾਈਡ ਭਾਸ਼ਾਵਾਂ",
+    "moreLanguagesSoon": "ਹੋਰ ਭਾਸ਼ਾਵਾਂ ਜਲਦੀ ਆ ਰਹੀਆਂ ਹਨ...",
+    "videoCoursesTitle": "ਵੀਡੀਓ ਕੋਰਸ",
+    "step1Title": "ਕਦਮ 1: ਇੱਕ ਸੰਪੂਰਨ ਫੋਟੋ ਖਿੱਚੋ",
+    "step2Title": "ਕਦਮ 2: ਸਿੱਕੇ ਨਾਲ ਕੈਲੀਬ੍ਰੇਟ ਕਰੋ",
+    "step3Title": "ਕਦਮ 3: ਸਥਾਨ ਮਾਪ"
+  },
+  "battlingBots": {
+    "title": "ਪਰਦੇ ਪਿੱਛੇ",
+    "supportSnail": "ਸਪੋਰਟ ਘੋਗਾ",
+    "subtitle": "ਪੈਨਹੈਂਡਲਰ ਇੱਕ ਜਨੂੰਨ ਪ੍ਰੋਜੈਕਟ ਹੈ। ਇਸਨੂੰ ਜ਼ਿੰਦਾ ਰੱਖਣ ਵਿੱਚ ਮਦਦ ਕਰੋ!",
+    "buyMeCoffee": "ਮੈਨੂੰ ਇੱਕ ਕੌਫੀ ਖਰੀਦੋ",
+    "cantDoCoffee": "ਮੈਂ ਕੌਫੀ ਨਹੀਂ ਪੀ ਸਕਦਾ: ਇੱਕ ਸਮੀਖਿਆ ਛੱਡੋ!",
+    "maybeLater": "ਸ਼ਾਇਦ ਬਾਅਦ ਵਿੱਚ"
+  },
+  "alerts": {
+    "permissionDenied": "ਆਗਿਆ ਤੋਂ ਇਨਕਾਰ",
+    "cameraPermissionNeeded": "ਫੋਟੋਆਂ ਖਿੱਚਣ ਲਈ ਕੈਮਰੇ ਦੀ ਇਜਾਜ਼ਤ ਦੀ ਲੋੜ ਹੈ",
+    "photoLibraryPermissionNeeded": "ਤਸਵੀਰਾਂ ਨੂੰ ਸੇਵ ਕਰਨ ਲਈ ਫੋਟੋ ਲਾਇਬ੍ਰੇਰੀ ਦੀ ਇਜਾਜ਼ਤ ਦੀ ਲੋੜ ਹੈ",
+    "calibrationRequired": "ਕਿਰਪਾ ਕਰਕੇ ਪਹਿਲਾਂ ਇੱਕ ਸਿੱਕੇ ਨਾਲ ਕੈਲੀਬਰੇਟ ਕਰੋ।",
+    "noMeasurements": "ਬਚਾਉਣ ਲਈ ਕੋਈ ਮਾਪ ਨਹੀਂ",
+    "emailError": "ਈਮੇਲ ਤਿਆਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਿਹਾ",
+    "saveError": "ਚਿੱਤਰ ਨੂੰ ਰੱਖਿਅਤ ਕਰਨ ਵਿੱਚ ਅਸਫਲ ਰਿਹਾ"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

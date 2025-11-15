@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamera",
+    "help": "Helfen",
+    "save": "Speichern",
+    "email": "E-Mail",
+    "close": "Schließen",
+    "cancel": "Stornieren",
+    "confirm": "Bestätigen",
+    "done": "Erledigt",
+    "next": "Nächste",
+    "back": "Zurück",
+    "ok": "OK",
+    "yes": "Ja",
+    "no": "NEIN",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "buttons": {
+    "lockIn": "Sperren",
+    "lockInCalibration": "Kalibrierung sperren",
+    "recalibrate": "Neu kalibrieren",
+    "pan": "Pfanne",
+    "edit": "Bearbeiten",
+    "measure": "Messen",
+    "undo": "Rückgängig machen",
+    "trash": "Delete",
+    "unitToggle": "Einheit",
+    "metric": "Metrisch",
+    "imperial": "Kaiserlich",
+    "flash": "Blitz",
+    "photoLibrary": "Fotobibliothek",
+    "scaleMode": "Skalierungsmodus"
+  },
+  "cameraScreen": {
+    "lookDown": "Schau nach unten",
+    "holdSteady": "Ruhig halten",
+    "capturing": "Erfassung...",
+    "almostLevel": "Fast eben",
+    "perfectLevel": "Perfekt! Ruhig halten!",
+    "tooMuchMovement": "Zu viel Bewegung",
+    "alignCrosshairs": "Fadenkreuz ausrichten",
+    "autoCapture": "Automatische Aufnahme bereit"
+  },
+  "coinCalibration": {
+    "title": "Mit einer Münze kalibrieren",
+    "searchPlaceholder": "Münze suchen...",
+    "zoomInstructions": "Zum Zoomen zusammenziehen, zum Positionieren ziehen",
+    "alignInstructions": "Richte die Außenkante der Münze an der Außenkante des farbigen Kreises aus.",
+    "lockInWhenReady": "Tippen Sie auf „Verriegeln“, wenn es ausgerichtet ist."
+  },
+  "dimensionOverlay": {
+    "calibrated": "Kalibriert",
+    "recalibrateButton": "Neu kalibrieren",
+    "panMode": "Schwenkmodus – Bild bewegen/zoomen",
+    "editMode": "Bearbeitungsmodus – Maße verschieben",
+    "measureMode": "Messmodus – Neue Messungen platzieren",
+    "distance": "Distanz",
+    "angle": "Winkel",
+    "circle": "Kreis",
+    "rectangle": "Rechteck",
+    "freehand": "Freihändig",
+    "legend": "Legende",
+    "tapToCollapse": "Zum Ausblenden tippen",
+    "tapToExpand": "Zum Vergrößern tippen",
+    "labelPrompt": "Messbezeichnung/Beschreibung eingeben",
+    "depthPrompt": "Tiefe eingeben (optional)",
+    "locked": "Schwenk-/Zoomfunktion gesperrt – tippen Sie auf „Bearbeiten“, um die Maße zu verschieben.",
+    "emailSent": "E-Mail ist fertig!",
+    "imageSaved": "In Fotos gespeichert!",
+    "measurements": "Messungen"
+  },
+  "helpModal": {
+    "title": "Führung",
+    "pdfGuideLanguages": "PDF-Leitfaden Sprachen",
+    "moreLanguagesSoon": "Weitere Sprachen folgen in Kürze...",
+    "videoCoursesTitle": "Videokurse",
+    "step1Title": "Schritt 1: Ein perfektes Foto machen",
+    "step2Title": "Schritt 2: Mit einer Münze kalibrieren.",
+    "step3Title": "Schritt 3: Maße platzieren"
+  },
+  "battlingBots": {
+    "title": "Hinter den Kulissen",
+    "supportSnail": "Stützschnecke",
+    "subtitle": "PanHandler ist ein Herzensprojekt. Helfen Sie mit, es am Leben zu erhalten!",
+    "buyMeCoffee": "Kauf mir einen Kaffee",
+    "cantDoCoffee": "Ich vertrage keinen Kaffee: Hinterlassen Sie eine Bewertung!",
+    "maybeLater": "Vielleicht später"
+  },
+  "alerts": {
+    "permissionDenied": "Zugriff verweigert",
+    "cameraPermissionNeeded": "Für das Fotografieren wird eine Kameraerlaubnis benötigt.",
+    "photoLibraryPermissionNeeded": "Für das Speichern von Bildern ist die Berechtigung zur Fotobibliothek erforderlich.",
+    "calibrationRequired": "Bitte zuerst mit einer Münze kalibrieren.",
+    "noMeasurements": "Keine Messungen zum Speichern",
+    "emailError": "E-Mail konnte nicht vorbereitet werden",
+    "saveError": "Bild konnte nicht gespeichert werden"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

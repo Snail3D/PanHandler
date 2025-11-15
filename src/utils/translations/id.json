@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamera",
+    "help": "Membantu",
+    "save": "Menyimpan",
+    "email": "E-mail",
+    "close": "Menutup",
+    "cancel": "Membatalkan",
+    "confirm": "Mengonfirmasi",
+    "done": "Selesai",
+    "next": "Berikutnya",
+    "back": "Kembali",
+    "ok": "OKE",
+    "yes": "Ya",
+    "no": "TIDAK",
+    "loading": "Memuat...",
+    "error": "Kesalahan",
+    "success": "Kesuksesan"
+  },
+  "buttons": {
+    "lockIn": "Kunci masuk",
+    "lockInCalibration": "Kunci Dalam Kalibrasi",
+    "recalibrate": "Kalibrasi ulang",
+    "pan": "Panci",
+    "edit": "Sunting",
+    "measure": "Ukuran",
+    "undo": "Membuka",
+    "trash": "Menghapus",
+    "unitToggle": "Unit",
+    "metric": "Metrik",
+    "imperial": "Imperial",
+    "flash": "Kilatan",
+    "photoLibrary": "Perpustakaan Foto",
+    "scaleMode": "Mode Skala"
+  },
+  "cameraScreen": {
+    "lookDown": "Memandang rendah",
+    "holdSteady": "Tahan Tetap",
+    "capturing": "Menangkap...",
+    "almostLevel": "Hampir Rata",
+    "perfectLevel": "Sempurna! Tahan dengan stabil",
+    "tooMuchMovement": "Terlalu Banyak Gerakan",
+    "alignCrosshairs": "Sejajarkan Garis Bidik",
+    "autoCapture": "Siap Tangkap Otomatis"
+  },
+  "coinCalibration": {
+    "title": "Kalibrasi dengan Koin",
+    "searchPlaceholder": "Cari koin...",
+    "zoomInstructions": "Cubit untuk memperbesar, seret untuk memposisikan",
+    "alignInstructions": "Match the outside edge of the coin with the outside edge of the colored circle",
+    "lockInWhenReady": "Ketuk Kunci saat sejajar"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Dikalibrasi",
+    "recalibrateButton": "Kalibrasi ulang",
+    "panMode": "Mode Pan - Pindahkan/perbesar gambar",
+    "editMode": "Mode Edit - Pindahkan pengukuran",
+    "measureMode": "Mode Pengukuran - Lakukan pengukuran baru",
+    "distance": "Jarak",
+    "angle": "Sudut",
+    "circle": "Lingkaran",
+    "rectangle": "Persegi panjang",
+    "freehand": "Tangan bebas",
+    "legend": "Legenda",
+    "tapToCollapse": "Ketuk untuk menutup",
+    "tapToExpand": "Ketuk untuk memperluas",
+    "labelPrompt": "Masukkan nama/deskripsi pengukuran",
+    "depthPrompt": "Masukkan kedalaman (opsional)",
+    "locked": "Pan/Zoom terkunci - ketuk Edit untuk memindahkan pengukuran",
+    "emailSent": "Email sudah disiapkan!",
+    "imageSaved": "Disimpan ke Foto!",
+    "measurements": "Pengukuran"
+  },
+  "helpModal": {
+    "title": "Memandu",
+    "pdfGuideLanguages": "Panduan PDF Bahasa",
+    "moreLanguagesSoon": "Segera hadir lebih banyak bahasa...",
+    "videoCoursesTitle": "Kursus Video",
+    "step1Title": "Langkah 1: Ambil Foto yang Sempurna",
+    "step2Title": "Langkah 2: Kalibrasi dengan Koin",
+    "step3Title": "Langkah 3: Lakukan Pengukuran"
+  },
+  "battlingBots": {
+    "title": "Di belakang layar",
+    "supportSnail": "Dukungan Siput",
+    "subtitle": "PanHandler adalah proyek yang penuh semangat. Bantu kami untuk tetap menjalankannya!",
+    "buyMeCoffee": "Belikan Aku Kopi",
+    "cantDoCoffee": "Saya tidak bisa minum kopi: Tinggalkan ulasan!",
+    "maybeLater": "Maybe Later"
+  },
+  "alerts": {
+    "permissionDenied": "Izin Ditolak",
+    "cameraPermissionNeeded": "Diperlukan izin kamera untuk mengambil foto",
+    "photoLibraryPermissionNeeded": "Izin perpustakaan foto diperlukan untuk menyimpan gambar",
+    "calibrationRequired": "Harap kalibrasi dengan koin terlebih dahulu",
+    "noMeasurements": "Tidak ada pengukuran yang perlu disimpan",
+    "emailError": "Gagal menyiapkan email",
+    "saveError": "Gagal menyimpan gambar"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

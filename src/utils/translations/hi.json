@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "कैमरा",
+    "help": "मदद",
+    "save": "बचाना",
+    "email": "ईमेल",
+    "close": "बंद करना",
+    "cancel": "रद्द करना",
+    "confirm": "पुष्टि करना",
+    "done": "हो गया",
+    "next": "अगला",
+    "back": "पीछे",
+    "ok": "ठीक है",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "loading": "लोड हो रहा है...",
+    "error": "Error",
+    "success": "सफलता"
+  },
+  "buttons": {
+    "lockIn": "बंद करना",
+    "lockInCalibration": "लॉक इन कैलिब्रेशन",
+    "recalibrate": "पुनः अंशांकन",
+    "pan": "Pan",
+    "edit": "संपादन करना",
+    "measure": "उपाय",
+    "undo": "पूर्ववत",
+    "trash": "मिटाना",
+    "unitToggle": "इकाई",
+    "metric": "मीट्रिक",
+    "imperial": "शाही",
+    "flash": "चमक",
+    "photoLibrary": "चित्र पुस्तकालय",
+    "scaleMode": "स्केल मोड"
+  },
+  "cameraScreen": {
+    "lookDown": "तिरस्कार करना",
+    "holdSteady": "स्थिर रहें",
+    "capturing": "वश में कर लेना...",
+    "almostLevel": "लगभग समतल",
+    "perfectLevel": "बहुत बढ़िया! स्थिर रहो",
+    "tooMuchMovement": "बहुत अधिक हलचल",
+    "alignCrosshairs": "क्रॉसहेयर संरेखित करें",
+    "autoCapture": "ऑटो-कैप्चर तैयार"
+  },
+  "coinCalibration": {
+    "title": "सिक्के से अंशांकन करें",
+    "searchPlaceholder": "सिक्का खोजें...",
+    "zoomInstructions": "ज़ूम करने के लिए पिंच करें, स्थिति तक खींचें",
+    "alignInstructions": "सिक्के के बाहरी किनारे को रंगीन वृत्त के बाहरी किनारे से मिलाएं",
+    "lockInWhenReady": "संरेखित होने पर लॉक इन पर टैप करें"
+  },
+  "dimensionOverlay": {
+    "calibrated": "कैलिब्रेटेड",
+    "recalibrateButton": "पुनः अंशांकन",
+    "panMode": "पैन मोड - छवि को ले जाएँ/ज़ूम करें",
+    "editMode": "Edit Mode - Move measurements",
+    "measureMode": "माप मोड - नए माप रखें",
+    "distance": "Distance",
+    "angle": "कोण",
+    "circle": "घेरा",
+    "rectangle": "आयत",
+    "freehand": "मुक्तहस्त",
+    "legend": "दंतकथा",
+    "tapToCollapse": "संक्षिप्त करने के लिए टैप करें",
+    "tapToExpand": "विस्तार करने के लिए टैप करें",
+    "labelPrompt": "माप का नाम/विवरण दर्ज करें",
+    "depthPrompt": "गहराई दर्ज करें (वैकल्पिक)",
+    "locked": "पैन/ज़ूम लॉक - मापों को स्थानांतरित करने के लिए संपादित करें पर टैप करें",
+    "emailSent": "ईमेल तैयार!",
+    "imageSaved": "फ़ोटो में सहेजा गया!",
+    "measurements": "मापन"
+  },
+  "helpModal": {
+    "title": "मार्गदर्शक",
+    "pdfGuideLanguages": "पीडीएफ गाइड भाषाएँ",
+    "moreLanguagesSoon": "जल्द ही और भी भाषाएं आ रही हैं...",
+    "videoCoursesTitle": "वीडियो पाठ्यक्रम",
+    "step1Title": "Step 1: Take a Perfect Photo",
+    "step2Title": "चरण 2: सिक्के से अंशांकन करें",
+    "step3Title": "चरण 3: माप रखें"
+  },
+  "battlingBots": {
+    "title": "पर्दे के पीछे",
+    "supportSnail": "समर्थन घोंघा",
+    "subtitle": "पैनहैंडलर एक जुनूनी प्रोजेक्ट है। इसे जीवित रखने में मदद करें!",
+    "buyMeCoffee": "मुझे एक कॉफ़ी खरीदो",
+    "cantDoCoffee": "मैं कॉफी नहीं कर सकता: एक समीक्षा छोड़ दो!",
+    "maybeLater": "शायद बाद में"
+  },
+  "alerts": {
+    "permissionDenied": "अनुमति नहीं मिली",
+    "cameraPermissionNeeded": "फ़ोटो लेने के लिए कैमरा अनुमति आवश्यक है",
+    "photoLibraryPermissionNeeded": "छवियों को सहेजने के लिए फ़ोटो लाइब्रेरी की अनुमति आवश्यक है",
+    "calibrationRequired": "कृपया पहले सिक्के से अंशांकन करें",
+    "noMeasurements": "सहेजने के लिए कोई माप नहीं",
+    "emailError": "ईमेल तैयार करने में विफल",
+    "saveError": "छवि सहेजने में विफल"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

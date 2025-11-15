@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "آلة تصوير",
+    "help": "يساعد",
+    "save": "يحفظ",
+    "email": "بريد إلكتروني",
+    "close": "يغلق",
+    "cancel": "يلغي",
+    "confirm": "يتأكد",
+    "done": "منتهي",
+    "next": "التالي",
+    "back": "خلف",
+    "ok": "نعم",
+    "yes": "نعم",
+    "no": "لا",
+    "loading": "تحميل...",
+    "error": "خطأ",
+    "success": "نجاح"
+  },
+  "buttons": {
+    "lockIn": "قفل في",
+    "lockInCalibration": "قفل المعايرة",
+    "recalibrate": "إعادة المعايرة",
+    "pan": "مِقلاة",
+    "edit": "يحرر",
+    "measure": "يقيس",
+    "undo": "التراجع",
+    "trash": "يمسح",
+    "unitToggle": "وحدة",
+    "metric": "متري",
+    "imperial": "إمبراطوري",
+    "flash": "فلاش",
+    "photoLibrary": "مكتبة الصور",
+    "scaleMode": "وضع المقياس"
+  },
+  "cameraScreen": {
+    "lookDown": "انظر إلى الأسفل",
+    "holdSteady": "ثبات",
+    "capturing": "التقاط...",
+    "almostLevel": "مستوى تقريبا",
+    "perfectLevel": "ممتاز! ثبات",
+    "tooMuchMovement": "الكثير من الحركة",
+    "alignCrosshairs": "محاذاة خطوط التقاطع",
+    "autoCapture": "جاهز للالتقاط التلقائي"
+  },
+  "coinCalibration": {
+    "title": "معايرة باستخدام العملة المعدنية",
+    "searchPlaceholder": "البحث عن العملة...",
+    "zoomInstructions": "اضغط للتكبير، واسحب لتحديد الموضع",
+    "alignInstructions": "قم بمطابقة الحافة الخارجية للعملة مع الحافة الخارجية للدائرة الملونة",
+    "lockInWhenReady": "اضغط على القفل عند المحاذاة"
+  },
+  "dimensionOverlay": {
+    "calibrated": "معايرة",
+    "recalibrateButton": "إعادة المعايرة",
+    "panMode": "وضع التحريك - تحريك/تكبير الصورة",
+    "editMode": "وضع التحرير - نقل القياسات",
+    "measureMode": "Measure Mode - Place new measurements",
+    "distance": "مسافة",
+    "angle": "زاوية",
+    "circle": "دائرة",
+    "rectangle": "المستطيل",
+    "freehand": "رسم يدوي حر",
+    "legend": "أسطورة",
+    "tapToCollapse": "انقر للطي",
+    "tapToExpand": "انقر للتوسيع",
+    "labelPrompt": "أدخل اسم القياس/الوصف",
+    "depthPrompt": "أدخل العمق (اختياري)",
+    "locked": "تم قفل التكبير/التصغير - انقر فوق \"تحرير\" لنقل القياسات",
+    "emailSent": "تم إعداد البريد الإلكتروني!",
+    "imageSaved": "تم حفظه في الصور!",
+    "measurements": "القياسات"
+  },
+  "helpModal": {
+    "title": "مرشد",
+    "pdfGuideLanguages": "دليل اللغات بصيغة PDF",
+    "moreLanguagesSoon": "مزيد من اللغات قادمة قريبا...",
+    "videoCoursesTitle": "دورات الفيديو",
+    "step1Title": "الخطوة 1: التقط صورة مثالية",
+    "step2Title": "الخطوة 2: المعايرة باستخدام العملة المعدنية",
+    "step3Title": "الخطوة 3: وضع القياسات"
+  },
+  "battlingBots": {
+    "title": "Behind the Scenes",
+    "supportSnail": "دعم الحلزون",
+    "subtitle": "بان هاندلر مشروعٌ شغوف. ساهم في إبقائه حيًا!",
+    "buyMeCoffee": "اشتري لي قهوة",
+    "cantDoCoffee": "لا أستطيع شرب القهوة: اترك تعليقا!",
+    "maybeLater": "ربما في وقت لاحق"
+  },
+  "alerts": {
+    "permissionDenied": "Permission Denied",
+    "cameraPermissionNeeded": "مطلوب إذن الكاميرا لالتقاط الصور",
+    "photoLibraryPermissionNeeded": "مطلوب إذن مكتبة الصور لحفظ الصور",
+    "calibrationRequired": "يرجى المعايرة باستخدام عملة معدنية أولاً",
+    "noMeasurements": "لا يوجد قياسات لحفظها",
+    "emailError": "فشل في إعداد البريد الإلكتروني",
+    "saveError": "فشل حفظ الصورة"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Camera",
+    "help": "Tulong",
+    "save": "I-save",
+    "email": "Email",
+    "close": "Isara",
+    "cancel": "Kanselahin",
+    "confirm": "Kumpirmahin",
+    "done": "Tapos na",
+    "next": "Susunod",
+    "back": "Bumalik",
+    "ok": "OK",
+    "yes": "Oo",
+    "no": "Hindi",
+    "loading": "Naglo-load...",
+    "error": "Error",
+    "success": "Tagumpay"
+  },
+  "buttons": {
+    "lockIn": "Lock in",
+    "lockInCalibration": "Lock In Calibration",
+    "recalibrate": "Muling i-calibrate",
+    "pan": "Pan",
+    "edit": "I-edit",
+    "measure": "Sukatin",
+    "undo": "I-undo",
+    "trash": "Tanggalin",
+    "unitToggle": "Yunit",
+    "metric": "Sukatan",
+    "imperial": "Imperial",
+    "flash": "Flash",
+    "photoLibrary": "Photo Library",
+    "scaleMode": "Mode ng Scale"
+  },
+  "cameraScreen": {
+    "lookDown": "Tumingin sa ibaba",
+    "holdSteady": "Hold Steady",
+    "capturing": "Kinukuha...",
+    "almostLevel": "Halos Level",
+    "perfectLevel": "Perpekto! Hold Steady",
+    "tooMuchMovement": "Napakaraming Paggalaw",
+    "alignCrosshairs": "I-align ang mga Crosshair",
+    "autoCapture": "Handa na ang Auto-Capture"
+  },
+  "coinCalibration": {
+    "title": "I-calibrate gamit ang Coin",
+    "searchPlaceholder": "Maghanap ng barya...",
+    "zoomInstructions": "I-pinch para mag-zoom, i-drag sa posisyon",
+    "alignInstructions": "Itugma ang panlabas na gilid ng barya sa labas ng gilid ng may kulay na bilog",
+    "lockInWhenReady": "I-tap ang Lock in kapag naka-align"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Naka-calibrate",
+    "recalibrateButton": "Muling i-calibrate",
+    "panMode": "Pan Mode - Ilipat/i-zoom ang larawan",
+    "editMode": "Edit Mode - Ilipat ang mga sukat",
+    "measureMode": "Mode ng Pagsukat - Maglagay ng mga bagong sukat",
+    "distance": "Distansya",
+    "angle": "anggulo",
+    "circle": "Bilog",
+    "rectangle": "Parihaba",
+    "freehand": "Malayang kamay",
+    "legend": "Alamat",
+    "tapToCollapse": "I-tap para i-collapse",
+    "tapToExpand": "I-tap para palawakin",
+    "labelPrompt": "Ilagay ang pangalan/paglalarawan ng pagsukat",
+    "depthPrompt": "Ipasok ang lalim (opsyonal)",
+    "locked": "I-pan/Zoom lock - i-tap ang I-edit upang ilipat ang mga sukat",
+    "emailSent": "Inihanda ang email!",
+    "imageSaved": "Na-save sa Mga Larawan!",
+    "measurements": "Mga sukat"
+  },
+  "helpModal": {
+    "title": "Patnubay",
+    "pdfGuideLanguages": "Mga Wika sa Gabay sa PDF",
+    "moreLanguagesSoon": "Higit pang mga wika ang paparating...",
+    "videoCoursesTitle": "Mga Video Course",
+    "step1Title": "Hakbang 1: Kumuha ng Perpektong Larawan",
+    "step2Title": "Hakbang 2: Mag-calibrate gamit ang Coin",
+    "step3Title": "Hakbang 3: Ilagay ang Mga Pagsukat"
+  },
+  "battlingBots": {
+    "title": "Sa Likod ng mga Eksena",
+    "supportSnail": "Suportahan ang Snail",
+    "subtitle": "Ang PanHandler ay isang passion project. Tulungan itong panatilihing buhay!",
+    "buyMeCoffee": "Bilhan Mo Ako ng Kape",
+    "cantDoCoffee": "Hindi ako marunong mag kape: Mag-iwan ng review!",
+    "maybeLater": "Baka Mamaya"
+  },
+  "alerts": {
+    "permissionDenied": "Tinanggihan ang Pahintulot",
+    "cameraPermissionNeeded": "Kinakailangan ang pahintulot ng camera para kumuha ng mga larawan",
+    "photoLibraryPermissionNeeded": "Kinakailangan ang pahintulot sa library ng larawan upang mag-save ng mga larawan",
+    "calibrationRequired": "Mangyaring i-calibrate muna gamit ang isang barya",
+    "noMeasurements": "Walang mga sukat na i-save",
+    "emailError": "Nabigong maghanda ng email",
+    "saveError": "Nabigong i-save ang larawan"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamera",
+    "help": "Pomoc",
+    "save": "Ratować",
+    "email": "E-mail",
+    "close": "Zamknąć",
+    "cancel": "Anulować",
+    "confirm": "Potwierdzać",
+    "done": "Zrobione",
+    "next": "Następny",
+    "back": "Z powrotem",
+    "ok": "OK",
+    "yes": "Tak",
+    "no": "NIE",
+    "loading": "Załadunek...",
+    "error": "Błąd",
+    "success": "Sukces"
+  },
+  "buttons": {
+    "lockIn": "Zablokuj",
+    "lockInCalibration": "Blokada kalibracji",
+    "recalibrate": "Ponowna kalibracja",
+    "pan": "Patelnia",
+    "edit": "Redagować",
+    "measure": "Mierzyć",
+    "undo": "Anulować",
+    "trash": "Usuwać",
+    "unitToggle": "Jednostka",
+    "metric": "Metryczny",
+    "imperial": "Cesarski",
+    "flash": "Błysk",
+    "photoLibrary": "Biblioteka zdjęć",
+    "scaleMode": "Tryb skalowania"
+  },
+  "cameraScreen": {
+    "lookDown": "Patrzeć w dół",
+    "holdSteady": "Trzymaj stabilnie",
+    "capturing": "Przechwytywanie...",
+    "almostLevel": "Prawie poziom",
+    "perfectLevel": "Idealnie! Trzymaj stabilnie",
+    "tooMuchMovement": "Zbyt dużo ruchu",
+    "alignCrosshairs": "Wyrównaj celowniki",
+    "autoCapture": "Gotowy do automatycznego przechwytywania"
+  },
+  "coinCalibration": {
+    "title": "Kalibracja za pomocą monety",
+    "searchPlaceholder": "Wyszukaj monetę...",
+    "zoomInstructions": "Ściśnij, aby powiększyć, przeciągnij, aby ustawić pozycję",
+    "alignInstructions": "Dopasuj zewnętrzną krawędź monety do zewnętrznej krawędzi kolorowego koła",
+    "lockInWhenReady": "Stuknij Zablokuj po wyrównaniu"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Skalibrowany",
+    "recalibrateButton": "Ponowna kalibracja",
+    "panMode": "Tryb panoramowania – przesuń/powiększ obraz",
+    "editMode": "Tryb edycji – Przesuń pomiary",
+    "measureMode": "Tryb pomiaru – Umieść nowe pomiary",
+    "distance": "Dystans",
+    "angle": "Kąt",
+    "circle": "Koło",
+    "rectangle": "Prostokąt",
+    "freehand": "Odręcznie",
+    "legend": "Legenda",
+    "tapToCollapse": "Kliknij, aby zwinąć",
+    "tapToExpand": "Kliknij, aby rozwinąć",
+    "labelPrompt": "Wprowadź nazwę/opis pomiaru",
+    "depthPrompt": "Wprowadź głębokość (opcjonalnie)",
+    "locked": "Zablokowane przesuwanie/powiększanie – dotknij opcji Edytuj, aby przenieść pomiary",
+    "emailSent": "E-mail przygotowany!",
+    "imageSaved": "Zapisano w Zdjęciach!",
+    "measurements": "Pomiary"
+  },
+  "helpModal": {
+    "title": "Przewodnik",
+    "pdfGuideLanguages": "Przewodnik PDF Języki",
+    "moreLanguagesSoon": "Wkrótce więcej języków...",
+    "videoCoursesTitle": "Kursy wideo",
+    "step1Title": "Krok 1: Zrób idealne zdjęcie",
+    "step2Title": "Krok 2: Kalibracja za pomocą monety",
+    "step3Title": "Krok 3: Umieść pomiary"
+  },
+  "battlingBots": {
+    "title": "Za kulisami",
+    "supportSnail": "Wsparcie Ślimaka",
+    "subtitle": "PanHandler to projekt z pasji. Pomóż nam go utrzymać!",
+    "buyMeCoffee": "Kup mi kawę",
+    "cantDoCoffee": "Nie umiem pić kawy: Zostaw recenzję!",
+    "maybeLater": "Może później"
+  },
+  "alerts": {
+    "permissionDenied": "Odmowa pozwolenia",
+    "cameraPermissionNeeded": "Do robienia zdjęć wymagane jest zezwolenie na fotografowanie",
+    "photoLibraryPermissionNeeded": "Do zapisywania obrazów wymagane jest uprawnienie do korzystania z biblioteki zdjęć",
+    "calibrationRequired": "Proszę najpierw skalibrować za pomocą monety",
+    "noMeasurements": "Brak pomiarów do zapisania",
+    "emailError": "Nie udało się przygotować wiadomości e-mail",
+    "saveError": "Nie udało się zapisać obrazu"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

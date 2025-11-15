@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "相机",
+    "help": "帮助",
+    "save": "节省",
+    "email": "电子邮件",
+    "close": "关闭",
+    "cancel": "取消",
+    "confirm": "确认",
+    "done": "完毕",
+    "next": "下一个",
+    "back": "后退",
+    "ok": "好的",
+    "yes": "是的",
+    "no": "不",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功"
+  },
+  "buttons": {
+    "lockIn": "锁定",
+    "lockInCalibration": "锁定校准",
+    "recalibrate": "重新校准",
+    "pan": "平底锅",
+    "edit": "编辑",
+    "measure": "措施",
+    "undo": "撤销",
+    "trash": "删除",
+    "unitToggle": "单元",
+    "metric": "指标",
+    "imperial": "帝国",
+    "flash": "闪光",
+    "photoLibrary": "图片库",
+    "scaleMode": "缩放模式"
+  },
+  "cameraScreen": {
+    "lookDown": "瞧不起",
+    "holdSteady": "保持稳定",
+    "capturing": "捕捉……",
+    "almostLevel": "几乎水平",
+    "perfectLevel": "完美！保持住！",
+    "tooMuchMovement": "动作过多",
+    "alignCrosshairs": "对齐十字线",
+    "autoCapture": "自动捕捉功能已就绪"
+  },
+  "coinCalibration": {
+    "title": "用硬币校准",
+    "searchPlaceholder": "搜索硬币……",
+    "zoomInstructions": "双指捏合缩放，拖动调整位置",
+    "alignInstructions": "将硬币的外边缘与彩色圆圈的外边缘对齐。",
+    "lockInWhenReady": "对齐后点击锁定"
+  },
+  "dimensionOverlay": {
+    "calibrated": "校准",
+    "recalibrateButton": "重新校准",
+    "panMode": "平移模式 - 移动/缩放图像",
+    "editMode": "编辑模式 - 移动测量值",
+    "measureMode": "测量模式 - 放置新的测量数据",
+    "distance": "距离",
+    "angle": "角度",
+    "circle": "圆圈",
+    "rectangle": "长方形",
+    "freehand": "Freehand",
+    "legend": "传奇",
+    "tapToCollapse": "点击即可收起",
+    "tapToExpand": "点击展开",
+    "labelPrompt": "请输入测量名称/描述",
+    "depthPrompt": "输入深度（可选）",
+    "locked": "平移/缩放已锁定 - 点击“编辑”按钮移动测量数据",
+    "emailSent": "邮件已准备就绪！",
+    "imageSaved": "已保存到照片！",
+    "measurements": "测量"
+  },
+  "helpModal": {
+    "title": "指导",
+    "pdfGuideLanguages": "PDF指南语言",
+    "moreLanguagesSoon": "更多语言即将推出……",
+    "videoCoursesTitle": "视频课程",
+    "step1Title": "第一步：拍摄一张完美的照片",
+    "step2Title": "Step 2: Calibrate with Coin",
+    "step3Title": "步骤三：放置测量数据"
+  },
+  "battlingBots": {
+    "title": "幕后花絮",
+    "supportSnail": "支持蜗牛",
+    "subtitle": "PanHandler 是我们倾注心血打造的项目。请帮助我们让它继续发展下去！",
+    "buyMeCoffee": "请我喝杯咖啡",
+    "cantDoCoffee": "我不会喝咖啡：请留下评论！",
+    "maybeLater": "也许以后"
+  },
+  "alerts": {
+    "permissionDenied": "没有权限",
+    "cameraPermissionNeeded": "需要获得相机许可才能拍照",
+    "photoLibraryPermissionNeeded": "保存图片需要获得照片库权限",
+    "calibrationRequired": "请先用硬币进行校准。",
+    "noMeasurements": "无需保存测量数据",
+    "emailError": "邮件准备失败",
+    "saveError": "图像保存失败"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

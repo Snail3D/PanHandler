@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Kamara",
+    "help": "Taimako",
+    "save": "Ajiye",
+    "email": "Imel",
+    "close": "Kusa",
+    "cancel": "Soke",
+    "confirm": "Tabbatar",
+    "done": "Anyi",
+    "next": "Na gaba",
+    "back": "Baya",
+    "ok": "KO",
+    "yes": "Ee",
+    "no": "A'a",
+    "loading": "Ana lodawa...",
+    "error": "Kuskure",
+    "success": "Nasara"
+  },
+  "buttons": {
+    "lockIn": "Kulle",
+    "lockInCalibration": "Kulle A Calibration",
+    "recalibrate": "Sake daidaitawa",
+    "pan": "Pan",
+    "edit": "Gyara",
+    "measure": "Auna",
+    "undo": "Gyara",
+    "trash": "Share",
+    "unitToggle": "Naúrar",
+    "metric": "Ma'auni",
+    "imperial": "Imperial",
+    "flash": "Filasha",
+    "photoLibrary": "Laburaren Hoto",
+    "scaleMode": "Yanayin Sikeli"
+  },
+  "cameraScreen": {
+    "lookDown": "Kalli Kasa",
+    "holdSteady": "Rike Dage",
+    "capturing": "Ana ɗaukar...",
+    "almostLevel": "Kusan Matsayi",
+    "perfectLevel": "Cikakku! Rike Dage",
+    "tooMuchMovement": "Yawan Motsi",
+    "alignCrosshairs": "Daidaita Crosshairs",
+    "autoCapture": "Shirye-shiryen ɗaukar atomatik"
+  },
+  "coinCalibration": {
+    "title": "Calibrate tare da Coin",
+    "searchPlaceholder": "Neman tsabar kudin...",
+    "zoomInstructions": "Danna don zuƙowa, ja zuwa matsayi",
+    "alignInstructions": "Daidaita gefen waje na tsabar kudin tare da gefen waje na da'irar launi",
+    "lockInWhenReady": "Matsa Kulle lokacin da aka daidaita"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Calibrated",
+    "recalibrateButton": "Sake daidaitawa",
+    "panMode": "Yanayin Pan - Matsar da hoto",
+    "editMode": "Yanayin Gyara - Matsar da ma'auni",
+    "measureMode": "Yanayin Aunawa - Sanya sabbin ma'auni",
+    "distance": "Nisa",
+    "angle": "Angle",
+    "circle": "Da'irar",
+    "rectangle": "Rectangle",
+    "freehand": "Hannun hannu",
+    "legend": "Labari",
+    "tapToCollapse": "Matsa don rushewa",
+    "tapToExpand": "Matsa don faɗaɗa",
+    "labelPrompt": "Shigar da suna/bayani",
+    "depthPrompt": "Shigar da zurfin (na zaɓi)",
+    "locked": "Kunna/Kulle Zuƙowa - taɓa Shirya don matsar da ma'auni",
+    "emailSent": "An shirya imel!",
+    "imageSaved": "Ajiye zuwa Hotuna!",
+    "measurements": "Ma'auni"
+  },
+  "helpModal": {
+    "title": "Jagora",
+    "pdfGuideLanguages": "Harsunan Jagorar PDF",
+    "moreLanguagesSoon": "Ƙarin harsuna masu zuwa nan ba da jimawa ba...",
+    "videoCoursesTitle": "Darussan Bidiyo",
+    "step1Title": "Mataki 1: Ɗauki Cikakken Hoto",
+    "step2Title": "Mataki 2: Daidaita tare da Coin",
+    "step3Title": "Mataki na 3: Ma'aunin Wuri"
+  },
+  "battlingBots": {
+    "title": "Bayan Fage",
+    "supportSnail": "Taimakawa katantanwa",
+    "subtitle": "PanHandler aikin sha'awa ne. Taimaka kiyaye shi da rai!",
+    "buyMeCoffee": "Siya Mani Kofi",
+    "cantDoCoffee": "Ba zan iya yin kofi ba: Bar bita!",
+    "maybeLater": "Wataƙila Daga baya"
+  },
+  "alerts": {
+    "permissionDenied": "An ƙi izini",
+    "cameraPermissionNeeded": "Ana buƙatar izinin kyamara don ɗaukar hotuna",
+    "photoLibraryPermissionNeeded": "Ana buƙatar izinin ɗakin karatu na hoto don adana hotuna",
+    "calibrationRequired": "Da fatan za a fara daidaitawa da tsabar kuɗi",
+    "noMeasurements": "Babu ma'auni don adanawa",
+    "emailError": "An kasa shirya imel",
+    "saveError": "An kasa ajiye hoto"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

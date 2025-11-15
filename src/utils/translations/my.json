@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "ကင်မရာ",
+    "help": "ကူညီကြပါ",
+    "save": "သိမ်းဆည်းပါ။",
+    "email": "အီးမေးလ်",
+    "close": "ပိတ်လိုက်",
+    "cancel": "မလုပ်တော့",
+    "confirm": "အတည်ပြုပါ။",
+    "done": "ပြီးပြီ။",
+    "next": "နောက်တစ်ခု",
+    "back": "ကျော",
+    "ok": "အိုကေ",
+    "yes": "ဟုတ်ကဲ့",
+    "no": "မရှိ",
+    "loading": "ဖွင့်နေသည်...",
+    "error": "အမှား",
+    "success": "အောင်မြင်မှု"
+  },
+  "buttons": {
+    "lockIn": "လော့ခ်ချပါ။",
+    "lockInCalibration": "Calibration တွင် လော့ခ်ချပါ။",
+    "recalibrate": "ပြန်လည်ချိန်ညှိပါ။",
+    "pan": "ပန်",
+    "edit": "တည်းဖြတ်ပါ။",
+    "measure": "တိုင်းတာသည်။",
+    "undo": "မလုပ်တော့",
+    "trash": "ဖျက်ပါ။",
+    "unitToggle": "ယူနစ်",
+    "metric": "မက်ထရစ်",
+    "imperial": "အင်ပါယာ",
+    "flash": "မီးရောင်",
+    "photoLibrary": "ဓာတ်ပုံစာကြည့်တိုက်",
+    "scaleMode": "စကေးမုဒ်"
+  },
+  "cameraScreen": {
+    "lookDown": "အောက်ကို ကြည့်ပါ။",
+    "holdSteady": "တည်ငြိမ်အောင်ထားပါ။",
+    "capturing": "ရိုက်ကူးနေသည်...",
+    "almostLevel": "အဆင့်နီးပါး",
+    "perfectLevel": "ပြီးပြည့်စုံသော! တည်ငြိမ်စွာထားပါ။",
+    "tooMuchMovement": "လှုပ်ရှားမှုများလွန်းခြင်း။",
+    "alignCrosshairs": "Crosshairs တန်းညှိပါ။",
+    "autoCapture": "အလိုအလျောက် ဖမ်းယူရန် အသင့်ဖြစ်ပါပြီ။"
+  },
+  "coinCalibration": {
+    "title": "Coin ဖြင့် ချိန်ညှိပါ။",
+    "searchPlaceholder": "အကြွေစေ့ရှာပါ...",
+    "zoomInstructions": "ဇူးမ်ချဲ့ရန် ဖိဆွဲပါ၊ အနေအထားသို့ ဖိဆွဲပါ။",
+    "alignInstructions": "အကြွေစေ့၏ အပြင်ဘက်အစွန်းကို ရောင်စုံစက်ဝိုင်း၏ အပြင်ဘက်အစွန်းနှင့် တွဲပါ။",
+    "lockInWhenReady": "ချိန်ညှိသည့်အခါ လော့ခ်ချမည်ကို နှိပ်ပါ။"
+  },
+  "dimensionOverlay": {
+    "calibrated": "ချိန်ညှိသည်။",
+    "recalibrateButton": "ပြန်လည်ချိန်ညှိပါ။",
+    "panMode": "ပန်မုဒ် - ပုံကို ရွှေ့/ချဲ့ပါ။",
+    "editMode": "တည်းဖြတ်မုဒ် - တိုင်းတာမှုများကို ရွှေ့ပါ။",
+    "measureMode": "တိုင်းတာမှုမုဒ် - တိုင်းတာမှုအသစ်များကို နေရာချပါ။",
+    "distance": "အကွာအဝေး",
+    "angle": "ထောင့်",
+    "circle": "စက်ဝိုင်း",
+    "rectangle": "စတုဂံပုံ",
+    "freehand": "လက်လွတ်",
+    "legend": "ဒဏ္ဍာရီ",
+    "tapToCollapse": "ပြိုကျရန် တို့ပါ။",
+    "tapToExpand": "ချဲ့ရန် တို့ပါ။",
+    "labelPrompt": "တိုင်းတာမှုအမည်/ဖော်ပြချက်ကို ထည့်ပါ။",
+    "depthPrompt": "အနက်ထည့်ပါ (ချန်လှပ်ထားနိုင်သည်)",
+    "locked": "ပန်/ချဲ့ခြင်း လော့ခ်ချခြင်း - တိုင်းတာမှုများကို ရွှေ့ရန် တည်းဖြတ်ပါ ကိုနှိပ်ပါ။",
+    "emailSent": "အီးမေးလ်ပြင်ဆင်ပါ။",
+    "imageSaved": "Photos တွင် သိမ်းထားသည်။",
+    "measurements": "တိုင်းတာမှုများ"
+  },
+  "helpModal": {
+    "title": "လမ်းညွှန်",
+    "pdfGuideLanguages": "PDF လမ်းညွှန်ဘာသာစကားများ",
+    "moreLanguagesSoon": "နောက်ထပ်ဘာသာစကားများမကြာမီလာမည်...",
+    "videoCoursesTitle": "ဗီဒီယိုသင်တန်းများ",
+    "step1Title": "အဆင့် 1- ပြီးပြည့်စုံသော ဓာတ်ပုံကို ရိုက်ပါ။",
+    "step2Title": "အဆင့် 2: Coin ဖြင့် ချိန်ညှိပါ။",
+    "step3Title": "အဆင့် 3: နေရာချ အတိုင်းအတာများ"
+  },
+  "battlingBots": {
+    "title": "နောက်ကွယ်မှ",
+    "supportSnail": "ခရုကို ပံ့ပိုးပါ။",
+    "subtitle": "PanHandler သည် စိတ်အားထက်သန်သော ပရောဂျက်တစ်ခုဖြစ်သည်။ ကူညီစောင့်ရှောက်ပေးပါ။",
+    "buyMeCoffee": "ကော်ဖီဝယ်ပေးနော်။",
+    "cantDoCoffee": "ကော်ဖီမသောက်နိုင်ဘူး- သုံးသပ်ချက် ရေးပါ။",
+    "maybeLater": "နောက်မှဖြစ်နိုင်တယ်။"
+  },
+  "alerts": {
+    "permissionDenied": "ခွင့်တောင်းမှုငြင်းဆိုခြင်း",
+    "cameraPermissionNeeded": "ဓာတ်ပုံရိုက်ရန်အတွက် ကင်မရာခွင့်ပြုချက် လိုအပ်သည်။",
+    "photoLibraryPermissionNeeded": "ပုံများကိုသိမ်းဆည်းရန် ဓာတ်ပုံစာကြည့်တိုက်ခွင့်ပြုချက် လိုအပ်သည်။",
+    "calibrationRequired": "အရင်ဆုံး အကြွေစေ့နဲ့ ချိန်ညှိပါ။",
+    "noMeasurements": "သိမ်းဆည်းရန် အတိုင်းအတာမရှိပါ။",
+    "emailError": "အီးမေးလ်ကို ပြင်ဆင်ရန် မအောင်မြင်ပါ။",
+    "saveError": "ပုံကို သိမ်းဆည်းရန် မအောင်မြင်ပါ။"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

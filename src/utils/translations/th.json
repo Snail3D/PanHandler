@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "กล้อง",
+    "help": "ช่วย",
+    "save": "บันทึก",
+    "email": "อีเมล",
+    "close": "ปิด",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "done": "เสร็จแล้ว",
+    "next": "ต่อไป",
+    "back": "กลับ",
+    "ok": "ตกลง",
+    "yes": "ใช่",
+    "no": "เลขที่",
+    "loading": "กำลังโหลด...",
+    "error": "ข้อผิดพลาด",
+    "success": "ความสำเร็จ"
+  },
+  "buttons": {
+    "lockIn": "ล็อคอิน",
+    "lockInCalibration": "ล็อคอินการสอบเทียบ",
+    "recalibrate": "ปรับเทียบใหม่",
+    "pan": "กระทะ",
+    "edit": "แก้ไข",
+    "measure": "วัด",
+    "undo": "เลิกทำ",
+    "trash": "ลบ",
+    "unitToggle": "หน่วย",
+    "metric": "เมตริก",
+    "imperial": "จักรวรรดิ",
+    "flash": "แฟลช",
+    "photoLibrary": "ห้องสมุดภาพถ่าย",
+    "scaleMode": "โหมดมาตราส่วน"
+  },
+  "cameraScreen": {
+    "lookDown": "มองลงมา",
+    "holdSteady": "ถือให้มั่นคง",
+    "capturing": "กำลังจับภาพ...",
+    "almostLevel": "เกือบเสมอระดับ",
+    "perfectLevel": "เพอร์เฟกต์! ถือให้มั่นคง",
+    "tooMuchMovement": "การเคลื่อนไหวมากเกินไป",
+    "alignCrosshairs": "จัดแนวเส้นเล็ง",
+    "autoCapture": "พร้อมจับภาพอัตโนมัติ"
+  },
+  "coinCalibration": {
+    "title": "ปรับเทียบด้วยเหรียญ",
+    "searchPlaceholder": "ค้นหาเหรียญ...",
+    "zoomInstructions": "บีบเพื่อซูม ลากเพื่อวางตำแหน่ง",
+    "alignInstructions": "จับคู่ขอบด้านนอกของเหรียญกับขอบด้านนอกของวงกลมสี",
+    "lockInWhenReady": "แตะล็อคเมื่อจัดตำแหน่งแล้ว"
+  },
+  "dimensionOverlay": {
+    "calibrated": "ปรับเทียบแล้ว",
+    "recalibrateButton": "ปรับเทียบใหม่",
+    "panMode": "โหมดแพน - เลื่อน/ซูมภาพ",
+    "editMode": "โหมดแก้ไข - ย้ายการวัด",
+    "measureMode": "โหมดการวัด - วางการวัดใหม่",
+    "distance": "ระยะทาง",
+    "angle": "มุม",
+    "circle": "วงกลม",
+    "rectangle": "สี่เหลี่ยมผืนผ้า",
+    "freehand": "วาดมือเปล่า",
+    "legend": "ตำนาน",
+    "tapToCollapse": "แตะเพื่อยุบ",
+    "tapToExpand": "แตะเพื่อขยาย",
+    "labelPrompt": "กรอกชื่อ/คำอธิบายการวัด",
+    "depthPrompt": "ระบุความลึก (ไม่บังคับ)",
+    "locked": "ล็อคการแพน/ซูม - แตะแก้ไขเพื่อย้ายการวัด",
+    "emailSent": "เตรียมพร้อมอีเมลแล้ว!",
+    "imageSaved": "บันทึกลงในรูปภาพ!",
+    "measurements": "การวัด"
+  },
+  "helpModal": {
+    "title": "แนะนำ",
+    "pdfGuideLanguages": "คู่มือ PDF ภาษาต่างๆ",
+    "moreLanguagesSoon": "จะมีภาษาอื่นๆ เพิ่มเติมเร็วๆ นี้...",
+    "videoCoursesTitle": "หลักสูตรวิดีโอ",
+    "step1Title": "ขั้นตอนที่ 1: ถ่ายภาพให้สมบูรณ์แบบ",
+    "step2Title": "ขั้นตอนที่ 2: ปรับเทียบด้วยเหรียญ",
+    "step3Title": "ขั้นตอนที่ 3: วางการวัด"
+  },
+  "battlingBots": {
+    "title": "เบื้องหลัง",
+    "supportSnail": "สนับสนุนหอยทาก",
+    "subtitle": "PanHandler เป็นโครงการที่เกิดจากความหลงใหล ช่วยกันรักษามันไว้!",
+    "buyMeCoffee": "ซื้อกาแฟให้ฉัน",
+    "cantDoCoffee": "ฉันดื่มกาแฟไม่ได้ : เขียนรีวิวหน่อยสิ!",
+    "maybeLater": "บางทีภายหลัง"
+  },
+  "alerts": {
+    "permissionDenied": "ปฏิเสธการอนุญาต",
+    "cameraPermissionNeeded": "ต้องได้รับอนุญาตจากกล้องจึงจะถ่ายภาพได้",
+    "photoLibraryPermissionNeeded": "ต้องได้รับอนุญาตจากคลังภาพจึงจะบันทึกภาพได้",
+    "calibrationRequired": "กรุณาปรับเทียบด้วยเหรียญก่อน",
+    "noMeasurements": "ไม่ต้องวัดขนาดเพื่อบันทึก",
+    "emailError": "ไม่สามารถเตรียมอีเมล์ได้",
+    "saveError": "ไม่สามารถบันทึกรูปภาพได้"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

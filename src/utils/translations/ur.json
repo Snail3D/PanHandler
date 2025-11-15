@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "کیمرہ",
+    "help": "مدد",
+    "save": "محفوظ کریں۔",
+    "email": "ای میل",
+    "close": "بند",
+    "cancel": "منسوخ کریں۔",
+    "confirm": "تصدیق کریں۔",
+    "done": "ہو گیا",
+    "next": "اگلا",
+    "back": "پیچھے",
+    "ok": "ٹھیک ہے",
+    "yes": "جی ہاں",
+    "no": "No",
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "Error",
+    "success": "کامیابی"
+  },
+  "buttons": {
+    "lockIn": "لاک ان",
+    "lockInCalibration": "انشانکن میں لاک",
+    "recalibrate": "Recalibrate",
+    "pan": "پین",
+    "edit": "ترمیم کریں۔",
+    "measure": "پیمائش کریں۔",
+    "undo": "کالعدم",
+    "trash": "حذف کریں۔",
+    "unitToggle": "یونٹ",
+    "metric": "میٹرک",
+    "imperial": "امپیریل",
+    "flash": "فلیش",
+    "photoLibrary": "فوٹو لائبریری",
+    "scaleMode": "اسکیل موڈ"
+  },
+  "cameraScreen": {
+    "lookDown": "نیچے دیکھو",
+    "holdSteady": "ثابت قدم رہیں",
+    "capturing": "کیپچر کر رہا ہے...",
+    "almostLevel": "تقریباً سطح",
+    "perfectLevel": "کامل! ثابت قدم رہیں",
+    "tooMuchMovement": "بہت زیادہ حرکت",
+    "alignCrosshairs": "کراس شائرز کو سیدھ کریں۔",
+    "autoCapture": "آٹو کیپچر تیار ہے۔"
+  },
+  "coinCalibration": {
+    "title": "سکے کے ساتھ کیلیبریٹ کریں۔",
+    "searchPlaceholder": "سکے تلاش کریں...",
+    "zoomInstructions": "زوم کرنے کے لیے چوٹکی لگائیں، پوزیشن پر گھسیٹیں۔",
+    "alignInstructions": "سکے کے بیرونی کنارے کو رنگین دائرے کے باہر کے کنارے سے ملا دیں۔",
+    "lockInWhenReady": "سیدھ میں آنے پر لاک ان پر ٹیپ کریں۔"
+  },
+  "dimensionOverlay": {
+    "calibrated": "کیلیبریٹڈ",
+    "recalibrateButton": "Recalibrate",
+    "panMode": "پین موڈ - تصویر کو منتقل/زوم کریں۔",
+    "editMode": "تدوین موڈ - حرکت کی پیمائش",
+    "measureMode": "پیمائش کا طریقہ - نئی پیمائشیں رکھیں",
+    "distance": "فاصلہ",
+    "angle": "زاویہ",
+    "circle": "دائرہ",
+    "rectangle": "مستطیل",
+    "freehand": "فری ہینڈ",
+    "legend": "لیجنڈ",
+    "tapToCollapse": "سکڑنے کے لیے تھپتھپائیں۔",
+    "tapToExpand": "پھیلانے کے لیے تھپتھپائیں۔",
+    "labelPrompt": "پیمائش کا نام/تفصیل درج کریں۔",
+    "depthPrompt": "گہرائی درج کریں (اختیاری)",
+    "locked": "Pan/Zoom locked - tap Edit to move measurements",
+    "emailSent": "ای میل تیار!",
+    "imageSaved": "تصاویر میں محفوظ!",
+    "measurements": "پیمائش"
+  },
+  "helpModal": {
+    "title": "گائیڈ",
+    "pdfGuideLanguages": "پی ڈی ایف گائیڈ زبانیں",
+    "moreLanguagesSoon": "مزید زبانیں جلد آرہی ہیں...",
+    "videoCoursesTitle": "ویڈیو کورسز",
+    "step1Title": "مرحلہ 1: ایک بہترین تصویر لیں۔",
+    "step2Title": "مرحلہ 2: سکے کے ساتھ کیلیبریٹ کریں۔",
+    "step3Title": "مرحلہ 3: جگہ کی پیمائش"
+  },
+  "battlingBots": {
+    "title": "پردے کے پیچھے",
+    "supportSnail": "Snail کو سپورٹ کریں۔",
+    "subtitle": "PanHandler ایک جذبہ منصوبہ ہے۔ اسے زندہ رکھنے میں مدد کریں!",
+    "buyMeCoffee": "مجھے ایک کافی خریدیں۔",
+    "cantDoCoffee": "میں کافی نہیں کر سکتا: ایک جائزہ چھوڑیں!",
+    "maybeLater": "شاید بعد میں"
+  },
+  "alerts": {
+    "permissionDenied": "اجازت نامنظور",
+    "cameraPermissionNeeded": "فوٹو لینے کے لیے کیمرے کی اجازت درکار ہے۔",
+    "photoLibraryPermissionNeeded": "تصاویر کو محفوظ کرنے کے لیے فوٹو لائبریری کی اجازت درکار ہے۔",
+    "calibrationRequired": "براہ کرم پہلے سکے کے ساتھ کیلیبریٹ کریں۔",
+    "noMeasurements": "بچانے کے لیے کوئی پیمائش نہیں۔",
+    "emailError": "ای میل تیار کرنے میں ناکام",
+    "saveError": "تصویر محفوظ کرنے میں ناکام"
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}

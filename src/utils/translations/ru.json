@@ -1,0 +1,106 @@
+{
+  "common": {
+    "camera": "Камера",
+    "help": "Помощь",
+    "save": "Сохранять",
+    "email": "Электронная почта",
+    "close": "Закрывать",
+    "cancel": "Отмена",
+    "confirm": "Подтверждать",
+    "done": "Сделанный",
+    "next": "Next",
+    "back": "Назад",
+    "ok": "ХОРОШО",
+    "yes": "Да",
+    "no": "Нет",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех"
+  },
+  "buttons": {
+    "lockIn": "Заблокировать",
+    "lockInCalibration": "Блокировка калибровки",
+    "recalibrate": "Перекалибровать",
+    "pan": "Кастрюля",
+    "edit": "Редактировать",
+    "measure": "Мера",
+    "undo": "Отменить",
+    "trash": "Удалить",
+    "unitToggle": "Единица",
+    "metric": "Метрическая",
+    "imperial": "Империал",
+    "flash": "Вспышка",
+    "photoLibrary": "Фотобиблиотека",
+    "scaleMode": "Режим масштабирования"
+  },
+  "cameraScreen": {
+    "lookDown": "Посмотрите вниз",
+    "holdSteady": "Держись крепче",
+    "capturing": "Захват...",
+    "almostLevel": "Почти ровно",
+    "perfectLevel": "Отлично! Держись крепче!",
+    "tooMuchMovement": "Слишком много движения",
+    "alignCrosshairs": "Выровнять перекрестие",
+    "autoCapture": "Готов к автоматическому захвату"
+  },
+  "coinCalibration": {
+    "title": "Калибровка с помощью монеты",
+    "searchPlaceholder": "Поиск монеты...",
+    "zoomInstructions": "Сожмите, чтобы увеличить, перетащите в нужное положение",
+    "alignInstructions": "Сопоставьте внешний край монеты с внешним краем цветного круга.",
+    "lockInWhenReady": "Нажмите «Заблокировать» при выравнивании"
+  },
+  "dimensionOverlay": {
+    "calibrated": "Калиброванный",
+    "recalibrateButton": "Перекалибровать",
+    "panMode": "Режим панорамирования — перемещение/масштабирование изображения",
+    "editMode": "Режим редактирования — перемещение измерений",
+    "measureMode": "Режим измерения — проведение новых измерений",
+    "distance": "Расстояние",
+    "angle": "Угол",
+    "circle": "Круг",
+    "rectangle": "Прямоугольник",
+    "freehand": "От руки",
+    "legend": "Легенда",
+    "tapToCollapse": "Нажмите, чтобы свернуть",
+    "tapToExpand": "Нажмите, чтобы развернуть",
+    "labelPrompt": "Введите название/описание измерения",
+    "depthPrompt": "Введите глубину (необязательно)",
+    "locked": "Панорамирование/масштабирование заблокированы — нажмите «Изменить», чтобы переместить измерения.",
+    "emailSent": "Письмо подготовлено!",
+    "imageSaved": "Сохранено в Фото!",
+    "measurements": "Измерения"
+  },
+  "helpModal": {
+    "title": "Гид",
+    "pdfGuideLanguages": "Языки руководства PDF",
+    "moreLanguagesSoon": "Скоро появятся и другие языки...",
+    "videoCoursesTitle": "Видеокурсы",
+    "step1Title": "Шаг 1: Сделайте идеальное фото",
+    "step2Title": "Шаг 2: Калибровка с помощью монеты",
+    "step3Title": "Шаг 3: Проведение измерений"
+  },
+  "battlingBots": {
+    "title": "За кулисами",
+    "supportSnail": "Поддержка Улитки",
+    "subtitle": "PanHandler — это проект, созданный для вас с энтузиазмом. Помогите ему сохраниться!",
+    "buyMeCoffee": "Купи мне кофе",
+    "cantDoCoffee": "Я не могу пить кофе: Оставьте отзыв!",
+    "maybeLater": "Может быть позже"
+  },
+  "alerts": {
+    "permissionDenied": "Доступ запрещен",
+    "cameraPermissionNeeded": "Для фотосъемки требуется разрешение на использование камеры.",
+    "photoLibraryPermissionNeeded": "Для сохранения изображений требуется разрешение на доступ к фотобиблиотеке.",
+    "calibrationRequired": "Сначала выполните калибровку с помощью монеты.",
+    "noMeasurements": "Нет измерений для сохранения",
+    "emailError": "Не удалось подготовить электронное письмо",
+    "saveError": "Не удалось сохранить изображение."
+  },
+  "quotes": {
+    "QUOTES_ARRAY_PLACEHOLDER": "// 200 top maker/designer quotes with 20% biblical weight"
+  },
+  "chuckNorris": {
+    "JOKES_ARRAY_PLACEHOLDER": "// Localized Chuck Norris style jokes"
+  }
+}
