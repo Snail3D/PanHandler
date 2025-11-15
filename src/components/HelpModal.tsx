@@ -2386,14 +2386,51 @@ Thank you for helping us improve PanHandler!
             >
               <View
                 style={{
-                  paddingVertical: 12,
+                  paddingVertical: 16,
                   paddingHorizontal: 24,
                   backgroundColor: 'rgba(255,255,255,0.85)',
                   borderTopWidth: 1,
                   borderTopColor: 'rgba(0,0,0,0.08)',
                 }}
               >
-                {/* Footer is now minimal - content moved to ScrollView */}
+                {/* PDF Guide Button */}
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                      await generatePdfGuide();
+                    } catch (error) {
+                      console.error('Error generating PDF:', error);
+                      showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
+                    }
+                  }}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: pressed ? '#0056b3' : '#007AFF',
+                    borderRadius: 12,
+                    shadowColor: '#007AFF',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 4,
+                    transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
+                  })}
+                >
+                  <Text style={{ fontSize: 20 }}>📄</Text>
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'white',
+                  }}>
+                    PDF Guide
+                  </Text>
+                </Pressable>
               </View>
             </View>
           </View>
