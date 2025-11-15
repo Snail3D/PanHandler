@@ -48,7 +48,12 @@
     "tiltBackward": "Tilt backward",
     "tiltForward": "Tilt forward",
     "tiltLeft": "Tilt left",
-    "tiltRight": "Tilt right"
+    "tiltRight": "Tilt right",
+    "aimDown": "Aim down for auto level/capture",
+    "placeCoinCenter": "1. Place coin in center",
+    "lineUpLines": "2. Line up the lines",
+    "tapToCapture": "3. Tap to capture",
+    "holdForAutoCapture": "(hold for auto capture)"
   },
   
   "coinCalibration": {
@@ -56,7 +61,8 @@
     "searchPlaceholder": "Search coin...",
     "zoomInstructions": "Pinch to zoom, drag to position",
     "alignInstructions": "Match the outside edge of the coin with the outside edge of the colored circle",
-    "lockInWhenReady": "Tap Lock in when aligned"
+    "lockInWhenReady": "Tap Lock in when aligned",
+    "pinchToZoom": "Pinch to Zoom"
   },
   
   "dimensionOverlay": {
@@ -105,7 +111,22 @@
     "tapToPlacePoint": "Tap to place point",
     "dragToMove": "Drag to move",
     "tapToEdit": "Tap to edit",
-    "doubleTapToLabel": "Double-tap to add label"
+    "doubleTapToLabel": "Double-tap to add label",
+    "cursorPoint1": "Point 1",
+    "cursorPoint2": "Point 2",
+    "cursorPoint3": "Point 3",
+    "cursorStartLocation": "Start location",
+    "cursorNorthReference": "North reference",
+    "cursorDestination": "Destination",
+    "cursorVertex": "Point 2 (vertex)",
+    "cursorCenter": "Center of circle",
+    "cursorOutside": "Outside of circle",
+    "cursorFirstCorner": "First corner",
+    "cursorSecondCorner": "Second corner",
+    "shareButton": "Share",
+    "newPhotoButton": "New Photo",
+    "recalibrateButtonText": "Recalibrate",
+    "swipeMenuToCollapse": "← Swipe menu to collapse →"
   },
   
   "units": {
@@ -139,7 +160,9 @@
       "screenDistance": "Screen distance",
       "realDistance": "Real distance",
       "apply": "Apply",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "setScaleTitle": "Set Your Scale",
+      "enterValidScale": "Please enter a valid scale value in the \"In Reality\" field to continue."
     },
     "blueprintModal": {
       "title": "Known Distance",
@@ -336,6 +359,18 @@
     "emailAttached": "Attached: 2 photos",
     "emailFullPhoto": "Full measurements photo",
     "emailCADCanvas": "Transparent CAD canvas (50% opacity)",
+    "emailTapEmail": "Tap",
+    "emailToGenerate": "to generate a report with 2 photos and a detailed measurement table.",
+    "emailExampleSubject": "Arduino Case - Measurements",
+    "emailExampleBody": "Arduino Case - Measurements by PanHandler",
+    "emailExampleCalibration": "Calibration Reference:",
+    "emailExampleCoinSelected": "24.26mm (the coin you selected)",
+    "emailExampleUnitMetric": "Metric",
+    "emailExampleDistance": "Distance: 145.2mm (Blue)",
+    "emailExampleAngle": "Angle: 87.5° (Green)",
+    "emailExampleCircle": "Circle: Ø 52.3mm (Red)",
+    "emailExampleBullet": "•",
+    "emailExampleAttachedPhotos": "Attached: 2 photos",
     "proTipFastWorkflow": "Pro Tip: Lightning Fast Workflow",
     "shareVsEmail": "Use the Share button to quickly send measurements via AirDrop, Messages, or any app. Use the Email button to send detailed reports with attachments.",
     "importToCAD": "Import to Any CAD Software",
@@ -412,7 +447,32 @@
     "permissionRequired": "Permission Required",
     "noMeasurementsToExport": "No measurements to export",
     "takeCalibrateFirst": "Please take a photo and calibrate first",
-    "addMeasurementsFirst": "Please add some measurements first"
+    "addMeasurementsFirst": "Please add some measurements first",
+    "viewNotReady": "View not ready. Wait and try again.",
+    "viewLostDuringCapture": "View lost during label capture.",
+    "shareError": "Share Error",
+    "noImageToShare": "No image to share.",
+    "shareFailed": "Failed to share",
+    "emailFailed": "Email Error",
+    "emailFailedMessage": "Failed:"
+  },
+  "email": {
+    "subjectWithLabel": "{{label}} - Measurements",
+    "subjectWithoutLabel": "PanHandler Measurements",
+    "bodyHeaderWithLabel": "{{label}} - Measurements by PanHandler",
+    "bodyHeaderWithoutLabel": "PanHandler Measurements",
+    "separator": "========================================",
+    "calibration": "Calibration:",
+    "calibrationCoin": "{{diameter}} ({{coinName}})",
+    "calibrationMapScale": "Map Scale ({{screenDistance}}{{screenUnit}} = {{realDistance}}{{realUnit}})",
+    "calibrationCoinGeneric": "{{diameter}} (the coin you selected)",
+    "unit": "Unit:",
+    "unitMetric": "Metric",
+    "unitImperial": "Imperial",
+    "measurements": "Measurements:",
+    "measurementItem": "{{index}}. {{value}}{{label}} ({{color}})",
+    "attached": "Attached: 2 photos",
+    "footer": "═══════════════════════════\nMade with PanHandler for iOS\n═══════════════════════════"
   },
   
   "quotes": {

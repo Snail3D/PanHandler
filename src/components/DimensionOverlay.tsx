@@ -3045,10 +3045,10 @@ export default function DimensionOverlay({
   };
 
   const performShare = async (label: string | null) => {
-    if (!currentImageUri) {
-      showAlert('Share Error', 'No image to share.', 'error');
-      return;
-    }
+      if (!currentImageUri) {
+        showAlert(t('alerts.shareError'), t('alerts.noImageToShare'), 'error');
+        return;
+      }
 
     try {
       __DEV__ && console.log('📤 Starting share export...');
@@ -3096,7 +3096,7 @@ export default function DimensionOverlay({
       __DEV__ && console.error('📤 Share error:', error);
       setIsCapturing(false);
       setCurrentLabel(null);
-      showAlert('Share Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      showAlert(t('alerts.shareError'), `${t('alerts.shareFailed')}: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
@@ -3113,7 +3113,7 @@ export default function DimensionOverlay({
 
     if (!currentImageUri) {
       __DEV__ && console.log('📧 ERROR: No currentImageUri');
-      showAlert('Email Error', 'No image to export.', 'error');
+      showAlert(t('alerts.emailFailed'), t('alerts.noImage'), 'error');
       return;
     }
 
@@ -3138,32 +3138,44 @@ export default function DimensionOverlay({
       });
 
       // Build email body
-      let measurementText = label ? `${label} - Measurements by PanHandler\n` : 'PanHandler Measurements\n';
-      measurementText += '========================================\n\n';
+      let measurementText = label 
+        ? t('email.bodyHeaderWithLabel', { label }) 
+        : t('email.bodyHeaderWithoutLabel');
+      measurementText += '\n' + t('email.separator') + '\n\n';
 
       if (coinCircle) {
         const coinDiameterDisplay = unitSystem === 'imperial'
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
-        measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
+        measurementText += t('email.calibration') + ' ' + t('email.calibrationCoinGeneric', { diameter: coinDiameterDisplay }) + '\n';
       } else if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
         const scale = calibration.verbalScale;
-        measurementText += `Calibration: Map Scale (${scale.screenDistance}${scale.screenUnit} = ${scale.realDistance}${scale.realUnit})\n`;
+        measurementText += t('email.calibration') + ' ' + t('email.calibrationMapScale', {
+          screenDistance: scale.screenDistance,
+          screenUnit: scale.screenUnit,
+          realDistance: scale.realDistance,
+          realUnit: scale.realUnit
+        }) + '\n';
       }
 
-      measurementText += `Unit: ${unitSystem === 'metric' ? 'Metric' : 'Imperial'}\n\nMeasurements:\n`;
+      measurementText += t('email.unit') + ' ' + (unitSystem === 'metric' ? t('email.unitMetric') : t('email.unitImperial')) + '\n\n' + t('email.measurements') + '\n';
 
       measurements.forEach((m, idx) => {
         const colorInfo = getMeasurementColor(idx, m.mode);
         const valueOnly = m.value.replace(/^(Blue|Green|Red|Purple|Orange|Yellow|Pink|Amber|Cyan|Rose|Teal|Violet|Crimson|Magenta|Indigo|Sky|Lime)\s+/i, '');
         // Format: Number. Measurement (Label if exists) (Color)
         const labelPart = m.label ? ` (${m.label})` : '';
-        measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
+        measurementText += t('email.measurementItem', {
+          index: idx + 1,
+          value: valueOnly,
+          label: labelPart,
+          color: colorInfo.name
+        }) + '\n';
       });
 
-      measurementText += `\n\nAttached: 2 photos\n`;
+      measurementText += '\n\n' + t('email.attached') + '\n';
       if (!isProUser) {
-        measurementText += '\n═══════════════════════════\nMade with PanHandler for iOS\n═══════════════════════════';
+        measurementText += '\n' + t('email.footer');
       }
 
       const attachments: string[] = [];
@@ -3178,7 +3190,7 @@ export default function DimensionOverlay({
       await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!externalViewRef?.current) {
-        showAlert('Error', 'View lost during label capture.', 'error');
+        showAlert(t('common.error'), t('alerts.viewLostDuringCapture'), 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         setHideMeasurementsForCapture(false);
@@ -3210,7 +3222,9 @@ export default function DimensionOverlay({
 
       __DEV__ && console.log('📧 Preparing to open email composer with attachments:', attachments.length);
 
-      const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
+      const subject = label 
+        ? t('email.subjectWithLabel', { label }) 
+        : t('email.subjectWithoutLabel');
 
       __DEV__ && console.log('📧 Opening MailComposer with:', { subject, attachmentsCount: attachments.length });
 
@@ -3234,7 +3248,7 @@ export default function DimensionOverlay({
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
       if (setImageOpacity) setImageOpacity(1);
-      showAlert('Email Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      showAlert(t('alerts.emailFailed'), `${t('alerts.emailFailedMessage')} ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     }
   };
 
@@ -5386,15 +5400,15 @@ export default function DimensionOverlay({
               </Svg>
               <View style={{ position: 'absolute', top: scaleMargin(-35), left: 0, right: 0, backgroundColor: cursorColor, paddingHorizontal: scalePadding(12), paddingVertical: scalePadding(4), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: 'bold', textAlign: 'center' }}>
-                  {mode === 'distance' && currentPoints.length === 0 && 'Point 1'}
-                  {mode === 'distance' && currentPoints.length === 1 && 'Point 2'}
-                  {mode === 'angle' && currentPoints.length === 0 && (isAzimuthMode ? 'Start location' : 'Point 1')}
-                  {mode === 'angle' && currentPoints.length === 1 && (isAzimuthMode ? 'North reference' : 'Point 2 (vertex)')}
-                  {mode === 'angle' && currentPoints.length === 2 && (isAzimuthMode ? 'Destination' : 'Point 3')}
-                  {mode === 'circle' && currentPoints.length === 0 && 'Center of circle'}
-                  {mode === 'circle' && currentPoints.length === 1 && 'Outside of circle'}
-                  {mode === 'rectangle' && currentPoints.length === 0 && 'First corner'}
-                  {mode === 'rectangle' && currentPoints.length === 1 && 'Second corner'}
+                  {mode === 'distance' && currentPoints.length === 0 && t('dimensionOverlay.cursorPoint1')}
+                  {mode === 'distance' && currentPoints.length === 1 && t('dimensionOverlay.cursorPoint2')}
+                  {mode === 'angle' && currentPoints.length === 0 && (isAzimuthMode ? t('dimensionOverlay.cursorStartLocation') : t('dimensionOverlay.cursorPoint1'))}
+                  {mode === 'angle' && currentPoints.length === 1 && (isAzimuthMode ? t('dimensionOverlay.cursorNorthReference') : t('dimensionOverlay.cursorVertex'))}
+                  {mode === 'angle' && currentPoints.length === 2 && (isAzimuthMode ? t('dimensionOverlay.cursorDestination') : t('dimensionOverlay.cursorPoint3'))}
+                  {mode === 'circle' && currentPoints.length === 0 && t('dimensionOverlay.cursorCenter')}
+                  {mode === 'circle' && currentPoints.length === 1 && t('dimensionOverlay.cursorOutside')}
+                  {mode === 'rectangle' && currentPoints.length === 0 && t('dimensionOverlay.cursorFirstCorner')}
+                  {mode === 'rectangle' && currentPoints.length === 1 && t('dimensionOverlay.cursorSecondCorner')}
                 </Text>
               </View>
             </View>
@@ -6874,7 +6888,7 @@ export default function DimensionOverlay({
                         fontWeight: '500',
                         textAlign: 'center',
                       }}>
-                        ← Swipe menu to collapse →
+                        {t('dimensionOverlay.swipeMenuToCollapse')}
                       </Text>
                     </View>
                   )}
@@ -7556,7 +7570,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Ionicons name="share-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Share</Text>
+                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>{t('dimensionOverlay.shareButton')}</Text>
               </Pressable>
 
               <Pressable
@@ -7573,7 +7587,7 @@ export default function DimensionOverlay({
                 }}
               >
                 <Ionicons name="mail-outline" size={12} color={true ? "white" : "rgba(128, 128, 128, 0.6)"} />
-                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>Email</Text>
+                <Text style={{ color: true ? 'white' : 'rgba(128, 128, 128, 0.6)', fontWeight: '600', fontSize: 11, marginLeft: 5 }}>{t('common.email')}</Text>
               </Pressable>
             </>
 
@@ -7598,7 +7612,7 @@ export default function DimensionOverlay({
               }}
             >
               <Ionicons name="camera-outline" size={14} color="white" />
-              <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
+              <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>{t('dimensionOverlay.newPhotoButton')}</Text>
             </Pressable>
           </View>
           

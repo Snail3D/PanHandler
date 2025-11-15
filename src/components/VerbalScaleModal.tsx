@@ -665,9 +665,9 @@ export default function VerbalScaleModal({ visible, onComplete, onBlueprintMode,
                       if (!isValid) {
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                         Alert.alert(
-                          'Set Your Scale',
-                          'Please enter a valid scale value in the "In Reality" field to continue.',
-                          [{ text: 'OK', style: 'default' }]
+                          t('modals.verbalScaleModal.setScaleTitle'),
+                          t('modals.verbalScaleModal.enterValidScale'),
+                          [{ text: t('common.ok'), style: 'default' }]
                         );
                         return;
                       }

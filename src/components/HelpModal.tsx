@@ -1377,20 +1377,20 @@ Thank you for helping us improve PanHandler!
                 
                 <View style={{ backgroundColor: 'rgba(52,199,89,0.08)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: 'rgba(52,199,89,0.2)' }}>
                   <Text style={{ fontSize: 13, color: '#8E8E93', marginBottom: 8 }}>
-                    Subject: <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>Arduino Case - Measurements</Text>
+                    {t('helpModal.emailSubject')} <Text style={{ color: '#1C1C1E', fontWeight: '600' }}>{t('helpModal.emailExampleSubject')}</Text>
                   </Text>
                   <View style={{ height: 1, backgroundColor: '#E5E5EA', marginBottom: 10 }} />
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    Arduino Case - Measurements by PanHandler{'\n\n'}
-                    <Text style={{ fontWeight: '600' }}>Calibration Reference:</Text> 24.26mm (the coin you selected){'\n'}
-                    <Text style={{ fontWeight: '600' }}>Unit System:</Text> Metric{'\n\n'}
-                    <Text style={{ fontWeight: '600' }}>Measurements:</Text>{'\n'}
-                    Distance: 145.2mm (Blue){'\n'}
-                    Angle: 87.5° (Green){'\n'}
-                    Circle: Ø 52.3mm (Red){'\n\n'}
-                    Attached: 2 photos{'\n'}
-                    {'\u2022'} Full measurements photo{'\n'}
-                    {'\u2022'} Transparent CAD canvas (50% opacity)
+                    {t('helpModal.emailExampleBody')}{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>{t('helpModal.emailExampleCalibration')}</Text> {t('helpModal.emailExampleCoinSelected')}{'\n'}
+                    <Text style={{ fontWeight: '600' }}>{t('helpModal.emailUnitSystem')}</Text> {t('helpModal.emailExampleUnitMetric')}{'\n\n'}
+                    <Text style={{ fontWeight: '600' }}>{t('helpModal.emailMeasurements')}</Text>{'\n'}
+                    {t('helpModal.emailExampleDistance')}{'\n'}
+                    {t('helpModal.emailExampleAngle')}{'\n'}
+                    {t('helpModal.emailExampleCircle')}{'\n\n'}
+                    {t('helpModal.emailExampleAttachedPhotos')}{'\n'}
+                    {t('helpModal.emailExampleBullet')} {t('helpModal.emailFullPhoto')}{'\n'}
+                    {t('helpModal.emailExampleBullet')} {t('helpModal.emailCADCanvas')}
                   </Text>
                 </View>
                 
