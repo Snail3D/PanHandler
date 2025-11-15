@@ -62,6 +62,7 @@ const ExpandableSection = ({
   const heightValue = useSharedValue(0);
   const rotateValue = useSharedValue(0);
   const opacity = useSharedValue(0);
+  const isAnimatingRef = useRef(false);
 
   useEffect(() => {
     // Simple fade in only - no scale animation to prevent jerky scrolling
@@ -69,11 +70,19 @@ const ExpandableSection = ({
   }, [delay]);
 
   useEffect(() => {
+    if (isAnimatingRef.current) return; // Prevent concurrent animations
+    
+    isAnimatingRef.current = true;
     if (expanded) {
-      heightValue.value = withSpring(1, { damping: 20, stiffness: 120 });
+      // Use timing instead of spring to prevent continuous updates that block touches
+      heightValue.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }, () => {
+        isAnimatingRef.current = false;
+      });
       rotateValue.value = withTiming(180, { duration: 300, easing: Easing.out(Easing.cubic) });
     } else {
-      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) });
+      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) }, () => {
+        isAnimatingRef.current = false;
+      });
       rotateValue.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     }
   }, [expanded]);
@@ -86,23 +95,23 @@ const ExpandableSection = ({
     };
   });
   
-  const contentAnimatedStyle = useAnimatedStyle(() => ({
-    maxHeight: heightValue.value === 0 ? 0 : 2000,
-    opacity: heightValue.value,
-    overflow: 'hidden',
-  }));
+  const contentAnimatedStyle = useAnimatedStyle(() => {
+    // Use a fixed maxHeight when expanded to prevent layout thrashing
+    const maxHeight = heightValue.value * 2000;
+    return {
+      maxHeight: maxHeight,
+      opacity: heightValue.value,
+      overflow: 'hidden',
+    };
+  });
   
   const chevronAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotateValue.value}deg` }],
   }));
 
   return (
-    <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14) }]}>
-      <Pressable
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setExpanded(!expanded);
-        }}
+    <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14) }]} pointerEvents="box-none">
+      <View
         style={{
           backgroundColor: 'rgba(255,255,255,0.9)',
           borderRadius: scaleBorderRadius(20),
@@ -116,12 +125,24 @@ const ExpandableSection = ({
           overflow: 'hidden',
         }}
       >
-        <View
+        {/* Header - Separate Pressable for better touch handling */}
+        <Pressable
+          onPress={() => {
+            // Prevent rapid toggling during animations that could cause race conditions
+            if (isAnimatingRef.current) return;
+            const newExpanded = !expanded;
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setExpanded(newExpanded);
+          }}
+          delayPressIn={0}
+          delayPressOut={0}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             padding: scalePadding(18),
+            zIndex: 10,
           }}
         >
           <Text style={{
@@ -130,15 +151,17 @@ const ExpandableSection = ({
             color: '#1C1C1E',
             textAlign: 'center',
             letterSpacing: -0.3,
+            flex: 1,
           }}>
             {title}
           </Text>
-          <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: scalePadding(18) }]}>
+          <AnimatedView style={[chevronAnimatedStyle, { position: 'absolute', right: scalePadding(18) }]} pointerEvents="none">
             <Ionicons name="chevron-down" size={scaleIconSize(24)} color="#666" />
           </AnimatedView>
-        </View>
+        </Pressable>
 
-        <AnimatedView style={contentAnimatedStyle}>
+        {/* Content - Separate animated container that doesn't interfere with header touches */}
+        <AnimatedView style={contentAnimatedStyle} pointerEvents={expanded ? 'auto' : 'none'}>
           <View style={{ 
             paddingHorizontal: scalePadding(18), 
             paddingBottom: scalePadding(18),
@@ -146,7 +169,7 @@ const ExpandableSection = ({
             {children}
           </View>
         </AnimatedView>
-      </Pressable>
+      </View>
     </Animated.View>
   );
 };
@@ -415,6 +438,9 @@ Thank you for helping us improve PanHandler!
                       closeLongPressedRef.current = false;
                     }, 100);
                   }}
+                  delayPressIn={0}
+                  delayPressOut={0}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   style={{
                     width: scaleSize(44),
                     height: scaleSize(44),
@@ -436,17 +462,20 @@ Thank you for helping us improve PanHandler!
                 collapsable={false}
                 style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
-                  <Animated.ScrollView
+                  <ScrollView
+                    ref={modalContentRef}
                     style={{ flex: 1 }}
-                    contentContainerStyle={{ padding: scalePadding(20) }}
-                    showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
+                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
+                    showsVerticalScrollIndicator={true}
+                    scrollEventThrottle={16}
                     scrollEnabled={true}
                     nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
-                    directionalLockEnabled={false}
-                    alwaysBounceVertical={true}
+                    bounces={true}
+                    overScrollMode="auto"
+                    decelerationRate="normal"
+                    persistentScrollbar={false}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
@@ -2341,7 +2370,7 @@ Thank you for helping us improve PanHandler!
               </View>
 
 
-            </Animated.ScrollView>
+            </ScrollView>
               </View>
             </View>
 
