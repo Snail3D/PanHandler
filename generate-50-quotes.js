@@ -123,7 +123,8 @@ function translateText(text, targetLanguage) {
   return new Promise((resolve, reject) => {
     const postData = JSON.stringify({
       q: text,
-      target_language_code: targetLanguage
+      target_language: targetLanguage,
+      source_language: 'en'
     });
 
     const options = {
@@ -133,7 +134,8 @@ function translateText(text, targetLanguage) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
+        'Content-Length': Buffer.byteLength(postData),
+        'X-Goog-Api-Client': 'gapic/1.0.0'
       }
     };
 
@@ -150,9 +152,9 @@ function translateText(text, targetLanguage) {
           if (response.data && response.data.translations && response.data.translations[0]) {
             resolve(response.data.translations[0].translatedText);
           } else if (response.error) {
-            reject(new Error(response.error.message));
+            reject(new Error(response.error.message || JSON.stringify(response.error)));
           } else {
-            reject(new Error('Unexpected response format'));
+            reject(new Error('Unexpected response format: ' + JSON.stringify(response)));
           }
         } catch (e) {
           reject(e);

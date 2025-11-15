@@ -1,7 +1,7 @@
-// PL - 50 maker/designer quotes
+// EL - 50 maker/designer quotes
 // Generated for PanHandler i18n
 
-export const quotes_pl: string[] = [
+export const quotes_el: string[] = [
   "Measure twice, cut once.",
   "Precision is the difference between amateur and professional.",
   "Good design is invisible.",

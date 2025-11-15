@@ -2556,7 +2556,7 @@ Thank you for helping us improve PanHandler!
                     try {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       const { generatePdfGuide } = await import('../utils/generatePdfGuide');
-                      await generatePdfGuide();
+                      await generatePdfGuide(i18n.language);
                     } catch (error) {
                       console.error('Error generating PDF:', error);
                       showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
@@ -2585,9 +2585,73 @@ Thank you for helping us improve PanHandler!
                     fontWeight: '600',
                     color: 'white',
                   }}>
-                    PDF Guide
+                    {t('helpModal.pdfGuide') || 'PDF Guide'}
                   </Text>
                 </Pressable>
+
+                {/* Language Selector */}
+                <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#666', marginBottom: 10, textAlign: 'center' }}>
+                    🌍 {t('helpModal.selectLanguage')}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#1C1C1E', lineHeight: 16, textAlign: 'center', flexWrap: 'wrap' }}>
+                    {[
+                      { code: 'en', label: 'EN English' },
+                      { code: 'es', label: 'ES Español' },
+                      { code: 'fr', label: 'FR Français' },
+                      { code: 'de', label: 'DE Deutsch' },
+                      { code: 'it', label: 'IT Italiano' },
+                      { code: 'pt', label: 'PT Português' },
+                      { code: 'ru', label: 'RU Русский' },
+                      { code: 'pl', label: 'PL Polski' },
+                      { code: 'tr', label: 'TR Türkçe' },
+                      { code: 'uk', label: 'UK Українська' },
+                      { code: 'vi', label: 'VI Tiếng Việt' },
+                      { code: 'id', label: 'ID Bahasa' },
+                      { code: 'jv', label: 'JV Basa Jawa' },
+                      { code: 'sw', label: 'SW Kiswahili' },
+                      { code: 'zh', label: 'ZH 中文' },
+                      { code: 'ja', label: 'JA 日本語' },
+                      { code: 'ko', label: 'KO 한국어' },
+                      { code: 'hi', label: 'HI हिन्दी' },
+                      { code: 'bn', label: 'BN বাংলা' },
+                      { code: 'mr', label: 'MR मराठी' },
+                      { code: 'ta', label: 'TA தமிழ்' },
+                      { code: 'te', label: 'TE తెలుగు' },
+                      { code: 'ar', label: 'AR العربية' },
+                      { code: 'ur', label: 'UR اردو' },
+                      { code: 'he', label: 'HE עברית' },
+                      { code: 'fa', label: 'FA فارسی' },
+                      { code: 'el', label: 'EL Ελληνικά' },
+                      { code: 'ha', label: 'HA Hausa' },
+                      { code: 'pa', label: 'PA ਪੰਜਾਬੀ' },
+                      { code: 'fil', label: 'FIL Filipino' },
+                      { code: 'am', label: 'AM አማርኛ' },
+                      { code: 'my', label: 'MY မြန်မာ' },
+                      { code: 'th', label: 'TH ไทย' },
+                    ].map((lang, index, array) => (
+                      <Text
+                        key={lang.code}
+                        onPress={async () => {
+                          try {
+                            await changeLanguage(lang.code);
+                            // Close and reopen modal to refresh with new language
+                            onClose();
+                            setTimeout(() => {
+                              showAlert('🌍 ' + t('helpModal.languageChanged'), `${lang.label}`, 'success');
+                            }, 300);
+                          } catch (error) {
+                            console.error('Error changing language:', error);
+                            showAlert('Error', t('helpModal.languageChangeError'), 'error');
+                          }
+                        }}
+                        style={{ color: '#007AFF', textDecorationLine: 'underline', marginHorizontal: 2 }}
+                      >
+                        {lang.label}{index < array.length - 1 ? ', ' : ''}
+                      </Text>
+                    ))}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>

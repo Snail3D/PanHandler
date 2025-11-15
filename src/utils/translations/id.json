@@ -145,7 +145,11 @@
     "3DPrintedAidsTitle": "3D Printed Aids",
     "viewOnMakerWorld": "View on MakerWorld",
     "downloadAnd3DPrint": "Download and 3D print for perfect reference photos",
-    "sendBugReportButton": "Send Bug Report"
+    "sendBugReportButton": "Send Bug Report",
+    "selectLanguage": "Select Language:",
+    "languageChanged": "Language Updated",
+    "languageChangeError": "Failed to change language",
+    "pdfGuide": "PDF Guide"
   },
   "battlingBots": {
     "title": "Di belakang layar",
