@@ -3,11 +3,35 @@ import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Import translation files
+// Import all translation files
 import en from './translations/en.json';
-// Import other languages when ready
-// import es from './translations/es.json';
-// etc...
+import es from './translations/es.json';
+import zh from './translations/zh.json';
+import hi from './translations/hi.json';
+import fr from './translations/fr.json';
+import ar from './translations/ar.json';
+import bn from './translations/bn.json';
+import ru from './translations/ru.json';
+import pt from './translations/pt.json';
+import ur from './translations/ur.json';
+import id from './translations/id.json';
+import de from './translations/de.json';
+import ja from './translations/ja.json';
+import pl from './translations/pl.json';
+import el from './translations/el.json';
+import sw from './translations/sw.json';
+import mr from './translations/mr.json';
+import te from './translations/te.json';
+import tr from './translations/tr.json';
+import ko from './translations/ko.json';
+import ta from './translations/ta.json';
+import vi from './translations/vi.json';
+import ha from './translations/ha.json';
+import pa from './translations/pa.json';
+import fil from './translations/fil.json';
+import am from './translations/am.json';
+import my from './translations/my.json';
+import th from './translations/th.json';
 
 const LANGUAGE_KEY = '@panhandler_language';
 
@@ -97,10 +121,33 @@ const initI18n = async () => {
       compatibilityJSON: 'v3',
       resources: {
         en: { translation: en },
-        // Add other languages as they're translated
-        // es: { translation: es },
-        // zh: { translation: zh },
-        // etc...
+        es: { translation: es },
+        zh: { translation: zh },
+        hi: { translation: hi },
+        fr: { translation: fr },
+        ar: { translation: ar },
+        bn: { translation: bn },
+        ru: { translation: ru },
+        pt: { translation: pt },
+        ur: { translation: ur },
+        id: { translation: id },
+        de: { translation: de },
+        ja: { translation: ja },
+        pl: { translation: pl },
+        el: { translation: el },
+        sw: { translation: sw },
+        mr: { translation: mr },
+        te: { translation: te },
+        tr: { translation: tr },
+        ko: { translation: ko },
+        ta: { translation: ta },
+        vi: { translation: vi },
+        ha: { translation: ha },
+        pa: { translation: pa },
+        fil: { translation: fil },
+        am: { translation: am },
+        my: { translation: my },
+        th: { translation: th }
       },
       lng: savedLanguage,
       fallbackLng: 'en',
