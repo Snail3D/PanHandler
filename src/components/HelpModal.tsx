@@ -50,7 +50,7 @@ const ExpandableSection = ({
   icon,
   color,
   children,
-  delay = 0
+  delay = 200
 }: {
   title: string;
   icon: string;
@@ -482,8 +482,6 @@ Thank you for helping us improve PanHandler!
                 icon="play-circle"
                 title="🎬 Video Courses"
                 color="#666"
-                delay={0}
-
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
