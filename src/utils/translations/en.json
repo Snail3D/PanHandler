@@ -245,7 +245,10 @@
     "noImage": "No image to export. Please take a photo first.",
     "viewError": "View not available. Try again.",
     "exportError": "Export Error",
-    "permissionRequired": "Permission Required"
+    "permissionRequired": "Permission Required",
+    "noMeasurementsToExport": "No measurements to export",
+    "takeCalibrateFirst": "Please take a photo and calibrate first",
+    "addMeasurementsFirst": "Please add some measurements first"
   },
   
   "quotes": {
