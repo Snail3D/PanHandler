@@ -18,11 +18,11 @@ export default function BlueprintPlacementModal({ visible, onStartPlacement, onD
   const insets = useSafeAreaInsets();
 
   const isAerial = mode === 'aerial';
-  const title = isAerial ? 'Aerial Photo Scale' : 'Blueprint Scale';
-  const instructionTitle = isAerial ? 'Place Two Ground Reference Points' : 'Place Two Reference Points';
+  const title = isAerial ? t('modals.blueprintModal.aerialPhotoScale') : t('modals.blueprintModal.blueprintScale');
+  const instructionTitle = isAerial ? t('modals.blueprintModal.placeTwoGroundReferencePoints') : t('modals.blueprintModal.placeTwoReferencePoints');
   const instructionText = isAerial 
-    ? "Tap two points on the ground in your aerial photo with a known distance between them. Then enter the real-world distance."
-    : "You'll tap two points on a known distance in your blueprint or drawing. Then enter the real-world distance.";
+    ? t('modals.blueprintModal.aerialInstructions')
+    : t('modals.blueprintModal.blueprintInstructions');
   const icon = isAerial ? 'airplane-outline' : 'locate-outline';
   const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 

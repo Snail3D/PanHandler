@@ -30,10 +30,10 @@ export default function BlueprintDistanceModal({ visible, onComplete, onDismiss,
   const [declinationInput, setDeclinationInput] = useState(magneticDeclination.toString());
 
   const isAerial = mode === 'aerial';
-  const title = isAerial ? 'Ground Distance' : 'Enter Distance';
+  const title = isAerial ? t('modals.blueprintModal.groundDistance') : t('modals.blueprintModal.enterDistance');
   const promptText = isAerial
-    ? 'What is the real-world ground distance between the two points?'
-    : 'What is the real-world distance between the two points you placed?';
+    ? t('modals.blueprintModal.aerialPrompt')
+    : t('modals.blueprintModal.blueprintPrompt');
   const icon = isAerial ? 'airplane-outline' : 'resize-outline';
   const iconColor = isAerial ? '#00C7BE' : '#2E7D32';
 
