@@ -1698,7 +1698,7 @@ export default function CameraScreen() {
                     ref={cameraRef}
                     style={{ flex: 1 }}
                     device={device}
-                    isActive={mode === 'camera'}
+                    isActive={mode === 'camera' && !showHelpModal}
                     photo={true}
                     enableZoomGesture={false}
                     torch={flashEnabled ? 'on' : 'off'}
