@@ -155,6 +155,7 @@ export async function generatePdfGuide(): Promise<void> {
         <div style="margin: 30px 0; padding: 20px; background: #F9F9F9; border-radius: 12px; border: 1px solid #E5E5EA;">
           <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 40px;">
             <div style="text-align: center; flex: 1;">
+              <div style="margin-bottom: 8px; font-weight: 700; font-size: 15px; color: #1C1C1E;">Android Phones/Tablets</div>
               <div style="background: white; padding: 10px; border-radius: 8px; display: inline-block; border: 2px solid #E5E5EA;">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/Snail3D/PanHandler/releases/latest" 
                      alt="GitHub QR Code" 
@@ -162,11 +163,12 @@ export async function generatePdfGuide(): Promise<void> {
               </div>
               <div style="margin-top: 12px; font-weight: 600; font-size: 14px;">GitHub Latest Release</div>
               <div style="font-size: 11px; color: #666; margin-top: 4px;">
-                github.com/Snail3D/PanHandler
+                <a href="https://github.com/Snail3D/PanHandler">github.com/Snail3D/PanHandler</a>
               </div>
             </div>
             
             <div style="text-align: center; flex: 1;">
+              <div style="margin-bottom: 8px; font-weight: 700; font-size: 15px; color: #1C1C1E;">iPhones and iPads</div>
               <div style="background: white; padding: 10px; border-radius: 8px; display: inline-block; border: 2px solid #E5E5EA;">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://apps.apple.com/app/id6754727828" 
                      alt="App Store QR Code" 
