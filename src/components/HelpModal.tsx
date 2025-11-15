@@ -520,7 +520,7 @@ Thank you for helping us improve PanHandler!
                           await generatePdfGuide(lang.code);
                         } catch (error) {
                           console.error('Error generating PDF:', error);
-                          showAlert('Error', \`Failed to generate PDF guide in \${lang.name}. Please try again.\`, 'error');
+                          showAlert('Error', `Failed to generate PDF guide. Please try again.`, 'error');
                         }
                       }}
                       style={({ pressed }) => ({
