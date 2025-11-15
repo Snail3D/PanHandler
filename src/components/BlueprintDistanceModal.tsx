@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useStore from '../state/measurementStore';
+import { useTranslation } from 'react-i18next';
 
 interface BlueprintDistanceModalProps {
   visible: boolean;
@@ -14,6 +15,7 @@ interface BlueprintDistanceModalProps {
 }
 
 export default function BlueprintDistanceModal({ visible, onComplete, onDismiss, mode = 'blueprint' }: BlueprintDistanceModalProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   // Access store for magnetic declination
