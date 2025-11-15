@@ -1556,7 +1556,7 @@ Thank you for helping us improve PanHandler!
                     💡 <Text style={{ fontWeight: '600' }}>Calibration stays accurate</Text> - Zoom freely after placing, coordinates are stored in image space
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Close the app anytime, resume your session later
+                    💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Minimize the app anytime, resume your session later
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🔄 <Text style={{ fontWeight: '600' }}>Switch units anytime</Text> - Toggle between metric ⇄ imperial instantly
@@ -1570,11 +1570,8 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
                   </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
-                  </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                    📸 <Text style={{ fontWeight: '600' }}>Tap to focus</Text> - Tap the camera preview to focus on specific areas before capturing
+                    🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
                   </Text>
                 </View>
                 
