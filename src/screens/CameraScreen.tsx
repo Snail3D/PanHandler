@@ -591,6 +591,11 @@ export default function CameraScreen() {
       return;
     }
 
+    // PAUSE camera processing when help modal is open to prevent UI lag
+    if (showHelpModal) {
+      return;
+    }
+
     // Adjust update rate based on device capability
     // Unified smooth performance: 50ms (20fps) for all devices
     // This provides the best balance of smoothness, battery life, and CPU usage
@@ -845,7 +850,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear all pending haptic timers to prevent memory leak
       hapticTimers.forEach(timer => clearTimeout(timer));
     };
-  }, [mode]);
+  }, [mode, showHelpModal]);
 
   // Auto-capture when holding shutter button and lines align
   // ONLY in horizontal mode - vertical mode allows quick tap only
@@ -891,8 +896,8 @@ export default function CameraScreen() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
 
-    // Only show guidance in camera mode, not capturing
-    if (mode !== 'camera' || isCapturing) {
+    // Only show guidance in camera mode, not capturing, and not when help modal is open
+    if (mode !== 'camera' || isCapturing || showHelpModal) {
       if (guidanceMessage) {
         guidanceOpacity.value = withTiming(0, { duration: 300 });
         timeoutId = setTimeout(() => setGuidanceMessage(null), 300);
@@ -959,7 +964,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear timeout to prevent memory leak
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma]);
+  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma, showHelpModal]);
   
   // Animated style for guidance text
   const guidanceAnimatedStyle = useAnimatedStyle(() => ({
@@ -1639,42 +1644,11 @@ export default function CameraScreen() {
         // DON'T BLOCK UI - Run orientation detection in background
         detectOrientation(asset.uri);
 
-        // 🔍 SMART ROUTING: Detect if photo was taken with a real camera (phone or drone)
-        // Photos taken with camera → Known Scale Mode (skip modal)
-        // Downloaded/screenshot images → Show modal
-        const exif = asset.exif;
-
-        // Check for camera-specific EXIF that screenshots/downloads won't have
-        const isCameraPhoto = exif && (
-          exif.Make || // Camera manufacturer (e.g., "Apple", "DJI", "Canon")
-          exif.Model || // Camera model
-          exif.LensModel || // Lens info (only real cameras have this)
-          exif.FocalLength || // Focal length (only real cameras)
-          exif.GPSAltitude !== undefined || // Drone altitude
-          exif.RelativeAltitude !== undefined // DJI specific
-        );
-
-        console.log('📸 EXIF detection:', {
-          hasExif: !!exif,
-          Make: exif?.Make,
-          Model: exif?.Model,
-          LensModel: exif?.LensModel,
-          FocalLength: exif?.FocalLength,
-          GPSAltitude: exif?.GPSAltitude,
-          isCameraPhoto
-        });
-
-        if (isCameraPhoto) {
-          // Photo was taken with a real camera → Auto-route to Known Scale Mode
-          console.log('✅ Detected camera photo → Auto-routing to Known Scale Mode');
-          setPendingPhotoUri(asset.uri);
-          handlePhotoTypeSelection('blueprint');
-        } else {
-          // Photo is screenshot/download without camera data → Show modal
-          console.log('📥 No camera EXIF (screenshot/download) → Showing photo type modal');
-          setPendingPhotoUri(asset.uri);
-          setShowPhotoTypeModal(true);
-        }
+        // Always show photo type selection modal for imported photos
+        // User decides whether to use coin calibration or known scale mode
+        console.log('📥 Photo imported → Showing photo type selection modal');
+        setPendingPhotoUri(asset.uri);
+        setShowPhotoTypeModal(true);
       }
     } catch (error) {
       console.error('Error picking image:', error);
