@@ -243,8 +243,8 @@ export async function generatePdfGuide(): Promise<void> {
               <p><strong>📐 How to Calibrate:</strong></p>
               <div class="bullet-point">1. Place a coin somewhere in your photo</div>
               <div class="bullet-point">2. Select the coin type from the list</div>
-              <div class="bullet-point">3. Align the blue circle with the coin's edge using pinch-zoom</div>
-              <div class="bullet-point">4. Tap ✓ when perfectly aligned</div>
+              <div class="bullet-point">3. Match the outside edge of the coin with the outside edge of the colored circle</div>
+              <div class="bullet-point">4. Tap Lock in when aligned</div>
             </div>
             
             <div class="tip-box">
