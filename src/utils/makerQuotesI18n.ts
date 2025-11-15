@@ -1,12 +1,11 @@
 // Multi-language maker/designer quotes for PanHandler
-// Supports 32 languages with 50 quotes each
-// English quotes are curated from historical figures
-// Other languages use translated quotes
+// English: Full curated collection from historical figures (with authors & years)
+// Other languages: 50 translated quotes (simple text strings)
 
 import i18n from 'i18next';
+import { makerQuotes, MakerQuote } from './makerQuotes';
 
-// Import quote arrays from quotes directory
-import { quotes_en } from './quotes/en';
+// Import 50-quote translated arrays from quotes directory
 import { quotes_es } from './quotes/es';
 import { quotes_fr } from './quotes/fr';
 import { quotes_de } from './quotes/de';
@@ -40,15 +39,8 @@ import { quotes_am } from './quotes/am';
 import { quotes_my } from './quotes/my';
 import { quotes_th } from './quotes/th';
 
-export interface MakerQuote {
-  text: string;
-  author?: string;
-  year?: string;
-}
-
-// Map of language codes to quote arrays
-const quotesByLanguage: Record<string, string[]> = {
-  'en': quotes_en,
+// Map of language codes to 50-quote arrays (non-English only)
+const translatedQuotesByLanguage: Record<string, string[]> = {
   'es': quotes_es,
   'fr': quotes_fr,
   'de': quotes_de,
@@ -85,48 +77,86 @@ const quotesByLanguage: Record<string, string[]> = {
 
 /**
  * Get a random quote in the user's current language
+ * 
+ * For ENGLISH users:
+ * - Returns full curated quotes with authors, years, and rich history
+ * - Uses the complete makerQuotes collection
+ * 
+ * For OTHER LANGUAGE users:
+ * - Returns 50 translated quotes (simple text strings)
+ * - No author/year info (to keep files lightweight)
+ * 
  * Falls back to English if language not supported
  * 
- * @returns Random quote text (string) in the current language
+ * @returns Random quote in the current language
  */
 export const getRandomQuoteI18n = (): MakerQuote => {
   const currentLang = i18n.language.split('-')[0]; // Get base language code
-  const quoteArray = quotesByLanguage[currentLang] || quotes_en;
-  const randomText = quoteArray[Math.floor(Math.random() * quoteArray.length)];
   
-  return {
-    text: randomText,
-    // Note: Author info only available for English quotes
-    author: currentLang === 'en' ? 'PanHandler' : undefined,
-  };
+  // For English: Use full makerQuotes collection
+  if (currentLang === 'en') {
+    const randomIndex = Math.floor(Math.random() * makerQuotes.length);
+    return makerQuotes[randomIndex];
+  }
+  
+  // For other languages: Use 50 translated quotes
+  const translatedQuotes = translatedQuotesByLanguage[currentLang];
+  if (translatedQuotes && translatedQuotes.length > 0) {
+    const randomText = translatedQuotes[Math.floor(Math.random() * translatedQuotes.length)];
+    return {
+      text: randomText,
+      author: undefined, // Translated quotes don't have author info
+    };
+  }
+  
+  // Fallback: If language not supported, use English
+  const randomIndex = Math.floor(Math.random() * makerQuotes.length);
+  return makerQuotes[randomIndex];
 };
 
 /**
  * Get a random quote in a specific language
  * 
- * @param languageCode - ISO 639-1 language code (e.g., 'es', 'fr', 'de')
- * @returns Random quote text in the specified language
+ * @param languageCode - ISO 639-1 language code (e.g., 'en', 'es', 'fr', 'de')
+ * @returns Random quote in the specified language
  */
 export const getRandomQuoteForLanguage = (languageCode: string): MakerQuote => {
-  const quoteArray = quotesByLanguage[languageCode] || quotes_en;
-  const randomText = quoteArray[Math.floor(Math.random() * quoteArray.length)];
+  // For English: Use full makerQuotes collection
+  if (languageCode === 'en') {
+    const randomIndex = Math.floor(Math.random() * makerQuotes.length);
+    return makerQuotes[randomIndex];
+  }
   
-  return {
-    text: randomText,
-    author: languageCode === 'en' ? 'PanHandler' : undefined,
-  };
+  // For other languages: Use 50 translated quotes
+  const translatedQuotes = translatedQuotesByLanguage[languageCode];
+  if (translatedQuotes && translatedQuotes.length > 0) {
+    const randomText = translatedQuotes[Math.floor(Math.random() * translatedQuotes.length)];
+    return {
+      text: randomText,
+      author: undefined,
+    };
+  }
+  
+  // Fallback: Use English if language not supported
+  const randomIndex = Math.floor(Math.random() * makerQuotes.length);
+  return makerQuotes[randomIndex];
 };
 
 /**
- * Get all available quote arrays
- * Useful for statistics or debugging
+ * Get quote count for a language
+ * English has full collection, others have 50 quotes
  */
-export const getAllQuoteArrays = () => quotesByLanguage;
+export const getQuoteCountForLanguage = (languageCode: string): number => {
+  if (languageCode === 'en') {
+    return makerQuotes.length;
+  }
+  return translatedQuotesByLanguage[languageCode]?.length || 0;
+};
 
 /**
- * Get supported languages for quotes
+ * Get all supported languages for quotes
  */
 export const getSupportedQuoteLanguages = (): string[] => {
-  return Object.keys(quotesByLanguage);
+  return ['en', ...Object.keys(translatedQuotesByLanguage)];
 };
 
