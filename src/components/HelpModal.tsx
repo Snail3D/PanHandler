@@ -555,6 +555,30 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </View>
                   </View>
+                  
+                  {/* PDF Guide Link */}
+                  <Pressable
+                    onPress={async () => {
+                      try {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                        await generatePdfGuide();
+                      } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
+                      }
+                    }}
+                    style={{ marginTop: 16, alignItems: 'center' }}
+                  >
+                    <Text style={{
+                      fontSize: 14,
+                      color: '#007AFF',
+                      textDecorationLine: 'underline',
+                      fontWeight: '600',
+                    }}>
+                      📄 PDF Guide
+                    </Text>
+                  </Pressable>
                 </View>
               </ExpandableSection>
 

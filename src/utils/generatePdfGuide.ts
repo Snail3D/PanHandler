@@ -149,6 +149,35 @@ export async function generatePdfGuide(): Promise<void> {
         <h1>📱 PanHandler Guide</h1>
         <p class="subtitle">Complete Reference for Precise Measurements</p>
         
+        <!-- QR Codes Section - Top of Document -->
+        <div style="margin: 30px 0; padding: 20px; background: #F9F9F9; border-radius: 12px; border: 1px solid #E5E5EA;">
+          <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 40px;">
+            <div style="text-align: center; flex: 1;">
+              <div style="background: white; padding: 10px; border-radius: 8px; display: inline-block; border: 2px solid #E5E5EA;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/Snail3D/PanHandler/releases/latest" 
+                     alt="GitHub QR Code" 
+                     style="width: 150px; height: 150px; display: block;" />
+              </div>
+              <div style="margin-top: 12px; font-weight: 600; font-size: 14px;">GitHub Latest Release</div>
+              <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                github.com/Snail3D/PanHandler
+              </div>
+            </div>
+            
+            <div style="text-align: center; flex: 1;">
+              <div style="background: white; padding: 10px; border-radius: 8px; display: inline-block; border: 2px solid #E5E5EA;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://apps.apple.com/app/id6754577499" 
+                     alt="App Store QR Code" 
+                     style="width: 150px; height: 150px; display: block;" />
+              </div>
+              <div style="margin-top: 12px; font-weight: 600; font-size: 14px;">Apple App Store</div>
+              <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                Download PanHandler
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Video Courses Section -->
         <div class="section">
           <div class="section-title">🎬 Video Courses</div>
@@ -497,43 +526,6 @@ export async function generatePdfGuide(): Promise<void> {
               <div class="bullet-point">• Import transparent overlay as reference layer</div>
               <div class="bullet-point">• Use measurement values to create precise CAD drawings</div>
               <div class="bullet-point">• Values include area and volume where applicable</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- QR Codes Section -->
-        <div class="qr-section">
-          <h2 style="margin-bottom: 20px;">Quick Access</h2>
-          <p style="margin-bottom: 20px; color: #666;">Scan QR codes for quick access to resources</p>
-          
-          <div style="display: flex; justify-content: center; flex-wrap: wrap;">
-            <div class="qr-container">
-              <div style="width: 150px; height: 150px; border: 2px solid #E5E5EA; background: #F9F9F9; display: flex; align-items: center; justify-content: center;">
-                <svg width="140" height="140" viewBox="0 0 140 140">
-                  <!-- GitHub Latest Release QR Code -->
-                  <rect width="140" height="140" fill="white"/>
-                  <!-- Simplified QR pattern - actual QR will be generated -->
-                  <text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#666">GitHub QR</text>
-                </svg>
-              </div>
-              <div class="qr-label">Latest Release</div>
-              <div style="font-size: 11px; color: #666; margin-top: 4px;">
-                <a href="https://github.com/Snail3D/PanHandler/releases/latest">github.com/Snail3D/PanHandler</a>
-              </div>
-            </div>
-            
-            <div class="qr-container">
-              <div style="width: 150px; height: 150px; border: 2px solid #E5E5EA; background: #F9F9F9; display: flex; align-items: center; justify-content: center;">
-                <svg width="140" height="140" viewBox="0 0 140 140">
-                  <!-- Apple App Store QR Code -->
-                  <rect width="140" height="140" fill="white"/>
-                  <text x="70" y="70" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#666">App Store QR</text>
-                </svg>
-              </div>
-              <div class="qr-label">Apple App Store</div>
-              <div style="font-size: 11px; color: #666; margin-top: 4px;">
-                <a href="https://apps.apple.com/app/id6754577499">Download on App Store</a>
-              </div>
             </div>
           </div>
         </div>
