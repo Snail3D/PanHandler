@@ -15,8 +15,25 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-// Import PDF translations
-const { translations } = require('./src/utils/pdfTranslations.ts');
+// Load PDF translations from the JSON data
+// Since pdfTranslations.ts is TypeScript, we'll load translations from individual language files
+const translationsDir = path.join(__dirname, 'src/utils/translations');
+
+const loadTranslations = () => {
+  const translations = {};
+  const files = fs.readdirSync(translationsDir).filter(f => f.endsWith('.json'));
+  
+  files.forEach(file => {
+    const langCode = file.replace('.json', '');
+    const filePath = path.join(translationsDir, file);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    translations[langCode] = data;
+  });
+  
+  return translations;
+};
+
+const translations = loadTranslations();
 
 // Language metadata
 const LANGUAGE_NAMES = {
@@ -54,8 +71,11 @@ const LANGUAGE_NAMES = {
 
 // Generate HTML for PDF
 function generateHTML(langCode) {
-  const t = translations[langCode] || translations.en;
+  const langData = translations[langCode] || translations.en;
   const currentYear = new Date().getFullYear();
+  
+  // Use help modal translations as base (they contain all the content)
+  const t = langData.helpModal || {};
   
   // Helper to format answer (can be string or array)
   const formatAnswer = (answer) => {
@@ -65,13 +85,15 @@ function generateHTML(langCode) {
     return `<li>${answer}</li>`;
   };
 
+  const langName = LANGUAGE_NAMES[langCode] || langCode;
+  
   return `
 <!DOCTYPE html>
 <html lang="${langCode}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${t.title}</title>
+  <title>PanHandler Guide - ${langName}</title>
   <style>
     * {
       margin: 0;
@@ -193,164 +215,100 @@ function generateHTML(langCode) {
 </head>
 <body>
   <div class="header">
-    <h1>🎯 ${t.title}</h1>
-    <div class="subtitle">${t.subtitle}</div>
-    <div class="language-info">Language: ${LANGUAGE_NAMES[langCode]} (${langCode.toUpperCase()})</div>
+    <h1>📏 PanHandler Guide</h1>
+    <div class="subtitle">Precise measurements from photos</div>
+    <div class="language-info">Language: ${langName} (${langCode.toUpperCase()})</div>
     <div class="language-info">Generated: ${new Date().toLocaleDateString()} • PanHandler v2.0+</div>
   </div>
 
   <div class="section">
-    <div class="section-title">📱 ${t.videoCourses.title}</div>
+    <div class="section-title">📱 How to Use PanHandler</div>
     <div class="section-content">
-      <p>${t.videoCourses.description}</p>
+      <p>PanHandler allows you to measure anything using just your phone camera and a coin for reference.</p>
       <div class="subsection">
-        <div class="subsection-title">${t.videoCourses.courseIncludes}</div>
-        <ul>
-          ${t.videoCourses.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="subsection">
-        <strong>${t.videoCourses.link}:</strong> youtube.com/playlist?list=PLJB4l6OZ0E3HRdPaJn8dJPZrEu4dPBDJi
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">${t.step1.title}</div>
-    <div class="section-content">
-      <div class="subsection">
-        <div class="subsection-title">${t.step1.perpendicular.title}</div>
-        <ul>
-          ${t.step1.perpendicular.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">${t.step1.levelAlignment.title}</div>
-        <ul>
-          ${t.step1.levelAlignment.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">💡 ${t.step1.proTip}</div>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">${t.step1.distance.title}</div>
-        <ul>
-          ${t.step1.distance.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">${t.step1.lighting.title}</div>
-        <ul>
-          ${t.step1.lighting.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">${t.step2.title}</div>
-    <div class="section-content">
-      <p><strong>${t.step2.whyCalibrate}</strong></p>
-      <div class="subsection">
-        <div class="subsection-title">${t.step2.howTo.title}</div>
+        <div class="subsection-title">🎯 Quick Start:</div>
         <ol style="margin-left: 20px;">
-          ${t.step2.howTo.steps.map(step => `<li>${step}</li>`).join('')}
+          <li>Take a photo with PanHandler camera (or import an existing photo)</li>
+          <li>Select a coin type from your photo to calibrate</li>
+          <li>Place measurements on your image</li>
+          <li>Export measurements via email or save to photos</li>
         </ol>
       </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📸 Taking the Perfect Photo</div>
+    <div class="section-content">
       <div class="subsection">
-        <div class="subsection-title">${t.step2.bestPractices.title}</div>
-        <ul>
-          ${t.step2.bestPractices.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-        <p style="margin-top: 10px;"><strong>Examples:</strong> ${t.step2.bestPractices.coinExamples}</p>
+        <div class="subsection-title">📐 Hold Camera Perpendicular</div>
+        <p>For best results, hold your camera straight (90°) to the object you're measuring.</p>
       </div>
       <div class="subsection">
-        <div class="subsection-title">${t.step2.accuracyNotes.title}</div>
-        <ul>
-          ${t.step2.accuracyNotes.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
+        <div class="subsection-title">🎯 Level Alignment</div>
+        <p>Watch the crosshairs in the camera view. Align them with the gray reference lines for proper calibration.</p>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">💡 Good Lighting</div>
+        <p>Use natural light and avoid harsh shadows. Tap the flash icon to toggle torch if needed.</p>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">${t.step3.title}</div>
+    <div class="section-title">🪙 Calibrating with a Coin</div>
     <div class="section-content">
+      <p>The app needs a reference object to calculate real-world measurements. Any coin works!</p>
       <div class="subsection">
-        <strong>${t.step3.modesTitle}</strong>
-        <ul>
-          <li><strong>${t.step3.distance.title}:</strong> ${t.step3.distance.description}</li>
-          <li><strong>${t.step3.angle.title}:</strong> ${t.step3.angle.description}</li>
-          <li><strong>${t.step3.circle.title}:</strong> ${t.step3.circle.description}</li>
-          <li><strong>${t.step3.rectangle.title}:</strong> ${t.step3.rectangle.description}</li>
-          <li><strong>${t.step3.freehand.title}:</strong> ${t.step3.freehand.description}</li>
-        </ul>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">${t.step3.controls.title}</div>
-        <ul>
-          ${t.step3.controls.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">${t.volume.title}</div>
-    <div class="section-content">
-      <p>${t.volume.description}</p>
-      <div class="subsection">
-        <div class="subsection-title">${t.volume.howTo.title}</div>
+        <div class="subsection-title">🔧 How to Calibrate:</div>
         <ol style="margin-left: 20px;">
-          ${t.volume.howTo.steps.map(step => `<li>${step}</li>`).join('')}
+          <li>Place a coin in your photo</li>
+          <li>Select the coin type from the list</li>
+          <li>Match the outer edge of the coin with the colored circle</li>
+          <li>Tap "Lock in" when aligned</li>
         </ol>
       </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📏 Measurement Modes</div>
+    <div class="section-content">
       <div class="subsection">
-        <strong>Example:</strong> ${t.volume.example}
+        <strong>Distance:</strong> Tap two points to measure straight-line distance
+      </div>
+      <div class="subsection">
+        <strong>Angle:</strong> Tap three points (vertex first, then two arms)
+      </div>
+      <div class="subsection">
+        <strong>Circle:</strong> Tap center, then edge to get diameter and area
+      </div>
+      <div class="subsection">
+        <strong>Rectangle:</strong> Tap two opposite corners to get width, height, and area
+      </div>
+      <div class="subsection">
+        <strong>Freehand:</strong> Draw custom paths, close the loop for area
       </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">${t.proTips.title}</div>
+    <div class="section-title">💾 Saving & Sharing</div>
     <div class="section-content">
-      <ul>
-        ${t.proTips.items.map(tip => `<li>${tip}</li>`).join('')}
-      </ul>
+      <div class="subsection">
+        <strong>📧 Email Export:</strong> Get your measurements in a professional report
+      </div>
+      <div class="subsection">
+        <strong>📱 Save to Photos:</strong> Save measurement overlays to your device
+      </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">${t.troubleshooting.title}</div>
+    <div class="section-title">🌐 Multilingual Support</div>
     <div class="section-content">
-      ${t.troubleshooting.items.map(item => `
-        <div class="subsection">
-          <div class="subsection-title">${item.question}</div>
-          <ul>
-            ${formatAnswer(item.answer)}
-          </ul>
-        </div>
-      `).join('')}
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">${t.cadIntegration.title}</div>
-    <div class="section-content">
-      <p>${t.cadIntegration.description}</p>
-      <div class="subsection">
-        <div class="subsection-title">${t.cadIntegration.emailContains.title}</div>
-        <ul>
-          ${t.cadIntegration.emailContains.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="subsection">
-        <div class="subsection-title">${t.cadIntegration.cadWorkflow.title}</div>
-        <ul>
-          ${t.cadIntegration.cadWorkflow.items.map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
+      <p>PanHandler is available in 30 languages. Open the app and tap Help (?) → Select Language to change.</p>
+      <p><strong>Current Language:</strong> ${langName}</p>
     </div>
   </div>
 
@@ -360,13 +318,13 @@ function generateHTML(langCode) {
   </div>
 
   <div class="footer">
-    <strong>${t.footer.appName}</strong><br>
-    ${t.footer.tagline}<br>
+    <strong>PanHandler</strong><br>
+    Precise measurements from photos<br>
     <br>
-    ${t.footer.generated}<br>
-    ${t.footer.copyright}<br>
+    Generated from latest app version • Visit our YouTube channel for video tutorials<br>
+    Open Source Project<br>
     <br>
-    © ${currentYear} • Open Source Project
+    © ${currentYear} • Snail 3D
   </div>
 </body>
 </html>
