@@ -2468,7 +2468,7 @@ Thank you for helping us improve PanHandler!
                   textAlign: 'center',
                   marginBottom: 12,
                 }}>
-                  🌍 Languages
+                  {`🌍 ${t('helpModal.languagesTitle') || 'Languages'}`}
                 </Text>
                 <Text style={{
                   fontSize: 12,
