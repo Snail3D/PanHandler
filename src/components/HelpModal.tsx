@@ -1523,12 +1523,12 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 14 }}>
-                    Measure real-world distances on maps, blueprints, and scaled drawings using coin calibration + map scale.
+                    {t('helpModal.mapModeDesc')}
                   </Text>
 
                   {/* Calibration Methods */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 10 }}>
-                    🎯 Two Ways to Calibrate
+                    🎯 {t('helpModal.twoWaysCalibrate')}
                   </Text>
 
                   {/* Coin Reference + Map Scale */}
@@ -1541,10 +1541,10 @@ Thank you for helping us improve PanHandler!
                     borderColor: 'rgba(0,102,255,0.2)',
                   }}>
                     <Text style={{ fontSize: 14, fontWeight: '600', color: '#0066FF', marginBottom: 6 }}>
-                      🪙 Coin Reference + Map Scale
+                      🪙 {t('helpModal.coinPlusMapScale')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19, marginBottom: 4 }}>
-                      Best for: Road maps, topo maps, property maps with verbal scale
+                      {t('helpModal.bestForRoadMaps')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       → Calibrate with coin first{'\n'}
@@ -1564,10 +1564,10 @@ Thank you for helping us improve PanHandler!
                     borderColor: 'rgba(0,102,255,0.2)',
                   }}>
                     <Text style={{ fontSize: 14, fontWeight: '600', color: '#0066FF', marginBottom: 6 }}>
-                      📐 Known Scale (Blueprints)
+                      📐 {t('helpModal.knownScaleBlueprints')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#4A4A4A', lineHeight: 19, marginBottom: 4 }}>
-                      Best for: Drone photos, blueprints, floor plans, engineering drawings
+                      {t('helpModal.bestForDroneBlueprints')}
                     </Text>
                     <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
                       → Find the scale bar on your drawing{'\n'}
@@ -1579,7 +1579,7 @@ Thank you for helping us improve PanHandler!
 
                   {/* Tools in Map Mode */}
                   <Text style={{ fontSize: 14, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
-                    🛠️ Tools in Map Mode
+                    🛠️ {t('helpModal.toolsInMapMode')}
                   </Text>
                   <View style={{ marginLeft: 12, marginBottom: 14 }}>
                     <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 6 }}>

@@ -319,7 +319,14 @@
     "appRestart": "App Restart",
     "stillHavingIssues": "Still having issues? Force-quit the app (swipe up from app switcher) and reopen. If problems persist, delete and reinstall the app for a fresh start.",
     "sendBugReport": "Send Bug Report",
-    "havingTrouble": "Having trouble? Our support team is here to help!"
+    "havingTrouble": "Having trouble? Our support team is here to help!",
+    "mapModeDesc": "Measure real-world distances on maps, blueprints, and scaled drawings using coin calibration + map scale.",
+    "twoWaysCalibrate": "Two Ways to Calibrate",
+    "coinPlusMapScale": "Coin Reference + Map Scale",
+    "bestForRoadMaps": "Best for: Road maps, topo maps, property maps with verbal scale",
+    "knownScaleBlueprints": "Known Scale (Blueprints)",
+    "bestForDroneBlueprints": "Best for: Drone photos, blueprints, floor plans, engineering drawings",
+    "toolsInMapMode": "Tools in Map Mode"
   },
   
   "battlingBots": {
