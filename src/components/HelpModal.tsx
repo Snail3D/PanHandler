@@ -494,7 +494,7 @@ Thank you for helping us improve PanHandler!
                   textAlign: 'center',
                   marginBottom: 12 
                 }}>
-                  📄 PDF Guide Languages
+                  {`📄 ${t('helpModal.pdfGuideLanguages')}`}
                 </Text>
                 <View style={{ 
                   flexDirection: 'row', 
@@ -541,7 +541,7 @@ Thank you for helping us improve PanHandler!
                   marginTop: 8,
                   fontStyle: 'italic'
                 }}>
-                  More languages coming soon...
+                  {t('helpModal.moreLanguagesSoon')}
                 </Text>
               </View>
               
