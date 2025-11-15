@@ -1859,7 +1859,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="phone-portrait-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to our servers
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to us
                       </Text>
                     </View>
                     
@@ -1875,7 +1875,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="eye-off-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics on your photos, files, or measurements
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics about you, your photos, files, or measurements
                       </Text>
                     </View>
                     
@@ -1944,16 +1944,33 @@ Thank you for helping us improve PanHandler!
                   </View>
                   
                   <View style={{
-                    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
                     borderRadius: 12,
                     padding: 12,
                     borderLeftWidth: 3,
-                    borderLeftColor: '#FF9500',
+                    borderLeftColor: '#666',
                   }}>
-                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 10 }}>
                       <Text style={{ fontWeight: '700' }}>Need to enable permissions?</Text>{'\n'}
-                      Go to Settings → PanHandler → Enable Camera & Photos
+                      Tap the button below to open PanHandler settings
                     </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        Linking.openSettings();
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.1)',
+                        borderRadius: 8,
+                        paddingVertical: 10,
+                        paddingHorizontal: 14,
+                        alignItems: 'center',
+                      })}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#1C1C1E' }}>
+                        Open App Settings
+                      </Text>
+                    </Pressable>
                   </View>
                 </View>
               </View>
