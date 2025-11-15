@@ -1349,11 +1349,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="cube" size={20} color="#5856D6" />
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#5856D6', marginLeft: 6 }}>
-                      Works with Any CAD Software
+                      {t('helpModal.worksWithAnyCAD')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 20 }}>
-                    Import photos as canvases in any CAD software. Scale values are included on every export for perfect alignment.
+                    {t('helpModal.importPhotosAsCanvases')}
                   </Text>
                 </View>
               </ExpandableSection>
