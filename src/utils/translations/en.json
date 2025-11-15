@@ -38,12 +38,17 @@
   "cameraScreen": {
     "lookDown": "Look Down",
     "holdSteady": "Hold Steady",
+    "holdStill": "Hold still",
     "capturing": "Capturing...",
     "almostLevel": "Almost Level",
     "perfectLevel": "Perfect! Hold Steady",
     "tooMuchMovement": "Too Much Movement",
     "alignCrosshairs": "Align Crosshairs",
-    "autoCapture": "Auto-Capture Ready"
+    "autoCapture": "Auto-Capture Ready",
+    "tiltBackward": "Tilt backward",
+    "tiltForward": "Tilt forward",
+    "tiltLeft": "Tilt left",
+    "tiltRight": "Tilt right"
   },
   
   "coinCalibration": {
