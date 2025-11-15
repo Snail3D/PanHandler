@@ -6,6 +6,8 @@ import * as Sharing from 'expo-sharing';
  * Includes all sections, styling, and QR codes for external resources
  */
 export async function generatePdfGuide(): Promise<void> {
+  const currentYear = new Date().getFullYear();
+  
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -207,10 +209,9 @@ export async function generatePdfGuide(): Promise<void> {
             
             <div class="subsection">
               <p><strong>🎯 Level Alignment</strong></p>
-              <div class="bullet-point">• Watch the <strong>red crosshairs</strong> - align with gray reference lines</div>
+              <div class="bullet-point">• Watch the <strong>crosshairs</strong> - align with gray reference lines</div>
               <div class="bullet-point">• <strong>Horizontal crosshair</strong>: Shows if camera is tilted (pitch)</div>
               <div class="bullet-point">• <strong>Vertical crosshair</strong>: Shows if camera is rotated (roll)</div>
-              <div class="bullet-point">• <strong>Bubble indicator</strong>: Shows combined tilt status</div>
             </div>
             
             <div class="tip-box">
@@ -531,7 +532,7 @@ export async function generatePdfGuide(): Promise<void> {
         <div class="footer">
           <p><strong>PanHandler</strong> - Precise measurements from photos</p>
           <p style="margin-top: 8px;">Generated from latest app version • Visit our YouTube channel for video tutorials</p>
-          <p style="margin-top: 8px;">© 2024 PanHandler • Open Source Project</p>
+          <p style="margin-top: 8px;">© ${currentYear} PanHandler • Open Source Project</p>
         </div>
       </body>
     </html>
