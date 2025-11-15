@@ -134,8 +134,6 @@ const ExpandableSection = ({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setExpanded(newExpanded);
           }}
-          delayPressIn={0}
-          delayPressOut={0}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{
             flexDirection: 'row',
@@ -438,8 +436,6 @@ Thank you for helping us improve PanHandler!
                       closeLongPressedRef.current = false;
                     }, 100);
                   }}
-                  delayPressIn={0}
-                  delayPressOut={0}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   style={{
                     width: scaleSize(44),
