@@ -29,6 +29,8 @@ import BattlingBotsModal from './BattlingBotsModal';
 import { getRandomQuote } from '../utils/makerQuotes';
 import { getRandomChuckNorrisJoke } from '../utils/chuckNorrisJokes';
 import { useTranslation } from 'react-i18next';
+import { getCurrentRTL } from '../utils/i18n';
+import { formatNumber, formatMeasurementValue } from '../utils/i18nNumbers';
 import SnailIcon from './SnailIcon';
 import {
   scaleFontSize,
@@ -143,7 +145,11 @@ export default function DimensionOverlay({
   skipToAerialMode = false,
 }: DimensionOverlayProps) {
   // Initialize i18n translation hook
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // Check if current language is RTL
+  const isRTL = getCurrentRTL();
+  
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
   
