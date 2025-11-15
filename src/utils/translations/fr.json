@@ -141,7 +141,11 @@
     "youtubeCourseTip": "📹 PanHandler YouTube Course Here!",
     "shutterButtonTip": "💡 Holding the shutter button helps ensure your photo is sharp and perfectly level!",
     "proTipLabel": "Pro Tip",
-    "emailError": "Could not open email. Please email us at snailmail3d@gmail.com"
+    "emailError": "Could not open email. Please email us at snailmail3d@gmail.com",
+    "3DPrintedAidsTitle": "3D Printed Aids",
+    "viewOnMakerWorld": "View on MakerWorld",
+    "downloadAnd3DPrint": "Download and 3D print for perfect reference photos",
+    "sendBugReportButton": "Send Bug Report"
   },
   "battlingBots": {
     "title": "Dans les coulisses",

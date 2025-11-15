@@ -1770,7 +1770,7 @@ Thank you for helping us improve PanHandler!
                         fontWeight: '700',
                         color: '#1C1C1E',
                       }}>
-                        🐛 Send Bug Report
+                        🐛 {t('helpModal.sendBugReportButton')}
                       </Text>
                     </Pressable>
                     
@@ -1816,7 +1816,7 @@ Thank you for helping us improve PanHandler!
 
               {/* 3D Printed Aids Section */}
               <ExpandableSection
-                title="🖨️ 3D Printed Aids"
+                title={`🖨️ ${t('helpModal.3DPrintedAidsTitle')}`}
                 icon="image"
                 color="#666"
                 delay={700}
@@ -1844,11 +1844,11 @@ Thank you for helping us improve PanHandler!
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Ionicons name="open-outline" size={18} color="#666" />
                     <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
-                      View on MakerWorld
+                      {t('helpModal.viewOnMakerWorld')}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                    Download and 3D print for perfect reference photos
+                    {t('helpModal.downloadAnd3DPrint')}
                   </Text>
                 </Pressable>
 
