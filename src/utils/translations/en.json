@@ -83,7 +83,28 @@
     "measurements": "Measurements",
     "newPhoto": "New Photo",
     "mapMode": "Map Mode",
-    "blueprintMode": "Blueprint Mode"
+    "blueprintMode": "Blueprint Mode",
+    "area": "A",
+    "volume": "V",
+    "perimeter": "P",
+    "diameter": "Ø"
+  },
+  
+  "units": {
+    "thousand": "K",
+    "million": "M",
+    "billion": "B",
+    "millimeter": "mm",
+    "centimeter": "cm",
+    "meter": "m",
+    "kilometer": "km",
+    "inch": "in",
+    "foot": "ft",
+    "mile": "mi",
+    "squareMeter": "m²",
+    "squareFoot": "ft²",
+    "cubicMeter": "m³",
+    "cubicFoot": "ft³"
   },
   
   "modals": {
@@ -113,6 +134,25 @@
       "title": "Name Your Measurement",
       "placeholder": "e.g., Arduino Case",
       "send": "Send Email",
+      "cancel": "Cancel"
+    },
+    "emailSuccess": {
+      "title": "Email Ready!",
+      "message": "Your measurement report has been prepared",
+      "ok": "OK"
+    },
+    "saveSuccess": {
+      "title": "Saved!",
+      "message": "Images saved to Photos",
+      "ok": "OK"
+    },
+    "labelEditModal": {
+      "title": "Edit Measurement",
+      "labelPlaceholder": "Enter measurement name",
+      "depthLabel": "Depth (optional)",
+      "depthPlaceholder": "Enter depth",
+      "unit": "Unit",
+      "save": "Save",
       "cancel": "Cancel"
     },
     "photoTypeSelection": {
