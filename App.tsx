@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withDelay, withTiming, Easing } from "react-native-reanimated";
 import CameraScreen from "./src/screens/CameraScreen";
 import QuoteScreen from "./src/screens/QuoteScreen";
+import { enableFakeTouchSupport } from "./src/utils/fakeTouchSupport";
+
+// Enable fake touch support for macOS on app startup
+enableFakeTouchSupport();
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
