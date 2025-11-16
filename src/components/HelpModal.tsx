@@ -2277,14 +2277,17 @@ Thank you for helping us improve PanHandler!
                         elevation: 4,
                       })}
                     >
-                      <Text style={{
-                        color: '#1C1C1E',
-                        fontSize: 16,
-                        fontWeight: '700',
-                        textAlign: 'center',
-                      }}>
-                        Tap here to leave a review 🙏
-                      </Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
+                        <Text style={{
+                          color: '#1C1C1E',
+                          fontSize: 16,
+                          fontWeight: '700',
+                          textAlign: 'center',
+                        }}>
+                          Tap here to leave a review 🙏
+                        </Text>
+                        <Text style={{ fontSize: 14, letterSpacing: 2 }}>⭐⭐⭐⭐⭐</Text>
+                      </View>
                     </Pressable>
                    </View>
                 </View>
