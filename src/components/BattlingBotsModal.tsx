@@ -806,7 +806,7 @@ export default function BattlingBotsModal({
                         fontWeight: '800',
                         letterSpacing: 0.3,
                       }}>
-                        Buy Me a Coffee
+                        Buy 🐌 a Coffee
                       </Text>
                     </View>
                   </Pressable>
