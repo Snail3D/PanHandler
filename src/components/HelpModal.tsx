@@ -2293,6 +2293,65 @@ Thank you for helping us improve PanHandler!
                 </View>
               </View>
 
+              {/* Download PDF Guide Section */}
+              <View style={{ marginTop: 32, marginBottom: 24 }}>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  color: '#1C1C1E',
+                  textAlign: 'center',
+                  marginBottom: 16,
+                }}>
+                  📄 Download Guide
+                </Text>
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                      await generatePdfGuide();
+                    } catch (error) {
+                      console.error('Error generating PDF:', error);
+                    }
+                  }}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: pressed ? 'rgba(99, 126, 234, 0.15)' : 'rgba(99, 126, 234, 0.1)',
+                    borderRadius: 12,
+                    marginHorizontal: 24,
+                    borderWidth: 1,
+                    borderColor: 'rgba(99, 126, 234, 0.3)',
+                    shadowColor: '#667eea',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 4,
+                    elevation: 3,
+                  })}
+                >
+                  <Ionicons name="document-text" size={24} color="#667eea" />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: '#667eea',
+                  }}>
+                    Generate PDF Guide
+                  </Text>
+                </Pressable>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#8E8E93',
+                  textAlign: 'center',
+                  marginTop: 8,
+                }}>
+                  Create a shareable PDF guide with all measurement tips
+                </Text>
+              </View>
+
               {/* For the Nerds - GitHub Section */}
               <View style={{ marginTop: 32, marginBottom: 24 }}>
                 <Text style={{
