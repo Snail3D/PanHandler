@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "requireFullScreen": true,
-      "bundleIdentifier": "com.vibecode.panhandler-83ilg2",
+      "bundleIdentifier": "com.vibecode.copyofpanhandler-mt2qxl",
       "infoPlist": {
         "NSCameraUsageDescription": "PanHandler uses the camera to capture reference photos for measurements.",
         "NSPhotoLibraryUsageDescription": "PanHandler accesses your photo library to import photos for measurement.",
