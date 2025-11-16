@@ -2260,20 +2260,9 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        const appStoreId = '6754727828'; // PanHandler App Store ID
-                        const androidPackage = 'com.snail.panhandler';
-
-                        const storeUrl = Platform.OS === 'ios'
-                          ? `itms-apps://itunes.apple.com/app/id${appStoreId}?action=write-review`
-                          : `market://details?id=${androidPackage}`;
-
-                        Linking.openURL(storeUrl).catch(() => {
-                          // Fallback to web URLs if native store apps aren't available
-                          const webUrl = Platform.OS === 'ios'
-                            ? `https://apps.apple.com/app/id${appStoreId}?action=write-review`
-                            : `https://play.google.com/store/apps/details?id=${androidPackage}`;
-                          Linking.openURL(webUrl);
-                        });
+                        // Universal link works on all platforms
+                        const universalLink = 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review';
+                        Linking.openURL(universalLink);
                       }}
                       style={({ pressed }) => ({
                         paddingVertical: 14,
