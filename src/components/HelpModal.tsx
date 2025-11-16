@@ -109,7 +109,6 @@ const ExpandableSection = ({
     const maxHeight = heightValue.value * 2000;
     return {
       maxHeight: maxHeight,
-      opacity: heightValue.value,
       overflow: 'hidden',
     };
   });
@@ -470,9 +469,10 @@ Thank you for helping us improve PanHandler!
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: scalePadding(20) }}
                     showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={32} // 30fps - reduced from 16 for better performance
+                    scrollEventThrottle={16} // 60fps - higher priority for scroll responsiveness
                     scrollEnabled={true}
-                    nestedScrollEnabled={true}
+                    nestedScrollEnabled={false}
+                    keyboardShouldPersistTaps="handled"
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
@@ -2277,7 +2277,7 @@ Thank you for helping us improve PanHandler!
                 </View>
               </View>
 
-              {/* Generate PDF Guide Button */}
+              {/* Generate PDF Guide Button - Red to match New Photo button */}
               <Pressable
                 onPress={async () => {
                   try {
@@ -2295,11 +2295,11 @@ Thank you for helping us improve PanHandler!
                   gap: 10,
                   paddingVertical: 16,
                   paddingHorizontal: 28,
-                  backgroundColor: pressed ? '#667eea' : '#667eea',
+                  backgroundColor: pressed ? 'rgba(255, 59, 48, 0.95)' : 'rgba(255, 59, 48, 0.85)',
                   borderRadius: 14,
                   marginHorizontal: 20,
                   marginVertical: 12,
-                  shadowColor: '#667eea',
+                  shadowColor: '#FF3B30',
                   shadowOffset: { width: 0, height: 8 },
                   shadowOpacity: 0.3,
                   shadowRadius: 12,
@@ -2307,7 +2307,7 @@ Thank you for helping us improve PanHandler!
                   transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                 })}
               >
-                  <Ionicons name="document-text" size={24} color="white" />
+                  <Ionicons name="document-text" size={24} color="white" style={{ marginRight: 4 }} />
                   <Text style={{
                     fontSize: 16,
                     fontWeight: '600',
