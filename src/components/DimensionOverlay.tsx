@@ -7503,7 +7503,7 @@ export default function DimensionOverlay({
                       } else if (selected?.mode === 'rectangle') {
                         return '⬜ Selected Rectangle: Drag corners to resize • Drag edges to move';
                       } else if (selected?.mode === 'distance') {
-                        return '📏 Selected Line: Drag endpoints to adjust • Tap line to move';
+                        return '📏 Selected Line: Drag endpoints to adjust';
                       } else if (selected?.mode === 'angle') {
                         return isAzimuthMode
                           ? '🧭 Selected Azimuth: Drag points to adjust bearing'
@@ -7514,7 +7514,7 @@ export default function DimensionOverlay({
                       return '✏️ Tap any measurement to select';
                     })()
                   : measurements.length > 0
-                  ? '✏️ Edit Mode: Tap any measurement to select • Tap trash icon to delete'
+                  ? '✏️ Edit Mode: Tap Edit labels to rename and add volume. Tap line 4 times to delete'
                   : '👉👉👉 Swipe to Close Menu'
                 }
               </Text>
