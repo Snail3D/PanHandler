@@ -249,6 +249,7 @@ export async function generatePdfGuide(): Promise<void> {
         mimeType: 'application/pdf',
         dialogTitle: 'Share PanHandler Guide PDF',
         UTI: 'com.adobe.pdf',
+        filename: 'PanHandler Guide.pdf',
       });
     }
   } catch (error) {
