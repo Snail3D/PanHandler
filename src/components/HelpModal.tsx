@@ -2245,9 +2245,11 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        // Universal link works on all platforms
-                        const universalLink = 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review';
-                        Linking.openURL(universalLink);
+                        // Direct to correct store based on platform
+                        const storeLink = Platform.OS === 'ios'
+                          ? 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review'
+                          : 'https://play.google.com/store/apps/details?id=com.snail.panhandler';
+                        Linking.openURL(storeLink);
                       }}
                       style={({ pressed }) => ({
                         paddingVertical: 14,

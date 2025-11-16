@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, Modal, Pressable, Linking } from 'react-native';
+import { View, Text, Modal, Pressable, Linking, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import Animated, { 
@@ -162,14 +162,17 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
               </AnimatedPressable>
 
               {/* Maybe Later but Review Button */}
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  // Open the review link
-                  Linking.openURL('https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review');
-                  // Close the modal
-                  onClose();
-                }}
+                     <Pressable
+                       onPress={() => {
+                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                         // Direct to correct store based on platform
+                         const storeLink = Platform.OS === 'ios'
+                           ? 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review'
+                           : 'https://play.google.com/store/apps/details?id=com.snail.panhandler';
+                         Linking.openURL(storeLink);
+                         // Close the modal
+                         onClose();
+                       }}
                 style={{
                   backgroundColor: '#F2F2F7',
                   paddingVertical: 16,
