@@ -197,6 +197,22 @@ const PDF_CONTENT = `<!DOCTYPE html>
   </ul>
 </div>
 
+<div class="section">
+  <h3>🖨️ Get PanHandler Printed</h3>
+  <p>Love PanHandler? You can now get it printed as a physical guide and merchandise!</p>
+  <p><strong>MakerWorld Print:</strong> High-quality printed guides, t-shirts, and more featuring PanHandler</p>
+  <div style="text-align: center; margin: 16px 0;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.makerworld.com/en/users/vibecode" width="200" height="200" alt="MakerWorld QR Code" />
+  </div>
+  <p style="text-align: center; margin-top: 12px;">
+    <strong>Scan to visit:</strong><br>
+    www.makerworld.com/en/users/vibecode
+  </p>
+  <div class="tip-box">
+    Support the development of PanHandler and get awesome merchandise at the same time! 🎁
+  </div>
+</div>
+
 <div class="footer">
   <p><strong>PanHandler</strong> - Precise measurements from photos</p>
   <p>© 2025 PanHandler • Open Source Project</p>
