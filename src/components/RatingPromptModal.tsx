@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, Modal, Pressable } from 'react-native';
+import { View, Text, Modal, Pressable, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import Animated, { 
@@ -60,13 +60,17 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
       onRequestClose={onClose}
     >
       <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-        <View style={{ 
-          flex: 1, 
-          backgroundColor: 'rgba(0,0,0,0.3)', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          paddingHorizontal: 30
-        }}>
+        <Pressable 
+          onPress={onClose}
+          style={{ 
+            flex: 1, 
+            backgroundColor: 'rgba(0,0,0,0.3)', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            paddingHorizontal: 30
+          }}
+        >
+          <Pressable onPress={(e) => e.stopPropagation()}>
           <Animated.View style={[{
             width: '100%',
             maxWidth: 400,
@@ -157,9 +161,15 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
                 </View>
               </AnimatedPressable>
 
-              {/* Not Now Button */}
+              {/* Maybe Later but Review Button */}
               <Pressable
-                onPress={handleNotNow}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  // Open the review link
+                  Linking.openURL('https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review');
+                  // Close the modal
+                  onClose();
+                }}
                 style={{
                   backgroundColor: '#F2F2F7',
                   paddingVertical: 16,
@@ -172,14 +182,15 @@ export default function RatingPromptModal({ visible, onClose, onRate }: RatingPr
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
-                  Maybe Later
+                  Maybe Later, But I'll Leave A Review!
                 </Text>
               </Pressable>
             </View>
               </View>
             </BlurView>
           </Animated.View>
-        </View>
+          </Pressable>
+        </Pressable>
       </BlurView>
     </Modal>
   );
