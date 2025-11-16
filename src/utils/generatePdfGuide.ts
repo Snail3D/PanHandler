@@ -102,6 +102,19 @@ const PDF_CONTENT = `<!DOCTYPE html>
   <p>Complete Reference for Precise Measurements from Photos</p>
 </div>
 
+<div style="display: flex; justify-content: space-around; margin: 30px 0; padding: 20px; background: #f9f9f9; border-radius: 12px;">
+  <div style="text-align: center;">
+    <strong style="display: block; margin-bottom: 8px;">📱 iPhone & iPad</strong>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://apps.apple.com/us/app/panhandler/id6754727828" width="150" height="150" alt="App Store QR" style="border-radius: 8px;" />
+    <div style="margin-top: 8px; font-size: 12px;">App Store</div>
+  </div>
+  <div style="text-align: center;">
+    <strong style="display: block; margin-bottom: 8px;">💻 Open Source</strong>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/Snail3D/PanHandler" width="150" height="150" alt="GitHub QR" style="border-radius: 8px;" />
+    <div style="margin-top: 8px; font-size: 12px;">GitHub Repository</div>
+  </div>
+</div>
+
 <div class="section">
   <h3><span class="step-number">1</span>Take a Perfect Photo</h3>
   <p><strong>Hold camera perpendicular (90°)</strong></p>
