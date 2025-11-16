@@ -1691,7 +1691,7 @@ export default function CameraScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
+          <TouchOverlayFingerprints color={crosshairColor.main} enabled={!showHelpModal}>
             <View style={{ flex: 1 }}>
               {device ? (
                 <Camera 
