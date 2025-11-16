@@ -168,7 +168,7 @@ const ExpandableSection = ({
         </Pressable>
 
         {/* Content - Separate animated container that doesn't interfere with header touches */}
-        <AnimatedView style={contentAnimatedStyle} pointerEvents={expanded ? 'auto' : 'none'}>
+        <AnimatedView style={contentAnimatedStyle} pointerEvents="box-none">
           <View style={{ 
             paddingHorizontal: scalePadding(18), 
             paddingBottom: scalePadding(18),
