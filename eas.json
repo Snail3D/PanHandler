@@ -8,7 +8,10 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "env": {
@@ -26,7 +29,7 @@
       },
       "cache": {
         "disabled": true,
-        "customPaths": ["patches"]
+        "paths": ["patches"]
       }
     },
     "production-clean": {
