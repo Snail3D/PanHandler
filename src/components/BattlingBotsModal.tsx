@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, View, Text, Pressable, ScrollView, Linking } from 'react-native';
+import { Modal, View, Text, Pressable, ScrollView, Linking, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -809,6 +809,36 @@ export default function BattlingBotsModal({
                         Buy Me a Coffee
                       </Text>
                     </View>
+                  </Pressable>
+
+                  {/* Review Button */}
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      // Direct to correct store based on platform
+                      const storeLink = Platform.OS === 'ios'
+                        ? 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review'
+                        : 'https://play.google.com/store/apps/details?id=com.snail.panhandler';
+                      Linking.openURL(storeLink);
+                      onClose();
+                    }}
+                    style={({ pressed }) => ({
+                      backgroundColor: pressed ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.08)',
+                      paddingVertical: scalePadding(16),
+                      borderRadius: scaleBorderRadius(14),
+                      borderWidth: scaleSize(1),
+                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                      marginBottom: scaleMargin(12),
+                    })}
+                  >
+                    <Text style={{
+                      color: '#3B82F6',
+                      fontSize: scaleFontSize(17),
+                      fontWeight: '600',
+                      textAlign: 'center',
+                    }}>
+                      Tap here to leave a review 🙏
+                    </Text>
                   </Pressable>
 
                   {/* Close Button */}
