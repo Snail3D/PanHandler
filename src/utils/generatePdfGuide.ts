@@ -109,9 +109,9 @@ const PDF_CONTENT = `<!DOCTYPE html>
     <div style="margin-top: 8px; font-size: 12px;">App Store</div>
   </div>
   <div style="text-align: center;">
-    <strong style="display: block; margin-bottom: 8px;">💻 Open Source</strong>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://github.com/Snail3D/PanHandler" width="150" height="150" alt="GitHub QR" style="border-radius: 8px;" />
-    <div style="margin-top: 8px; font-size: 12px;">GitHub Repository</div>
+    <strong style="display: block; margin-bottom: 8px;">🤖 Android</strong>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://play.google.com/store/apps/details?id=com.snail.panhandler" width="150" height="150" alt="Play Store QR" style="border-radius: 8px;" />
+    <div style="margin-top: 8px; font-size: 12px;">Google Play Store</div>
   </div>
 </div>
 
