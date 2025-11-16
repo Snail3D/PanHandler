@@ -2289,6 +2289,12 @@ Thank you for helping us improve PanHandler!
                   }
                 }}
                 style={({ pressed }) => ({
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  paddingVertical: 16,
+                  paddingHorizontal: 28,
                   backgroundColor: pressed ? 'rgba(255, 59, 48, 0.95)' : 'rgba(255, 59, 48, 0.85)',
                   borderRadius: 14,
                   marginHorizontal: 20,
@@ -2301,23 +2307,14 @@ Thank you for helping us improve PanHandler!
                   transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
                 })}
               >
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  paddingVertical: 16,
-                  paddingHorizontal: 28,
+                <Ionicons name="document-text" size={24} color="white" />
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: 'white',
                 }}>
-                  <Ionicons name="document-text" size={24} color="white" />
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: 'white',
-                  }}>
-                    Generate PDF Guide
-                  </Text>
-                </View>
+                  Generate PDF Guide
+                </Text>
               </Pressable>
 
               {/* For the Nerds - GitHub Section */}
