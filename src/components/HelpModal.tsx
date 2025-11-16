@@ -153,11 +153,12 @@ const ExpandableSection = ({
           }}
         >
           <Text style={{
-            fontSize: scaleFontSize(17),
+            fontSize: scaleFontSize(14.5),
             fontWeight: '700',
             color: '#1C1C1E',
             textAlign: 'center',
             letterSpacing: -0.3,
+            flex: 1,
           }}>
             {title}
           </Text>
