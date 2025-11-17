@@ -2338,12 +2338,6 @@ export default function CameraScreen() {
           sessionColor={crosshairColor}
         />
 
-        {/* Help Modal - accessible from camera mode */}
-        <HelpModal
-          visible={showHelpModal}
-          onClose={() => setShowHelpModal(false)}
-        />
-
       </View>
     );
   }
@@ -2505,6 +2499,12 @@ export default function CameraScreen() {
           />
         </>
       )}
+
+      {/* Help Modal - accessible from measurement and calibration modes */}
+      <HelpModal
+        visible={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
 
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
