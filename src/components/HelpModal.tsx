@@ -2316,14 +2316,14 @@ Thank you for helping us improve PanHandler!
                       console.error('Error generating PDF:', error);
                     }
                   }}
-                  style={({ pressed }) => ({
+                  style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 10,
                     paddingVertical: 14,
                     paddingHorizontal: 20,
-                    backgroundColor: pressed ? 'rgba(255, 59, 48, 0.95)' : 'rgba(255, 59, 48, 0.85)',
+                    backgroundColor: 'rgba(255, 59, 48, 0.85)',
                     borderRadius: 12,
                     marginHorizontal: 24,
                     marginTop: 12,
@@ -2332,7 +2332,7 @@ Thank you for helping us improve PanHandler!
                     shadowOpacity: 0.2,
                     shadowRadius: 4,
                     elevation: 4,
-                  })}
+                  }}
                 >
                   <Ionicons name="document-text" size={24} color="white" />
                   <Text style={{
