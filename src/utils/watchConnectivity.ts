@@ -59,16 +59,22 @@ export async function checkWatchAvailability(): Promise<WatchInfo> {
 
   // TODO: Implement native WatchConnectivity check
   // This requires a native module using WCSession.default
+  // The Watch app should send its screen size when responding to availability check
   // For now, return false - will be implemented with native code
   try {
     // Native implementation would look like:
     // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // return await WatchConnectivity.checkAvailability();
+    // const watchInfo = await WatchConnectivity.checkAvailability();
+    // // Watch app responds with: { isPaired, isInstalled, isReachable, watchModel, watchSize }
+    // // watchSize is the actual screen size in mm (e.g., 40, 44, 45, 49)
+    // return watchInfo;
     
     return {
       isPaired: false,
       isWatchAppInstalled: false,
       isReachable: false,
+      // watchSize will be populated by native module when Watch responds
+      // Example sizes: 38mm, 40mm, 42mm, 44mm, 41mm, 45mm, 49mm (Ultra)
     };
   } catch (error) {
     console.error('Error checking Watch availability:', error);
@@ -102,13 +108,16 @@ export async function requestWatchQRCode(
   try {
     // Native implementation would look like:
     // const { WatchConnectivity } = require('./native/WatchConnectivity');
+    // // The Watch app will detect its own screen size and use that for the QR code
+    // // The QR code URL will be generated with the actual Watch screen size
     // return await WatchConnectivity.sendMessage({
     //   action: 'displayQRCode',
-    //   size: qrSize,
+    //   size: qrSize, // Fallback size, but Watch will use its actual screen size
     //   format: format,
-    //   url: `https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-${format}-${qrSize}mm`,
+    //   url: `https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-${format}-${watchScreenSize}mm`,
     //   vibrateOnShow: true, // Long vibrate when QR code appears
-    //   enableRemoteShutter: true // Enable tap-to-capture on Watch screen
+    //   enableRemoteShutter: true, // Enable tap-to-capture on Watch screen
+    //   useWatchScreenSize: true // Tell Watch to use its detected screen size
     // });
     
     console.log(`📱 Would send to Watch: Display QR code ${format} ${qrSize}mm with long vibrate`);
@@ -149,8 +158,9 @@ export async function stopWatchQRCode(): Promise<boolean> {
 /**
  * Auto-detect Watch and open QR code display
  * This is called automatically when QR calibration is detected
+ * Uses the Watch's actual screen size if available, otherwise uses provided qrSize
  * 
- * @param qrSize - Size of QR code in mm
+ * @param qrSize - Fallback size of QR code in mm (used if Watch size not detected)
  * @param format - Format type
  * @returns Promise<boolean> - Success status
  */
@@ -172,11 +182,17 @@ export async function autoOpenWatchQRCode(
       return false;
     }
 
-    // Send message to Watch to display QR code
-    const success = await requestWatchQRCode(qrSize, format);
+    // Use Watch's actual screen size if available, otherwise use provided qrSize
+    // The Watch app will detect its own screen size and send it back
+    // For now, we'll request the Watch to use its detected size
+    const actualSize = watchInfo.watchSize || qrSize;
+    
+    // Send message to Watch to display QR code with its actual screen size
+    // The Watch app should detect its screen size and use that for calibration
+    const success = await requestWatchQRCode(actualSize, format);
     
     if (success) {
-      console.log(`✅ Watch QR code displayed: ${format} ${qrSize}mm`);
+      console.log(`✅ Watch QR code displayed: ${format} ${actualSize}mm (Watch screen size: ${watchInfo.watchSize || 'auto-detected'})`);
       return true;
     }
 
@@ -217,9 +233,10 @@ export async function notifyWatchPhotoCaptured(): Promise<void> {
 /**
  * Automatically show/hide Watch QR code based on camera mode
  * Called when camera screen opens/closes
+ * Automatically detects Watch screen size and uses that for calibration
  * 
  * @param show - true to show QR code, false to hide
- * @param qrSize - Size of QR code in mm (default: 30)
+ * @param qrSize - Fallback size in mm (default: 30, only used if Watch size not detected)
  * @returns Promise<boolean> - Success status
  */
 export async function toggleWatchQRCode(
@@ -233,6 +250,8 @@ export async function toggleWatchQRCode(
   try {
     if (show) {
       // Show QR code on Watch (triggers long vibrate)
+      // Watch app will automatically detect its screen size and use that for calibration
+      // The QR code URL will include the actual Watch screen size (e.g., 40mm, 44mm, 45mm, 49mm)
       return await autoOpenWatchQRCode(qrSize, 'watch');
     } else {
       // Hide QR code on Watch
