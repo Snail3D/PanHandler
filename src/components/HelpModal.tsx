@@ -538,34 +538,45 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
 
-                  {/* PDF Guide Link */}
+                  {/* PDF Guide Button */}
                   <Pressable
                     onPress={async () => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       try {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        // Generate PDF guide
                         const { generatePdfGuide } = await import('../utils/generatePdfGuide');
                         await generatePdfGuide();
                       } catch (error) {
                         console.error('Error generating PDF:', error);
+                        showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
                       }
                     }}
-                    style={({ pressed }) => ({
-                      marginTop: 16,
-                      paddingVertical: 10,
-                      paddingHorizontal: 12,
-                      backgroundColor: pressed ? 'rgba(99, 126, 234, 0.15)' : 'rgba(99, 126, 234, 0.08)',
-                      borderRadius: 8,
+                    style={{
+                      flexDirection: 'row',
                       alignItems: 'center',
-                    })}
+                      justifyContent: 'center',
+                      gap: 10,
+                      paddingVertical: 14,
+                      paddingHorizontal: 20,
+                      backgroundColor: 'rgba(255, 59, 48, 0.85)',
+                      borderRadius: 12,
+                      marginTop: 16,
+                      shadowColor: '#FF3B30',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 4,
+                      elevation: 4,
+                    }}
                   >
+                    <Text style={{ fontSize: 20 }}>📄</Text>
                     <Text style={{
-                      fontSize: 13,
-                      color: '#667eea',
+                      fontSize: 16,
                       fontWeight: '600',
-                      textDecorationLine: 'underline',
+                      color: 'white',
                     }}>
-                      📄 Or download our PDF guide
+                      PDF Guide and QR codes
                     </Text>
+                    <Text style={{ fontSize: 20 }}>📱</Text>
                   </Pressable>
                 </View>
               </ExpandableSection>
