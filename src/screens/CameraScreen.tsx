@@ -1040,7 +1040,7 @@ export default function CameraScreen() {
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
 
-    if (mode === 'camera') {
+    if (mode === 'camera' && !showHelpModal) {
       __DEV__ && console.log('📷 Camera mode initialized, setting up fade-in');
       
       // Reset states immediately
@@ -1063,7 +1063,7 @@ export default function CameraScreen() {
         __DEV__ && console.log('📷 Camera is ready for capture');
       }, 100)); // Brief delay for camera to initialize
     } else {
-      // Not in camera mode, camera not ready
+      // Not in camera mode or modal is open, camera not ready
       setIsCameraReady(false);
       // PERFORMANCE FIX: Stop DeviceMotion sensors immediately when leaving camera
       // This prevents 60fps sensor updates during transitions, reducing CPU load
