@@ -2417,6 +2417,7 @@ export default function CameraScreen() {
                     }}
                   />
                 {/* Measurement overlay needs to be sibling to image for capture */}
+                <View pointerEvents={showHelpModal ? 'none' : 'auto'} style={{ flex: 1, position: 'absolute', width: '100%', height: '100%' }}>
                 <DimensionOverlay 
                   zoomScale={measurementZoom.scale}
                   zoomTranslateX={measurementZoom.translateX}
@@ -2485,6 +2486,7 @@ export default function CameraScreen() {
                     }, 300); // Wait for black fade to complete
                   }}
                 />
+                </View>
               </View>
             </View>
           )}
