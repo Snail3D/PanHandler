@@ -348,8 +348,6 @@ Thank you for helping us improve PanHandler!
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
-      presentationStyle="overFullScreen"
-      statusBarTranslucent={true}
     >
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
@@ -453,19 +451,13 @@ Thank you for helping us improve PanHandler!
               >
                   <ScrollView
                     style={{ flex: 1 }}
-                    contentContainerStyle={{ 
-                      padding: scalePadding(20), 
-                      paddingBottom: scalePadding(40),
-                      flexGrow: 1 
-                    }}
+                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
                     showsVerticalScrollIndicator={true}
-                    scrollEventThrottle={32}
+                    scrollEventThrottle={16}
                     scrollEnabled={true}
-                    nestedScrollEnabled={false}
+                    nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
-                    bounces={true}
-                    alwaysBounceVertical={true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
