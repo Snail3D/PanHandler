@@ -170,6 +170,14 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
+  
+  // Force re-render when modal becomes visible
+  const [forceRender, setForceRender] = useState(0);
+  useEffect(() => {
+    if (visible) {
+      setForceRender(prev => prev + 1);
+    }
+  }, [visible]);
 
   // Track if close button was long-pressed to prevent modal closing
   const closeLongPressedRef = useRef(false);
@@ -343,10 +351,13 @@ Thank you for helping us improve PanHandler!
   return (
     <>
     <Modal
+      key={forceRender}
       visible={visible}
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
+      presentationStyle="overFullScreen"
+      statusBarTranslucent={true}
     >
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
@@ -450,13 +461,19 @@ Thank you for helping us improve PanHandler!
               >
                   <ScrollView
                     style={{ flex: 1 }}
-                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
+                    contentContainerStyle={{ 
+                      padding: scalePadding(20), 
+                      paddingBottom: scalePadding(40),
+                      flexGrow: 1 
+                    }}
                     showsVerticalScrollIndicator={true}
                     scrollEventThrottle={32}
                     scrollEnabled={true}
                     nestedScrollEnabled={false}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
+                    bounces={true}
+                    alwaysBounceVertical={true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
