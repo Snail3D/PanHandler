@@ -2429,6 +2429,86 @@ Thank you for helping us improve PanHandler!
               </View>
             </View>
 
+            {/* Apple Watch App Install Section - iOS Only */}
+            {Platform.OS === 'ios' && (
+              <View
+                style={{
+                  paddingVertical: 20,
+                  paddingHorizontal: 24,
+                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                  borderTopWidth: 1,
+                  borderTopColor: 'rgba(0,0,0,0.08)',
+                }}
+              >
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: '#1C1C1E',
+                  marginBottom: 12,
+                  textAlign: 'center',
+                }}>
+                  ⌚ Apple Watch App
+                </Text>
+                <Text style={{
+                  fontSize: 14,
+                  color: '#3C3C43',
+                  lineHeight: 20,
+                  marginBottom: 16,
+                  textAlign: 'center',
+                }}>
+                  Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration!
+                </Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#8E8E93',
+                  lineHeight: 18,
+                  marginBottom: 16,
+                  textAlign: 'center',
+                }}>
+                  <Text style={{ fontWeight: '600' }}>How to install:</Text>{'\n'}
+                  1. Open the Watch app on your iPhone{'\n'}
+                  2. Find "PanHandler" in the list{'\n'}
+                  3. Tap "Install"{'\n'}
+                  4. The app will sync to your Apple Watch
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    // Open Watch app on iPhone (when watch app is available)
+                    // TODO: Update with actual Watch App Store URL when watch app is published
+                    Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
+                      showAlert('Error', 'Could not open Watch App Store', 'error');
+                    });
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                    borderRadius: 12,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>⌚</Text>
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'white',
+                  }}>
+                    Open Watch App Store
+                  </Text>
+                  <Text style={{ fontSize: 20 }}>⌚</Text>
+                </Pressable>
+              </View>
+            )}
+
             {/* Footer */}
             <View
               style={{
