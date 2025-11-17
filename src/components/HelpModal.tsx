@@ -62,7 +62,6 @@ const ExpandableSection = ({
   const heightValue = useSharedValue(0);
   const rotateValue = useSharedValue(0);
   const opacity = useSharedValue(0);
-  const isAnimatingRef = useRef(false);
 
   useEffect(() => {
     // Simple fade in only - no scale animation to prevent jerky scrolling
@@ -70,22 +69,14 @@ const ExpandableSection = ({
   }, [delay]);
 
   useEffect(() => {
-    // Prevent rapid toggling during animations
-    if (isAnimatingRef.current) return;
-    
-    isAnimatingRef.current = true;
-    
+    // Simple animations without locks
     if (expanded) {
       // Fast expand animation
-      heightValue.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.cubic) }, (finished) => {
-        if (finished) isAnimatingRef.current = false;
-      });
+      heightValue.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.cubic) });
       rotateValue.value = withTiming(180, { duration: 200, easing: Easing.out(Easing.cubic) });
     } else {
       // Fast collapse animation
-      heightValue.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.cubic) }, (finished) => {
-        if (finished) isAnimatingRef.current = false;
-      });
+      heightValue.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.cubic) });
       rotateValue.value = withTiming(0, { duration: 150, easing: Easing.out(Easing.cubic) });
     }
   }, [expanded]);
@@ -129,8 +120,7 @@ const ExpandableSection = ({
         {/* Header - Separate Pressable for better touch handling */}
         <Pressable
           onPress={() => {
-            // Prevent rapid toggling during animations that could cause race conditions
-            if (isAnimatingRef.current) return;
+            // Simple toggle without animation lock
             const newExpanded = !expanded;
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setExpanded(newExpanded);
