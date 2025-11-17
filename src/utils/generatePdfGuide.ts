@@ -1,5 +1,6 @@
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
 import { Alert } from 'react-native';
 
 const PDF_CONTENT = `<!DOCTYPE html>
@@ -244,12 +245,20 @@ export async function generatePdfGuide(): Promise<void> {
     });
 
     if (result.uri) {
-      // Share the generated PDF
-      await Sharing.shareAsync(result.uri, {
+      // Copy to a file with a proper name
+      const fileName = 'PanHandler_Guide.pdf';
+      const newPath = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.copyAsync({
+        from: result.uri,
+        to: newPath,
+      });
+
+      // Share the renamed PDF
+      await Sharing.shareAsync(newPath, {
         mimeType: 'application/pdf',
         dialogTitle: 'Share PanHandler Guide PDF',
         UTI: 'com.adobe.pdf',
-        filename: 'PanHandler Guide.pdf',
       });
     }
   } catch (error) {
