@@ -171,13 +171,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
   
-  // Force re-render when modal becomes visible
-  const [forceRender, setForceRender] = useState(0);
-  useEffect(() => {
-    if (visible) {
-      setForceRender(prev => prev + 1);
-    }
-  }, [visible]);
 
   // Track if close button was long-pressed to prevent modal closing
   const closeLongPressedRef = useRef(false);
@@ -351,7 +344,6 @@ Thank you for helping us improve PanHandler!
   return (
     <>
     <Modal
-      key={forceRender}
       visible={visible}
       animationType="slide"
       transparent={true}
