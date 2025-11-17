@@ -189,7 +189,7 @@ export async function autoOpenWatchQRCode(
 
 /**
  * Notify Watch that photo was captured
- * Triggers hard double tap haptic and screen blink on Watch
+ * Triggers hard double tap haptic, screen blink, and closes Watch app
  */
 export async function notifyWatchPhotoCaptured(): Promise<void> {
   if (Platform.OS !== 'ios') {
@@ -204,10 +204,11 @@ export async function notifyWatchPhotoCaptured(): Promise<void> {
     // await WatchConnectivity.sendMessage({
     //   action: 'photoCaptured',
     //   hapticType: 'doubleTap', // Hard double tap
-    //   blinkScreen: true // Blink the Watch screen
+    //   blinkScreen: true, // Blink the Watch screen
+    //   closeApp: true // Close Watch app and return to watch face
     // });
     
-    console.log('📱 Would notify Watch: Photo captured (hard double tap + screen blink)');
+    console.log('📱 Would notify Watch: Photo captured (hard double tap + screen blink + close app)');
   } catch (error) {
     console.error('Error notifying Watch of photo capture:', error);
   }

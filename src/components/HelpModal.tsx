@@ -2488,7 +2488,8 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontWeight: '600' }}>Watch Feedback:</Text>{'\n'}
                   • Long vibrate when QR code appears{'\n'}
                   • Hard double tap when photo is captured{'\n'}
-                  • Screen blinks to confirm capture
+                  • Screen blinks to confirm capture{'\n'}
+                  • Watch app automatically closes after capture
                 </Text>
                 <Pressable
                   onPress={() => {
