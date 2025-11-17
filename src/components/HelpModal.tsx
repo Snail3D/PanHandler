@@ -2456,13 +2456,13 @@ Thank you for helping us improve PanHandler!
                   marginBottom: 16,
                   textAlign: 'center',
                 }}>
-                  Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration!
+                  Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration and remote shutter control!
                 </Text>
                 <Text style={{
                   fontSize: 12,
                   color: '#8E8E93',
                   lineHeight: 18,
-                  marginBottom: 16,
+                  marginBottom: 12,
                   textAlign: 'center',
                 }}>
                   <Text style={{ fontWeight: '600' }}>How to install:</Text>{'\n'}
@@ -2470,6 +2470,25 @@ Thank you for helping us improve PanHandler!
                   2. Find "PanHandler" in the list{'\n'}
                   3. Tap "Install"{'\n'}
                   4. The app will sync to your Apple Watch
+                </Text>
+                <Text style={{
+                  fontSize: 12,
+                  color: '#1C1C1E',
+                  lineHeight: 18,
+                  marginBottom: 16,
+                  textAlign: 'center',
+                  backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                  padding: 12,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: 'rgba(52, 199, 89, 0.3)',
+                }}>
+                  <Text style={{ fontWeight: '700', color: '#10B981' }}>📸 Remote Shutter:</Text>{'\n'}
+                  When the QR code is displayed on your Watch, simply tap the Watch screen to capture a photo! Perfect for hands-free operation.{'\n\n'}
+                  <Text style={{ fontWeight: '600' }}>Watch Feedback:</Text>{'\n'}
+                  • Long vibrate when QR code appears{'\n'}
+                  • Hard double tap when photo is captured{'\n'}
+                  • Screen blinks to confirm capture
                 </Text>
                 <Pressable
                   onPress={() => {

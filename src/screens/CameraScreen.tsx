@@ -585,6 +585,47 @@ export default function CameraScreen() {
     };
   }, [mode, isCapturing]);
   
+        // Auto-show/hide Watch QR code based on camera mode
+        useEffect(() => {
+          if (Platform.OS !== 'ios') {
+            return;
+          }
+
+          // Only show Watch QR when in camera mode (not when HelpModal is open)
+          if (mode === 'camera' && !showHelpModal) {
+            // Show QR code on Watch (non-blocking, runs in background)
+            // This triggers long vibrate on Watch when QR code appears
+            (async () => {
+              try {
+                const { toggleWatchQRCode, setRemoteShutterCallback } = await import('../utils/watchConnectivity');
+                await toggleWatchQRCode(true, 30); // Default 30mm watch QR code (triggers long vibrate)
+                
+                // Set up remote shutter callback - when user taps Watch screen, trigger photo capture
+                setRemoteShutterCallback(() => {
+                  __DEV__ && console.log('⌚ Remote shutter triggered from Watch');
+                  takePicture();
+                });
+              } catch (watchError) {
+                // Silently fail - Watch support is optional
+                __DEV__ && console.log('⌚ Watch QR auto-show failed (optional feature):', watchError);
+              }
+            })();
+          } else {
+            // Hide QR code when leaving camera mode
+            (async () => {
+              try {
+                const { toggleWatchQRCode, setRemoteShutterCallback } = await import('../utils/watchConnectivity');
+                await toggleWatchQRCode(false);
+                // Clear remote shutter callback when leaving camera mode
+                setRemoteShutterCallback(null);
+              } catch (watchError) {
+                // Silently fail - Watch support is optional
+                __DEV__ && console.log('⌚ Watch QR auto-hide failed (optional feature):', watchError);
+              }
+            })();
+          }
+        }, [mode, showHelpModal]);
+
   // Monitor device tilt for auto-capture when holding shutter
   // CRITICAL: Include showHelpModal in dependency array so sensors restart when modal closes
   useEffect(() => {
@@ -1320,6 +1361,21 @@ export default function CameraScreen() {
               qrSize: calibrationData.size,
             });
             
+            // Auto-open Watch app to display QR code if available (non-blocking)
+            if (Platform.OS === 'ios') {
+              (async () => {
+                try {
+                  const { autoOpenWatchQRCode, notifyWatchPhotoCaptured } = await import('../utils/watchConnectivity');
+                  await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                  // Notify Watch that photo was captured (hard double tap + screen blink)
+                  await notifyWatchPhotoCaptured();
+                } catch (watchError) {
+                  // Silently fail - Watch support is optional
+                  __DEV__ && console.log('⌚ Watch auto-open failed (optional feature):', watchError);
+                }
+              })();
+            }
+            
             // Go directly to measurement mode (skip calibration)
             // Add small delay to match normal flow timing and ensure smooth transition
             setCapturedPhotoUri(photoUri);
@@ -1354,6 +1410,19 @@ export default function CameraScreen() {
       const isLookingAtTable = absBeta < 45 && absGamma < 45;
       
       __DEV__ && console.log('📷 Photo captured:', { isLookingAtTable, beta: currentBeta, gamma: currentGamma });
+      
+      // Notify Watch that photo was captured (hard double tap + screen blink)
+      if (Platform.OS === 'ios') {
+        (async () => {
+          try {
+            const { notifyWatchPhotoCaptured } = await import('../utils/watchConnectivity');
+            await notifyWatchPhotoCaptured();
+          } catch (watchError) {
+            // Silently fail - Watch support is optional
+            __DEV__ && console.log('⌚ Watch photo notification failed (optional feature):', watchError);
+          }
+        })();
+      }
       
       if (isLookingAtTable) {
         // TABLE PHOTO: Go directly to calibration
@@ -1744,6 +1813,19 @@ export default function CameraScreen() {
                 qrFormat: calibrationData.format,
                 qrSize: calibrationData.size,
               });
+              
+              // Auto-open Watch app to display QR code if available (non-blocking)
+              if (Platform.OS === 'ios') {
+                (async () => {
+                  try {
+                    const { autoOpenWatchQRCode } = await import('../utils/watchConnectivity');
+                    await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                  } catch (watchError) {
+                    // Silently fail - Watch support is optional
+                    __DEV__ && console.log('⌚ Watch auto-open failed (optional feature):', watchError);
+                  }
+                })();
+              }
               
               // Go directly to measurement mode
               // Add small delay to ensure smooth transition
