@@ -1,6 +1,6 @@
 import { Camera } from 'react-native-vision-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
-import * as BarcodeScanner from 'expo-barcode-scanner';
+// import * as BarcodeScanner from 'expo-barcode-scanner'; // Temporarily disabled due to build errors
 import * as FileSystem from 'expo-file-system';
 
 export interface Point {
@@ -11,7 +11,7 @@ export interface Point {
 export interface QRResult {
   url: string;
   size: number; // Extracted size in mm
-  format: 'paper' | 'disc';
+  format: 'paper' | 'disc' | 'watch';
   corners: Point[]; // QR corner pixel positions
   centerX: number;
   centerY: number;
@@ -22,15 +22,16 @@ export interface QRResult {
  * Examples:
  * - https://makerworld.com/en/models/1991923#panhandler-paper-30mm → {size: 30, format: 'paper'}
  * - https://makerworld.com/en/models/1991923#panhandler-disc-30mm → {size: 30, format: 'disc'}
+ * - https://apps.apple.com/...#panhandler-watch-30mm → {size: 30, format: 'watch'}
  * - panhandler.app/calibrate/paper-30mm → {size: 30, format: 'paper'} (legacy)
  */
-export function parseCalibrationURL(url: string): { size: number; format: 'paper' | 'disc' } | null {
+export function parseCalibrationURL(url: string): { size: number; format: 'paper' | 'disc' | 'watch' } | null {
   try {
-    // Check for MakerWorld URL fragment (new format)
-    const makerworldMatch = url.match(/#panhandler-(paper|disc)-(\d+)mm/);
-    if (makerworldMatch) {
-      const format = makerworldMatch[1] as 'paper' | 'disc';
-      const size = parseInt(makerworldMatch[2], 10);
+    // Check for URL fragment (new format) - supports paper, disc, and watch
+    const fragmentMatch = url.match(/#panhandler-(paper|disc|watch)-(\d+)mm/);
+    if (fragmentMatch) {
+      const format = fragmentMatch[1] as 'paper' | 'disc' | 'watch';
+      const size = parseInt(fragmentMatch[2], 10);
       if (!isNaN(size) && size > 0) {
         return { size, format };
       }
@@ -38,9 +39,9 @@ export function parseCalibrationURL(url: string): { size: number; format: 'paper
 
     // Legacy format: panhandler.app/calibrate/
     if (url.includes('panhandler.app/calibrate/')) {
-      const match = url.match(/panhandler\.app\/calibrate\/(paper|disc)-(\d+)mm/);
+      const match = url.match(/panhandler\.app\/calibrate\/(paper|disc|watch)-(\d+)mm/);
       if (match) {
-        const format = match[1] as 'paper' | 'disc';
+        const format = match[1] as 'paper' | 'disc' | 'watch';
         const size = parseInt(match[2], 10);
         if (!isNaN(size) && size > 0) {
           return { size, format };
@@ -105,9 +106,15 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
       }
     }
     
+    // QR detection temporarily disabled due to expo-barcode-scanner build errors
+    // TODO: Re-enable when expo-barcode-scanner compilation issues are fixed
+    console.warn('⚠️ QR detection temporarily disabled - expo-barcode-scanner has build errors');
+    return null;
+    
     // Use expo-barcode-scanner to scan the image
     // Note: scanFromURLAsync might not be available in all versions
     // If not available, we'll need to use a different approach
+    /* Temporarily disabled
     try {
       // Try to use scanFromURLAsync if available
       if (BarcodeScanner.scanFromURLAsync) {
@@ -172,6 +179,7 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
         return null;
       }
     }
+    */
     
     console.log('❌ No QR code detected in image');
     return null;
