@@ -597,9 +597,9 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 16, marginRight: 8 }}>🪙</Text>
+                    <Text style={{ fontSize: 16, marginRight: 8 }}>🪙📱</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Coin in center of object</Text>
+                      <Text style={{ fontWeight: '600' }}>Coin or QR code in center of object</Text>
                     </Text>
                   </View>
                 </View>
