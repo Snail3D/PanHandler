@@ -837,6 +837,124 @@ Thank you for helping us improve PanHandler!
                 </Pressable>
               </ExpandableSection>
 
+              {/* Apple Watch App - iOS Only */}
+              {Platform.OS === 'ios' && (
+                <ExpandableSection
+                  icon="watch"
+                  title="⌚ Apple Watch App"
+                  color="#666"
+                  delay={200}
+                >
+                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                    Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration and remote shutter control!
+                  </Text>
+
+                  {/* Installation Instructions */}
+                  <View style={{
+                    marginTop: 12,
+                    backgroundColor: 'rgba(0,0,0,0.08)',
+                    borderRadius: 12,
+                    padding: 14,
+                    borderWidth: 1,
+                    borderColor: 'rgba(0,0,0,0.15)',
+                    marginBottom: 16,
+                  }}>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
+                      How to install:
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 20 }}>
+                      1. Open the Watch app on your iPhone{'\n'}
+                      2. Find "PanHandler" in the list{'\n'}
+                      3. Tap "Install"{'\n'}
+                      4. The app will sync to your Apple Watch
+                    </Text>
+                  </View>
+
+                  {/* Remote Shutter & Feedback */}
+                  <View style={{
+                    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                    borderRadius: 12,
+                    padding: 14,
+                    borderWidth: 1.5,
+                    borderColor: 'rgba(52, 199, 89, 0.3)',
+                    marginBottom: 16,
+                  }}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#10B981', marginBottom: 8 }}>
+                      📸 Remote Shutter
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 12 }}>
+                      When the QR code is displayed on your Watch, simply tap the Watch screen to capture a photo! Perfect for hands-free operation.
+                    </Text>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
+                      Watch Feedback:
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                      • Long vibrate when QR code appears{'\n'}
+                      • Hard double tap when photo is captured{'\n'}
+                      • Screen blinks to confirm capture{'\n'}
+                      • Watch app automatically closes after capture
+                    </Text>
+                  </View>
+
+                  {/* How It Works */}
+                  <View style={{
+                    backgroundColor: 'rgba(99, 126, 234, 0.08)',
+                    borderRadius: 12,
+                    padding: 14,
+                    borderWidth: 1,
+                    borderColor: 'rgba(99, 126, 234, 0.2)',
+                    marginBottom: 16,
+                  }}>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#667eea', marginBottom: 8 }}>
+                      How It Works:
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 20 }}>
+                      • When you open the camera in PanHandler, the Watch automatically displays a QR code{'\n'}
+                      • The QR code contains your Watch's screen size for automatic calibration{'\n'}
+                      • Tap the Watch screen to capture photos remotely{'\n'}
+                      • The Watch app closes automatically after each capture
+                    </Text>
+                  </View>
+
+                  {/* Watch App Store Button */}
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      // Open Watch App Store (when watch app is available)
+                      // TODO: Update with actual Watch App Store URL when watch app is published
+                      Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
+                        showAlert('Error', 'Could not open Watch App Store', 'error');
+                      });
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 10,
+                      paddingVertical: 14,
+                      paddingHorizontal: 20,
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      borderRadius: 12,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 4,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ fontSize: 20 }}>⌚</Text>
+                    <Text style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: 'white',
+                    }}>
+                      Open Watch App Store
+                    </Text>
+                    <Text style={{ fontSize: 20 }}>⌚</Text>
+                  </Pressable>
+                </ExpandableSection>
+              )}
+
               {/* Map Mode */}
 
               {/* Measurement Modes */}
@@ -2457,153 +2575,12 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 20 }}>📱</Text>
                 </Pressable>
 
-                {/* Apple Watch App Button - iOS Only */}
-                {Platform.OS === 'ios' && (
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      // Open Watch App Store (when watch app is available)
-                      // TODO: Update with actual Watch App Store URL when watch app is published
-                      Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
-                        showAlert('Error', 'Could not open Watch App Store', 'error');
-                      });
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 10,
-                      paddingVertical: 14,
-                      paddingHorizontal: 20,
-                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                      borderRadius: 12,
-                      marginHorizontal: 24,
-                      marginTop: 12,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 4,
-                      elevation: 4,
-                    }}
-                  >
-                    <Text style={{ fontSize: 20 }}>⌚</Text>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: 'white',
-                    }}>
-                      Apple Watch App
-                    </Text>
-                    <Text style={{ fontSize: 20 }}>⌚</Text>
-                  </Pressable>
-                )}
-
               </View>
 
 
             </ScrollView>
               </View>
             </View>
-
-            {/* Apple Watch App Install Section - iOS Only */}
-            {Platform.OS === 'ios' && (
-              <View
-                style={{
-                  paddingVertical: 20,
-                  paddingHorizontal: 24,
-                  backgroundColor: 'rgba(0, 0, 0, 0.03)',
-                  borderTopWidth: 1,
-                  borderTopColor: 'rgba(0,0,0,0.08)',
-                }}
-              >
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '700',
-                  color: '#1C1C1E',
-                  marginBottom: 12,
-                  textAlign: 'center',
-                }}>
-                  ⌚ Apple Watch App
-                </Text>
-                <Text style={{
-                  fontSize: 14,
-                  color: '#3C3C43',
-                  lineHeight: 20,
-                  marginBottom: 16,
-                  textAlign: 'center',
-                }}>
-                  Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration and remote shutter control!
-                </Text>
-                <Text style={{
-                  fontSize: 12,
-                  color: '#8E8E93',
-                  lineHeight: 18,
-                  marginBottom: 12,
-                  textAlign: 'center',
-                }}>
-                  <Text style={{ fontWeight: '600' }}>How to install:</Text>{'\n'}
-                  1. Open the Watch app on your iPhone{'\n'}
-                  2. Find "PanHandler" in the list{'\n'}
-                  3. Tap "Install"{'\n'}
-                  4. The app will sync to your Apple Watch
-                </Text>
-                <Text style={{
-                  fontSize: 12,
-                  color: '#1C1C1E',
-                  lineHeight: 18,
-                  marginBottom: 16,
-                  textAlign: 'center',
-                  backgroundColor: 'rgba(52, 199, 89, 0.1)',
-                  padding: 12,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: 'rgba(52, 199, 89, 0.3)',
-                }}>
-                  <Text style={{ fontWeight: '700', color: '#10B981' }}>📸 Remote Shutter:</Text>{'\n'}
-                  When the QR code is displayed on your Watch, simply tap the Watch screen to capture a photo! Perfect for hands-free operation.{'\n\n'}
-                  <Text style={{ fontWeight: '600' }}>Watch Feedback:</Text>{'\n'}
-                  • Long vibrate when QR code appears{'\n'}
-                  • Hard double tap when photo is captured{'\n'}
-                  • Screen blinks to confirm capture{'\n'}
-                  • Watch app automatically closes after capture
-                </Text>
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    // Open Watch app on iPhone (when watch app is available)
-                    // TODO: Update with actual Watch App Store URL when watch app is published
-                    Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
-                      showAlert('Error', 'Could not open Watch App Store', 'error');
-                    });
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 10,
-                    paddingVertical: 14,
-                    paddingHorizontal: 20,
-                    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                    borderRadius: 12,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 4,
-                    elevation: 4,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>⌚</Text>
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: 'white',
-                  }}>
-                    Open Watch App Store
-                  </Text>
-                  <Text style={{ fontSize: 20 }}>⌚</Text>
-                </Pressable>
-              </View>
-            )}
 
             {/* Footer */}
             <View
