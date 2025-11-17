@@ -3138,7 +3138,11 @@ export default function DimensionOverlay({
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
         measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
       } else if (calibration?.calibrationType === 'qr' && calibration.qrFormat && calibration.qrSize) {
-        measurementText += `Calibration: QR ${calibration.qrFormat} ${calibration.qrSize}mm\n`;
+        if (calibration.qrFormat === 'watch') {
+          measurementText += `Calibration: Apple Watch ${calibration.qrSize}mm side to side\n`;
+        } else {
+          measurementText += `Calibration: QR ${calibration.qrFormat} ${calibration.qrSize}mm\n`;
+        }
       } else if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
         const scale = calibration.verbalScale;
         measurementText += `Calibration: Map Scale (${scale.screenDistance}${scale.screenUnit} = ${scale.realDistance}${scale.realUnit})\n`;
@@ -3772,7 +3776,9 @@ export default function DimensionOverlay({
               : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
               : calibration?.calibrationType === 'qr' && calibration.qrFormat && calibration.qrSize
-              ? `QR ${calibration.qrFormat} • ${calibration.qrSize}mm`
+              ? calibration.qrFormat === 'watch'
+                ? `Apple Watch • ${calibration.qrSize}mm`
+                : `QR ${calibration.qrFormat} • ${calibration.qrSize}mm`
               : mapScale && !coinCircle
               ? `${mapScale.screenDistance}${mapScale.screenUnit} = ${mapScale.realDistance}${mapScale.realUnit}`
               : coinCircle
@@ -3857,15 +3863,31 @@ export default function DimensionOverlay({
               return;
             }
             
-            // Scenario 1: Map scale ONLY (no coin, no other calibration)
+            // Scenario 1: QR code calibration (with or without map scale)
+            // QR codes are auto-detected, so go back to camera to retake photo
+            if (calibration?.calibrationType === 'qr') {
+              console.log('📍 Recalibrating: QR code calibration - returning to camera');
+              // Clear map scale if present
+              if (mapScale) {
+                setMapScale(null);
+                setIsMapMode(false);
+                setIsPlacingBlueprint(false);
+                setMeasurementMode(false);
+                setBlueprintPoints([]);
+                setShowBlueprintPlacementModal(false);
+                setShowBlueprintDistanceModal(false);
+              }
+              if (onReset) onReset(false); // Go back to camera
+            }
+            // Scenario 2: Map scale ONLY (no coin, no other calibration)
             // Reset map scale and reopen map scale modal (stay in measurement screen)
-            if (mapScale && !calibration && !coinCircle) {
+            else if (mapScale && !calibration && !coinCircle) {
               console.log('📍 Recalibrating: Map scale only');
               setMapScale(null);
               setIsMapMode(false);
               setShowMapScaleModal(true);
             }
-            // Scenario 2: Map scale + Verbal calibration
+            // Scenario 3: Map scale + Verbal calibration
             // Reset map scale, reopen map modal (keep verbal as base calibration)
             else if (mapScale && calibration?.calibrationType === 'verbal') {
               console.log('📍 Recalibrating: Map scale with verbal base');
@@ -3879,7 +3901,7 @@ export default function DimensionOverlay({
               setShowBlueprintDistanceModal(false);
               setShowMapScaleModal(true);
             }
-            // Scenario 3: Map scale + Coin calibration
+            // Scenario 4: Map scale + Coin calibration
             // User likely wants to recalibrate the coin, so go back to coin screen
             else if (mapScale && coinCircle) {
               console.log('📍 Recalibrating: Map scale with coin base - returning to coin screen');
@@ -3893,13 +3915,13 @@ export default function DimensionOverlay({
               setShowBlueprintDistanceModal(false);
               if (onReset) onReset(true); // Go to coin calibration screen
             }
-            // Scenario 4: Coin calibration ONLY (no map scale)
+            // Scenario 5: Coin calibration ONLY (no map scale)
             // Go back to coin calibration screen
             else if (coinCircle) {
               console.log('📍 Recalibrating: Coin only - returning to coin screen');
               if (onReset) onReset(true);
             }
-            // Scenario 5: Verbal calibration ONLY (no map scale)
+            // Scenario 6: Verbal calibration ONLY (no map scale)
             // Go back to camera to retake photo (verbal modal is in MeasurementScreen)
             else if (calibration?.calibrationType === 'verbal') {
               console.log('📍 Recalibrating: Verbal only - returning to camera');
@@ -5993,11 +6015,13 @@ export default function DimensionOverlay({
                   }}
                 >
                   <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
-                    QR Calibrated
+                    {calibration.qrFormat === 'watch' ? 'Apple Watch' : 'QR Calibrated'}
                   </Text>
                   {calibration.qrFormat && calibration.qrSize && (
                     <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
-                      {calibration.qrFormat} {calibration.qrSize}mm
+                      {calibration.qrFormat === 'watch' 
+                        ? `${calibration.qrSize}mm side to side`
+                        : `${calibration.qrFormat} ${calibration.qrSize}mm`}
                     </Text>
                   )}
                 </View>
@@ -7872,11 +7896,13 @@ export default function DimensionOverlay({
               }}
             >
               <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                QR Calibrated
+                {calibration.qrFormat === 'watch' ? 'Apple Watch' : 'QR Calibrated'}
               </Text>
               {calibration.qrFormat && calibration.qrSize && (
                 <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
-                  {calibration.qrFormat} {calibration.qrSize}mm
+                  {calibration.qrFormat === 'watch' 
+                    ? `${calibration.qrSize}mm side to side`
+                    : `${calibration.qrFormat} ${calibration.qrSize}mm`}
                 </Text>
               )}
             </View>
