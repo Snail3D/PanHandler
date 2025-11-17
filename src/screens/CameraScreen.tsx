@@ -1650,13 +1650,6 @@ export default function CameraScreen() {
     }
   };
 
-  // Close HelpModal when transitioning away from camera mode
-  useEffect(() => {
-    if (mode !== 'camera' && showHelpModal) {
-      setShowHelpModal(false);
-    }
-  }, [mode]);
-
   // Diagnostic Mode
   if (showDiagnostic) {
     return <DiagnosticScreen onComplete={() => setShowDiagnostic(false)} />;
@@ -2512,12 +2505,6 @@ export default function CameraScreen() {
           />
         </>
       )}
-
-      {/* Help Modal */}
-      <HelpModal
-        visible={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
 
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
