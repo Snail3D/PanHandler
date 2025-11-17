@@ -1660,14 +1660,14 @@ export default function CameraScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
+          <TouchOverlayFingerprints color={crosshairColor.main} enabled={!showHelpModal}>
             <View style={{ flex: 1 }}>
               {device ? (
                 <Camera 
                     ref={cameraRef}
                     style={{ flex: 1 }}
                     device={device}
-                    isActive={mode === 'camera'}
+                    isActive={mode === 'camera' && !showHelpModal}
                     photo={true}
                     enableZoomGesture={false}
                     torch={flashEnabled ? 'on' : 'off'}
@@ -2338,11 +2338,6 @@ export default function CameraScreen() {
           sessionColor={crosshairColor}
         />
 
-        {/* Help Modal - needs to be here for camera mode */}
-        <HelpModal
-          visible={showHelpModal}
-          onClose={() => setShowHelpModal(false)}
-        />
       </View>
     );
   }
