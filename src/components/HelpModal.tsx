@@ -538,46 +538,6 @@ Thank you for helping us improve PanHandler!
                     </View>
                   </View>
 
-                  {/* PDF Guide Button */}
-                  <Pressable
-                    onPress={async () => {
-                      try {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        // Generate PDF guide
-                        const { generatePdfGuide } = await import('../utils/generatePdfGuide');
-                        await generatePdfGuide();
-                      } catch (error) {
-                        console.error('Error generating PDF:', error);
-                        showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
-                      }
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 10,
-                      paddingVertical: 14,
-                      paddingHorizontal: 20,
-                      backgroundColor: 'rgba(255, 59, 48, 0.85)',
-                      borderRadius: 12,
-                      marginTop: 16,
-                      shadowColor: '#FF3B30',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 4,
-                      elevation: 4,
-                    }}
-                  >
-                    <Text style={{ fontSize: 20 }}>📄</Text>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: 'white',
-                    }}>
-                      PDF Guide and QR codes
-                    </Text>
-                    <Text style={{ fontSize: 20 }}>📱</Text>
-                  </Pressable>
                 </View>
               </ExpandableSection>
 
@@ -770,6 +730,111 @@ Thank you for helping us improve PanHandler!
                     Made a mistake with your calibration? No worries! Just tap the red <Text style={{ fontWeight: '600' }}>Recalibrate</Text> button (below the calibration badge) to start fresh. You will go back to the camera without losing your place!
                   </Text>
                 </View>
+              </ExpandableSection>
+
+              {/* QR Calibration */}
+              <ExpandableSection
+                icon="qr-code"
+                title="📱 QR Code Calibration"
+                color="#666"
+                delay={150}
+              >
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  Use QR codes for automatic calibration! Simply place a QR code near the center of your photo and the app will detect and calibrate automatically.
+                </Text>
+
+                {/* Distance Instructions */}
+                <View style={{
+                  marginTop: 12,
+                  backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                  borderRadius: 12,
+                  padding: 14,
+                  borderWidth: 1.5,
+                  borderColor: 'rgba(52, 199, 89, 0.3)',
+                  marginBottom: 16,
+                }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="information-circle" size={18} color="#10B981" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#10B981', marginLeft: 6 }}>
+                      Distance Guidelines
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    <Text style={{ fontWeight: '600' }}>Small QR (30mm):</Text> ~1.5 feet from object{'\n'}
+                    <Text style={{ fontWeight: '600' }}>Large QR (180mm):</Text> At least 6 feet from object
+                  </Text>
+                </View>
+
+                {/* PDF Guide Button */}
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      // Generate PDF guide
+                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                      await generatePdfGuide();
+                    } catch (error) {
+                      console.error('Error generating PDF:', error);
+                      showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
+                    }
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: 'rgba(255, 59, 48, 0.85)',
+                    borderRadius: 12,
+                    marginBottom: 16,
+                    shadowColor: '#FF3B30',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }}
+                >
+                  <Text style={{ fontSize: 20 }}>📄</Text>
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'white',
+                  }}>
+                    PDF Guide and QR codes
+                  </Text>
+                  <Text style={{ fontSize: 20 }}>📱</Text>
+                </Pressable>
+
+                {/* MakerWorld Keychain Link */}
+                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
+                  Need a durable QR code? Check out our 3D printable QR code keychain on MakerWorld!
+                </Text>
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    Linking.openURL('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761').catch(() => {
+                      showAlert('Error', 'Could not open link', 'error');
+                    });
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0.1)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(255,87,34,0.3)',
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="open-outline" size={18} color="#666" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
+                      3D Printable QR Keychain on MakerWorld
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
+                    Download and 3D print a durable QR code keychain for easy calibration
+                  </Text>
+                </Pressable>
               </ExpandableSection>
 
               {/* Map Mode */}
