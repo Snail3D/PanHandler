@@ -3,6 +3,42 @@ import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
 import { Alert } from 'react-native';
 
+// Generate QR code grid HTML for iOS
+function generateIOSQRGrid(): string {
+  const qrURL = 'https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-30mm';
+  const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
+  return Array(24).fill(0).map(() => `
+    <div class="grid-qr-item">
+      <div class="grid-qr-code">
+        <img src="${qrCodeImageURL}" alt="QR Code" />
+      </div>
+      <div class="grid-size-text">
+        PanHandler - 30mm<br>
+        side to side<br>
+        <span style="font-size: 7pt; color: #8E8E93;">iOS</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Generate QR code grid HTML for Android
+function generateAndroidQRGrid(): string {
+  const qrURL = 'https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-30mm';
+  const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
+  return Array(24).fill(0).map(() => `
+    <div class="grid-qr-item">
+      <div class="grid-qr-code">
+        <img src="${qrCodeImageURL}" alt="QR Code" />
+      </div>
+      <div class="grid-size-text">
+        PanHandler - 30mm<br>
+        side to side<br>
+        <span style="font-size: 7pt; color: #8E8E93;">Android</span>
+      </div>
+    </div>
+  `).join('');
+}
+
 const PDF_CONTENT = `<!DOCTYPE html>
 <html>
 <head>
@@ -391,22 +427,7 @@ const PDF_CONTENT = `<!DOCTYPE html>
   </div>
   
   <div class="qr-grid">
-    ${Array(24).fill(0).map(() => {
-      const qrURL = 'https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-30mm';
-      const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
-      return `
-        <div class="grid-qr-item">
-          <div class="grid-qr-code">
-            <img src="${qrCodeImageURL}" alt="QR Code" />
-          </div>
-          <div class="grid-size-text">
-            PanHandler - 30mm<br>
-            side to side<br>
-            <span style="font-size: 7pt; color: #8E8E93;">iOS</span>
-          </div>
-        </div>
-      `;
-    }).join('')}
+    ${generateIOSQRGrid()}
   </div>
 </div>
 
@@ -421,22 +442,7 @@ const PDF_CONTENT = `<!DOCTYPE html>
   </div>
   
   <div class="qr-grid">
-    ${Array(24).fill(0).map(() => {
-      const qrURL = 'https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-30mm';
-      const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
-      return `
-        <div class="grid-qr-item">
-          <div class="grid-qr-code">
-            <img src="${qrCodeImageURL}" alt="QR Code" />
-          </div>
-          <div class="grid-size-text">
-            PanHandler - 30mm<br>
-            side to side<br>
-            <span style="font-size: 7pt; color: #8E8E93;">Android</span>
-          </div>
-        </div>
-      `;
-    }).join('')}
+    ${generateAndroidQRGrid()}
   </div>
 </div>
 
@@ -498,6 +504,8 @@ const PDF_CONTENT = `<!DOCTYPE html>
 export async function generatePdfGuide(): Promise<void> {
   try {
     // Generate PDF using expo-print
+    // Note: PDF_CONTENT is a template literal that calls generateIOSQRGrid() and generateAndroidQRGrid()
+    // These functions execute at module load time, so the HTML is already generated
     const result = await Print.printToFileAsync({
       html: PDF_CONTENT,
       base64: false,
