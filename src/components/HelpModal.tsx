@@ -105,10 +105,9 @@ const ExpandableSection = ({
   });
   
   const contentAnimatedStyle = useAnimatedStyle(() => {
-    // Use a fixed maxHeight when expanded to prevent layout thrashing
-    const maxHeight = heightValue.value * 2000;
+    // Simplified: only animate maxHeight, not opacity
     return {
-      maxHeight: maxHeight,
+      maxHeight: heightValue.value * 2000,
       overflow: 'hidden',
     };
   });
@@ -364,10 +363,9 @@ Thank you for helping us improve PanHandler!
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
-      hardwareAccelerated={true}
     >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }} pointerEvents="auto">
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} pointerEvents="auto">
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
           <View
             style={{
               flex: 1,
@@ -470,14 +468,11 @@ Thank you for helping us improve PanHandler!
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
                     showsVerticalScrollIndicator={true}
-                    scrollEventThrottle={16}
+                    scrollEventThrottle={32}
                     scrollEnabled={true}
-                    nestedScrollEnabled={true}
+                    nestedScrollEnabled={false}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
-                    pointerEvents="auto"
-                    onStartShouldSetResponder={() => true}
-                    onMoveShouldSetResponder={() => true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
