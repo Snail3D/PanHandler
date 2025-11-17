@@ -364,9 +364,10 @@ Thank you for helping us improve PanHandler!
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
+      hardwareAccelerated={true}
     >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' }} pointerEvents="auto">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }} pointerEvents="auto">
           <View
             style={{
               flex: 1,
@@ -474,6 +475,9 @@ Thank you for helping us improve PanHandler!
                     nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
+                    pointerEvents="auto"
+                    onStartShouldSetResponder={() => true}
+                    onMoveShouldSetResponder={() => true}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
