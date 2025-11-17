@@ -911,6 +911,8 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 20 }}>
                       • When you open the camera in PanHandler, the Watch automatically displays a QR code{'\n'}
                       • The QR code contains your Watch's screen size for automatic calibration{'\n'}
+                      • Put the Watch directly on top of the object you want to measure{'\n'}
+                      • Position yourself about 1.5-3 feet away from the object{'\n'}
                       • Tap the Watch screen to capture photos remotely{'\n'}
                       • The Watch app closes automatically after each capture
                     </Text>
