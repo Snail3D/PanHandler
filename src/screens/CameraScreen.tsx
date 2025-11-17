@@ -1650,6 +1650,13 @@ export default function CameraScreen() {
     }
   };
 
+  // Close HelpModal when transitioning away from camera mode
+  useEffect(() => {
+    if (mode !== 'camera' && showHelpModal) {
+      setShowHelpModal(false);
+    }
+  }, [mode]);
+
   // Diagnostic Mode
   if (showDiagnostic) {
     return <DiagnosticScreen onComplete={() => setShowDiagnostic(false)} />;
