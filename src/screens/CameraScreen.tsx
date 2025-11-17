@@ -146,6 +146,7 @@ export default function CameraScreen() {
 
   // NOTE: Opening quote removed - now handled by App.tsx
 
+
   // Emergency reset - tap screen 5 times rapidly to force reset if stuck
   const emergencyTapCount = useRef(0);
   const emergencyTapTimer = useRef<NodeJS.Timeout | null>(null);
@@ -1281,7 +1282,73 @@ export default function CameraScreen() {
       // react-native-vision-camera returns path, not URI
       const photoUri = `file://${photo.path}`;
       
-      // Determine if table or wall based on phone tilt
+      __DEV__ && console.log('📷 Photo captured, checking for QR code...');
+      
+      // AUTO-DETECT QR CODE IN BACKGROUND
+      // Try to detect QR code in the captured photo (with timeout to prevent long delays)
+      try {
+        const { detectQR, parseCalibrationURL } = await import('../utils/qrDetection');
+        // Add timeout: if QR detection takes > 1 second, skip it and continue with normal flow
+        const qrDetectionPromise = detectQR(photoUri);
+        const timeoutPromise = new Promise<null>((resolve) => 
+          setTimeout(() => resolve(null), 1000)
+        );
+        const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
+        
+        if (qrResult) {
+          const calibrationData = parseCalibrationURL(qrResult.url);
+          
+          if (calibrationData) {
+            // PanHandler QR code detected! Auto-calibrate
+            __DEV__ && console.log('✅ PanHandler QR code detected! Auto-calibrating...', calibrationData);
+            
+            const { setCalibration } = useStore.getState();
+            
+            // Calculate pixels per mm from QR code
+            const qrWidthPixels = Math.max(
+              Math.abs(qrResult.corners[1]?.x - qrResult.corners[0]?.x || 0),
+              Math.abs(qrResult.corners[2]?.x - qrResult.corners[3]?.x || 0)
+            );
+            const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            
+            setCalibration({
+              pixelsPerUnit: pixelsPerMM,
+              unit: 'mm',
+              referenceDistance: calibrationData.size,
+              calibrationType: 'qr',
+              qrFormat: calibrationData.format,
+              qrSize: calibrationData.size,
+            });
+            
+            // Go directly to measurement mode (skip calibration)
+            // Add small delay to match normal flow timing and ensure smooth transition
+            setCapturedPhotoUri(photoUri);
+            setIsCapturing(false);
+            
+            // Small delay to ensure photo is ready before transitioning
+            setTimeout(() => {
+              if (photoUri) setImageUri(photoUri, false);
+              setMode('measurement');
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              __DEV__ && console.log('✅ QR auto-calibration complete, going to measurement mode');
+            }, 150); // Match normal flow delay timing
+            
+            return;
+          } else {
+            // QR code detected but not a PanHandler QR code
+            __DEV__ && console.log('⚠️ QR code detected but not a PanHandler calibration QR');
+            // Continue with normal flow
+          }
+        } else {
+          // No QR code detected - continue with normal flow
+          __DEV__ && console.log('ℹ️ No QR code detected, using normal calibration flow');
+        }
+      } catch (qrError) {
+        // QR detection failed - continue with normal flow
+        console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
+      }
+      
+      // Normal flow: Determine if table or wall based on phone tilt
       const absBeta = Math.abs(currentBeta);
       const absGamma = Math.abs(currentGamma);
       const isLookingAtTable = absBeta < 45 && absGamma < 45;
@@ -1548,7 +1615,7 @@ export default function CameraScreen() {
   };
 
   // Handle photo type selection from modal
-  const handlePhotoTypeSelection = (type: PhotoType) => {
+  const handlePhotoTypeSelection = async (type: PhotoType) => {
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
     setIsCapturing(false); // Reset since user made selection
@@ -1558,7 +1625,7 @@ export default function CameraScreen() {
     const photoUri = pendingPhotoUri;
 
     // Small delay to ensure modal state updates before transitions
-    setTimeout(() => {
+    setTimeout(async () => {
       if (type === 'coin') {
         // COIN: Go to calibration immediately
         if (photoUri) {
@@ -1640,9 +1707,61 @@ export default function CameraScreen() {
         // DON'T BLOCK UI - Run orientation detection in background
         detectOrientation(asset.uri);
 
-        // Always show photo type selection modal for imported photos
-        // User decides whether to use coin calibration or known scale mode
-        console.log('📥 Photo imported → Showing photo type selection modal');
+        // Auto-detect QR code first, then show modal if no QR found
+        console.log('📥 Photo imported → Checking for QR code...');
+        
+        // Try to detect QR code in background (with timeout to prevent long delays)
+        try {
+          const { detectQR, parseCalibrationURL } = await import('../utils/qrDetection');
+          // Add timeout: if QR detection takes > 1 second, skip it and continue with normal flow
+          const qrDetectionPromise = detectQR(asset.uri);
+          const timeoutPromise = new Promise<null>((resolve) => 
+            setTimeout(() => resolve(null), 1000)
+          );
+          const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
+          
+          if (qrResult) {
+            const calibrationData = parseCalibrationURL(qrResult.url);
+            
+            if (calibrationData) {
+              // PanHandler QR code detected! Auto-calibrate and go to measurement
+              __DEV__ && console.log('✅ PanHandler QR code detected in imported photo! Auto-calibrating...', calibrationData);
+              
+              const { setCalibration } = useStore.getState();
+              
+              // Calculate pixels per mm from QR code
+              const qrWidthPixels = Math.max(
+                Math.abs(qrResult.corners[1]?.x - qrResult.corners[0]?.x || 0),
+                Math.abs(qrResult.corners[2]?.x - qrResult.corners[3]?.x || 0)
+              );
+              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              
+              setCalibration({
+                pixelsPerUnit: pixelsPerMM,
+                unit: 'mm',
+                referenceDistance: calibrationData.size,
+                calibrationType: 'qr',
+                qrFormat: calibrationData.format,
+                qrSize: calibrationData.size,
+              });
+              
+              // Go directly to measurement mode
+              // Add small delay to ensure smooth transition
+              setTimeout(() => {
+                setMode('measurement');
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                __DEV__ && console.log('✅ QR auto-calibration complete for imported photo');
+              }, 100); // Small delay for smooth transition
+              return; // Skip showing modal
+            }
+          }
+        } catch (qrError) {
+          // QR detection failed - continue with normal flow
+          console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
+        }
+        
+        // No QR code found - show photo type selection modal
+        console.log('📥 No QR code found → Showing photo type selection modal');
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
       }
@@ -1672,6 +1791,7 @@ export default function CameraScreen() {
                     photo={true}
                     enableZoomGesture={false}
                     torch={flashEnabled ? 'on' : 'off'}
+                    // QR detection happens automatically after photo capture - no frame processor needed
                 />
               ) : (
                 <View style={{ flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' }}>
@@ -1932,7 +2052,7 @@ export default function CameraScreen() {
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(16), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
-                  1. Place coin in center
+                  1. Center your coin/QR code
                 </Text>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
                   2. Line up the lines

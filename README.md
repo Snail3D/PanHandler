@@ -311,6 +311,54 @@ Want even better reference photos for your design work? **Check out our FREE Mak
 
 ---
 
+## 📱 QR Code Calibration
+
+PanHandler supports automatic calibration using QR codes! Generate printable QR codes that PanHandler can automatically detect and use for calibration.
+
+### How It Works
+
+1. **Generate QR Code** - Tap the "PDF Guide and QR codes" button in the Help menu
+2. **QR Code Saved** - A 30mm QR code image is automatically saved to your camera roll
+3. **Print & Use** - Print the QR code at 100% scale (no scaling), then include it in your photo
+4. **Auto-Detection** - PanHandler automatically detects the QR code and calibrates!
+
+### Creating Custom QR Codes
+
+You can create QR codes in different sizes for your needs. The QR code URL format is:
+
+```
+#panhandler-(paper|disc)-XXmm
+```
+
+**Examples:**
+- `#panhandler-paper-30mm` → 30mm paper QR code
+- `#panhandler-paper-50mm` → 50mm paper QR code  
+- `#panhandler-disc-30mm` → 30mm 3D printed disc QR code
+
+**Full URL Format:**
+```
+https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-30mm
+```
+
+### Print Requirements
+
+For accurate calibration, QR codes must be printed at **exact dimensions**:
+
+- **Print Resolution:** 300 DPI (standard print quality)
+- **Print Scale:** 100% (no scaling, no "fit to page")
+- **Verify Size:** After printing, measure the QR code - it should be exactly the specified size (e.g., 30mm × 30mm)
+
+**Pro Tip:** The QR code image saved to your camera roll is already sized correctly for 300 DPI printing. Print it directly from Photos at 100% scale for perfect results!
+
+### Format Types
+
+- **`paper`** - For printable paper QR codes (cut out and use)
+- **`disc`** - For 3D printed disc/coin objects with QR codes
+
+Both formats work the same way - the QR code is always square, and the format just indicates the material it's printed on.
+
+---
+
 ## 🔒 Privacy & Security
 
 - ✅ **Photos stay on your device** — never uploaded or transferred to our servers

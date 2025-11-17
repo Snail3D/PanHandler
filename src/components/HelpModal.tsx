@@ -208,6 +208,7 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     message: '',
   });
 
+
   const showAlert = (title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
     setAlertConfig({ visible: true, title, message, type });
   };
@@ -1706,7 +1707,7 @@ Thank you for helping us improve PanHandler!
                 delay={700}
               >
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
-                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
+                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text> - includes 3D printable QR code calibration discs!
                 </Text>
 
                 <Pressable
@@ -1732,7 +1733,39 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                    Download and 3D print for perfect reference photos
+                    Download and 3D print for perfect reference photos and QR code calibration discs
+                  </Text>
+                </Pressable>
+
+                {/* QR Calibration PDF Link */}
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const { generateQRCalibrationPDF } = await import('../utils/generateQRCalibrationPDF');
+                      await generateQRCalibrationPDF();
+                    } catch (error) {
+                      console.error('Error generating QR calibration PDF:', error);
+                      showAlert('Error', 'Failed to generate QR calibration PDF. Please try again.', 'error');
+                    }
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(52,199,89,0.1)',
+                    borderRadius: 14,
+                    padding: 14,
+                    borderWidth: 2,
+                    borderColor: 'rgba(52,199,89,0.3)',
+                    marginBottom: 16,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <Ionicons name="qr-code-outline" size={18} color="#34C759" />
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
+                      Generate QR Calibration PDF
+                    </Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
+                    Print QR codes for automatic calibration (30mm fixed size)
                   </Text>
                 </Pressable>
 
@@ -1943,7 +1976,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="images" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
+                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements and QR code calibration images
                       </Text>
                     </View>
                   </View>
@@ -2311,10 +2344,12 @@ Thank you for helping us improve PanHandler!
                   onPress={async () => {
                     try {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      // Generate PDF guide
                       const { generatePdfGuide } = await import('../utils/generatePdfGuide');
                       await generatePdfGuide();
                     } catch (error) {
                       console.error('Error generating PDF:', error);
+                      showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
                     }
                   }}
                   style={{
@@ -2335,15 +2370,58 @@ Thank you for helping us improve PanHandler!
                     elevation: 4,
                   }}
                 >
-                  <Ionicons name="document-text" size={24} color="white" />
+                  <Text style={{ fontSize: 20 }}>📄</Text>
                   <Text style={{
                     fontSize: 16,
                     fontWeight: '600',
                     color: 'white',
                   }}>
-                    Generate PDF Guide
+                    PDF Guide and QR codes
                   </Text>
+                  <Text style={{ fontSize: 20 }}>📱</Text>
                 </Pressable>
+
+                {/* Apple Watch App Button - iOS Only */}
+                {Platform.OS === 'ios' && (
+                  <Pressable
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      // Open Watch App Store (when watch app is available)
+                      // TODO: Update with actual Watch App Store URL when watch app is published
+                      Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
+                        showAlert('Error', 'Could not open Watch App Store', 'error');
+                      });
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 10,
+                      paddingVertical: 14,
+                      paddingHorizontal: 20,
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      borderRadius: 12,
+                      marginHorizontal: 24,
+                      marginTop: 12,
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 4,
+                      elevation: 4,
+                    }}
+                  >
+                    <Text style={{ fontSize: 20 }}>⌚</Text>
+                    <Text style={{
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: 'white',
+                    }}>
+                      Apple Watch App
+                    </Text>
+                    <Text style={{ fontSize: 20 }}>⌚</Text>
+                  </Pressable>
+                )}
+
               </View>
 
 

@@ -83,6 +83,140 @@ const PDF_CONTENT = `<!DOCTYPE html>
     color: #8E8E93;
     font-size: 12px;
   }
+  .full-page-qr {
+    page-break-before: always;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+    background: white;
+  }
+  .full-page-qr h2 {
+    font-size: 24px;
+    color: #1C1C1E;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .full-page-qr .qr-container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .full-page-qr .qr-code-large {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    aspect-ratio: 1;
+    border: 4px solid #1C1C1E;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .full-page-qr .qr-label {
+    margin-top: 24px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1C1C1E;
+    text-align: center;
+  }
+  .full-page-qr .qr-instructions {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(255, 59, 48, 0.1);
+    border: 2px solid rgba(255, 59, 48, 0.3);
+    border-radius: 12px;
+    text-align: center;
+    max-width: 500px;
+  }
+  .full-page-qr .qr-instructions strong {
+    color: #FF3B30;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .full-page-qr .qr-instructions p {
+    font-size: 12px;
+    color: #3C3C43;
+    margin: 4px 0;
+    line-height: 1.5;
+  }
+  /* Grid page styles for 30mm QR codes */
+  .qr-grid-page {
+    page-break-before: always;
+    width: 100%;
+    min-height: 100vh;
+    padding: 36pt;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .qr-grid-header {
+    text-align: center;
+    margin-bottom: 24pt;
+  }
+  .qr-grid-header h2 {
+    font-size: 20px;
+    color: #1C1C1E;
+    margin-bottom: 8px;
+  }
+  .qr-grid-header p {
+    font-size: 12px;
+    color: #8E8E93;
+  }
+  .qr-grid-warning {
+    font-size: 11px;
+    font-weight: 700;
+    color: #FF3B30;
+    text-align: center;
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(255, 59, 48, 0.1);
+    border-radius: 4px;
+  }
+  .qr-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8pt;
+    width: 100%;
+    flex: 1;
+    align-content: start;
+  }
+  .grid-qr-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #333;
+    border-radius: 4px;
+    padding: 8pt;
+    box-sizing: border-box;
+  }
+  .grid-qr-code {
+    width: 85pt;
+    height: 85pt;
+    margin-bottom: 4pt;
+  }
+  .grid-qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .grid-size-text {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #1C1C1E;
+    text-align: center;
+    line-height: 1.2;
+  }
   .download-box {
     background: #f0f4ff;
     border: 2px solid #667eea;
@@ -140,13 +274,14 @@ const PDF_CONTENT = `<!DOCTYPE html>
 </div>
 
 <div class="section">
-  <h3><span class="step-number">2</span>Calibrate with a Coin</h3>
+  <h3><span class="step-number">2</span>Calibrate with a Coin or QR Code</h3>
   <p><strong>How to Calibrate:</strong></p>
   <ol>
-    <li>Place a coin somewhere visible in your photo</li>
-    <li>Select the coin type from the dropdown list</li>
-    <li>Align the colored circle with the coin's edge</li>
-    <li>Tap "Lock in" when perfectly aligned</li>
+    <li>Place a coin or QR code somewhere visible in your photo</li>
+    <li>For coins: Select the coin type from the dropdown list</li>
+    <li>For QR codes: PanHandler automatically detects and calibrates!</li>
+    <li>Align the colored circle with the coin's edge (if using coin)</li>
+    <li>Tap "Lock in" when perfectly aligned (if using coin)</li>
   </ol>
   <div class="tip-box">
     <strong>Common coins:</strong>
@@ -156,7 +291,15 @@ const PDF_CONTENT = `<!DOCTYPE html>
       <li>£1 Pound: 22.50mm</li>
     </ul>
   </div>
-  <p><strong>Why coins?</strong> They have standardized sizes, making them perfect calibration references!</p>
+  <p><strong>QR Code Calibration (Automatic!):</strong></p>
+  <ul>
+    <li>PanHandler automatically detects QR codes in your photos</li>
+    <li>No manual calibration needed - it's instant!</li>
+    <li>Generate QR codes from the Help menu → "PDF Guide and QR codes"</li>
+    <li>Print at 100% scale for accurate 30mm calibration</li>
+    <li>Perfect for workshops, construction sites, or anywhere you need quick calibration</li>
+  </ul>
+  <p><strong>Why coins or QR codes?</strong> Both have standardized sizes, making them perfect calibration references! QR codes offer automatic detection for even faster workflow.</p>
 </div>
 
 <div class="section">
@@ -216,7 +359,7 @@ const PDF_CONTENT = `<!DOCTYPE html>
 </div>
 
 <div class="section">
-  <h3>🖨️ Get PanHandler Printed</h3>
+  <h3>🖨️ 3D Printable QR codes HERE</h3>
   <p>Love PanHandler? You can now get it printed as a physical guide and merchandise!</p>
   <p><strong>MakerWorld Print:</strong> High-quality printed guides, t-shirts, and more featuring PanHandler</p>
   <div style="text-align: center; margin: 16px 0;">
@@ -235,6 +378,118 @@ const PDF_CONTENT = `<!DOCTYPE html>
   <p><strong>PanHandler</strong> - Precise measurements from photos</p>
   <p>© 2025 PanHandler • Open Source Project</p>
   <p style="margin-top: 8px; font-size: 11px;">For the latest updates, visit: github.com/Snail3D/PanHandler</p>
+</div>
+
+<!-- Grid Page: Multiple 30mm QR codes for iOS -->
+<div class="qr-grid-page">
+  <div class="qr-grid-header">
+    <h2>📱 PanHandler QR Calibration Codes (30mm) - iOS</h2>
+    <p>Cut out and share these QR codes for easy calibration on iPhone/iPad</p>
+    <div class="qr-grid-warning">
+      ⚠️ Print at 100% scale (no scaling) - Verify: 30mm edge to edge
+    </div>
+  </div>
+  
+  <div class="qr-grid">
+    ${Array(24).fill(0).map(() => {
+      const qrURL = 'https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-30mm';
+      const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
+      return `
+        <div class="grid-qr-item">
+          <div class="grid-qr-code">
+            <img src="${qrCodeImageURL}" alt="QR Code" />
+          </div>
+          <div class="grid-size-text">
+            PanHandler - 30mm<br>
+            side to side<br>
+            <span style="font-size: 7pt; color: #8E8E93;">iOS</span>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  </div>
+</div>
+
+<!-- Grid Page: Multiple 30mm QR codes for Android -->
+<div class="qr-grid-page">
+  <div class="qr-grid-header">
+    <h2>🤖 PanHandler QR Calibration Codes (30mm) - Android</h2>
+    <p>Cut out and share these QR codes for easy calibration on Android devices</p>
+    <div class="qr-grid-warning">
+      ⚠️ Print at 100% scale (no scaling) - Verify: 30mm edge to edge
+    </div>
+  </div>
+  
+  <div class="qr-grid">
+    ${Array(24).fill(0).map(() => {
+      const qrURL = 'https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-30mm';
+      const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
+      return `
+        <div class="grid-qr-item">
+          <div class="grid-qr-code">
+            <img src="${qrCodeImageURL}" alt="QR Code" />
+          </div>
+          <div class="grid-size-text">
+            PanHandler - 30mm<br>
+            side to side<br>
+            <span style="font-size: 7pt; color: #8E8E93;">Android</span>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  </div>
+</div>
+
+<!-- Full-Page QR Code for Wall Hanging - iOS -->
+<div class="full-page-qr">
+  <h2>📱 PanHandler Calibration QR Code - iOS (180mm)</h2>
+  <div class="qr-container">
+    <img 
+      src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-180mm')}" 
+      class="qr-code-large"
+      alt="PanHandler QR Code - 180mm iOS" 
+    />
+    <div class="qr-label">
+      PanHandler - 180mm side to side (iOS)
+    </div>
+    <div class="qr-instructions">
+      <strong>⚠️ Print at 100% scale (no scaling)</strong>
+      <p>Perfect for hanging on walls or keeping as a reference</p>
+      <p style="margin-top: 8px; font-size: 11px; color: #8E8E93;">
+        This large QR code is easy to scan from a distance!<br>
+        When printed at 100% scale, measure the QR code - it should be exactly 180mm × 180mm.<br>
+        PanHandler will automatically detect and calibrate using this 180mm reference.<br>
+        <strong>Maximum size:</strong> This is the largest QR code that fits on standard US Letter paper (8.5" × 11") with comfortable margins.<br>
+        <strong>Platform:</strong> iOS (iPhone/iPad)
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Full-Page QR Code for Wall Hanging - Android -->
+<div class="full-page-qr">
+  <h2>🤖 PanHandler Calibration QR Code - Android (180mm)</h2>
+  <div class="qr-container">
+    <img 
+      src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-180mm')}" 
+      class="qr-code-large"
+      alt="PanHandler QR Code - 180mm Android" 
+    />
+    <div class="qr-label">
+      PanHandler - 180mm side to side (Android)
+    </div>
+    <div class="qr-instructions">
+      <strong>⚠️ Print at 100% scale (no scaling)</strong>
+      <p>Perfect for hanging on walls or keeping as a reference</p>
+      <p style="margin-top: 8px; font-size: 11px; color: #8E8E93;">
+        This large QR code is easy to scan from a distance!<br>
+        When printed at 100% scale, measure the QR code - it should be exactly 180mm × 180mm.<br>
+        PanHandler will automatically detect and calibrate using this 180mm reference.<br>
+        <strong>Maximum size:</strong> This is the largest QR code that fits on standard US Letter paper (8.5" × 11") with comfortable margins.<br>
+        <strong>Platform:</strong> Android
+      </p>
+    </div>
+  </div>
 </div>
 
 </body>

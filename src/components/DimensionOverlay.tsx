@@ -3137,6 +3137,8 @@ export default function DimensionOverlay({
           ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
           : `${coinCircle.coinDiameter.toFixed(2)}mm`;
         measurementText += `Calibration: ${coinDiameterDisplay} (${coinCircle.coinName})\n`;
+      } else if (calibration?.calibrationType === 'qr' && calibration.qrFormat && calibration.qrSize) {
+        measurementText += `Calibration: QR ${calibration.qrFormat} ${calibration.qrSize}mm\n`;
       } else if (calibration?.calibrationType === 'verbal' && calibration.verbalScale) {
         const scale = calibration.verbalScale;
         measurementText += `Calibration: Map Scale (${scale.screenDistance}${scale.screenUnit} = ${scale.realDistance}${scale.realUnit})\n`;
@@ -3769,6 +3771,8 @@ export default function DimensionOverlay({
               ? `${calibration.blueprintScale.distance}${calibration.blueprintScale.unit} between points`
               : calibration?.calibrationType === 'verbal' && calibration.verbalScale
               ? `${calibration.verbalScale.screenDistance}${calibration.verbalScale.screenUnit} = ${calibration.verbalScale.realDistance}${calibration.verbalScale.realUnit}`
+              : calibration?.calibrationType === 'qr' && calibration.qrFormat && calibration.qrSize
+              ? `QR ${calibration.qrFormat} • ${calibration.qrSize}mm`
               : mapScale && !coinCircle
               ? `${mapScale.screenDistance}${mapScale.screenUnit} = ${mapScale.realDistance}${mapScale.realUnit}`
               : coinCircle
@@ -5941,7 +5945,7 @@ export default function DimensionOverlay({
                 </Text>
               </View>
               
-              {/* Coin/Drone reference info */}
+              {/* Coin/Drone/QR reference info */}
               {calibration && coinCircle && (
                 <View
                   style={{
@@ -5975,6 +5979,26 @@ export default function DimensionOverlay({
                           : `${coinCircle.coinDiameter.toFixed(2)}mm`}
                       </Text>
                     </>
+                  )}
+                </View>
+              )}
+              {/* QR Calibration badge */}
+              {calibration && calibration.calibrationType === 'qr' && (
+                <View
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    paddingHorizontal: scalePadding(8),
+                    paddingVertical: scalePadding(4),
+                    borderRadius: scaleBorderRadius(5),
+                  }}
+                >
+                  <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
+                    QR Calibrated
+                  </Text>
+                  {calibration.qrFormat && calibration.qrSize && (
+                    <Text style={{ color: '#A0A0A0', fontSize: scaleFontSize(10), fontWeight: '500' }}>
+                      {calibration.qrFormat} {calibration.qrSize}mm
+                    </Text>
                   )}
                 </View>
               )}
@@ -7817,7 +7841,7 @@ export default function DimensionOverlay({
             </Text>
           </View>
           
-          {/* Coin reference info */}
+          {/* Coin/QR reference info */}
           {calibration && coinCircle && (
             <View
               style={{
@@ -7835,6 +7859,26 @@ export default function DimensionOverlay({
                   ? formatMeasurement(coinCircle.coinDiameter, 'mm', 'imperial', 2)
                   : `${coinCircle.coinDiameter.toFixed(2)}mm`}
               </Text>
+            </View>
+          )}
+          {/* QR Calibration badge for imported photos */}
+          {calibration && calibration.calibrationType === 'qr' && (
+            <View
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 5,
+              }}
+            >
+              <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                QR Calibrated
+              </Text>
+              {calibration.qrFormat && calibration.qrSize && (
+                <Text style={{ color: '#A0A0A0', fontSize: 10, fontWeight: '500' }}>
+                  {calibration.qrFormat} {calibration.qrSize}mm
+                </Text>
+              )}
             </View>
           )}
         </View>

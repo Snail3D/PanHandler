@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, Modal, Pressable, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import { CoinIcon, MapIcon, BlueprintIcon } from './CalibrationIcons';
+import { CoinIcon, MapIcon, BlueprintIcon, QRCodeIcon } from './CalibrationIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-export type PhotoType = 'coin' | 'map' | 'blueprint';
+export type PhotoType = 'coin' | 'map' | 'blueprint' | 'qr';
 
 interface PhotoTypeOption {
   type: PhotoType;

@@ -68,9 +68,11 @@ interface MeasurementStore {
     pixelsPerUnit: number;
     unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi';
     referenceDistance: number;
-    calibrationType?: 'coin' | 'verbal' | 'blueprint';
+    calibrationType?: 'coin' | 'verbal' | 'blueprint' | 'qr';
     verbalScale?: VerbalScale;
     blueprintScale?: { distance: number; unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }; // Store for display
+    qrFormat?: 'paper' | 'disc'; // QR calibration format
+    qrSize?: number; // QR calibration size in mm
   } | null;
   coinCircle: CoinCircle | null;
   unitSystem: UnitSystem; // Current session unit system (changes mid-session)

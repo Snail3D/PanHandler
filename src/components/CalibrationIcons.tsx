@@ -161,6 +161,37 @@ export const ScaleBarIcon: React.FC<IconProps> = ({ size = 24, color = '#5856D6'
   </Svg>
 );
 
+// QR Code Icon - Square QR code pattern
+export const QRCodeIcon: React.FC<IconProps> = ({ size = 24, color = '#34C759' }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    {/* Outer border */}
+    <Rect x="3" y="3" width="18" height="18" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
+    
+    {/* Top-left finder pattern */}
+    <Rect x="5" y="5" width="6" height="6" fill={color} />
+    <Rect x="6.5" y="6.5" width="3" height="3" fill="white" />
+    <Rect x="7.5" y="7.5" width="1" height="1" fill={color} />
+    
+    {/* Top-right finder pattern */}
+    <Rect x="13" y="5" width="6" height="6" fill={color} />
+    <Rect x="14.5" y="6.5" width="3" height="3" fill="white" />
+    <Rect x="15.5" y="7.5" width="1" height="1" fill={color} />
+    
+    {/* Bottom-left finder pattern */}
+    <Rect x="5" y="13" width="6" height="6" fill={color} />
+    <Rect x="6.5" y="14.5" width="3" height="3" fill="white" />
+    <Rect x="7.5" y="15.5" width="1" height="1" fill={color} />
+    
+    {/* Data pattern (simplified) */}
+    <Rect x="13" y="13" width="1.5" height="1.5" fill={color} />
+    <Rect x="15.5" y="13" width="1.5" height="1.5" fill={color} />
+    <Rect x="13" y="15.5" width="1.5" height="1.5" fill={color} />
+    <Rect x="16.5" y="15.5" width="1.5" height="1.5" fill={color} />
+    <Rect x="18" y="13" width="1.5" height="1.5" fill={color} />
+    <Rect x="18" y="16.5" width="1.5" height="1.5" fill={color} />
+  </Svg>
+);
+
 export default {
   CoinIcon,
   DroneIcon,
@@ -168,4 +199,5 @@ export default {
   BlueprintIcon,
   RulerIcon,
   ScaleBarIcon,
+  QRCodeIcon,
 };
