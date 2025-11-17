@@ -2278,47 +2278,6 @@ Thank you for helping us improve PanHandler!
                 </View>
               </View>
 
-              {/* Generate PDF Guide Button - Red to match New Photo button */}
-              <Pressable
-                onPress={async () => {
-                  try {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    const { generatePdfGuide } = await import('../utils/generatePdfGuide');
-                    await generatePdfGuide();
-                  } catch (error) {
-                    console.error('Error generating PDF:', error);
-                  }
-                }}
-                style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  paddingVertical: 16,
-                  paddingHorizontal: 28,
-                  backgroundColor: pressed ? 'rgba(255, 59, 48, 0.95)' : 'rgba(255, 59, 48, 0.85)',
-                  borderRadius: 14,
-                  marginHorizontal: 20,
-                  marginTop: 24,
-                  marginBottom: 12,
-                  shadowColor: '#FF3B30',
-                  shadowOffset: { width: 0, height: 8 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 12,
-                  elevation: 6,
-                  transform: pressed ? [{ scale: 0.98 }] : [{ scale: 1 }],
-                })}
-              >
-                <Ionicons name="document-text" size={24} color="white" />
-                <Text style={{
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: 'white',
-                }}>
-                  Generate PDF Guide
-                </Text>
-              </Pressable>
-
               {/* For the Nerds - GitHub Section */}
               <View style={{ marginTop: 32, marginBottom: 24 }}>
                 <Text style={{
@@ -2359,6 +2318,45 @@ Thank you for helping us improve PanHandler!
                     color: 'white',
                   }}>
                     See the Code
+                  </Text>
+                </Pressable>
+
+                {/* Generate PDF Guide Button */}
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
+                      await generatePdfGuide();
+                    } catch (error) {
+                      console.error('Error generating PDF:', error);
+                    }
+                  }}
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    backgroundColor: pressed ? 'rgba(255, 59, 48, 0.95)' : 'rgba(255, 59, 48, 0.85)',
+                    borderRadius: 12,
+                    marginHorizontal: 24,
+                    marginTop: 12,
+                    shadowColor: '#FF3B30',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  })}
+                >
+                  <Ionicons name="document-text" size={24} color="white" />
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: 'white',
+                  }}>
+                    Generate PDF Guide
                   </Text>
                 </Pressable>
               </View>
