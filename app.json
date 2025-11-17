@@ -23,6 +23,9 @@
         "NSPhotoLibraryUsageDescription": "PanHandler accesses your photo library to import photos for measurement.",
         "NSPhotoLibraryAddUsageDescription": "PanHandler saves measurement images to your photo library.",
         "NSMotionUsageDescription": "PanHandler uses motion data for tilt detection and level alignment.",
+        "NSLocationWhenInUseUsageDescription": "PanHandler does not require location access. If requested by a third-party library, this permission is not used.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "PanHandler does not require location access. If requested by a third-party library, this permission is not used.",
+        "NSLocationAlwaysUsageDescription": "PanHandler does not require location access. If requested by a third-party library, this permission is not used.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "buildNumber": "2"
