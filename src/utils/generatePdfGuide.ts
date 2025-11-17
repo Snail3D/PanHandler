@@ -416,6 +416,53 @@ const PDF_CONTENT = `<!DOCTYPE html>
   <p style="margin-top: 8px; font-size: 11px;">For the latest updates, visit: github.com/Snail3D/PanHandler</p>
 </div>
 
+<!-- QR Code Calibration Explanation -->
+<div class="section" style="page-break-before: always; margin-top: 0;">
+  <h2>📱 QR Code Calibration - Automatic & Easy!</h2>
+  <p>PanHandler QR codes are special calibration codes that make measuring faster and more accurate. Here's everything you need to know:</p>
+  
+  <h3>How QR Code Calibration Works</h3>
+  <p>PanHandler QR codes contain embedded calibration data (size information) that the app automatically detects when you take or import a photo. No manual calibration needed - just place the QR code in your photo and PanHandler does the rest!</p>
+  
+  <div class="tip-box">
+    <strong>✨ Automatic Detection</strong>
+    <p>When you capture or import a photo, PanHandler automatically scans for QR codes. If a PanHandler QR code is detected, calibration happens instantly - no buttons to press, no circles to align!</p>
+  </div>
+  
+  <h3>Dual Purpose: Calibration + App Download</h3>
+  <p>These QR codes serve two purposes:</p>
+  <ol>
+    <li><strong>Calibration:</strong> When scanned by PanHandler, they automatically calibrate your measurements</li>
+    <li><strong>App Download:</strong> When scanned by any camera app (or someone without PanHandler), they open the App Store (iPhone) or Play Store (Android) to download PanHandler</li>
+  </ol>
+  <p>This means you can share QR codes with others - they'll either get calibrated measurements (if they have PanHandler) or be directed to download the app!</p>
+  
+  <h3>Distance Guidelines for Best Results</h3>
+  <p>For accurate calibration, follow these distance guidelines based on QR code size:</p>
+  <ul>
+    <li><strong>Small QR codes (30mm):</strong> Position yourself about <strong>1.5 feet (~0.5 meters)</strong> away from the object you're measuring. Place the QR code near the center of your photo, in the same plane as your object.</li>
+    <li><strong>Large QR codes (180mm):</strong> Position yourself at least <strong>6 feet (~2 meters)</strong> away from the object. These larger codes are perfect for measuring large objects or when you need to step back to fit everything in frame.</li>
+  </ul>
+  
+  <div class="tip-box">
+    <strong>💡 Pro Tips</strong>
+    <ul style="margin-top: 8px;">
+      <li>Place the QR code in the same plane as your object (both flat on a table, or both on a wall)</li>
+      <li>Keep the QR code near the center of your photo for best detection</li>
+      <li>Ensure good lighting so the QR code is clearly visible</li>
+      <li>The QR code doesn't need to be perfectly centered - just visible and in the same plane as your object</li>
+    </ul>
+  </div>
+  
+  <h3>Using the QR Codes in This Guide</h3>
+  <p>The following pages contain printable QR codes:</p>
+  <ul>
+    <li><strong>30mm QR Code Grids:</strong> Cut out individual codes for small objects. Perfect for measuring items on your desk, workbench, or small projects.</li>
+    <li><strong>180mm Large QR Codes:</strong> Full-page codes for wall mounting or large-scale measurements. Ideal for measuring furniture, rooms, or outdoor objects.</li>
+  </ul>
+  <p>Each QR code is labeled with its platform (iOS or Android) and includes the embedded calibration size. Simply print, cut out (for small codes), and use!</p>
+</div>
+
 <!-- Grid Page: Multiple 30mm QR codes for iOS -->
 <div class="qr-grid-page">
   <div class="qr-grid-header">

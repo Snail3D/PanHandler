@@ -3158,7 +3158,7 @@ export default function DimensionOverlay({
         measurementText += `${idx + 1}. ${valueOnly}${labelPart} (${colorInfo.name})\n`;
       });
 
-      measurementText += `\n\nAttached: 2 photos\n`;
+      measurementText += `\n\nAttached: 2 photos + CAD import guide (PDF)\n`;
       if (!isProUser) {
         measurementText += '\n═══════════════════════════\nMade with PanHandler for iOS\n═══════════════════════════';
       }
@@ -3196,6 +3196,17 @@ export default function DimensionOverlay({
       const labelOnlyDest = `${FileSystem.cacheDirectory}${labelOnlyFilename}`;
       await FileSystem.copyAsync({ from: labelOnlyUri, to: labelOnlyDest });
       attachments.push(labelOnlyDest);
+
+      // Generate and attach CAD import instructions PDF
+      try {
+        const { generateCadImportPdf } = await import('../utils/generateCadImportPdf');
+        const cadPdfPath = await generateCadImportPdf();
+        attachments.push(cadPdfPath);
+        __DEV__ && console.log('📄 CAD import PDF generated and attached');
+      } catch (error) {
+        __DEV__ && console.error('⚠️ Failed to generate CAD import PDF:', error);
+        // Continue without PDF - don't block email export
+      }
 
       // CRITICAL: Reset all capture states BEFORE opening email composer
       // This prevents the screen from staying blank if user cancels email
