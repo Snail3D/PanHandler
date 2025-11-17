@@ -465,14 +465,15 @@ Thank you for helping us improve PanHandler!
                 collapsable={false}
                 style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
-                  <Animated.ScrollView
+                  <ScrollView
                     style={{ flex: 1 }}
-                    contentContainerStyle={{ padding: scalePadding(20) }}
-                    showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={16} // 60fps - higher priority for scroll responsiveness
+                    contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
+                    showsVerticalScrollIndicator={true}
+                    scrollEventThrottle={16}
                     scrollEnabled={true}
-                    nestedScrollEnabled={false}
+                    nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
+                    removeClippedSubviews={false}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
@@ -2362,7 +2363,7 @@ Thank you for helping us improve PanHandler!
               </View>
 
 
-            </Animated.ScrollView>
+            </ScrollView>
               </View>
             </View>
 
