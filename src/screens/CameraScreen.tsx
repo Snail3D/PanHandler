@@ -586,8 +586,8 @@ export default function CameraScreen() {
   
   // Monitor device tilt for auto-capture when holding shutter
   useEffect(() => {
-    if (mode !== 'camera') {
-      holdStartTime.current = 0; // Reset when leaving camera
+    if (mode !== 'camera' || showHelpModal) {
+      holdStartTime.current = 0; // Reset when leaving camera or modal is open
       return;
     }
 
@@ -1074,7 +1074,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear all pending timers to prevent memory leak
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [mode]);
+  }, [mode, showHelpModal]);
 
   // CRITICAL: Cleanup on component unmount to prevent memory leaks
   useEffect(() => {
