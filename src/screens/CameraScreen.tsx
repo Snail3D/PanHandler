@@ -585,6 +585,7 @@ export default function CameraScreen() {
   }, [mode, isCapturing]);
   
   // Monitor device tilt for auto-capture when holding shutter
+  // CRITICAL: Include showHelpModal in dependency array so sensors restart when modal closes
   useEffect(() => {
     if (mode !== 'camera' || showHelpModal) {
       holdStartTime.current = 0; // Reset when leaving camera or modal is open
@@ -845,7 +846,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear all pending haptic timers to prevent memory leak
       hapticTimers.forEach(timer => clearTimeout(timer));
     };
-  }, [mode]);
+  }, [mode, showHelpModal]);
 
   // Auto-capture when holding shutter button and lines align
   // ONLY in horizontal mode - vertical mode allows quick tap only
