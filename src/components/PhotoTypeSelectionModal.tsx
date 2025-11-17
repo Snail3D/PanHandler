@@ -25,13 +25,6 @@ const OPTIONS: PhotoTypeOption[] = [
     color: '#FF9500',
   },
   {
-    type: 'map',
-    title: 'Map Overlay',
-    subtitle: 'Measure on real-world maps and images',
-    icon: MapIcon,
-    color: '#34C759',
-  },
-  {
     type: 'blueprint',
     title: 'Known Scale Mode',
     subtitle: 'For aerial photos, blueprints, and more',

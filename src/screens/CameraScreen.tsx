@@ -1639,42 +1639,11 @@ export default function CameraScreen() {
         // DON'T BLOCK UI - Run orientation detection in background
         detectOrientation(asset.uri);
 
-        // 🔍 SMART ROUTING: Detect if photo was taken with a real camera (phone or drone)
-        // Photos taken with camera → Known Scale Mode (skip modal)
-        // Downloaded/screenshot images → Show modal
-        const exif = asset.exif;
-
-        // Check for camera-specific EXIF that screenshots/downloads won't have
-        const isCameraPhoto = exif && (
-          exif.Make || // Camera manufacturer (e.g., "Apple", "DJI", "Canon")
-          exif.Model || // Camera model
-          exif.LensModel || // Lens info (only real cameras have this)
-          exif.FocalLength || // Focal length (only real cameras)
-          exif.GPSAltitude !== undefined || // Drone altitude
-          exif.RelativeAltitude !== undefined // DJI specific
-        );
-
-        console.log('📸 EXIF detection:', {
-          hasExif: !!exif,
-          Make: exif?.Make,
-          Model: exif?.Model,
-          LensModel: exif?.LensModel,
-          FocalLength: exif?.FocalLength,
-          GPSAltitude: exif?.GPSAltitude,
-          isCameraPhoto
-        });
-
-        if (isCameraPhoto) {
-          // Photo was taken with a real camera → Auto-route to Known Scale Mode
-          console.log('✅ Detected camera photo → Auto-routing to Known Scale Mode');
-          setPendingPhotoUri(asset.uri);
-          handlePhotoTypeSelection('blueprint');
-        } else {
-          // Photo is screenshot/download without camera data → Show modal
-          console.log('📥 No camera EXIF (screenshot/download) → Showing photo type modal');
-          setPendingPhotoUri(asset.uri);
-          setShowPhotoTypeModal(true);
-        }
+        // Always show photo type selection modal for imported photos
+        // User decides whether to use coin calibration or known scale mode
+        console.log('📥 Photo imported → Showing photo type selection modal');
+        setPendingPhotoUri(asset.uri);
+        setShowPhotoTypeModal(true);
       }
     } catch (error) {
       console.error('Error picking image:', error);
