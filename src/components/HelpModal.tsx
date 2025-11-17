@@ -104,6 +104,7 @@ const ExpandableSection = ({
   return (
     <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14) }]} pointerEvents="box-none">
       <View
+        pointerEvents="auto"
         style={{
           backgroundColor: 'rgba(255,255,255,0.9)',
           borderRadius: scaleBorderRadius(20),
