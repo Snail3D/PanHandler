@@ -2506,6 +2506,12 @@ export default function CameraScreen() {
         </>
       )}
 
+      {/* Help Modal */}
+      <HelpModal
+        visible={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
+
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
       
