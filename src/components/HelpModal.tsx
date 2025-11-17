@@ -345,7 +345,7 @@ Thank you for helping us improve PanHandler!
     <>
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="none"
       transparent={true}
       onRequestClose={onClose}
     >
