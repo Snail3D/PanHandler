@@ -3,7 +3,7 @@ import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
 import { Alert } from 'react-native';
 
-// Generate 4 iOS QR codes
+// Generate 4 iOS QR codes with cut lines (2mm padding)
 function generateIOSQRGrid(): string {
   const qrURL = 'https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-30mm';
   const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
@@ -12,16 +12,11 @@ function generateIOSQRGrid(): string {
       <div class="grid-qr-code">
         <img src="${qrCodeImageURL}" alt="QR Code" />
       </div>
-      <div class="grid-size-text">
-        PanHandler - 30mm<br>
-        side to side<br>
-        <span style="font-size: 7pt; color: #8E8E93;">iOS</span>
-      </div>
     </div>
   `).join('');
 }
 
-// Generate 4 Android QR codes
+// Generate 4 Android QR codes with cut lines (2mm padding)
 function generateAndroidQRGrid(): string {
   const qrURL = 'https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-30mm';
   const qrCodeImageURL = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrURL)}`;
@@ -29,11 +24,6 @@ function generateAndroidQRGrid(): string {
     <div class="grid-qr-item">
       <div class="grid-qr-code">
         <img src="${qrCodeImageURL}" alt="QR Code" />
-      </div>
-      <div class="grid-size-text">
-        PanHandler - 30mm<br>
-        side to side<br>
-        <span style="font-size: 7pt; color: #8E8E93;">Android</span>
       </div>
     </div>
   `).join('');
@@ -232,26 +222,75 @@ const PDF_CONTENT = `<!DOCTYPE html>
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Removed border and padding - QR code itself is exactly 30mm for 1:1 calibration */
     box-sizing: border-box;
+    padding: 2mm;
+    border: 0.5pt dashed #000;
   }
   .grid-qr-code {
     width: 30mm;
     height: 30mm;
-    margin-bottom: 3pt;
-    /* Ensure QR code pattern itself is exactly 30mm - no quiet zone included */
+    /* QR code pattern itself is exactly 30mm - 2mm padding around it for cut lines */
   }
   .grid-qr-code img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
-  .grid-size-text {
-    font-size: 8pt;
-    font-weight: 600;
+  .cut-line-separator {
+    width: 100%;
+    height: 0;
+    border-top: 1pt dashed #000;
+    margin: 12pt 0;
+  }
+  .back-to-back-page {
+    page-break-before: always;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .page-title {
+    font-size: 18pt;
+    font-weight: 700;
     color: #1C1C1E;
     text-align: center;
-    line-height: 1.2;
+    margin-bottom: 16pt;
+  }
+  .qr-row-30mm {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8mm;
+    width: 100%;
+    margin-bottom: 16pt;
+  }
+  .qr-section-180mm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16pt;
+  }
+  .qr-code-180mm {
+    width: 180mm;
+    height: 180mm;
+    max-width: calc(100% - 0mm);
+    margin: 0 auto;
+    display: block;
+  }
+  .qr-code-180mm img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .qr-label-180mm {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #1C1C1E;
+    margin-top: 12pt;
+    text-align: center;
   }
   .calibration-ruler {
     width: 30mm;
@@ -373,88 +412,45 @@ const PDF_CONTENT = `<!DOCTYPE html>
   </div>
 </div>
 
-<!-- Page 3: Combined 30mm QR Codes (4 iOS + 4 Android) -->
-<div class="qr-grid-page">
-  <div class="qr-grid-header">
-    <h2>📱 PanHandler QR Calibration Codes (30mm)</h2>
-    <p>Cut out and use for easy calibration</p>
-    <div class="qr-grid-warning">
-      ⚠️ CRITICAL: Print at 100% scale (Actual Size, not Fit to Page)<br>
-      Verify: QR code should measure exactly 30mm edge to edge
-    </div>
-    <div style="margin: 10pt 0; padding: 6pt; background: #FFF3CD; border: 2px solid #FFC107; border-radius: 4px; font-size: 9pt; text-align: center;">
-      <strong>📏 Calibration Check:</strong> Ruler below should measure exactly 30mm.
-      <div class="calibration-ruler"></div>
-      If ruler is NOT 30mm, check print settings and select "Actual Size" or "100%".
-    </div>
+<!-- Page 3: Android Back-to-Back Page (Front) -->
+<div class="back-to-back-page">
+  <div class="page-title">30MM Android</div>
+  
+  <div class="qr-row-30mm">
+    ${generateAndroidQRGrid()}
   </div>
   
-  <div style="margin-bottom: 12pt;">
-    <h3 style="text-align: center; font-size: 11pt; margin-bottom: 8pt;">📱 iOS (iPhone/iPad)</h3>
-    <div class="qr-grid-combined">
-      ${generateIOSQRGrid()}
+  <div class="cut-line-separator"></div>
+  
+  <div class="qr-section-180mm">
+    <div class="qr-code-180mm">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-180mm')}" 
+        alt="PanHandler QR Code - 180mm Android" 
+      />
     </div>
+    <div class="qr-label-180mm">180MM Android</div>
+  </div>
+</div>
+
+<!-- Page 4: iPhone Back-to-Back Page (Back) -->
+<div class="back-to-back-page">
+  <div class="page-title">30MM Iphone</div>
+  
+  <div class="qr-row-30mm">
+    ${generateIOSQRGrid()}
   </div>
   
-  <div>
-    <h3 style="text-align: center; font-size: 11pt; margin-bottom: 8pt;">🤖 Android</h3>
-    <div class="qr-grid-combined">
-      ${generateAndroidQRGrid()}
+  <div class="cut-line-separator"></div>
+  
+  <div class="qr-section-180mm">
+    <div class="qr-code-180mm">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-180mm')}" 
+        alt="PanHandler QR Code - 180mm iOS" 
+      />
     </div>
-  </div>
-</div>
-
-<!-- Page 4: Blank/Spacer (for even page count) -->
-<div style="page-break-before: always; min-height: 297mm; width: 210mm;">
-  <!-- Blank page for front/back printing alignment -->
-</div>
-
-<!-- Page 5: Blank/Spacer -->
-<div style="page-break-before: always; min-height: 297mm; width: 210mm;">
-  <!-- Blank page for front/back printing alignment -->
-</div>
-
-<!-- Page 6: 180mm iOS QR Code -->
-<div class="full-page-qr">
-  <h2 style="font-size: 18pt; margin-bottom: 12pt;">📱 PanHandler Calibration QR Code - iOS (180mm)</h2>
-  <div class="qr-container">
-    <img 
-      src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-180mm')}" 
-      class="qr-code-large"
-      alt="PanHandler QR Code - 180mm iOS" 
-    />
-    <div class="qr-label">
-      PanHandler - 180mm side to side (iOS)
-    </div>
-    <div class="qr-instructions">
-      <strong>⚠️ Print at 100% scale (Actual Size, not Fit to Page)</strong>
-      <p>Perfect for wall mounting or large-scale measurements</p>
-      <p>When printed correctly, QR code measures exactly 180mm × 180mm</p>
-      <p>Position yourself at least 6 feet away when using this code</p>
-      <p><strong>Platform:</strong> iOS (iPhone/iPad)</p>
-    </div>
-  </div>
-</div>
-
-<!-- Page 7: 180mm Android QR Code -->
-<div class="full-page-qr">
-  <h2 style="font-size: 18pt; margin-bottom: 12pt;">🤖 PanHandler Calibration QR Code - Android (180mm)</h2>
-  <div class="qr-container">
-    <img 
-      src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-180mm')}" 
-      class="qr-code-large"
-      alt="PanHandler QR Code - 180mm Android" 
-    />
-    <div class="qr-label">
-      PanHandler - 180mm side to side (Android)
-    </div>
-    <div class="qr-instructions">
-      <strong>⚠️ Print at 100% scale (Actual Size, not Fit to Page)</strong>
-      <p>Perfect for wall mounting or large-scale measurements</p>
-      <p>When printed correctly, QR code measures exactly 180mm × 180mm</p>
-      <p>Position yourself at least 6 feet away when using this code</p>
-      <p><strong>Platform:</strong> Android</p>
-    </div>
+    <div class="qr-label-180mm">180MM Iphone</div>
   </div>
 </div>
 
