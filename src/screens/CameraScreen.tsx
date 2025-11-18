@@ -1353,15 +1353,6 @@ export default function CameraScreen() {
             );
             const pixelsPerMM = qrWidthPixels / calibrationData.size;
             
-            setCalibration({
-              pixelsPerUnit: pixelsPerMM,
-              unit: 'mm',
-              referenceDistance: calibrationData.size,
-              calibrationType: 'qr',
-              qrFormat: calibrationData.format,
-              qrSize: calibrationData.size,
-            });
-            
             // Auto-open Watch app to display QR code if available (non-blocking)
             if (Platform.OS === 'ios') {
               (async () => {
@@ -1384,7 +1375,18 @@ export default function CameraScreen() {
             
             // Small delay to ensure photo is ready before transitioning
             setTimeout(() => {
-              if (photoUri) setImageUri(photoUri, false);
+              if (photoUri) {
+                setImageUri(photoUri, false);
+                // Set calibration AFTER setImageUri (which clears it) to ensure it persists
+                setCalibration({
+                  pixelsPerUnit: pixelsPerMM,
+                  unit: 'mm',
+                  referenceDistance: calibrationData.size,
+                  calibrationType: 'qr',
+                  qrFormat: calibrationData.format,
+                  qrSize: calibrationData.size,
+                });
+              }
               setMode('measurement');
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               __DEV__ && console.log('✅ QR auto-calibration complete, going to measurement mode');
@@ -1768,9 +1770,6 @@ export default function CameraScreen() {
         setSkipToMapMode(false);
         setSkipToAerialMode(false);
 
-        // Set image URI (this will trigger ONE MMKV write, but it's necessary)
-        setImageUri(asset.uri, false);
-
         // Use local state for immediate UI update
         setCapturedPhotoUri(asset.uri);
 
@@ -1806,15 +1805,6 @@ export default function CameraScreen() {
               );
               const pixelsPerMM = qrWidthPixels / calibrationData.size;
               
-              setCalibration({
-                pixelsPerUnit: pixelsPerMM,
-                unit: 'mm',
-                referenceDistance: calibrationData.size,
-                calibrationType: 'qr',
-                qrFormat: calibrationData.format,
-                qrSize: calibrationData.size,
-              });
-              
               // Auto-open Watch app to display QR code if available (non-blocking)
               if (Platform.OS === 'ios') {
                 (async () => {
@@ -1827,6 +1817,21 @@ export default function CameraScreen() {
                   }
                 })();
               }
+              
+              // Set image URI first (which clears calibration), then set calibration
+              setImageUri(asset.uri, false);
+              // Set calibration AFTER setImageUri (which clears it) to ensure it persists
+              setCalibration({
+                pixelsPerUnit: pixelsPerMM,
+                unit: 'mm',
+                referenceDistance: calibrationData.size,
+                calibrationType: 'qr',
+                qrFormat: calibrationData.format,
+                qrSize: calibrationData.size,
+              });
+              
+              // Set local state for immediate UI update
+              setCapturedPhotoUri(asset.uri);
               
               // Go directly to measurement mode
               // Add small delay to ensure smooth transition
@@ -1849,8 +1854,9 @@ export default function CameraScreen() {
           console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
         }
         
-        // No QR code found - show photo type selection modal
+        // No QR code found - set image URI and show photo type selection modal
         console.log('📥 No QR code found → Showing photo type selection modal');
+        setImageUri(asset.uri, false);
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
       }
