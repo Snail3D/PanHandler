@@ -1389,27 +1389,47 @@ export default function CameraScreen() {
             }
             
             // MLKit might scan at a different resolution than the actual image
-            // Check if we need to scale the corner points to match actual image dimensions
-            // Get the max coordinate from corner points to estimate MLKit's coordinate system
-            const maxCornerX = Math.max(...corners.map(c => c.x));
-            const maxCornerY = Math.max(...corners.map(c => c.y));
-            
+            // Use bounding box to determine MLKit's coordinate system more accurately
             let scaleFactor = 1;
-            if (actualImageWidth > 0 && actualImageHeight > 0) {
-              // If MLKit scanned at a different resolution, we need to scale
-              // Estimate MLKit's coordinate system from corner points
-              const mlKitWidth = maxCornerX;
-              const mlKitHeight = maxCornerY;
-              
-              // If there's a significant difference, MLKit likely downscaled
-              if (mlKitWidth > 0 && mlKitHeight > 0) {
-                const widthScale = actualImageWidth / mlKitWidth;
-                const heightScale = actualImageHeight / mlKitHeight;
-                // Use average scale factor (should be similar if image wasn't cropped)
-                scaleFactor = (widthScale + heightScale) / 2;
+            if (actualImageWidth > 0 && actualImageHeight > 0 && qrResult) {
+              // Try to get bounding box from the QR result to estimate MLKit's coordinate system
+              if (qrResult.boundingBox) {
+                const { left, top, width, height } = qrResult.boundingBox;
+                // Estimate MLKit's coordinate system from bounding box
+                // Use the maximum extent of bounding box + corners to estimate full image size
+                const maxX = Math.max(left + width, ...corners.map(c => c.x));
+                const maxY = Math.max(top + height, ...corners.map(c => c.y));
+                // Add 10% margin to account for QR code not being at the very edge
+                const mlKitWidth = maxX * 1.1;
+                const mlKitHeight = maxY * 1.1;
                 
-                __DEV__ && console.log('📐 MLKit coordinate system:', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                __DEV__ && console.log('📐 Scale factor:', scaleFactor.toFixed(4));
+                if (mlKitWidth > 0 && mlKitHeight > 0) {
+                  const widthScale = actualImageWidth / mlKitWidth;
+                  const heightScale = actualImageHeight / mlKitHeight;
+                  // Use average scale factor
+                  scaleFactor = (widthScale + heightScale) / 2;
+                  
+                  __DEV__ && console.log('📐 MLKit bounding box:', { left, top, width, height });
+                  __DEV__ && console.log('📐 MLKit estimated coordinate system:', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                  __DEV__ && console.log('📐 Actual image dimensions:', actualImageWidth, 'x', actualImageHeight);
+                  __DEV__ && console.log('📐 Scale factor:', scaleFactor.toFixed(4));
+                }
+              } else {
+                // Fallback: use max corner coordinates (less accurate)
+                const maxCornerX = Math.max(...corners.map(c => c.x));
+                const maxCornerY = Math.max(...corners.map(c => c.y));
+                // Add 20% margin since QR might not be at edge
+                const mlKitWidth = maxCornerX * 1.2;
+                const mlKitHeight = maxCornerY * 1.2;
+                
+                if (mlKitWidth > 0 && mlKitHeight > 0) {
+                  const widthScale = actualImageWidth / mlKitWidth;
+                  const heightScale = actualImageHeight / mlKitHeight;
+                  scaleFactor = (widthScale + heightScale) / 2;
+                  
+                  __DEV__ && console.log('📐 MLKit coordinate system (estimated from corners):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                  __DEV__ && console.log('📐 Scale factor (fallback):', scaleFactor.toFixed(4));
+                }
               }
             }
             
@@ -1951,27 +1971,44 @@ export default function CameraScreen() {
               }
               
               // MLKit might scan at a different resolution than the actual image
-              // Check if we need to scale the corner points to match actual image dimensions
-              // Get the max coordinate from corner points to estimate MLKit's coordinate system
-              const maxCornerX = Math.max(...corners.map(c => c.x));
-              const maxCornerY = Math.max(...corners.map(c => c.y));
-              
+              // Use bounding box to determine MLKit's coordinate system more accurately
               let scaleFactor = 1;
-              if (actualImageWidth > 0 && actualImageHeight > 0) {
-                // If MLKit scanned at a different resolution, we need to scale
-                // Estimate MLKit's coordinate system from corner points
-                const mlKitWidth = maxCornerX;
-                const mlKitHeight = maxCornerY;
-                
-                // If there's a significant difference, MLKit likely downscaled
-                if (mlKitWidth > 0 && mlKitHeight > 0) {
-                  const widthScale = actualImageWidth / mlKitWidth;
-                  const heightScale = actualImageHeight / mlKitHeight;
-                  // Use average scale factor (should be similar if image wasn't cropped)
-                  scaleFactor = (widthScale + heightScale) / 2;
+              if (actualImageWidth > 0 && actualImageHeight > 0 && qrResult) {
+                // Try to get bounding box from the QR result to estimate MLKit's coordinate system
+                if (qrResult.boundingBox) {
+                  const { left, top, width, height } = qrResult.boundingBox;
+                  // Estimate MLKit's coordinate system from bounding box
+                  const maxX = Math.max(left + width, ...corners.map(c => c.x));
+                  const maxY = Math.max(top + height, ...corners.map(c => c.y));
+                  // Add 10% margin to account for QR code not being at the very edge
+                  const mlKitWidth = maxX * 1.1;
+                  const mlKitHeight = maxY * 1.1;
                   
-                  __DEV__ && console.log('📐 MLKit coordinate system (imported):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                  __DEV__ && console.log('📐 Scale factor (imported):', scaleFactor.toFixed(4));
+                  if (mlKitWidth > 0 && mlKitHeight > 0) {
+                    const widthScale = actualImageWidth / mlKitWidth;
+                    const heightScale = actualImageHeight / mlKitHeight;
+                    scaleFactor = (widthScale + heightScale) / 2;
+                    
+                    __DEV__ && console.log('📐 MLKit bounding box (imported):', { left, top, width, height });
+                    __DEV__ && console.log('📐 MLKit estimated coordinate system (imported):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                    __DEV__ && console.log('📐 Actual image dimensions (imported):', actualImageWidth, 'x', actualImageHeight);
+                    __DEV__ && console.log('📐 Scale factor (imported):', scaleFactor.toFixed(4));
+                  }
+                } else {
+                  // Fallback: use max corner coordinates (less accurate)
+                  const maxCornerX = Math.max(...corners.map(c => c.x));
+                  const maxCornerY = Math.max(...corners.map(c => c.y));
+                  const mlKitWidth = maxCornerX * 1.2;
+                  const mlKitHeight = maxCornerY * 1.2;
+                  
+                  if (mlKitWidth > 0 && mlKitHeight > 0) {
+                    const widthScale = actualImageWidth / mlKitWidth;
+                    const heightScale = actualImageHeight / mlKitHeight;
+                    scaleFactor = (widthScale + heightScale) / 2;
+                    
+                    __DEV__ && console.log('📐 MLKit coordinate system (imported, estimated from corners):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                    __DEV__ && console.log('📐 Scale factor (imported, fallback):', scaleFactor.toFixed(4));
+                  }
                 }
               }
               

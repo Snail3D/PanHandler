@@ -24,6 +24,7 @@ export interface QRResult {
   corners: Point[]; // QR corner pixel positions
   centerX: number;
   centerY: number;
+  boundingBox?: { left: number; top: number; width: number; height: number }; // MLKit bounding box
 }
 
 /**
@@ -276,6 +277,7 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
               corners,
               centerX,
               centerY,
+              boundingBox: qrCode.boundingBox, // Include bounding box for scale calculation
             },
             distanceToCenter,
           });
