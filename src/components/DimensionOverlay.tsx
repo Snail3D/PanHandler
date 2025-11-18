@@ -7001,7 +7001,7 @@ export default function DimensionOverlay({
                   fontSize: scaleFontSize(12),
                   color: !measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'
                 }}>
-                  {isPanZoomLocked ? 'Edit' : 'Pan'}
+                  {isPanZoomLocked && measurements.length > 0 ? 'Edit' : 'Pan'}
                 </Text>
               </View>
             </Pressable>
