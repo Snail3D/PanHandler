@@ -1365,7 +1365,7 @@ export default function CameraScreen() {
               throw new Error('QR code corners invalid structure');
             }
             
-            // Get actual image dimensions to scale MLKit coordinates
+            // Get actual image dimensions 
             let actualImageWidth = 0;
             let actualImageHeight = 0;
             try {
@@ -1375,10 +1375,11 @@ export default function CameraScreen() {
                   (width, height) => {
                     actualImageWidth = width;
                     actualImageHeight = height;
+                    __DEV__ && console.log('📏 Actual image dimensions:', width, 'x', height);
                     resolve();
                   },
                   (error) => {
-                    console.warn('⚠️ Could not get image size for scaling:', error);
+                    console.warn('⚠️ Could not get image size:', error);
                     resolve();
                   }
                 );
@@ -1387,45 +1388,31 @@ export default function CameraScreen() {
               console.error('⚠️ Error getting image size:', error);
             }
             
-            // MLKit processes images at its own resolution (often downscaled)
-            // We need to scale MLKit coordinates to match the actual image
+            // MLKit on Android consistently returns coordinates at 1/4 scale
+            // This is a known behavior where MLKit processes images at lower resolution
+            // Apply a fixed 4x scale factor for Android
             let scaleFactor = 1;
-            if (actualImageWidth > 0 && actualImageHeight > 0 && corners && corners.length >= 4) {
-              // Find the max coordinates from MLKit to estimate its coordinate system
-              const maxMLKitX = Math.max(...corners.map(c => c.x));
-              const maxMLKitY = Math.max(...corners.map(c => c.y));
-              
-              // If MLKit coordinates are much smaller than actual image dimensions,
-              // it means MLKit processed a downscaled version
-              if (maxMLKitX > 0 && maxMLKitY > 0) {
-                // Calculate scale factor based on aspect ratio
-                // MLKit likely maintains aspect ratio when scaling
-                const xScale = actualImageWidth / maxMLKitX;
-                const yScale = actualImageHeight / maxMLKitY;
-                
-                // Use the smaller scale to be conservative
-                // But if they're very different, use average
-                if (Math.abs(xScale - yScale) / Math.min(xScale, yScale) < 0.2) {
-                  scaleFactor = (xScale + yScale) / 2;
-                } else {
-                  // If scales are very different, MLKit might be using full resolution
-                  // Check if MLKit is already at full resolution
-                  if (maxMLKitX <= actualImageWidth && maxMLKitY <= actualImageHeight) {
-                    // MLKit coordinates are within image bounds, likely full resolution
-                    scaleFactor = 1;
-                  } else {
-                    // Use conservative estimate
-                    scaleFactor = Math.min(xScale, yScale);
-                  }
-                }
-              }
+            
+            if (Platform.OS === 'android') {
+              // Android MLKit typically processes at 1/4 resolution (0.5x in each dimension)
+              scaleFactor = 4;
+              __DEV__ && console.log('🤖 Android detected: applying 4x scale factor for MLKit coordinates');
+            } else {
+              // iOS MLKit typically uses full resolution
+              scaleFactor = 1;
+              __DEV__ && console.log('🍎 iOS detected: MLKit coordinates at full resolution');
             }
             
-            // Scale corner points to match actual image dimensions
-            const scaledCorners = corners.map(c => ({
-              x: c.x * scaleFactor,
-              y: c.y * scaleFactor,
-            }));
+            __DEV__ && console.log('📏 Corner points before scaling:', corners[0]);
+            __DEV__ && console.log('📏 Image dimensions:', actualImageWidth, 'x', actualImageHeight);
+            
+            // Scale corner points if needed
+            const scaledCorners = scaleFactor !== 1 
+              ? corners.map(c => ({
+                  x: c.x * scaleFactor,
+                  y: c.y * scaleFactor,
+                }))
+              : corners;
             
             // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
@@ -1925,7 +1912,7 @@ export default function CameraScreen() {
                 throw new Error('QR code corners invalid structure');
               }
               
-              // Get actual image dimensions to scale MLKit coordinates
+              // Get actual image dimensions 
               let actualImageWidth = 0;
               let actualImageHeight = 0;
               try {
@@ -1935,10 +1922,11 @@ export default function CameraScreen() {
                     (width, height) => {
                       actualImageWidth = width;
                       actualImageHeight = height;
+                      __DEV__ && console.log('📏 Actual image dimensions:', width, 'x', height);
                       resolve();
                     },
                     (error) => {
-                      console.warn('⚠️ Could not get image size for scaling:', error);
+                      console.warn('⚠️ Could not get image size:', error);
                       resolve();
                     }
                   );
@@ -1947,45 +1935,31 @@ export default function CameraScreen() {
                 console.error('⚠️ Error getting image size:', error);
               }
               
-              // MLKit processes images at its own resolution (often downscaled)
-              // We need to scale MLKit coordinates to match the actual image
+              // MLKit on Android consistently returns coordinates at 1/4 scale
+              // This is a known behavior where MLKit processes images at lower resolution
+              // Apply a fixed 4x scale factor for Android
               let scaleFactor = 1;
-              if (actualImageWidth > 0 && actualImageHeight > 0 && corners && corners.length >= 4) {
-                // Find the max coordinates from MLKit to estimate its coordinate system
-                const maxMLKitX = Math.max(...corners.map(c => c.x));
-                const maxMLKitY = Math.max(...corners.map(c => c.y));
-                
-                // If MLKit coordinates are much smaller than actual image dimensions,
-                // it means MLKit processed a downscaled version
-                if (maxMLKitX > 0 && maxMLKitY > 0) {
-                  // Calculate scale factor based on aspect ratio
-                  // MLKit likely maintains aspect ratio when scaling
-                  const xScale = actualImageWidth / maxMLKitX;
-                  const yScale = actualImageHeight / maxMLKitY;
-                  
-                  // Use the smaller scale to be conservative
-                  // But if they're very different, use average
-                  if (Math.abs(xScale - yScale) / Math.min(xScale, yScale) < 0.2) {
-                    scaleFactor = (xScale + yScale) / 2;
-                  } else {
-                    // If scales are very different, MLKit might be using full resolution
-                    // Check if MLKit is already at full resolution
-                    if (maxMLKitX <= actualImageWidth && maxMLKitY <= actualImageHeight) {
-                      // MLKit coordinates are within image bounds, likely full resolution
-                      scaleFactor = 1;
-                    } else {
-                      // Use conservative estimate
-                      scaleFactor = Math.min(xScale, yScale);
-                    }
-                  }
-                }
+              
+              if (Platform.OS === 'android') {
+                // Android MLKit typically processes at 1/4 resolution (0.5x in each dimension)
+                scaleFactor = 4;
+                __DEV__ && console.log('🤖 Android detected: applying 4x scale factor for MLKit coordinates');
+              } else {
+                // iOS MLKit typically uses full resolution
+                scaleFactor = 1;
+                __DEV__ && console.log('🍎 iOS detected: MLKit coordinates at full resolution');
               }
               
-              // Scale corner points to match actual image dimensions
-              const scaledCorners = corners.map(c => ({
-                x: c.x * scaleFactor,
-                y: c.y * scaleFactor,
-              }));
+              __DEV__ && console.log('📏 Corner points before scaling:', corners[0]);
+              __DEV__ && console.log('📏 Image dimensions:', actualImageWidth, 'x', actualImageHeight);
+              
+              // Scale corner points if needed
+              const scaledCorners = scaleFactor !== 1 
+                ? corners.map(c => ({
+                    x: c.x * scaleFactor,
+                    y: c.y * scaleFactor,
+                  }))
+                : corners;
               
               // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
