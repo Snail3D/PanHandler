@@ -93,6 +93,7 @@ module.exports = function withProguardRules(config) {
     // Also add a Gradle task to ensure ProGuard rules file exists before R8 runs
     if (!buildGradle.includes('// Ensure proguard-rules.pro exists')) {
       // Escape the ProGuard rules content for Groovy triple-quoted string
+      // Need to escape backslashes, dollar signs, and triple quotes
       const escapedRules = proguardRulesContent
         .replace(/\\/g, '\\\\')
         .replace(/\$/g, '\\$')
@@ -100,51 +101,55 @@ module.exports = function withProguardRules(config) {
       
       const ensureRulesTask = `
 // Ensure proguard-rules.pro exists for R8 (added by withProguardRules config plugin)
-afterEvaluate {
-    println '[withProguardRules] ========================================='
-    println '[withProguardRules] Checking ProGuard rules file...'
-    
-    def rulesFile = file('app/proguard-rules.pro')
-    println '[withProguardRules] Rules file path: ' + rulesFile.absolutePath
-    println '[withProguardRules] Rules file exists: ' + rulesFile.exists()
-    
-    if (!rulesFile.exists()) {
-        println '[withProguardRules] Creating proguard-rules.pro file...'
-        rulesFile.parentFile.mkdirs()
-        rulesFile.text = '''${escapedRules}'''
-        println '[withProguardRules] ✅ Created proguard-rules.pro file'
-        println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
-    } else {
-        println '[withProguardRules] ✅ proguard-rules.pro already exists'
-        println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
-        def content = rulesFile.text
-        println '[withProguardRules] File contains VRUtilities: ' + content.contains('VRUtilities')
-        println '[withProguardRules] File contains expo.modules.core: ' + content.contains('expo.modules.core')
+task ensureProguardRules {
+    doLast {
+        println '[withProguardRules] ========================================='
+        println '[withProguardRules] Ensuring ProGuard rules file exists...'
+        
+        def rulesFile = file('app/proguard-rules.pro')
+        println '[withProguardRules] Rules file path: ' + rulesFile.absolutePath
+        println '[withProguardRules] Rules file exists: ' + rulesFile.exists()
+        
+        if (!rulesFile.exists()) {
+            println '[withProguardRules] Creating proguard-rules.pro file...'
+            rulesFile.parentFile.mkdirs()
+            rulesFile.text = '''${escapedRules}'''
+            println '[withProguardRules] ✅ Created proguard-rules.pro file'
+            println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
+        } else {
+            println '[withProguardRules] ✅ proguard-rules.pro already exists'
+            println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
+            def content = rulesFile.text
+            println '[withProguardRules] File contains VRUtilities: ' + content.contains('VRUtilities')
+            println '[withProguardRules] File contains expo.modules.core: ' + content.contains('expo.modules.core')
+        }
+        
+        // Verify the file one more time
+        if (rulesFile.exists()) {
+            def verifyContent = rulesFile.text
+            println '[withProguardRules] Verification - File contains VRUtilities: ' + verifyContent.contains('VRUtilities')
+            println '[withProguardRules] Verification - File contains expo.modules.core: ' + verifyContent.contains('expo.modules.core')
+            println '[withProguardRules] Verification - File line count: ' + verifyContent.split('\n').length
+        } else {
+            throw new GradleException('[withProguardRules] ❌ CRITICAL: ProGuard rules file still missing after creation attempt!')
+        }
+        
+        println '[withProguardRules] ========================================='
     }
-    
+}
+
+// Make sure ensureProguardRules runs before R8
+afterEvaluate {
     tasks.named('minifyReleaseWithR8').configure {
+        dependsOn 'ensureProguardRules'
         doFirst {
-            println '[withProguardRules] ========================================='
-            println '[withProguardRules] R8 minification starting - verifying ProGuard rules...'
+            println '[withProguardRules] R8 minification starting - ProGuard rules should be ready'
             def verifyFile = file('app/proguard-rules.pro')
-            if (verifyFile.exists()) {
-                println '[withProguardRules] ✅ ProGuard rules file exists before R8'
-                def verifyContent = verifyFile.text
-                println '[withProguardRules] Rules file contains VRUtilities: ' + verifyContent.contains('VRUtilities')
-                println '[withProguardRules] Rules file contains expo.modules.core: ' + verifyContent.contains('expo.modules.core')
-                println '[withProguardRules] Rules file line count: ' + verifyContent.split('\n').length
-            } else {
-                println '[withProguardRules] ❌ ERROR: ProGuard rules file missing before R8!'
-                println '[withProguardRules] Attempting emergency creation...'
-                verifyFile.parentFile.mkdirs()
-                verifyFile.text = '''${escapedRules}'''
-                println '[withProguardRules] Emergency file created'
+            if (!verifyFile.exists()) {
+                throw new GradleException('[withProguardRules] ❌ CRITICAL ERROR: ProGuard rules file missing before R8!')
             }
-            println '[withProguardRules] ========================================='
         }
     }
-    
-    println '[withProguardRules] ========================================='
 }
 `;
       
