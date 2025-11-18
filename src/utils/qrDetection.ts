@@ -1,4 +1,4 @@
-import { Platform, Image } from 'react-native';
+import { Platform } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
@@ -148,44 +148,31 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
       console.log('📊 MLKit returned barcodes:', barcodes?.length || 0);
       
       if (barcodes && barcodes.length > 0) {
-        // Get image dimensions to calculate center
+        // Estimate image dimensions from bounding boxes (instant, no async call needed)
+        // This is fast and accurate enough for "closest to center" calculation
         let imageWidth = 0;
         let imageHeight = 0;
-        try {
-          await new Promise<void>((resolve) => {
-            Image.getSize(scanUri, (width, height) => {
-              imageWidth = width;
-              imageHeight = height;
-              console.log('📐 Image dimensions:', width, 'x', height);
-              resolve();
-            }, (error) => {
-              console.warn('⚠️ Could not get image size, using bounding box max:', error);
-              // Fallback: use max bounding box coordinates to estimate image size
-              if (barcodes.length > 0) {
-                const maxX = Math.max(...barcodes.map(b => {
-                  if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
-                  if (b.cornerPoints) return Math.max(...b.cornerPoints.map(p => p.x));
-                  return 0;
-                }));
-                const maxY = Math.max(...barcodes.map(b => {
-                  if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
-                  if (b.cornerPoints) return Math.max(...b.cornerPoints.map(p => p.y));
-                  return 0;
-                }));
-                imageWidth = maxX * 1.1; // Add 10% padding
-                imageHeight = maxY * 1.1;
-                console.log('📐 Estimated image dimensions from barcodes:', imageWidth, 'x', imageHeight);
-              }
-              resolve();
-            });
-          });
-        } catch (sizeError) {
-          console.warn('⚠️ Error getting image size:', sizeError);
+        
+        if (barcodes.length > 0) {
+          const maxX = Math.max(...barcodes.map(b => {
+            if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
+            if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.x));
+            return 0;
+          }));
+          const maxY = Math.max(...barcodes.map(b => {
+            if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
+            if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.y));
+            return 0;
+          }));
+          // Add 20% padding to ensure center calculation is accurate
+          imageWidth = maxX * 1.2;
+          imageHeight = maxY * 1.2;
+          console.log('📐 Estimated image dimensions from barcodes:', imageWidth.toFixed(0), 'x', imageHeight.toFixed(0));
         }
         
         const imageCenterX = imageWidth / 2;
         const imageCenterY = imageHeight / 2;
-        console.log('📐 Image center:', imageCenterX, imageCenterY);
+        console.log('📐 Image center:', imageCenterX.toFixed(0), imageCenterY.toFixed(0));
         
         // Filter for QR codes only
         const qrCodes = barcodes.filter(b => {
