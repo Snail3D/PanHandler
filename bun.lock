@@ -7,7 +7,6 @@
         "@expo/vector-icons": "^14.1.0",
         "@react-native-async-storage/async-storage": "2.1.2",
         "@react-native-clipboard/clipboard": "^1.16.3",
-        "@react-native-ml-kit/barcode-scanning": "^2.0.0",
         "@react-navigation/native": "^7.1.6",
         "@shopify/react-native-skia": "v2.0.0-next.4",
         "clsx": "^2.1.1",
@@ -403,8 +402,6 @@
     "@react-native-async-storage/async-storage": ["@react-native-async-storage/async-storage@2.1.2", "", { "dependencies": { "merge-options": "^3.0.4" }, "peerDependencies": { "react-native": "^0.0.0-0 || >=0.65 <1.0" } }, "sha512-dvlNq4AlGWC+ehtH12p65+17V0Dx7IecOWl6WanF2ja38O1Dcjjvn7jVzkUHJ5oWkQBlyASurTPlTHgKXyYiow=="],
 
     "@react-native-clipboard/clipboard": ["@react-native-clipboard/clipboard@1.16.3", "", { "peerDependencies": { "react": ">= 16.9.0", "react-native": ">= 0.61.5", "react-native-macos": ">= 0.61.0", "react-native-windows": ">= 0.61.0" }, "optionalPeers": ["react-native-macos", "react-native-windows"] }, "sha512-cMIcvoZKIrShzJHEaHbTAp458R9WOv0fB6UyC7Ek4Qk561Ow/DrzmmJmH/rAZg21Z6ixJ4YSdFDC14crqIBmCQ=="],
-
-    "@react-native-ml-kit/barcode-scanning": ["@react-native-ml-kit/barcode-scanning@2.0.0", "", { "peerDependencies": { "react": ">=16.8.1", "react-native": ">=0.60.0-rc.0 <1.0.x" } }, "sha512-gCbxV6k/2IOYEw+GnMPbFWvURq0BDJYn6K4lOf5+gqr6L8bwH7CEMxnK8NA8J6aeNKDUh8OKDtZC0kL1gc9OWA=="],
 
     "@react-native/assets-registry": ["@react-native/assets-registry@0.79.6", "", {}, "sha512-UVSP1224PWg0X+mRlZNftV5xQwZGfawhivuW8fGgxNK9MS/U84xZ+16lkqcPh1ank6MOt239lIWHQ1S33CHgqA=="],
 

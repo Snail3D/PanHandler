@@ -1323,52 +1323,25 @@ export default function CameraScreen() {
       // react-native-vision-camera returns path, not URI
       const photoUri = `file://${photo.path}`;
       
-      __DEV__ && console.log('📷 Photo captured, checking for QR code...');
-      
       // AUTO-DETECT QR CODE IN BACKGROUND
       // Try to detect QR code in the captured photo (with timeout to prevent long delays)
       try {
         const { parseCalibrationURL } = await import('../utils/qrDetection');
         
-        // Try expo-barcode-scanner first (full resolution, no scaling issues)
-        let qrResult = null;
-        try {
-          const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
-          __DEV__ && console.log('🎯 Trying expo-barcode-scanner for QR detection...');
-          
-          const expoDetectionPromise = detectQRWithExpo(photoUri);
-          const timeoutPromise = new Promise<null>((resolve) => 
-            setTimeout(() => resolve(null), 2000) // 2 second timeout for expo
-          );
-          qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
-          
-          if (qrResult) {
-            __DEV__ && console.log('✅ Expo scanner detected QR successfully');
-            // Mark that this came from expo scanner (no scaling needed)
-            (qrResult as any).fromExpo = true;
-          }
-        } catch (expoError) {
-          __DEV__ && console.log('⚠️ Expo scanner failed, falling back to MLKit:', expoError);
-        }
+        // Use expo-barcode-scanner for QR detection (full resolution, no scaling issues)
+        const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
         
-        // Fall back to MLKit if expo scanner didn't work
-        if (!qrResult) {
-          const { detectQR } = await import('../utils/qrDetection');
-          __DEV__ && console.log('🔄 Falling back to MLKit for QR detection...');
-          
-          const mlkitDetectionPromise = detectQR(photoUri);
-          const timeoutPromise = new Promise<null>((resolve) => 
-            setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit (it's faster)
-          );
-          qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
-        }
+        const expoDetectionPromise = detectQRWithExpo(photoUri);
+        const timeoutPromise = new Promise<null>((resolve) => 
+          setTimeout(() => resolve(null), 2000) // 2 second timeout
+        );
+        const qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
         
         if (qrResult && qrResult.url) {
           const calibrationData = parseCalibrationURL(qrResult.url);
           
           if (calibrationData) {
             // PanHandler QR code detected! Auto-calibrate
-            __DEV__ && console.log('✅ PanHandler QR code detected! Auto-calibrating...', calibrationData);
             
             const { setCalibration } = useStore.getState();
             
@@ -1401,7 +1374,6 @@ export default function CameraScreen() {
                   (width, height) => {
                     actualImageWidth = width;
                     actualImageHeight = height;
-                    __DEV__ && console.log('📏 Actual image dimensions:', width, 'x', height);
                     resolve();
                   },
                   (error) => {
@@ -1414,37 +1386,9 @@ export default function CameraScreen() {
               console.error('⚠️ Error getting image size:', error);
             }
             
-            // Check if we need to scale coordinates
-            // MLKit on Android returns coordinates at 1/4 scale
-            // Expo scanner returns at full resolution
-            let scaleFactor = 1;
-            
-            const isFromExpo = (qrResult as any).fromExpo === true;
-            
-            if (!isFromExpo && Platform.OS === 'android') {
-              // Android MLKit processes at 1/4 resolution (0.5x in each dimension)
-              scaleFactor = 4;
-              __DEV__ && console.log('🤖 Android MLKit: applying 4x scale factor');
-            } else if (isFromExpo) {
-              // Expo scanner uses full resolution, no scaling needed
-              scaleFactor = 1;
-              __DEV__ && console.log('📱 Expo scanner: no scaling needed (full resolution)');
-            } else {
-              // iOS MLKit typically uses full resolution
-              scaleFactor = 1;
-              __DEV__ && console.log('🍎 iOS MLKit: no scaling needed');
-            }
-            
-            __DEV__ && console.log('📏 Corner points before scaling:', corners[0]);
-            __DEV__ && console.log('📏 Scale factor:', scaleFactor);
-            
-            // Scale corner points if needed
-            const scaledCorners = scaleFactor !== 1 
-              ? corners.map(c => ({
-                  x: c.x * scaleFactor,
-                  y: c.y * scaleFactor,
-                }))
-              : corners;
+            // Expo scanner returns coordinates at full resolution - no scaling needed
+            // Use corners directly - expo scanner provides full resolution coordinates
+            const scaledCorners = corners;
             
             // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
@@ -1919,45 +1863,20 @@ export default function CameraScreen() {
         try {
           const { parseCalibrationURL } = await import('../utils/qrDetection');
           
-          // Try expo-barcode-scanner first (full resolution, no scaling issues)
-          let qrResult = null;
-          try {
-            const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
-            __DEV__ && console.log('🎯 Trying expo-barcode-scanner for imported photo QR detection...');
-            
-            const expoDetectionPromise = detectQRWithExpo(asset.uri);
-            const timeoutPromise = new Promise<null>((resolve) => 
-              setTimeout(() => resolve(null), 1500) // 1.5 second timeout for expo
-            );
-            qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
-            
-            if (qrResult) {
-              __DEV__ && console.log('✅ Expo scanner detected QR in imported photo');
-              // Mark that this came from expo scanner (no scaling needed)
-              (qrResult as any).fromExpo = true;
-            }
-          } catch (expoError) {
-            __DEV__ && console.log('⚠️ Expo scanner failed on import, falling back to MLKit:', expoError);
-          }
+          // Use expo-barcode-scanner for QR detection (full resolution, no scaling issues)
+          const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
           
-          // Fall back to MLKit if expo scanner didn't work
-          if (!qrResult) {
-            const { detectQR } = await import('../utils/qrDetection');
-            __DEV__ && console.log('🔄 Falling back to MLKit for imported photo QR detection...');
-            
-            const mlkitDetectionPromise = detectQR(asset.uri);
-            const timeoutPromise = new Promise<null>((resolve) => 
-              setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit
-            );
-            qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
-          }
+          const expoDetectionPromise = detectQRWithExpo(asset.uri);
+          const timeoutPromise = new Promise<null>((resolve) => 
+            setTimeout(() => resolve(null), 1500) // 1.5 second timeout
+          );
+          const qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
           
           if (qrResult && qrResult.url) {
             const calibrationData = parseCalibrationURL(qrResult.url);
             
             if (calibrationData) {
               // PanHandler QR code detected! Auto-calibrate and go to measurement
-              __DEV__ && console.log('✅ PanHandler QR code detected in imported photo! Auto-calibrating...', calibrationData);
               
               const { setCalibration } = useStore.getState();
               
@@ -1990,7 +1909,6 @@ export default function CameraScreen() {
                     (width, height) => {
                       actualImageWidth = width;
                       actualImageHeight = height;
-                      __DEV__ && console.log('📏 Actual image dimensions:', width, 'x', height);
                       resolve();
                     },
                     (error) => {
@@ -2003,37 +1921,9 @@ export default function CameraScreen() {
                 console.error('⚠️ Error getting image size:', error);
               }
               
-              // Check if we need to scale coordinates
-              // MLKit on Android returns coordinates at 1/4 scale
-              // Expo scanner returns at full resolution
-              let scaleFactor = 1;
-              
-              const isFromExpo = (qrResult as any).fromExpo === true;
-              
-              if (!isFromExpo && Platform.OS === 'android') {
-                // Android MLKit processes at 1/4 resolution (0.5x in each dimension)
-                scaleFactor = 4;
-                __DEV__ && console.log('🤖 Android MLKit: applying 4x scale factor');
-              } else if (isFromExpo) {
-                // Expo scanner uses full resolution, no scaling needed
-                scaleFactor = 1;
-                __DEV__ && console.log('📱 Expo scanner: no scaling needed (full resolution)');
-              } else {
-                // iOS MLKit typically uses full resolution
-                scaleFactor = 1;
-                __DEV__ && console.log('🍎 iOS MLKit: no scaling needed');
-              }
-              
-              __DEV__ && console.log('📏 Corner points before scaling:', corners[0]);
-              __DEV__ && console.log('📏 Scale factor:', scaleFactor);
-              
-              // Scale corner points if needed
-              const scaledCorners = scaleFactor !== 1 
-                ? corners.map(c => ({
-                    x: c.x * scaleFactor,
-                    y: c.y * scaleFactor,
-                  }))
-                : corners;
+              // Expo scanner returns coordinates at full resolution - no scaling needed
+              // Use corners directly - expo scanner provides full resolution coordinates
+              const scaledCorners = corners;
               
               // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
@@ -2115,12 +2005,8 @@ export default function CameraScreen() {
               setTimeout(() => {
                 setMode('measurement');
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                __DEV__ && console.log('✅ QR auto-calibration complete for imported photo');
               }, 100); // Small delay for smooth transition
               return; // Skip showing modal
-            } else {
-              // QR code detected but not a PanHandler QR code
-              __DEV__ && console.log('⚠️ QR code detected but not a PanHandler calibration QR');
             }
           }
         } catch (qrError) {

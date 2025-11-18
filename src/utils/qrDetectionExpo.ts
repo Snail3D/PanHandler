@@ -9,8 +9,6 @@ import { Point, QRResult, parseCalibrationURL } from './qrDetection';
  */
 export async function detectQRWithExpo(imageUri: string): Promise<QRResult | null> {
   try {
-    console.log('🔍 Starting QR detection with expo-barcode-scanner:', imageUri);
-    
     // Convert to a file URI that expo-barcode-scanner can process
     let fileUri = imageUri;
     
@@ -23,25 +21,18 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
           to: tempUri,
         });
         fileUri = tempUri;
-        console.log('📱 Copied iOS photo to temp file for expo scanner:', fileUri);
       } catch (copyError) {
-        console.error('⚠️ Failed to copy iOS photo:', copyError);
         return null;
       }
     }
     
     // Use expo-barcode-scanner to scan the image
-    console.log('🔍 Scanning image with expo-barcode-scanner:', fileUri);
-    
     // scanFromURLAsync returns an array of detected barcodes
     const results = await BarCodeScanner.scanFromURLAsync(fileUri, [
       BarCodeScanner.Constants.BarCodeType.qr
     ]);
     
-    console.log(`📊 Expo scanner found ${results?.length || 0} QR code(s)`);
-    
     if (!results || results.length === 0) {
-      console.log('❌ No QR codes found by expo scanner');
       return null;
     }
     
@@ -115,7 +106,6 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       }
       
       if (corners.length < 4) {
-        console.warn('⚠️ QR code missing corners, skipping');
         continue;
       }
       
@@ -131,15 +121,12 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
     }
     
     if (panHandlerQRs.length === 0) {
-      console.log('❌ No PanHandler QR codes found by expo scanner');
       return null;
     }
     
     // Use the PanHandler QR closest to center
     panHandlerQRs.sort((a, b) => a.distanceToCenter - b.distanceToCenter);
     const selected = panHandlerQRs[0];
-    
-    console.log('✅ Selected PanHandler QR from expo scanner:', selected.data.data);
     
     // Build QRResult
     const bounds = selected.data.bounds || selected.data.cornerPoints;
@@ -178,7 +165,6 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
     };
     
   } catch (error) {
-    console.error('Error detecting QR with expo scanner:', error);
     return null;
   }
 }
