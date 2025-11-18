@@ -184,10 +184,14 @@ const PDF_CONTENT = `<!DOCTYPE html>
     line-height: 1.5;
   }
   /* Grid page styles for 30mm QR codes */
+  @page {
+    size: A4;
+    margin: 0;
+  }
   .qr-grid-page {
     page-break-before: always;
-    width: 100%;
-    min-height: 100vh;
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
     padding: 36pt;
     box-sizing: border-box;
     display: flex;
@@ -237,8 +241,8 @@ const PDF_CONTENT = `<!DOCTYPE html>
     box-sizing: border-box;
   }
   .grid-qr-code {
-    width: 85pt;
-    height: 85pt;
+    width: 30mm; /* Exactly 30mm - explicit sizing to prevent printer scaling */
+    height: 30mm;
     margin-bottom: 4pt;
   }
   .grid-qr-code img {
@@ -252,6 +256,30 @@ const PDF_CONTENT = `<!DOCTYPE html>
     color: #1C1C1E;
     text-align: center;
     line-height: 1.2;
+  }
+  .calibration-ruler {
+    width: 30mm;
+    height: 3mm;
+    border: 1px solid #000;
+    background: repeating-linear-gradient(
+      to right,
+      #000 0mm,
+      #000 1mm,
+      transparent 1mm,
+      transparent 2mm
+    );
+    margin: 8pt auto;
+    position: relative;
+  }
+  .calibration-ruler::before {
+    content: '30mm';
+    position: absolute;
+    top: -12pt;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8pt;
+    font-weight: bold;
+    color: #000;
   }
   .download-box {
     background: #f0f4ff;
@@ -469,7 +497,14 @@ const PDF_CONTENT = `<!DOCTYPE html>
     <h2>📱 PanHandler QR Calibration Codes (30mm) - iOS</h2>
     <p>Cut out and share these QR codes for easy calibration on iPhone/iPad</p>
     <div class="qr-grid-warning">
-      ⚠️ Print at 100% scale (no scaling) - Verify: 30mm edge to edge
+      ⚠️ CRITICAL: Print at 100% scale (Actual Size, not Fit to Page)<br>
+      In print dialog: Select "Actual Size" or "100%" - NOT "Fit to Page"<br>
+      Verify after printing: QR code should measure exactly 30mm edge to edge
+    </div>
+    <div style="margin: 12pt 0; padding: 8pt; background: #FFF3CD; border: 2px solid #FFC107; border-radius: 4px; font-size: 10pt; text-align: center;">
+      <strong>📏 Calibration Check:</strong> Use the ruler below to verify print scale. It should measure exactly 30mm.
+      <div class="calibration-ruler"></div>
+      If the ruler is NOT 30mm, your printer scaled the PDF. Check print settings and select "Actual Size" or "100%".
     </div>
   </div>
   
@@ -484,7 +519,14 @@ const PDF_CONTENT = `<!DOCTYPE html>
     <h2>🤖 PanHandler QR Calibration Codes (30mm) - Android</h2>
     <p>Cut out and share these QR codes for easy calibration on Android devices</p>
     <div class="qr-grid-warning">
-      ⚠️ Print at 100% scale (no scaling) - Verify: 30mm edge to edge
+      ⚠️ CRITICAL: Print at 100% scale (Actual Size, not Fit to Page)<br>
+      In print dialog: Select "Actual Size" or "100%" - NOT "Fit to Page"<br>
+      Verify after printing: QR code should measure exactly 30mm edge to edge
+    </div>
+    <div style="margin: 12pt 0; padding: 8pt; background: #FFF3CD; border: 2px solid #FFC107; border-radius: 4px; font-size: 10pt; text-align: center;">
+      <strong>📏 Calibration Check:</strong> Use the ruler below to verify print scale. It should measure exactly 30mm.
+      <div class="calibration-ruler"></div>
+      If the ruler is NOT 30mm, your printer scaled the PDF. Check print settings and select "Actual Size" or "100%".
     </div>
   </div>
   
