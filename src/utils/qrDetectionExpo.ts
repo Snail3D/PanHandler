@@ -1,15 +1,15 @@
 import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import * as BarCodeScanner from 'expo-barcode-scanner';
+import { scanFromURLAsync, BarcodeScanningResult } from 'expo-camera';
 import { Point, QRResult, parseCalibrationURL } from './qrDetection';
 
 /**
- * Detect QR code using expo-barcode-scanner
- * This should work at full resolution without the 4x scaling issue
+ * Detect QR code using expo-camera's scanFromURLAsync
+ * This works at full resolution and provides accurate corner points
  */
 export async function detectQRWithExpo(imageUri: string): Promise<QRResult | null> {
   try {
-    // Convert to a file URI that expo-barcode-scanner can process
+    // Convert to a file URI that expo-camera can process
     let fileUri = imageUri;
     
     // Handle iOS photo library URIs
@@ -26,11 +26,9 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       }
     }
     
-    // Use expo-barcode-scanner to scan the image
+    // Use expo-camera to scan the image
     // scanFromURLAsync returns an array of detected barcodes
-    const results = await BarCodeScanner.scanFromURLAsync(fileUri, [
-      BarCodeScanner.Constants.BarCodeType.qr
-    ]);
+    const results = await scanFromURLAsync(fileUri, ['qr']);
     
     if (!results || results.length === 0) {
       return null;
@@ -38,31 +36,25 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
     
     // Process all QR codes and find PanHandler ones
     const panHandlerQRs: Array<{
-      data: typeof results[0];
+      barcode: BarcodeScanningResult;
       calibration: ReturnType<typeof parseCalibrationURL>;
       distanceToCenter: number;
     }> = [];
     
-    // Estimate image dimensions from the bounds
-    // Expo scanner returns bounds as { x, y, width, height }
+    // Estimate image dimensions from the bounds and corner points
     let maxX = 0;
     let maxY = 0;
     
     for (const barcode of results) {
-      // Expo scanner returns: { type, data, bounds }
-      // bounds has: { origin: {x, y}, size: {width, height} }
-      const bounds = barcode.bounds || barcode.cornerPoints;
-      
-      if (bounds) {
-        if ('origin' in bounds && 'size' in bounds) {
-          // Expo format
-          maxX = Math.max(maxX, bounds.origin.x + bounds.size.width);
-          maxY = Math.max(maxY, bounds.origin.y + bounds.size.height);
-        } else if (Array.isArray(bounds) && bounds.length >= 4) {
-          // Corner points format
-          maxX = Math.max(maxX, ...bounds.map(p => p.x));
-          maxY = Math.max(maxY, ...bounds.map(p => p.y));
-        }
+      // expo-camera returns: { type, data, bounds, cornerPoints }
+      // bounds: { origin: {x, y}, size: {width, height} }
+      // cornerPoints: Array<{x, y}>
+      if (barcode.cornerPoints && barcode.cornerPoints.length >= 4) {
+        maxX = Math.max(maxX, ...barcode.cornerPoints.map(p => p.x));
+        maxY = Math.max(maxY, ...barcode.cornerPoints.map(p => p.y));
+      } else if (barcode.bounds) {
+        maxX = Math.max(maxX, barcode.bounds.origin.x + barcode.bounds.size.width);
+        maxY = Math.max(maxY, barcode.bounds.origin.y + barcode.bounds.size.height);
       }
     }
     
@@ -75,34 +67,30 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       const calibrationData = parseCalibrationURL(barcode.data);
       if (!calibrationData) continue;
       
-      // Calculate center and distance
+      // Use corner points if available (most accurate), otherwise use bounds
+      let corners: Point[] = [];
       let centerX = 0;
       let centerY = 0;
-      let corners: Point[] = [];
       
-      const bounds = barcode.bounds || barcode.cornerPoints;
-      
-      if (bounds) {
-        if ('origin' in bounds && 'size' in bounds) {
-          // Expo format - convert to corners
-          const { x, y } = bounds.origin;
-          const { width, height } = bounds.size;
-          
-          corners = [
-            { x: x, y: y },
-            { x: x + width, y: y },
-            { x: x + width, y: y + height },
-            { x: x, y: y + height }
-          ];
-          
-          centerX = x + width / 2;
-          centerY = y + height / 2;
-        } else if (Array.isArray(bounds) && bounds.length >= 4) {
-          // Corner points format
-          corners = bounds.map(p => ({ x: p.x, y: p.y }));
-          centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
-          centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
-        }
+      if (barcode.cornerPoints && barcode.cornerPoints.length >= 4) {
+        // Use actual corner points (most accurate)
+        corners = barcode.cornerPoints.map(p => ({ x: p.x, y: p.y }));
+        centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
+        centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
+      } else if (barcode.bounds) {
+        // Fallback to bounds if corner points not available
+        const { x, y } = barcode.bounds.origin;
+        const { width, height } = barcode.bounds.size;
+        
+        corners = [
+          { x: x, y: y },
+          { x: x + width, y: y },
+          { x: x + width, y: y + height },
+          { x: x, y: y + height }
+        ];
+        
+        centerX = x + width / 2;
+        centerY = y + height / 2;
       }
       
       if (corners.length < 4) {
@@ -114,7 +102,7 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       const distanceToCenter = Math.sqrt(dx * dx + dy * dy);
       
       panHandlerQRs.push({
-        data: barcode,
+        barcode,
         calibration: calibrationData,
         distanceToCenter
       });
@@ -128,35 +116,34 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
     panHandlerQRs.sort((a, b) => a.distanceToCenter - b.distanceToCenter);
     const selected = panHandlerQRs[0];
     
-    // Build QRResult
-    const bounds = selected.data.bounds || selected.data.cornerPoints;
+    // Build QRResult using corner points (most accurate)
     let corners: Point[] = [];
     let centerX = 0;
     let centerY = 0;
     
-    if (bounds) {
-      if ('origin' in bounds && 'size' in bounds) {
-        const { x, y } = bounds.origin;
-        const { width, height } = bounds.size;
-        
-        corners = [
-          { x: x, y: y },
-          { x: x + width, y: y },
-          { x: x + width, y: y + height },
-          { x: x, y: y + height }
-        ];
-        
-        centerX = x + width / 2;
-        centerY = y + height / 2;
-      } else if (Array.isArray(bounds) && bounds.length >= 4) {
-        corners = bounds.map(p => ({ x: p.x, y: p.y }));
-        centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
-        centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
-      }
+    if (selected.barcode.cornerPoints && selected.barcode.cornerPoints.length >= 4) {
+      // Use actual corner points (most accurate for measurement)
+      corners = selected.barcode.cornerPoints.map(p => ({ x: p.x, y: p.y }));
+      centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
+      centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
+    } else if (selected.barcode.bounds) {
+      // Fallback to bounds
+      const { x, y } = selected.barcode.bounds.origin;
+      const { width, height } = selected.barcode.bounds.size;
+      
+      corners = [
+        { x: x, y: y },
+        { x: x + width, y: y },
+        { x: x + width, y: y + height },
+        { x: x, y: y + height }
+      ];
+      
+      centerX = x + width / 2;
+      centerY = y + height / 2;
     }
     
     return {
-      url: selected.data.data,
+      url: selected.barcode.data,
       size: selected.calibration.size,
       format: selected.calibration.format,
       corners,
