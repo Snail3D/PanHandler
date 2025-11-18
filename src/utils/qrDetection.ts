@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Image } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
@@ -145,29 +145,68 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
         throw new Error(`QR detection failed: ${moduleError?.message || String(moduleError)}`);
       }
       
-      console.log('📊 MLKit returned barcodes:', barcodes?.length || 0, JSON.stringify(barcodes, null, 2));
+      console.log('📊 MLKit returned barcodes:', barcodes?.length || 0);
       
       if (barcodes && barcodes.length > 0) {
-        // Accept ANY barcode first to test if module is working
-        // Then filter for QR codes
-        let qrCode = barcodes.find(b => {
+        // Get image dimensions to calculate center
+        let imageWidth = 0;
+        let imageHeight = 0;
+        try {
+          await new Promise<void>((resolve) => {
+            Image.getSize(scanUri, (width, height) => {
+              imageWidth = width;
+              imageHeight = height;
+              console.log('📐 Image dimensions:', width, 'x', height);
+              resolve();
+            }, (error) => {
+              console.warn('⚠️ Could not get image size, using bounding box max:', error);
+              // Fallback: use max bounding box coordinates to estimate image size
+              if (barcodes.length > 0) {
+                const maxX = Math.max(...barcodes.map(b => {
+                  if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
+                  if (b.cornerPoints) return Math.max(...b.cornerPoints.map(p => p.x));
+                  return 0;
+                }));
+                const maxY = Math.max(...barcodes.map(b => {
+                  if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
+                  if (b.cornerPoints) return Math.max(...b.cornerPoints.map(p => p.y));
+                  return 0;
+                }));
+                imageWidth = maxX * 1.1; // Add 10% padding
+                imageHeight = maxY * 1.1;
+                console.log('📐 Estimated image dimensions from barcodes:', imageWidth, 'x', imageHeight);
+              }
+              resolve();
+            });
+          });
+        } catch (sizeError) {
+          console.warn('⚠️ Error getting image size:', sizeError);
+        }
+        
+        const imageCenterX = imageWidth / 2;
+        const imageCenterY = imageHeight / 2;
+        console.log('📐 Image center:', imageCenterX, imageCenterY);
+        
+        // Filter for QR codes only
+        const qrCodes = barcodes.filter(b => {
           const format = b.format;
           return format === BarcodeFormat.QR_CODE || 
                  format === 256 ||
                  (typeof format === 'number' && format === 256);
         });
         
-        // If no QR code found, use first barcode anyway (for testing)
-        if (!qrCode && barcodes.length > 0) {
-          qrCode = barcodes[0];
-          console.log('⚠️ No QR code found, using first barcode for testing:', qrCode.format);
+        console.log('🔍 Found', qrCodes.length, 'QR code(s) out of', barcodes.length, 'total barcode(s)');
+        
+        if (qrCodes.length === 0) {
+          console.log('❌ No QR codes found in barcodes');
+          return null;
         }
         
-        console.log('🔍 Selected barcode:', JSON.stringify(qrCode, null, 2));
-        console.log('🔍 Format check - QR_CODE enum:', BarcodeFormat.QR_CODE, 'barcode format:', qrCode?.format);
+        // Process all QR codes and extract their data
+        const qrResults: Array<{ barcode: BarcodeWithCorners; result: QRResult; distanceToCenter: number }> = [];
         
-        if (qrCode && qrCode.value) {
-          console.log('✅ QR code detected (offline):', qrCode.value);
+        for (const qrCode of qrCodes) {
+          if (!qrCode.value) continue;
           
           // Use ACTUAL corner points from MLKit for precise calculation (not estimation!)
           let corners: Point[] = [];
@@ -181,8 +220,6 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
             // Calculate center from actual corner points
             centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
             centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
-            
-            console.log('📐 Using actual corner points for precise calculation:', corners);
           } else if (qrCode.boundingBox) {
             // Fallback: use bounding box if corner points not available
             const { left, top, width, height } = qrCode.boundingBox;
@@ -194,27 +231,59 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
             ];
             centerX = left + width / 2;
             centerY = top + height / 2;
-            
-            console.log('📐 Using bounding box for calculation:', qrCode.boundingBox);
           } else {
-            // Fallback: If corner points aren't available (module not rebuilt yet), 
-            // we can't do precise calibration, but we can still detect the QR code
-            // The calibration will need to be done manually or after rebuild
-            console.warn('⚠️ No corner points or bounding box - native module may need rebuild');
-            // Return null so it falls back to normal calibration flow
-            // User can manually calibrate if needed
-            return null;
+            // Skip QR codes without corner points or bounding box
+            console.warn('⚠️ QR code missing corner points and bounding box, skipping:', qrCode.value);
+            continue;
           }
           
-          return {
-            url: qrCode.value,
-            size: 0, // Will be extracted from URL by parseCalibrationURL
-            format: 'paper', // Will be determined from URL
-            corners,
-            centerX,
-            centerY,
-          };
+          // Calculate distance from QR code center to image center
+          const dx = centerX - imageCenterX;
+          const dy = centerY - imageCenterY;
+          const distanceToCenter = Math.sqrt(dx * dx + dy * dy);
+          
+          qrResults.push({
+            barcode: qrCode,
+            result: {
+              url: qrCode.value,
+              size: 0, // Will be extracted from URL by parseCalibrationURL
+              format: 'paper', // Will be determined from URL
+              corners,
+              centerX,
+              centerY,
+            },
+            distanceToCenter,
+          });
         }
+        
+        if (qrResults.length === 0) {
+          console.log('❌ No QR codes with valid corner points found');
+          return null;
+        }
+        
+        // Filter for PanHandler QR codes first
+        const panHandlerQRCodes = qrResults.filter(({ result }) => {
+          const calibrationData = parseCalibrationURL(result.url);
+          return calibrationData !== null;
+        });
+        
+        console.log('🔍 Found', panHandlerQRCodes.length, 'PanHandler QR code(s) out of', qrResults.length, 'total QR code(s)');
+        
+        // If we have PanHandler QR codes, use the one closest to center
+        // Otherwise, don't use any QR code (we only want PanHandler QR codes for calibration)
+        if (panHandlerQRCodes.length === 0) {
+          console.log('❌ No PanHandler QR codes found - will not calibrate');
+          return null;
+        }
+        
+        // Sort PanHandler QR codes by distance to center (closest first)
+        panHandlerQRCodes.sort((a, b) => a.distanceToCenter - b.distanceToCenter);
+        
+        const selectedQR = panHandlerQRCodes[0];
+        console.log('✅ Selected PanHandler QR code closest to center:', selectedQR.result.url);
+        console.log('📐 Distance to center:', selectedQR.distanceToCenter.toFixed(1), 'pixels');
+        
+        return selectedQR.result;
       }
       
       console.log('❌ No QR code detected in image');
