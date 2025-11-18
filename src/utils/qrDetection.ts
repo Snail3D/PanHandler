@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Image } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
@@ -148,26 +148,64 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
       console.log('📊 MLKit returned barcodes:', barcodes?.length || 0);
       
       if (barcodes && barcodes.length > 0) {
-        // Estimate image dimensions from bounding boxes (instant, no async call needed)
-        // This is fast and accurate enough for "closest to center" calculation
+        // Get actual image dimensions for accurate coordinate system matching
+        // MLKit corner points are in the scanned image coordinate system
+        // We need to ensure they match the original image dimensions used for measurements
         let imageWidth = 0;
         let imageHeight = 0;
         
-        if (barcodes.length > 0) {
-          const maxX = Math.max(...barcodes.map(b => {
-            if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
-            if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.x));
-            return 0;
-          }));
-          const maxY = Math.max(...barcodes.map(b => {
-            if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
-            if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.y));
-            return 0;
-          }));
-          // Add 20% padding to ensure center calculation is accurate
-          imageWidth = maxX * 1.2;
-          imageHeight = maxY * 1.2;
-          console.log('📐 Estimated image dimensions from barcodes:', imageWidth.toFixed(0), 'x', imageHeight.toFixed(0));
+        // Get actual image dimensions using Image.getSize
+        // This ensures coordinate systems match between QR detection and measurements
+        try {
+          await new Promise<void>((resolve, reject) => {
+            Image.getSize(
+              fileUri,
+              (width, height) => {
+                imageWidth = width;
+                imageHeight = height;
+                console.log('📐 Actual image dimensions:', imageWidth, 'x', imageHeight);
+                resolve();
+              },
+              (error) => {
+                console.warn('⚠️ Could not get image size, estimating from barcodes:', error);
+                // Fallback: estimate from bounding boxes
+                if (barcodes.length > 0) {
+                  const maxX = Math.max(...barcodes.map(b => {
+                    if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
+                    if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.x));
+                    return 0;
+                  }));
+                  const maxY = Math.max(...barcodes.map(b => {
+                    if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
+                    if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.y));
+                    return 0;
+                  }));
+                  imageWidth = maxX;
+                  imageHeight = maxY;
+                  console.log('📐 Estimated image dimensions from barcodes:', imageWidth.toFixed(0), 'x', imageHeight.toFixed(0));
+                }
+                resolve();
+              }
+            );
+          });
+        } catch (error) {
+          console.error('⚠️ Error getting image size:', error);
+          // Fallback: estimate from bounding boxes
+          if (barcodes.length > 0) {
+            const maxX = Math.max(...barcodes.map(b => {
+              if (b.boundingBox) return b.boundingBox.left + b.boundingBox.width;
+              if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.x));
+              return 0;
+            }));
+            const maxY = Math.max(...barcodes.map(b => {
+              if (b.boundingBox) return b.boundingBox.top + b.boundingBox.height;
+              if (b.cornerPoints && b.cornerPoints.length > 0) return Math.max(...b.cornerPoints.map(p => p.y));
+              return 0;
+            }));
+            imageWidth = maxX;
+            imageHeight = maxY;
+            console.log('📐 Estimated image dimensions from barcodes (fallback):', imageWidth.toFixed(0), 'x', imageHeight.toFixed(0));
+          }
         }
         
         const imageCenterX = imageWidth / 2;
