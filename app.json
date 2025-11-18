@@ -39,8 +39,7 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.INTERNET"
-      ],
-      "proguardFiles": ["./proguard-rules.pro"]
+      ]
     },
     "plugins": [
       [
@@ -109,7 +108,8 @@
       "./plugins/withNukePermissions.js",
       "./plugins/withAbsoluteFinalCleanup.js",
       "./plugins/withGradlePermissionRemoval.js",
-      "./plugins/withManifestRemoveDirectives.js"
+      "./plugins/withManifestRemoveDirectives.js",
+      "./plugins/withProguardRules.js"
     ],
     "extra": {
       "eas": {
