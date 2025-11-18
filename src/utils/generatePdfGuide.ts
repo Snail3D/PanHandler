@@ -547,6 +547,31 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
     margin-top: 12pt;
     text-align: center;
   }
+  .frame-qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20pt;
+  }
+  .frame-qr-code {
+    width: 50mm;
+    height: 50mm;
+    margin: 0 auto 8pt;
+    display: block;
+  }
+  .frame-qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .frame-qr-label {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1C1C1E;
+    text-align: center;
+    margin-top: 4pt;
+  }
 </style>
 </head>
 <body>
@@ -569,6 +594,16 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
       />
     </div>
     <div class="qr-label-180mm">180MM Android</div>
+    
+    <div class="frame-qr-section">
+      <div class="frame-qr-code">
+        <img 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761')}" 
+          alt="MakerWorld Frame QR Code" 
+        />
+      </div>
+      <div class="frame-qr-label">3D print a frame for these!</div>
+    </div>
   </div>
 </div>
 
@@ -590,6 +625,16 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
       />
     </div>
     <div class="qr-label-180mm">180MM Iphone</div>
+    
+    <div class="frame-qr-section">
+      <div class="frame-qr-code">
+        <img 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761')}" 
+          alt="MakerWorld Frame QR Code" 
+        />
+      </div>
+      <div class="frame-qr-label">3D print a frame for these!</div>
+    </div>
   </div>
 </div>
 
@@ -604,7 +649,7 @@ export async function generateQRCodePagesOnly(): Promise<void> {
     });
 
     if (result.uri) {
-      const fileName = 'PanHandler_QR_Codes.pdf';
+      const fileName = 'PanHandler QR Codes.pdf';
       const newPath = `${FileSystem.documentDirectory}${fileName}`;
       
       await FileSystem.copyAsync({
