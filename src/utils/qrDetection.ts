@@ -248,7 +248,8 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
           return null;
         }
         
-        // Filter for PanHandler QR codes first
+        // CRITICAL: Filter for PanHandler QR codes ONLY - ignore all other QR codes
+        // Even if a non-PanHandler QR code is closer to center, we will NOT use it
         const panHandlerQRCodes = qrResults.filter(({ result }) => {
           const calibrationData = parseCalibrationURL(result.url);
           return calibrationData !== null;
@@ -258,12 +259,14 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
         
         // If we have PanHandler QR codes, use the one closest to center
         // Otherwise, don't use any QR code (we only want PanHandler QR codes for calibration)
+        // IMPORTANT: We will NEVER use a non-PanHandler QR code, even if it's closer to center
         if (panHandlerQRCodes.length === 0) {
-          console.log('❌ No PanHandler QR codes found - will not calibrate');
+          console.log('❌ No PanHandler QR codes found - will not calibrate (ignoring all non-PanHandler QR codes)');
           return null;
         }
         
         // Sort PanHandler QR codes by distance to center (closest first)
+        // This ensures we use the PanHandler QR code closest to center, not just any QR code
         panHandlerQRCodes.sort((a, b) => a.distanceToCenter - b.distanceToCenter);
         
         const selectedQR = panHandlerQRCodes[0];
