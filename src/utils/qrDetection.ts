@@ -1,7 +1,16 @@
+import { Platform } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
-// import * as BarcodeScanner from 'expo-barcode-scanner'; // Temporarily disabled due to build errors
 import * as FileSystem from 'expo-file-system';
+import BarcodeScanning, { BarcodeFormat } from '@react-native-ml-kit/barcode-scanning';
+
+// Extended Barcode interface with corner points (patched native module provides these)
+interface BarcodeWithCorners {
+  format: BarcodeFormat;
+  value: string;
+  cornerPoints?: Array<{ x: number; y: number }>;
+  boundingBox?: { left: number; top: number; width: number; height: number };
+}
 
 export interface Point {
   x: number;
@@ -106,57 +115,99 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
       }
     }
     
-    // QR detection temporarily disabled due to expo-barcode-scanner build errors
-    // TODO: Re-enable when expo-barcode-scanner compilation issues are fixed
-    console.warn('⚠️ QR detection temporarily disabled - expo-barcode-scanner has build errors');
-    return null;
-    
-    // Use expo-barcode-scanner to scan the image
-    // Note: scanFromURLAsync might not be available in all versions
-    // If not available, we'll need to use a different approach
-    /* Temporarily disabled
+    // Use MLKit Barcode Scanner to detect QR codes in the image (works offline, on-device)
     try {
-      // Try to use scanFromURLAsync if available
-      if (BarcodeScanner.scanFromURLAsync) {
-        const result = await BarcodeScanner.scanFromURLAsync(fileUri, [
-          BarcodeScanner.Constants.BarCodeType.qr,
-        ]);
+      console.log('🔍 Scanning image for QR codes (offline MLKit):', fileUri);
+      
+      // MLKit BarcodeScanning.scan() takes an image URL
+      // On Android, ensure we have a proper file:// URI
+      // On iOS, file:// URIs work fine
+      let scanUri = fileUri;
+      if (Platform.OS === 'android' && !fileUri.startsWith('file://') && !fileUri.startsWith('http')) {
+        // Android might need file:// prefix
+        scanUri = fileUri.startsWith('/') ? `file://${fileUri}` : `file:///${fileUri}`;
+        console.log('📱 Adjusted Android URI:', scanUri);
+      }
+      
+      console.log('🔍 Calling BarcodeScanning.scan with URI:', scanUri);
+      
+      // Check if module is available
+      if (!BarcodeScanning || typeof BarcodeScanning.scan !== 'function') {
+        throw new Error('BarcodeScanning module not available - native module may not be linked');
+      }
+      
+      // This works 100% offline - MLKit runs on-device
+      let barcodes: BarcodeWithCorners[];
+      try {
+        barcodes = await BarcodeScanning.scan(scanUri) as BarcodeWithCorners[];
+      } catch (moduleError: any) {
+        console.error('❌ BarcodeScanning.scan threw error:', moduleError);
+        throw new Error(`QR detection failed: ${moduleError?.message || String(moduleError)}`);
+      }
+      
+      console.log('📊 MLKit returned barcodes:', barcodes?.length || 0, JSON.stringify(barcodes, null, 2));
+      
+      if (barcodes && barcodes.length > 0) {
+        // Accept ANY barcode first to test if module is working
+        // Then filter for QR codes
+        let qrCode = barcodes.find(b => {
+          const format = b.format;
+          return format === BarcodeFormat.QR_CODE || 
+                 format === 256 ||
+                 (typeof format === 'number' && format === 256);
+        });
         
-        if (result && result.length > 0) {
-          const qrCode = result[0];
-          console.log('✅ QR code detected:', qrCode.data);
+        // If no QR code found, use first barcode anyway (for testing)
+        if (!qrCode && barcodes.length > 0) {
+          qrCode = barcodes[0];
+          console.log('⚠️ No QR code found, using first barcode for testing:', qrCode.format);
+        }
+        
+        console.log('🔍 Selected barcode:', JSON.stringify(qrCode, null, 2));
+        console.log('🔍 Format check - QR_CODE enum:', BarcodeFormat.QR_CODE, 'barcode format:', qrCode?.format);
+        
+        if (qrCode && qrCode.value) {
+          console.log('✅ QR code detected (offline):', qrCode.value);
           
-          // Extract corners from bounds if available
-          const corners: Point[] = [];
+          // Use ACTUAL corner points from MLKit for precise calculation (not estimation!)
+          let corners: Point[] = [];
           let centerX = 0;
           let centerY = 0;
           
-          if (qrCode.bounds) {
-            // expo-barcode-scanner provides bounds as { origin: { x, y }, size: { width, height } }
-            const { origin, size } = qrCode.bounds;
-            corners.push(
-              { x: origin.x, y: origin.y },
-              { x: origin.x + size.width, y: origin.y },
-              { x: origin.x + size.width, y: origin.y + size.height },
-              { x: origin.x, y: origin.y + size.height }
-            );
-            centerX = origin.x + size.width / 2;
-            centerY = origin.y + size.height / 2;
+          if (qrCode.cornerPoints && qrCode.cornerPoints.length >= 4) {
+            // MLKit provides exact corner points - use them for precise calculation
+            corners = qrCode.cornerPoints.map(p => ({ x: p.x, y: p.y }));
+            
+            // Calculate center from actual corner points
+            centerX = corners.reduce((sum, p) => sum + p.x, 0) / corners.length;
+            centerY = corners.reduce((sum, p) => sum + p.y, 0) / corners.length;
+            
+            console.log('📐 Using actual corner points for precise calculation:', corners);
+          } else if (qrCode.boundingBox) {
+            // Fallback: use bounding box if corner points not available
+            const { left, top, width, height } = qrCode.boundingBox;
+            corners = [
+              { x: left, y: top },
+              { x: left + width, y: top },
+              { x: left + width, y: top + height },
+              { x: left, y: top + height }
+            ];
+            centerX = left + width / 2;
+            centerY = top + height / 2;
+            
+            console.log('📐 Using bounding box for calculation:', qrCode.boundingBox);
           } else {
-            // Fallback: use image center if bounds not available
-            // We'd need image dimensions for this, but for now use placeholder
-            centerX = 500; // Placeholder
-            centerY = 500; // Placeholder
-            corners.push(
-              { x: 400, y: 400 },
-              { x: 600, y: 400 },
-              { x: 600, y: 600 },
-              { x: 400, y: 600 }
-            );
+            // Fallback: If corner points aren't available (module not rebuilt yet), 
+            // we can't do precise calibration, but we can still detect the QR code
+            // The calibration will need to be done manually or after rebuild
+            console.warn('⚠️ No corner points or bounding box - native module may need rebuild');
+            // Return null so it falls back to normal calibration flow
+            // User can manually calibrate if needed
+            return null;
           }
           
           return {
-            url: qrCode.data,
+            url: qrCode.value,
             size: 0, // Will be extracted from URL by parseCalibrationURL
             format: 'paper', // Will be determined from URL
             corners,
@@ -164,25 +215,14 @@ export async function detectQR(imageUri: string): Promise<QRResult | null> {
             centerY,
           };
         }
-      } else {
-        // scanFromURLAsync not available, try jsqr fallback
-        console.warn('⚠️ scanFromURLAsync not available, trying jsqr fallback');
-        return await detectQRWithJSQR(fileUri);
       }
+      
+      console.log('❌ No QR code detected in image');
+      return null;
     } catch (scanError) {
-      console.error('⚠️ QR scan error with expo-barcode-scanner, trying jsqr fallback:', scanError);
-      // Try jsqr as fallback
-      try {
-        return await detectQRWithJSQR(fileUri);
-      } catch (jsqrError) {
-        console.error('⚠️ jsqr fallback also failed:', jsqrError);
-        return null;
-      }
+      console.error('⚠️ QR scan error with MLKit (offline):', scanError);
+      return null;
     }
-    */
-    
-    console.log('❌ No QR code detected in image');
-    return null;
   } catch (error) {
     console.error('Error detecting QR code:', error);
     return null;

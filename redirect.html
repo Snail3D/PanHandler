@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PanHandler - Redirecting...</title>
+  <script>
+    // Extract calibration data from URL fragment or query parameter
+    // Format: ?calibrate=paper-30mm or #panhandler-paper-30mm
+    function getCalibrationData() {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      
+      // Check URL fragment first (e.g., #panhandler-paper-30mm)
+      if (hash.includes('panhandler-')) {
+        return hash.substring(1); // Remove the #
+      }
+      
+      // Check query parameter (e.g., ?calibrate=paper-30mm)
+      if (params.has('calibrate')) {
+        const calibrate = params.get('calibrate');
+        return `panhandler-${calibrate}`;
+      }
+      
+      return null;
+    }
+    
+    // Detect platform and redirect
+    function redirect() {
+      const calibration = getCalibrationData();
+      const calibrationFragment = calibration ? `#${calibration}` : '';
+      
+      // Detect platform
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+      const isAndroid = /android/i.test(userAgent);
+      
+      let redirectURL;
+      
+      if (isIOS) {
+        // iOS: App Store URL
+        redirectURL = `https://apps.apple.com/us/app/panhandler/id6754727828${calibrationFragment}`;
+      } else if (isAndroid) {
+        // Android: Play Store URL
+        redirectURL = `https://play.google.com/store/apps/details?id=com.snail.panhandler${calibrationFragment}`;
+      } else {
+        // Desktop/Other: Default to App Store (or show both options)
+        redirectURL = `https://apps.apple.com/us/app/panhandler/id6754727828${calibrationFragment}`;
+      }
+      
+      // Redirect immediately
+      window.location.href = redirectURL;
+    }
+    
+    // Redirect on page load
+    redirect();
+  </script>
+</head>
+<body>
+  <p>Redirecting to PanHandler...</p>
+  <p>If you are not redirected, <a href="#" onclick="redirect(); return false;">click here</a>.</p>
+</body>
+</html>
+

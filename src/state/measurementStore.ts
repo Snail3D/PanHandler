@@ -71,7 +71,7 @@ interface MeasurementStore {
     calibrationType?: 'coin' | 'verbal' | 'blueprint' | 'qr';
     verbalScale?: VerbalScale;
     blueprintScale?: { distance: number; unit: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }; // Store for display
-    qrFormat?: 'paper' | 'disc'; // QR calibration format
+    qrFormat?: 'paper' | 'disc' | 'watch'; // QR calibration format
     qrSize?: number; // QR calibration size in mm
   } | null;
   coinCircle: CoinCircle | null;

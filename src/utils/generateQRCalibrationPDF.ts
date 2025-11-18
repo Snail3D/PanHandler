@@ -232,6 +232,16 @@ function generatePDFHTML(qrURL: string): string {
       font-size: 12px;
       color: #8E8E93;
     }
+    .grid-warning {
+      font-size: 11px;
+      font-weight: 700;
+      color: #FF3B30;
+      text-align: center;
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(255, 59, 48, 0.1);
+      border-radius: 4px;
+    }
     .qr-grid {
       display: grid;
       grid-template-columns: repeat(${columns}, 1fr);
@@ -311,6 +321,9 @@ function generatePDFHTML(qrURL: string): string {
     <div class="grid-header">
       <h2>PanHandler QR Calibration Codes</h2>
       <p>Cut out and share these QR codes for easy calibration</p>
+      <div class="grid-warning">
+        ⚠️ Print at 100% scale (no scaling) - Verify: 30mm edge to edge
+      </div>
     </div>
     
     <div class="qr-grid">
