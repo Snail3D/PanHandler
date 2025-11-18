@@ -72,7 +72,7 @@
           "android": {
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
-            "enableProguardInReleaseBuilds": true,
+            "enableProguardInReleaseBuilds": false,
             "useAndroidX": true,
             "enableJetifier": true,
             "blockedPermissions": [
@@ -108,8 +108,7 @@
       "./plugins/withNukePermissions.js",
       "./plugins/withAbsoluteFinalCleanup.js",
       "./plugins/withGradlePermissionRemoval.js",
-      "./plugins/withManifestRemoveDirectives.js",
-      "./plugins/withProguardRules.js"
+      "./plugins/withManifestRemoveDirectives.js"
     ],
     "extra": {
       "eas": {
