@@ -2011,7 +2011,6 @@ export default function CameraScreen() {
           }
         } catch (qrError) {
           // QR detection failed - continue with normal flow
-          console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
         }
         
         // No QR code found - set image URI and show photo type selection modal
