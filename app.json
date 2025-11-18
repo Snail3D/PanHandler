@@ -103,6 +103,14 @@
           "enableCodeScanner": false
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "PanHandler uses the camera for QR code calibration.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       "./plugins/withRemoveActivityRecognition.js",
       "./plugins/withExcludeFormFactors.js",
       "./plugins/withNukePermissions.js",
