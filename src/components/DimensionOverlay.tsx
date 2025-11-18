@@ -6991,7 +6991,7 @@ export default function DimensionOverlay({
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Ionicons
-                  name={isPanZoomLocked ? "hand-left-outline" : "move-outline"}
+                  name={isPanZoomLocked && measurements.length > 0 ? "hand-left-outline" : "move-outline"}
                   size={scaleIconSize(14)}
                   color={!measurementMode ? '#007AFF' : 'rgba(0, 0, 0, 0.45)'}
                 />
