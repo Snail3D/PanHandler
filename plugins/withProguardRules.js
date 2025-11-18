@@ -90,51 +90,54 @@ module.exports = function withProguardRules(config) {
       }
     }
     
-    // Also add a Gradle task to ensure ProGuard rules file exists before R8 runs
+    // Create ProGuard rules file immediately during configuration phase
     if (!buildGradle.includes('// Ensure proguard-rules.pro exists')) {
       // Escape the ProGuard rules content for Groovy triple-quoted string
-      // Need to escape backslashes, dollar signs, and triple quotes
       const escapedRules = proguardRulesContent
         .replace(/\\/g, '\\\\')
         .replace(/\$/g, '\\$')
         .replace(/'''/g, "''' + \"'''\" + '''");
       
-      const ensureRulesTask = `
+      const ensureRulesCode = `
 // Ensure proguard-rules.pro exists for R8 (added by withProguardRules config plugin)
+println '[withProguardRules] ========================================='
+println '[withProguardRules] Configuring ProGuard rules during build configuration...'
+
+def rulesFile = file('app/proguard-rules.pro')
+println '[withProguardRules] Rules file path: ' + rulesFile.absolutePath
+println '[withProguardRules] Rules file exists: ' + rulesFile.exists()
+
+if (!rulesFile.exists()) {
+    println '[withProguardRules] Creating proguard-rules.pro file during configuration...'
+    rulesFile.parentFile.mkdirs()
+    rulesFile.text = '''${escapedRules}'''
+    println '[withProguardRules] ✅ Created proguard-rules.pro file'
+    println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
+} else {
+    println '[withProguardRules] ✅ proguard-rules.pro already exists'
+    println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
+    def content = rulesFile.text
+    println '[withProguardRules] File contains VRUtilities: ' + content.contains('VRUtilities')
+    println '[withProguardRules] File contains expo.modules.core: ' + content.contains('expo.modules.core')
+}
+
+// Verify the file exists
+if (!rulesFile.exists()) {
+    throw new GradleException('[withProguardRules] ❌ CRITICAL: Failed to create ProGuard rules file!')
+}
+
+println '[withProguardRules] ========================================='
+
+// Also create a task as backup to ensure file exists before R8
 task ensureProguardRules {
     doLast {
-        println '[withProguardRules] ========================================='
-        println '[withProguardRules] Ensuring ProGuard rules file exists...'
-        
-        def rulesFile = file('app/proguard-rules.pro')
-        println '[withProguardRules] Rules file path: ' + rulesFile.absolutePath
-        println '[withProguardRules] Rules file exists: ' + rulesFile.exists()
-        
-        if (!rulesFile.exists()) {
-            println '[withProguardRules] Creating proguard-rules.pro file...'
-            rulesFile.parentFile.mkdirs()
-            rulesFile.text = '''${escapedRules}'''
-            println '[withProguardRules] ✅ Created proguard-rules.pro file'
-            println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
-        } else {
-            println '[withProguardRules] ✅ proguard-rules.pro already exists'
-            println '[withProguardRules] File size: ' + rulesFile.length() + ' bytes'
-            def content = rulesFile.text
-            println '[withProguardRules] File contains VRUtilities: ' + content.contains('VRUtilities')
-            println '[withProguardRules] File contains expo.modules.core: ' + content.contains('expo.modules.core')
+        def verifyFile = file('app/proguard-rules.pro')
+        if (!verifyFile.exists()) {
+            println '[withProguardRules] Emergency: Creating proguard-rules.pro file in task...'
+            verifyFile.parentFile.mkdirs()
+            verifyFile.text = '''${escapedRules}'''
         }
-        
-        // Verify the file one more time
-        if (rulesFile.exists()) {
-            def verifyContent = rulesFile.text
-            println '[withProguardRules] Verification - File contains VRUtilities: ' + verifyContent.contains('VRUtilities')
-            println '[withProguardRules] Verification - File contains expo.modules.core: ' + verifyContent.contains('expo.modules.core')
-            println '[withProguardRules] Verification - File line count: ' + verifyContent.split('\n').length
-        } else {
-            throw new GradleException('[withProguardRules] ❌ CRITICAL: ProGuard rules file still missing after creation attempt!')
-        }
-        
-        println '[withProguardRules] ========================================='
+        println '[withProguardRules] Task verification - File exists: ' + verifyFile.exists()
     }
 }
 
@@ -143,25 +146,28 @@ afterEvaluate {
     tasks.named('minifyReleaseWithR8').configure {
         dependsOn 'ensureProguardRules'
         doFirst {
-            println '[withProguardRules] R8 minification starting - ProGuard rules should be ready'
             def verifyFile = file('app/proguard-rules.pro')
             if (!verifyFile.exists()) {
                 throw new GradleException('[withProguardRules] ❌ CRITICAL ERROR: ProGuard rules file missing before R8!')
             }
+            println '[withProguardRules] ✅ ProGuard rules file verified before R8 minification'
         }
     }
 }
 `;
       
-      // Add before dependencies block or at end of android block
-      const dependenciesMatch = buildGradle.match(/(dependencies\s*\{)/);
-      if (dependenciesMatch) {
-        config.modResults.contents = buildGradle.replace(/(dependencies\s*\{)/, `${ensureRulesTask}$1`);
+      // Add at the very beginning of the android block, right after the opening brace
+      const androidBlockStart = buildGradle.match(/(android\s*\{)/);
+      if (androidBlockStart) {
+        config.modResults.contents = buildGradle.replace(
+          /(android\s*\{)/,
+          `$1${ensureRulesCode}`
+        );
       } else {
-        // Add at end of android block
-        const androidEndMatch = buildGradle.match(/(android\s*\{[\s\S]*?)(\n\s*\})/);
-        if (androidEndMatch) {
-          config.modResults.contents = buildGradle.replace(/(android\s*\{[\s\S]*?)(\n\s*\})/, `$1${ensureRulesTask}$2`);
+        // Fallback: add before dependencies block
+        const dependenciesMatch = buildGradle.match(/(dependencies\s*\{)/);
+        if (dependenciesMatch) {
+          config.modResults.contents = buildGradle.replace(/(dependencies\s*\{)/, `${ensureRulesCode}$1`);
         }
       }
     }
