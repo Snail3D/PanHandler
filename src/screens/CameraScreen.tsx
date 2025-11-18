@@ -1347,20 +1347,45 @@ export default function CameraScreen() {
             const { setCalibration } = useStore.getState();
             
             // Calculate pixels per mm from QR code
-            const qrWidthPixels = Math.max(
-              Math.abs(qrResult.corners[1]?.x - qrResult.corners[0]?.x || 0),
-              Math.abs(qrResult.corners[2]?.x - qrResult.corners[3]?.x || 0)
-            );
-            const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            // Calculate actual side length from corner points (accounts for rotation)
+            // For a square QR code, calculate the distance between adjacent corners
+            const corners = qrResult.corners;
+            if (corners.length >= 4) {
+              // Calculate all four side lengths
+              const side1 = Math.sqrt(
+                Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+              );
+              const side2 = Math.sqrt(
+                Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+              );
+              const side3 = Math.sqrt(
+                Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+              );
+              const side4 = Math.sqrt(
+                Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+              );
+              // Average the four sides to get the average side length (width)
+              const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            } else {
+              // Fallback: use bounding box if corners are missing
+              const qrWidthPixels = Math.max(
+                Math.abs(corners[1]?.x - corners[0]?.x || 0),
+                Math.abs(corners[2]?.x - corners[3]?.x || 0)
+              );
+              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            }
             
             // Auto-open Watch app to display QR code if available (non-blocking)
             if (Platform.OS === 'ios') {
               (async () => {
                 try {
-                  const { autoOpenWatchQRCode, notifyWatchPhotoCaptured } = await import('../utils/watchConnectivity');
-                  await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
-                  // Notify Watch that photo was captured (hard double tap + screen blink)
-                  await notifyWatchPhotoCaptured();
+                  const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
+                  const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                  // Notify Watch about calibration status (success)
+                  if (watchOpened) {
+                    await notifyWatchCalibrationStatus(true);
+                  }
                 } catch (watchError) {
                   // Silently fail - Watch support is optional
                   __DEV__ && console.log('⌚ Watch auto-open failed (optional feature):', watchError);
@@ -1780,15 +1805,13 @@ export default function CameraScreen() {
         detectOrientation(asset.uri);
 
         // Auto-detect QR code first, then show modal if no QR found
-        console.log('📥 Photo imported → Checking for QR code...');
-        
         // Try to detect QR code in background (with timeout to prevent long delays)
         try {
           const { detectQR, parseCalibrationURL } = await import('../utils/qrDetection');
-          // Add timeout: if QR detection takes > 1 second, skip it and continue with normal flow
+          // Add timeout: if QR detection takes > 1.5 seconds, skip it and continue with normal flow
           const qrDetectionPromise = detectQR(asset.uri);
           const timeoutPromise = new Promise<null>((resolve) => 
-            setTimeout(() => resolve(null), 1000)
+            setTimeout(() => resolve(null), 1500)
           );
           const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
           
@@ -1802,18 +1825,45 @@ export default function CameraScreen() {
               const { setCalibration } = useStore.getState();
               
               // Calculate pixels per mm from QR code
-              const qrWidthPixels = Math.max(
-                Math.abs(qrResult.corners[1]?.x - qrResult.corners[0]?.x || 0),
-                Math.abs(qrResult.corners[2]?.x - qrResult.corners[3]?.x || 0)
-              );
-              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              // Calculate actual side length from corner points (accounts for rotation)
+              // For a square QR code, calculate the distance between adjacent corners
+              const corners = qrResult.corners;
+              if (corners.length >= 4) {
+                // Calculate all four side lengths
+                const side1 = Math.sqrt(
+                  Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+                );
+                const side2 = Math.sqrt(
+                  Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+                );
+                const side3 = Math.sqrt(
+                  Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+                );
+                const side4 = Math.sqrt(
+                  Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+                );
+                // Average the four sides to get the average side length (width)
+                const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+                const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              } else {
+                // Fallback: use bounding box if corners are missing
+                const qrWidthPixels = Math.max(
+                  Math.abs(corners[1]?.x - corners[0]?.x || 0),
+                  Math.abs(corners[2]?.x - corners[3]?.x || 0)
+                );
+                const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              }
               
               // Auto-open Watch app to display QR code if available (non-blocking)
               if (Platform.OS === 'ios') {
                 (async () => {
                   try {
-                    const { autoOpenWatchQRCode } = await import('../utils/watchConnectivity');
-                    await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                    const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
+                    const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                    // Notify Watch about calibration status (success)
+                    if (watchOpened) {
+                      await notifyWatchCalibrationStatus(true);
+                    }
                   } catch (watchError) {
                     // Silently fail - Watch support is optional
                     __DEV__ && console.log('⌚ Watch auto-open failed (optional feature):', watchError);
@@ -1851,9 +1901,6 @@ export default function CameraScreen() {
               // QR code detected but not a PanHandler QR code
               __DEV__ && console.log('⚠️ QR code detected but not a PanHandler calibration QR');
             }
-          } else {
-            // No QR code detected
-            __DEV__ && console.log('ℹ️ No QR code detected in imported photo');
           }
         } catch (qrError) {
           // QR detection failed - continue with normal flow
@@ -1861,7 +1908,6 @@ export default function CameraScreen() {
         }
         
         // No QR code found - set image URI and show photo type selection modal
-        console.log('📥 No QR code found → Showing photo type selection modal');
         setImageUri(asset.uri, false);
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);

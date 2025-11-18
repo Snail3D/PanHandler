@@ -231,6 +231,37 @@ export async function notifyWatchPhotoCaptured(): Promise<void> {
 }
 
 /**
+ * Notify Watch about calibration status
+ * Displays success or failure message on Watch before closing
+ * 
+ * @param success - true if calibration succeeded, false if failed
+ */
+export async function notifyWatchCalibrationStatus(success: boolean): Promise<void> {
+  if (Platform.OS !== 'ios') {
+    return;
+  }
+
+  // TODO: Implement native WatchConnectivity message sending
+  // This requires a native module using WCSession.sendMessage
+  try {
+    // Native implementation would look like:
+    // const { WatchConnectivity } = require('./native/WatchConnectivity');
+    // await WatchConnectivity.sendMessage({
+    //   action: 'calibrationStatus',
+    //   success: success,
+    //   message: success ? 'Watch Calibration Success' : 'Watch Calibration Failed',
+    //   displayDuration: 2000, // Show message for 2 seconds
+    //   closeApp: true // Close Watch app after displaying message
+    // });
+    
+    const message = success ? 'Watch Calibration Success' : 'Watch Calibration Failed';
+    console.log(`📱 Would notify Watch: ${message}`);
+  } catch (error) {
+    console.error('Error notifying Watch of calibration status:', error);
+  }
+}
+
+/**
  * Automatically show/hide Watch QR code based on camera mode
  * Called when camera screen opens/closes
  * Automatically detects Watch screen size and uses that for calibration
