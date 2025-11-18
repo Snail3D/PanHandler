@@ -1365,85 +1365,18 @@ export default function CameraScreen() {
               throw new Error('QR code corners invalid structure');
             }
             
-            // Get actual image dimensions to check if MLKit scaled the image
-            let actualImageWidth = 0;
-            let actualImageHeight = 0;
-            try {
-              await new Promise<void>((resolve) => {
-                Image.getSize(
-                  photoUri,
-                  (width, height) => {
-                    actualImageWidth = width;
-                    actualImageHeight = height;
-                    resolve();
-                  },
-                  (error) => {
-                    console.warn('⚠️ Could not get image size for scaling check:', error);
-                    resolve();
-                  }
-                );
-              });
-            } catch (error) {
-              console.error('⚠️ Error getting image size:', error);
-            }
-            
-            // MLKit might scan at a different resolution than the actual image
-            // Use bounding box to determine MLKit's coordinate system more accurately
-            let scaleFactor = 1;
-            if (actualImageWidth > 0 && actualImageHeight > 0 && qrResult) {
-              // Try to get bounding box from the QR result to estimate MLKit's coordinate system
-              if (qrResult.boundingBox) {
-                const { left, top, width, height } = qrResult.boundingBox;
-                // Estimate MLKit's coordinate system from bounding box
-                // Use the maximum extent of bounding box + corners to estimate full image size
-                const maxX = Math.max(left + width, ...corners.map(c => c.x));
-                const maxY = Math.max(top + height, ...corners.map(c => c.y));
-                // Add 10% margin to account for QR code not being at the very edge
-                const mlKitWidth = maxX * 1.1;
-                const mlKitHeight = maxY * 1.1;
-                
-                if (mlKitWidth > 0 && mlKitHeight > 0) {
-                  const widthScale = actualImageWidth / mlKitWidth;
-                  const heightScale = actualImageHeight / mlKitHeight;
-                  // Use average scale factor
-                  scaleFactor = (widthScale + heightScale) / 2;
-                  
-                }
-              } else {
-                // Fallback: use max corner coordinates (less accurate)
-                const maxCornerX = Math.max(...corners.map(c => c.x));
-                const maxCornerY = Math.max(...corners.map(c => c.y));
-                // Add 20% margin since QR might not be at edge
-                const mlKitWidth = maxCornerX * 1.2;
-                const mlKitHeight = maxCornerY * 1.2;
-                
-                if (mlKitWidth > 0 && mlKitHeight > 0) {
-                  const widthScale = actualImageWidth / mlKitWidth;
-                  const heightScale = actualImageHeight / mlKitHeight;
-                  scaleFactor = (widthScale + heightScale) / 2;
-                  
-                }
-              }
-            }
-            
-            // Scale corner points to match actual image dimensions
-            const scaledCorners = corners.map(c => ({
-              x: c.x * scaleFactor,
-              y: c.y * scaleFactor,
-            }));
-            
-            // Calculate all four side lengths using scaled corners
+            // Calculate all four side lengths using corner points directly (no scaling, no margins)
             const side1 = Math.sqrt(
-              Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
+              Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
             );
             const side2 = Math.sqrt(
-              Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
+              Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
             );
             const side3 = Math.sqrt(
-              Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
+              Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
             );
             const side4 = Math.sqrt(
-              Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
+              Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
             );
             
             // Average the four sides to get the average side length (width)
@@ -1930,82 +1863,18 @@ export default function CameraScreen() {
                 throw new Error('QR code corners invalid structure');
               }
               
-              // Get actual image dimensions to check if MLKit scaled the image
-              let actualImageWidth = 0;
-              let actualImageHeight = 0;
-              try {
-                await new Promise<void>((resolve) => {
-                  Image.getSize(
-                    asset.uri,
-                    (width, height) => {
-                      actualImageWidth = width;
-                      actualImageHeight = height;
-                      resolve();
-                    },
-                    (error) => {
-                      console.warn('⚠️ Could not get image size for scaling check:', error);
-                      resolve();
-                    }
-                  );
-                });
-              } catch (error) {
-                console.error('⚠️ Error getting image size:', error);
-              }
-              
-              // MLKit might scan at a different resolution than the actual image
-              // Use bounding box to determine MLKit's coordinate system more accurately
-              let scaleFactor = 1;
-              if (actualImageWidth > 0 && actualImageHeight > 0 && qrResult) {
-                // Try to get bounding box from the QR result to estimate MLKit's coordinate system
-                if (qrResult.boundingBox) {
-                  const { left, top, width, height } = qrResult.boundingBox;
-                  // Estimate MLKit's coordinate system from bounding box
-                  const maxX = Math.max(left + width, ...corners.map(c => c.x));
-                  const maxY = Math.max(top + height, ...corners.map(c => c.y));
-                  // Add 10% margin to account for QR code not being at the very edge
-                  const mlKitWidth = maxX * 1.1;
-                  const mlKitHeight = maxY * 1.1;
-                  
-                  if (mlKitWidth > 0 && mlKitHeight > 0) {
-                    const widthScale = actualImageWidth / mlKitWidth;
-                    const heightScale = actualImageHeight / mlKitHeight;
-                    scaleFactor = (widthScale + heightScale) / 2;
-                    
-                  }
-                } else {
-                  // Fallback: use max corner coordinates (less accurate)
-                  const maxCornerX = Math.max(...corners.map(c => c.x));
-                  const maxCornerY = Math.max(...corners.map(c => c.y));
-                  const mlKitWidth = maxCornerX * 1.2;
-                  const mlKitHeight = maxCornerY * 1.2;
-                  
-                  if (mlKitWidth > 0 && mlKitHeight > 0) {
-                    const widthScale = actualImageWidth / mlKitWidth;
-                    const heightScale = actualImageHeight / mlKitHeight;
-                    scaleFactor = (widthScale + heightScale) / 2;
-                    
-                  }
-                }
-              }
-              
-              // Scale corner points to match actual image dimensions
-              const scaledCorners = corners.map(c => ({
-                x: c.x * scaleFactor,
-                y: c.y * scaleFactor,
-              }));
-              
-              // Calculate all four side lengths using scaled corners
+              // Calculate all four side lengths using corner points directly (no scaling, no margins)
               const side1 = Math.sqrt(
-                Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
+                Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
               );
               const side2 = Math.sqrt(
-                Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
+                Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
               );
               const side3 = Math.sqrt(
-                Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
+                Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
               );
               const side4 = Math.sqrt(
-                Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
+                Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
               );
               
               // Average the four sides to get the average side length (width)
