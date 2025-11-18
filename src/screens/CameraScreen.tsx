@@ -1376,6 +1376,9 @@ export default function CameraScreen() {
             // Small delay to ensure photo is ready before transitioning
             setTimeout(() => {
               if (photoUri) {
+                // Explicitly clear measurements before setting image URI (defensive)
+                setCompletedMeasurements([]);
+                setCurrentPoints([]);
                 setImageUri(photoUri, false);
                 // Set calibration AFTER setImageUri (which clears it) to ensure it persists
                 setCalibration({
@@ -1818,6 +1821,9 @@ export default function CameraScreen() {
                 })();
               }
               
+              // Explicitly clear measurements before setting image URI (defensive)
+              setCompletedMeasurements([]);
+              setCurrentPoints([]);
               // Set image URI first (which clears calibration), then set calibration
               setImageUri(asset.uri, false);
               // Set calibration AFTER setImageUri (which clears it) to ensure it persists
