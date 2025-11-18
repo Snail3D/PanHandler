@@ -11,7 +11,15 @@ module.exports = function withProguardRules(config) {
       const sourceRulesPath = path.join(config.modRequest.projectRoot, 'proguard-rules.pro');
       
       if (fs.existsSync(sourceRulesPath)) {
+        // Ensure directory exists
+        const rulesDir = path.dirname(proguardRulesPath);
+        if (!fs.existsSync(rulesDir)) {
+          fs.mkdirSync(rulesDir, { recursive: true });
+        }
         fs.copyFileSync(sourceRulesPath, proguardRulesPath);
+        console.log('[withProguardRules] Copied ProGuard rules to:', proguardRulesPath);
+      } else {
+        console.warn('[withProguardRules] Source ProGuard rules file not found:', sourceRulesPath);
       }
       
       return config;
@@ -24,8 +32,11 @@ module.exports = function withProguardRules(config) {
     
     // Check if proguardFiles is already configured (multiple possible formats)
     if (buildGradle.includes("proguard-rules.pro") || buildGradle.includes("proguardFiles")) {
+      console.log('[withProguardRules] ProGuard rules already configured in build.gradle');
       return config;
     }
+    
+    console.log('[withProguardRules] Adding ProGuard rules to build.gradle');
     
     // Find the release buildType block - try multiple patterns
     // Pattern 1: release { ... minifyEnabled true ... }
