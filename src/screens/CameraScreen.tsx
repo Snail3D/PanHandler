@@ -1375,7 +1375,6 @@ export default function CameraScreen() {
                   (width, height) => {
                     actualImageWidth = width;
                     actualImageHeight = height;
-                    __DEV__ && console.log('📐 Actual image dimensions:', actualImageWidth, 'x', actualImageHeight);
                     resolve();
                   },
                   (error) => {
@@ -1409,10 +1408,6 @@ export default function CameraScreen() {
                   // Use average scale factor
                   scaleFactor = (widthScale + heightScale) / 2;
                   
-                  __DEV__ && console.log('📐 MLKit bounding box:', { left, top, width, height });
-                  __DEV__ && console.log('📐 MLKit estimated coordinate system:', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                  __DEV__ && console.log('📐 Actual image dimensions:', actualImageWidth, 'x', actualImageHeight);
-                  __DEV__ && console.log('📐 Scale factor:', scaleFactor.toFixed(4));
                 }
               } else {
                 // Fallback: use max corner coordinates (less accurate)
@@ -1427,8 +1422,6 @@ export default function CameraScreen() {
                   const heightScale = actualImageHeight / mlKitHeight;
                   scaleFactor = (widthScale + heightScale) / 2;
                   
-                  __DEV__ && console.log('📐 MLKit coordinate system (estimated from corners):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                  __DEV__ && console.log('📐 Scale factor (fallback):', scaleFactor.toFixed(4));
                 }
               }
             }
@@ -1456,13 +1449,6 @@ export default function CameraScreen() {
             // Average the four sides to get the average side length (width)
             const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
             
-            __DEV__ && console.log('📐 QR Code Calibration Debug:');
-            __DEV__ && console.log('  - QR Code Size (mm):', calibrationData.size);
-            __DEV__ && console.log('  - Original corner points (MLKit space):', corners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
-            __DEV__ && console.log('  - Scaled corner points (image space):', scaledCorners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
-            __DEV__ && console.log('  - Side lengths (px):', side1.toFixed(2), side2.toFixed(2), side3.toFixed(2), side4.toFixed(2));
-            __DEV__ && console.log('  - Average QR width (px):', qrWidthPixels.toFixed(2));
-            
             // Validate calculation result
             if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
               console.error('⚠️ Invalid QR width calculation, skipping auto-calibration');
@@ -1470,9 +1456,6 @@ export default function CameraScreen() {
             }
             
             const pixelsPerMM = qrWidthPixels / calibrationData.size;
-            
-            __DEV__ && console.log('  - pixelsPerMM:', pixelsPerMM.toFixed(4));
-            __DEV__ && console.log('  - Expected: For 30mm QR, if QR is 300px wide, pixelsPerMM = 10');
             
             // Validate final pixelsPerMM
             if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
@@ -1957,7 +1940,6 @@ export default function CameraScreen() {
                     (width, height) => {
                       actualImageWidth = width;
                       actualImageHeight = height;
-                      __DEV__ && console.log('📐 Actual image dimensions (imported):', actualImageWidth, 'x', actualImageHeight);
                       resolve();
                     },
                     (error) => {
@@ -1989,10 +1971,6 @@ export default function CameraScreen() {
                     const heightScale = actualImageHeight / mlKitHeight;
                     scaleFactor = (widthScale + heightScale) / 2;
                     
-                    __DEV__ && console.log('📐 MLKit bounding box (imported):', { left, top, width, height });
-                    __DEV__ && console.log('📐 MLKit estimated coordinate system (imported):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                    __DEV__ && console.log('📐 Actual image dimensions (imported):', actualImageWidth, 'x', actualImageHeight);
-                    __DEV__ && console.log('📐 Scale factor (imported):', scaleFactor.toFixed(4));
                   }
                 } else {
                   // Fallback: use max corner coordinates (less accurate)
@@ -2006,8 +1984,6 @@ export default function CameraScreen() {
                     const heightScale = actualImageHeight / mlKitHeight;
                     scaleFactor = (widthScale + heightScale) / 2;
                     
-                    __DEV__ && console.log('📐 MLKit coordinate system (imported, estimated from corners):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
-                    __DEV__ && console.log('📐 Scale factor (imported, fallback):', scaleFactor.toFixed(4));
                   }
                 }
               }
@@ -2035,13 +2011,6 @@ export default function CameraScreen() {
               // Average the four sides to get the average side length (width)
               const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
               
-              __DEV__ && console.log('📐 QR Code Calibration Debug (imported photo):');
-              __DEV__ && console.log('  - QR Code Size (mm):', calibrationData.size);
-              __DEV__ && console.log('  - Original corner points (MLKit space):', corners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
-              __DEV__ && console.log('  - Scaled corner points (image space):', scaledCorners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
-              __DEV__ && console.log('  - Side lengths (px):', side1.toFixed(2), side2.toFixed(2), side3.toFixed(2), side4.toFixed(2));
-              __DEV__ && console.log('  - Average QR width (px):', qrWidthPixels.toFixed(2));
-              
               // Validate calculation result
               if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
                 console.error('⚠️ Invalid QR width calculation, skipping auto-calibration');
@@ -2049,9 +2018,6 @@ export default function CameraScreen() {
               }
               
               const pixelsPerMM = qrWidthPixels / calibrationData.size;
-              
-              __DEV__ && console.log('  - pixelsPerMM:', pixelsPerMM.toFixed(4));
-              __DEV__ && console.log('  - Expected: For 30mm QR, if QR is 300px wide, pixelsPerMM = 10');
               
               // Validate final pixelsPerMM
               if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
