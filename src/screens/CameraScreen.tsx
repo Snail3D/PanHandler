@@ -1377,13 +1377,12 @@ export default function CameraScreen() {
                     resolve();
                   },
                   (error) => {
-                    console.warn('⚠️ Could not get image size:', error);
                     resolve();
                   }
                 );
               });
             } catch (error) {
-              console.error('⚠️ Error getting image size:', error);
+              // Error getting image size - continue without it
             }
             
             // Expo scanner returns coordinates at full resolution - no scaling needed
@@ -1912,13 +1911,12 @@ export default function CameraScreen() {
                       resolve();
                     },
                     (error) => {
-                      console.warn('⚠️ Could not get image size:', error);
                       resolve();
                     }
                   );
                 });
               } catch (error) {
-                console.error('⚠️ Error getting image size:', error);
+                // Error getting image size - continue without it
               }
               
               // Expo scanner returns coordinates at full resolution - no scaling needed
