@@ -163,6 +163,7 @@ function generatePDFHTML(qrURL: string): string {
       width: ${qrSizePoints}pt;
       height: ${qrSizePoints}pt;
       margin-bottom: 8pt;
+      /* QR code pattern itself is exactly ${qrSizePoints}pt (30mm) - border is for cutting only */
     }
     .qr-code img {
       width: 100%;
@@ -255,15 +256,14 @@ function generatePDFHTML(qrURL: string): string {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border: 2px dashed #333;
-      border-radius: 4px;
-      padding: 8pt;
+      /* Removed border and padding - QR code itself is exactly ${qrSizePoints}pt (30mm) for 1:1 calibration */
       box-sizing: border-box;
     }
     .grid-qr-code {
       width: ${qrSizePoints}pt;
       height: ${qrSizePoints}pt;
       margin-bottom: 4pt;
+      /* Ensure QR code pattern itself is exactly ${qrSizePoints}pt - no quiet zone included */
     }
     .grid-qr-code img {
       width: 100%;

@@ -1337,7 +1337,7 @@ export default function CameraScreen() {
         );
         const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
         
-        if (qrResult) {
+        if (qrResult && qrResult.url) {
           const calibrationData = parseCalibrationURL(qrResult.url);
           
           if (calibrationData) {
@@ -1349,31 +1349,51 @@ export default function CameraScreen() {
             // Calculate pixels per mm from QR code
             // Calculate actual side length from corner points (accounts for rotation)
             // For a square QR code, calculate the distance between adjacent corners
-            const corners = qrResult.corners;
-            if (corners.length >= 4) {
-              // Calculate all four side lengths
-              const side1 = Math.sqrt(
-                Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
-              );
-              const side2 = Math.sqrt(
-                Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
-              );
-              const side3 = Math.sqrt(
-                Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
-              );
-              const side4 = Math.sqrt(
-                Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
-              );
-              // Average the four sides to get the average side length (width)
-              const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
-              const pixelsPerMM = qrWidthPixels / calibrationData.size;
-            } else {
-              // Fallback: use bounding box if corners are missing
-              const qrWidthPixels = Math.max(
-                Math.abs(corners[1]?.x - corners[0]?.x || 0),
-                Math.abs(corners[2]?.x - corners[3]?.x || 0)
-              );
-              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            const corners = qrResult?.corners;
+            
+            // Validate corners before attempting calculation
+            if (!corners || !Array.isArray(corners) || corners.length < 4) {
+              console.error('⚠️ QR code corners missing or invalid, skipping auto-calibration');
+              throw new Error('QR code corners missing or invalid');
+            }
+            
+            // Verify all corners have valid x and y properties
+            const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
+            
+            if (!hasValidCorners) {
+              console.error('⚠️ QR code corners have invalid structure, skipping auto-calibration');
+              throw new Error('QR code corners invalid structure');
+            }
+            
+            // Calculate all four side lengths
+            const side1 = Math.sqrt(
+              Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+            );
+            const side2 = Math.sqrt(
+              Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+            );
+            const side3 = Math.sqrt(
+              Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+            );
+            const side4 = Math.sqrt(
+              Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+            );
+            
+            // Average the four sides to get the average side length (width)
+            const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+            
+            // Validate calculation result
+            if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
+              console.error('⚠️ Invalid QR width calculation, skipping auto-calibration');
+              throw new Error('Invalid QR width calculation');
+            }
+            
+            const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            
+            // Validate final pixelsPerMM
+            if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
+              console.error('⚠️ Invalid pixelsPerMM calculation, skipping auto-calibration');
+              throw new Error('Invalid pixelsPerMM calculation');
             }
             
             // Auto-open Watch app to display QR code if available (non-blocking)
@@ -1815,7 +1835,7 @@ export default function CameraScreen() {
           );
           const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
           
-          if (qrResult) {
+          if (qrResult && qrResult.url) {
             const calibrationData = parseCalibrationURL(qrResult.url);
             
             if (calibrationData) {
@@ -1827,31 +1847,51 @@ export default function CameraScreen() {
               // Calculate pixels per mm from QR code
               // Calculate actual side length from corner points (accounts for rotation)
               // For a square QR code, calculate the distance between adjacent corners
-              const corners = qrResult.corners;
-              if (corners.length >= 4) {
-                // Calculate all four side lengths
-                const side1 = Math.sqrt(
-                  Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
-                );
-                const side2 = Math.sqrt(
-                  Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
-                );
-                const side3 = Math.sqrt(
-                  Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
-                );
-                const side4 = Math.sqrt(
-                  Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
-                );
-                // Average the four sides to get the average side length (width)
-                const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
-                const pixelsPerMM = qrWidthPixels / calibrationData.size;
-              } else {
-                // Fallback: use bounding box if corners are missing
-                const qrWidthPixels = Math.max(
-                  Math.abs(corners[1]?.x - corners[0]?.x || 0),
-                  Math.abs(corners[2]?.x - corners[3]?.x || 0)
-                );
-                const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              const corners = qrResult?.corners;
+              
+              // Validate corners before attempting calculation
+              if (!corners || !Array.isArray(corners) || corners.length < 4) {
+                console.error('⚠️ QR code corners missing or invalid, skipping auto-calibration');
+                throw new Error('QR code corners missing or invalid');
+              }
+              
+              // Verify all corners have valid x and y properties
+              const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
+              
+              if (!hasValidCorners) {
+                console.error('⚠️ QR code corners have invalid structure, skipping auto-calibration');
+                throw new Error('QR code corners invalid structure');
+              }
+              
+              // Calculate all four side lengths
+              const side1 = Math.sqrt(
+                Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+              );
+              const side2 = Math.sqrt(
+                Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+              );
+              const side3 = Math.sqrt(
+                Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+              );
+              const side4 = Math.sqrt(
+                Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+              );
+              
+              // Average the four sides to get the average side length (width)
+              const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+              
+              // Validate calculation result
+              if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
+                console.error('⚠️ Invalid QR width calculation, skipping auto-calibration');
+                throw new Error('Invalid QR width calculation');
+              }
+              
+              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              
+              // Validate final pixelsPerMM
+              if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
+                console.error('⚠️ Invalid pixelsPerMM calculation, skipping auto-calibration');
+                throw new Error('Invalid pixelsPerMM calculation');
               }
               
               // Auto-open Watch app to display QR code if available (non-blocking)

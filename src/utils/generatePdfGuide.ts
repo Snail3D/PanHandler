@@ -232,15 +232,14 @@ const PDF_CONTENT = `<!DOCTYPE html>
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 2px dashed #333;
-    border-radius: 4px;
-    padding: 6pt;
+    /* Removed border and padding - QR code itself is exactly 30mm for 1:1 calibration */
     box-sizing: border-box;
   }
   .grid-qr-code {
     width: 30mm;
     height: 30mm;
     margin-bottom: 3pt;
+    /* Ensure QR code pattern itself is exactly 30mm - no quiet zone included */
   }
   .grid-qr-code img {
     width: 100%;
