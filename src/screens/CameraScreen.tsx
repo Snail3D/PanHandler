@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState, Alert } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -1327,11 +1327,8 @@ export default function CameraScreen() {
       
       // AUTO-DETECT QR CODE IN BACKGROUND
       // Try to detect QR code in the captured photo (with timeout to prevent long delays)
-      Alert.alert('QR Detection Started', 'Starting QR detection...', [{ text: 'OK' }]);
-      
       try {
         const { detectQR, parseCalibrationURL } = await import('../utils/qrDetection');
-        Alert.alert('Module Loaded', 'QR detection module imported', [{ text: 'OK' }]);
         
         // Add timeout: if QR detection takes > 3 seconds, skip it and continue with normal flow
         const qrDetectionPromise = detectQR(photoUri);
@@ -1340,19 +1337,11 @@ export default function CameraScreen() {
         );
         const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
         
-        if (qrResult === null) {
-          Alert.alert('QR Timeout or No Result', 'QR detection returned null (timeout or no QR found)', [{ text: 'OK' }]);
-        }
-        
         if (qrResult) {
-          // Show visible alert - QR detected
-          Alert.alert('QR Detected', `Found QR: ${qrResult.url.substring(0, 50)}...`, [{ text: 'OK' }]);
-          
           const calibrationData = parseCalibrationURL(qrResult.url);
           
           if (calibrationData) {
             // PanHandler QR code detected! Auto-calibrate
-            Alert.alert('✅ PanHandler QR!', `Format: ${calibrationData.format}, Size: ${calibrationData.size}mm`, [{ text: 'OK' }]);
             __DEV__ && console.log('✅ PanHandler QR code detected! Auto-calibrating...', calibrationData);
             
             const { setCalibration } = useStore.getState();
@@ -1404,24 +1393,16 @@ export default function CameraScreen() {
             return;
           } else {
             // QR code detected but not a PanHandler QR code
-            Alert.alert('⚠️ Not PanHandler QR', `Found QR but missing #panhandler fragment:\n${qrResult.url}`, [{ text: 'OK' }]);
             __DEV__ && console.log('⚠️ QR code detected but not a PanHandler calibration QR');
             // Continue with normal flow
           }
         } else {
           // No QR code detected - continue with normal flow
-          Alert.alert('No QR Found', 'No QR code detected in photo', [{ text: 'OK' }]);
           __DEV__ && console.log('ℹ️ No QR code detected, using normal calibration flow');
         }
       } catch (qrError) {
         // QR detection failed - continue with normal flow
         console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
-        // Show visible error for debugging
-        Alert.alert(
-          'QR Detection Error',
-          `Error: ${qrError instanceof Error ? qrError.message : String(qrError)}`,
-          [{ text: 'OK' }]
-        );
       }
       
       // Normal flow: Determine if table or wall based on phone tilt
@@ -1810,14 +1791,10 @@ export default function CameraScreen() {
           const qrResult = await Promise.race([qrDetectionPromise, timeoutPromise]);
           
           if (qrResult) {
-            // Show visible alert - QR detected
-            Alert.alert('QR Detected (Import)', `Found QR: ${qrResult.url.substring(0, 50)}...`, [{ text: 'OK' }]);
-            
             const calibrationData = parseCalibrationURL(qrResult.url);
             
             if (calibrationData) {
               // PanHandler QR code detected! Auto-calibrate and go to measurement
-              Alert.alert('✅ PanHandler QR! (Import)', `Format: ${calibrationData.format}, Size: ${calibrationData.size}mm`, [{ text: 'OK' }]);
               __DEV__ && console.log('✅ PanHandler QR code detected in imported photo! Auto-calibrating...', calibrationData);
               
               const { setCalibration } = useStore.getState();
@@ -1861,20 +1838,15 @@ export default function CameraScreen() {
               return; // Skip showing modal
             } else {
               // QR code detected but not a PanHandler QR code
-              Alert.alert('⚠️ Not PanHandler QR (Import)', `Found QR but missing #panhandler fragment:\n${qrResult.url}`, [{ text: 'OK' }]);
+              __DEV__ && console.log('⚠️ QR code detected but not a PanHandler calibration QR');
             }
           } else {
             // No QR code detected
-            Alert.alert('No QR Found (Import)', 'No QR code detected in imported photo', [{ text: 'OK' }]);
+            __DEV__ && console.log('ℹ️ No QR code detected in imported photo');
           }
         } catch (qrError) {
           // QR detection failed - continue with normal flow
           console.error('⚠️ QR detection error (continuing with normal flow):', qrError);
-          Alert.alert(
-            'QR Detection Error (Import)',
-            `Error: ${qrError instanceof Error ? qrError.message : String(qrError)}`,
-            [{ text: 'OK' }]
-          );
         }
         
         // No QR code found - show photo type selection modal
