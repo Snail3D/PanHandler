@@ -50,80 +50,75 @@ module.exports = function withProguardRules(config) {
     let releaseBuildTypeRegex = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)(minifyEnabled\s+true)/;
     
     if (releaseBuildTypeRegex.test(buildGradle)) {
-      // Add proguardFiles and embed rules inline
-      const replacement = proguardRulesContent 
-        ? `$1minifyEnabled true
+      // Add proguardFiles
+      config.modResults.contents = buildGradle.replace(
+        releaseBuildTypeRegex,
+        `$1minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Embedded ProGuard rules for expo-camera VRUtilities
-            proguardFile('proguard-rules.pro')
             $2`
-        : `$1minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            $2`;
-      
-      config.modResults.contents = buildGradle.replace(releaseBuildTypeRegex, replacement);
+      );
     } else {
       // Pattern 2: release { ... } (without minifyEnabled)
       releaseBuildTypeRegex = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)(\})/;
       if (releaseBuildTypeRegex.test(buildGradle)) {
-        const replacement = proguardRulesContent
-          ? `$1minifyEnabled true
+        config.modResults.contents = buildGradle.replace(
+          releaseBuildTypeRegex,
+          `$1minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Embedded ProGuard rules for expo-camera VRUtilities
-            proguardFile('proguard-rules.pro')
             $2`
-          : `$1minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            $2`;
-        
-        config.modResults.contents = buildGradle.replace(releaseBuildTypeRegex, replacement);
+        );
       } else {
         // Pattern 3: No release block exists, add it before defaultConfig
         const androidBlockRegex = /(android\s*\{[\s\S]*?)(defaultConfig)/;
         if (androidBlockRegex.test(buildGradle)) {
-          const replacement = proguardRulesContent
-            ? `$1buildTypes {
+          config.modResults.contents = buildGradle.replace(
+            androidBlockRegex,
+            `$1buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Embedded ProGuard rules for expo-camera VRUtilities
-            proguardFile('proguard-rules.pro')
         }
     }
     $2`
-            : `$1buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    $2`;
-          
-          config.modResults.contents = buildGradle.replace(androidBlockRegex, replacement);
+          );
         }
       }
     }
     
-    // Also add a Gradle task to ensure ProGuard rules file exists
+    // Also add a Gradle task to ensure ProGuard rules file exists before R8 runs
     if (!buildGradle.includes('// Ensure proguard-rules.pro exists')) {
-      const beforeDependencies = buildGradle.match(/(dependencies\s*\{)/);
-      if (beforeDependencies) {
-        const ensureRulesTask = `
-// Ensure proguard-rules.pro exists for R8
+      // Escape the ProGuard rules content for Groovy triple-quoted string
+      const escapedRules = proguardRulesContent
+        .replace(/\\/g, '\\\\')
+        .replace(/\$/g, '\\$')
+        .replace(/'''/g, "''' + \"'''\" + '''");
+      
+      const ensureRulesTask = `
+// Ensure proguard-rules.pro exists for R8 (added by withProguardRules config plugin)
 afterEvaluate {
     tasks.named('minifyReleaseWithR8').configure {
         doFirst {
             def rulesFile = file('app/proguard-rules.pro')
             if (!rulesFile.exists()) {
                 rulesFile.parentFile.mkdirs()
-                rulesFile.text = '''${proguardRulesContent.replace(/'/g, "\\'")}'''
+                rulesFile.text = '''${escapedRules}'''
                 println '[withProguardRules] Created proguard-rules.pro file'
             }
         }
     }
 }
 `;
+      
+      // Add before dependencies block or at end of android block
+      const dependenciesMatch = buildGradle.match(/(dependencies\s*\{)/);
+      if (dependenciesMatch) {
         config.modResults.contents = buildGradle.replace(/(dependencies\s*\{)/, `${ensureRulesTask}$1`);
+      } else {
+        // Add at end of android block
+        const androidEndMatch = buildGradle.match(/(android\s*\{[\s\S]*?)(\n\s*\})/);
+        if (androidEndMatch) {
+          config.modResults.contents = buildGradle.replace(/(android\s*\{[\s\S]*?)(\n\s*\})/, `$1${ensureRulesTask}$2`);
+        }
       }
     }
     
