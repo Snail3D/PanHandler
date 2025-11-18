@@ -1365,18 +1365,72 @@ export default function CameraScreen() {
               throw new Error('QR code corners invalid structure');
             }
             
-            // Calculate all four side lengths
+            // Get actual image dimensions to check if MLKit scaled the image
+            let actualImageWidth = 0;
+            let actualImageHeight = 0;
+            try {
+              await new Promise<void>((resolve) => {
+                Image.getSize(
+                  photoUri,
+                  (width, height) => {
+                    actualImageWidth = width;
+                    actualImageHeight = height;
+                    __DEV__ && console.log('📐 Actual image dimensions:', actualImageWidth, 'x', actualImageHeight);
+                    resolve();
+                  },
+                  (error) => {
+                    console.warn('⚠️ Could not get image size for scaling check:', error);
+                    resolve();
+                  }
+                );
+              });
+            } catch (error) {
+              console.error('⚠️ Error getting image size:', error);
+            }
+            
+            // MLKit might scan at a different resolution than the actual image
+            // Check if we need to scale the corner points to match actual image dimensions
+            // Get the max coordinate from corner points to estimate MLKit's coordinate system
+            const maxCornerX = Math.max(...corners.map(c => c.x));
+            const maxCornerY = Math.max(...corners.map(c => c.y));
+            
+            let scaleFactor = 1;
+            if (actualImageWidth > 0 && actualImageHeight > 0) {
+              // If MLKit scanned at a different resolution, we need to scale
+              // Estimate MLKit's coordinate system from corner points
+              const mlKitWidth = maxCornerX;
+              const mlKitHeight = maxCornerY;
+              
+              // If there's a significant difference, MLKit likely downscaled
+              if (mlKitWidth > 0 && mlKitHeight > 0) {
+                const widthScale = actualImageWidth / mlKitWidth;
+                const heightScale = actualImageHeight / mlKitHeight;
+                // Use average scale factor (should be similar if image wasn't cropped)
+                scaleFactor = (widthScale + heightScale) / 2;
+                
+                __DEV__ && console.log('📐 MLKit coordinate system:', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                __DEV__ && console.log('📐 Scale factor:', scaleFactor.toFixed(4));
+              }
+            }
+            
+            // Scale corner points to match actual image dimensions
+            const scaledCorners = corners.map(c => ({
+              x: c.x * scaleFactor,
+              y: c.y * scaleFactor,
+            }));
+            
+            // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
-              Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+              Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
             );
             const side2 = Math.sqrt(
-              Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+              Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
             );
             const side3 = Math.sqrt(
-              Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+              Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
             );
             const side4 = Math.sqrt(
-              Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+              Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
             );
             
             // Average the four sides to get the average side length (width)
@@ -1384,6 +1438,8 @@ export default function CameraScreen() {
             
             __DEV__ && console.log('📐 QR Code Calibration Debug:');
             __DEV__ && console.log('  - QR Code Size (mm):', calibrationData.size);
+            __DEV__ && console.log('  - Original corner points (MLKit space):', corners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
+            __DEV__ && console.log('  - Scaled corner points (image space):', scaledCorners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
             __DEV__ && console.log('  - Side lengths (px):', side1.toFixed(2), side2.toFixed(2), side3.toFixed(2), side4.toFixed(2));
             __DEV__ && console.log('  - Average QR width (px):', qrWidthPixels.toFixed(2));
             
@@ -1871,18 +1927,72 @@ export default function CameraScreen() {
                 throw new Error('QR code corners invalid structure');
               }
               
-              // Calculate all four side lengths
+              // Get actual image dimensions to check if MLKit scaled the image
+              let actualImageWidth = 0;
+              let actualImageHeight = 0;
+              try {
+                await new Promise<void>((resolve) => {
+                  Image.getSize(
+                    asset.uri,
+                    (width, height) => {
+                      actualImageWidth = width;
+                      actualImageHeight = height;
+                      __DEV__ && console.log('📐 Actual image dimensions (imported):', actualImageWidth, 'x', actualImageHeight);
+                      resolve();
+                    },
+                    (error) => {
+                      console.warn('⚠️ Could not get image size for scaling check:', error);
+                      resolve();
+                    }
+                  );
+                });
+              } catch (error) {
+                console.error('⚠️ Error getting image size:', error);
+              }
+              
+              // MLKit might scan at a different resolution than the actual image
+              // Check if we need to scale the corner points to match actual image dimensions
+              // Get the max coordinate from corner points to estimate MLKit's coordinate system
+              const maxCornerX = Math.max(...corners.map(c => c.x));
+              const maxCornerY = Math.max(...corners.map(c => c.y));
+              
+              let scaleFactor = 1;
+              if (actualImageWidth > 0 && actualImageHeight > 0) {
+                // If MLKit scanned at a different resolution, we need to scale
+                // Estimate MLKit's coordinate system from corner points
+                const mlKitWidth = maxCornerX;
+                const mlKitHeight = maxCornerY;
+                
+                // If there's a significant difference, MLKit likely downscaled
+                if (mlKitWidth > 0 && mlKitHeight > 0) {
+                  const widthScale = actualImageWidth / mlKitWidth;
+                  const heightScale = actualImageHeight / mlKitHeight;
+                  // Use average scale factor (should be similar if image wasn't cropped)
+                  scaleFactor = (widthScale + heightScale) / 2;
+                  
+                  __DEV__ && console.log('📐 MLKit coordinate system (imported):', mlKitWidth.toFixed(0), 'x', mlKitHeight.toFixed(0));
+                  __DEV__ && console.log('📐 Scale factor (imported):', scaleFactor.toFixed(4));
+                }
+              }
+              
+              // Scale corner points to match actual image dimensions
+              const scaledCorners = corners.map(c => ({
+                x: c.x * scaleFactor,
+                y: c.y * scaleFactor,
+              }));
+              
+              // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
-                Math.pow(corners[1].x - corners[0].x, 2) + Math.pow(corners[1].y - corners[0].y, 2)
+                Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
               );
               const side2 = Math.sqrt(
-                Math.pow(corners[2].x - corners[1].x, 2) + Math.pow(corners[2].y - corners[1].y, 2)
+                Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
               );
               const side3 = Math.sqrt(
-                Math.pow(corners[3].x - corners[2].x, 2) + Math.pow(corners[3].y - corners[2].y, 2)
+                Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
               );
               const side4 = Math.sqrt(
-                Math.pow(corners[0].x - corners[3].x, 2) + Math.pow(corners[0].y - corners[3].y, 2)
+                Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
               );
               
               // Average the four sides to get the average side length (width)
@@ -1890,6 +2000,8 @@ export default function CameraScreen() {
               
               __DEV__ && console.log('📐 QR Code Calibration Debug (imported photo):');
               __DEV__ && console.log('  - QR Code Size (mm):', calibrationData.size);
+              __DEV__ && console.log('  - Original corner points (MLKit space):', corners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
+              __DEV__ && console.log('  - Scaled corner points (image space):', scaledCorners.map(c => `(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`).join(', '));
               __DEV__ && console.log('  - Side lengths (px):', side1.toFixed(2), side2.toFixed(2), side3.toFixed(2), side4.toFixed(2));
               __DEV__ && console.log('  - Average QR width (px):', qrWidthPixels.toFixed(2));
               
