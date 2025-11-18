@@ -22,13 +22,14 @@ module.exports = function withProguardRules(config) {
   return withAppBuildGradle(config, (config) => {
     const buildGradle = config.modResults.contents;
     
-    // Check if proguardFiles is already configured
-    if (buildGradle.includes("proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'")) {
+    // Check if proguardFiles is already configured (multiple possible formats)
+    if (buildGradle.includes("proguard-rules.pro") || buildGradle.includes("proguardFiles")) {
       return config;
     }
     
-    // Find the release buildType block and add proguardFiles
-    const releaseBuildTypeRegex = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)(minifyEnabled\s+true)/;
+    // Find the release buildType block - try multiple patterns
+    // Pattern 1: release { ... minifyEnabled true ... }
+    let releaseBuildTypeRegex = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)(minifyEnabled\s+true)/;
     
     if (releaseBuildTypeRegex.test(buildGradle)) {
       config.modResults.contents = buildGradle.replace(
@@ -38,19 +39,30 @@ module.exports = function withProguardRules(config) {
             $2`
       );
     } else {
-      // If release block doesn't exist, add it
-      const androidBlockRegex = /(android\s*\{[\s\S]*?)(defaultConfig)/;
-      if (androidBlockRegex.test(buildGradle)) {
+      // Pattern 2: release { ... } (without minifyEnabled)
+      releaseBuildTypeRegex = /(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?)(\})/;
+      if (releaseBuildTypeRegex.test(buildGradle)) {
         config.modResults.contents = buildGradle.replace(
-          androidBlockRegex,
-          `$1buildTypes {
+          releaseBuildTypeRegex,
+          `$1minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            $2`
+        );
+      } else {
+        // Pattern 3: No release block exists, add it before defaultConfig
+        const androidBlockRegex = /(android\s*\{[\s\S]*?)(defaultConfig)/;
+        if (androidBlockRegex.test(buildGradle)) {
+          config.modResults.contents = buildGradle.replace(
+            androidBlockRegex,
+            `$1buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     $2`
-        );
+          );
+        }
       }
     }
     
