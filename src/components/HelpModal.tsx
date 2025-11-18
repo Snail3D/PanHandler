@@ -765,17 +765,17 @@ Thank you for helping us improve PanHandler!
                   </Text>
                 </View>
 
-                {/* PDF Guide Button */}
+                {/* Printable QR Codes Button */}
                 <Pressable
                   onPress={async () => {
                     try {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      // Generate PDF guide
-                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
-                      await generatePdfGuide();
+                      // Generate QR code pages only
+                      const { generateQRCodePagesOnly } = await import('../utils/generatePdfGuide');
+                      await generateQRCodePagesOnly();
                     } catch (error) {
-                      console.error('Error generating PDF:', error);
-                      showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
+                      console.error('Error generating QR code PDF:', error);
+                      showAlert('Error', 'Failed to generate QR code PDF. Please try again.', 'error');
                     }
                   }}
                   style={{
@@ -801,7 +801,7 @@ Thank you for helping us improve PanHandler!
                     fontWeight: '600',
                     color: 'white',
                   }}>
-                    PDF Guide and QR codes
+                    Printable QR Codes
                   </Text>
                   <Text style={{ fontSize: 20 }}>📱</Text>
                 </Pressable>

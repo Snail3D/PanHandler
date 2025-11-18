@@ -457,6 +457,173 @@ const PDF_CONTENT = `<!DOCTYPE html>
 </body>
 </html>`;
 
+// QR Code pages only (for quick printing)
+const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PanHandler QR Codes</title>
+<style>
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .grid-qr-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 2mm;
+    border: 0.5pt dashed #000;
+  }
+  .grid-qr-code {
+    width: 30mm;
+    height: 30mm;
+  }
+  .grid-qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .cut-line-separator {
+    width: 100%;
+    height: 0;
+    border-top: 1pt dashed #000;
+    margin: 12pt 0;
+  }
+  .back-to-back-page {
+    page-break-before: always;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .page-title {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #1C1C1E;
+    text-align: center;
+    margin-bottom: 16pt;
+  }
+  .qr-row-30mm {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8mm;
+    width: 100%;
+    margin-bottom: 16pt;
+  }
+  .qr-section-180mm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16pt;
+  }
+  .qr-code-180mm {
+    width: 180mm;
+    height: 180mm;
+    max-width: calc(100% - 0mm);
+    margin: 0 auto;
+    display: block;
+  }
+  .qr-code-180mm img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .qr-label-180mm {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #1C1C1E;
+    margin-top: 12pt;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- Page 1: Android Back-to-Back Page (Front) -->
+<div class="back-to-back-page">
+  <div class="page-title">30MM Android</div>
+  
+  <div class="qr-row-30mm">
+    ${generateAndroidQRGrid()}
+  </div>
+  
+  <div class="cut-line-separator"></div>
+  
+  <div class="qr-section-180mm">
+    <div class="qr-code-180mm">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.snail.panhandler#panhandler-paper-180mm')}" 
+        alt="PanHandler QR Code - 180mm Android" 
+      />
+    </div>
+    <div class="qr-label-180mm">180MM Android</div>
+  </div>
+</div>
+
+<!-- Page 2: iPhone Back-to-Back Page (Back) -->
+<div class="back-to-back-page">
+  <div class="page-title">30MM Iphone</div>
+  
+  <div class="qr-row-30mm">
+    ${generateIOSQRGrid()}
+  </div>
+  
+  <div class="cut-line-separator"></div>
+  
+  <div class="qr-section-180mm">
+    <div class="qr-code-180mm">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent('https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-paper-180mm')}" 
+        alt="PanHandler QR Code - 180mm iOS" 
+      />
+    </div>
+    <div class="qr-label-180mm">180MM Iphone</div>
+  </div>
+</div>
+
+</body>
+</html>`;
+
+export async function generateQRCodePagesOnly(): Promise<void> {
+  try {
+    const result = await Print.printToFileAsync({
+      html: QR_CODE_PAGES_ONLY,
+      base64: false,
+    });
+
+    if (result.uri) {
+      const fileName = 'PanHandler_QR_Codes.pdf';
+      const newPath = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.copyAsync({
+        from: result.uri,
+        to: newPath,
+      });
+
+      await Sharing.shareAsync(newPath, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'Share PanHandler QR Codes PDF',
+        UTI: 'com.adobe.pdf',
+      });
+    }
+  } catch (error) {
+    console.error('Error generating QR code PDF:', error);
+    Alert.alert('Error', 'Failed to generate QR code PDF. Please try again.');
+  }
+}
+
 export async function generatePdfGuide(): Promise<void> {
   try {
     const result = await Print.printToFileAsync({
