@@ -1506,6 +1506,15 @@ export default function CameraScreen() {
                 setCompletedMeasurements([]);
                 setCurrentPoints([]);
                 setImageUri(photoUri, false);
+                
+                // Store QR position (similar to coin circle) for map mode
+                // This allows the QR to act as a reference object on maps
+                setCoinCircle({
+                  centerX: qrResult.centerX,
+                  centerY: qrResult.centerY,
+                  radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+                });
+                
                 // Set calibration AFTER setImageUri (which clears it) to ensure it persists
                 setCalibration({
                   pixelsPerUnit: pixelsPerMM,
@@ -2079,6 +2088,15 @@ export default function CameraScreen() {
               setCurrentPoints([]);
               // Set image URI first (which clears calibration), then set calibration
               setImageUri(asset.uri, false);
+              
+              // Store QR position (similar to coin circle) for map mode
+              // This allows the QR to act as a reference object on maps
+              setCoinCircle({
+                centerX: qrResult.centerX,
+                centerY: qrResult.centerY,
+                radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+              });
+              
               // Set calibration AFTER setImageUri (which clears it) to ensure it persists
               setCalibration({
                 pixelsPerUnit: pixelsPerMM,
