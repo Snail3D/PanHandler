@@ -372,6 +372,49 @@ const PDF_CONTENT = `<!DOCTYPE html>
     <li>Measurements shown in Imperial and Metric</li>
     <li>Tap measurements to edit labels</li>
     <li>Export to DWG (CAD format) or save images</li>
+    <li>Email measurements with photos and CAD import instructions</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>🎯 Advanced Features</h3>
+  <p><strong>Map Mode:</strong> Measure distances on maps and aerial photos using verbal scale</p>
+  <p><strong>Blueprint Mode:</strong> Measure architectural drawings and technical diagrams</p>
+  <p><strong>Pan & Zoom:</strong> Pinch to zoom, drag to pan - measurements stay accurate</p>
+  <p><strong>Unit Switching:</strong> Toggle between Imperial and Metric anytime</p>
+</div>
+
+<div class="section">
+  <h3>💡 Pro Tips for Best Results</h3>
+  <ul>
+    <li><strong>Lighting:</strong> Ensure even lighting - avoid harsh shadows</li>
+    <li><strong>Focus:</strong> Tap to focus on your object before capturing</li>
+    <li><strong>Distance:</strong> Stay 1-3 feet away for small objects, 3-6 feet for large</li>
+    <li><strong>Stability:</strong> Hold steady or use a tripod for precision</li>
+    <li><strong>Calibration:</strong> Place coin/QR in same plane as object being measured</li>
+  </ul>
+</div>
+
+<div class="section" style="page-break-before: always; margin-top: 0;">
+  <h3>🔧 Troubleshooting</h3>
+  <p><strong>Measurements seem wrong?</strong></p>
+  <ul>
+    <li>Check that coin/QR is in the same plane as your object</li>
+    <li>Ensure camera was perpendicular (90°) when photo was taken</li>
+    <li>Try recalibrating with a different coin or QR code</li>
+  </ul>
+  <p><strong>QR code not detected?</strong></p>
+  <ul>
+    <li>Ensure QR code is printed at 100% scale (check with ruler)</li>
+    <li>Keep QR code near center of photo</li>
+    <li>Ensure good lighting and focus</li>
+    <li>Try moving closer or further away based on QR size</li>
+  </ul>
+  <p><strong>Export not working?</strong></p>
+  <ul>
+    <li>Check that you have completed at least one measurement</li>
+    <li>Ensure you have email app configured on your device</li>
+    <li>For CAD export, measurements must form closed shapes</li>
   </ul>
 </div>
 
@@ -380,7 +423,7 @@ const PDF_CONTENT = `<!DOCTYPE html>
   <p>© 2025 PanHandler • github.com/Snail3D/PanHandler</p>
 </div>
 
-<!-- Page 2: QR Code Explanation -->
+<!-- Page 3: QR Code Explanation -->
 <div class="section" style="page-break-before: always; margin-top: 0;">
   <h2>📱 QR Code Calibration - Automatic & Easy!</h2>
   <p><strong>How it works:</strong> PanHandler QR codes contain embedded calibration data. When you take or import a photo, the app automatically detects and calibrates - no buttons to press!</p>
@@ -408,11 +451,41 @@ const PDF_CONTENT = `<!DOCTYPE html>
       <li>Place QR code in same plane as your object</li>
       <li>Keep near center of photo for best detection</li>
       <li>Ensure good lighting for clear visibility</li>
+      <li>Print QR codes at 100% scale for accurate calibration</li>
     </ul>
   </div>
 </div>
 
-<!-- Page 3: Android Back-to-Back Page (Front) -->
+<!-- Page 4: MakerWorld Frames QR Code -->
+<div class="section" style="page-break-before: always; margin-top: 0; text-align: center;">
+  <h2>🖨️ 3D Printable QR Code Frames</h2>
+  <p style="margin-bottom: 16px;">Protect your QR codes with custom 3D printed frames! These frames make it easy to laminate and mount your QR codes for professional use.</p>
+  
+  <div style="display: flex; flex-direction: column; align-items: center; margin: 20px 0;">
+    <div style="width: 80mm; height: 80mm; margin: 0 auto 12px;">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761')}" 
+        alt="MakerWorld Frame QR Code" 
+        style="width: 100%; height: 100%; object-fit: contain;"
+      />
+    </div>
+    <p style="font-size: 11pt; font-weight: 600; margin-top: 8px;">Scan to view 3D printable frames on MakerWorld</p>
+    <p style="font-size: 9pt; color: #8E8E93; margin-top: 4px;">Includes frames for 30mm and 180mm QR codes</p>
+  </div>
+  
+  <div class="tip-box" style="margin-top: 20px;">
+    <strong>📦 Frame Features</strong>
+    <ul style="margin-top: 4px; text-align: left;">
+      <li>Protective frame for laminated QR codes</li>
+      <li>Keychain attachment option</li>
+      <li>Designed for easy insertion and removal</li>
+      <li>Works with both 30mm and 180mm QR codes</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Pages 5-6: QR Code Pages (Back-to-Back) -->
+<!-- Page 5: Android Back-to-Back Page (Front) -->
 <div class="back-to-back-page">
   <div class="page-title">30MM Android</div>
   
@@ -433,7 +506,7 @@ const PDF_CONTENT = `<!DOCTYPE html>
   </div>
 </div>
 
-<!-- Page 4: iPhone Back-to-Back Page (Back) -->
+<!-- Page 6: iPhone Back-to-Back Page (Back) -->
 <div class="back-to-back-page">
   <div class="page-title">30MM Iphone</div>
   
@@ -547,31 +620,6 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
     margin-top: 12pt;
     text-align: center;
   }
-  .frame-qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 20pt;
-  }
-  .frame-qr-code {
-    width: 50mm;
-    height: 50mm;
-    margin: 0 auto 8pt;
-    display: block;
-  }
-  .frame-qr-code img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .frame-qr-label {
-    font-size: 11pt;
-    font-weight: 600;
-    color: #1C1C1E;
-    text-align: center;
-    margin-top: 4pt;
-  }
 </style>
 </head>
 <body>
@@ -594,16 +642,6 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
       />
     </div>
     <div class="qr-label-180mm">180MM Android</div>
-    
-    <div class="frame-qr-section">
-      <div class="frame-qr-code">
-        <img 
-          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761')}" 
-          alt="MakerWorld Frame QR Code" 
-        />
-      </div>
-      <div class="frame-qr-label">3D print a frame for these!</div>
-    </div>
   </div>
 </div>
 
@@ -625,16 +663,6 @@ const QR_CODE_PAGES_ONLY = `<!DOCTYPE html>
       />
     </div>
     <div class="qr-label-180mm">180MM Iphone</div>
-    
-    <div class="frame-qr-section">
-      <div class="frame-qr-code">
-        <img 
-          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761')}" 
-          alt="MakerWorld Frame QR Code" 
-        />
-      </div>
-      <div class="frame-qr-label">3D print a frame for these!</div>
-    </div>
   </div>
 </div>
 
