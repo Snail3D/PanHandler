@@ -234,8 +234,6 @@ export default function CoinCalibration({
               gsd: metadata.groundSampleDistance,
               resolution: metadata.specs.resolution,
             };
-            console.log('🚁 AUTO-CALIBRATING:', JSON.stringify(debugInfo));
-            
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             
             // Auto-calculate calibration from drone altitude
@@ -270,7 +268,6 @@ export default function CoinCalibration({
           }
         }
       } catch (error) {
-        console.error('Error detecting drone:', error);
         // Silently fail - just proceed with manual calibration
       }
     };
