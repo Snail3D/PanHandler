@@ -1307,15 +1307,8 @@ export default function CameraScreen() {
         }
         
         // Fall back to MLKit if expo scanner didn't work
-        if (!qrResult) {
-          const { detectQR } = await import('../utils/qrDetection');
-          
-          const mlkitDetectionPromise = detectQR(photoUri);
-          const timeoutPromise = new Promise<null>((resolve) => 
-            setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit (it's faster)
-          );
-          qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
-        }
+        // NOTE: MLKit detection removed - expo-camera is the only QR scanner now
+        // If expo scanner fails, continue with normal flow
         
         if (qrResult && qrResult.url) {
           const calibrationData = parseCalibrationURL(qrResult.url);
@@ -1442,9 +1435,13 @@ export default function CameraScreen() {
                 setImageUri(photoUri, false);
                 
                 // Store QR position (similar to coin circle) for map mode
+                // Calculate center from corners if not provided
+                const centerX = qrResult.centerX ?? (corners.reduce((sum, p) => sum + p.x, 0) / corners.length);
+                const centerY = qrResult.centerY ?? (corners.reduce((sum, p) => sum + p.y, 0) / corners.length);
+                
                 setCoinCircle({
-                  centerX: qrResult.centerX,
-                  centerY: qrResult.centerY,
+                  centerX,
+                  centerY,
                   radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
                 });
                 
