@@ -143,17 +143,13 @@ export default function DimensionOverlay({
 }: DimensionOverlayProps) {
   // CACHE BUST v4.0 - Verify new bundle is loaded
   // console.log('✅ DimensionOverlay v4.0 loaded - Static Tetris active');
-  
   const insets = useSafeAreaInsets();
-  
   const [mode, setMode] = useState<MeasurementMode>('distance');
   const internalViewRef = useRef<View>(null);
   const viewRef = externalViewRef !== undefined ? externalViewRef : internalViewRef; // Use external ref if provided
-  
   // Lock-in animation
   const lockInOpacity = useSharedValue(0);
   const lockInScale = useSharedValue(1);
-  
   // Use store for persistent state
   const calibration = useStore((s) => s.calibration);
   const setCalibration = useStore((s) => s.setCalibration);
@@ -174,7 +170,6 @@ export default function DimensionOverlay({
   const setHasSeenPanTutorial = useStore((s) => s.setHasSeenPanTutorial);
   const magneticDeclination = useStore((s) => s.magneticDeclination); // For azimuth correction
   const isDonor = useStore((s) => s.isDonor); // Check if user is a supporter
-  
   // STUB: Pro/Free system removed - Freehand is now free for everyone!
   const isProUser = true; // All users have access to all features
   const freehandTrialUsed = 0; // No trial system
@@ -184,7 +179,6 @@ export default function DimensionOverlay({
   const dismissFreehandOffer = () => {}; // No-op
   const setIsProUser = () => {}; // No-op
   const [showProModal, setShowProModal] = useState(false); // Unused
-  
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
   const panTutorialOpacity = useSharedValue(0);
@@ -196,10 +190,8 @@ export default function DimensionOverlay({
   const lastZoomScale = useRef(zoomScale);
   const lastRotation = useRef(zoomRotation); // Track rotation too!
   const isDismissing = useRef(false); // Prevent multiple dismissals
-  
   // Freehand mode activation (long-press on Distance button)
   const freehandLongPressRef = useRef<NodeJS.Timeout | null>(null);
-  
   // Label modal for save/email
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [showEmailPromptModal, setShowEmailPromptModal] = useState(false);
@@ -209,7 +201,6 @@ export default function DimensionOverlay({
   const fusionViewRef = useRef<View>(null); // For capturing unzoomed transparent canvas
   const fusionZoomedViewRef = useRef<View>(null); // For capturing zoomed transparent canvas
   const [currentLabel, setCurrentLabel] = useState<string | null>(null);
-  
   // Alert modal state
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -224,7 +215,6 @@ export default function DimensionOverlay({
     title: '',
     message: '',
   });
-  
   // Helper function to show alerts
   const showAlert = (
     title: string,
@@ -244,11 +234,9 @@ export default function DimensionOverlay({
       onConfirm,
     });
   };
-  
   const closeAlert = () => {
     setAlertConfig(prev => ({ ...prev, visible: false }));
   };
-  
   // Smart calibration hint state
   interface MeasurementAttempt {
     type: 'distance' | 'circle' | 'rectangle' | 'angle' | 'freehand' | 'polygon';
@@ -256,33 +244,27 @@ export default function DimensionOverlay({
     centerY: number;
     timestamp: number;
   }
-  
   const [attemptHistory, setAttemptHistory] = useState<MeasurementAttempt[]>([]);
   const [hasShownCalibrationHint, setHasShownCalibrationHint] = useState(false);
   const [showCalibrationHint, setShowCalibrationHint] = useState(false);
   const hintOpacity = useSharedValue(0);
   const hintScale = useSharedValue(0.8);
   const hintColorShift = useSharedValue(0); // 0-1 for color animation
-  
   // Selected measurement for delete/drag
   const [draggedMeasurementId, setDraggedMeasurementId] = useState<string | null>(null);
   const [resizingPoint, setResizingPoint] = useState<{ measurementId: string, pointIndex: number } | null>(null);
   const dragStartPos = useSharedValue({ x: 0, y: 0 });
   const dragCurrentPos = useSharedValue({ x: 0, y: 0 });
   const [didDrag, setDidDrag] = useState(false); // Track if user actually dragged
-  
   // Rapid tap to delete feature
   const [tapDeleteState, setTapDeleteState] = useState<{ measurementId: string, count: number, lastTapTime: number } | null>(null);
   const [selectedMeasurementId, setSelectedMeasurementId] = useState<string | null>(null);
-  
   // Label editing feature - double tap to add/edit label
   const [labelEditingMeasurementId, setLabelEditingMeasurementId] = useState<string | null>(null);
   const [showLabelEditModal, setShowLabelEditModal] = useState(false);
   const [labelTapState, setLabelTapState] = useState<{ measurementId: string, lastTapTime: number } | null>(null);
-  
   // Undo history for measurement edits - stores original state before first edit
   const [measurementHistory, setMeasurementHistory] = useState<Map<string, Measurement>>(new Map());
-  
   // Freehand drawing state
   const [isDrawingFreehand, setIsDrawingFreehand] = useState(false);
   const [freehandPath, setFreehandPath] = useState<Array<{ x: number; y: number }>>([]);
@@ -325,24 +307,19 @@ export default function DimensionOverlay({
       clearAllHapticTimers();
     };
   }, []);
-  
   // Lock-in animation states
   const [showLockedInAnimation, setShowLockedInAnimation] = useState(false);
   const [hasShownAnimation, setHasShownAnimation] = useState(false); // Always start false - only show animation on first calibration
   const lockInTimersRef = useRef<NodeJS.Timeout[]>([]); // Track lock-in animation timers for cleanup
   const prevZoomRef = useRef({ scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY });
-  
   // Reset animation flag when image changes (new photo = new session)
   useEffect(() => {
     setHasShownAnimation(false);
   }, [currentImageUri]);
-  
   // Measurement mode states
   const [measurementMode, setMeasurementMode] = useState(false); // false = pan/zoom, true = place points
-  
   // DEBUG: Track touch interceptions
   const [debugInfo, setDebugInfo] = useState({ lastTouch: 0, interceptor: '', mode: '' });
-  
   // Register the callback with parent so it can be called on double-tap
   useEffect(() => {
     if (onRegisterDoubleTapCallback) {
@@ -378,18 +355,14 @@ export default function DimensionOverlay({
   const [menuFingerTouches, setMenuFingerTouches] = useState<Array<{x: number, y: number, id: string, pressure: number, seed: number}>>([]);
   const menuFingerOpacity = useSharedValue(0);
   const menuFingerScale = useSharedValue(1);
-  
   // Swipe trail effect (for menu closing)
   const [swipeTrail, setSwipeTrail] = useState<Array<{x: number, y: number, id: string, timestamp: number}>>([]);
-  
   const cursorOffsetY = 40; // Reduced from 120 to ~1cm above finger
   const HAPTIC_DISTANCE = 2; // ~0.5mm on screen for frequent haptic feedback
   const MAGNIFICATION_SCALE = 1.2; // 20% zoom magnification
-  
   // Cursor movement speed tracking for dynamic glow
   const [cursorSpeed, setCursorSpeed] = useState(0); // pixels per millisecond
   const lastCursorUpdateRef = useRef({ x: 0, y: 0, time: Date.now() });
-  
   // Menu states
   const [menuMinimized, setMenuMinimized] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -401,19 +374,15 @@ export default function DimensionOverlay({
   const menuOpacity = useSharedValue(1); // For shake fade animation
   const tabPositionY = useSharedValue(SCREEN_HEIGHT / 2); // Draggable tab position
   const menuHiddenShared = useSharedValue(false); // Shared value for gesture worklets
-  
   // Legend collapse state
   const [legendCollapsed, setLegendCollapsed] = useState(false);
-  
   // Hide measurement labels toggle
   const [hideMeasurementLabels, setHideMeasurementLabels] = useState(false);
   const [labelEditMode, setLabelEditMode] = useState(false);
-  
   // Easter egg: 7 rapid taps on Imperial button
   const [imperialTapCount, setImperialTapCount] = useState(0);
   const [imperialTapTimestamps, setImperialTapTimestamps] = useState<number[]>([]);
   const imperialTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
   // Map Mode state
   const [isMapMode, setIsMapMode] = useState(false);
   const [mapScale, setMapScale] = useState<{screenDistance: number, screenUnit: 'cm' | 'in', realDistance: number, realUnit: 'km' | 'mi' | 'm' | 'ft'} | null>(null);
@@ -422,7 +391,6 @@ export default function DimensionOverlay({
   // Azimuth mode: Active when map mode is on OR when magnetic declination is set (≠ 0)
   // This allows azimuth measurements even in "known points" calibration without enabling full map mode
   const isAzimuthMode = isMapMode || magneticDeclination !== 0;
-  
   // Blueprint scale placement
   const [showBlueprintPlacementModal, setShowBlueprintPlacementModal] = useState(false);
   const [isPlacingBlueprint, setIsPlacingBlueprint] = useState(false); // Actually placing pins
@@ -430,7 +398,6 @@ export default function DimensionOverlay({
   const [blueprintPoints, setBlueprintPoints] = useState<Array<{ x: number; y: number }>>([]);
   const [showBlueprintDistanceModal, setShowBlueprintDistanceModal] = useState(false);
   const blueprintLineOpacity = useSharedValue(1); // For fade-out animation
-  
   // Vibrant colors for mode buttons - rotates each time a mode is selected
   const [modeColorIndex, setModeColorIndex] = useState(0);
   const vibrantColors = [
@@ -445,47 +412,38 @@ export default function DimensionOverlay({
     { main: '#84CC16', glow: 'rgba(132, 204, 22, 0.6)' },  // Lime
     { main: '#A855F7', glow: 'rgba(168, 85, 247, 0.6)' },  // Violet
   ];
-  
   // Get current vibrant color
   const getCurrentModeColor = () => vibrantColors[modeColorIndex % vibrantColors.length];
-  
   // Imperial button 7-tap easter egg handler
   const handleImperialTap = () => {
     const now = Date.now();
     const newTimestamps = [...imperialTapTimestamps, now];
-    
     // Keep only recent taps (within 2 seconds)
     const recentTaps = newTimestamps.filter(t => now - t < 2000);
     setImperialTapTimestamps(recentTaps);
-    
     // Clear existing timeout
     if (imperialTapTimeoutRef.current) {
       clearTimeout(imperialTapTimeoutRef.current);
     }
-    
     // Check if we have 7 rapid taps
     if (recentTaps.length === 7) {
       // SUCCESS! Trigger easter egg
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      
       // Open the same link as the auto-flash button easter egg
       setTimeout(() => {
         Linking.openURL('https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98');
       }, 300);
-      
       // Clear taps
       setImperialTapTimestamps([]);
     } else {
       // Light haptic feedback for each tap
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      
       // Reset after 2 seconds of inactivity
       imperialTapTimeoutRef.current = setTimeout(() => {
         setImperialTapTimestamps([]);
       }, 2000);
     }
   };
-  
   // Mode swipe animation for finger tracking
   const modeSwipeOffset = useSharedValue(0);
 
@@ -495,7 +453,6 @@ export default function DimensionOverlay({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const toastOpacity = useSharedValue(0);
-  
   // Easter egg states
   const [calibratedTapCount, setCalibrateTapCount] = useState(0);
   const [autoLevelTapCount, setAutoLevelTapCount] = useState(0);
@@ -503,16 +460,13 @@ export default function DimensionOverlay({
   const [stepBrothersMode, setStepBrothersMode] = useState(false); // Step Brothers Easter egg!
   const calibratedTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoLevelTapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
   // Undo long-press state
   const undoIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const undoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
   // Tetris Easter egg state - simplified static version
   const [showTetris, setShowTetris] = useState(false);
   const tetrisOpacity = useSharedValue(0);
   const [hasTriggeredTetris, setHasTriggeredTetris] = useState(false);
-  
   // Initialize pan/zoom state - ALWAYS unlocked on mount
   // User should be able to pan/zoom freely after entering measurement screen
   // IMPORTANT: This useEffect must be AFTER all other hooks to avoid hooks order issues
@@ -545,17 +499,14 @@ export default function DimensionOverlay({
       { translateY: interpolate(toastOpacity.value, [0, 1], [20, 0]) }
     ],
   }));
-  
   // Animated style for mode swipe
   const modeSwipeAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: modeSwipeOffset.value * 0.3 }], // Dampened movement (30% of finger)
   }));
-  
   // Animated style for pan tutorial with zoom-responsive scaling
   const panTutorialAnimatedStyle = useAnimatedStyle(() => ({
     opacity: panTutorialOpacity.value,
   }));
-  
   // Menu fingerprint animated style
   const menuEvaporationStyle = useAnimatedStyle(() => ({
     opacity: menuFingerOpacity.value,
@@ -591,7 +542,6 @@ export default function DimensionOverlay({
     // Only show for fresh photos (no measurements yet = new session)
     // Don't show if user is returning to saved work with existing measurements
     const isFreshPhoto = measurements.length === 0;
-    
     if (isFreshPhoto) {
       // Show tutorial after a brief delay
       const timer = setTimeout(() => {
@@ -600,11 +550,9 @@ export default function DimensionOverlay({
         lastPanPosition.current = { x: zoomTranslateX, y: zoomTranslateY };
         lastZoomScale.current = zoomScale;
         lastRotation.current = zoomRotation;
-        
         setShowPanTutorial(true);
         panTutorialOpacity.value = withSpring(1, { damping: 20, stiffness: 100 });
       }, 500);
-      
       return () => clearTimeout(timer);
     }
   }, []); // Only run once on mount
@@ -635,7 +583,6 @@ export default function DimensionOverlay({
   // Detect panning/measuring/zooming/rotating and fade out tutorial - CINEMATIC
   useEffect(() => {
     if (!showPanTutorial || isDismissing.current) return; // Don't process if already dismissing!
-    
     // Dismiss if user switches to measure mode
     if (measurementMode) {
       isDismissing.current = true;
@@ -650,26 +597,21 @@ export default function DimensionOverlay({
       }, 800);
       return;
     }
-    
     // Calculate total movement from START position
     const deltaX = zoomTranslateX - tutorialStartPosition.current.x;
     const deltaY = zoomTranslateY - tutorialStartPosition.current.y;
     const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     const zoomDelta = Math.abs(zoomScale - lastZoomScale.current);
     const rotationDelta = Math.abs(zoomRotation - lastRotation.current);
-    
     // ANY movement detected? Fade out CINEMATICALLY!
     const anyMovement = totalMovement > 10 || zoomDelta > 0.02 || rotationDelta > 1;
-    
     if (anyMovement) {
       isDismissing.current = true; // Lock it so we don't fire multiple times!
-      
       // Cinematic fade - like entering a movie scene 🎬
       panTutorialOpacity.value = withTiming(0, { 
         duration: 800, // Longer, more graceful
         easing: Easing.bezier(0.4, 0, 0.2, 1), // Silky smooth cubic bezier
       });
-      
       setTimeout(() => {
         setShowPanTutorial(false); // Remove from DOM after animation completes
         isDismissing.current = false; // Reset for next time
@@ -690,7 +632,6 @@ export default function DimensionOverlay({
       setMapScale(null);
     }
   }, [calibration]); // Run when calibration changes (including on app restore)
-  
   // Handle skipToMapMode prop (from calibration screen's "Map Scale" button)
   const hasTriggeredSkipToMap = useRef(false);
   useEffect(() => {
@@ -700,7 +641,6 @@ export default function DimensionOverlay({
       setShowMapScaleModal(true);
     }
   }, [skipToMapMode, mapScale]);
-  
   // Handle skipToBlueprintMode prop (from photo type selection)
   const hasTriggeredSkipToBlueprint = useRef(false);
   useEffect(() => {
@@ -712,7 +652,6 @@ export default function DimensionOverlay({
       setMenuHidden(true); // Hide menu when modal appears
     }
   }, [skipToBlueprintMode]);
-  
   // Handle skipToAerialMode prop (from photo type selection)
   const hasTriggeredSkipToAerial = useRef(false);
   useEffect(() => {
@@ -724,7 +663,6 @@ export default function DimensionOverlay({
       setMenuHidden(true); // Hide menu when modal appears
     }
   }, [skipToAerialMode]);
-  
   // CRITICAL: Reset blueprint modal states when starting a new photo session
   // sessionColor changes with each new photo, so we use it as a signal to reset
   useEffect(() => {
@@ -747,13 +685,11 @@ export default function DimensionOverlay({
   const showToastNotification = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
-    
     // Fade in
     toastOpacity.value = withSpring(1, {
       damping: 15,
       stiffness: 100,
     });
-    
     // Auto-dismiss after 3 seconds
     setTimeout(() => {
       toastOpacity.value = withTiming(0, { duration: 300 }, () => {
@@ -761,7 +697,6 @@ export default function DimensionOverlay({
       });
     }, 3000);
   };
-  
   // Create menu button fingerprint with session color
   const createMenuFingerprint = (x: number, y: number) => {
     const touch = {
@@ -771,15 +706,12 @@ export default function DimensionOverlay({
       pressure: 0.7, // Default pressure for button taps
       seed: Math.random(),
     };
-    
     setMenuFingerTouches([touch]);
-    
     // Fade in
     menuFingerOpacity.value = 0;
     menuFingerScale.value = 0.8;
     menuFingerOpacity.value = withTiming(1, { duration: 150 });
     menuFingerScale.value = withSpring(1, { damping: 15, stiffness: 200 });
-    
     // Fade out after 600ms
     setTimeout(() => {
       menuFingerOpacity.value = withTiming(0, { 
@@ -791,7 +723,6 @@ export default function DimensionOverlay({
       menuFingerScale.value = withTiming(1.2, { duration: 400 });
     }, 600);
   };
-  
   // 🎮 Game-inspired haptic sequences for measurement modes
   const playModeHaptic = (mode: MeasurementMode) => {
     switch(mode) {
@@ -828,9 +759,7 @@ export default function DimensionOverlay({
         break;
     }
   };
-  
   const CALCULATOR_WORDS = ['HELLO', 'BOOBS', '80085', '5318008', 'SHELL', '07734', 'GOOGLE', '376616', 'BOOBLESS', '553780085'];
-  
   // Easter egg: Calibrated badge tap handler
   const handleCalibratedTap = () => {
     // Clear existing timeout
@@ -863,7 +792,6 @@ export default function DimensionOverlay({
       }, 2000);
     }
   };
-  
   // Easter egg: AUTO LEVEL badge tap handler - WITH HAPTIC RICKROLL! 🎵
   const handleAutoLevelTap = () => {
     // Clear existing timeout
@@ -922,31 +850,25 @@ export default function DimensionOverlay({
       }, 2000);
     }
   };
-  
   // Get calculator word for a measurement value
   const getCalculatorWord = (value: string): string => {
     const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return CALCULATOR_WORDS[hash % CALCULATOR_WORDS.length];
   };
-  
   // Tetris animation trigger - EPIC GAME OVER sequence!
   // Static Tetris animation - simple fade in/out (v4.0)
   const triggerTetrisAnimation = () => {
     setShowTetris(true);
-    
     // Success haptic
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    
     // Fade in the static screen
     tetrisOpacity.value = withTiming(1, { duration: 600 });
-    
     // Hold for 3 seconds, then fade out and clear everything
     setTimeout(() => {
       tetrisOpacity.value = withTiming(0, { duration: 800 }, (finished) => {
         'worklet';
         if (finished) {
           runOnJS(setShowTetris)(false);
-          
           // CRITICAL: Clear measurements and points IMMEDIATELY after animation finishes
           // Do this synchronously without waiting for animation callback
           runOnJS(() => {
@@ -955,14 +877,12 @@ export default function DimensionOverlay({
             setHasTriggeredTetris(false); // Allow trigger again if they rebuild
             setCurrentLabel(null); // Clear the saved label since measurements are cleared
           });
-          
           // Success haptic for the reset - wrapped in runOnJS
           runOnJS(Haptics.notificationAsync)(Haptics.NotificationFeedbackType.Success);
         }
       });
     }, 3000);
   };
-  
   // Get color for measurement based on index
   const getMeasurementColor = (index: number, measurementMode: MeasurementMode) => {
     const colors = MEASUREMENT_COLORS[measurementMode];
@@ -973,29 +893,23 @@ export default function DimensionOverlay({
   const getComplementaryColor = (hexColor: string): string => {
     // Remove # if present
     const hex = hexColor.replace('#', '');
-    
     // Convert to RGB
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
-    
     // Calculate complementary color (rotate hue by 180 degrees)
     // Convert RGB to HSL
     const rNorm = r / 255;
     const gNorm = g / 255;
     const bNorm = b / 255;
-    
     const max = Math.max(rNorm, gNorm, bNorm);
     const min = Math.min(rNorm, gNorm, bNorm);
     const l = (max + min) / 2;
-    
     let h = 0;
     let s = 0;
-    
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
       if (max === rNorm) {
         h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) / 6;
       } else if (max === gNorm) {
@@ -1004,10 +918,8 @@ export default function DimensionOverlay({
         h = ((rNorm - gNorm) / d + 4) / 6;
       }
     }
-    
     // Rotate hue by 180 degrees for complementary color
     h = (h + 0.5) % 1;
-    
     // Convert back to RGB
     const hue2rgb = (p: number, q: number, t: number) => {
       if (t < 0) t += 1;
@@ -1017,9 +929,7 @@ export default function DimensionOverlay({
       if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
       return p;
     };
-    
     let rComp, gComp, bComp;
-    
     if (s === 0) {
       rComp = gComp = bComp = l;
     } else {
@@ -1029,13 +939,11 @@ export default function DimensionOverlay({
       gComp = hue2rgb(p, q, h);
       bComp = hue2rgb(p, q, h - 1/3);
     }
-    
     // Convert back to hex
     const toHex = (n: number) => {
       const hex = Math.round(n * 255).toString(16);
       return hex.length === 1 ? '0' + hex : hex;
     };
-    
     return `#${toHex(rComp)}${toHex(gComp)}${toHex(bComp)}`;
   };
 
@@ -1043,20 +951,16 @@ export default function DimensionOverlay({
   const getTappedMeasurementPoint = (tapX: number, tapY: number): { measurementId: string, pointIndex: number } | null => {
     const POINT_THRESHOLD = 40; // pixels
     const RECTANGLE_CORNER_THRESHOLD = 25; // Tighter threshold for rectangle corners
-    
     for (const measurement of measurements) {
       // For rectangles, use a much tighter threshold for corner points
       // This makes it easier to drag the whole rectangle vs editing corners
       const threshold = measurement.mode === 'rectangle' ? RECTANGLE_CORNER_THRESHOLD : POINT_THRESHOLD;
-      
       // Check all points in the measurement
       for (let i = 0; i < measurement.points.length; i++) {
         const point = imageToScreen(measurement.points[i].x, measurement.points[i].y);
-        
         const distToPoint = Math.sqrt(
           Math.pow(tapX - point.x, 2) + Math.pow(tapY - point.y, 2)
         );
-        
         if (distToPoint < threshold) {
           return { measurementId: measurement.id, pointIndex: i };
         }
@@ -1094,11 +998,9 @@ export default function DimensionOverlay({
   const checkForCalibrationIssues = (newMeasurement: Measurement) => {
     // Don't show if already shown for this photo
     if (hasShownCalibrationHint) return;
-    
     // Calculate center point of new measurement
     const centerX = newMeasurement.points.reduce((sum, p) => sum + p.x, 0) / newMeasurement.points.length;
     const centerY = newMeasurement.points.reduce((sum, p) => sum + p.y, 0) / newMeasurement.points.length;
-    
     // Create new attempt
     const attempt: MeasurementAttempt = {
       type: newMeasurement.mode,
@@ -1106,11 +1008,9 @@ export default function DimensionOverlay({
       centerY,
       timestamp: Date.now(),
     };
-    
     // Filter recent attempts (last 20 seconds)
     const now = Date.now();
     const recentAttempts = attemptHistory.filter(a => now - a.timestamp < 20000);
-    
     // Count attempts in same area (80px radius) and same type
     const nearbyAttempts = recentAttempts.filter(a => {
       const distance = Math.sqrt(
@@ -1119,17 +1019,14 @@ export default function DimensionOverlay({
       );
       return distance < 80 && a.type === newMeasurement.mode;
     });
-    
     // Check threshold (distance = 4, others = 5) - less sensitive to avoid false positives
     const threshold = newMeasurement.mode === 'distance' ? 3 : 4; // -1 because we count the new one
-    
     if (nearbyAttempts.length >= threshold) {
       // Trigger hint!
       setShowCalibrationHint(true);
       setHasShownCalibrationHint(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
-    
     // Update history (keep last 10 attempts)
     const updatedHistory = [...recentAttempts, attempt].slice(-10);
     setAttemptHistory(updatedHistory);
@@ -1141,26 +1038,21 @@ export default function DimensionOverlay({
     if (isAzimuthMode && mode === 'angle' && currentPoints.length === 1) {
       const firstPoint = imageToScreen(currentPoints[0].x, currentPoints[0].y);
       const dy = cursorY - firstPoint.y;
-      
       // Don't snap if too close to first point (less than 20px)
       const distance = Math.abs(dy);
       if (distance < 20) {
         return { x: cursorX, y: cursorY, snapped: false };
       }
-      
       // ALWAYS lock to vertical line (north reference)
       return { x: firstPoint.x, y: cursorY, snapped: true };
     }
-    
     // Snap when placing second point in distance mode OR second point in angle mode (before vertex) OR blueprint mode
     const shouldSnap = (mode === 'distance' && currentPoints.length === 1) || 
                        (mode === 'angle' && currentPoints.length === 1) ||
                        (isPlacingBlueprint && blueprintPoints.length === 1);
-    
     if (!shouldSnap) {
       return { x: cursorX, y: cursorY, snapped: false };
     }
-    
     // Get the first point (either from currentPoints or blueprintPoints)
     let firstPoint;
     if (isPlacingBlueprint && blueprintPoints.length === 1) {
@@ -1170,40 +1062,32 @@ export default function DimensionOverlay({
     } else {
       return { x: cursorX, y: cursorY, snapped: false };
     }
-    
     const dx = cursorX - firstPoint.x;
     const dy = cursorY - firstPoint.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    
     // Don't snap if too close to first point (less than 20px)
     if (distance < 20) {
       return { x: cursorX, y: cursorY, snapped: false };
     }
-    
     // Calculate angle from first point
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-    
     // Snap thresholds: very subtle!
     // Smaller entry threshold = harder to enter snap
     // Slightly larger exit threshold = easier to break free
     const snapEntryThreshold = 3;  // Only snap if within 3° 
     const snapExitThreshold = 4;   // Stay snapped until 4° away (very subtle)
-    
     // Use different threshold based on whether we're already snapped
     const threshold = isSnapped ? snapExitThreshold : snapEntryThreshold;
-    
     // Check for horizontal snap (0° or 180°)
     const horizontalAngle = Math.abs(angle) % 180;
     if (horizontalAngle < threshold || horizontalAngle > (180 - threshold)) {
       return { x: cursorX, y: firstPoint.y, snapped: true };
     }
-    
     // Check for vertical snap (90° or -90°)
     const verticalAngle = Math.abs(Math.abs(angle) - 90);
     if (verticalAngle < threshold) {
       return { x: firstPoint.x, y: cursorY, snapped: true };
     }
-    
     // No snap
     return { x: cursorX, y: cursorY, snapped: false };
   };
@@ -1212,45 +1096,36 @@ export default function DimensionOverlay({
   // Ignores first and last 5% of path to account for natural hand jitter
   const doesPathSelfIntersect = (path: Array<{ x: number; y: number }>): boolean => {
     if (path.length < 4) return false; // Need at least 4 points to self-intersect
-    
     // Calculate exclusion zones (first and last 5% of path)
     const exclusionZoneSize = Math.ceil(path.length * 0.05); // 5% of path length
     const startExclusionEnd = exclusionZoneSize;
     const endExclusionStart = path.length - exclusionZoneSize - 1;
-    
     // Check each line segment against all other non-adjacent line segments
     for (let i = 0; i < path.length - 1; i++) {
       // Skip segments in the exclusion zones
       if (i < startExclusionEnd || i >= endExclusionStart) {
         continue;
       }
-      
       const seg1Start = path[i];
       const seg1End = path[i + 1];
-      
       // Start checking from i+2 to avoid adjacent segments
       for (let j = i + 2; j < path.length - 1; j++) {
         // Skip segments in the exclusion zones
         if (j < startExclusionEnd || j >= endExclusionStart) {
           continue;
         }
-        
         // Don't check the last segment against the first (they're supposed to connect in a loop)
         if (i === 0 && j === path.length - 2) continue;
-        
         const seg2Start = path[j];
         const seg2End = path[j + 1];
-        
         // Check if segments intersect
         if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
           return true;
         }
       }
     }
-    
     return false;
   };
-  
   // Helper to check if two line segments intersect
   const doSegmentsIntersect = (
     p1: { x: number; y: number },
@@ -1261,7 +1136,6 @@ export default function DimensionOverlay({
     const ccw = (A: { x: number; y: number }, B: { x: number; y: number }, C: { x: number; y: number }) => {
       return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
     };
-    
     return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
   };
 
@@ -1275,7 +1149,6 @@ export default function DimensionOverlay({
     const SNAP_DISTANCE = calibration 
       ? SNAP_DISTANCE_MM * calibration.pixelsPerUnit 
       : (moveMode ? 5 : 30); // fallback pixels if not calibrated (5px when moving, very tight)
-    
     // Check all existing measurement points
     for (const measurement of measurements) {
       for (const point of measurement.points) {
@@ -1284,14 +1157,12 @@ export default function DimensionOverlay({
           Math.pow(cursorX - screenPoint.x, 2) + 
           Math.pow(cursorY - screenPoint.y, 2)
         );
-        
         // If cursor is close enough, snap to this point
         if (distance < SNAP_DISTANCE) {
           return { x: screenPoint.x, y: screenPoint.y, snapped: true };
         }
       }
     }
-    
     // Also check current points being placed (for connecting within same measurement)
     for (const point of currentPoints) {
       const screenPoint = imageToScreen(point.x, point.y);
@@ -1299,29 +1170,24 @@ export default function DimensionOverlay({
         Math.pow(cursorX - screenPoint.x, 2) + 
         Math.pow(cursorY - screenPoint.y, 2)
       );
-      
       // If cursor is close enough, snap to this point
       if (distance < SNAP_DISTANCE) {
         return { x: screenPoint.x, y: screenPoint.y, snapped: true };
       }
     }
-    
     return { x: cursorX, y: cursorY, snapped: false };
   };
 
   // Helper: Convert pixel distance to map scale units
   const convertToMapScale = (pixelDistance: number): number => {
     if (!mapScale) return 0;
-    
     // Calculate how many screen units (cm/in) the measurement is
     const screenWidthCm = 10.8; // Standard phone screen width
     const screenWidthIn = 4.25;
     const imageWidth = SCREEN_WIDTH * 2; // Assume 2x pixel density
-    
     const screenWidthPhysical = mapScale.screenUnit === 'cm' ? screenWidthCm : screenWidthIn;
     const pixelsPerScreenUnit = imageWidth / screenWidthPhysical;
     const screenUnits = pixelDistance / pixelsPerScreenUnit;
-    
     // Convert to map units and return directly (not in mm)
     const mapDistance = screenUnits * (mapScale.realDistance / mapScale.screenDistance);
     return mapDistance;
@@ -1413,14 +1279,11 @@ export default function DimensionOverlay({
   // Helper: Format map scale distance (for lines, perimeters)
   const formatMapScaleDistance = (pixelDistance: number): string => {
     if (!mapScale) return "";
-    
     const mapDistance = convertToMapScale(pixelDistance);
-    
     // Convert based on user's unit system preference (metric vs imperial)
     // Start with map scale's unit, then convert if needed
     const isMapMetric = mapScale.realUnit === "km" || mapScale.realUnit === "m";
     const isMapImperial = mapScale.realUnit === "mi" || mapScale.realUnit === "ft";
-    
     // If user wants metric and map is metric, or user wants imperial and map is imperial, use as-is
     if ((unitSystem === 'metric' && isMapMetric) || (unitSystem === 'imperial' && isMapImperial)) {
       if (mapScale.realUnit === "km") {
@@ -1434,14 +1297,12 @@ export default function DimensionOverlay({
         const totalInches = Math.round(mapDistance * 12);
         const feet = Math.floor(totalInches / 12);
         const inches = totalInches % 12;
-        
         if (inches === 0) {
           return `${feet}'`;
         }
         return `${feet}'${inches}"`;
       }
     }
-    
     // User wants metric, but map is imperial - convert to metric
     if (unitSystem === 'metric' && isMapImperial) {
       let meters = 0;
@@ -1450,7 +1311,6 @@ export default function DimensionOverlay({
       } else { // ft
         meters = mapDistance * 0.3048; // feet to meters
       }
-      
       // Choose appropriate metric unit
       if (meters < 1) {
         return `${(meters * 100).toFixed(0)} cm`;
@@ -1460,7 +1320,6 @@ export default function DimensionOverlay({
         return `${(meters / 1000).toFixed(2)} km`;
       }
     }
-    
     // User wants imperial, but map is metric - convert to imperial
     if (unitSystem === 'imperial' && isMapMetric) {
       let feet = 0;
@@ -1469,14 +1328,12 @@ export default function DimensionOverlay({
       } else { // m
         feet = mapDistance * 3.28084; // meters to feet
       }
-      
       // Choose appropriate imperial unit
       if (feet < 5280) {
         // Format as feet'inches"
         const totalInches = Math.round(feet * 12);
         const feetPart = Math.floor(totalInches / 12);
         const inches = totalInches % 12;
-        
         if (inches === 0) {
           return `${feetPart}'`;
         }
@@ -1486,7 +1343,6 @@ export default function DimensionOverlay({
         return `${(feet / 5280).toFixed(2)} mi`;
       }
     }
-    
     // Fallback (shouldn't reach here)
     return `${mapDistance.toFixed(2)} ${mapScale.realUnit}`;
   };
@@ -1656,53 +1512,41 @@ export default function DimensionOverlay({
       // p1 = starting point
       // p2 = north reference point (defines north direction)
       // p3 = destination point
-      
       // Vector from p1 to p2 (north reference)
       const northX = p2.x - p1.x;
       const northY = p2.y - p1.y;
-      
       // Vector from p1 to p3 (destination)
       const destX = p3.x - p1.x;
       const destY = p3.y - p1.y;
-      
       // Calculate angle of north vector from horizontal (in radians)
       const northAngle = Math.atan2(-northY, northX); // Negative Y because screen coords are inverted
-      
       // Calculate angle of destination vector from horizontal
       const destAngle = Math.atan2(-destY, destX);
-      
       // Calculate clockwise angle from north to destination
       let azimuth = (destAngle - northAngle) * (180 / Math.PI);
-      
       // Apply magnetic declination correction
       // Positive declination (East) = add to azimuth to get true bearing
       // Negative declination (West) = subtract from azimuth to get true bearing
       azimuth += magneticDeclination;
-      
       // Normalize to 0-360 range
       if (azimuth < 0) azimuth += 360;
       if (azimuth >= 360) azimuth -= 360;
-      
       return `${azimuth.toFixed(1)}° (Azimuth)`;
     }
-    
     // Normal Mode: Calculate interior angle
     const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
     const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
     let angle = Math.abs((angle2 - angle1) * (180 / Math.PI));
-    
     // Normalize to 0-180 range
     if (angle > 180) {
       angle = 360 - angle;
     }
-    
     return `${angle.toFixed(1)}°`;
   };
 
   // Helper to check if a tap is near a measurement
   const getTappedMeasurement = (tapX: number, tapY: number): string | null => {
     const TAP_THRESHOLD = 30; // pixels
-    
     for (const measurement of measurements) {
       if (measurement.mode === 'distance') {
         const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
@@ -1737,7 +1581,6 @@ export default function DimensionOverlay({
         const maxX = Math.max(...xCoords);
         const minY = Math.min(...yCoords);
         const maxY = Math.max(...yCoords);
-        
         const onEdge = (
           (Math.abs(tapX - minX) < TAP_THRESHOLD && tapY >= minY && tapY <= maxY) ||
           (Math.abs(tapX - maxX) < TAP_THRESHOLD && tapY >= minY && tapY <= maxY) ||
@@ -1749,7 +1592,6 @@ export default function DimensionOverlay({
       } else if (measurement.mode === 'freehand') {
         // Check if tap is near any segment of the freehand path
         if (measurement.points.length < 2) continue;
-        
         for (let i = 1; i < measurement.points.length; i++) {
           const p0 = imageToScreen(measurement.points[i - 1].x, measurement.points[i - 1].y);
           const p1 = imageToScreen(measurement.points[i].x, measurement.points[i].y);
@@ -1800,10 +1642,8 @@ export default function DimensionOverlay({
   // Helper function to recalculate measurement values after points are moved
   const recalculateMeasurement = (measurement: Measurement, overrideCalibration?: typeof calibration): Measurement => {
     const { mode, points } = measurement;
-    
     // Use override calibration if provided, otherwise use component state
     const activeCalibration = overrideCalibration !== undefined ? overrideCalibration : calibration;
-    
     // Determine if we're in map mode (verbal scale)
     // When recalibrating with new verbal scale, use the override calibration's verbal scale
     const isUsingMapMode = overrideCalibration?.calibrationType === 'verbal' 
@@ -1812,7 +1652,6 @@ export default function DimensionOverlay({
     const activeMapScale = overrideCalibration?.calibrationType === 'verbal' && overrideCalibration.verbalScale
       ? overrideCalibration.verbalScale
       : mapScale;
-    
     if (mode === 'distance') {
       const value = calculateDistance(points[0], points[1]);
       return { ...measurement, value };
@@ -1825,7 +1664,6 @@ export default function DimensionOverlay({
         Math.pow(points[1].x - points[0].x, 2) + 
         Math.pow(points[1].y - points[0].y, 2)
       );
-      
       // Map Mode: Apply scale conversion
       if (isUsingMapMode && activeMapScale) {
         const diameterPx = radius * 2;
@@ -1833,7 +1671,6 @@ export default function DimensionOverlay({
         const value = `⌀ ${formatMapValue(diameterDist)}`;
         return { ...measurement, value, radius };
       }
-      
       const radiusInUnits = radius / (activeCalibration?.pixelsPerUnit || 1);
       const diameter = radiusInUnits * 2;
       const value = `⌀ ${formatMeasurement(diameter, activeCalibration?.unit || 'mm', unitSystem, 2)}`;
@@ -1868,7 +1705,6 @@ export default function DimensionOverlay({
     } else if (mode === 'freehand') {
       // Recalculate path length for freehand (both closed and open paths)
       let totalLength = 0;
-      
       if (measurement.isClosed) {
         // Closed loop - connect back to start
         for (let i = 0; i < points.length; i++) {
@@ -1887,7 +1723,6 @@ export default function DimensionOverlay({
           totalLength += Math.sqrt(dx * dx + dy * dy);
         }
       }
-      
       // Map Mode: Apply scale conversion
       let lengthStr: string;
       if (isUsingMapMode && activeMapScale) {
@@ -1896,7 +1731,6 @@ export default function DimensionOverlay({
         const lengthInUnits = totalLength / (activeCalibration?.pixelsPerUnit || 1);
         lengthStr = formatMeasurement(lengthInUnits, activeCalibration?.unit || 'mm', unitSystem, 2);
       }
-      
       // If closed loop, clear area (not accurate after recalibration)
       if (measurement.isClosed) {
         return { 
@@ -1924,7 +1758,6 @@ export default function DimensionOverlay({
         );
         perimeter += segmentLength;
       }
-      
       // Calculate area using Shoelace formula
       let areaPixels = 0;
       for (let i = 0; i < points.length; i++) {
@@ -1933,7 +1766,6 @@ export default function DimensionOverlay({
         areaPixels += (p1.x * p2.y - p2.x * p1.y);
       }
       areaPixels = Math.abs(areaPixels) / 2;
-      
       // Map Mode: Apply scale conversion
       let perimeterStr: string;
       let areaStr: string;
@@ -1949,7 +1781,6 @@ export default function DimensionOverlay({
         area = areaPixels / (pixelsPerUnit * pixelsPerUnit);
         areaStr = formatBlueprintArea(area, activeCalibration?.unit || 'mm', unitSystem);
       }
-      
       return { 
         ...measurement, 
         perimeter: perimeterStr, 
@@ -1957,56 +1788,44 @@ export default function DimensionOverlay({
         area: area,
       };
     }
-    
     return measurement;
   };
 
   // 🔷 POLYGON AUTO-DETECTION: Detect closed polygons from connected distance lines
   const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
     const SNAP_TOLERANCE = 30; // pixels - how close endpoints need to be to snap
-    
     // Only check distance measurements
     const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
-    
     // Need at least 3 lines to form a polygon (triangle, square, etc.)
     if (distanceLines.length < 3) {
       return;
     }
-    
     // Get the most recently added line (the one that might close the polygon)
     const lastLine = distanceLines[distanceLines.length - 1];
     const lastLineEnd = lastLine.points[1];
-    
     // Find all connected chains of lines that START from various points
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
       const chain: Measurement[] = [startLine];
       usedIds.add(startLine.id);
-      
       let currentEndpoint = startLine.points[1]; // End of current line
       let foundConnection = true;
-      
       while (foundConnection) {
         foundConnection = false;
-        
         // Find a line that starts where current line ends
         for (const line of distanceLines) {
           if (usedIds.has(line.id)) continue;
-          
           const lineStart = line.points[0];
           const lineEnd = line.points[1];
-          
           // Check if line starts at current endpoint
           const distToStart = Math.sqrt(
             Math.pow(lineStart.x - currentEndpoint.x, 2) + 
             Math.pow(lineStart.y - currentEndpoint.y, 2)
           );
-          
           // Check if line ends at current endpoint (reverse direction)
           const distToEnd = Math.sqrt(
             Math.pow(lineEnd.x - currentEndpoint.x, 2) + 
             Math.pow(lineEnd.y - currentEndpoint.y, 2)
           );
-          
           if (distToStart < SNAP_TOLERANCE) {
             // Line connects forward
             chain.push(line);
@@ -2028,32 +1847,25 @@ export default function DimensionOverlay({
           }
         }
       }
-      
       return chain;
     };
-    
     // ONLY check if the chain that contains the LAST line closes
     // This prevents premature snapping - only snaps when user explicitly closes back to start
     const usedIds = new Set<string>();
     const chain = findConnectedChain(lastLine, usedIds);
-    
     // Only proceed if we have at least 3 lines in the chain
     if (chain.length < 3) {
       return;
     }
-    
     // Check if THIS specific chain forms a closed loop
     const firstPoint = chain[0].points[0];
     const lastPoint = chain[chain.length - 1].points[1];
-    
     const closingDistance = Math.sqrt(
       Math.pow(lastPoint.x - firstPoint.x, 2) + 
       Math.pow(lastPoint.y - firstPoint.y, 2)
     );
-    
     if (closingDistance < SNAP_TOLERANCE) {
       // 🎉 FOUND A CLOSED POLYGON!
-        
         // Extract all unique points in order
         // For each line, add its start point (end point is the next line's start)
         const polygonPoints: Array<{x: number, y: number}> = [];
@@ -2062,7 +1874,6 @@ export default function DimensionOverlay({
           const point = { x: line.points[0].x, y: line.points[0].y };
           polygonPoints.push(point);
         }
-        
         // Check if all points are at the same location (collapsed polygon)
         if (polygonPoints.length >= 2) {
           const first = polygonPoints[0];
@@ -2073,12 +1884,10 @@ export default function DimensionOverlay({
             return;
           }
         }
-        
         // Validate polygon has at least 3 unique points
         if (polygonPoints.length < 3) {
           return;
         }
-        
         // Calculate perimeter (sum of all line lengths)
         let perimeterPx = 0;
         for (const line of chain) {
@@ -2089,7 +1898,6 @@ export default function DimensionOverlay({
           );
           perimeterPx += length;
         }
-        
         // Calculate area using shoelace formula
         let areaPx2 = 0;
         for (let i = 0; i < polygonPoints.length; i++) {
@@ -2098,7 +1906,6 @@ export default function DimensionOverlay({
           areaPx2 += (p1.x * p2.y - p2.x * p1.y);
         }
         areaPx2 = Math.abs(areaPx2) / 2;
-        
         // Validate that area is not zero (collinear points)
         // Only reject if EXACTLY zero or extremely small (< 0.5 px²) to be more forgiving
         if (areaPx2 < 0.5) {
@@ -2106,17 +1913,14 @@ export default function DimensionOverlay({
           // Just don't create the polygon, let user continue placing lines
           return;
         }
-        
         // Convert to physical units
         let perimeterStr: string;
         let areaStr: string;
         let physicalArea: number;
-        
         if (isMapMode && mapScale) {
           // Map mode
           const perimeterDist = convertToMapScale(perimeterPx);
           perimeterStr = formatMapValue(perimeterDist);
-          
           // For area, we need to square the scale factor
           const scaleFactor = convertToMapScale(1); // Get scale for 1 pixel
           const areaDist2 = areaPx2 * scaleFactor * scaleFactor;
@@ -2131,7 +1935,6 @@ export default function DimensionOverlay({
           physicalArea = areaInUnits2;
           areaStr = formatBlueprintArea(areaInUnits2, calibration?.unit || 'mm', unitSystem);
         }
-        
         // Create new polygon measurement
         const polygonMeasurement: Measurement = {
           id: Date.now().toString(),
@@ -2144,14 +1947,11 @@ export default function DimensionOverlay({
           calibrationMode: isMapMode ? 'map' : 'coin',
           ...(isMapMode && mapScale && { mapScaleData: mapScale }),
         };
-        
         // Remove the individual lines and add the polygon
         const remainingMeasurements = allMeasurements.filter(m => !usedIds.has(m.id));
         setMeasurements([...remainingMeasurements, polygonMeasurement]);
-        
         // Success haptic!
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        
         return; // Only merge one polygon at a time
       }
   };
@@ -2159,17 +1959,14 @@ export default function DimensionOverlay({
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
-    
     const requiredPoints = mode === 'distance' ? 2 
       : mode === 'angle' ? 3 
       : mode === 'circle' ? 2 
       : 2; // rectangle
     const newPoint = { x: imageCoords.x, y: imageCoords.y, id: Date.now().toString() };
-    
     if (currentPoints.length + 1 < requiredPoints) {
       // Still need more points
       setCurrentPoints([...currentPoints, newPoint]);
-      
       // Auto-enable measurement mode after first point (async to avoid blocking)
       if (currentPoints.length === 0 && measurements.length === 0) {
         setTimeout(() => setMeasurementMode(true), 0);
@@ -2177,13 +1974,11 @@ export default function DimensionOverlay({
     } else {
       // This completes a measurement
       let completedPoints = [...currentPoints, newPoint];
-      
       // Calculate measurement value
       let value: string;
       let radius: number | undefined;
       let width: number | undefined;
       let height: number | undefined;
-      
       if (mode === 'distance') {
         value = calculateDistance(completedPoints[0], completedPoints[1]);
       } else if (mode === 'angle') {
@@ -2276,15 +2071,12 @@ export default function DimensionOverlay({
         ...(height !== undefined && { height }),
         ...(area !== undefined && { area }),
       };
-      
       setMeasurements([...measurements, newMeasurement]);
-      
       // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
       // Require at least 4 lines (squares/rectangles) to prevent premature triangle snapping
       if (mode === 'distance') {
         detectAndMergePolygon([...measurements, newMeasurement]);
       }
-      
       checkForCalibrationIssues(newMeasurement); // Check if user is struggling
       setCurrentPoints([]); // Reset for next measurement
     }
@@ -2296,11 +2088,9 @@ export default function DimensionOverlay({
       Math.abs(zoomScale - prevZoomRef.current.scale) > 0.01 ||
       Math.abs(zoomTranslateX - prevZoomRef.current.x) > 1 ||
       Math.abs(zoomTranslateY - prevZoomRef.current.y) > 1;
-    
     if (zoomChanged && showLockedInAnimation) {
       setShowLockedInAnimation(false);
     }
-    
     prevZoomRef.current = { scale: zoomScale, x: zoomTranslateX, y: zoomTranslateY };
   }, [zoomScale, zoomTranslateX, zoomTranslateY, showLockedInAnimation]);
 
@@ -2345,7 +2135,6 @@ export default function DimensionOverlay({
       }, 1200));
     }
   }, [coinCircle, hasShownAnimation]);
-  
   // Cleanup undo long-press timers and lock-in animation timers on unmount
   useEffect(() => {
     return () => {
@@ -2356,7 +2145,6 @@ export default function DimensionOverlay({
       lockInTimersRef.current = [];
     };
   }, []);
-  
   // Reset calibration hint for new photos
   useEffect(() => {
     // Reset hint state when image changes
@@ -2366,14 +2154,12 @@ export default function DimensionOverlay({
     hintOpacity.value = 0;
     hintScale.value = 0.8;
   }, [currentImageUri]);
-  
   // Animate hint appearance
   useEffect(() => {
     if (showCalibrationHint) {
       // Graceful fade in + scale up
       hintOpacity.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.4, 0, 0.2, 1) });
       hintScale.value = withTiming(1, { duration: 600, easing: Easing.bezier(0.34, 1.56, 0.64, 1) }); // Spring-like ease
-      
       // Color shift animation (loops forever)
       hintColorShift.value = withTiming(1, { 
         duration: 3000, 
@@ -2390,18 +2176,15 @@ export default function DimensionOverlay({
       hintScale.value = withTiming(0.9, { duration: 300 });
     }
   }, [showCalibrationHint]);
-  
   // Animated styles for hint (must be at top level, not inside conditional)
   const hintBackgroundStyle = useAnimatedStyle(() => ({
     opacity: hintOpacity.value,
   }));
-  
   const hintCardStyle = useAnimatedStyle(() => {
     // Color shift between amber, orange, and rose
     const r = interpolate(hintColorShift.value, [0, 0.5, 1], [245, 251, 251]);
     const g = interpolate(hintColorShift.value, [0, 0.5, 1], [158, 146, 113]);
     const b = interpolate(hintColorShift.value, [0, 0.5, 1], [11, 59, 133]);
-    
     return {
       transform: [{ scale: hintScale.value }],
       backgroundColor: `rgba(${r}, ${g}, ${b}, 0.25)`, // Very transparent for glass effect
@@ -2409,18 +2192,14 @@ export default function DimensionOverlay({
       overflow: 'hidden', // Ensure children respect the rounded corners
     };
   });
-  
   // Tetris Easter egg trigger - detect when legend fills screen
   useEffect(() => {
     if (hasTriggeredTetris || measurements.length === 0) return;
-    
     // Calculate legend height: each measurement is ~10px + margins
     const legendItemHeight = 10; // 8px font + 2px margin
     const legendHeight = measurements.length * legendItemHeight + 8; // +8 for padding
-    
     // Trigger if legend is taller than 70% of screen height
     const triggerHeight = SCREEN_HEIGHT * 0.7;
-    
     if (legendHeight >= triggerHeight) {
       setHasTriggeredTetris(true);
       triggerTetrisAnimation();
@@ -2441,7 +2220,6 @@ export default function DimensionOverlay({
       if (now - lastShakeTime < SHAKE_COOLDOWN) return; // Cooldown to prevent rapid toggles
 
       const { x, y, z } = data.acceleration;
-      
       // Detect HORIZONTAL shake only (x and z axes, not y)
       // This prevents karate chop (vertical Y motion) from triggering shake
       const horizontalAcceleration = Math.abs(x) + Math.abs(z);
@@ -2449,14 +2227,11 @@ export default function DimensionOverlay({
       // Detect shake - need significant HORIZONTAL acceleration
       if (horizontalAcceleration > SHAKE_THRESHOLD) {
         lastShakeTime = now;
-        
         // Toggle menu using menuHidden (same as swipe/tab controls)
         setMenuHidden(prev => {
           const newState = !prev;
-          
           // Sync shared value for gesture worklets
           menuHiddenShared.value = newState;
-          
           // Animate menu position AND opacity
           if (newState) {
             // Hide menu - fade out while sliding
@@ -2473,7 +2248,6 @@ export default function DimensionOverlay({
             });
             menuOpacity.value = withTiming(1, { duration: 300 });
           }
-          
           Haptics.impactAsync(
             newState ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light
           );
@@ -2502,7 +2276,6 @@ export default function DimensionOverlay({
     const updatedMeasurements = measurements.map(m => {
       let newValue = m.value;
       let width, height, radius, area, newPerimeter;
-      
       if (m.mode === 'distance') {
         newValue = calculateDistance(m.points[0], m.points[1]);
       } else if (m.mode === 'angle') {
@@ -2633,7 +2406,6 @@ export default function DimensionOverlay({
           );
           perimeter += segmentLength;
         }
-        
         // Map Mode: Apply scale conversion
         let perimeterStr: string;
         if (isMapMode && mapScale) {
@@ -2642,7 +2414,6 @@ export default function DimensionOverlay({
           const perimeterInUnits = perimeter / (calibration?.pixelsPerUnit || 1);
           perimeterStr = formatMeasurement(perimeterInUnits, calibration?.unit || 'mm', unitSystem, 2);
         }
-        
         // Recalculate area if it exists
         if (m.area !== undefined) {
           let areaStr: string;
@@ -2715,7 +2486,6 @@ export default function DimensionOverlay({
           newValue = perimeterStr;
         }
       }
-      
       return {
         ...m,
         value: newValue,
@@ -2726,7 +2496,6 @@ export default function DimensionOverlay({
         ...(area !== undefined && { area }),
       };
     });
-    
     setMeasurements(updatedMeasurements);
   }, [unitSystem, measurements, calibration, isMapMode, mapScale, calculateDistance, calculateAngle, formatMeasurement, formatAreaMeasurement, formatMapScaleDistance, formatMapScaleArea, convertToMapScale]); // Include all dependencies
 
@@ -2738,11 +2507,9 @@ export default function DimensionOverlay({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return;
     }
-    
     // Priority 2: Check if the last measurement has been edited (has history)
     if (measurements.length > 0) {
       const lastMeasurement = measurements[measurements.length - 1];
-      
       if (measurementHistory.has(lastMeasurement.id)) {
         // Revert to original state instead of deleting
         const originalState = measurementHistory.get(lastMeasurement.id)!;
@@ -2750,12 +2517,10 @@ export default function DimensionOverlay({
           m.id === lastMeasurement.id ? originalState : m
         );
         setMeasurements(updatedMeasurements);
-        
         // Remove from history
         const newHistory = new Map(measurementHistory);
         newHistory.delete(lastMeasurement.id);
         setMeasurementHistory(newHistory);
-        
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       } else {
         // No edits - delete the measurement
@@ -2764,26 +2529,21 @@ export default function DimensionOverlay({
       }
     }
   };
-  
   // Long-press handlers for undo button (like holding backspace)
   const startUndoLongPress = () => {
     // Clear any existing timers
     if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
     if (undoIntervalRef.current) clearInterval(undoIntervalRef.current);
-    
     // First undo happens immediately on press
     handleClear();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
     let deleteCount = 0; // Track how many deletions for acceleration
-    
     // Start with slower interval, then speed up like backspace
     const startDeletion = (interval: number) => {
       undoIntervalRef.current = setInterval(() => {
         // Get current measurements from store
         const currentMeasurements = useStore.getState().completedMeasurements;
         const currentPointsState = useStore.getState().currentPoints;
-        
         // If nothing left to delete, stop the interval
         if (currentMeasurements.length === 0 && currentPointsState.length === 0) {
           if (undoIntervalRef.current) {
@@ -2792,7 +2552,6 @@ export default function DimensionOverlay({
           }
           return;
         }
-        
         // Delete one measurement
         if (currentMeasurements.length > 0) {
           setMeasurements(currentMeasurements.slice(0, -1));
@@ -2801,9 +2560,7 @@ export default function DimensionOverlay({
           setCurrentPoints([]);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
-        
         deleteCount++;
-        
         // Accelerate after certain milestones (like backspace)
         if (deleteCount === 3 && interval === 300) {
           // After 3 deletions at slow speed, speed up to medium
@@ -2820,13 +2577,11 @@ export default function DimensionOverlay({
         }
       }, interval);
     };
-    
     // After 400ms delay, start slow deletion (300ms intervals)
     undoTimeoutRef.current = setTimeout(() => {
       startDeletion(300); // Start slow
     }, 400);
   };
-  
   const stopUndoLongPress = () => {
     // Clear both timers when user releases
     if (undoTimeoutRef.current) {
@@ -2844,24 +2599,19 @@ export default function DimensionOverlay({
     const radius = 40;
     const angle1 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
     const angle2 = Math.atan2(p3.y - p2.y, p3.x - p2.x);
-    
     const startX = p2.x + radius * Math.cos(angle1);
     const startY = p2.y + radius * Math.sin(angle1);
     const endX = p2.x + radius * Math.cos(angle2);
     const endY = p2.y + radius * Math.sin(angle2);
-    
     let angleDiff = angle2 - angle1;
     if (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
     if (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
-    
     const largeArcFlag = Math.abs(angleDiff) > Math.PI ? 1 : 0;
     const sweepFlag = angleDiff > 0 ? 1 : 0;
-    
     return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${endX} ${endY}`;
   };
 
   const handleExport = async () => {
-    
     // Show label modal first
     setPendingAction('save');
     setShowLabelModal(true);
@@ -2879,25 +2629,21 @@ export default function DimensionOverlay({
         showAlert('Permission Required', 'Please grant photo library access.', 'warning');
         return;
       }
-      
       setIsCapturing(true);
       setCurrentLabel(label);
       await new Promise(resolve => setTimeout(resolve, 600));
-      
       if (!externalViewRef?.current) {
         showAlert('View Error', 'View ref not available. Try again.', 'error');
         setIsCapturing(false);
         setCurrentLabel(null);
         return;
       }
-      
       const measurementsUri = await captureRef(externalViewRef.current, { 
         format: 'jpg', 
         quality: 0.9,
         result: 'tmpfile',
       });
       const measurementsAsset = await MediaLibrary.createAssetAsync(measurementsUri);
-      
       // Add to "PanHandler Measurements" album
       try {
         const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
@@ -2909,11 +2655,9 @@ export default function DimensionOverlay({
       } catch (albumError) {
         // Failed to add to album, but measurements were saved to Camera Roll
       }
-      
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
       await new Promise(resolve => setTimeout(resolve, 600));
-      
       if (!externalViewRef?.current) {
         showAlert('Error', 'View lost during capture.', 'error');
         setIsCapturing(false);
@@ -2922,14 +2666,12 @@ export default function DimensionOverlay({
         if (setImageOpacity) setImageOpacity(1);
         return;
       }
-      
       const labelOnlyUri = await captureRef(externalViewRef.current, { 
         format: 'png', 
         quality: 1.0,
         result: 'tmpfile',
       });
       const labelOnlyAsset = await MediaLibrary.createAssetAsync(labelOnlyUri);
-      
       // Add label-only version to "PanHandler Measurements" album
       try {
         const album = await MediaLibrary.getAlbumAsync('PanHandler Measurements');
@@ -2939,15 +2681,12 @@ export default function DimensionOverlay({
       } catch (albumError) {
         // Failed to add label-only to album
       }
-      
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
       setIsCapturing(false);
       setCurrentLabel(null);
-      
       // Show success modal instead of toast
       setShowSaveSuccessModal(true);
-      
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       setIsCapturing(false);
@@ -3086,12 +2825,10 @@ export default function DimensionOverlay({
       const measurementsDest = `${FileSystem.cacheDirectory}${measurementsFilename}`;
       await FileSystem.copyAsync({ from: measurementsUri, to: measurementsDest });
       attachments.push(measurementsDest);
-      
       // Capture label only (transparent overlay with just the label)
       setHideMeasurementsForCapture(true);
       if (setImageOpacity) setImageOpacity(0.5);
       await new Promise(resolve => setTimeout(resolve, 600));
-      
       if (!externalViewRef?.current) {
         showAlert('Error', 'View lost during label capture.', 'error');
         setIsCapturing(false);
@@ -3100,13 +2837,11 @@ export default function DimensionOverlay({
         if (setImageOpacity) setImageOpacity(1);
         return;
       }
-      
       const labelOnlyUri = await captureRef(externalViewRef.current, { 
         format: 'png', 
         quality: 1.0,
         result: 'tmpfile',
       });
-      
       if (setImageOpacity) setImageOpacity(1);
       setHideMeasurementsForCapture(false);
 
@@ -3159,7 +2894,6 @@ export default function DimensionOverlay({
   const handleReset = () => {
     // Don't clear state here - let the parent's transition handle it properly
     // This prevents the measurement screen from unmounting before the transition starts
-    
     // Call parent's reset callback to return to camera mode
     onReset?.();
 
@@ -3175,18 +2909,15 @@ export default function DimensionOverlay({
     : mode === 'angle' ? 3 
     : mode === 'circle' ? 2  // center + edge point
     : 2;  // rectangle: 2 corners
-  
   // Lock pan/zoom when in Measure mode OR when any points are placed
   // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
   const isPanZoomLocked = isPlacingBlueprint ? false : (measurementMode || hasAnyMeasurements);
-  
   // Notify parent when lock state changes
   useEffect(() => {
     if (onPanZoomLockChange) {
       onPanZoomLockChange(isPanZoomLocked);
     }
   }, [isPanZoomLocked, onPanZoomLockChange]);
-  
   // Handle label modal completion
   const handleLabelComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
     setShowLabelModal(false);
@@ -3233,23 +2964,19 @@ export default function DimensionOverlay({
 
     setLabelEditingMeasurementId(null);
   };
-  
   const handleLabelEditDismiss = () => {
     setShowLabelEditModal(false);
     setLabelEditingMeasurementId(null);
   };
-  
   // Animated style for menu sliding
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: menuTranslateX.value }],
     opacity: menuOpacity.value,
   }));
-  
   // Animated style for tab position
   const tabAnimatedStyle = useAnimatedStyle(() => ({
     top: tabPositionY.value - 40, // Center the 80px tall tab
   }));
-  
   // Pan gesture for sliding menu in/out - requires FAST swipe to avoid conflicts
 
   // Swipe gesture for cycling through measurement modes - ONLY active when IN measurement mode
@@ -3273,12 +3000,10 @@ export default function DimensionOverlay({
       const distanceThreshold = 25; // Minimum 25px movement
       const modes: MeasurementMode[] = ['distance', 'angle', 'circle', 'rectangle', 'freehand'];
       const currentIndex = modes.indexOf(mode);
-      
       // Detect primarily horizontal swipes with good velocity
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
       const hasVelocity = Math.abs(event.velocityX) > velocityThreshold;
       const hasDistance = Math.abs(event.translationX) > distanceThreshold;
-      
       // Trigger on: fast flick OR good distance (original distance-based detection still works)
       if (isHorizontal && (hasVelocity || hasDistance)) {
         if (event.translationX < 0) {
@@ -3301,14 +3026,12 @@ export default function DimensionOverlay({
           runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         }
       }
-      
       // Reset offset with spring animation
       modeSwipeOffset.value = withSpring(0, {
         damping: 20,
         stiffness: 300,
       });
     });
-  
   // Drag gesture for repositioning tab vertically
   const tabDragGesture = Gesture.Pan()
     .onStart(() => {
@@ -3324,7 +3047,6 @@ export default function DimensionOverlay({
     .onEnd(() => {
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
     });
-  
   // Quick swipe gesture to collapse/expand menu
   // ANDROID FIX: Use failOffsetY to prevent vertical scrolling from triggering
   // Use enableTrackpadTwoFingerGesture(false) to ensure native touches work
@@ -3360,7 +3082,6 @@ export default function DimensionOverlay({
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY) * 2;
       const threshold = SCREEN_WIDTH * 0.25; // 25% of screen width
       const velocityThreshold = 800; // Faster swipe required = 800 units/sec
-      
       // Swipe right OR left to collapse menu (both directions work!)
       if (isHorizontal && 
           (Math.abs(event.translationX) > threshold || Math.abs(event.velocityX) > velocityThreshold) &&
@@ -3394,7 +3115,6 @@ export default function DimensionOverlay({
         runOnJS(setSwipeTrail)([]);
       }
     });
-  
   const toggleMenuFromTab = () => {
     if (menuHidden) {
       menuTranslateX.value = withSpring(0);
@@ -3409,7 +3129,6 @@ export default function DimensionOverlay({
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
-  
   const collapseMenu = () => {
     menuTranslateX.value = SCREEN_WIDTH; // Changed from withSpring to instant
     menuOpacity.value = 1; // Reset for next show
@@ -3421,14 +3140,11 @@ export default function DimensionOverlay({
   // Memoize measurement rendering to prevent re-calculating SVG on every state change
   const renderedMeasurements = useMemo(() => {
     if (hideMeasurementsForCapture) return null;
-    
     return measurements.map((measurement, idx) => {
       const color = getMeasurementColor(idx, measurement.mode);
-      
       if (measurement.mode === 'distance') {
         const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
         const p1 = imageToScreen(measurement.points[1].x, measurement.points[1].y);
-        
         return (
           <React.Fragment key={measurement.id}>
             {/* Outer glow layers */}
@@ -3503,7 +3219,6 @@ export default function DimensionOverlay({
         const screenRadius = Math.sqrt(
           Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
         );
-        
         return (
           <React.Fragment key={measurement.id}>
             {/* Glow layers */}
@@ -3522,7 +3237,6 @@ export default function DimensionOverlay({
       } else if (measurement.mode === 'rectangle') {
         // Get all 4 corners
         const corners = measurement.points.map(p => imageToScreen(p.x, p.y));
-        
         // Calculate bounding box for rectangle rendering
         const xCoords = corners.map(c => c.x);
         const yCoords = corners.map(c => c.y);
@@ -3532,7 +3246,6 @@ export default function DimensionOverlay({
         const maxY = Math.max(...yCoords);
         const width = maxX - minX;
         const height = maxY - minY;
-        
         return (
           <React.Fragment key={measurement.id}>
             {/* Glow layers */}
@@ -3555,17 +3268,14 @@ export default function DimensionOverlay({
       } else if (measurement.mode === 'freehand') {
         // Render freehand path
         if (measurement.points.length < 2) return null;
-        
         // Convert all points to screen coordinates
         const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
-        
         // Generate simple polyline that exactly follows the drawn path
         // This prevents morphing issues from Bezier curve interpolation
         let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
         for (let i = 1; i < screenPoints.length; i++) {
           pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
         }
-        
         return (
           <React.Fragment key={measurement.id}>
             {/* Glow layers for freehand path */}
@@ -3591,17 +3301,14 @@ export default function DimensionOverlay({
       } else if (measurement.mode === 'polygon') {
         // Render auto-detected polygon with filled area
         if (measurement.points.length < 3) return null;
-        
         // Convert all points to screen coordinates
         const screenPoints = measurement.points.map(p => imageToScreen(p.x, p.y));
-        
         // Generate polygon path (closed)
         let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
         for (let i = 1; i < screenPoints.length; i++) {
           pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
         }
         pathData += ' Z'; // Close the path
-        
         // Calculate centroid for label placement
         let centroidX = 0, centroidY = 0;
         for (const p of screenPoints) {
@@ -3610,7 +3317,6 @@ export default function DimensionOverlay({
         }
         centroidX /= screenPoints.length;
         centroidY /= screenPoints.length;
-        
         return (
           <React.Fragment key={measurement.id}>
             {/* Filled area with transparency */}
@@ -3647,7 +3353,6 @@ export default function DimensionOverlay({
           and preventing buttons from receiving taps for 15+ seconds after pan gestures.
           Fingerprints are already handled by UniversalFingerprints in ZoomableImageV2.
       */}
-      
       {/* Persistent "Calibration Locked" indicator */}
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && (
         <Pressable
@@ -3731,25 +3436,21 @@ export default function DimensionOverlay({
           )}
         </Pressable>
       )}
-      
       {/* Recalibrate button - appears below calibration badge when there's any calibration */}
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            
             // BLUEPRINT MODE: Reopen pin placement, keep measurements, recalculate with new calibration
             if (calibration?.calibrationType === 'blueprint') {
               // CRITICAL: Lock pan/zoom if there are measurements to prevent them from appearing to move
               // (measurements are stored in image coords, but displayed in screen coords that change with pan/zoom)
               // If no measurements exist, allow pan/zoom for easier pin placement
               const shouldLockPanZoom = measurements.length > 0;
-              
               // Notify parent to lock/unlock pan/zoom
               if (onPanZoomLockChange) {
                 onPanZoomLockChange(shouldLockPanZoom);
               }
-              
               // DON'T clear calibration yet - keep it so measurements display correctly
               // It will be replaced when new calibration is set
               // setCalibration(null); // REMOVED - keep old calibration until new one is ready
@@ -3758,16 +3459,13 @@ export default function DimensionOverlay({
               setMeasurementMode(false);
               setIsPlacingBlueprint(false); // Not placing yet - just showing modal
               setMenuHidden(true); // Hide menu when modal appears
-              
               // Small delay to ensure pan/zoom gestures remain responsive
               setTimeout(() => {
                 setShowBlueprintPlacementModal(true);
               }, 150);
-              
               // Measurements stay intact - will be recalculated when new pins placed
               return;
             }
-            
             // Scenario 1: QR code calibration (with or without map scale)
             // QR codes are auto-detected, so go back to camera to retake photo
             if (calibration?.calibrationType === 'qr') {
@@ -3819,18 +3517,18 @@ export default function DimensionOverlay({
             // Scenario 5: Coin calibration ONLY (no map scale)
             // Go back to coin calibration screen
             else if (coinCircle) {
-              console.log('📍 Recalibrating: Coin only - returning to coin screen');
+
               if (onReset) onReset(true);
             }
             // Scenario 6: Verbal calibration ONLY (no map scale)
             // Go back to camera to retake photo (verbal modal is in MeasurementScreen)
             else if (calibration?.calibrationType === 'verbal') {
-              console.log('📍 Recalibrating: Verbal only - returning to camera');
+
               if (onReset) onReset(false); // Go back to camera
             }
             // Fallback: Unknown state, go to coin screen
             else {
-              console.log('📍 Recalibrating: Unknown state - returning to coin screen');
+
               if (onReset) onReset(true);
             }
           }}
@@ -3918,12 +3616,11 @@ export default function DimensionOverlay({
           onMoveShouldSetResponder={() => true}
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
-            console.log('👆 Touch started - activating cursor');
-            
+
             // CHECK: If in map mode without calibration, show alert
-            console.log('🔍 Touch check:', { isMapMode, hasMapScale: !!mapScale });
+
             if (isMapMode && !mapScale) {
-              console.log('⚠️ Blocking measurement - no map scale set');
+
               // Triple haptic warning to make it VERY obvious
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
               scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error), 100);
@@ -3935,7 +3632,6 @@ export default function DimensionOverlay({
               );
               return; // Prevent any measurement placement
             }
-            
             // Track finger touch for visual indicator with random seed and pressure
             const pressure = event.nativeEvent.force || 0.5; // Default to 0.5 if force not available
             setFingerTouches([{ 
@@ -3948,12 +3644,10 @@ export default function DimensionOverlay({
             fingerOpacity.value = withTiming(1, { duration: 150 });
             fingerScale.value = 1;
             fingerRotation.value = 0;
-            
             // For freehand mode, start activation timer (1.5 seconds)
             if (mode === 'freehand') {
               setFreehandActivating(true);
               setShowFreehandCursor(true);
-              
               // Gradient horizontal offset for cursor positioning
               const distanceFromCenter = pageX - (SCREEN_WIDTH / 2);
               const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2);
@@ -3961,9 +3655,7 @@ export default function DimensionOverlay({
               const horizontalOffset = normalizedPosition * maxOffset;
               const rawCursorX = pageX + horizontalOffset;
               const rawCursorY = pageY - cursorOffsetY;
-              
               setCursorPosition({ x: rawCursorX, y: rawCursorY });
-              
               // Start activation timer (1.5 seconds)
               if (freehandActivationTimerRef.current) {
                 clearTimeout(freehandActivationTimerRef.current);
@@ -3980,7 +3672,6 @@ export default function DimensionOverlay({
                 // 1.5s - FULLY CHARGED! Ready to fire! 🔥
                 setIsDrawingFreehand(true);
                 setFreehandActivating(false);
-                
                 // LOCK zoom/pan/rotation state to prevent coordinate drift during drawing
                 freehandZoomLockRef.current = {
                   scale: zoomScale,
@@ -3988,16 +3679,14 @@ export default function DimensionOverlay({
                   translateY: zoomTranslateY,
                   rotation: zoomRotation,
                 };
-                console.log('🔒 Locked zoom state:', freehandZoomLockRef.current);
-                
+
                 // Powerful "weapon charged" haptic
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                console.log('🎨 Freehand drawing activated!');
+
               }, 1500);
               return; // Skip normal cursor logic for freehand
             }
-            
             // Normal cursor logic for other modes...
             // Gradient horizontal offset: crosshair leans in direction of movement
             // At center: 0 offset
@@ -4007,22 +3696,18 @@ export default function DimensionOverlay({
             const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
             const maxOffset = 30;
             const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
-            
             // Calculate raw cursor position
             const rawCursorX = pageX + horizontalOffset;
             const rawCursorY = pageY - cursorOffsetY;
-            
             // Apply point snapping FIRST (highest priority), then alignment snapping
             const pointSnapped = snapToNearbyPoint(rawCursorX, rawCursorY);
             const finalPosition = pointSnapped.snapped 
               ? pointSnapped 
               : snapCursorToAlignment(rawCursorX, rawCursorY);
-            
             setShowCursor(true);
             setCursorPosition({ x: finalPosition.x, y: finalPosition.y });
             setIsSnapped(finalPosition.snapped);
             setLastHapticPosition({ x: pageX, y: pageY });
-            
             // Haptic for activation
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }}
@@ -4031,9 +3716,7 @@ export default function DimensionOverlay({
               // CACHE BUST v2: Extra safe touch handling
               const touch = event?.nativeEvent?.touches?.[0];
               if (!touch) return;
-              
               const { pageX, pageY } = touch;
-              
               // Update finger touch positions for all touches with pressure and random seeds
               const nativeTouches = event?.nativeEvent?.touches;
               const touches = nativeTouches && Array.isArray(nativeTouches) 
@@ -4046,7 +3729,6 @@ export default function DimensionOverlay({
                   }))
                 : [];
               setFingerTouches(touches);
-              
               // Handle freehand drawing mode
               if (mode === 'freehand') {
                 // Update cursor position with offset (above finger)
@@ -4056,7 +3738,6 @@ export default function DimensionOverlay({
                 const horizontalOffset = normalizedPosition * maxOffset;
                 const rawCursorX = pageX + horizontalOffset;
                 const rawCursorY = pageY - cursorOffsetY;
-                
                 // Calculate speed for freehand cursor
                 const now = Date.now();
                 const deltaTime = now - lastCursorUpdateRef.current.time;
@@ -4064,24 +3745,20 @@ export default function DimensionOverlay({
                 const deltaY = rawCursorY - lastCursorUpdateRef.current.y;
                 const cursorDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
                 const cursorMoveSpeed = deltaTime > 0 ? cursorDistance / deltaTime : 0;
-                
                 lastCursorUpdateRef.current = { x: rawCursorX, y: rawCursorY, time: now };
                 setCursorSpeed(cursorMoveSpeed);
                 setCursorPosition({ x: rawCursorX, y: rawCursorY });
-                
                 // Handle speed-based activation control with hysteresis
                 if (freehandActivating) {
                   // Hysteresis: Different thresholds for starting/stopping warning
                   const speedThresholdHigh = 0.3; // Show warning when speed exceeds this
                   const speedThresholdLow = 0.15; // Hide warning when speed drops below this
-                  
                   // Update warning state with hysteresis
                   if (!isShowingSpeedWarning && cursorMoveSpeed > speedThresholdHigh) {
                     setIsShowingSpeedWarning(true);
                   } else if (isShowingSpeedWarning && cursorMoveSpeed < speedThresholdLow) {
                     setIsShowingSpeedWarning(false);
                   }
-                  
                   // Cancel timer if moving too fast
                   if (cursorMoveSpeed > speedThresholdHigh) {
                     if (freehandActivationTimerRef.current) {
@@ -4096,7 +3773,6 @@ export default function DimensionOverlay({
                       setIsDrawingFreehand(true);
                       setFreehandActivating(false);
                       setIsShowingSpeedWarning(false);
-                      
                       // LOCK zoom/pan/rotation state
                       freehandZoomLockRef.current = {
                         scale: zoomScale,
@@ -4104,14 +3780,12 @@ export default function DimensionOverlay({
                         translateY: zoomTranslateY,
                         rotation: zoomRotation,
                       };
-                      
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
                       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                      console.log('🎨 Freehand drawing activated after slowing down!');
+
                     }, 1500);
                   }
                 }
-                
                 // If already drawing, add points to path
                 // IMPORTANT: Use cursor position (rawCursorX, rawCursorY), not finger position (pageX, pageY)
                 if (isDrawingFreehand) {
@@ -4119,7 +3793,6 @@ export default function DimensionOverlay({
                   const lockedZoom = freehandZoomLockRef.current || { scale: zoomScale, translateX: zoomTranslateX, translateY: zoomTranslateY, rotation: zoomRotation };
                   const imageX = (rawCursorX - lockedZoom.translateX) / lockedZoom.scale;
                   const imageY = (rawCursorY - lockedZoom.translateY) / lockedZoom.scale;
-                  
                   // Only add point if it's far enough from the last point (smooth path)
                   // Use functional update to ensure we have the latest state
                   setFreehandPath(prevPath => {
@@ -4128,13 +3801,11 @@ export default function DimensionOverlay({
                       // Freehand draws freely - user can manually start at a point if needed
                       return [{ x: imageX, y: imageY }];
                     }
-                    
                     const lastPoint = prevPath[prevPath.length - 1];
                     const distance = Math.sqrt(
                       Math.pow(imageX - lastPoint.x, 2) +
                       Math.pow(imageY - lastPoint.y, 2)
                     );
-                    
                     // Minimum distance: 0.5 image pixels for smooth, fluid lines
                     if (distance > 0.5) {
                       // LASSO SNAP: Check if we're close to the starting point (to close the loop)
@@ -4144,18 +3815,15 @@ export default function DimensionOverlay({
                         const distToStart = Math.sqrt(
                           Math.pow(imageX - firstPoint.x, 2) + Math.pow(imageY - firstPoint.y, 2)
                         );
-                        
                         // Snap threshold: Use PIXELS for universal, scale-independent behavior
                         // 8 pixels = very tight, deliberate closure (half of 15px)
                         const snapThresholdPixels = 8; // Requires precise aim at starting point
-                        
                         if (distToStart < snapThresholdPixels) {
                           // Check if path self-intersects - if it does, DON'T snap (allow free drawing)
                           const testPath = [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
                           const selfIntersects = doesPathSelfIntersect(testPath);
-                          
                           if (!selfIntersects) {
-                            console.log('🎯 LASSO SNAP! Closing loop at', distToStart.toFixed(1), 'pixels from start');
+, 'pixels from start');
                             // Strong haptic feedback for successful lasso close
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                             setFreehandClosedLoop(true);
@@ -4163,24 +3831,20 @@ export default function DimensionOverlay({
                             // Snap to exact start point to close the loop
                             return [...prevPath, { x: firstPoint.x, y: firstPoint.y }];
                           } else {
-                            console.log('⚠️ Path self-intersects - NOT snapping to start point (allowing free drawing)');
+');
                             // Continue drawing normally without snapping
                             return [...prevPath, { x: imageX, y: imageY }];
                           }
                         }
                       }
-                      
                       // No snapping to other measurements - freehand draws freely
                       return [...prevPath, { x: imageX, y: imageY }];
                     }
-                    
                     return prevPath;
                   });
                 }
-                
                 return; // Skip normal cursor logic for freehand
               }
-              
               // Normal cursor logic for other modes...
               // Gradient horizontal offset: crosshair leans in direction of movement
               // At center: 0 offset
@@ -4190,19 +3854,15 @@ export default function DimensionOverlay({
               const normalizedPosition = distanceFromCenter / (SCREEN_WIDTH / 2); // -1 (left) to +1 (right)
               const maxOffset = 30;
               const horizontalOffset = normalizedPosition * maxOffset; // Positive = right, Negative = left
-              
               // Calculate raw cursor position
               const rawCursorX = pageX + horizontalOffset;
               const rawCursorY = pageY - cursorOffsetY;
-              
               // Apply point snapping FIRST (highest priority - magnetic snap to existing points)
               const pointSnapped = snapToNearbyPoint(rawCursorX, rawCursorY);
-              
               // If not snapped to a point, try horizontal/vertical alignment snapping
               const finalPosition = pointSnapped.snapped 
                 ? pointSnapped 
                 : snapCursorToAlignment(rawCursorX, rawCursorY);
-              
               // Update cursor with final snapped position AND calculate speed
               const now = Date.now();
               const deltaTime = now - lastCursorUpdateRef.current.time;
@@ -4210,11 +3870,9 @@ export default function DimensionOverlay({
               const deltaY = finalPosition.y - lastCursorUpdateRef.current.y;
               const cursorDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
               const cursorMoveSpeed = deltaTime > 0 ? cursorDistance / deltaTime : 0; // pixels per millisecond
-              
               lastCursorUpdateRef.current = { x: finalPosition.x, y: finalPosition.y, time: now };
               setCursorSpeed(cursorMoveSpeed);
               setCursorPosition({ x: finalPosition.x, y: finalPosition.y });
-              
               // Haptic feedback when snapping occurs
               if (finalPosition.snapped && !isSnapped) {
                 // Just entered snap zone - medium haptic
@@ -4225,19 +3883,15 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setIsSnapped(false);
               }
-              
               // Adaptive haptic feedback based on movement speed
               const distance = Math.sqrt(
                 Math.pow(pageX - lastHapticPosition.x, 2) + 
                 Math.pow(pageY - lastHapticPosition.y, 2)
               );
-              
               const currentTime = Date.now();
               const timeDelta = currentTime - lastHapticTime;
-              
               // Calculate speed (pixels per millisecond)
               const speed = distance / Math.max(timeDelta, 1);
-              
               // Dynamic haptic distance based on speed:
               // - Fast movements: larger distance between haptics (slow tick...tick...tick)
               // - Slow movements: smaller distance between haptics (fast tickticktick)
@@ -4255,25 +3909,21 @@ export default function DimensionOverlay({
                 // Very fast - very slow ticks
                 dynamicHapticDistance = 30; // tick.....tick.....tick
               }
-              
               if (distance >= dynamicHapticDistance) {
                 // Use light haptic for all movement feedback
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                
                 setLastHapticPosition({ x: pageX, y: pageY });
                 setLastHapticTime(currentTime);
               }
             } catch (error) {
               // Silently handle any touch errors to prevent crashes
-              console.warn('Touch handling error:', error);
+
             }
           }}
           onResponderRelease={() => {
-            console.log('✅ Touch released');
-            
+
             // Reset snap state
             setIsSnapped(false);
-            
             // Handle freehand mode
             if (mode === 'freehand') {
               // Cancel activation timer if they released early
@@ -4281,21 +3931,18 @@ export default function DimensionOverlay({
                 clearTimeout(freehandActivationTimerRef.current);
                 freehandActivationTimerRef.current = null;
               }
-              
               // If they were just waiting (not drawing yet), reset
               if (freehandActivating && !isDrawingFreehand) {
                 setFreehandActivating(false);
                 setShowFreehandCursor(false);
                 setFreehandPath([]); // IMPORTANT: Clear any points that might have been captured
-                console.log('⚠️ Freehand activation cancelled (released too early)');
-                
+');
                 // Continue to evaporation effect
               } else if (isDrawingFreehand && freehandPath.length >= 2) {
                 // If they were drawing, complete the measurement (require at least 2 points for a line)
                 // Use ref instead of state to avoid async state issues
                 const isClosedLoop = freehandClosedLoopRef.current;
-                console.log('🎨 Freehand path points captured:', freehandPath.length, 'Closed loop:', isClosedLoop);
-                
+
                 // Calculate total path length (perimeter)
                 let totalLength = 0;
                 for (let i = 1; i < freehandPath.length; i++) {
@@ -4303,42 +3950,33 @@ export default function DimensionOverlay({
                   const dy = freehandPath[i].y - freehandPath[i - 1].y;
                   totalLength += Math.sqrt(dx * dx + dy * dy);
                 }
-                
                 // Convert to physical units
                 const pixelsPerUnit = calibration?.pixelsPerUnit || 1;
                 const physicalLength = totalLength / pixelsPerUnit;
-                
                 // Check if path self-intersects
                 const selfIntersects = doesPathSelfIntersect(freehandPath);
-                console.log('🔍 Self-intersection check:', selfIntersects);
-                console.log('🔍 Closed loop state:', isClosedLoop);
-                console.log('🔍 Path length:', freehandPath.length);
-                
+
+
+
                 // Calculate area only if loop is closed AND doesn't self-intersect
                 let area = 0;
                 if (isClosedLoop && !selfIntersects && freehandPath.length >= 3) {
-                  console.log('✅ Conditions met for area calculation!');
-                  
+
                   // Shoelace formula for polygon area
                   for (let i = 0; i < freehandPath.length - 1; i++) {
                     area += freehandPath[i].x * freehandPath[i + 1].y;
                     area -= freehandPath[i + 1].x * freehandPath[i].y;
                   }
                   area = Math.abs(area) / 2;
-                  
-                  console.log('📐 Raw area in pixels²:', area.toFixed(2));
-                  
+);
                   // Convert from pixel² to physical units²
                   const physicalArea = area / (pixelsPerUnit * pixelsPerUnit);
-                  
-                  console.log('📐 Physical area:', physicalArea.toFixed(2), 'square units');
-                  console.log('📐 Calibration unit:', calibration?.unit);
-                  console.log('📐 Unit system:', unitSystem);
-                  
+, 'square units');
+
+
                   // Format measurement with both perimeter and area
                   let perimeterStr: string;
                   let areaStr: string;
-                  
                   // Map Mode: Apply scale conversion
                   if (isMapMode && mapScale) {
                     // Convert perimeter to map scale
@@ -4348,7 +3986,6 @@ export default function DimensionOverlay({
                       return sum + Math.sqrt(Math.pow(next.x - point.x, 2) + Math.pow(next.y - point.y, 2));
                     }, 0);
                     perimeterStr = formatMapScaleDistance(totalPixelLength);
-                    
                     // Convert area to map scale
                     // Get a linear pixel measurement to establish scale ratio
                     const samplePixelLength = Math.sqrt(area); // approximate side length
@@ -4421,13 +4058,10 @@ export default function DimensionOverlay({
                       areaStr = formatBlueprintArea(physicalArea, unit as any, unitSystem);
                     }
                   }
-                  
                   const formattedValue = `${perimeterStr} ⊞ ${areaStr}`;
-                  
-                  console.log('📐 Formatted perimeter:', perimeterStr);
-                  console.log('📐 Formatted area:', areaStr);
-                  console.log('📐 Final value string:', formattedValue);
-                  
+
+
+
                   // Create completed measurement with area
                   const newMeasurement: Measurement = {
                     id: Date.now().toString(),
@@ -4440,11 +4074,8 @@ export default function DimensionOverlay({
                     calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
                     ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
                   };
-                  
-                  console.log('📐 Created measurement:', JSON.stringify(newMeasurement, null, 2));
-                  
+);
                   setMeasurements([...measurements, newMeasurement]);
-                  
                   // Increment freehand trial counter if not Pro
                   if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
                     incrementFreehandTrial();
@@ -4455,17 +4086,14 @@ export default function DimensionOverlay({
                     selfIntersects,
                     pathLength: freehandPath.length,
                   });
-                  
                   // Open path OR self-intersecting - just show length
                   let formattedValue: string;
-                  
                   // Map Mode: Apply scale conversion
                   if (isMapMode && mapScale) {
                     formattedValue = formatMapScaleDistance(totalLength);
                   } else {
                     formattedValue = formatMeasurement(physicalLength, calibration?.unit || 'mm', unitSystem);
                   }
-                  
                   const newMeasurement: Measurement = {
                     id: Date.now().toString(),
                     points: [...freehandPath],
@@ -4475,22 +4103,17 @@ export default function DimensionOverlay({
                     calibrationMode: isMapMode ? 'map' : 'coin', // Store which calibration was used
                     ...(isMapMode && mapScale && { mapScaleData: mapScale }), // Store map scale data if in map mode
                   };
-                  
                   setMeasurements([...measurements, newMeasurement]);
-                  
                   // Increment freehand trial counter if not Pro
                   if (!isProUser && freehandTrialUsed < freehandTrialLimit) {
                     incrementFreehandTrial();
                   }
-                  
                   // Log reason for no area
                   if (isClosedLoop && selfIntersects) {
-                    console.log('⚠️ Closed loop detected, but path self-intersects - area calculation skipped');
+
                   }
                 }
-                
-                console.log('🎨 Creating freehand measurement with', freehandPath.length, 'points');
-                
+
                 // Reset freehand state
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
@@ -4499,41 +4122,37 @@ export default function DimensionOverlay({
                 setFreehandClosedLoop(false); // Reset closed loop state
                 freehandClosedLoopRef.current = false; // Reset ref too
                 freehandZoomLockRef.current = null; // Clear zoom lock
-                console.log('🔓 Cleared zoom lock');
+
                 // Success haptic
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                console.log('🎨 Freehand measurement completed with', freehandPath.length, 'points');
+
               } else if (isDrawingFreehand) {
                 // Path too short, just reset
-                console.log('⚠️ Path too short (', freehandPath.length, 'points), need at least 2 - discarding');
+, need at least 2 - discarding');
                 setFreehandPath([]);
                 setIsDrawingFreehand(false);
                 setShowFreehandCursor(false);
                 setFreehandActivating(false);
                 freehandZoomLockRef.current = null; // Clear zoom lock
-                console.log('🔓 Cleared zoom lock (path too short)');
+');
               }
-              
               // Evaporation effect for freehand mode - organic fade with slight expansion and dissipation
               // Like condensation evaporating from cold glass
               fingerOpacity.value = withTiming(0, { 
                 duration: 450, // Fluid evaporation
                 easing: Easing.bezier(0.4, 0.0, 0.6, 1) // Organic easing curve
               });
-              
               // Slight expansion as it evaporates (like water spreading then disappearing)
               fingerScale.value = withTiming(1.3, { 
                 duration: 450,
                 easing: Easing.out(Easing.quad)
               });
-              
               // Subtle random rotation for organic feel (±5 degrees)
               const randomRotation = (Math.random() - 0.5) * 10;
               fingerRotation.value = withTiming(randomRotation, { 
                 duration: 450,
                 easing: Easing.out(Easing.cubic)
               });
-              
               // Clear fingerprints after evaporation completes
               setTimeout(() => {
                 setFingerTouches([]);
@@ -4541,32 +4160,27 @@ export default function DimensionOverlay({
                 fingerScale.value = 1;
                 fingerRotation.value = 0;
               }, 500);
-              
               // IMPORTANT: Return early for freehand mode to prevent placing a stray point
               // The freehand logic above completely handles the touch lifecycle
               return;
             }
-            
             // Evaporation effect - organic fade with slight expansion and dissipation
             // Like condensation evaporating from cold glass
             fingerOpacity.value = withTiming(0, { 
               duration: 450, // Fluid evaporation
               easing: Easing.bezier(0.4, 0.0, 0.6, 1) // Organic easing curve
             });
-            
             // Slight expansion as it evaporates (like water spreading then disappearing)
             fingerScale.value = withTiming(1.3, { 
               duration: 450,
               easing: Easing.out(Easing.quad)
             });
-            
             // Subtle random rotation for organic feel (±5 degrees)
             const randomRotation = (Math.random() - 0.5) * 10;
             fingerRotation.value = withTiming(randomRotation, { 
               duration: 450,
               easing: Easing.out(Easing.cubic)
             });
-            
             // Clear fingerprints after evaporation completes
             setTimeout(() => {
               setFingerTouches([]);
@@ -4574,7 +4188,6 @@ export default function DimensionOverlay({
               fingerScale.value = 1;
               fingerRotation.value = 0;
             }, 500);
-            
             // Blueprint placement mode
             if (isPlacingBlueprint) {
               // Convert screen position to image coordinates for blueprint points
@@ -4582,10 +4195,8 @@ export default function DimensionOverlay({
               const newPoint = { x: imageCoords.x, y: imageCoords.y };
               const updatedPoints = [...blueprintPoints, newPoint];
               setBlueprintPoints(updatedPoints);
-              
               // Haptic feedback
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              
               // If we've placed 2 points, show distance input modal
               if (updatedPoints.length === 2) {
                 setIsPlacingBlueprint(false);
@@ -4615,7 +4226,6 @@ export default function DimensionOverlay({
               // For other modes, place point normally
               placePoint(cursorPosition.x, cursorPosition.y);
               setShowCursor(false);
-              
               // Heavy haptic for point placement
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }
@@ -4636,15 +4246,12 @@ export default function DimensionOverlay({
           onResponderGrant={(event) => {
             const { pageX, pageY } = event.nativeEvent;
             setDebugInfo({ lastTouch: Date.now(), interceptor: 'TAP_OVERLAY', mode: measurementMode ? 'MEASURE' : 'PAN' });
-            
             // Check if tapping any measurement point first (distance, angle, circle, rectangle)
             const point = getTappedMeasurementPoint(pageX, pageY);
             if (point) {
               const measurement = measurements.find(m => m.id === point.measurementId);
-              
               // Set selected measurement for context instructions
               setSelectedMeasurementId(point.measurementId);
-              
               // Special case for circles: if tapping the center point (point 0) and the tap is
               // inside the circle area (not near the edge), treat it as a drag operation
               if (measurement && measurement.mode === 'circle' && point.pointIndex === 0) {
@@ -4656,7 +4263,6 @@ export default function DimensionOverlay({
                 const distFromCenter = Math.sqrt(
                   Math.pow(pageX - center.x, 2) + Math.pow(pageY - center.y, 2)
                 );
-                
                 // If tap is inside the circle but not very close to center (> 20px from center),
                 // treat as whole circle drag instead of point resize
                 if (distFromCenter > 20 && distFromCenter < radius - 20) {
@@ -4669,13 +4275,11 @@ export default function DimensionOverlay({
                   setIsSnapped(false);
                   dragStartPos.value = { x: pageX, y: pageY };
                   dragCurrentPos.value = { x: pageX, y: pageY };
-                  
                   // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   setTimeout(() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   }, 150); // 150ms pause between taps
-                  
                   return;
                 }
               } else if (measurement && measurement.mode === 'rectangle' && measurement.points.length === 4) {
@@ -4686,7 +4290,6 @@ export default function DimensionOverlay({
                 const distToTappedCorner = Math.sqrt(
                   Math.pow(pageX - tappedCorner.x, 2) + Math.pow(pageY - tappedCorner.y, 2)
                 );
-                
                 // Only resize corner if within 20px AND it's the closest corner
                 if (distToTappedCorner < 20) {
                   // Check if this is the closest corner
@@ -4701,7 +4304,6 @@ export default function DimensionOverlay({
                       break;
                     }
                   }
-                  
                   if (isClosestCorner) {
                     // Very close to this corner and it's the closest - allow corner resize
                     saveOriginalState(point.measurementId); // Save state before editing
@@ -4710,13 +4312,11 @@ export default function DimensionOverlay({
                     setIsSnapped(false);
                     dragStartPos.value = { x: pageX, y: pageY };
                     dragCurrentPos.value = { x: pageX, y: pageY };
-                    
                     // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     setTimeout(() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     }, 150); // 150ms pause between taps
-                    
                     return;
                   }
                 }
@@ -4729,25 +4329,20 @@ export default function DimensionOverlay({
                 setIsSnapped(false); // Reset snap state when starting to resize
                 dragStartPos.value = { x: pageX, y: pageY };
                 dragCurrentPos.value = { x: pageX, y: pageY };
-                
                 // Double-tap haptic feedback: tap...pause...tap (indicates expansion mode)
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setTimeout(() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }, 150); // 150ms pause between taps
-                
                 return;
               }
             }
-            
             // Check if tapping a measurement body (for dragging whole measurement)
             const tappedId = getTappedMeasurement(pageX, pageY);
-            
             // Reset drag flag and states
             setDidDrag(false);
             setDraggedMeasurementId(null);
             setResizingPoint(null);
-            
             if (tappedId) {
               // Store start position for potential drag
               dragStartPos.value = { x: pageX, y: pageY };
@@ -4758,14 +4353,11 @@ export default function DimensionOverlay({
           }}
           onResponderMove={(event) => {
             const { pageX, pageY } = event.nativeEvent;
-            
             // Handle point resizing/moving
             if (resizingPoint) {
               setDidDrag(true);
-              
               // Check what type of measurement we're resizing
               const measurement = measurements.find(m => m.id === resizingPoint.measurementId);
-              
               // Disable snapping for:
               // - Circle edge points (for smooth radius adjustment)
               // - Freehand paths (to preserve organic shapes and prevent distortion when crossing other measurements)
@@ -4773,11 +4365,9 @@ export default function DimensionOverlay({
                 (measurement?.mode === 'circle' && resizingPoint.pointIndex === 1) ||
                 (measurement?.mode === 'freehand')
               );
-              
               // Use raw position for smooth movement, only snap when actually close to a point
               let finalPosition = { x: pageX, y: pageY };
               let isCurrentlySnapped = false;
-              
               if (shouldCheckSnapping) {
                 const snappedPosition = snapToNearbyPoint(pageX, pageY, true);
                 if (snappedPosition.snapped) {
@@ -4785,9 +4375,7 @@ export default function DimensionOverlay({
                   isCurrentlySnapped = true;
                 }
               }
-              
               const imageCoords = screenToImage(finalPosition.x, finalPosition.y);
-              
               // Haptic feedback only when snap state changes
               if (isCurrentlySnapped && !isSnapped) {
                 // Entering snap - double haptic
@@ -4802,41 +4390,34 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setIsSnapped(false);
               }
-              
               const updatedMeasurements = measurements.map(m => {
                 if (m.id === resizingPoint.measurementId) {
                   const newPoints = [...m.points];
-                  
                   // Special case: moving circle center point - move both points to maintain radius
                   if (m.mode === 'circle' && resizingPoint.pointIndex === 0) {
                     const oldCenter = m.points[0];
                     const deltaX = imageCoords.x - oldCenter.x;
                     const deltaY = imageCoords.y - oldCenter.y;
-                    
                     // Move both center and edge point by the same delta
                     newPoints[0] = imageCoords;
                     newPoints[1] = {
                       x: m.points[1].x + deltaX,
                       y: m.points[1].y + deltaY
                     };
-                    
                     // Value stays the same (radius unchanged) - just update points
                     return {
                       ...m,
                       points: newPoints,
                     };
                   }
-                  
                   // Special case: moving rectangle corner - update adjacent corners to maintain axis-aligned rectangle
                   // IMPORTANT: Only apply to actual rectangles, NOT freehand paths
                   if (m.mode === 'rectangle' && m.points.length === 4) {
                     // Rectangle corners: 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
                     // Update adjacent corners to maintain axis alignment
                     const movedIdx = resizingPoint.pointIndex;
-                    
                     // Update the dragged corner
                     newPoints[movedIdx] = imageCoords;
-                    
                     if (movedIdx === 0) {
                       // Moving top-left: update top-right's Y and bottom-left's X
                       newPoints[1] = { ...m.points[1], y: imageCoords.y };
@@ -4854,22 +4435,18 @@ export default function DimensionOverlay({
                       newPoints[2] = { ...m.points[2], y: imageCoords.y };
                       newPoints[0] = { ...m.points[0], x: imageCoords.x };
                     }
-                    
                     return {
                       ...m,
                       points: newPoints,
                     };
                   }
-                  
                   // Normal point movement - update points immediately, skip expensive calculations
                   // Value will be recalculated on release for better performance
                   // This applies to: distance, angle, freehand, and any other measurement types
-                  
                   // Special smoothing for freehand paths - make reshaping more fluid and organic
                   if (m.mode === 'freehand' && m.points.length > 3) {
                     const draggedIdx = resizingPoint.pointIndex;
                     newPoints[draggedIdx] = imageCoords;
-                    
                     // If this is a closed loop and we're moving the first or last point, sync them
                     if (m.isClosed) {
                       if (draggedIdx === 0) {
@@ -4880,10 +4457,8 @@ export default function DimensionOverlay({
                         newPoints[0] = imageCoords;
                       }
                     }
-                    
                     // Calculate influence radius (how many neighboring points to smooth)
                     const influenceRadius = 2; // Affect 2 points on each side
-                    
                     // Smooth neighboring points for organic curve reshaping
                     for (let i = 1; i <= influenceRadius; i++) {
                       // Smooth points BEFORE the dragged point
@@ -4896,7 +4471,6 @@ export default function DimensionOverlay({
                           y: originalPoint.y + (imageCoords.y - m.points[draggedIdx].y) * weight,
                         };
                       }
-                      
                       // Smooth points AFTER the dragged point
                       const afterIdx = draggedIdx + i;
                       if (afterIdx < m.points.length && !(m.isClosed && afterIdx === newPoints.length - 1)) {
@@ -4912,7 +4486,6 @@ export default function DimensionOverlay({
                     // For non-freehand measurements, just update the single point
                     newPoints[resizingPoint.pointIndex] = imageCoords;
                   }
-                  
                   return {
                     ...m,
                     points: newPoints,
@@ -4920,22 +4493,18 @@ export default function DimensionOverlay({
                 }
                 return m;
               });
-              
               setMeasurements(updatedMeasurements.map(m => 
                 m.id === resizingPoint.measurementId ? recalculateMeasurement(m) : m
               ));
-              
               // Reduced haptic feedback - only if not snapping and movement is significant
               // This prevents jittery feeling from too many haptics
               return;
             }
-            
             // Check if user moved enough to start dragging
             const dragDistance = Math.sqrt(
               Math.pow(pageX - dragStartPos.value.x, 2) +
               Math.pow(pageY - dragStartPos.value.y, 2)
             );
-            
             // Start dragging if moved > 10px and not already dragging
             if (dragDistance > 10 && !draggedMeasurementId) {
               const tappedId = getTappedMeasurement(dragStartPos.value.x, dragStartPos.value.y);
@@ -4950,21 +4519,17 @@ export default function DimensionOverlay({
                 }
               }
             }
-            
             // Continue dragging if active
             if (draggedMeasurementId) {
               dragCurrentPos.value = { x: pageX, y: pageY };
-              
               // Calculate offset from start
               const deltaX = pageX - dragStartPos.value.x;
               const deltaY = pageY - dragStartPos.value.y;
-              
               // Update measurement position
               const measurement = measurements.find(m => m.id === draggedMeasurementId);
               if (measurement) {
                 const deltaImageX = deltaX / zoomScale;
                 const deltaImageY = deltaY / zoomScale;
-                
                 const updatedMeasurements = measurements.map(m => {
                   if (m.id === draggedMeasurementId) {
                     return {
@@ -4977,36 +4542,30 @@ export default function DimensionOverlay({
                   }
                   return m;
                 });
-                
                 setMeasurements(updatedMeasurements);
                 dragStartPos.value = { x: pageX, y: pageY };
-                
                 // No haptic during drag - smooth movement
               }
             }
           }}
           onResponderRelease={(event) => {
             const { pageX, pageY } = event.nativeEvent;
-            
             // Check for rapid tap to delete (only if didn't drag)
             if (!didDrag) {
               const tappedId = getTappedMeasurement(pageX, pageY);
               if (tappedId) {
                 const now = Date.now();
                 const TAP_TIMEOUT = 500; // 500ms between taps
-                
                 if (tapDeleteState?.measurementId === tappedId && (now - tapDeleteState.lastTapTime) < TAP_TIMEOUT) {
                   // Same measurement tapped within timeout
                   const newCount = tapDeleteState.count + 1;
-                  
                   if (newCount >= 4) {
                     // 4th tap - delete the measurement!
                     const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                     setMeasurements(updatedMeasurements);
                     setTapDeleteState(null);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    console.log('🗑️ Measurement deleted via 4 rapid taps');
-                    
+
                     // Reset all states and return early
                     setDraggedMeasurementId(null);
                     setResizingPoint(null);
@@ -5025,25 +4584,21 @@ export default function DimensionOverlay({
                 }
               }
             }
-            
             if (resizingPoint && !didDrag) {
               // Released without dragging - check for 4-tap delete
               const tappedId = resizingPoint.measurementId;
               const now = Date.now();
               const TAP_TIMEOUT = 500; // 500ms between taps
-              
               if (tapDeleteState?.measurementId === tappedId && (now - tapDeleteState.lastTapTime) < TAP_TIMEOUT) {
                 // Same measurement tapped within timeout
                 const newCount = tapDeleteState.count + 1;
-                
                 if (newCount >= 4) {
                   // 4th tap - delete the measurement!
                   const updatedMeasurements = measurements.filter(m => m.id !== tappedId);
                   setMeasurements(updatedMeasurements);
                   setTapDeleteState(null);
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  console.log('🗑️ Measurement deleted via 4 rapid taps');
-                  
+
                   // Reset all states and return early
                   setDraggedMeasurementId(null);
                   setResizingPoint(null);
@@ -5061,7 +4616,6 @@ export default function DimensionOverlay({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
             }
-            
             if (resizingPoint) {
               // Recalculate measurement values after point movement completes using our helper function
               const updatedMeasurements = measurements.map(m => {
@@ -5070,22 +4624,18 @@ export default function DimensionOverlay({
                 }
                 return m;
               });
-              
               setMeasurements(updatedMeasurements);
-              
               // Finished resizing
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             } else if (draggedMeasurementId) {
               // Finished dragging
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             }
-            
             // Always reset drag state and snap state
             setDraggedMeasurementId(null);
             setResizingPoint(null);
             setDidDrag(false);
             setIsSnapped(false);
-            
             // Clear selection after a delay if no longer dragging
             setTimeout(() => {
               if (!didDrag) {
@@ -5104,7 +4654,6 @@ export default function DimensionOverlay({
           const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
           const cursorColor = nextColor.main;
           const glowColor = getComplementaryColor(cursorColor);
-          
           // Calculate dynamic glow opacity based on cursor speed
           // Speed ranges: 0 (still) to ~3+ (very fast) pixels per millisecond
           // Map to opacity: 0.07 (slow/still) to 0.14 (fast) - 30% reduced from original
@@ -5112,7 +4661,6 @@ export default function DimensionOverlay({
           const maxGlowOpacity = 0.14; // 30% less than 0.2
           const speedFactor = Math.min(cursorSpeed / 2, 1); // Normalize to 0-1 range
           const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
-          
           // Determine label based on state
           let label = 'Hold to start';
           if (freehandActivating) {
@@ -5125,7 +4673,6 @@ export default function DimensionOverlay({
           } else if (isDrawingFreehand) {
             label = 'Drawing';
           }
-          
           return (
             <View
               style={{
@@ -5162,7 +4709,6 @@ export default function DimensionOverlay({
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
-                
                 {/* Center dot - yellow with glow */}
                 <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
                 <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
@@ -5187,19 +4733,16 @@ export default function DimensionOverlay({
             </View>
           );
         })()}
-        
         {/* Blueprint cursor (gray) */}
         {showCursor && isPlacingBlueprint && (() => {
           // Gray colors for blueprint mode
           const cursorColor = 'rgba(100, 100, 100, 0.8)';
           const glowColor = 'rgba(150, 150, 150, 0.6)';
-          
           // Calculate dynamic glow opacity based on cursor speed
           const minGlowOpacity = 0.07;
           const maxGlowOpacity = 0.14;
           const speedFactor = Math.min(cursorSpeed / 2, 1);
           const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
-          
           return (
             <View
               style={{
@@ -5228,7 +4771,6 @@ export default function DimensionOverlay({
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
-                
                 {/* Yellow center dot */}
                 <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
                 <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
@@ -5245,19 +4787,16 @@ export default function DimensionOverlay({
             </View>
           );
         })()}
-        
         {/* Regular cursor (for other modes) */}
         {showCursor && mode !== 'freehand' && !isPlacingBlueprint && (() => {
           // Determine which measurement this will be (if completing current or starting new)
           const nextMeasurementIndex = currentPoints.length === requiredPoints 
             ? measurements.length + 1  // Current measurement will be saved, this is the next one
             : measurements.length;      // This is for the current measurement being placed
-          
           // Get the color for the next measurement
           const nextColor = getMeasurementColor(nextMeasurementIndex, mode);
           const cursorColor = nextColor.main;
           const glowColor = getComplementaryColor(cursorColor);
-          
           // Calculate dynamic glow opacity based on cursor speed
           // Speed ranges: 0 (still) to ~3+ (very fast) pixels per millisecond
           // Map to opacity: 0.07 (slow/still) to 0.14 (fast) - 30% reduced from original
@@ -5265,7 +4804,6 @@ export default function DimensionOverlay({
           const maxGlowOpacity = 0.14; // 30% less than 0.2
           const speedFactor = Math.min(cursorSpeed / 2, 1); // Normalize to 0-1 range
           const dynamicGlowOpacity = minGlowOpacity + (maxGlowOpacity - minGlowOpacity) * speedFactor;
-          
           return (
             <View
               style={{
@@ -5294,7 +4832,6 @@ export default function DimensionOverlay({
                 <Line x1={65} y1={50} x2={90} y2={50} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={10} x2={50} y2={35} stroke={cursorColor} strokeWidth="2" />
                 <Line x1={50} y1={65} x2={50} y2={90} stroke={cursorColor} strokeWidth="2" />
-                
                 {/* Neon yellow center dot with glow */}
                 <Circle cx={50} cy={50} r={4} fill="#FFFF00" opacity={0.2} />
                 <Circle cx={50} cy={50} r={3} fill="#FFFF00" opacity={0.3} />
@@ -5329,23 +4866,19 @@ export default function DimensionOverlay({
           // Size based on pressure (subtle variation: 85% to 115% of base size)
           const pressureScale = 0.85 + (touch.pressure * 0.3);
           const baseRadius = 18 * pressureScale;
-          
           // Create organic fingerprint-like pattern with randomization
           // Using the seed to create pseudo-random but consistent pattern
           const ridges = [];
           const numRidges = 5;
-          
           for (let i = 0; i < numRidges; i++) {
             const radiusOffset = (touch.seed * 2 - 1) * 3; // -3 to +3 variation
             const radius = baseRadius * (0.3 + i * 0.15) + radiusOffset;
             const opacityVariation = 0.05 + (Math.sin(touch.seed * 10 + i) * 0.03);
-            
             ridges.push({
               radius,
               opacity: 0.18 - (i * 0.025) + opacityVariation
             });
           }
-          
           return (
             <Animated.View
               key={touch.id}
@@ -5373,7 +4906,6 @@ export default function DimensionOverlay({
                     opacity={ridge.opacity}
                   />
                 ))}
-                
                 {/* Add some subtle irregular "pores" for realism */}
                 {[...Array(8)].map((_, idx) => {
                   const angle = (touch.seed * Math.PI * 2) + (idx * Math.PI / 4);
@@ -5381,7 +4913,6 @@ export default function DimensionOverlay({
                   const poreX = (baseRadius + 5) + Math.cos(angle) * distance;
                   const poreY = (baseRadius + 5) + Math.sin(angle) * distance;
                   const poreSize = 0.8 + (Math.cos(touch.seed * 30 + idx) * 0.4);
-                  
                   return (
                     <Circle 
                       key={`pore-${idx}`}
@@ -5402,27 +4933,21 @@ export default function DimensionOverlay({
       {/* Menu button fingerprints (session color) */}
       {(() => {
         if (menuFingerTouches.length === 0 || !sessionColor) return null;
-        
         const fingerColor = sessionColor.main;
-        
         return menuFingerTouches.map((touch) => {
           const pressureScale = 0.85 + (touch.pressure * 0.3);
           const baseRadius = 18 * pressureScale;
-          
           const ridges = [];
           const numRidges = 5;
-          
           for (let i = 0; i < numRidges; i++) {
             const radiusOffset = (touch.seed * 2 - 1) * 3;
             const radius = baseRadius * (0.3 + i * 0.15) + radiusOffset;
             const opacityVariation = 0.05 + (Math.sin(touch.seed * 10 + i) * 0.03);
-            
             ridges.push({
               radius,
               opacity: 0.18 - (i * 0.025) + opacityVariation
             });
           }
-          
           return (
             <Animated.View
               key={touch.id}
@@ -5449,14 +4974,12 @@ export default function DimensionOverlay({
                     opacity={ridge.opacity}
                   />
                 ))}
-                
                 {[...Array(8)].map((_, idx) => {
                   const angle = (touch.seed * Math.PI * 2) + (idx * Math.PI / 4);
                   const distance = baseRadius * (0.4 + (Math.sin(touch.seed * 20 + idx) * 0.2));
                   const poreX = (baseRadius + 5) + Math.cos(angle) * distance;
                   const poreY = (baseRadius + 5) + Math.sin(angle) * distance;
                   const poreSize = 0.8 + (Math.cos(touch.seed * 30 + idx) * 0.4);
-                  
                   return (
                     <Circle 
                       key={`pore-${idx}`}
@@ -5482,26 +5005,19 @@ export default function DimensionOverlay({
         //   length: swipeTrail?.length, 
         //   hasSessionColor: !!sessionColor 
         // });
-        
         if (!Array.isArray(swipeTrail) || swipeTrail.length === 0 || !sessionColor) return null;
-        
         // COMMENTED OUT TO REDUCE LOG SPAM
         // console.log('🎨 Rendering', swipeTrail.length, 'trail points');
-        
         const fingerColor = sessionColor.main;
         const now = Date.now();
         const trailDuration = 1000; // 1 second fade
-        
         return swipeTrail.map((point, index) => {
           const age = now - point.timestamp;
           const progress = Math.min(age / trailDuration, 1);
-          
           // Fade out from start to end
           const startProgress = index / swipeTrail.length;
           const fadeOpacity = (1 - progress) * (1 - startProgress * 0.5);
-          
           const baseRadius = 12;
-          
           return (
             <View
               key={point.id}
@@ -5553,7 +5069,6 @@ export default function DimensionOverlay({
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           />
-          
           {/* Horizontal center line - subtle but visible */}
           <View
             style={{
@@ -5565,7 +5080,6 @@ export default function DimensionOverlay({
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           />
-          
           {/* Upper horizontal red guide line - for leveling assistance */}
           <View
             style={{
@@ -5577,7 +5091,6 @@ export default function DimensionOverlay({
               backgroundColor: 'rgba(255, 0, 0, 0.5)',
             }}
           />
-          
           {/* Lower horizontal red guide line - for leveling assistance */}
           <View
             style={{
@@ -5605,7 +5118,6 @@ export default function DimensionOverlay({
             {showLockedInAnimation && coinCircle && (() => {
               const screenPos = imageToScreen(coinCircle.centerX, coinCircle.centerY);
               const screenRadius = coinCircle.radius * zoomScale;
-              
               return (
                 <>
                   {/* Animated green circle that blinks */}
@@ -5634,13 +5146,11 @@ export default function DimensionOverlay({
             {mode === 'freehand' && isDrawingFreehand && freehandPath.length > 1 && (() => {
               const screenPoints = freehandPath.map(p => imageToScreen(p.x, p.y));
               const nextColor = getMeasurementColor(measurements.length, 'freehand');
-              
               // Generate path
               let pathData = `M ${screenPoints[0].x} ${screenPoints[0].y}`;
               for (let i = 1; i < screenPoints.length; i++) {
                 pathData += ` L ${screenPoints[i].x} ${screenPoints[i].y}`;
               }
-              
               return (
                 <>
                   {/* Beautiful glow layers - same as completed measurements */}
@@ -5671,7 +5181,6 @@ export default function DimensionOverlay({
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
               const p2 = currentPoints.length === 3 ? imageToScreen(currentPoints[2].x, currentPoints[2].y) : null;
               const nextColor = getMeasurementColor(measurements.length, 'angle');
-              
               return (
                 <>
                   <Line x1={p1.x} y1={p1.y} x2={p0.x} y2={p0.y} stroke={nextColor.main} strokeWidth="2" />
@@ -5693,7 +5202,6 @@ export default function DimensionOverlay({
                 Math.pow(edge.x - center.x, 2) + Math.pow(edge.y - center.y, 2)
               );
               const nextColor = getMeasurementColor(measurements.length, 'circle');
-              
               return (
                 <>
                   <Circle cx={center.x} cy={center.y} r={radius} fill="none" stroke={nextColor.main} strokeWidth="2" opacity="0.8" />
@@ -5707,7 +5215,6 @@ export default function DimensionOverlay({
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
               const nextColor = getMeasurementColor(measurements.length, 'rectangle');
-              
               return (
                 <Rect 
                   x={Math.min(p0.x, p1.x)} 
@@ -5767,7 +5274,6 @@ export default function DimensionOverlay({
           {currentPoints.length === requiredPoints && (() => {
             let screenX, screenY, value;
             const nextColor = getMeasurementColor(measurements.length, mode);
-            
             if (mode === 'distance') {
               const p0 = imageToScreen(currentPoints[0].x, currentPoints[0].y);
               const p1 = imageToScreen(currentPoints[1].x, currentPoints[1].y);
@@ -5817,7 +5323,6 @@ export default function DimensionOverlay({
             } else {
               return null; // Safety fallback
             }
-            
             return (
               <View
                 style={{
@@ -5842,7 +5347,6 @@ export default function DimensionOverlay({
               </View>
             );
           })()}
-          
           {/* Label and coin info - upper-left corner (always visible when capturing) */}
           {(currentLabel || isCapturing) && (
             <View
@@ -5867,7 +5371,6 @@ export default function DimensionOverlay({
                   {currentLabel || 'PanHandler Measurements'}
                 </Text>
               </View>
-              
               {/* Coin/Drone/QR reference info */}
               {calibration && coinCircle && (
                 <View
@@ -6293,7 +5796,6 @@ export default function DimensionOverlay({
               )}
             </View>
           )}
-          
           {/* "Made with PanHandler" watermark - only visible during capture for free users */}
           {isCapturing && !isProUser && (
             <View
@@ -6394,11 +5896,9 @@ export default function DimensionOverlay({
 
                 // Check if labels overlap horizontally
                 const xOverlap = Math.abs(label1.screenX - label2.screenX) < LABEL_WIDTH;
-                
                 if (xOverlap) {
                   // Check if they overlap vertically
                   const yDistance = Math.abs(label1.screenY - label2.screenY);
-                  
                   if (yDistance < LABEL_HEIGHT + MIN_SEPARATION) {
                     // Overlap detected! Adjust positions
                     // Move the lower label down further
@@ -6512,19 +6012,16 @@ export default function DimensionOverlay({
           {/* Side labels for rectangles - Width on left, Height on top */}
           {!hideMeasurementsForCapture && !hideMeasurementLabels && measurements.filter(m => m.mode === 'rectangle').map((measurement, idx) => {
             const color = getMeasurementColor(measurements.indexOf(measurement), measurement.mode);
-            
             // Rectangle is stored with 4 corners: [0] top-left, [1] top-right, [2] bottom-right, [3] bottom-left
             // Use points[0] (top-left) and points[2] (bottom-right) for opposite corners
             const p0 = imageToScreen(measurement.points[0].x, measurement.points[0].y);
             const p2 = imageToScreen(measurement.points[2].x, measurement.points[2].y);
-            
             const minX = Math.min(p0.x, p2.x);
             const maxX = Math.max(p0.x, p2.x);
             const minY = Math.min(p0.y, p2.y);
             const maxY = Math.max(p0.y, p2.y);
             const centerY = (minY + maxY) / 2;
             const centerX = (minX + maxX) / 2;
-            
             // Calculate width and height using IMAGE coordinates from opposite corners
             const widthPx = Math.abs(measurement.points[2].x - measurement.points[0].x);
             const heightPx = Math.abs(measurement.points[2].y - measurement.points[0].y);
@@ -6532,7 +6029,6 @@ export default function DimensionOverlay({
             const heightValue = heightPx / (calibration?.pixelsPerUnit || 1);
             const widthLabel = formatMeasurement(widthValue, calibration?.unit || 'mm', unitSystem, 2);
             const heightLabel = formatMeasurement(heightValue, calibration?.unit || 'mm', unitSystem, 2);
-            
             // Handle tap on label to open edit modal when in edit mode AND not in measurement mode
             const handleRectLabelPress = () => {
               if (labelEditMode && !measurementMode) {
@@ -7146,7 +6642,7 @@ export default function DimensionOverlay({
                     setIsDrawingFreehand(false);
                     setModeColorIndex((prev) => prev + 1);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                    console.log('🎨 Freehand mode activated via long-press');
+
                   }, 500); // 500ms long-press
                 }}
                 onPressOut={() => {
@@ -7314,12 +6810,12 @@ export default function DimensionOverlay({
             {/* Map Mode Toggle */}
             <Pressable
               onPress={() => {
-                console.log('🗺️ Map button pressed:', { isMapMode, hasMapScale: !!mapScale });
+
                 if (!isMapMode) {
                   // Turning ON map mode
                   if (mapScale) {
                     // Scale already exists for this photo - just activate map mode
-                    console.log('✅ Activating map mode (scale exists)');
+');
                     setIsMapMode(true);
                     // Dora "We did it!" - Triumphant celebratory sequence! 🗺️
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -7328,12 +6824,12 @@ export default function DimensionOverlay({
                     scheduleHaptic(() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success), 300);
                   } else {
                     // No scale yet - show modal to set scale
-                    console.log('📋 No scale - showing modal');
+
                     setShowMapScaleModal(true);
                   }
                 } else {
                   // Turning OFF map mode - keep scale for this photo session
-                  console.log('⏸️ Deactivating map mode (keeping scale)');
+');
                   setIsMapMode(false);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
@@ -7456,7 +6952,6 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
-          
           {/* Locked notice */}
           {isPanZoomLocked && (
             <View style={{ backgroundColor: 'rgba(254, 243, 199, 1)', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12 }}>
@@ -7465,7 +6960,6 @@ export default function DimensionOverlay({
               </Text>
             </View>
           )}
-          
           {/* Action Buttons - Share and Email */}
           <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
             <>
@@ -7528,14 +7022,12 @@ export default function DimensionOverlay({
               <Text style={{ color: 'white', fontWeight: '600', fontSize: 11, marginLeft: 6 }}>New Photo</Text>
             </Pressable>
           </View>
-          
           {/* Pro status footer - REMOVED: Now donation-based via BattlingBots */}
               </View>
             </BlurView>
           </Animated.View>
         </GestureDetector>
       )}
-      
       {/* Battling Bots Pro Upgrade Modal */}
       {/* REMOVED: Old Pro upgrade modal - Now using donation-based BattlingBots in MeasurementScreen */}
 
@@ -7543,7 +7035,7 @@ export default function DimensionOverlay({
       {(coinCircle || calibration || mapScale) && !showLockedInAnimation && !isCapturing && (
         <Pressable
           onPress={() => {
-            __DEV__ && console.log('❓ Help button pressed');
+            __DEV__ &&
             setShowHelpModal(true);
           }}
           style={{
@@ -7648,7 +7140,6 @@ export default function DimensionOverlay({
           </View>
         </Animated.View>
       )}
-      
       {/* Label Modal */}
       <LabelModal 
         visible={showLabelModal} 
@@ -7658,7 +7149,6 @@ export default function DimensionOverlay({
         isMapMode={isMapMode}
         actionType={pendingAction || 'save'}
       />
-      
       {/* Label Edit Modal - for editing existing measurement labels via double-tap */}
       <LabelModal
         visible={showLabelEditModal}
@@ -7677,7 +7167,6 @@ export default function DimensionOverlay({
         measurementMode={labelEditingMeasurementId ? measurements.find(m => m.id === labelEditingMeasurementId)?.mode : undefined}
         unitSystem={unitSystem}
       />
-      
       {/* Email Prompt Modal */}
       <EmailPromptModal 
         visible={showEmailPromptModal} 
@@ -7692,7 +7181,6 @@ export default function DimensionOverlay({
           }
         }}
       />
-      
       {/* Hidden view for capturing CAD canvas image (light/washed out, FULL unzoomed but with locked rotation) */}
       <View
         ref={fusionViewRef}
@@ -7725,7 +7213,6 @@ export default function DimensionOverlay({
             />
           </Animated.View>
         )}
-        
         {/* Title and coin info overlay - ALWAYS SHOW */}
         <View
           style={{
@@ -7752,7 +7239,6 @@ export default function DimensionOverlay({
               PanHandler Import
             </Text>
           </View>
-          
           {/* Coin/QR reference info */}
           {calibration && coinCircle && (
             <View
@@ -7797,7 +7283,6 @@ export default function DimensionOverlay({
           )}
         </View>
       </View>
-      
       {/* Hidden view for capturing CAD canvas image - ZOOMED (35% opacity, current zoom/pan) */}
       <View
         ref={fusionZoomedViewRef}
@@ -7833,7 +7318,6 @@ export default function DimensionOverlay({
             />
           </View>
         )}
-        
         {/* Title and coin info overlay - ALWAYS SHOW */}
         <View
           style={{
@@ -7860,7 +7344,6 @@ export default function DimensionOverlay({
               PanHandler Import
             </Text>
           </View>
-          
           {/* Coin reference info */}
           {calibration && coinCircle && (
             <View
@@ -7883,7 +7366,6 @@ export default function DimensionOverlay({
           )}
         </View>
       </View>
-      
       {/* Toast Notification - appears behind modals */}
       {showToast && (
         <Animated.View
@@ -7951,7 +7433,6 @@ export default function DimensionOverlay({
               const row = Math.floor(idx / blocksPerRow);
               const col = idx % blocksPerRow;
               const colors = ['#00F0F0', '#F0F000', '#A000F0', '#F0A000', '#0000F0', '#00F000', '#F00000'];
-              
               return (
                 <View
                   key={`tetris-block-${idx}`}
@@ -7969,7 +7450,6 @@ export default function DimensionOverlay({
                 />
               );
             })}
-            
             {/* GAME OVER text overlay */}
             <View
               style={{
@@ -8010,7 +7490,6 @@ export default function DimensionOverlay({
               </View>
             </View>
           </View>
-          
           {/* Centered congratulations text */}
           <Animated.View
             style={{
@@ -8066,29 +7545,23 @@ export default function DimensionOverlay({
             showBlueprintDistanceModal,
             isPlacingBlueprint
           });
-          
           // NUCLEAR OPTION: Clear ALL blueprint-related state first
           setShowBlueprintPlacementModal(false);
           setShowBlueprintDistanceModal(false);
           setIsPlacingBlueprint(false);
           setBlueprintPoints([]);
-          
-          console.log('🚨🚨🚨 MAP SCALE LOCK IN - AFTER setting to false');
-          
+
           setMapScale(scale);
           setIsMapMode(true);
           setShowMapScaleModal(false);
-          
           // Create calibration from verbal scale
           // Convert screen measurement to pixels
           const DPI = 160; // Standard Android DPI (iOS ~163, but 160 is close enough)
           const pixelsPerInch = DPI;
           const pixelsPerCm = DPI / 2.54;
-          
           const screenPixels = scale.screenUnit === 'cm' 
             ? scale.screenDistance * pixelsPerCm 
             : scale.screenDistance * pixelsPerInch;
-          
           // Convert real-world distance to mm for calibration
           let realDistanceMm = 0;
           if (scale.realUnit === 'km') {
@@ -8100,10 +7573,8 @@ export default function DimensionOverlay({
           } else if (scale.realUnit === 'ft') {
             realDistanceMm = scale.realDistance * 304.8; // ft to mm
           }
-          
           // Calculate pixels per mm
           const pixelsPerMm = screenPixels / realDistanceMm;
-          
           // Create calibration object
           const newCalibration = {
             pixelsPerUnit: pixelsPerMm,
@@ -8112,9 +7583,7 @@ export default function DimensionOverlay({
             calibrationType: 'verbal' as const,
             verbalScale: scale,
           };
-          
           setCalibration(newCalibration);
-          
           // FAILSAFE: Ensure blueprint modals stay closed after setting verbal calibration
           setTimeout(() => {
             setShowBlueprintPlacementModal(false);
@@ -8123,26 +7592,21 @@ export default function DimensionOverlay({
             // CRITICAL: Unlock pan/zoom after map scale calibration completes
             if (onPanZoomLockChange) {
               onPanZoomLockChange(false);
-              console.log('🔓 Unlocking pan/zoom - map scale calibration complete');
+
             }
           }, 100);
-          
           // Recalculate ALL existing measurements with new calibration (same as blueprint recalibration)
           if (measurements.length > 0) {
-            console.log('🔄 Recalculating', measurements.length, 'measurements with new verbal scale calibration');
+
             // Pass the NEW calibration directly to ensure it uses the new scale
             const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m, newCalibration));
-            
             // Update measurements immediately
             setMeasurements(recalibratedMeasurements);
-            
             // Force unit system ref to null so the useEffect will recalculate display values
             // This ensures the UI updates with the new calibration
             prevUnitSystemRef.current = null;
-            
-            console.log('✅ Measurements recalculated with new verbal scale calibration');
+
           }
-          
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }}
         onBlueprintMode={() => {
@@ -8180,16 +7644,15 @@ export default function DimensionOverlay({
           // ALWAYS close the blueprint modal first, regardless of path
           setShowBlueprintPlacementModal(false);
           setBlueprintPoints([]);
-          
           // If user came from "Known Scale" button directly (skipToBlueprintMode or skipToAerialMode),
           // dismissing without placing points should reset to camera for fresh start
           if (skipToBlueprintMode || skipToAerialMode) {
-            console.log('🔄 Known Scale dismissed without calibration - resetting to camera');
+
             handleReset(); // Go back to camera screen
           } else {
             // Regular dismissal (from coin calibration → Map → Place Points, or recalibration)
             // Just close modal and stay on measurement screen
-            console.log('📐 Blueprint modal dismissed - staying on measurement screen');
+
             setIsMapMode(false); // Turn off map mode if it was on
             setMenuHidden(false); // Show menu again
           }
@@ -8226,7 +7689,6 @@ export default function DimensionOverlay({
                 />
               );
             })()}
-            
             {/* Draw circles for each point */}
             {blueprintPoints.map((point, idx) => {
               const screenPoint = imageToScreen(point.x, point.y);
@@ -8292,25 +7754,20 @@ export default function DimensionOverlay({
 
           // Store calibration FIRST
           useStore.getState().setCalibration(newCalibration);
-          
           // Recalculate ALL existing measurements with new calibration
           // Force immediate update by triggering unit system ref reset
           if (measurements.length > 0) {
-            console.log('🔄 Recalculating', measurements.length, 'measurements with new blueprint calibration');
-            console.log('📐 New calibration unit:', newCalibration.unit, 'Old unit was:', calibration?.unit);
+
+
             // Pass the NEW calibration directly to ensure it uses the new unit
             const recalibratedMeasurements = measurements.map(m => recalculateMeasurement(m, newCalibration));
-            
             // Update measurements immediately
             setMeasurements(recalibratedMeasurements);
-            
             // Force unit system ref to null so the useEffect will recalculate display values
             // This ensures the UI updates with the new calibration
             prevUnitSystemRef.current = null;
-            
-            console.log('✅ Measurements recalculated and unit system ref reset to force display update');
+
           }
-          
           // Show menu again and clean up after fade
           setTimeout(() => {
             setMenuHidden(false);
@@ -8319,17 +7776,14 @@ export default function DimensionOverlay({
             setBlueprintPoints([]);
             setIsMapMode(false);
             blueprintLineOpacity.value = 1; // Reset for next time
-            
             // Unlock pan/zoom now that calibration is complete
             if (onPanZoomLockChange) {
               onPanZoomLockChange(false);
-              console.log('🔓 Unlocking pan/zoom - blueprint calibration complete');
+
             }
           }, 400);
-          
           // Success haptic
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          
           console.log('🎯 Blueprint calibration complete:', {
             pixelDistance,
             realDistance: distance,
@@ -8341,28 +7795,26 @@ export default function DimensionOverlay({
           // If user came from "Known Scale" button directly and dismisses without entering distance,
           // reset to camera for fresh start (same as dismissing placement modal)
           if (skipToBlueprintMode || skipToAerialMode) {
-            console.log('🔄 Known Scale distance input dismissed without calibration - resetting to camera');
+
             handleReset(); // Go back to camera screen
           } else {
             // Regular dismissal (from coin calibration path or recalibration)
             // Cancel - fade out and clean up, stay on measurement screen
-            console.log('📐 Blueprint distance input dismissed - cleaning up');
+
             blueprintLineOpacity.value = withTiming(0, {
               duration: 300,
               easing: Easing.out(Easing.ease),
             });
-            
             setTimeout(() => {
               setMenuHidden(false);
               setShowBlueprintDistanceModal(false);
               setBlueprintPoints([]);
               setIsMapMode(false);
               blueprintLineOpacity.value = 1; // Reset for next time
-              
               // Unlock pan/zoom when dismissing (cancelled calibration)
               if (onPanZoomLockChange) {
                 onPanZoomLockChange(false);
-                console.log('🔓 Unlocking pan/zoom - blueprint calibration cancelled');
+
               }
             }, 300);
           }
@@ -8587,7 +8039,6 @@ export default function DimensionOverlay({
               <View style={{ marginBottom: 16 }}>
                 <Ionicons name="warning-outline" size={40} color="rgba(255, 255, 255, 0.95)" />
               </View>
-              
               <Text style={{ 
                 fontSize: 20, 
                 fontWeight: '800', 
@@ -8600,7 +8051,6 @@ export default function DimensionOverlay({
               }}>
                 Measurements seem off?
               </Text>
-              
               <Text style={{ 
                 fontSize: 16, 
                 color: 'rgba(255, 255, 255, 0.95)', 
@@ -8613,7 +8063,6 @@ export default function DimensionOverlay({
               }}>
                 Check your calibration (upper right)
               </Text>
-              
               <Text style={{ 
                 fontSize: 13, 
                 color: 'rgba(255, 255, 255, 0.7)', 
