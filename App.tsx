@@ -10,7 +10,7 @@ import QuoteScreen from "./src/screens/QuoteScreen";
 import { enableFakeTouchSupport } from "./src/utils/fakeTouchSupport";
 
 // Enable fake touch support for macOS only (not Android/iOS)
-if (Platform.OS === 'macos' || (Platform.OS === 'web' && navigator.platform.includes('Mac'))) {
+if (Platform.OS === 'macos') {
   enableFakeTouchSupport();
 }
 
