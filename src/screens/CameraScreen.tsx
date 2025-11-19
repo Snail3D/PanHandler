@@ -1396,6 +1396,9 @@ export default function CameraScreen() {
             const density = Platform.OS === 'android' ? PixelRatio.get() : 1;
             const densityScale = 1 / density;
 
+            // DEBUG: Alert to check density values
+            // Alert.alert('Debug', `OS: ${Platform.OS}, Density: ${density}, Scale: ${densityScale}`);
+
             const scaledCorners = corners.map((corner) => ({
               x: corner.x * widthScale * densityScale,
               y: corner.y * heightScale * densityScale,
