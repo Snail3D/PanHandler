@@ -13,10 +13,29 @@
  * - Send haptic feedback to Watch
  */
 
-import { Platform } from 'react-native';
+import { Platform, NativeModules, NativeEventEmitter } from 'react-native';
+
+const { WatchConnectivityModule } = NativeModules;
+const watchEventEmitter = Platform.OS === 'ios' && WatchConnectivityModule 
+  ? new NativeEventEmitter(WatchConnectivityModule) 
+  : null;
 
 // Callback for remote shutter trigger from Watch
 let remoteShutterCallback: (() => void) | null = null;
+
+// Initialize event listeners
+if (Platform.OS === 'ios' && watchEventEmitter) {
+  watchEventEmitter.addListener('onRemoteShutter', () => {
+    console.log('📸 Remote shutter triggered from Watch');
+    if (remoteShutterCallback) {
+      remoteShutterCallback();
+    }
+  });
+  
+  watchEventEmitter.addListener('onWatchMessage', (message) => {
+    console.log('⌚ Received message from Watch:', message);
+  });
+}
 
 /**
  * Set callback for remote shutter trigger from Watch
@@ -49,7 +68,7 @@ export interface WatchInfo {
  * @returns Promise<WatchInfo> - Watch connection status
  */
 export async function checkWatchAvailability(): Promise<WatchInfo> {
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== 'ios' || !WatchConnectivityModule) {
     return {
       isPaired: false,
       isWatchAppInstalled: false,
@@ -57,22 +76,12 @@ export async function checkWatchAvailability(): Promise<WatchInfo> {
     };
   }
 
-  // TODO: Implement native WatchConnectivity check
-  // This requires a native module using WCSession.default
-  // The Watch app should send its screen size when responding to availability check
-  // For now, return false - will be implemented with native code
   try {
-    // Native implementation would look like:
-    // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // const watchInfo = await WatchConnectivity.checkAvailability();
-    // // Watch app responds with: { isPaired, isInstalled, isReachable, watchModel, watchSize }
-    // // watchSize is the actual screen size in mm (e.g., 40, 44, 45, 49)
-    // return watchInfo;
-    
+    const info = await WatchConnectivityModule.checkAvailability();
     return {
-      isPaired: false,
-      isWatchAppInstalled: false,
-      isReachable: false,
+      isPaired: info.isPaired,
+      isWatchAppInstalled: info.isWatchAppInstalled,
+      isReachable: info.isReachable,
       // watchSize will be populated by native module when Watch responds
       // Example sizes: 38mm, 40mm, 42mm, 44mm, 41mm, 45mm, 49mm (Ultra)
     };
@@ -98,30 +107,25 @@ export async function requestWatchQRCode(
   qrSize: number,
   format: 'paper' | 'disc' | 'watch' = 'watch'
 ): Promise<boolean> {
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== 'ios' || !WatchConnectivityModule) {
     return false;
   }
 
-  // TODO: Implement native WatchConnectivity message sending
-  // This requires a native module using WCSession.sendMessage
-  // For now, return false - will be implemented with native code
   try {
-    // Native implementation would look like:
-    // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // // The Watch app will detect its own screen size and use that for the QR code
-    // // The QR code URL will be generated with the actual Watch screen size
-    // return await WatchConnectivity.sendMessage({
-    //   action: 'displayQRCode',
-    //   size: qrSize, // Fallback size, but Watch will use its actual screen size
-    //   format: format,
-    //   url: `https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-${format}-${watchScreenSize}mm`,
-    //   vibrateOnShow: true, // Long vibrate when QR code appears
-    //   enableRemoteShutter: true, // Enable tap-to-capture on Watch screen
-    //   useWatchScreenSize: true // Tell Watch to use its detected screen size
-    // });
+    // The Watch app will detect its own screen size and use that for the QR code
+    // The QR code URL will be generated with the actual Watch screen size
+    await WatchConnectivityModule.sendMessage({
+      action: 'displayQRCode',
+      size: qrSize, // Fallback size, but Watch will use its actual screen size
+      format: format,
+      // url: `https://apps.apple.com/us/app/panhandler/id6754727828#panhandler-${format}-${watchScreenSize}mm`,
+      vibrateOnShow: true, // Long vibrate when QR code appears
+      enableRemoteShutter: true, // Enable tap-to-capture on Watch screen
+      useWatchScreenSize: true // Tell Watch to use its detected screen size
+    });
     
-    console.log(`📱 Would send to Watch: Display QR code ${format} ${qrSize}mm with long vibrate`);
-    return false;
+    console.log(`📱 Sent to Watch: Display QR code ${format} ${qrSize}mm with long vibrate`);
+    return true;
   } catch (error) {
     console.error('Error sending message to Watch:', error);
     return false;
@@ -134,21 +138,17 @@ export async function requestWatchQRCode(
  * @returns Promise<boolean> - Success status
  */
 export async function stopWatchQRCode(): Promise<boolean> {
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== 'ios' || !WatchConnectivityModule) {
     return false;
   }
 
-  // TODO: Implement native WatchConnectivity message sending
-  // This requires a native module using WCSession.sendMessage
   try {
-    // Native implementation would look like:
-    // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // return await WatchConnectivity.sendMessage({
-    //   action: 'stopQRCode'
-    // });
+    await WatchConnectivityModule.sendMessage({
+      action: 'stopQRCode'
+    });
     
-    console.log('📱 Would send to Watch: Stop displaying QR code');
-    return false;
+    console.log('📱 Sent to Watch: Stop displaying QR code');
+    return true;
   } catch (error) {
     console.error('Error sending stop message to Watch:', error);
     return false;
@@ -208,23 +208,19 @@ export async function autoOpenWatchQRCode(
  * Triggers hard double tap haptic, screen blink, and closes Watch app
  */
 export async function notifyWatchPhotoCaptured(): Promise<void> {
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== 'ios' || !WatchConnectivityModule) {
     return;
   }
 
-  // TODO: Implement native WatchConnectivity message sending
-  // This requires a native module using WCSession.sendMessage
   try {
-    // Native implementation would look like:
-    // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // await WatchConnectivity.sendMessage({
-    //   action: 'photoCaptured',
-    //   hapticType: 'doubleTap', // Hard double tap
-    //   blinkScreen: true, // Blink the Watch screen
-    //   closeApp: true // Close Watch app and return to watch face
-    // });
+    await WatchConnectivityModule.sendMessage({
+      action: 'photoCaptured',
+      hapticType: 'doubleTap', // Hard double tap
+      blinkScreen: true, // Blink the Watch screen
+      closeApp: true // Close Watch app and return to watch face
+    });
     
-    console.log('📱 Would notify Watch: Photo captured (hard double tap + screen blink + close app)');
+    console.log('📱 Notified Watch: Photo captured (hard double tap + screen blink + close app)');
   } catch (error) {
     console.error('Error notifying Watch of photo capture:', error);
   }
@@ -237,25 +233,21 @@ export async function notifyWatchPhotoCaptured(): Promise<void> {
  * @param success - true if calibration succeeded, false if failed
  */
 export async function notifyWatchCalibrationStatus(success: boolean): Promise<void> {
-  if (Platform.OS !== 'ios') {
+  if (Platform.OS !== 'ios' || !WatchConnectivityModule) {
     return;
   }
 
-  // TODO: Implement native WatchConnectivity message sending
-  // This requires a native module using WCSession.sendMessage
   try {
-    // Native implementation would look like:
-    // const { WatchConnectivity } = require('./native/WatchConnectivity');
-    // await WatchConnectivity.sendMessage({
-    //   action: 'calibrationStatus',
-    //   success: success,
-    //   message: success ? 'Watch Calibration Success' : 'Watch Calibration Failed',
-    //   displayDuration: 2000, // Show message for 2 seconds
-    //   closeApp: true // Close Watch app after displaying message
-    // });
+    await WatchConnectivityModule.sendMessage({
+      action: 'calibrationStatus',
+      success: success,
+      message: success ? 'Watch Calibration Success' : 'Watch Calibration Failed',
+      displayDuration: 2000, // Show message for 2 seconds
+      closeApp: true // Close Watch app after displaying message
+    });
     
     const message = success ? 'Watch Calibration Success' : 'Watch Calibration Failed';
-    console.log(`📱 Would notify Watch: ${message}`);
+    console.log(`📱 Notified Watch: ${message}`);
   } catch (error) {
     console.error('Error notifying Watch of calibration status:', error);
   }

@@ -116,7 +116,8 @@
       "./plugins/withNukePermissions.js",
       "./plugins/withAbsoluteFinalCleanup.js",
       "./plugins/withGradlePermissionRemoval.js",
-      "./plugins/withManifestRemoveDirectives.js"
+      "./plugins/withManifestRemoveDirectives.js",
+      "./plugins/withWatchConnectivity.js"
     ],
     "extra": {
       "eas": {

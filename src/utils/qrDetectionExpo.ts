@@ -168,8 +168,8 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       corners,
       centerX,
       centerY,
-      rawWidth: imageWidth || maxX || undefined,
-      rawHeight: imageHeight || maxY || undefined
+      rawWidth: imageWidth || undefined,
+      rawHeight: imageHeight || undefined
     };
     
   } catch (error) {

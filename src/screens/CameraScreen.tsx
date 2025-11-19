@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState, PixelRatio } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -1392,12 +1392,17 @@ export default function CameraScreen() {
             const heightScale =
               actualImageHeight > 0 && rawHeight && rawHeight > 0 ? actualImageHeight / rawHeight : 1;
 
+            // Apply PixelRatio correction for Android devices where scanner returns physical pixels
+            // but measurement UI operates in logical points
+            const density = Platform.OS === 'android' ? PixelRatio.get() : 1;
+            const densityScale = 1 / density;
+
             const scaledCorners = corners.map((corner) => ({
-              x: corner.x * widthScale,
-              y: corner.y * heightScale,
+              x: corner.x * widthScale * densityScale,
+              y: corner.y * heightScale * densityScale,
             }));
-            const scaledCenterX = qrResult.centerX * widthScale;
-            const scaledCenterY = qrResult.centerY * heightScale;
+            const scaledCenterX = qrResult.centerX * widthScale * densityScale;
+            const scaledCenterY = qrResult.centerY * heightScale * densityScale;
             
             // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
@@ -1945,12 +1950,17 @@ export default function CameraScreen() {
               const heightScale =
                 actualImageHeight > 0 && rawHeight && rawHeight > 0 ? actualImageHeight / rawHeight : 1;
 
+              // Apply PixelRatio correction for Android devices where scanner returns physical pixels
+              // but measurement UI operates in logical points
+              const density = Platform.OS === 'android' ? PixelRatio.get() : 1;
+              const densityScale = 1 / density;
+
               const scaledCorners = corners.map((corner) => ({
-                x: corner.x * widthScale,
-                y: corner.y * heightScale,
+                x: corner.x * widthScale * densityScale,
+                y: corner.y * heightScale * densityScale,
               }));
-              const scaledCenterX = qrResult.centerX * widthScale;
-              const scaledCenterY = qrResult.centerY * heightScale;
+              const scaledCenterX = qrResult.centerX * widthScale * densityScale;
+              const scaledCenterY = qrResult.centerY * heightScale * densityScale;
               
               // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
