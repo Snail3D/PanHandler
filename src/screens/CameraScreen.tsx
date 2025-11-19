@@ -1385,12 +1385,11 @@ export default function CameraScreen() {
               // Error getting image size - continue without it
             }
             
-            const rawWidth = qrResult.rawWidth ?? actualImageWidth;
-            const rawHeight = qrResult.rawHeight ?? actualImageHeight;
-            const widthScale =
-              actualImageWidth > 0 && rawWidth && rawWidth > 0 ? actualImageWidth / rawWidth : 1;
-            const heightScale =
-              actualImageHeight > 0 && rawHeight && rawHeight > 0 ? actualImageHeight / rawHeight : 1;
+            // Force widthScale to 1 because rawWidth (from scanner) and actualImageWidth (from UI)
+            // might be in different units (Logical vs Physical) depending on the URI source.
+            // We rely on densityScale to handle the Physical -> Logical conversion.
+            const widthScale = 1;
+            const heightScale = 1;
 
             // Apply PixelRatio correction for Android devices where scanner returns physical pixels
             // but measurement UI operates in logical points
