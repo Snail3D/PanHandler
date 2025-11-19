@@ -184,8 +184,6 @@ export default function DimensionOverlay({
   const dismissFreehandOffer = () => {}; // No-op
   const setIsProUser = () => {}; // No-op
   const [showProModal, setShowProModal] = useState(false); // Unused
-  const [showFreehandOfferModal, setShowFreehandOfferModal] = useState(false); // Unused
-  const [showFreehandConfirmModal, setShowFreehandConfirmModal] = useState(false); // Unused
   
   // Pan tutorial state
   const [showPanTutorial, setShowPanTutorial] = useState(false);
@@ -525,7 +523,6 @@ export default function DimensionOverlay({
       // ALWAYS unlock on mount - user needs to pan/zoom after calibration
       if (onPanZoomLockChange) {
         onPanZoomLockChange(false);
-        console.log('🔧 Initial lock state: UNLOCKED on mount');
       }
 
       // CRITICAL: Start in pan mode, not measurement mode
@@ -699,7 +696,6 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (skipToMapMode && !mapScale && !hasTriggeredSkipToMap.current) {
       // User clicked "Map Scale" button in calibration - open modal immediately
-      console.log('🗺️ skipToMapMode triggered - opening map scale modal');
       hasTriggeredSkipToMap.current = true;
       setShowMapScaleModal(true);
     }
@@ -710,7 +706,6 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (skipToBlueprintMode && !hasTriggeredSkipToBlueprint.current) {
       // User selected blueprint from photo type selection - open modal immediately
-      console.log('📐 skipToBlueprintMode triggered - opening blueprint placement modal');
       hasTriggeredSkipToBlueprint.current = true;
       setIsAerialMode(false); // Blueprint mode
       setShowBlueprintPlacementModal(true);
@@ -723,7 +718,6 @@ export default function DimensionOverlay({
   useEffect(() => {
     if (skipToAerialMode && !hasTriggeredSkipToAerial.current) {
       // User selected aerial from photo type selection - open modal immediately with aerial language
-      console.log('✈️ skipToAerialMode triggered - opening aerial placement modal');
       hasTriggeredSkipToAerial.current = true;
       setIsAerialMode(true); // Aerial mode
       setShowBlueprintPlacementModal(true);
@@ -735,7 +729,6 @@ export default function DimensionOverlay({
   // sessionColor changes with each new photo, so we use it as a signal to reset
   useEffect(() => {
     if (sessionColor) {
-      console.log('📸 New photo detected (sessionColor changed) - resetting blueprint modal states');
       setShowBlueprintPlacementModal(false);
       setShowBlueprintDistanceModal(false);
       setIsPlacingBlueprint(false);
@@ -919,7 +912,6 @@ export default function DimensionOverlay({
         const youtubeUrl = 'https://youtu.be/Aq5WXmQQooo?si=Ptp9PPm8Mou1TU98';
         Linking.openURL(youtubeUrl).catch(err => {
           showAlert('Error', 'Could not open video', 'error');
-          console.error('Failed to open URL:', err);
         });
       }, 3200);
 
@@ -940,7 +932,6 @@ export default function DimensionOverlay({
   // Tetris animation trigger - EPIC GAME OVER sequence!
   // Static Tetris animation - simple fade in/out (v4.0)
   const triggerTetrisAnimation = () => {
-    console.log('🎮 STATIC TETRIS v4.0 - Simple fade animation');
     setShowTetris(true);
     
     // Success haptic
@@ -963,7 +954,6 @@ export default function DimensionOverlay({
             setCurrentPoints([]);
             setHasTriggeredTetris(false); // Allow trigger again if they rebuild
             setCurrentLabel(null); // Clear the saved label since measurements are cleared
-            console.log('🧹 TETRIS: Measurements cleared');
           });
           
           // Success haptic for the reset - wrapped in runOnJS
@@ -1135,11 +1125,6 @@ export default function DimensionOverlay({
     
     if (nearbyAttempts.length >= threshold) {
       // Trigger hint!
-      console.log('🎯 Calibration hint triggered:', {
-        attempts: nearbyAttempts.length + 1,
-        type: newMeasurement.mode,
-        threshold: threshold + 1,
-      });
       setShowCalibrationHint(true);
       setHasShownCalibrationHint(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -1233,8 +1218,6 @@ export default function DimensionOverlay({
     const startExclusionEnd = exclusionZoneSize;
     const endExclusionStart = path.length - exclusionZoneSize - 1;
     
-    console.log(`🔍 Self-intersection check: path length ${path.length}, excluding first ${exclusionZoneSize} and last ${exclusionZoneSize} segments`);
-    
     // Check each line segment against all other non-adjacent line segments
     for (let i = 0; i < path.length - 1; i++) {
       // Skip segments in the exclusion zones
@@ -1260,13 +1243,11 @@ export default function DimensionOverlay({
         
         // Check if segments intersect
         if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
-          console.log(`❌ Self-intersection detected between segment ${i} and segment ${j}`);
           return true;
         }
       }
     }
     
-    console.log('✅ No self-intersection detected (excluding start/end zones)');
     return false;
   };
   
@@ -1666,7 +1647,6 @@ export default function DimensionOverlay({
   const calculateAngle = (p1: { x: number; y: number }, p2: { x: number; y: number }, p3: { x: number; y: number }) => {
     // Safety check
     if (!p1 || !p2 || !p3 || p1.y === undefined || p2.y === undefined || p3.y === undefined) {
-      console.warn('⚠️ calculateAngle called with undefined points');
       return '0°';
     }
 
@@ -1813,7 +1793,6 @@ export default function DimensionOverlay({
       const measurement = measurements.find(m => m.id === measurementId);
       if (measurement) {
         setMeasurementHistory(new Map(measurementHistory.set(measurementId, { ...measurement })));
-        console.log('💾 Saved original state for measurement:', measurementId);
       }
     }
   };
@@ -1920,7 +1899,6 @@ export default function DimensionOverlay({
       
       // If closed loop, clear area (not accurate after recalibration)
       if (measurement.isClosed) {
-        console.log('⚠️ Freehand closed loop recalibrated - removing area (perimeter still valid)');
         return { 
           ...measurement, 
           perimeter: lengthStr, 
@@ -1987,24 +1965,17 @@ export default function DimensionOverlay({
   const detectAndMergePolygon = (allMeasurements: Measurement[]) => {
     const SNAP_TOLERANCE = 30; // pixels - how close endpoints need to be to snap
     
-    console.log('🔷 detectAndMergePolygon called with', allMeasurements.length, 'total measurements');
-    
     // Only check distance measurements
     const distanceLines = allMeasurements.filter(m => m.mode === 'distance');
     
-    console.log('🔷 Found', distanceLines.length, 'distance lines');
-    
     // Need at least 3 lines to form a polygon (triangle, square, etc.)
     if (distanceLines.length < 3) {
-      console.log('🔷 Not enough lines for polygon (need 3+)');
       return;
     }
     
     // Get the most recently added line (the one that might close the polygon)
     const lastLine = distanceLines[distanceLines.length - 1];
     const lastLineEnd = lastLine.points[1];
-    
-    console.log('🔷 Last line end point:', lastLineEnd);
     
     // Find all connected chains of lines that START from various points
     const findConnectedChain = (startLine: Measurement, usedIds: Set<string>): Measurement[] => {
@@ -2066,11 +2037,8 @@ export default function DimensionOverlay({
     const usedIds = new Set<string>();
     const chain = findConnectedChain(lastLine, usedIds);
     
-    console.log('🔷 Chain found from last line:', chain.length, 'lines connected');
-    
     // Only proceed if we have at least 3 lines in the chain
     if (chain.length < 3) {
-      console.log('🔷 Chain too short, need at least 3 lines');
       return;
     }
     
@@ -2083,12 +2051,8 @@ export default function DimensionOverlay({
       Math.pow(lastPoint.y - firstPoint.y, 2)
     );
     
-    console.log('🔷 Closing distance:', closingDistance.toFixed(2), 'px (tolerance:', SNAP_TOLERANCE, 'px)');
-    console.log('🔷 First point:', firstPoint, 'Last point:', lastPoint);
-    
     if (closingDistance < SNAP_TOLERANCE) {
       // 🎉 FOUND A CLOSED POLYGON!
-      console.log('🔷 Polygon detected! Merging', chain.length, 'lines');
         
         // Extract all unique points in order
         // For each line, add its start point (end point is the next line's start)
@@ -2097,10 +2061,7 @@ export default function DimensionOverlay({
           const line = chain[i];
           const point = { x: line.points[0].x, y: line.points[0].y };
           polygonPoints.push(point);
-          console.log(`  Point ${i}:`, point);
         }
-        
-        console.log('🔷 Polygon points extracted:', polygonPoints.length, 'points');
         
         // Check if all points are at the same location (collapsed polygon)
         if (polygonPoints.length >= 2) {
@@ -2109,14 +2070,12 @@ export default function DimensionOverlay({
             Math.abs(p.x - first.x) < 1 && Math.abs(p.y - first.y) < 1
           );
           if (allSame) {
-            console.log('⚠️ All polygon points are at the same location (collapsed), skipping');
             return;
           }
         }
         
         // Validate polygon has at least 3 unique points
         if (polygonPoints.length < 3) {
-          console.log('⚠️ Polygon has fewer than 3 points, skipping');
           return;
         }
         
@@ -2143,13 +2102,10 @@ export default function DimensionOverlay({
         // Validate that area is not zero (collinear points)
         // Only reject if EXACTLY zero or extremely small (< 0.5 px²) to be more forgiving
         if (areaPx2 < 0.5) {
-          console.log('⚠️ Polygon area too small (collinear or nearly flat), skipping. Area:', areaPx2.toFixed(2), 'px²');
           // Silently skip - don't show error alert (was causing blank modal issues)
           // Just don't create the polygon, let user continue placing lines
           return;
         }
-        
-        console.log('✅ Polygon area:', areaPx2, 'px²');
         
         // Convert to physical units
         let perimeterStr: string;
@@ -2195,11 +2151,6 @@ export default function DimensionOverlay({
         
         // Success haptic!
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        console.log('🔷 Polygon created:', {
-          sides: chain.length,
-          perimeter: perimeterStr,
-          area: areaStr
-        });
         
         return; // Only merge one polygon at a time
       }
@@ -2208,10 +2159,6 @@ export default function DimensionOverlay({
   const placePoint = (x: number, y: number) => {
     // Convert screen tap to original image coordinates
     const imageCoords = screenToImage(x, y);
-    console.log('🎯 Placing point:');
-    console.log('  Screen coords:', x, y);
-    console.log('  Image coords:', imageCoords.x.toFixed(1), imageCoords.y.toFixed(1));
-    console.log('  Current zoom:', zoomScale.toFixed(2), 'translate:', zoomTranslateX.toFixed(0), zoomTranslateY.toFixed(0));
     
     const requiredPoints = mode === 'distance' ? 2 
       : mode === 'angle' ? 3 
@@ -2330,15 +2277,6 @@ export default function DimensionOverlay({
         ...(area !== undefined && { area }),
       };
       
-      console.log('📏 Created measurement:', {
-        mode,
-        hasWidth: width !== undefined,
-        hasHeight: height !== undefined,
-        width,
-        height,
-        value,
-      });
-      
       setMeasurements([...measurements, newMeasurement]);
       
       // 🔷 POLYGON AUTO-DETECTION: Check if this distance line closes a polygon
@@ -2360,7 +2298,6 @@ export default function DimensionOverlay({
       Math.abs(zoomTranslateY - prevZoomRef.current.y) > 1;
     
     if (zoomChanged && showLockedInAnimation) {
-      console.log('🚫 Pan/zoom detected - dismissing lock-in animation');
       setShowLockedInAnimation(false);
     }
     
@@ -2485,7 +2422,6 @@ export default function DimensionOverlay({
     const triggerHeight = SCREEN_HEIGHT * 0.7;
     
     if (legendHeight >= triggerHeight) {
-      console.log('🎮 TETRIS EASTER EGG TRIGGERED!', measurements.length, 'measurements');
       setHasTriggeredTetris(true);
       triggerTetrisAnimation();
     }
@@ -2561,7 +2497,6 @@ export default function DimensionOverlay({
       return;
     }
 
-    console.log('🔄 Unit system changed, recalculating all measurements...');
     prevUnitSystemRef.current = unitSystem;
 
     const updatedMeasurements = measurements.map(m => {
@@ -2792,7 +2727,6 @@ export default function DimensionOverlay({
       };
     });
     
-    console.log('✅ Updated', updatedMeasurements.length, 'measurements for', unitSystem, 'system');
     setMeasurements(updatedMeasurements);
   }, [unitSystem, measurements, calibration, isMapMode, mapScale, calculateDistance, calculateAngle, formatMeasurement, formatAreaMeasurement, formatMapScaleDistance, formatMapScaleArea, convertToMapScale]); // Include all dependencies
 
@@ -2802,7 +2736,6 @@ export default function DimensionOverlay({
       // Remove just the last point, not all points
       setCurrentPoints(currentPoints.slice(0, -1));
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      console.log('↩️ Removed last point, remaining:', currentPoints.length - 1);
       return;
     }
     
@@ -2823,7 +2756,6 @@ export default function DimensionOverlay({
         newHistory.delete(lastMeasurement.id);
         setMeasurementHistory(newHistory);
         
-        console.log('↩️ Reverted measurement to original state:', lastMeasurement.id);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       } else {
         // No edits - delete the measurement
@@ -2974,10 +2906,8 @@ export default function DimensionOverlay({
         } else {
           await MediaLibrary.createAlbumAsync('PanHandler Measurements', measurementsAsset, false);
         }
-        __DEV__ && console.log('✅ Measurements saved to Camera Roll + PanHandler Measurements album');
       } catch (albumError) {
-        console.error('Failed to add to PanHandler Measurements album:', albumError);
-        __DEV__ && console.log('✅ Measurements saved to Camera Roll only');
+        // Failed to add to album, but measurements were saved to Camera Roll
       }
       
       setHideMeasurementsForCapture(true);
@@ -3006,9 +2936,8 @@ export default function DimensionOverlay({
         if (album) {
           await MediaLibrary.addAssetsToAlbumAsync([labelOnlyAsset], album, false);
         }
-        __DEV__ && console.log('✅ Label-only version also saved to PanHandler Measurements album');
       } catch (albumError) {
-        console.error('Failed to add label-only to album:', albumError);
+        // Failed to add label-only to album
       }
       
       if (setImageOpacity) setImageOpacity(1);
@@ -3042,8 +2971,6 @@ export default function DimensionOverlay({
     }
 
     try {
-      __DEV__ && console.log('📤 Starting share export...');
-
       setIsCapturing(true);
       setCurrentLabel(label);
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -3073,8 +3000,6 @@ export default function DimensionOverlay({
       // Wait for UI to restore
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      __DEV__ && console.log('📤 Opening share sheet...');
-
       // Use expo-sharing to open iOS share sheet
       await Sharing.shareAsync(measurementsDest, {
         mimeType: 'image/jpeg',
@@ -3084,7 +3009,6 @@ export default function DimensionOverlay({
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      __DEV__ && console.error('📤 Share error:', error);
       setIsCapturing(false);
       setCurrentLabel(null);
       showAlert('Share Error', `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
@@ -3092,24 +3016,18 @@ export default function DimensionOverlay({
   };
 
   const handleEmail = async () => {
-    __DEV__ && console.log('📧 handleEmail called');
     // Show label modal first
     setPendingAction('email');
     setShowLabelModal(true);
-    __DEV__ && console.log('📧 Label modal shown, pending action set to email');
   };
 
   const performEmail = async (label: string | null) => {
-    __DEV__ && console.log('📧 performEmail called with label:', label);
-
     if (!currentImageUri) {
-      __DEV__ && console.log('📧 ERROR: No currentImageUri');
       showAlert('Email Error', 'No image to export.', 'error');
       return;
     }
 
     try {
-      __DEV__ && console.log('📧 Starting email export...');
 
       setIsCapturing(true);
       setCurrentLabel(label);
@@ -3202,9 +3120,7 @@ export default function DimensionOverlay({
         const { generateCadImportPdf } = await import('../utils/generateCadImportPdf');
         const cadPdfPath = await generateCadImportPdf();
         attachments.push(cadPdfPath);
-        __DEV__ && console.log('📄 CAD import PDF generated and attached');
       } catch (error) {
-        __DEV__ && console.error('⚠️ Failed to generate CAD import PDF:', error);
         // Continue without PDF - don't block email export
       }
 
@@ -3216,11 +3132,7 @@ export default function DimensionOverlay({
       // Wait for state to update and UI to restore
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      __DEV__ && console.log('📧 Preparing to open email composer with attachments:', attachments.length);
-
       const subject = label ? `${label} - Measurements` : 'PanHandler Measurements';
-
-      __DEV__ && console.log('📧 Opening MailComposer with:', { subject, attachmentsCount: attachments.length });
 
       const result = await MailComposer.composeAsync({
         recipients: [],
@@ -3229,15 +3141,12 @@ export default function DimensionOverlay({
         attachments,
       });
 
-      __DEV__ && console.log('📧 MailComposer result:', result);
-
       // Show success message if email was sent
       if (result.status === 'sent') {
         showAlert('Email Sent', 'Your measurements have been emailed successfully!', 'success');
       }
 
     } catch (error) {
-      __DEV__ && console.error('📧 Email export error:', error);
       setIsCapturing(false);
       setCurrentLabel(null);
       setHideMeasurementsForCapture(false);
@@ -3280,21 +3189,16 @@ export default function DimensionOverlay({
   
   // Handle label modal completion
   const handleLabelComplete = (data: { label: string | null; depth?: number; depthUnit?: 'mm' | 'cm' | 'in' | 'm' | 'ft' | 'km' | 'mi' }) => {
-    __DEV__ && console.log('📝 handleLabelComplete called with:', data);
-    __DEV__ && console.log('📝 pendingAction:', pendingAction);
     setShowLabelModal(false);
 
     // Remember the label for this session
     setCurrentLabel(data.label);
 
     if (pendingAction === 'save') {
-      __DEV__ && console.log('📝 Calling performSave...');
       performSave(data.label);
     } else if (pendingAction === 'email') {
-      __DEV__ && console.log('📝 Calling performEmail...');
       performEmail(data.label);
     } else if (pendingAction === 'share') {
-      __DEV__ && console.log('📝 Calling performShare...');
       performShare(data.label);
     }
 
@@ -3325,7 +3229,6 @@ export default function DimensionOverlay({
       });
       setMeasurements(updatedMeasurements);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      console.log('✅ Label and depth updated for measurement:', labelEditingMeasurementId);
     }
 
     setLabelEditingMeasurementId(null);
@@ -3445,11 +3348,9 @@ export default function DimensionOverlay({
         id: `trail-${Date.now()}-${Math.random()}`,
         timestamp: Date.now(),
       };
-      console.log('🎨 Trail point recorded:', trailPoint);
       runOnJS(setSwipeTrail)((prev) => {
         // Safety check: ensure prev is always an array
         const currentTrail = Array.isArray(prev) ? prev : [];
-        console.log('🎨 Current trail length:', currentTrail.length);
         return [...currentTrail, trailPoint];
       });
     })
@@ -3839,17 +3740,10 @@ export default function DimensionOverlay({
             
             // BLUEPRINT MODE: Reopen pin placement, keep measurements, recalculate with new calibration
             if (calibration?.calibrationType === 'blueprint') {
-              console.log('📍 Recalibrating blueprint mode - keeping measurements');
-              
               // CRITICAL: Lock pan/zoom if there are measurements to prevent them from appearing to move
               // (measurements are stored in image coords, but displayed in screen coords that change with pan/zoom)
               // If no measurements exist, allow pan/zoom for easier pin placement
               const shouldLockPanZoom = measurements.length > 0;
-              if (shouldLockPanZoom) {
-                console.log('🔒 Locking pan/zoom - measurements exist and would appear to move');
-              } else {
-                console.log('🔓 Allowing pan/zoom - no measurements to worry about');
-              }
               
               // Notify parent to lock/unlock pan/zoom
               if (onPanZoomLockChange) {
@@ -3877,7 +3771,6 @@ export default function DimensionOverlay({
             // Scenario 1: QR code calibration (with or without map scale)
             // QR codes are auto-detected, so go back to camera to retake photo
             if (calibration?.calibrationType === 'qr') {
-              console.log('📍 Recalibrating: QR code calibration - returning to camera');
               // Clear map scale if present
               if (mapScale) {
                 setMapScale(null);
@@ -3893,7 +3786,6 @@ export default function DimensionOverlay({
             // Scenario 2: Map scale ONLY (no coin, no other calibration)
             // Reset map scale and reopen map scale modal (stay in measurement screen)
             else if (mapScale && !calibration && !coinCircle) {
-              console.log('📍 Recalibrating: Map scale only');
               setMapScale(null);
               setIsMapMode(false);
               setShowMapScaleModal(true);
@@ -3901,7 +3793,6 @@ export default function DimensionOverlay({
             // Scenario 3: Map scale + Verbal calibration
             // Reset map scale, reopen map modal (keep verbal as base calibration)
             else if (mapScale && calibration?.calibrationType === 'verbal') {
-              console.log('📍 Recalibrating: Map scale with verbal base');
               setMapScale(null);
               setIsMapMode(false);
               // Reset blueprint placement state
@@ -3915,7 +3806,6 @@ export default function DimensionOverlay({
             // Scenario 4: Map scale + Coin calibration
             // User likely wants to recalibrate the coin, so go back to coin screen
             else if (mapScale && coinCircle) {
-              console.log('📍 Recalibrating: Map scale with coin base - returning to coin screen');
               setMapScale(null);
               setIsMapMode(false);
               // Reset blueprint placement state
@@ -7242,13 +7132,8 @@ export default function DimensionOverlay({
                     if (!isProUser) {
                       // Check if trial exhausted
                       if (freehandTrialUsed >= freehandTrialLimit) {
-                        console.log('🤖 Freehand trial exhausted! Opening modal...');
                         if (freehandOfferDismissed) {
-                          console.log('🤖 Offer was dismissed, showing Battling Bots Modal');
                           setShowProModal(true);
-                        } else {
-                          console.log('📧 Showing freehand offer modal first');
-                          setShowFreehandOfferModal(true);
                         }
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                         return;
@@ -7323,14 +7208,6 @@ export default function DimensionOverlay({
                   if (freehandTrialUsed >= freehandTrialLimit && freehandOfferDismissed) {
                     // Show Pro modal
                     setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                    return;
-                  }
-
-                  // Check if trial is exhausted but offer not yet dismissed
-                  if (freehandTrialUsed >= freehandTrialLimit && !freehandOfferDismissed) {
-                    // Show special offer modal
-                    setShowFreehandOfferModal(true);
                     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
                     return;
                   }
@@ -8750,178 +8627,6 @@ export default function DimensionOverlay({
           </Animated.View>
         </Animated.View>
       )}
-
-      {/* Freehand Trial Offer Modal - First Time */}
-      <Modal
-        visible={showFreehandOfferModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowFreehandOfferModal(false)}
-      >
-        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-          <Pressable
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
-            onPress={() => {
-              // Don't dismiss on backdrop tap - force user to make choice
-            }}
-          >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={{
-                width: '100%',
-                maxWidth: 400,
-                backgroundColor: '#FFFFFF',
-                borderRadius: 20,
-                padding: 24,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.3,
-                shadowRadius: 30,
-                elevation: 20,
-              }}
-            >
-              {/* Typewriter message */}
-              <TypewriterText
-                text="Hey there! I noticed you're out of free freehand measurements. Would you like to upgrade to Pro for just $6.97 (normally $9.97)?"
-                speed={25}
-                style={{
-                  fontSize: 16,
-                  color: '#1C1C1E',
-                  lineHeight: 24,
-                  marginBottom: 24,
-                }}
-              />
-
-              {/* Buttons */}
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <Pressable
-                  onPress={() => {
-                    setShowFreehandOfferModal(false);
-                    setShowFreehandConfirmModal(true);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
-                    No Thanks
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    setShowFreehandOfferModal(false);
-                    setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: '#007AFF',
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
-                    Upgrade Now
-                  </Text>
-                </Pressable>
-              </View>
-            </Pressable>
-          </Pressable>
-        </BlurView>
-      </Modal>
-
-      {/* Freehand Trial Confirm Modal - Second Chance */}
-      <Modal
-        visible={showFreehandConfirmModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowFreehandConfirmModal(false)}
-      >
-        <BlurView intensity={90} tint="dark" style={{ flex: 1 }}>
-          <Pressable
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}
-            onPress={() => {
-              // Don't dismiss on backdrop tap
-            }}
-          >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={{
-                width: '100%',
-                maxWidth: 400,
-                backgroundColor: '#FFFFFF',
-                borderRadius: 20,
-                padding: 24,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.3,
-                shadowRadius: 30,
-                elevation: 20,
-              }}
-            >
-              {/* Typewriter message */}
-              <TypewriterText
-                text="Are you sure? This special offer won't be shown again."
-                speed={25}
-                style={{
-                  fontSize: 16,
-                  color: '#1C1C1E',
-                  lineHeight: 24,
-                  marginBottom: 24,
-                }}
-              />
-
-              {/* Buttons */}
-              <View style={{ flexDirection: 'row', gap: 12 }}>
-                <Pressable
-                  onPress={() => {
-                    setShowFreehandConfirmModal(false);
-                    dismissFreehandOffer();
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#1C1C1E' }}>
-                    {"I'm Sure"}
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => {
-                    setShowFreehandConfirmModal(false);
-                    setShowProModal(true);
-                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: '#34C759',
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#FFFFFF' }}>
-                    Yes, Upgrade
-                  </Text>
-                </Pressable>
-              </View>
-            </Pressable>
-          </Pressable>
-        </BlurView>
-      </Modal>
 
       {/* Alert Modal */}
       <AlertModal
