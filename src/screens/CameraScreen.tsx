@@ -1385,9 +1385,19 @@ export default function CameraScreen() {
               // Error getting image size - continue without it
             }
             
-            // Expo scanner returns coordinates at full resolution - no scaling needed
-            // Use corners directly - expo scanner provides full resolution coordinates
-            const scaledCorners = corners;
+            const rawWidth = qrResult.rawWidth ?? actualImageWidth;
+            const rawHeight = qrResult.rawHeight ?? actualImageHeight;
+            const widthScale =
+              actualImageWidth > 0 && rawWidth && rawWidth > 0 ? actualImageWidth / rawWidth : 1;
+            const heightScale =
+              actualImageHeight > 0 && rawHeight && rawHeight > 0 ? actualImageHeight / rawHeight : 1;
+
+            const scaledCorners = corners.map((corner) => ({
+              x: corner.x * widthScale,
+              y: corner.y * heightScale,
+            }));
+            const scaledCenterX = qrResult.centerX * widthScale;
+            const scaledCenterY = qrResult.centerY * heightScale;
             
             // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
@@ -1460,8 +1470,8 @@ export default function CameraScreen() {
                     : 'Watch QR';
 
                 setCoinCircle({
-                  centerX: qrResult.centerX,
-                  centerY: qrResult.centerY,
+                  centerX: Number.isFinite(scaledCenterX) ? scaledCenterX : qrResult.centerX,
+                  centerY: Number.isFinite(scaledCenterY) ? scaledCenterY : qrResult.centerY,
                   radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
                   coinName: `Auto: ${qrFormatLabel} ${calibrationData.size}mm`,
                   coinDiameter: calibrationData.size,
@@ -1928,9 +1938,19 @@ export default function CameraScreen() {
                 // Error getting image size - continue without it
               }
               
-              // Expo scanner returns coordinates at full resolution - no scaling needed
-              // Use corners directly - expo scanner provides full resolution coordinates
-              const scaledCorners = corners;
+              const rawWidth = qrResult.rawWidth ?? actualImageWidth;
+              const rawHeight = qrResult.rawHeight ?? actualImageHeight;
+              const widthScale =
+                actualImageWidth > 0 && rawWidth && rawWidth > 0 ? actualImageWidth / rawWidth : 1;
+              const heightScale =
+                actualImageHeight > 0 && rawHeight && rawHeight > 0 ? actualImageHeight / rawHeight : 1;
+
+              const scaledCorners = corners.map((corner) => ({
+                x: corner.x * widthScale,
+                y: corner.y * heightScale,
+              }));
+              const scaledCenterX = qrResult.centerX * widthScale;
+              const scaledCenterY = qrResult.centerY * heightScale;
               
               // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
@@ -1996,8 +2016,8 @@ export default function CameraScreen() {
                   : 'Watch QR';
 
               setCoinCircle({
-                centerX: qrResult.centerX,
-                centerY: qrResult.centerY,
+                centerX: Number.isFinite(scaledCenterX) ? scaledCenterX : qrResult.centerX,
+                centerY: Number.isFinite(scaledCenterY) ? scaledCenterY : qrResult.centerY,
                 radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
                 coinName: `Auto: ${qrFormatLabel} ${calibrationData.size}mm`,
                 coinDiameter: calibrationData.size,

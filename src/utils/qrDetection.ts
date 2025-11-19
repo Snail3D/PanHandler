@@ -10,6 +10,8 @@ export interface QRResult {
   corners: Point[]; // QR corner pixel positions
   centerX: number;
   centerY: number;
+  rawWidth?: number;
+  rawHeight?: number;
 }
 
 /**

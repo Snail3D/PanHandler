@@ -148,7 +148,9 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       format: selected.calibration.format,
       corners,
       centerX,
-      centerY
+      centerY,
+      rawWidth: maxX || undefined,
+      rawHeight: maxY || undefined
     };
     
   } catch (error) {
