@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
-    "icon": "./icon.jpg",
+    "icon": "./icon.png",
     "splash": {
       "image": "./assets/pan-handler-logo.png",
       "resizeMode": "contain",
