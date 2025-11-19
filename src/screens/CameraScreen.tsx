@@ -1452,10 +1452,19 @@ export default function CameraScreen() {
                 
                 // Store QR position (similar to coin circle) for map mode
                 // This allows the QR to act as a reference object on maps
+                const qrFormatLabel =
+                  calibrationData.format === 'paper'
+                    ? 'Paper QR'
+                    : calibrationData.format === 'disc'
+                    ? '3D QR'
+                    : 'Watch QR';
+
                 setCoinCircle({
                   centerX: qrResult.centerX,
                   centerY: qrResult.centerY,
                   radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+                  coinName: `Auto: ${qrFormatLabel} ${calibrationData.size}mm`,
+                  coinDiameter: calibrationData.size,
                 });
                 
                 // Set calibration AFTER setImageUri (which clears it) to ensure it persists
@@ -1979,10 +1988,19 @@ export default function CameraScreen() {
               
               // Store QR position (similar to coin circle) for map mode
               // This allows the QR to act as a reference object on maps
+              const qrFormatLabel =
+                calibrationData.format === 'paper'
+                  ? 'Paper QR'
+                  : calibrationData.format === 'disc'
+                  ? '3D QR'
+                  : 'Watch QR';
+
               setCoinCircle({
                 centerX: qrResult.centerX,
                 centerY: qrResult.centerY,
                 radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+                coinName: `Auto: ${qrFormatLabel} ${calibrationData.size}mm`,
+                coinDiameter: calibrationData.size,
               });
               
               // Set calibration AFTER setImageUri (which clears it) to ensure it persists
