@@ -79,7 +79,6 @@ interface MeasurementStore {
   defaultUnitSystem: UnitSystem; // User's preferred default for NEW sessions
   magneticDeclination: number; // Magnetic declination in degrees for maps (positive = east, negative = west)
   lastSelectedCoin: string | null; // Store coin name
-  userEmail: string | null; // User's email for auto-population
   savedZoomState: { scale: number; translateX: number; translateY: number; rotation?: number } | null; // Restore zoom/pan/rotation
   sessionCount: number; // Track app opens (incremented each time app becomes active)
   reviewPromptCount: number; // Track how many times we've asked (max 2)
@@ -116,7 +115,6 @@ interface MeasurementStore {
   setUnitSystem: (system: UnitSystem) => void;
   setDefaultUnitSystem: (system: UnitSystem) => void; // Set preferred default for new sessions
   setMagneticDeclination: (degrees: number) => void; // Set magnetic declination for maps
-  setUserEmail: (email: string | null) => void;
   setSavedZoomState: (state: { scale: number; translateX: number; translateY: number; rotation?: number } | null) => void;
   setHasSeenPinchTutorial: (hasSeen: boolean) => void;
   setHasSeenPanTutorial: (hasSeen: boolean) => void;
@@ -144,7 +142,6 @@ const useStore = create<MeasurementStore>()(
       defaultUnitSystem: 'metric', // Default preference for new sessions
       magneticDeclination: 0, // Default: no declination adjustment
       lastSelectedCoin: null,
-      userEmail: null,
       savedZoomState: null,
       sessionCount: 0,
       reviewPromptCount: 0,
@@ -262,7 +259,6 @@ const useStore = create<MeasurementStore>()(
 
       setMagneticDeclination: (degrees: number) => set({ magneticDeclination: degrees }),
 
-      setUserEmail: (email: string | null) => set({ userEmail: email }),
 
       // ⚠️ WARNING: This writes to AsyncStorage via persist middleware
       // NEVER call this in high-frequency callbacks (onUpdate, onTransformChange, etc.)
@@ -313,7 +309,6 @@ const useStore = create<MeasurementStore>()(
         defaultUnitSystem: state.defaultUnitSystem, // Persist default preference
         // magneticDeclination: REMOVED - always start at 0 (angle mode by default)
         lastSelectedCoin: state.lastSelectedCoin,
-        userEmail: state.userEmail, // Persist user email
         sessionCount: state.sessionCount, // Persist session count
         reviewPromptCount: state.reviewPromptCount, // Persist review prompt count
         hasReviewedApp: state.hasReviewedApp, // Persist review status

@@ -3,7 +3,6 @@ import { View, Text, Modal, ScrollView, Pressable, Linking, Image, Platform } fr
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import * as MailComposer from 'expo-mail-composer';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { captureRef } from 'react-native-view-shot';
@@ -62,6 +61,7 @@ const ExpandableSection = ({
   const heightValue = useSharedValue(0);
   const rotateValue = useSharedValue(0);
   const opacity = useSharedValue(0);
+  const isAnimatingRef = useRef(false);
 
   useEffect(() => {
     // Simple fade in only - no scale animation to prevent jerky scrolling
@@ -69,15 +69,20 @@ const ExpandableSection = ({
   }, [delay]);
 
   useEffect(() => {
-    // Simple animations without locks
+    if (isAnimatingRef.current) return; // Prevent concurrent animations
+    
+    isAnimatingRef.current = true;
     if (expanded) {
-      // Fast expand animation
-      heightValue.value = withTiming(1, { duration: 200, easing: Easing.out(Easing.cubic) });
-      rotateValue.value = withTiming(180, { duration: 200, easing: Easing.out(Easing.cubic) });
+      // Use timing instead of spring to prevent continuous updates that block touches
+      heightValue.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }, () => {
+        isAnimatingRef.current = false;
+      });
+      rotateValue.value = withTiming(180, { duration: 300, easing: Easing.out(Easing.cubic) });
     } else {
-      // Fast collapse animation
-      heightValue.value = withTiming(0, { duration: 150, easing: Easing.in(Easing.cubic) });
-      rotateValue.value = withTiming(0, { duration: 150, easing: Easing.out(Easing.cubic) });
+      heightValue.value = withTiming(0, { duration: 250, easing: Easing.in(Easing.cubic) }, () => {
+        isAnimatingRef.current = false;
+      });
+      rotateValue.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     }
   }, [expanded]);
 
@@ -90,9 +95,11 @@ const ExpandableSection = ({
   });
   
   const contentAnimatedStyle = useAnimatedStyle(() => {
-    // Simplified: only animate maxHeight, not opacity
+    // Use a fixed maxHeight when expanded to prevent layout thrashing
+    const maxHeight = heightValue.value * 2000;
     return {
-      maxHeight: heightValue.value * 2000,
+      maxHeight: maxHeight,
+      opacity: heightValue.value,
       overflow: 'hidden',
     };
   });
@@ -104,7 +111,6 @@ const ExpandableSection = ({
   return (
     <Animated.View style={[animatedStyle, { marginBottom: scaleMargin(14) }]} pointerEvents="box-none">
       <View
-        pointerEvents="auto"
         style={{
           backgroundColor: 'rgba(255,255,255,0.9)',
           borderRadius: scaleBorderRadius(20),
@@ -121,7 +127,8 @@ const ExpandableSection = ({
         {/* Header - Separate Pressable for better touch handling */}
         <Pressable
           onPress={() => {
-            // Simple toggle without animation lock
+            // Prevent rapid toggling during animations that could cause race conditions
+            if (isAnimatingRef.current) return;
             const newExpanded = !expanded;
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setExpanded(newExpanded);
@@ -151,7 +158,7 @@ const ExpandableSection = ({
         </Pressable>
 
         {/* Content - Separate animated container that doesn't interfere with header touches */}
-        <AnimatedView style={contentAnimatedStyle} pointerEvents="box-none">
+        <AnimatedView style={contentAnimatedStyle} pointerEvents={expanded ? 'auto' : 'none'}>
           <View style={{ 
             paddingHorizontal: scalePadding(18), 
             paddingBottom: scalePadding(18),
@@ -171,7 +178,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   const insets = useSafeAreaInsets();
   const headerScale = useSharedValue(0.9);
   // REMOVED: Pro/Free system no longer exists - freehand is free for all!
-  
 
   // Track if close button was long-pressed to prevent modal closing
   const closeLongPressedRef = useRef(false);
@@ -208,7 +214,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
     message: '',
   });
 
-
   const showAlert = (title: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
     setAlertConfig({ visible: true, title, message, type });
   };
@@ -220,92 +225,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
   // Ref for capturing the modal container as screenshot (wrap ScrollView)
   const modalContainerRef = useRef<View>(null);
   
-  // Handle support email with pre-populated template and screenshot
-  const handleSupportEmail = async () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      
-      // Get device info
-      const deviceInfo = {
-        brand: Device.brand || 'Unknown',
-        model: Device.modelName || 'Unknown',
-        osName: Device.osName || 'Unknown',
-        osVersion: Device.osVersion || 'Unknown',
-      };
-      
-      // Get app info
-      const appVersion = Constants.expoConfig?.version || 'Unknown';
-      const appName = Constants.expoConfig?.name || 'PanHandler';
-      
-      // Get session info from store
-      const currentImageUri = useStore.getState().currentImageUri;
-      const calibration = useStore.getState().calibration;
-      const measurements = useStore.getState().completedMeasurements;
-      const isDonor = useStore.getState().isDonor;
-      
-      // Build session activity log
-      const sessionLog = [
-        currentImageUri ? '✓ Photo captured' : '✗ No photo',
-        calibration ? `✓ Calibrated (${calibration.calibrationType || 'unknown'} method)` : '✗ Not calibrated',
-        measurements?.length > 0 ? `✓ ${measurements.length} measurement(s) made` : '✗ No measurements',
-        `Donor status: ${isDonor ? 'Supporter ❤️' : 'Non-donor'}`,
-      ].join(' → ');
-      
-      // Pre-populated email body with template
-      const emailBody = `
-Please describe your issue below:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ISSUE DESCRIPTION:
-[Example: App freezes when I try to measure after calibrating]
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DEVICE & APP INFORMATION:
-App: ${appName} v${appVersion}
-Phone: ${deviceInfo.brand} ${deviceInfo.model}
-OS: ${deviceInfo.osName} ${deviceInfo.osVersion}
-Platform: ${Platform.OS} ${Platform.Version}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SESSION ACTIVITY:
-Last Screen: Help Modal
-Session Flow: ${sessionLog}
-
-Thank you for helping us improve PanHandler!
-      `.trim();
-      
-      // Check if mail composer is available
-      const isAvailable = await MailComposer.isAvailableAsync();
-      
-      if (!isAvailable) {
-        showAlert(
-          'Email Not Available',
-          'Please email us directly at snailmail3d@gmail.com',
-          'info'
-        );
-        return;
-      }
-      
-      // Compose email with pre-populated fields
-      const options: MailComposer.MailComposerOptions = {
-        recipients: ['snailmail3d@gmail.com'],
-        subject: `[PanHandler ${appVersion}] Support Request`,
-        body: emailBody,
-        isHtml: false,
-      };
-      
-      await MailComposer.composeAsync(options);
-      
-    } catch (error) {
-      console.error('Error composing support email:', error);
-      showAlert(
-        'Error',
-        'Could not open email. Please email us at snailmail3d@gmail.com',
-        'error'
-      );
-    }
-  };
 
   // Removed: Pulsing animation for "Upgrade to Pro" (Free vs Pro section removed)
 
@@ -347,7 +266,7 @@ Thank you for helping us improve PanHandler!
     <>
     <Modal
       visible={visible}
-      animationType="none"
+      animationType="slide"
       transparent={true}
       onRequestClose={onClose}
     >
@@ -430,6 +349,7 @@ Thank you for helping us improve PanHandler!
                       closeLongPressedRef.current = false;
                     }, 100);
                   }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   style={{
                     width: scaleSize(44),
                     height: scaleSize(44),
@@ -452,6 +372,7 @@ Thank you for helping us improve PanHandler!
                 style={{ flex: 1, backgroundColor: 'rgba(232,232,237,0.98)', borderWidth: scaleSize(1), borderColor: 'rgba(200,200,210,0.4)' }}
               >
                   <ScrollView
+                    ref={modalContentRef}
                     style={{ flex: 1 }}
                     contentContainerStyle={{ padding: scalePadding(20), paddingBottom: scalePadding(40) }}
                     showsVerticalScrollIndicator={true}
@@ -460,14 +381,16 @@ Thank you for helping us improve PanHandler!
                     nestedScrollEnabled={true}
                     keyboardShouldPersistTaps="handled"
                     removeClippedSubviews={false}
+                    bounces={true}
+                    overScrollMode="auto"
+                    decelerationRate="normal"
+                    persistentScrollbar={false}
                   >
               {/* Video Course Section - NEW! */}
               <ExpandableSection
                 icon="play-circle"
                 title="🎬 Video Courses"
                 color="#666"
-                delay={0}
-
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, marginBottom: 12, fontWeight: '600' }}>
@@ -537,7 +460,6 @@ Thank you for helping us improve PanHandler!
                       </Text>
                     </View>
                   </View>
-
                 </View>
               </ExpandableSection>
 
@@ -564,13 +486,13 @@ Thank you for helping us improve PanHandler!
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
                       <Text style={{ fontWeight: '600' }}>Distance matters:</Text>{'\n'}
                       • Small objects: 18 inches (1.5 feet / 0.5m){'\n'}
-                      • Large objects: 3-4 feet away
+                      • Large objects: 6 feet (2 meters) or further
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 16, marginRight: 8 }}>🪙📱</Text>
+                    <Text style={{ fontSize: 16, marginRight: 8 }}>🪙</Text>
                     <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                      <Text style={{ fontWeight: '600' }}>Coin or QR code in center of object</Text>
+                      <Text style={{ fontWeight: '600' }}>Coin in center of object</Text>
                     </Text>
                   </View>
                 </View>
@@ -627,39 +549,14 @@ Thank you for helping us improve PanHandler!
                       1. Frame your object with the coin{'\n'}
                       2. Watch the bubble level crosshairs{'\n'}
                       3. Level your phone to center the bubble{'\n'}
-                      4. Hold steady - photo captures automatically!
+                      4. Hold down the shutter button until photo captures
                     </Text>
                   </View>
                   
-                  <View style={{ marginTop: 8, backgroundColor: 'rgba(52,199,89,0.15)', borderRadius: 10, padding: 10 }}>
-                    <Text style={{ fontSize: 13, color: '#2E7D32', fontStyle: 'italic', textAlign: 'center' }}>
-                      💡 No button press needed! Just level your phone and the camera captures when perfectly aligned
+                  <View style={{ marginTop: 8, backgroundColor: 'rgba(0,0,0,0.08)', borderRadius: 10, padding: 10 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', fontStyle: 'italic', textAlign: 'center' }}>
+                      💡 Holding the shutter button helps ensure your photo is sharp and perfectly level!
                     </Text>
-                  </View>
-                  
-                  {/* NEW: Camera Controls */}
-                  <View style={{
-                    marginTop: 12,
-                    backgroundColor: 'rgba(52,199,89,0.08)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(52,199,89,0.2)',
-                  }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                      <Ionicons name="settings-outline" size={18} color="#666" />
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
-                        Camera Controls
-                      </Text>
-                    </View>
-                    <View style={{ gap: 8 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        <Text style={{ fontSize: 14, marginRight: 6 }}>🔘</Text>
-                        <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, flex: 1 }}>
-                          <Text style={{ fontWeight: '600' }}>Auto-Capture Toggle</Text> - Not a fan of hands-free? Just flip the switch and use the shutter button instead!
-                        </Text>
-                      </View>
-                    </View>
                   </View>
 
                   {/* Auto-Leveled Album Feature */}
@@ -731,231 +628,6 @@ Thank you for helping us improve PanHandler!
                   </Text>
                 </View>
               </ExpandableSection>
-
-              {/* QR Calibration */}
-              <ExpandableSection
-                icon="qr-code"
-                title="📱 QR Code Calibration"
-                color="#666"
-                delay={150}
-              >
-                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Use QR codes for automatic calibration! Simply place a QR code near the center of your photo and the app will detect and calibrate automatically.
-                </Text>
-
-                {/* Distance Instructions */}
-                <View style={{
-                  marginTop: 12,
-                  backgroundColor: 'rgba(52, 199, 89, 0.1)',
-                  borderRadius: 12,
-                  padding: 14,
-                  borderWidth: 1.5,
-                  borderColor: 'rgba(52, 199, 89, 0.3)',
-                  marginBottom: 16,
-                }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="information-circle" size={18} color="#10B981" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#10B981', marginLeft: 6 }}>
-                      Distance Guidelines
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                    <Text style={{ fontWeight: '600' }}>Small QR (30mm):</Text> ~1.5 feet from object{'\n'}
-                    <Text style={{ fontWeight: '600' }}>Large QR (180mm):</Text> At least 6 feet from object
-                  </Text>
-                </View>
-
-                {/* Printable QR Codes Button */}
-                <Pressable
-                  onPress={async () => {
-                    try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      // Generate QR code pages only
-                      const { generateQRCodePagesOnly } = await import('../utils/generatePdfGuide');
-                      await generateQRCodePagesOnly();
-                    } catch (error) {
-                      console.error('Error generating QR code PDF:', error);
-                      showAlert('Error', 'Failed to generate QR code PDF. Please try again.', 'error');
-                    }
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 10,
-                    paddingVertical: 14,
-                    paddingHorizontal: 20,
-                    backgroundColor: 'rgba(255, 59, 48, 0.85)',
-                    borderRadius: 12,
-                    marginBottom: 16,
-                    shadowColor: '#FF3B30',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 4,
-                    elevation: 4,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>📄</Text>
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: 'white',
-                  }}>
-                    Printable QR Codes
-                  </Text>
-                  <Text style={{ fontSize: 20 }}>📱</Text>
-                </Pressable>
-
-                {/* MakerWorld Keychain Link */}
-                <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                  Need a durable QR code? Check out our 3D printable QR code keychain on MakerWorld!
-                </Text>
-                <Pressable
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    Linking.openURL('https://makerworld.com/en/models/1991923-most-useful-fidget-reference-photo-super-toy#profileId-2143761').catch(() => {
-                      showAlert('Error', 'Could not open link', 'error');
-                    });
-                  }}
-                  style={{
-                    backgroundColor: 'rgba(0,0,0,0.1)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 2,
-                    borderColor: 'rgba(255,87,34,0.3)',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="open-outline" size={18} color="#666" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#FF5722', marginLeft: 6 }}>
-                      3D Printable QR Keychain on MakerWorld
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                    Download and 3D print a durable QR code keychain for easy calibration
-                  </Text>
-                </Pressable>
-              </ExpandableSection>
-
-              {/* Apple Watch App - iOS Only */}
-              {Platform.OS === 'ios' && (
-                <ExpandableSection
-                  icon="watch"
-                  title="⌚ Apple Watch App"
-                  color="#666"
-                  delay={200}
-                >
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 12 }}>
-                    Install the PanHandler Watch app to display QR codes on your Apple Watch for easy calibration and remote shutter control!
-                  </Text>
-
-                  {/* Installation Instructions */}
-                  <View style={{
-                    marginTop: 12,
-                    backgroundColor: 'rgba(0,0,0,0.08)',
-                    borderRadius: 12,
-                    padding: 14,
-                    borderWidth: 1,
-                    borderColor: 'rgba(0,0,0,0.15)',
-                    marginBottom: 16,
-                  }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1C1C1E', marginBottom: 8 }}>
-                      How to install:
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 20 }}>
-                      1. Open the Watch app on your iPhone{'\n'}
-                      2. Find "PanHandler" in the list{'\n'}
-                      3. Tap "Install"{'\n'}
-                      4. The app will sync to your Apple Watch
-                    </Text>
-                  </View>
-
-                  {/* Remote Shutter & Feedback */}
-                  <View style={{
-                    backgroundColor: 'rgba(52, 199, 89, 0.1)',
-                    borderRadius: 12,
-                    padding: 14,
-                    borderWidth: 1.5,
-                    borderColor: 'rgba(52, 199, 89, 0.3)',
-                    marginBottom: 16,
-                  }}>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#10B981', marginBottom: 8 }}>
-                      📸 Remote Shutter
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 12 }}>
-                      When the QR code is displayed on your Watch, simply tap the Watch screen to capture a photo! Perfect for hands-free operation.
-                    </Text>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1C1C1E', marginBottom: 6 }}>
-                      Watch Feedback:
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
-                      • Long vibrate when QR code appears{'\n'}
-                      • Hard double tap when photo is captured{'\n'}
-                      • Screen blinks to confirm capture{'\n'}
-                      • Watch app automatically closes after capture
-                    </Text>
-                  </View>
-
-                  {/* How It Works */}
-                  <View style={{
-                    backgroundColor: 'rgba(99, 126, 234, 0.08)',
-                    borderRadius: 12,
-                    padding: 14,
-                    borderWidth: 1,
-                    borderColor: 'rgba(99, 126, 234, 0.2)',
-                    marginBottom: 16,
-                  }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#667eea', marginBottom: 8 }}>
-                      How It Works:
-                    </Text>
-                    <Text style={{ fontSize: 13, color: '#3C3C43', lineHeight: 20 }}>
-                      • When you open the camera in PanHandler, the Watch automatically displays a QR code{'\n'}
-                      • The QR code contains your Watch's screen size for automatic calibration{'\n'}
-                      • Put the Watch directly on top of the object you want to measure{'\n'}
-                      • Position yourself about 1.5-3 feet away from the object{'\n'}
-                      • Tap the Watch screen to capture photos remotely{'\n'}
-                      • The Watch app closes automatically after each capture
-                    </Text>
-                  </View>
-
-                  {/* Watch App Store Button */}
-                  <Pressable
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      // Open Watch App Store (when watch app is available)
-                      // TODO: Update with actual Watch App Store URL when watch app is published
-                      Linking.openURL('https://apps.apple.com/app/panhandler-watch/idYOUR_WATCH_APP_ID').catch(() => {
-                        showAlert('Error', 'Could not open Watch App Store', 'error');
-                      });
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 10,
-                      paddingVertical: 14,
-                      paddingHorizontal: 20,
-                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                      borderRadius: 12,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 4,
-                      elevation: 4,
-                    }}
-                  >
-                    <Text style={{ fontSize: 20 }}>⌚</Text>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: '600',
-                      color: 'white',
-                    }}>
-                      Open Watch App Store
-                    </Text>
-                    <Text style={{ fontSize: 20 }}>⌚</Text>
-                  </Pressable>
-                </ExpandableSection>
-              )}
 
               {/* Map Mode */}
 
@@ -1656,8 +1328,8 @@ Thank you for helping us improve PanHandler!
 
               <ExpandableSection
                 icon="map"
-                title="Map Mode"
-                color="#0066FF"
+                title="🗺️ Map Mode"
+                color="#666"
                 delay={550}
 
 
@@ -1796,10 +1468,7 @@ Thank you for helping us improve PanHandler!
               >
                 <View style={{ marginLeft: 4 }}>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    💡 <Text style={{ fontWeight: '600' }}>Calibration stays accurate</Text> - Zoom freely after placing, coordinates are stored in image space
-                  </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Close the app anytime, resume your session later
+                    💾 <Text style={{ fontWeight: '600' }}>Auto-save enabled</Text> - Minimize the app anytime, resume your session later
                   </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     🔄 <Text style={{ fontWeight: '600' }}>Switch units anytime</Text> - Toggle between metric ⇄ imperial instantly
@@ -1810,14 +1479,8 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
                     ✏️ <Text style={{ fontWeight: '600' }}>Edit after placing</Text> - Move measurements or adjust individual points while in Edit mode
                   </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
-                  </Text>
-                  <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21, marginBottom: 8 }}>
-                    🔄 <Text style={{ fontWeight: '600' }}>Recalibrate anytime</Text> - Tap the red button to reset calibration and start fresh
-                  </Text>
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
-                    📸 <Text style={{ fontWeight: '600' }}>Tap to focus</Text> - Tap the camera preview to focus on specific areas before capturing
+                    🗑️ <Text style={{ fontWeight: '600' }}>Quick delete</Text> - Tap any measurement (in edit mode) 4 times rapidly to delete it
                   </Text>
                 </View>
                 
@@ -1892,6 +1555,7 @@ Thank you for helping us improve PanHandler!
                   <Text style={{ fontSize: 14, color: '#4A4A4A', lineHeight: 21 }}>
                     <Text style={{ fontWeight: '600' }}>Still having issues?</Text> Force-quit the app (swipe up from app switcher) and reopen. If problems persist, delete and reinstall the app for a fresh start.
                   </Text>
+                  
                 </View>
               </ExpandableSection>
 
@@ -1903,7 +1567,7 @@ Thank you for helping us improve PanHandler!
                 delay={700}
               >
                 <Text style={{ fontSize: 14, color: '#1C1C1E', lineHeight: 21, marginBottom: 14 }}>
-                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text> - includes 3D printable QR code calibration discs!
+                  Want even better reference photos for your design work? Check out our FREE Makerworld listing named <Text style={{ fontWeight: '600' }}>'Most Useful Fidget'</Text>
                 </Text>
 
                 <Pressable
@@ -1929,39 +1593,7 @@ Thank you for helping us improve PanHandler!
                     </Text>
                   </View>
                   <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                    Download and 3D print for perfect reference photos and QR code calibration discs
-                  </Text>
-                </Pressable>
-
-                {/* QR Calibration PDF Link */}
-                <Pressable
-                  onPress={async () => {
-                    try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      const { generateQRCalibrationPDF } = await import('../utils/generateQRCalibrationPDF');
-                      await generateQRCalibrationPDF();
-                    } catch (error) {
-                      console.error('Error generating QR calibration PDF:', error);
-                      showAlert('Error', 'Failed to generate QR calibration PDF. Please try again.', 'error');
-                    }
-                  }}
-                  style={{
-                    backgroundColor: 'rgba(52,199,89,0.1)',
-                    borderRadius: 14,
-                    padding: 14,
-                    borderWidth: 2,
-                    borderColor: 'rgba(52,199,89,0.3)',
-                    marginBottom: 16,
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="qr-code-outline" size={18} color="#34C759" />
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#34C759', marginLeft: 6 }}>
-                      Generate QR Calibration PDF
-                    </Text>
-                  </View>
-                  <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 18 }}>
-                    Print QR codes for automatic calibration (30mm fixed size)
+                    Download and 3D print for perfect reference photos
                   </Text>
                 </Pressable>
 
@@ -2093,7 +1725,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="phone-portrait-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to our servers
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Photos stay on your device</Text> — never uploaded or transferred to us
                       </Text>
                     </View>
                     
@@ -2109,7 +1741,7 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                       <Ionicons name="eye-off-outline" size={18} color="#666" style={{ marginRight: 8, marginTop: 2 }} />
                       <Text style={{ fontSize: 15, color: '#1C1C1E', lineHeight: 22, flex: 1 }}>
-                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics on your photos, files, or measurements
+                        <Text style={{ fontWeight: '700', color: '#1C1C1E' }}>Zero tracking</Text> — no analytics about you, your photos, files, or measurements
                       </Text>
                     </View>
                     
@@ -2172,22 +1804,47 @@ Thank you for helping us improve PanHandler!
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Ionicons name="images" size={16} color="#666" style={{ marginRight: 8 }} />
                       <Text style={{ fontSize: 14, color: '#1C1C1E', flex: 1 }}>
-                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements and QR code calibration images
+                        <Text style={{ fontWeight: '600' }}>Photo Library</Text> — to save measurements
                       </Text>
                     </View>
                   </View>
                   
                   <View style={{
-                    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
                     borderRadius: 12,
                     padding: 12,
                     borderLeftWidth: 3,
-                    borderLeftColor: '#FF9500',
+                    borderLeftColor: '#666',
                   }}>
-                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19 }}>
+                    <Text style={{ fontSize: 13, color: '#1C1C1E', lineHeight: 19, marginBottom: 10 }}>
                       <Text style={{ fontWeight: '700' }}>Need to enable permissions?</Text>{'\n'}
-                      Go to Settings → PanHandler → Enable Camera & Photos
+                      Tap the button below to open PanHandler settings
                     </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        Linking.openSettings().catch(() => {
+                          // Fallback: Try to open general settings
+                          const url = Platform.OS === 'ios' 
+                            ? 'app-settings:' 
+                            : 'package:com.snail.panhandler';
+                          Linking.openURL(url).catch(() => {
+                            showAlert('Error', 'Could not open settings', 'error');
+                          });
+                        });
+                      }}
+                      style={({ pressed }) => ({
+                        backgroundColor: pressed ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.1)',
+                        borderRadius: 8,
+                        paddingVertical: 10,
+                        paddingHorizontal: 14,
+                        alignItems: 'center',
+                      })}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#1C1C1E' }}>
+                        Open App Settings
+                      </Text>
+                    </Pressable>
                   </View>
                 </View>
               </View>
@@ -2460,11 +2117,20 @@ Thank you for helping us improve PanHandler!
                     <Pressable
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        // Direct to correct store based on platform
-                        const storeLink = Platform.OS === 'ios'
-                          ? 'https://apps.apple.com/us/app/panhandler/id6754727828?action=write-review'
-                          : 'https://play.google.com/store/apps/details?id=com.snail.panhandler';
-                        Linking.openURL(storeLink);
+                        const appStoreId = '6754727828'; // PanHandler App Store ID
+                        const androidPackage = 'com.snail.panhandler';
+
+                        const storeUrl = Platform.OS === 'ios'
+                          ? `itms-apps://itunes.apple.com/app/id${appStoreId}?action=write-review`
+                          : `market://details?id=${androidPackage}`;
+
+                        Linking.openURL(storeUrl).catch(() => {
+                          // Fallback to web URLs if native store apps aren't available
+                          const webUrl = Platform.OS === 'ios'
+                            ? `https://apps.apple.com/app/id${appStoreId}?action=write-review`
+                            : `https://play.google.com/store/apps/details?id=${androidPackage}`;
+                          Linking.openURL(webUrl);
+                        });
                       }}
                       style={({ pressed }) => ({
                         paddingVertical: 14,
@@ -2534,49 +2200,6 @@ Thank you for helping us improve PanHandler!
                     See the Code
                   </Text>
                 </Pressable>
-
-                {/* Generate PDF Guide Button */}
-                <Pressable
-                  onPress={async () => {
-                    try {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      // Generate PDF guide
-                      const { generatePdfGuide } = await import('../utils/generatePdfGuide');
-                      await generatePdfGuide();
-                    } catch (error) {
-                      console.error('Error generating PDF:', error);
-                      showAlert('Error', 'Failed to generate PDF guide. Please try again.', 'error');
-                    }
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 10,
-                    paddingVertical: 14,
-                    paddingHorizontal: 20,
-                    backgroundColor: 'rgba(255, 59, 48, 0.85)',
-                    borderRadius: 12,
-                    marginHorizontal: 24,
-                    marginTop: 12,
-                    shadowColor: '#FF3B30',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 4,
-                    elevation: 4,
-                  }}
-                >
-                  <Text style={{ fontSize: 20 }}>📄</Text>
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: 'white',
-                  }}>
-                    PDF Guide and QR codes
-                  </Text>
-                  <Text style={{ fontSize: 20 }}>📱</Text>
-                </Pressable>
-
               </View>
 
 

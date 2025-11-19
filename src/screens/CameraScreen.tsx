@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, Pressable, Image, Dimensions, Platform, Linking, AppState } from 'react-native';
+import { View, Text, Pressable, Image, Dimensions, Platform, AccessibilityInfo, Linking, AppState } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -92,6 +92,7 @@ const COLOR_PAIRS = [
 async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<string | null> {
   try {
     if (!compositeRef.current) {
+      console.warn('Composite ref not available');
       return null;
     }
     
@@ -104,6 +105,7 @@ async function addAutoLevelBadge(compositeRef: React.RefObject<View>): Promise<s
     
     return uri;
   } catch (error) {
+    console.error('Error adding AUTO LEVEL badge:', error);
     return null;
   }
 }
@@ -144,26 +146,17 @@ export default function CameraScreen() {
 
   // NOTE: Opening quote removed - now handled by App.tsx
 
-
   // Emergency reset - tap screen 5 times rapidly to force reset if stuck
   const emergencyTapCount = useRef(0);
   const emergencyTapTimer = useRef<NodeJS.Timeout | null>(null);
   
+  // Accessibility & Performance Detection
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [isLowEndDevice, setIsLowEndDevice] = useState(false);
+  
   // Ref for the hidden composite view (photo + badge) to capture
   const compositeViewRef = useRef<View>(null);
   const [tempPhotoForBadge, setTempPhotoForBadge] = useState<string | null>(null);
-  
-  // Track displayed image dimensions for accurate coordinate mapping
-  const [displayedImageSize, setDisplayedImageSize] = useState<{ width: number; height: number } | null>(null);
-  
-  // Store pending QR calibration data until image is laid out
-  const pendingQRCalibrationRef = useRef<{
-    qrResult: any;
-    calibrationData: any;
-    originalImageWidth: number;
-    originalImageHeight: number;
-    imageUri: string;
-  } | null>(null);
   
   // Cinematic fade-in animation for camera screen
   const cameraOpacity = useSharedValue(1); // Start visible immediately
@@ -271,15 +264,12 @@ export default function CameraScreen() {
   const lastDonationSession = useStore((s) => s.lastDonationSession);
   const isFirstTimeDonor = useStore((s) => s.isFirstTimeDonor);
   const setIsFirstTimeDonor = useStore((s) => s.setIsFirstTimeDonor);
-  const setUserEmail = useStore((s) => s.setUserEmail);
   const setMagneticDeclination = useStore((s) => s.setMagneticDeclination);
 
   // BattlingBots donation modal state
   const [showBattlingBots, setShowBattlingBots] = useState(false);
   const [hasIncrementedSession, setHasIncrementedSession] = useState(false);
 
-  // Email reset confirmation modal
-  const [showEmailResetModal, setShowEmailResetModal] = useState(false);
 
   // Track if help button was long-pressed to prevent modal opening
   const helpLongPressedRef = useRef(false);
@@ -303,9 +293,10 @@ export default function CameraScreen() {
 
       if (shouldTrigger) {
         // Show after 2 second delay
-        timeoutId =         setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setShowBattlingBots(true);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          console.log(`🤖 BattlingBots triggered at session ${sessionCount} on measurement screen`);
         }, 2000);
       }
     }
@@ -391,8 +382,11 @@ export default function CameraScreen() {
 
   // Stable callback reference to prevent frozen callbacks in production builds
   const handlePanZoomLockChange = useCallback((shouldLock: boolean) => {
+    console.log('🔐 onPanZoomLockChange called with:', shouldLock);
+    console.log('🔐 Current isPanZoomLocked state:', isPanZoomLockedRef.current);
     isPanZoomLockedRef.current = shouldLock;
     setIsPanZoomLocked(shouldLock);
+    console.log('🔐 Updated isPanZoomLocked to:', shouldLock);
   }, []);
 
 
@@ -401,8 +395,10 @@ export default function CameraScreen() {
     try {
       await new Promise<void>((resolve) => {
         Image.getSize(uri, (width, height) => {
+          __DEV__ && console.log('📐 Image dimensions:', width, 'x', height);
           const isLandscape = width > height;
           const orientation = isLandscape ? 'LANDSCAPE' : 'PORTRAIT';
+          __DEV__ && console.log('📱 Image orientation:', orientation);
           
           // ⚠️ CRITICAL: Defer AsyncStorage write to prevent UI blocking
           setTimeout(() => {
@@ -411,11 +407,12 @@ export default function CameraScreen() {
           
           resolve();
         }, (error) => {
+          console.error('Error getting image size:', error);
           resolve();
         });
       });
     } catch (error) {
-      // Error detecting orientation
+      console.error('Error detecting orientation:', error);
     }
   };
 
@@ -481,6 +478,46 @@ export default function CameraScreen() {
     }
   }, [mode]);
   
+  // Detect accessibility settings and device performance on mount
+  useEffect(() => {
+    async function detectAccessibilityAndPerformance() {
+      try {
+        // Check for iOS Reduce Motion setting
+        const isReduceMotionEnabled = await AccessibilityInfo.isReduceMotionEnabled();
+        setReduceMotion(isReduceMotionEnabled);
+        
+        // Detect low-end device based on multiple factors
+        const deviceYear = Device.deviceYearClass || 2024; // Default to current year if unknown
+        const isOldDevice = deviceYear < 2018; // Devices older than iPhone X / Pixel 2 era
+
+        // Check available memory (if available)
+        const totalMemory = Device.totalMemory || 4000000000; // Default to 4GB if unknown
+        const hasLowMemory = totalMemory < 3000000000; // Less than 3GB RAM
+
+        // Budget Android detection: Many cheap Android phones from 2020-2024 have weak CPUs
+        // but decent RAM (3-4GB). Check for Android devices with low year class despite recent years.
+        const isBudgetAndroid = Platform.OS === 'android' && deviceYear >= 2018 && deviceYear < 2021 && totalMemory < 4000000000;
+
+        // Determine if device is low-end
+        const isLowEnd = isOldDevice || hasLowMemory || isBudgetAndroid;
+        setIsLowEndDevice(isLowEnd);
+        
+        if (isReduceMotionEnabled || isLowEnd) {
+          __DEV__ && console.log('🎯 Accessibility Mode Enabled:', {
+            reduceMotion: isReduceMotionEnabled,
+            isLowEnd,
+            deviceYear,
+            totalMemory: (totalMemory / 1000000000).toFixed(1) + 'GB'
+          });
+        }
+      } catch (error) {
+        console.error('Error detecting accessibility settings:', error);
+      }
+    }
+    
+    detectAccessibilityAndPerformance();
+  }, []); // Only on mount
+  
   // Instructional text sequence: Initial → Encouragement → Reminder
   useEffect(() => {
     if (mode !== 'camera' || isCapturing) {
@@ -494,15 +531,15 @@ export default function CameraScreen() {
       return;
     }
 
-    // Animation durations - fixed values for consistent experience
-    const fadeDuration = 500;
-    const holdDuration = 2500;
+    // Animation durations - shorter for reduce motion, instant for extreme cases
+    const fadeDuration = reduceMotion ? 150 : 500;
+    const holdDuration = reduceMotion ? 2000 : 2500;
 
     // Track all timers for cleanup (CRITICAL: prevents memory leak)
     const timers: NodeJS.Timeout[] = [];
 
     // Phase 1: Show initial instructions for 10 seconds
-    instructionalTextOpacity.value = withTiming(1, { duration: 300 });
+    instructionalTextOpacity.value = withTiming(1, { duration: reduceMotion ? 100 : 300 });
 
     timers.push(setTimeout(() => {
       // Fade out initial text
@@ -544,145 +581,15 @@ export default function CameraScreen() {
     };
   }, [mode, isCapturing]);
   
-  // Clear pending QR calibration and reset displayed size when image URI changes
-  useEffect(() => {
-    // Reset displayed size to get fresh measurement for new image
-    setDisplayedImageSize(null);
-    
-    if (currentImageUri) {
-      const pending = pendingQRCalibrationRef.current;
-      // Clear if pending calibration is for a different image
-      if (pending && pending.imageUri !== currentImageUri) {
-        pendingQRCalibrationRef.current = null;
-      }
-    } else {
-      // Clear when image URI is cleared
-      pendingQRCalibrationRef.current = null;
-    }
-  }, [currentImageUri]);
-  
-  // Apply pending QR calibration when image is laid out (Ratio Method)
-  useEffect(() => {
-    const pending = pendingQRCalibrationRef.current;
-    if (!pending || !displayedImageSize || currentImageUri !== pending.imageUri) {
-      return;
-    }
-    
-    // Now we have both displayed size and original size - calculate scale factor
-    const scaleFactor = displayedImageSize.width / pending.originalImageWidth;
-    
-    if (!scaleFactor || isNaN(scaleFactor) || scaleFactor <= 0) {
-      pendingQRCalibrationRef.current = null;
-      return;
-    }
-    
-    // Apply scale factor to QR coordinates (Ratio Method)
-    const { qrResult, calibrationData } = pending;
-    const corners = qrResult.corners;
-    
-    const scaledCorners = corners.map((corner: { x: number; y: number }) => ({
-      x: corner.x * scaleFactor,
-      y: corner.y * scaleFactor,
-    }));
-    const scaledCenterX = qrResult.centerX * scaleFactor;
-    const scaledCenterY = qrResult.centerY * scaleFactor;
-    
-    // Calculate QR width in displayed coordinates
-    const side1 = Math.sqrt(
-      Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
-    );
-    const side2 = Math.sqrt(
-      Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
-    );
-    const side3 = Math.sqrt(
-      Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
-    );
-    const side4 = Math.sqrt(
-      Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
-    );
-    
-    const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
-    const pixelsPerMM = qrWidthPixels / calibrationData.size;
-    
-    if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
-      pendingQRCalibrationRef.current = null;
-      return;
-    }
-    
-    // Apply calibration
-    const { setCalibration, setCoinCircle } = useStore.getState();
-    
-    const qrFormatLabel =
-      calibrationData.format === 'paper'
-        ? 'Paper QR'
-        : calibrationData.format === 'disc'
-        ? '3D QR'
-        : 'Watch QR';
-    
-    setCoinCircle({
-      centerX: Number.isFinite(scaledCenterX) ? scaledCenterX : qrResult.centerX,
-      centerY: Number.isFinite(scaledCenterY) ? scaledCenterY : qrResult.centerY,
-      radius: qrWidthPixels / 2,
-      coinName: `Auto: ${qrFormatLabel} ${calibrationData.size}mm`,
-      coinDiameter: calibrationData.size,
-    });
-    
-    setCalibration({
-      pixelsPerUnit: pixelsPerMM,
-      unit: 'mm',
-      referenceDistance: calibrationData.size,
-      calibrationType: 'qr',
-      qrFormat: calibrationData.format,
-      qrSize: calibrationData.size,
-    });
-    
-    // Clear pending calibration
-    pendingQRCalibrationRef.current = null;
-  }, [displayedImageSize, currentImageUri]);
-  
-        // Auto-show/hide Watch QR code based on camera mode
-        useEffect(() => {
-          if (Platform.OS !== 'ios') {
-            return;
-          }
-
-          // Only show Watch QR when in camera mode (not when HelpModal is open)
-          if (mode === 'camera' && !showHelpModal) {
-            // Show QR code on Watch (non-blocking, runs in background)
-            // This triggers long vibrate on Watch when QR code appears
-            (async () => {
-              try {
-                const { toggleWatchQRCode, setRemoteShutterCallback } = await import('../utils/watchConnectivity');
-                await toggleWatchQRCode(true, 30); // Default 30mm watch QR code (triggers long vibrate)
-                
-                // Set up remote shutter callback - when user taps Watch screen, trigger photo capture
-                setRemoteShutterCallback(() => {
-                  takePicture();
-                });
-                } catch (watchError) {
-                  // Silently fail - Watch support is optional
-                }
-            })();
-          } else {
-            // Hide QR code when leaving camera mode
-            (async () => {
-              try {
-                const { toggleWatchQRCode, setRemoteShutterCallback } = await import('../utils/watchConnectivity');
-                await toggleWatchQRCode(false);
-                // Clear remote shutter callback when leaving camera mode
-                setRemoteShutterCallback(null);
-                } catch (watchError) {
-                  // Silently fail - Watch support is optional
-                }
-            })();
-          }
-        }, [mode, showHelpModal]);
-
   // Monitor device tilt for auto-capture when holding shutter
-  // CRITICAL: Include showHelpModal in dependency array so sensors restart when modal closes
   useEffect(() => {
-    if (mode !== 'camera' || showHelpModal) {
-      holdStartTime.current = 0; // Reset when leaving camera or modal is open
+    if (mode !== 'camera') {
+      holdStartTime.current = 0; // Reset when leaving camera
+      return;
+    }
+
+    // PAUSE camera processing when help modal is open to prevent UI lag
+    if (showHelpModal) {
       return;
     }
 
@@ -955,6 +862,9 @@ export default function CameraScreen() {
     const phoneIsHorizontal = isHorizontal.value;
     if (!phoneIsHorizontal) {
       // Vertical mode: auto-capture disabled, user must quick tap
+      if (__DEV__) {
+        console.log('⚠️ Auto-capture disabled in vertical mode - use quick tap');
+      }
       return;
     }
 
@@ -970,6 +880,11 @@ export default function CameraScreen() {
 
     if (alignmentStatus === 'good' && isStable) {
       // Trigger immediately when conditions are met (removed delay)
+      __DEV__ && console.log('🎯 Auto-capture triggered!', {
+        alignmentStatus,
+        isStable,
+        isHoldingShutter,
+      });
       takePicture();
     }
   }, [mode, alignmentStatus, isStable, isCapturing, isHoldingShutter]);
@@ -978,8 +893,8 @@ export default function CameraScreen() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
 
-    // Only show guidance in camera mode, not capturing
-    if (mode !== 'camera' || isCapturing) {
+    // Only show guidance in camera mode, not capturing, and not when help modal is open
+    if (mode !== 'camera' || isCapturing || showHelpModal) {
       if (guidanceMessage) {
         guidanceOpacity.value = withTiming(0, { duration: 300 });
         timeoutId = setTimeout(() => setGuidanceMessage(null), 300);
@@ -1046,7 +961,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear timeout to prevent memory leak
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma]);
+  }, [mode, accelerationVariance, tiltAngle, alignmentStatus, isStable, isCapturing, currentBeta, currentGamma, showHelpModal]);
   
   // Animated style for guidance text
   const guidanceAnimatedStyle = useAnimatedStyle(() => ({
@@ -1100,9 +1015,11 @@ export default function CameraScreen() {
   useEffect(() => {
     // Restore if we have an image AND calibration (any type: coin, blueprint, or verbal/map)
     if (currentImageUri && calibration) {
+      __DEV__ && console.log('📦 Restoring previous session');
       setMode('measurement');
       // Restore saved zoom state if available
       if (savedZoomState) {
+        __DEV__ && console.log('🔄 Restoring zoom state:', savedZoomState);
         setMeasurementZoom({ ...savedZoomState, rotation: savedZoomState.rotation || 0 });
       } else {
         setMeasurementZoom({ scale: 1, translateX: 0, translateY: 0, rotation: 0 });
@@ -1125,7 +1042,9 @@ export default function CameraScreen() {
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
 
-    if (mode === 'camera' && !showHelpModal) {
+    if (mode === 'camera') {
+      __DEV__ && console.log('📷 Camera mode initialized, setting up fade-in');
+      
       // Reset states immediately
       setIsCapturing(false);
       setIsTransitioning(false);
@@ -1143,10 +1062,10 @@ export default function CameraScreen() {
       // Camera is ready immediately
       timers.push(setTimeout(() => {
         setIsCameraReady(true);
-        // Camera is ready for capture
+        __DEV__ && console.log('📷 Camera is ready for capture');
       }, 100)); // Brief delay for camera to initialize
     } else {
-      // Not in camera mode or modal is open, camera not ready
+      // Not in camera mode, camera not ready
       setIsCameraReady(false);
       // PERFORMANCE FIX: Stop DeviceMotion sensors immediately when leaving camera
       // This prevents 60fps sensor updates during transitions, reducing CPU load
@@ -1157,7 +1076,7 @@ export default function CameraScreen() {
       // CRITICAL: Clear all pending timers to prevent memory leak
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [mode, showHelpModal]);
+  }, [mode]);
 
   // CRITICAL: Cleanup on component unmount to prevent memory leaks
   useEffect(() => {
@@ -1173,12 +1092,18 @@ export default function CameraScreen() {
   }, []);
 
   const cameraAnimatedStyle = useAnimatedStyle(() => {
+    if (__DEV__ && Math.random() < 0.001) { // Log occasionally to avoid spam
+      console.log('🎥 Camera opacity:', cameraOpacity.value);
+    }
     return {
       opacity: cameraOpacity.value,
     };
   });
 
   const blackOverlayStyle = useAnimatedStyle(() => {
+    if (__DEV__ && Math.random() < 0.001) { // Log occasionally to avoid spam
+      console.log('🖤 Black overlay opacity:', blackOverlayOpacity.value);
+    }
     return {
       opacity: blackOverlayOpacity.value,
     };
@@ -1332,6 +1257,7 @@ export default function CameraScreen() {
   const takePicture = async () => {
     // Simple guard - don't capture if already capturing or camera not ready
     if (!cameraRef.current || isCapturing || mode !== 'camera') {
+      __DEV__ && console.log('⚠️ Skipping capture - not ready');
       return;
     }
     
@@ -1356,141 +1282,12 @@ export default function CameraScreen() {
       // react-native-vision-camera returns path, not URI
       const photoUri = `file://${photo.path}`;
       
-      // AUTO-DETECT QR CODE IN BACKGROUND
-      // Try to detect QR code in the captured photo (with timeout to prevent long delays)
-      try {
-        const { parseCalibrationURL } = await import('../utils/qrDetection');
-        
-        // Use expo-barcode-scanner for QR detection (full resolution, no scaling issues)
-        const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
-        
-        const expoDetectionPromise = detectQRWithExpo(photoUri);
-        const timeoutPromise = new Promise<null>((resolve) => 
-          setTimeout(() => resolve(null), 2000) // 2 second timeout
-        );
-        const qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
-        
-        if (qrResult && qrResult.url) {
-          const calibrationData = parseCalibrationURL(qrResult.url);
-          
-          if (calibrationData) {
-            // PanHandler QR code detected! Auto-calibrate
-            
-            const { setCalibration } = useStore.getState();
-            
-            // Calculate pixels per mm from QR code
-            // Calculate actual side length from corner points (accounts for rotation)
-            // For a square QR code, calculate the distance between adjacent corners
-            const corners = qrResult?.corners;
-            
-            // Validate corners before attempting calculation
-            if (!corners || !Array.isArray(corners) || corners.length < 4) {
-              throw new Error('QR code corners missing or invalid');
-            }
-            
-            // Verify all corners have valid x and y properties
-            const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
-            
-            if (!hasValidCorners) {
-              throw new Error('QR code corners invalid structure');
-            }
-            
-            // Get actual image dimensions for Ratio Method
-            let actualImageWidth = 0;
-            let actualImageHeight = 0;
-            try {
-              await new Promise<void>((resolve) => {
-                Image.getSize(
-                  photoUri,
-                  (width, height) => {
-                    actualImageWidth = width;
-                    actualImageHeight = height;
-                    resolve();
-                  },
-                  (error) => {
-                    resolve();
-                  }
-                );
-              });
-            } catch (error) {
-              // Error getting image size - continue without it
-            }
-            
-            if (!actualImageWidth || actualImageWidth <= 0) {
-              throw new Error('Could not get image dimensions');
-            }
-            
-            // Store QR calibration data to be applied when image is laid out (Ratio Method)
-            // This ensures we have both displayed size and original size for accurate scaling
-            pendingQRCalibrationRef.current = {
-              qrResult,
-              calibrationData,
-              originalImageWidth: actualImageWidth,
-              originalImageHeight: actualImageHeight,
-              imageUri: photoUri,
-            };
-            
-            // Auto-open Watch app to display QR code if available (non-blocking)
-            if (Platform.OS === 'ios') {
-              (async () => {
-                try {
-                  const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
-                  const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
-                  // Notify Watch about calibration status (success)
-                  if (watchOpened) {
-                    await notifyWatchCalibrationStatus(true);
-                  }
-                } catch (watchError) {
-                  // Silently fail - Watch support is optional
-                }
-              })();
-            }
-            
-            // Go directly to measurement mode (skip calibration)
-            // Calibration will be applied when image is laid out via useEffect
-            setCapturedPhotoUri(photoUri);
-            setIsCapturing(false);
-            
-            // Small delay to ensure photo is ready before transitioning
-            setTimeout(() => {
-              if (photoUri) {
-                // Explicitly clear measurements before setting image URI (defensive)
-                setCompletedMeasurements([]);
-                setCurrentPoints([]);
-                setImageUri(photoUri, false);
-              }
-              setMode('measurement');
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            }, 150); // Match normal flow delay timing
-            
-            return;
-          } else {
-            // QR code detected but not a PanHandler QR code
-            // Continue with normal flow
-          }
-        } else {
-          // No QR code detected - continue with normal flow
-        }
-      } catch (qrError) {
-        // QR detection failed - continue with normal flow
-      }
-      
-      // Normal flow: Determine if table or wall based on phone tilt
+      // Determine if table or wall based on phone tilt
       const absBeta = Math.abs(currentBeta);
       const absGamma = Math.abs(currentGamma);
       const isLookingAtTable = absBeta < 45 && absGamma < 45;
       
-      // Notify Watch that photo was captured (hard double tap + screen blink)
-      if (Platform.OS === 'ios') {
-        (async () => {
-          try {
-            const { notifyWatchPhotoCaptured } = await import('../utils/watchConnectivity');
-            await notifyWatchPhotoCaptured();
-                } catch (watchError) {
-                  // Silently fail - Watch support is optional
-                }
-        })();
-      }
+      __DEV__ && console.log('📷 Photo captured:', { isLookingAtTable, beta: currentBeta, gamma: currentGamma });
       
       if (isLookingAtTable) {
         // TABLE PHOTO: Go directly to calibration
@@ -1559,16 +1356,16 @@ export default function CameraScreen() {
                 await MediaLibrary.createAlbumAsync('PanHandler', asset, false);
               }
             } catch (albumError) {
-              // Album save failed, saved to camera roll only
+              __DEV__ && console.log('Album save failed, saved to camera roll only');
             }
           }
         } catch (error) {
-          // Failed to save photo
+          console.error('Failed to save photo:', error);
         }
       })();
       
     } catch (error) {
-      // Photo capture error
+      __DEV__ && console.error('Photo capture error:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setIsCapturing(false);
       setIsTransitioning(false);
@@ -1608,6 +1405,7 @@ export default function CameraScreen() {
         referenceDistance: calibrationData.referenceDistance,
       });
       setCoinCircle(calibrationData.coinCircle);
+      __DEV__ && console.log('✅ Deferred calibration AsyncStorage write complete');
     }, 600); // Write after transition to measurement completes
 
     // Fade to black quickly
@@ -1661,13 +1459,18 @@ export default function CameraScreen() {
     // Clear both local AND Zustand photo state to prevent old photo showing
     setCapturedPhotoUri(null);
     setImageUri(null, false); // Clear Zustand state (fast, no MMKV block since null)
+    
+    __DEV__ && console.log('🔄 Cancelled calibration, returning to camera mode');
   };
 
   const handleManualAltitudeConfirm = (altitudeMeters: number) => {
     if (!pendingDroneData || !pendingDroneData.specs) {
+      console.error('❌ No pending drone data');
       setShowManualAltitudeModal(false);
       return;
     }
+
+    console.log(`✅ Manual altitude entered: ${altitudeMeters}m`);
 
     // Calculate GSD from manual altitude
     const { sensor, focalLength, resolution } = pendingDroneData.specs;
@@ -1679,6 +1482,8 @@ export default function CameraScreen() {
     // GSD = (altitude * sensorWidth) / (focalLength * imageWidth)
     const gsdMM = (altitudeMM * sensorWidthMM) / (focalLengthMM * imageWidthPx);
     const gsdCM = gsdMM / 10;
+
+    console.log(`📐 Calculated GSD: ${gsdCM.toFixed(4)} cm/px`);
 
     // Set calibration
     const mmPerPixel = gsdCM * 10;
@@ -1726,6 +1531,7 @@ export default function CameraScreen() {
   };
 
   const handleManualAltitudeCancel = () => {
+    console.log('❌ Manual altitude entry cancelled');
     setShowManualAltitudeModal(false);
     setPendingDroneData(null);
     // Stay in calibration mode with the imported image
@@ -1743,7 +1549,7 @@ export default function CameraScreen() {
   };
 
   // Handle photo type selection from modal
-  const handlePhotoTypeSelection = async (type: PhotoType) => {
+  const handlePhotoTypeSelection = (type: PhotoType) => {
     setShowPhotoTypeModal(false);
     setCurrentPhotoType(type);
     setIsCapturing(false); // Reset since user made selection
@@ -1753,7 +1559,7 @@ export default function CameraScreen() {
     const photoUri = pendingPhotoUri;
 
     // Small delay to ensure modal state updates before transitions
-    setTimeout(async () => {
+    setTimeout(() => {
       if (type === 'coin') {
         // COIN: Go to calibration immediately
         if (photoUri) {
@@ -1794,6 +1600,7 @@ export default function CameraScreen() {
     try {
       // Request media library permission first
       if (!mediaLibraryPermission?.granted) {
+        console.log("📸 Requesting media library permission...");
         const { granted } = await requestMediaLibraryPermission();
         if (!granted) {
           alert("Permission to access photo library is required to import photos. Please enable it in Settings.");
@@ -1801,6 +1608,8 @@ export default function CameraScreen() {
         }
       }
       
+      console.log("📸 Opening image picker...");
+      console.log('📸 Photo library button: opening image picker...');
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: false,
@@ -1808,6 +1617,8 @@ export default function CameraScreen() {
         quality: 1,
         exif: true, // Request EXIF data
       });
+
+      console.log('📷 Image picker returned:', { canceled: result.canceled, hasAsset: !!result.assets?.[0] });
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
@@ -1821,132 +1632,23 @@ export default function CameraScreen() {
         setSkipToMapMode(false);
         setSkipToAerialMode(false);
 
+        // Set image URI (this will trigger ONE MMKV write, but it's necessary)
+        setImageUri(asset.uri, false);
+
         // Use local state for immediate UI update
         setCapturedPhotoUri(asset.uri);
 
         // DON'T BLOCK UI - Run orientation detection in background
         detectOrientation(asset.uri);
 
-        // Auto-detect QR code first, then show modal if no QR found
-        // Try to detect QR code in background (with timeout to prevent long delays)
-        try {
-          const { parseCalibrationURL } = await import('../utils/qrDetection');
-          
-          // Use expo-barcode-scanner for QR detection (full resolution, no scaling issues)
-          const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
-          
-          const expoDetectionPromise = detectQRWithExpo(asset.uri);
-          const timeoutPromise = new Promise<null>((resolve) => 
-            setTimeout(() => resolve(null), 1500) // 1.5 second timeout
-          );
-          const qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
-          
-          if (qrResult && qrResult.url) {
-            const calibrationData = parseCalibrationURL(qrResult.url);
-            
-            if (calibrationData) {
-              // PanHandler QR code detected! Auto-calibrate and go to measurement
-              
-              const { setCalibration } = useStore.getState();
-              
-              // Calculate pixels per mm from QR code
-              // Calculate actual side length from corner points (accounts for rotation)
-              // For a square QR code, calculate the distance between adjacent corners
-              const corners = qrResult?.corners;
-              
-              // Validate corners before attempting calculation
-              if (!corners || !Array.isArray(corners) || corners.length < 4) {
-                throw new Error('QR code corners missing or invalid');
-              }
-              
-              // Verify all corners have valid x and y properties
-              const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
-              
-              if (!hasValidCorners) {
-                throw new Error('QR code corners invalid structure');
-              }
-              
-              // Get actual image dimensions for Ratio Method
-              let actualImageWidth = 0;
-              let actualImageHeight = 0;
-              try {
-                await new Promise<void>((resolve) => {
-                  Image.getSize(
-                    asset.uri,
-                    (width, height) => {
-                      actualImageWidth = width;
-                      actualImageHeight = height;
-                      resolve();
-                    },
-                    (error) => {
-                      resolve();
-                    }
-                  );
-                });
-              } catch (error) {
-                // Error getting image size - continue without it
-              }
-              
-              if (!actualImageWidth || actualImageWidth <= 0) {
-                throw new Error('Could not get image dimensions');
-              }
-              
-              // Store QR calibration data to be applied when image is laid out (Ratio Method)
-              // This ensures we have both displayed size and original size for accurate scaling
-              pendingQRCalibrationRef.current = {
-                qrResult,
-                calibrationData,
-                originalImageWidth: actualImageWidth,
-                originalImageHeight: actualImageHeight,
-                imageUri: asset.uri,
-              };
-              
-              // Auto-open Watch app to display QR code if available (non-blocking)
-              if (Platform.OS === 'ios') {
-                (async () => {
-                  try {
-                    const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
-                    const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
-                    // Notify Watch about calibration status (success)
-                    if (watchOpened) {
-                      await notifyWatchCalibrationStatus(true);
-                    }
-                } catch (watchError) {
-                  // Silently fail - Watch support is optional
-                }
-                })();
-              }
-              
-              // Explicitly clear measurements before setting image URI (defensive)
-              setCompletedMeasurements([]);
-              setCurrentPoints([]);
-              // Set image URI first (which clears calibration)
-              // Calibration will be applied when image is laid out via useEffect
-              setImageUri(asset.uri, false);
-              
-              // Set local state for immediate UI update
-              setCapturedPhotoUri(asset.uri);
-              
-              // Go directly to measurement mode
-              // Add small delay to ensure smooth transition
-              setTimeout(() => {
-                setMode('measurement');
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              }, 100); // Small delay for smooth transition
-              return; // Skip showing modal
-            }
-          }
-        } catch (qrError) {
-          // QR detection failed - continue with normal flow
-        }
-        
-        // No QR code found - set image URI and show photo type selection modal
-        setImageUri(asset.uri, false);
+        // Always show photo type selection modal for imported photos
+        // User decides whether to use coin calibration or known scale mode
+        console.log('📥 Photo imported → Showing photo type selection modal');
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
       }
     } catch (error) {
-      // Error picking image
+      console.error('Error picking image:', error);
     }
   };
 
@@ -1960,7 +1662,7 @@ export default function CameraScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: 'black' }}>
         <Animated.View style={[{ flex: 1 }, cameraAnimatedStyle]}>
-          <TouchOverlayFingerprints color={crosshairColor.main} enabled={!showHelpModal}>
+          <TouchOverlayFingerprints color={crosshairColor.main} enabled={true}>
             <View style={{ flex: 1 }}>
               {device ? (
                 <Camera 
@@ -1971,7 +1673,6 @@ export default function CameraScreen() {
                     photo={true}
                     enableZoomGesture={false}
                     torch={flashEnabled ? 'on' : 'off'}
-                    // QR detection happens automatically after photo capture - no frame processor needed
                 />
               ) : (
                 <View style={{ flex: 1, backgroundColor: 'black', alignItems: 'center', justifyContent: 'center' }}>
@@ -1996,6 +1697,7 @@ export default function CameraScreen() {
                       onPress={() => {
                         // Only open modal if it wasn't a long press
                         if (!helpLongPressedRef.current) {
+                          __DEV__ && console.log('🔵 Help button pressed in camera screen');
                           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                           setShowHelpModal(true);
                         }
@@ -2005,10 +1707,9 @@ export default function CameraScreen() {
                         }, 100);
                       }}
                       onLongPress={() => {
+                        __DEV__ && console.log('🔵 Help button long-pressed');
                         helpLongPressedRef.current = true;
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                        setUserEmail(null);
-                        setShowEmailResetModal(true);
                       }}
                       delayLongPress={800}
                       style={{ width: scaleSize(40), height: scaleSize(40), alignItems: 'center', justifyContent: 'center' }}
@@ -2230,7 +1931,7 @@ export default function CameraScreen() {
             >
               <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)', paddingHorizontal: scalePadding(16), paddingVertical: scalePadding(12), borderRadius: scaleBorderRadius(12) }}>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
-                  1. Center your coin/QR code
+                  1. Place coin in center
                 </Text>
                 <Text style={{ color: 'white', fontSize: scaleFontSize(12), fontWeight: '600', textAlign: 'center', lineHeight: scaleSize(18) }}>
                   2. Line up the lines
@@ -2331,6 +2032,7 @@ export default function CameraScreen() {
             >
               <Pressable
                 onPress={async () => {
+                  console.log('📸 Photo library button pressed');
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   await pickImage();
                 }}
@@ -2522,10 +2224,23 @@ export default function CameraScreen() {
                     });
                   }
 
+                  __DEV__ && console.log('📸 Shutter released:', {
+                    holdDuration,
+                    wasHolding,
+                    isCapturing,
+                    mode,
+                    hasCameraRef: !!cameraRef.current,
+                    isCameraReady,
+                  });
+
                   // For horizontal mode: Quick tap - capture immediately on release
                   // Immediate capture for instant response
                   if (!isCapturing && wasHolding && holdDuration < 500) {
                     takePicture();
+                  } else if (isCapturing) {
+                    __DEV__ && console.log('⚠️ Already capturing, skipping takePicture');
+                  } else if (wasHolding && holdDuration >= 500) {
+                    __DEV__ && console.log('✅ Released after hold - auto-capture should have triggered');
                   }
                 }}
                 style={({ pressed }) => ({
@@ -2622,15 +2337,6 @@ export default function CameraScreen() {
           }}
           sessionColor={crosshairColor}
         />
-
-        {/* Help Modal - camera mode instance */}
-        {mode === 'camera' && (
-          <HelpModal
-            visible={showHelpModal}
-            onClose={() => setShowHelpModal(false)}
-          />
-        )}
-
       </View>
     );
   }
@@ -2664,7 +2370,8 @@ export default function CameraScreen() {
                 collapsable={false} 
                 style={{ flex: 1 }}
                 onLayout={() => {
-                  // View laid out
+                  // Debug: Log when view is laid out and ref should be attached
+                  __DEV__ && console.log('📐 Measurement view laid out, ref should be attached:', !!measurementViewRef.current);
                 }}
               >
                 {/* Render ZoomableImage always, but disable gestures when locked */}
@@ -2679,9 +2386,6 @@ export default function CameraScreen() {
                   showLevelLine={false}
                   locked={isPanZoomLocked}
                   opacity={imageOpacity}
-                  onImageLayout={(width, height) => {
-                    setDisplayedImageSize({ width, height });
-                  }}
                     onTransformChange={(scale, translateX, translateY, rotation) => {
                       const newZoom = { scale, translateX, translateY, rotation };
                       setMeasurementZoom(newZoom);
@@ -2744,6 +2448,7 @@ export default function CameraScreen() {
                           setCalibration(null);
                           setCompletedMeasurements([]);
                           setCurrentPoints([]);
+                          __DEV__ && console.log('✅ Deferred recalibrate AsyncStorage writes complete');
                         }, 300);
                         
                         // Fade in the calibration screen
@@ -2794,13 +2499,11 @@ export default function CameraScreen() {
         </>
       )}
 
-      {/* Help Modal - measurement and calibration modes instance */}
-      {mode !== 'camera' && (
-        <HelpModal
-          visible={showHelpModal}
-          onClose={() => setShowHelpModal(false)}
-        />
-      )}
+      {/* Help Modal */}
+      <HelpModal
+        visible={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
 
       {/* Blueprint Placement Modal - Blueprint/Known Scale Mode */}
       {/* BlueprintPlacementModal removed - DimensionOverlay handles it */}
