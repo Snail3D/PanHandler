@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Image } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { scanFromURLAsync, BarcodeScanningResult } from 'expo-camera';
 import { Point, QRResult, parseCalibrationURL } from './qrDetection';
@@ -25,6 +25,25 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
         return null;
       }
     }
+
+    // Get actual image dimensions to ensure correct scaling
+    let imageWidth = 0;
+    let imageHeight = 0;
+    try {
+      await new Promise<void>((resolve) => {
+        Image.getSize(
+          fileUri,
+          (width, height) => {
+            imageWidth = width;
+            imageHeight = height;
+            resolve();
+          },
+          () => resolve()
+        );
+      });
+    } catch (e) {
+      // Ignore error, will default to 0
+    }
     
     // Use expo-camera to scan the image
     // scanFromURLAsync returns an array of detected barcodes
@@ -41,20 +60,20 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       distanceToCenter: number;
     }> = [];
     
-    // Estimate image dimensions from the bounds and corner points
-    let maxX = 0;
-    let maxY = 0;
+    // Use actual image dimensions for center calculation if available
+    // Otherwise estimate from bounds (less accurate)
+    let maxX = imageWidth;
+    let maxY = imageHeight;
     
-    for (const barcode of results) {
-      // expo-camera returns: { type, data, bounds, cornerPoints }
-      // bounds: { origin: {x, y}, size: {width, height} }
-      // cornerPoints: Array<{x, y}>
-      if (barcode.cornerPoints && barcode.cornerPoints.length >= 4) {
-        maxX = Math.max(maxX, ...barcode.cornerPoints.map(p => p.x));
-        maxY = Math.max(maxY, ...barcode.cornerPoints.map(p => p.y));
-      } else if (barcode.bounds) {
-        maxX = Math.max(maxX, barcode.bounds.origin.x + barcode.bounds.size.width);
-        maxY = Math.max(maxY, barcode.bounds.origin.y + barcode.bounds.size.height);
+    if (maxX === 0 || maxY === 0) {
+      for (const barcode of results) {
+        if (barcode.cornerPoints && barcode.cornerPoints.length >= 4) {
+          maxX = Math.max(maxX, ...barcode.cornerPoints.map(p => p.x));
+          maxY = Math.max(maxY, ...barcode.cornerPoints.map(p => p.y));
+        } else if (barcode.bounds) {
+          maxX = Math.max(maxX, barcode.bounds.origin.x + barcode.bounds.size.width);
+          maxY = Math.max(maxY, barcode.bounds.origin.y + barcode.bounds.size.height);
+        }
       }
     }
     
@@ -149,8 +168,8 @@ export async function detectQRWithExpo(imageUri: string): Promise<QRResult | nul
       corners,
       centerX,
       centerY,
-      rawWidth: maxX || undefined,
-      rawHeight: maxY || undefined
+      rawWidth: imageWidth || maxX || undefined,
+      rawHeight: imageHeight || maxY || undefined
     };
     
   } catch (error) {
