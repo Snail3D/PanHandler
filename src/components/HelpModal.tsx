@@ -2006,7 +2006,6 @@ export default function HelpModal({ visible, onClose }: HelpModalProps) {
                           // Open YouTube link after 3 seconds
                           leftEggNestedTimers.current.push(setTimeout(() => {
                             Linking.openURL('https://youtube.com/shorts/pEDsH9YD84s?feature=share').catch((err) => {
-                              console.log('Failed to open YouTube link:', err);
                               showAlert('Error', 'Could not open YouTube link', 'error');
                             });
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

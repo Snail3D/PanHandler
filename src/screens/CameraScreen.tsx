@@ -1282,12 +1282,197 @@ export default function CameraScreen() {
       // react-native-vision-camera returns path, not URI
       const photoUri = `file://${photo.path}`;
       
-      // Determine if table or wall based on phone tilt
+      // AUTO-DETECT QR CODE IN BACKGROUND
+      // Try to detect QR code in the captured photo (with timeout to prevent long delays)
+      try {
+        const { parseCalibrationURL } = await import('../utils/qrDetection');
+        
+        // Try expo-barcode-scanner first (full resolution, no scaling issues)
+        let qrResult = null;
+        try {
+          const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
+          
+          const expoDetectionPromise = detectQRWithExpo(photoUri);
+          const timeoutPromise = new Promise<null>((resolve) => 
+            setTimeout(() => resolve(null), 2000) // 2 second timeout for expo
+          );
+          qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
+          
+          if (qrResult) {
+            // Mark that this came from expo scanner (no scaling needed)
+            (qrResult as any).fromExpo = true;
+          }
+        } catch (expoError) {
+          // Expo scanner failed, will try MLKit fallback
+        }
+        
+        // Fall back to MLKit if expo scanner didn't work
+        if (!qrResult) {
+          const { detectQR } = await import('../utils/qrDetection');
+          
+          const mlkitDetectionPromise = detectQR(photoUri);
+          const timeoutPromise = new Promise<null>((resolve) => 
+            setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit (it's faster)
+          );
+          qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
+        }
+        
+        if (qrResult && qrResult.url) {
+          const calibrationData = parseCalibrationURL(qrResult.url);
+          
+          if (calibrationData) {
+            // PanHandler QR code detected! Auto-calibrate
+            const { setCalibration } = useStore.getState();
+            
+            // Calculate pixels per mm from QR code
+            const corners = qrResult?.corners;
+            
+            // Validate corners before attempting calculation
+            if (!corners || !Array.isArray(corners) || corners.length < 4) {
+              throw new Error('QR code corners missing or invalid');
+            }
+            
+            // Verify all corners have valid x and y properties
+            const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
+            
+            if (!hasValidCorners) {
+              throw new Error('QR code corners invalid structure');
+            }
+            
+            // Get actual image dimensions 
+            let actualImageWidth = 0;
+            let actualImageHeight = 0;
+            try {
+              await new Promise<void>((resolve) => {
+                Image.getSize(
+                  photoUri,
+                  (width, height) => {
+                    actualImageWidth = width;
+                    actualImageHeight = height;
+                    resolve();
+                  },
+                  () => resolve()
+                );
+              });
+            } catch (error) {
+              // Ignore error
+            }
+            
+            // Check if we need to scale coordinates
+            // MLKit on Android returns coordinates at 1/4 scale
+            // Expo scanner returns at full resolution
+            let scaleFactor = 1;
+            
+            const isFromExpo = (qrResult as any).fromExpo === true;
+            
+            if (!isFromExpo && Platform.OS === 'android') {
+              // Android MLKit processes at 1/4 resolution (0.5x in each dimension)
+              scaleFactor = 4;
+            } else if (isFromExpo) {
+              // Expo scanner uses full resolution, no scaling needed
+              scaleFactor = 1;
+            } else {
+              // iOS MLKit typically uses full resolution
+              scaleFactor = 1;
+            }
+            
+            // Scale corner points if needed
+            const scaledCorners = scaleFactor !== 1 
+              ? corners.map(c => ({
+                  x: c.x * scaleFactor,
+                  y: c.y * scaleFactor,
+                }))
+              : corners;
+            
+            // Calculate all four side lengths using scaled corners
+            const side1 = Math.sqrt(
+              Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
+            );
+            const side2 = Math.sqrt(
+              Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
+            );
+            const side3 = Math.sqrt(
+              Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
+            );
+            const side4 = Math.sqrt(
+              Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
+            );
+            
+            // Average the four sides to get the average side length (width)
+            const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+            
+            // Validate calculation result
+            if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
+              throw new Error('Invalid QR width calculation');
+            }
+            
+            const pixelsPerMM = qrWidthPixels / calibrationData.size;
+            
+            // Validate final pixelsPerMM
+            if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
+              throw new Error('Invalid pixelsPerMM calculation');
+            }
+            
+            // Auto-open Watch app to display QR code if available (non-blocking)
+            if (Platform.OS === 'ios') {
+              (async () => {
+                try {
+                  const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
+                  const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                  // Notify Watch about calibration status (success)
+                  if (watchOpened) {
+                    await notifyWatchCalibrationStatus(true);
+                  }
+                } catch (watchError) {
+                  // Silently fail - Watch support is optional
+                }
+              })();
+            }
+            
+            // Go directly to measurement mode (skip calibration)
+            setCapturedPhotoUri(photoUri);
+            setIsCapturing(false);
+            
+            // Small delay to ensure photo is ready before transitioning
+            setTimeout(() => {
+              if (photoUri) {
+                // Explicitly clear measurements before setting image URI (defensive)
+                setCompletedMeasurements([]);
+                setCurrentPoints([]);
+                setImageUri(photoUri, false);
+                
+                // Store QR position (similar to coin circle) for map mode
+                setCoinCircle({
+                  centerX: qrResult.centerX,
+                  centerY: qrResult.centerY,
+                  radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+                });
+                
+                // Set calibration AFTER setImageUri (which clears it) to ensure it persists
+                setCalibration({
+                  pixelsPerUnit: pixelsPerMM,
+                  unit: 'mm',
+                  referenceDistance: calibrationData.size,
+                  calibrationType: 'qr',
+                  qrFormat: calibrationData.format,
+                  qrSize: calibrationData.size,
+                });
+              }
+              setMode('measurement');
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }, 150);
+            
+            return;
+          }
+        }
+      } catch (qrError) {
+        // QR detection failed - continue with normal flow
+      }
+      
+      // Normal flow: Determine if table or wall based on phone tilt
       const absBeta = Math.abs(currentBeta);
       const absGamma = Math.abs(currentGamma);
       const isLookingAtTable = absBeta < 45 && absGamma < 45;
-      
-      __DEV__ && console.log('📷 Photo captured:', { isLookingAtTable, beta: currentBeta, gamma: currentGamma });
       
       if (isLookingAtTable) {
         // TABLE PHOTO: Go directly to calibration
@@ -1618,7 +1803,6 @@ export default function CameraScreen() {
         exif: true, // Request EXIF data
       });
 
-      console.log('📷 Image picker returned:', { canceled: result.canceled, hasAsset: !!result.assets?.[0] });
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
@@ -1632,23 +1816,182 @@ export default function CameraScreen() {
         setSkipToMapMode(false);
         setSkipToAerialMode(false);
 
-        // Set image URI (this will trigger ONE MMKV write, but it's necessary)
+        // AUTO-DETECT QR CODE IN IMPORTED PHOTO
+        try {
+          const { parseCalibrationURL } = await import('../utils/qrDetection');
+          
+          // Try expo-barcode-scanner first (full resolution, no scaling issues)
+          let qrResult = null;
+          try {
+            const { detectQRWithExpo } = await import('../utils/qrDetectionExpo');
+            
+            const expoDetectionPromise = detectQRWithExpo(asset.uri);
+            const timeoutPromise = new Promise<null>((resolve) => 
+              setTimeout(() => resolve(null), 2000) // 2 second timeout for expo
+            );
+            qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
+            
+            if (qrResult) {
+              // Mark that this came from expo scanner (no scaling needed)
+              (qrResult as any).fromExpo = true;
+            }
+          } catch (expoError) {
+            // Expo scanner failed, will try MLKit fallback
+          }
+          
+          // Fall back to MLKit if expo scanner didn't work
+          if (!qrResult) {
+            const { detectQR } = await import('../utils/qrDetection');
+            
+            const mlkitDetectionPromise = detectQR(asset.uri);
+            const timeoutPromise = new Promise<null>((resolve) => 
+              setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit (it's faster)
+            );
+            qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
+          }
+          
+          if (qrResult && qrResult.url) {
+            const calibrationData = parseCalibrationURL(qrResult.url);
+            
+            if (calibrationData) {
+              // PanHandler QR code detected! Auto-calibrate
+              const { setCalibration } = useStore.getState();
+              
+              // Calculate pixels per mm from QR code
+              const corners = qrResult?.corners;
+              
+              // Validate corners before attempting calculation
+              if (!corners || !Array.isArray(corners) || corners.length < 4) {
+                throw new Error('QR code corners missing or invalid');
+              }
+              
+              // Verify all corners have valid x and y properties
+              const hasValidCorners = corners.every(c => c && typeof c === 'object' && typeof c.x === 'number' && typeof c.y === 'number' && !isNaN(c.x) && !isNaN(c.y));
+              
+              if (!hasValidCorners) {
+                throw new Error('QR code corners invalid structure');
+              }
+              
+              // Check if we need to scale coordinates
+              let scaleFactor = 1;
+              
+              const isFromExpo = (qrResult as any).fromExpo === true;
+              
+              if (!isFromExpo && Platform.OS === 'android') {
+                // Android MLKit processes at 1/4 resolution
+                scaleFactor = 4;
+              } else if (isFromExpo) {
+                // Expo scanner uses full resolution, no scaling needed
+                scaleFactor = 1;
+              } else {
+                // iOS MLKit typically uses full resolution
+                scaleFactor = 1;
+              }
+              
+              // Scale corner points if needed
+              const scaledCorners = scaleFactor !== 1 
+                ? corners.map(c => ({
+                    x: c.x * scaleFactor,
+                    y: c.y * scaleFactor,
+                  }))
+                : corners;
+              
+              // Calculate all four side lengths using scaled corners
+              const side1 = Math.sqrt(
+                Math.pow(scaledCorners[1].x - scaledCorners[0].x, 2) + Math.pow(scaledCorners[1].y - scaledCorners[0].y, 2)
+              );
+              const side2 = Math.sqrt(
+                Math.pow(scaledCorners[2].x - scaledCorners[1].x, 2) + Math.pow(scaledCorners[2].y - scaledCorners[1].y, 2)
+              );
+              const side3 = Math.sqrt(
+                Math.pow(scaledCorners[3].x - scaledCorners[2].x, 2) + Math.pow(scaledCorners[3].y - scaledCorners[2].y, 2)
+              );
+              const side4 = Math.sqrt(
+                Math.pow(scaledCorners[0].x - scaledCorners[3].x, 2) + Math.pow(scaledCorners[0].y - scaledCorners[3].y, 2)
+              );
+              
+              // Average the four sides to get the average side length (width)
+              const qrWidthPixels = (side1 + side2 + side3 + side4) / 4;
+              
+              // Validate calculation result
+              if (!qrWidthPixels || isNaN(qrWidthPixels) || qrWidthPixels <= 0) {
+                throw new Error('Invalid QR width calculation');
+              }
+              
+              const pixelsPerMM = qrWidthPixels / calibrationData.size;
+              
+              // Validate final pixelsPerMM
+              if (!pixelsPerMM || isNaN(pixelsPerMM) || pixelsPerMM <= 0) {
+                throw new Error('Invalid pixelsPerMM calculation');
+              }
+              
+              // Auto-open Watch app to display QR code if available (non-blocking)
+              if (Platform.OS === 'ios') {
+                (async () => {
+                  try {
+                    const { autoOpenWatchQRCode, notifyWatchCalibrationStatus } = await import('../utils/watchConnectivity');
+                    const watchOpened = await autoOpenWatchQRCode(calibrationData.size, calibrationData.format);
+                    // Notify Watch about calibration status (success)
+                    if (watchOpened) {
+                      await notifyWatchCalibrationStatus(true);
+                    }
+                  } catch (watchError) {
+                    // Silently fail - Watch support is optional
+                  }
+                })();
+              }
+              
+              // Explicitly clear measurements before setting image URI (defensive)
+              setCompletedMeasurements([]);
+              setCurrentPoints([]);
+              // Set image URI first (which clears calibration), then set calibration
+              setImageUri(asset.uri, false);
+              
+              // Store QR position (similar to coin circle) for map mode
+              setCoinCircle({
+                centerX: qrResult.centerX,
+                centerY: qrResult.centerY,
+                radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
+              });
+              
+              // Set calibration AFTER setImageUri (which clears it) to ensure it persists
+              setCalibration({
+                pixelsPerUnit: pixelsPerMM,
+                unit: 'mm',
+                referenceDistance: calibrationData.size,
+                calibrationType: 'qr',
+                qrFormat: calibrationData.format,
+                qrSize: calibrationData.size,
+              });
+              
+              // Set local state for immediate UI update
+              setCapturedPhotoUri(asset.uri);
+              
+              // Go directly to measurement mode
+              setTimeout(() => {
+                setMode('measurement');
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }, 100);
+              return; // Skip showing modal
+            }
+          }
+        } catch (qrError) {
+          // QR detection failed - continue with normal flow
+        }
+        
+        // No QR code found - set image URI and show photo type selection modal
         setImageUri(asset.uri, false);
-
-        // Use local state for immediate UI update
         setCapturedPhotoUri(asset.uri);
-
+        
         // DON'T BLOCK UI - Run orientation detection in background
         detectOrientation(asset.uri);
 
         // Always show photo type selection modal for imported photos
-        // User decides whether to use coin calibration or known scale mode
-        console.log('📥 Photo imported → Showing photo type selection modal');
         setPendingPhotoUri(asset.uri);
         setShowPhotoTypeModal(true);
       }
     } catch (error) {
-      console.error('Error picking image:', error);
+      // Error picking image - silently fail
     }
   };
 
