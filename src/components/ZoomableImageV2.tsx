@@ -28,6 +28,7 @@ interface ZoomableImageProps {
   locked?: boolean; // If true, disable all pan/zoom gestures
   opacity?: number; // Opacity of the image (0-1), default 1
   singleFingerPan?: boolean; // If true, allow one-finger panning (for calibration screen)
+  onImageLayout?: (width: number, height: number) => void; // Callback for image layout dimensions
 }
 
 export default function ZoomableImage({
@@ -45,6 +46,7 @@ export default function ZoomableImage({
   locked = false,
   opacity = 1,
   singleFingerPan = false,
+  onImageLayout,
 }: ZoomableImageProps) {
   const scale = useSharedValue(initialScale);
   const savedScale = useSharedValue(initialScale);
@@ -264,6 +266,12 @@ export default function ZoomableImage({
               source={{ uri: imageUri }}
               style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, opacity }}
               resizeMode="contain"
+              onLayout={(event) => {
+                const { width, height } = event.nativeEvent.layout;
+                if (onImageLayout) {
+                  onImageLayout(width, height);
+                }
+              }}
             />
           </Animated.View>
         </GestureDetector>
