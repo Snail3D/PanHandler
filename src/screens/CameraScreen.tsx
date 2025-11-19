@@ -1298,16 +1298,12 @@ export default function CameraScreen() {
           );
           qrResult = await Promise.race([expoDetectionPromise, timeoutPromise]);
           
-          if (qrResult) {
-            // Mark that this came from expo scanner (no scaling needed)
-            (qrResult as any).fromExpo = true;
-          }
+          // qrResult from expo scanner (always full resolution)
         } catch (expoError) {
-          // Expo scanner failed, will try MLKit fallback
+          // Expo scanner failed - continue with normal flow (no QR code detected)
         }
         
-        // Fall back to MLKit if expo scanner didn't work
-        // NOTE: MLKit detection removed - expo-camera is the only QR scanner now
+        // NOTE: expo-camera is the only QR scanner - no MLKit fallback
         // If expo scanner fails, continue with normal flow
         
         if (qrResult && qrResult.url) {
@@ -1351,31 +1347,8 @@ export default function CameraScreen() {
               // Ignore error
             }
             
-            // Check if we need to scale coordinates
-            // MLKit on Android returns coordinates at 1/4 scale
-            // Expo scanner returns at full resolution
-            let scaleFactor = 1;
-            
-            const isFromExpo = (qrResult as any).fromExpo === true;
-            
-            if (!isFromExpo && Platform.OS === 'android') {
-              // Android MLKit processes at 1/4 resolution (0.5x in each dimension)
-              scaleFactor = 4;
-            } else if (isFromExpo) {
-              // Expo scanner uses full resolution, no scaling needed
-              scaleFactor = 1;
-            } else {
-              // iOS MLKit typically uses full resolution
-              scaleFactor = 1;
-            }
-            
-            // Scale corner points if needed
-            const scaledCorners = scaleFactor !== 1 
-              ? corners.map(c => ({
-                  x: c.x * scaleFactor,
-                  y: c.y * scaleFactor,
-                }))
-              : corners;
+            // Expo scanner returns at full resolution - no scaling needed
+            const scaledCorners = corners;
             
             // Calculate all four side lengths using scaled corners
             const side1 = Math.sqrt(
@@ -1833,19 +1806,10 @@ export default function CameraScreen() {
               (qrResult as any).fromExpo = true;
             }
           } catch (expoError) {
-            // Expo scanner failed, will try MLKit fallback
+            // Expo scanner failed - continue with normal flow (no QR code detected)
           }
           
-          // Fall back to MLKit if expo scanner didn't work
-          if (!qrResult) {
-            const { detectQR } = await import('../utils/qrDetection');
-            
-            const mlkitDetectionPromise = detectQR(asset.uri);
-            const timeoutPromise = new Promise<null>((resolve) => 
-              setTimeout(() => resolve(null), 1000) // 1 second timeout for MLKit (it's faster)
-            );
-            qrResult = await Promise.race([mlkitDetectionPromise, timeoutPromise]);
-          }
+          // NOTE: expo-camera is the only QR scanner - no MLKit fallback
           
           if (qrResult && qrResult.url) {
             const calibrationData = parseCalibrationURL(qrResult.url);
@@ -1869,29 +1833,8 @@ export default function CameraScreen() {
                 throw new Error('QR code corners invalid structure');
               }
               
-              // Check if we need to scale coordinates
-              let scaleFactor = 1;
-              
-              const isFromExpo = (qrResult as any).fromExpo === true;
-              
-              if (!isFromExpo && Platform.OS === 'android') {
-                // Android MLKit processes at 1/4 resolution
-                scaleFactor = 4;
-              } else if (isFromExpo) {
-                // Expo scanner uses full resolution, no scaling needed
-                scaleFactor = 1;
-              } else {
-                // iOS MLKit typically uses full resolution
-                scaleFactor = 1;
-              }
-              
-              // Scale corner points if needed
-              const scaledCorners = scaleFactor !== 1 
-                ? corners.map(c => ({
-                    x: c.x * scaleFactor,
-                    y: c.y * scaleFactor,
-                  }))
-                : corners;
+              // Expo scanner returns at full resolution - no scaling needed
+              const scaledCorners = corners;
               
               // Calculate all four side lengths using scaled corners
               const side1 = Math.sqrt(
@@ -1945,9 +1888,13 @@ export default function CameraScreen() {
               setImageUri(asset.uri, false);
               
               // Store QR position (similar to coin circle) for map mode
+              // Calculate center from corners if not provided
+              const centerX = qrResult.centerX ?? (corners.reduce((sum, p) => sum + p.x, 0) / corners.length);
+              const centerY = qrResult.centerY ?? (corners.reduce((sum, p) => sum + p.y, 0) / corners.length);
+              
               setCoinCircle({
-                centerX: qrResult.centerX,
-                centerY: qrResult.centerY,
+                centerX,
+                centerY,
                 radius: qrWidthPixels / 2, // QR side length / 2 for equivalent radius
               });
               
