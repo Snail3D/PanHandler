@@ -3250,9 +3250,10 @@ export default function DimensionOverlay({
     : mode === 'circle' ? 2  // center + edge point
     : 2;  // rectangle: 2 corners
   
-  // Lock pan/zoom when in Measure mode OR when any points are placed
+  // Lock pan/zoom ONLY when there are actual measurements or points placed
+  // When no measurement points are on the photo, pan/zoom should be unlocked
   // EXCEPT during blueprint/aerial placement - allow pan/zoom until calibration complete
-  const isPanZoomLocked = isPlacingBlueprint ? false : (measurementMode || hasAnyMeasurements);
+  const isPanZoomLocked = isPlacingBlueprint ? false : hasAnyMeasurements;
   
   // Notify parent when lock state changes
   useEffect(() => {
