@@ -3722,7 +3722,13 @@ export default function DimensionOverlay({
   return (
     <View
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-      pointerEvents={showBlueprintPlacementModal ? "box-none" : "auto"}
+      pointerEvents={
+        showBlueprintPlacementModal 
+          ? "box-none" 
+          : (!measurementMode && !hasAnyMeasurements) 
+            ? "box-none"  // Allow pan/zoom when in Pan mode with no measurements
+            : "auto"  // Block touches when placing measurements or editing existing ones
+      }
     >
       {/* REMOVED: Universal Touch Overlay was blocking buttons after panning!
           The onStartShouldSetResponder was claiming responder chain on Android
