@@ -3,7 +3,7 @@
     "name": "PanHandler",
     "slug": "panhandler",
     "scheme": "panhandler",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
@@ -28,7 +28,7 @@
         "NSLocationAlwaysUsageDescription": "PanHandler does not require location access. If requested by a third-party library, this permission is not used.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "3"
+      "buildNumber": "4"
     },
     "android": {
       "edgeToEdgeEnabled": true,
